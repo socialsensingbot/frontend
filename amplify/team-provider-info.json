@@ -1,15 +1,20 @@
 {
     "dev": {
-        "awscloudformation": {
-            "AuthRoleName": "amplify-socialsensing-dev-145019-authRole",
-            "UnauthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-dev-145019-unauthRole",
-            "AuthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-dev-145019-authRole",
-            "Region": "eu-west-2",
-            "DeploymentBucketName": "amplify-socialsensing-dev-145019-deployment",
-            "UnauthRoleName": "amplify-socialsensing-dev-145019-unauthRole",
-            "StackName": "amplify-socialsensing-dev-145019",
-            "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-dev-145019/78189480-62de-11ea-996a-02c134fada26",
-            "AmplifyAppId": "d2vvc0ll54duwn"
+      "awscloudformation": {
+        "AuthRoleName": "amplify-socialsensing-dev-145019-authRole",
+        "UnauthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-dev-145019-unauthRole",
+        "AuthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-dev-145019-authRole",
+        "Region": "eu-west-2",
+        "DeploymentBucketName": "amplify-socialsensing-dev-145019-deployment",
+        "UnauthRoleName": "amplify-socialsensing-dev-145019-unauthRole",
+        "StackName": "amplify-socialsensing-dev-145019",
+        "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-dev-145019/78189480-62de-11ea-996a-02c134fada26",
+        "AmplifyAppId": "d2vvc0ll54duwn"
+      },
+      "categories": {
+        "auth": {
+          "frontend56ec923c": {}
         }
+      }
     }
 }
