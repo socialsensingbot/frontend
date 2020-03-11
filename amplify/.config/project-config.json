@@ -1,5 +1,5 @@
 {
-  "projectName": "frontend",
+  "projectName": "socialsensing",
   "version": "3.0",
   "frontend": "javascript",
   "javascript": {
@@ -10,8 +10,8 @@
       "BuildCommand": "npm run-script build",
       "StartCommand": "ng serve"
     }
-    },
-    "providers": [
-        "awscloudformation"
-    ]
+  },
+  "providers": [
+    "awscloudformation"
+  ]
 }

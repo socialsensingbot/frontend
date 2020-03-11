@@ -1,20 +1,38 @@
 {
     "dev": {
       "awscloudformation": {
-        "AuthRoleName": "amplify-socialsensing-dev-145019-authRole",
-        "UnauthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-dev-145019-unauthRole",
-        "AuthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-dev-145019-authRole",
+        "AuthRoleName": "amplify-socialsensing-dev-183906-authRole",
+        "UnauthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-dev-183906-unauthRole",
+        "AuthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-dev-183906-authRole",
         "Region": "eu-west-2",
-        "DeploymentBucketName": "amplify-socialsensing-dev-145019-deployment",
-        "UnauthRoleName": "amplify-socialsensing-dev-145019-unauthRole",
-        "StackName": "amplify-socialsensing-dev-145019",
-        "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-dev-145019/78189480-62de-11ea-996a-02c134fada26",
-        "AmplifyAppId": "d2vvc0ll54duwn"
+        "DeploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
+        "UnauthRoleName": "amplify-socialsensing-dev-183906-unauthRole",
+        "StackName": "amplify-socialsensing-dev-183906",
+        "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-dev-183906/6da31140-62fe-11ea-a0c9-060e4e394d84",
+        "AmplifyAppId": "d2457gqay49951"
       },
       "categories": {
         "auth": {
-          "frontend56ec923c": {}
+          "socialsensingf07a871c": {}
         }
       }
+    },
+  "prod": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-socialsensing-prod-224245-authRole",
+      "UnauthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-prod-224245-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-prod-224245-authRole",
+      "Region": "eu-west-2",
+      "DeploymentBucketName": "amplify-socialsensing-prod-224245-deployment",
+      "UnauthRoleName": "amplify-socialsensing-prod-224245-unauthRole",
+      "StackName": "amplify-socialsensing-prod-224245",
+      "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-prod-224245/76208f10-6320-11ea-9f6c-06bdd06f2a66",
+      "AmplifyAppId": "d2457gqay49951"
+    },
+    "categories": {
+      "auth": {
+        "socialsensingf07a871c": {}
+      }
     }
+  }
 }
