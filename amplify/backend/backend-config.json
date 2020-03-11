@@ -1,34 +1,35 @@
 {
-  "auth": {
-    "socialsensingf07a871c": {
-      "service": "Cognito",
-      "providerPlugin": "awscloudformation",
-      "dependsOn": [],
-      "customAuth": false
-    }
-  },
-  "function": {
-    "S3Triggerb3a090e2": {
-      "service": "Lambda",
-      "providerPlugin": "awscloudformation",
-      "build": true
-    }
-  },
-  "storage": {
-    "s3storage": {
-      "service": "S3",
-      "providerPlugin": "awscloudformation",
-      "dependsOn": [
-        {
-          "category": "function",
-          "resourceName": "S3Triggerb3a090e2",
-          "attributes": [
-            "Name",
-            "Arn",
-            "LambdaExecutionRole"
-          ]
-        }
-      ]
-    }
-  }
+	"auth": {
+		"socialsensingf07a871c": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": [],
+			"customAuth": false
+		}
+	},
+	"function": {
+		"S3Triggerb3a090e2": {
+			"service": "Lambda",
+			"providerPlugin": "awscloudformation",
+			"build": true
+		}
+	},
+	"storage": {
+		"s3storage": {
+			"service": "S3",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": [
+				{
+					"category": "function",
+					"resourceName": "S3Triggerb3a090e2",
+					"attributes": [
+						"Name",
+						"Arn",
+						"LambdaExecutionRole"
+					]
+				}
+			]
+		}
+	},
+	"hosting": {}
 }

@@ -9,14 +9,11 @@
             "UnauthRoleName": "amplify-socialsensing-dev-183906-unauthRole",
             "StackName": "amplify-socialsensing-dev-183906",
             "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-dev-183906/6da31140-62fe-11ea-a0c9-060e4e394d84",
-            "AmplifyAppId": "d2457gqay49951"
+            "AmplifyAppId": "drx2var758nmx"
         },
         "categories": {
             "auth": {
                 "socialsensingf07a871c": {}
-            },
-            "function": {
-                "S3Triggerb3a090e2": {}
             }
         }
     },
@@ -30,7 +27,7 @@
             "UnauthRoleName": "amplify-socialsensing-prod-224245-unauthRole",
             "StackName": "amplify-socialsensing-prod-224245",
             "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-prod-224245/76208f10-6320-11ea-9f6c-06bdd06f2a66",
-            "AmplifyAppId": "d2457gqay49951"
+            "AmplifyAppId": "drx2var758nmx"
         },
         "categories": {
             "auth": {
