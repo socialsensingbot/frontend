@@ -20,11 +20,18 @@ export class AppComponent {
 
   constructor( private amplifyService: AmplifyService, public auth: AuthService,
                private _router: Router  ) {
+    Auth.currentAuthenticatedUser({bypassCache: true}).then(user => this.isAuthenticated = (user != null))
+        .catch(err => console.log(err));
     auth.authState.subscribe((event: string) => {
-      if (event === AuthService.SIGN_IN)
+      if (event === AuthService.SIGN_IN) {
         this.checkSession();
-      if (event === AuthService.SIGN_OUT)
+        this.isAuthenticated= true;
+      }
+      if (event === AuthService.SIGN_OUT) {
         this.user = undefined;
+        this.isAuthenticated= false;
+
+      }
     });
   }
   async checkSession() {
@@ -42,7 +49,7 @@ export class AppComponent {
   public logout() {
     this.isAuthenticated= false;
     Auth.signOut()
-        .then(data => this._router.navigate(['auth/confirm']))
+        .then(data => this._router.navigate(['/']))
         .catch(err => console.log(err));
 
 

@@ -30,7 +30,7 @@ const routes: Routes = [
     ]
   },
   {path: 'map', component: MapComponent, canActivate: [AuthGuard]},
-  {path: 'home', component: HomeComponent, canActivate: [AuthGuard]}
+  {path: '', component: HomeComponent, canActivate: [AuthGuard]}
 ];
 
 @NgModule({
