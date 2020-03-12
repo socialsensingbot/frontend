@@ -27,6 +27,10 @@
         <mat-icon>map</mat-icon>
         Map
       </button>
+      <button mat-button routerLink="/auth/signup" *ngIf="isSignup">
+        Signup (Dev Only)
+      </button>
+
     </div>
 <!--    <button mat-button [mat-menu-trigger-for]="menu" fxHide="false" fxHide.gt-sm>-->
 <!--      <mat-icon>menu</mat-icon>-->
