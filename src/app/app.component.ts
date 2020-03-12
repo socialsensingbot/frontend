@@ -44,6 +44,7 @@ export class AppComponent {
         const avatar = userInfo.attributes.profile;
         this.user= userInfo;
         this.isAuthenticated= true;
+        this.isSignup= false;
       }
     } catch(error) {
       console.log('no session: ', error);
