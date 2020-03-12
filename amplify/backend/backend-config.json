@@ -15,20 +15,9 @@
 		}
 	},
 	"storage": {
-		"s3storage": {
+		"jsonstorage": {
 			"service": "S3",
-			"providerPlugin": "awscloudformation",
-			"dependsOn": [
-				{
-					"category": "function",
-					"resourceName": "S3Triggerb3a090e2",
-					"attributes": [
-						"Name",
-						"Arn",
-						"LambdaExecutionRole"
-					]
-				}
-			]
+			"providerPlugin": "awscloudformation"
 		}
 	},
 	"hosting": {}

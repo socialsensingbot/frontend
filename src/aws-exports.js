@@ -7,7 +7,7 @@ const awsmobile = {
     "aws_user_pools_id": "eu-west-2_L3RQGANbS",
     "aws_user_pools_web_client_id": "77ie34pv0ck1k59emrq4jq3k4m",
     "oauth": {},
-    "aws_user_files_s3_bucket": "socialsensing-frontend183906-dev",
+    "aws_user_files_s3_bucket": "json183906-dev",
     "aws_user_files_s3_bucket_region": "eu-west-2"
 };
 

@@ -21,6 +21,7 @@ import { ConfirmCodeComponent } from './auth/confirm-code/confirm-code.component
 import { AuthService } from './auth/auth.service';
 import {Router} from "@angular/router";
 import {HomeComponent} from "./home/home.component";
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 @NgModule({
             declarations: [
               AppComponent,
@@ -42,6 +43,7 @@ import {HomeComponent} from "./home/home.component";
               AppRoutingModule,
               FormsModule,
               ReactiveFormsModule,
+              LeafletModule.forRoot()
             ],
             providers:    [{
               provide: AmplifyService,

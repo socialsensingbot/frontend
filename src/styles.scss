@@ -87,3 +87,127 @@ a {
 .active {
   color: mat-color($app-active);
 }
+
+//The Map
+
+.map {
+  min-width: 100%;
+  //min-height: 100%;
+  margin: auto;
+  position: absolute;
+  top: 80px; left: 0; bottom: 0; right: 0;
+  //z-index:-10;
+}
+
+#button-wrapper {
+  position: absolute;
+  top: 20%; left: 1%; bottom: 0; right: 0;
+  z-index: 2000;
+}
+
+.btnStyle {
+  width: 100px;
+  border-radius: 10%;
+  border: none;
+  margin: 0;
+  padding: 0;
+  color: #777;
+  background-color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 3px #999;
+  float: left;
+}
+
+.info { width: 175px; height: 50px; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
+.info h4 { margin: 0 0 5px; color: #777; }
+
+.date_lab { width: 175px; height: 20px; padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
+.date_lab h4 { margin: 0px 0px 0px 5px; color: #777; }
+
+
+.tinfo {
+  width: 41vw;
+  height: 80vh;
+  overflow: hidden;
+  padding: 6px 8px;
+  font: 14px/16px Arial,
+  Helvetica, sans-serif;
+  background: white;
+  background: rgba(255,255,255,0.5);
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  border-radius: 5px;
+  -webkit-transition: height 1s;
+  transition: height 1s;
+}
+.tinfo_h4 { margin: 0 0 0px; color: #777; }
+.tinfo_h4b { padding: 5px 0 5px 0; color: #000; }
+
+.tinfo_table_wrapper {
+  width: 40vw;
+  height: 60vh;
+  overflow: auto;
+}
+.tinfo td, .tinfo th {
+  padding: 8px;
+}
+
+
+
+.tinfo tr:hover {background-color: #ddd;}
+
+.tinfo th {
+  border: 1px solid #ddd;
+  padding: 0px;
+  text-align: left;
+  margin: 0px;
+  color: #777;
+}
+.tinfo button {
+  position: sticky;
+  cursor:pointer;
+  width: 20px;
+  height: auto;
+  background-color: #00A8EA;
+  color: #fff;
+  border: solid 1px #0095cc;
+  text-align: center;
+  float: right;
+  padding: 3px;
+  border-radius: 3px;
+  z-index: 4000;
+}
+
+
+.legend { text-align: left; line-height: 18px; color: #555; }
+.legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
+
+
+.timeslider_container {
+  width: 32vw;
+  height: 10vh;
+}
+.timeslider {
+  width: 30vw;
+}
+.timeslider_input {
+  border:0;
+  width: 32vw;
+  font-weight:bold;
+  font-size:2vh;
+  background-color:transparent;
+  text-align: center;
+}
+
+
+
+
+.leaflet-top.leaflet-left {
+  float: left;
+}
+.leaflet-control-layers.leaflet-control {
+  display:inline-block;
+  float: none;
+}
+
