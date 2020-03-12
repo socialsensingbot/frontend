@@ -334,7 +334,7 @@ export class MapComponent {
     //get datafiles & init
     /////////////////////////////
     const read_data = () => {
-      this.load("data.json",0,(tweet_json) => {
+      this.load("live.json",0,(tweet_json) => {
             this.tweetInfo = tweet_json;
             time_keys = getTimes(this.tweetInfo);
             processData(this.tweetInfo, processedTweetInfo, polygonData, this.stats, B,
