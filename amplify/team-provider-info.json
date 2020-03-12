@@ -32,6 +32,9 @@
         "categories": {
             "auth": {
                 "socialsensingf07a871c": {}
+            },
+            "function": {
+                "S3Triggerb3a090e2": {}
             }
         }
     }
