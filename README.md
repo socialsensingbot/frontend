@@ -137,6 +137,36 @@ Details can be found at <https://aws-amplify.github.io/docs/js/angular> and <htt
 
 #### [material](/src/app/material)
 
+## The Development/Release Cycle
+
+### Simple Development
+
+1. Developer checks out the ```develop``` branch from GitHub.
+2. Developer makes changes to the codebase.
+3. Developer commits and pushes to ```develop```
+4. Amplify automatically builds, tests and deploys to https://dev.socialsensing.com
+5. Developer manually tests their code.
+6. Developer issues a pull request (PR) on GitHub to request merging on to the ```master``` branch.
+7. Lead (or just other) Developer reviews the code (optionally views a live preview of the changes created by Amplify) and decides to accept or reject the PR.
+8. If PR is accepted, GitHub merges the changes into ```master```
+9. Amplify builds a production environment, tests and atomically (i.e. instantly) deploys to production.
+
+### Feature Branch Development
+
+1. Developer creates a new branch from develop called feature/XXX (where XXX is the name of the feature being developed)
+2. Developer makes changes to the codebase.
+3. Developer commits and pushes to ```feature/XXX```
+4. Amplify automatically builds, tests and deploys to a temporary environment (the console will show the name of the environment).
+5. Developer manually tests their code.
+6. Developer requests merging of the feature branch into ```develop```
+7. If team is happy developer merges into ```develop```
+8. Amplify automatically builds, tests and deploys to https://dev.socialsensing.com
+9. Team issues a pull request (PR) on GitHub to request merging on to the ```master``` branch from ```develop```
+10. Lead (or just other) Developer reviews the code (optionally views a live preview of the changes created by Amplify) and decides to accept or reject the PR.
+11. If PR is accepted, GitHub merges the changes into ```master```
+12. Amplify builds a production environment, tests and atomically (i.e. instantly) deploys to production.
+
+
 ## Technology
 
 ### Angular
@@ -248,12 +278,12 @@ This a good standard way of managing changes - in uber summary it goes. Dev code
 
 ### Testing
 
-There is a lot of boiler plate code for testing in the app, as you can imagine that has not been within scope during the work to get this together. However going forward using continuous deployment it will be necessary - as continuous deployment mandates automated testing. For now, you don't need to implement full continuous deployment. Which leads me onto ...
-
+There is a lot of boiler plate code for testing in the app, as you can imagine that has not been within scope during the work to get this together. However going forward using continuous deployment it will be necessary - as continuous deployment mandates automated testing. For now, you don't need to implement full continuous deployment.
 
 
 ###  Issue Tracking 
-Finally there are two problems with my version both of which are trivial for me to fix: 1) The massive lag. That's because I load all the large JSON files from a secure S3 location (giving you genuine app security). However I need to move some of them to an insecure S3 bucket which can be cached as a normal web resource.
+
+Please see https://github.com/socialsensingbot/frontend/issues for issues.
 
 ## Further help
 
@@ -282,7 +312,6 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 [Installation and Quick Start]: #installation-and-quick-start
 [Testing]: #testing
 [Issue Tracking]: #issue-tracking
-[authhome]: #authhome
 [Authentication Component (auth)]: #authentication-component-auth
 [Sign-in Component (sign-in)]: #sign-in-component-sign-in
 
