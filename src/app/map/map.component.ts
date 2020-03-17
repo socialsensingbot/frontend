@@ -1,31 +1,21 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {fgsData} from './county_bi';
 import {coarseData} from './coarse_bi';
 import {fineData} from './fine_bi';
-import {getColor, getFill, getFeatureStyle, dohighlightFeature} from './layerStyle';
+import {dohighlightFeature, getColor, getFeatureStyle} from './layerStyle';
 import {makeLegend} from './legend';
 import {tinfo} from './tweetPanel';
 import {fineBox} from './fineBox.js';
 import {coarseBox} from './coarseBox.js';
-import {processData, getTimes} from './processTweets';
-import {timeslider, cleanDate} from './timeSlider';
-import {Auth, Storage} from 'aws-amplify';
-import {
-  Map,
-  DomUtil,
-  latLng,
-  layerGroup,
-  tileLayer,
-  control,
-  point,
-  GeoJSON,
-  Control,
-  ControlOptions,
-  Browser
-} from 'leaflet';
+import {getTimes, processData} from './processTweets';
+import {cleanDate, timeslider} from './timeSlider';
+import {Storage} from 'aws-amplify';
+import {control, Control, DomUtil, GeoJSON, latLng, layerGroup, Map, tileLayer} from 'leaflet';
 import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/slider.js';
-import {NavigationEnd, Router} from '@angular/router';
+import {ActivatedRoute, Params, Router} from '@angular/router';
+import {Observable} from "rxjs";
+import {switchMap} from "rxjs/operators";
 
 
 @Component({
@@ -42,6 +32,16 @@ export class MapComponent {
   county_layer = layerGroup(); //dummy layers to fool layer control
   coarse_layer = layerGroup();
   fine_layer = layerGroup();
+
+  _searchParams: Observable<Params>;
+  private _map: Map;
+
+  updateSearch(params: Partial<Params>) {
+    this._router.navigate([], {
+      queryParams:         params,
+      queryParamsHandling: 'merge'
+    })
+  }
 
   options = {
     layers: [
@@ -63,12 +63,22 @@ export class MapComponent {
 
   stats = {"county": {}, "coarse": {}, "fine": {}};
 
-  constructor(private _router: Router) {
+  constructor(private _router: Router, private route: ActivatedRoute) {
+    this._searchParams= this.route.queryParams;
+    this._searchParams.subscribe(params => this.updateMap(params));
+    this.fetchJson();
   }
 
   onMapReady(map: Map) {
+    this._map = map;
+    this.route.queryParams.toPromise().then(params => this.updateMap(params)).catch(e=>console.log(e));
+    this.fetchJson()
+        .then(() => this.main(map))
+        .catch(err => console.log(err));
+  }
 
-    fetch("assets/data/county_stats.json")
+  private fetchJson() {
+    return fetch("assets/data/county_stats.json")
       .then(response => response.json())
       .then(json => {
         this.stats.county = json;
@@ -83,9 +93,20 @@ export class MapComponent {
         .then(response => response.json())
         .then(json => {
           this.stats.fine = json;
-        }))
-      .then(() => this.main(map))
-      .catch(err => console.log(err));
+        }));
+  }
+
+  private updateMap(mapState: Params) {
+    console.log("Updaing with params");
+    console.log(mapState);
+    const {lng, lat, zoom} = mapState;
+    if (typeof lat != "undefined" && typeof lng != "undefined") {
+      this.options.center = latLng(lat, lng);
+    }
+    if(typeof zoom != "undefined") {
+      this.options.zoom= zoom;
+    }
+    return undefined;
   }
 
   private loadData() {
@@ -98,6 +119,13 @@ export class MapComponent {
   private main(map: Map) {
 
 
+    map.addEventListener("dragend", event => {
+      this.updateSearch({lat: this._map.getCenter().lat, lng: this._map.getCenter().lng})
+    });
+
+    map.addEventListener("zoomend", event => {
+      this.updateSearch({zoom: this._map.getZoom()})
+    });
     //Generate Leaflet Map
     // var map = map('map',{
     //   center: [53, -2],
@@ -419,5 +447,6 @@ export class MapComponent {
 
 
   }
+
 
 }
