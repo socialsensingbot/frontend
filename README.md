@@ -10,7 +10,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
   - [Running end-to-end tests] 
   - [Key files and folders for development] 
   - [The Application Structure] 
-- [The Structure of an Angular Application] 
+- [The Development/Release Cycle]  
   - [Simple Development] 
   - [Feature Branch Development] 
 - [Technology] 
@@ -286,7 +286,7 @@ There is a lot of boiler plate code for testing in the app, as you can imagine t
 
 ###  Issue Tracking 
 
-Please see https://github.com/socialsensingbot/frontend/issues for issues.
+Please see <https://github.com/socialsensingbot/frontend/issues> for issues and for managing issues and tasks please see the Kanban board <https://github.com/socialsensingbot/frontend/projects/1> 
 
 ## Further help
 
@@ -319,6 +319,8 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 [Sign-in Component (sign-in)]: #sign-in-component-sign-in
 [Simple Development]: #simple-development
 [Feature Branch Development]: #feature-branch-development
+[The Development/Release Cycle]: #the-developmentrelease-cycle
+
 
 
 
