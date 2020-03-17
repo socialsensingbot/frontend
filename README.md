@@ -9,6 +9,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
   - [Running unit tests] 
   - [Running end-to-end tests] 
   - [Key files and folders for development] 
+  - [The Application Structure] 
 - [Technology] 
   - [Angular] 
   - [The Structure of an Angular Application] 
@@ -48,30 +49,30 @@ Make sure you are in the top level of the project and follow the instructions be
        amplify status
        
        
-### Development Quick Reference
+## Development Quick Reference
 
-#### Development server
+### Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-#### Code scaffolding
+### Code scaffolding
 
 Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
-##### Build
+#### Build
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
 
-#### Running unit tests
+### Running unit tests
 
 Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
-#### Running end-to-end tests
+### Running end-to-end tests
 
 Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
        
        
-#### Key files and folders for development
+### Key files and folders for development
 
 The [src](/src) folder is the main folder for development and contains all the source code for the app. 
 
@@ -82,10 +83,60 @@ The [environments](/src/environments) folder contains application variables that
 The [amplify](/amplify) folder contains all the amplify generated configuration and should not be manually edited.
 
 
-#### The Application Structure
+### The Application Structure
 
 Please make sure you have read through [Angular] and especially [The Structure of an Angular Application].
- 
+
+Much of the code used in the application that did not come from Angular boilerplating or Amplify is taken from <https://github.com/mlabieniec/AngularMaterialPWA> (MIT License) try reading the blog posts to learn more : <https://itnext.io/part-1-building-a-progressive-web-application-pwa-with-angular-material-and-aws-amplify-5c741c957259>
+
+
+You will see in the [/src/app](/src/app) folder: 
+
+####  [app-routing.module.ts](/src/app/app-routing.module.ts)
+
+Routing is the terminology for deciding how a URL maps to code. See <https://angular.io/guide/router>
+
+You will notice the use of authentication guards https://angular.io/guide/router#milestone-5-route-guards which can be found in the [Authentication Component (auth)]  
+
+#### [app.component.ts](/src/app/app.component.ts)
+
+#### [app.component.scss](/src/app/app.component.scss)
+
+#### [app.component.html](/src/app/app.component.html)
+
+
+
+And the following subfolders:
+
+#### [services](/src/app/services)
+
+Please ignore for now (todo: document)
+
+#### Authentication Component ([auth](/src/app/auth))
+
+The Authentication Component has two guards, a sign-in component and a few modules due for deletion (sign-up, confirm-code and country-code-select).
+
+##### [auth.guard.ts](/src/app/auth/auth.guard.ts) 
+Forces redirect to the [Sign-in Component (sign-in)]  page. 
+
+##### [unauth.guard.ts](/src/app/auth/unauth.guard.ts)
+Forces redirect to the ```/``` page if already authenticated.
+
+#### Sign-in Component ([sign-in](/src/app/auth/sign-in))
+
+This component provides the sign-in page. Although Amplify+Cognito can provide pre-built pages it is easier with the requirements of this application to have a custom page which uses the Auth.XXX() methods.
+
+Details can be found at <https://aws-amplify.github.io/docs/js/angular> and <https://aws-amplify.github.io/docs/js/authentication>.
+
+ Please read to learn more about how this is specifically implemented: <https://itnext.io/part-1-building-a-progressive-web-application-pwa-with-angular-material-and-aws-amplify-5c741c957259>
+
+
+#### Home Page ([home](/src/app/home))
+
+#### The UK Map Application ([map](/src/app/map)) 
+
+#### [material](/src/app/material)
+
 ## Technology
 
 ### Angular
@@ -96,11 +147,41 @@ Angular (and angular CLI) - the application is built using Angular. Angular prov
 
 #### Typescript
 
+Main Page: <https://www.typescriptlang.org/>
+
+In 5 mins: <https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html>
+
+Playground: <http://www.typescriptlang.org/play>
+
 Angular uses Typescript. Typescript is a type safe and more advanced version of JavaScript, it compiles down to JavaScript. Most of TypeScript will be familiar to use if you use recent versions of JavaScript. When adding new libraries you will need to make sure they are added the 'Angular way' so that you get the Typescript headers for type safety (and usually proper integration with Angular and it's lifecycle). Typescript is not scary - and can be learnt and implemented incrementally.
+
+
 
 #### The Structure of an Angular Application
 
-todo: what other tech do I assume you know?
+I recommend you familiarize yourself with this guide: <https://angular.io/guide/file-structure>
+
+[app/](/src/app/) Contains the component files in which your application logic and data are defined. See [The Application Structure].
+
+[assets/](/src/assets) Contains image and other asset files to be copied as-is when you build the application.
+
+[environments/](/src/environments)Contains build configuration options for particular target environments. By default there is an unnamed standard development environment and a production ("prod") environment. You can define additional target environment configurations.
+
+[favicon.ico](/src/favicon.ico)	An icon to use for the application in the bookmark bar. (todo: At present this is the default Angular icon)
+
+[index.html](/src/index.html)	The main HTML page that is served when someone visits your site. The CLI automatically adds all JavaScript and CSS files when building your app, so you typically don't need to add any &lt;script&gt; or &lt;link&gt; tags here manually.
+
+[main.ts](/src/main.ts)	The main entry point for your application. Compiles the application with the JIT compiler and bootstraps the application's root module (AppModule) to run in the browser. You can also use the AOT compiler without changing any code by appending the --aot flag to the CLI build and serve commands.
+
+[polyfills.ts](/src/polyfills.ts)	Provides polyfill scripts for browser support.
+
+[styles.scss](/src/styles.scss)	Lists CSS files that supply styles for a project. This is 
+
+
+[test.ts](/src/test.ts)	The main entry point for your unit tests, with some Angular-specific configuration. You don't typically need to edit this file.
+
+
+   todo: what other tech do I assume you know?
 
   
 ## AWS Services 
@@ -201,6 +282,12 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 [Installation and Quick Start]: #installation-and-quick-start
 [Testing]: #testing
 [Issue Tracking]: #issue-tracking
+[authhome]: #authhome
+[Authentication Component (auth)]: #authentication-component-auth
+[Sign-in Component (sign-in)]: #sign-in-component-sign-in
+
+
+
 
 
 
