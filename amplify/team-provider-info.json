@@ -44,7 +44,6 @@
             },
             "function": {
                 "S3Triggerb3a090e2": {}
-
             },
             "hosting": {
                 "amplifyhosting": {
@@ -53,5 +52,4 @@
             }
         }
     }
-      
 }
