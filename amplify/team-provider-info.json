@@ -44,6 +44,7 @@
             },
             "function": {
                 "S3Triggerb3a090e2": {}
+
             },
             "hosting": {
                 "amplifyhosting": {
@@ -51,25 +52,7 @@
                 }
             }
         }
-    },
-    "master": {
-        "awscloudformation": {
-            "AuthRoleName": "amplify-socialsensing-master-202535-authRole",
-            "UnauthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-master-202535-unauthRole",
-            "AuthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-master-202535-authRole",
-            "Region": "eu-west-2",
-            "DeploymentBucketName": "amplify-socialsensing-master-202535-deployment",
-            "UnauthRoleName": "amplify-socialsensing-master-202535-unauthRole",
-            "StackName": "amplify-socialsensing-master-202535",
-            "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-master-202535/b048a530-649f-11ea-aabe-0ab68d74e79c"
-        },
-        "categories": {
-            "auth": {
-                "socialsensingf07a871c": {}
-            },
-            "function": {
-                "S3Triggerb3a090e2": {}
-            }
+    }
         }
     }
 }

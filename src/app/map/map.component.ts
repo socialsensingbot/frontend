@@ -1,14 +1,15 @@
 import {Component, OnInit} from '@angular/core';
+import {Cache} from 'aws-amplify';
 import {fgsData} from './county_bi';
 import {coarseData} from './coarse_bi';
 import {fineData} from './fine_bi';
-import {getColor, getFill, getFeatureStyle, dohighlightFeature} from './layerStyle.js';
-import {makeLegend} from './legend.js';
-import {tinfo} from './tweetPanel.js';
+import {getColor, getFill, getFeatureStyle, dohighlightFeature} from './layerStyle';
+import {makeLegend} from './legend';
+import {tinfo} from './tweetPanel';
 import {fineBox} from './fineBox.js';
 import {coarseBox} from './coarseBox.js';
-import {processData, getTimes} from './processTweets.js';
-import {timeslider, cleanDate} from './timeSlider.js';
+import {processData, getTimes} from './processTweets';
+import {timeslider, cleanDate} from './timeSlider';
 import {Auth, Storage} from 'aws-amplify';
 import {
   Map,
@@ -94,11 +95,21 @@ export class MapComponent {
       .catch(err => console.log(err));
   }
 
-  private loadData() {
-    return Storage.get("live.json")
-                  .then((url: any) =>
-                          fetch(url.toString())
-                            .then(response => response.json()));
+  private load(key, expiresSeconds: number, action: (json) => void): Promise<any> {
+    // if (Cache.getItem("json:" + key)) {
+    //   return new Promise<any>(() => action(Cache.getItem("json:" + key)));
+    // } else {
+      return Storage.get(key)
+                    .then((url: any) =>
+                            fetch(url.toString())
+                              .then(response => response.json())
+                              .then(json => {
+                                // Cache.setItem("json:" + key, json,{
+                                //   expires: new Date().getTime()+(expiresSeconds * 1000)
+                                // });
+                                action(json);
+                              }));
+    // }
   }
 
   private main(map: Map) {
@@ -337,6 +348,7 @@ export class MapComponent {
     const read_data = () => {
       this.loadData()
           .then((tweet_json) => {
+
             this.tweetInfo = tweet_json;
             time_keys = getTimes(this.tweetInfo);
             processData(this.tweetInfo, processedTweetInfo, polygonData, this.stats, B,
@@ -351,7 +363,9 @@ export class MapComponent {
 
     };
 
+
     read_data(); //reads data and sets up map
+
     setInterval(function () {
       read_data();
     }, 60000);
@@ -367,7 +381,7 @@ export class MapComponent {
         default_min = Math.max(default_min, -(time_keys.length - 1));
 
         //Add the initial header
-        $( function() {
+        $(function () {
           //console.log("timeslider", cleanDate(time_keys[-default_min], 0), cleanDate(time_keys[-default_max], 1) )
           $(".timeslider_input")
             .val(cleanDate(time_keys[-default_min], 0) + " - " + cleanDate(time_keys[-default_max], 1));
