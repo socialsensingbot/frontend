@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {Cache} from 'aws-amplify';
 import {fgsData} from './county_bi';
 import {coarseData} from './coarse_bi';
 import {fineData} from './fine_bi';
@@ -68,12 +67,6 @@ export class MapComponent {
   }
 
   onMapReady(map: Map) {
-    // // @ts-ignore
-    // map.fitBounds(this._router.getBounds(), {
-    //   padding: point(24, 24),
-    //   maxZoom: 12,
-    //   animate: true
-    // });
 
     fetch("assets/data/county_stats.json")
       .then(response => response.json())
@@ -95,21 +88,11 @@ export class MapComponent {
       .catch(err => console.log(err));
   }
 
-  private load(key, expiresSeconds: number, action: (json) => void): Promise<any> {
-    // if (Cache.getItem("json:" + key)) {
-    //   return new Promise<any>(() => action(Cache.getItem("json:" + key)));
-    // } else {
-      return Storage.get(key)
-                    .then((url: any) =>
-                            fetch(url.toString())
-                              .then(response => response.json())
-                              .then(json => {
-                                // Cache.setItem("json:" + key, json,{
-                                //   expires: new Date().getTime()+(expiresSeconds * 1000)
-                                // });
-                                action(json);
-                              }));
-    // }
+  private loadData() {
+    return Storage.get("live.json")
+                  .then((url: any) =>
+                          fetch(url.toString())
+                            .then(response => response.json()));
   }
 
   private main(map: Map) {
@@ -348,7 +331,6 @@ export class MapComponent {
     const read_data = () => {
       this.loadData()
           .then((tweet_json) => {
-
             this.tweetInfo = tweet_json;
             time_keys = getTimes(this.tweetInfo);
             processData(this.tweetInfo, processedTweetInfo, polygonData, this.stats, B,
@@ -363,9 +345,7 @@ export class MapComponent {
 
     };
 
-
     read_data(); //reads data and sets up map
-
     setInterval(function () {
       read_data();
     }, 60000);
@@ -381,6 +361,7 @@ export class MapComponent {
         default_min = Math.max(default_min, -(time_keys.length - 1));
 
         //Add the initial header
+        //TODO: Convert to Angular Material Widget
         $(function () {
           //console.log("timeslider", cleanDate(time_keys[-default_min], 0), cleanDate(time_keys[-default_max], 1) )
           $(".timeslider_input")
