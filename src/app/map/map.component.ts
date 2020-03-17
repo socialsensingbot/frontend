@@ -1,32 +1,21 @@
-import {Component, OnInit} from '@angular/core';
-import {Cache} from 'aws-amplify';
+import {Component} from '@angular/core';
 import {fgsData} from './county_bi';
 import {coarseData} from './coarse_bi';
 import {fineData} from './fine_bi';
-import {getColor, getFill, getFeatureStyle, dohighlightFeature} from './layerStyle';
+import {dohighlightFeature, getColor, getFeatureStyle} from './layerStyle';
 import {makeLegend} from './legend';
 import {tinfo} from './tweetPanel';
 import {fineBox} from './fineBox.js';
 import {coarseBox} from './coarseBox.js';
-import {processData, getTimes} from './processTweets';
-import {timeslider, cleanDate} from './timeSlider';
-import {Auth, Storage} from 'aws-amplify';
-import {
-  Map,
-  DomUtil,
-  latLng,
-  layerGroup,
-  tileLayer,
-  control,
-  point,
-  GeoJSON,
-  Control,
-  ControlOptions,
-  Browser
-} from 'leaflet';
+import {getTimes, processData} from './processTweets';
+import {cleanDate, timeslider} from './timeSlider';
+import {Storage} from 'aws-amplify';
+import {control, Control, DomUtil, GeoJSON, latLng, layerGroup, Map, tileLayer} from 'leaflet';
 import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/slider.js';
-import {NavigationEnd, Router} from '@angular/router';
+import {ActivatedRoute, Params, Router} from '@angular/router';
+import {Observable} from "rxjs";
+import {switchMap} from "rxjs/operators";
 
 
 @Component({
@@ -43,6 +32,16 @@ export class MapComponent {
   county_layer = layerGroup(); //dummy layers to fool layer control
   coarse_layer = layerGroup();
   fine_layer = layerGroup();
+
+  _searchParams: Observable<Params>;
+  private _map: Map;
+
+  updateSearch(params: Partial<Params>) {
+    this._router.navigate([], {
+      queryParams:         params,
+      queryParamsHandling: 'merge'
+    })
+  }
 
   options = {
     layers: [
@@ -64,45 +63,69 @@ export class MapComponent {
 
   stats = {"county": {}, "coarse": {}, "fine": {}};
 
-  constructor(private _router: Router) {
+  constructor(private _router: Router, private route: ActivatedRoute) {
+    this._searchParams= this.route.queryParams;
+    this._searchParams.subscribe(params => this.updateMap(params));
+    this.fetchJson();
   }
 
   onMapReady(map: Map) {
-    // // @ts-ignore
-    // map.fitBounds(this._router.getBounds(), {
-    //   padding: point(24, 24),
-    //   maxZoom: 12,
-    //   animate: true
-    // });
-
-    this.load("county_stats.json", 60*60*24, json => this.stats.county = json)
-        .then(()=>this.load("coarse_stats.json", 60*60*24, json => this.stats.coarse = json))
-        .then(()=>this.load("fine_stats.json", 60*60*24, json => this.stats.fine = json))
+    this._map = map;
+    this.route.queryParams.toPromise().then(params => this.updateMap(params)).catch(e=>console.log(e));
+    this.fetchJson()
         .then(() => this.main(map))
         .catch(err => console.log(err));
   }
 
-  private load(key, expiresSeconds: number, action: (json) => void): Promise<any> {
-    // if (Cache.getItem("json:" + key)) {
-    //   return new Promise<any>(() => action(Cache.getItem("json:" + key)));
-    // } else {
-      return Storage.get(key)
-                    .then((url: any) =>
-                            fetch(url.toString())
-                              .then(response => response.json())
-                              .then(json => {
-                                // Cache.setItem("json:" + key, json,{
-                                //   expires: new Date().getTime()+(expiresSeconds * 1000)
-                                // });
-                                action(json);
-                              }));
-    // }
+  private fetchJson() {
+    return fetch("assets/data/county_stats.json")
+      .then(response => response.json())
+      .then(json => {
+        this.stats.county = json;
+      })
+      .then(() =>
+              fetch("assets/data/coarse_stats.json")
+                .then(response => response.json())
+                .then(json => {
+                  this.stats.coarse = json;
+                }))
+      .then(() => fetch("assets/data/fine_stats.json")
+        .then(response => response.json())
+        .then(json => {
+          this.stats.fine = json;
+        }));
   }
 
+  private updateMap(mapState: Params) {
+    console.log("Updaing with params");
+    console.log(mapState);
+    const {lng, lat, zoom} = mapState;
+    if (typeof lat != "undefined" && typeof lng != "undefined") {
+      this.options.center = latLng(lat, lng);
+    }
+    if(typeof zoom != "undefined") {
+      this.options.zoom= zoom;
+    }
+    return undefined;
+  }
+
+  private loadData() {
+    return Storage.get("live.json")
+                  .then((url: any) =>
+                          fetch(url.toString())
+                            .then(response => response.json()));
+  }
 
   private main(map: Map) {
 
 
+    map.addEventListener("dragend", event => {
+      this.updateSearch({lat: this._map.getCenter().lat, lng: this._map.getCenter().lng})
+    });
+
+    map.addEventListener("zoomend", event => {
+      this.updateSearch({zoom: this._map.getZoom()})
+    });
     //Generate Leaflet Map
     // var map = map('map',{
     //   center: [53, -2],
@@ -334,7 +357,8 @@ export class MapComponent {
     //get datafiles & init
     /////////////////////////////
     const read_data = () => {
-      this.load("live.json",0,(tweet_json) => {
+      this.loadData()
+          .then((tweet_json) => {
             this.tweetInfo = tweet_json;
             time_keys = getTimes(this.tweetInfo);
             processData(this.tweetInfo, processedTweetInfo, polygonData, this.stats, B,
@@ -349,8 +373,7 @@ export class MapComponent {
 
     };
 
-    read_data(); //reads
-    // data and sets up map
+    read_data(); //reads data and sets up map
     setInterval(function () {
       read_data();
     }, 60000);
@@ -366,6 +389,7 @@ export class MapComponent {
         default_min = Math.max(default_min, -(time_keys.length - 1));
 
         //Add the initial header
+        //TODO: Convert to Angular Material Widget
         $(function () {
           //console.log("timeslider", cleanDate(time_keys[-default_min], 0), cleanDate(time_keys[-default_max], 1) )
           $(".timeslider_input")
@@ -423,5 +447,6 @@ export class MapComponent {
 
 
   }
+
 
 }
