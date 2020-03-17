@@ -9,11 +9,20 @@
             "UnauthRoleName": "amplify-socialsensing-dev-183906-unauthRole",
             "StackName": "amplify-socialsensing-dev-183906",
             "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-dev-183906/6da31140-62fe-11ea-a0c9-060e4e394d84",
-            "AmplifyAppId": "drx2var758nmx"
+            "AmplifyAppId": "dtmxl3q3i7oix"
         },
         "categories": {
             "auth": {
                 "socialsensingf07a871c": {}
+            },
+            "function": {
+                "S3Triggerb3a090e2": {}
+            },
+            "hosting": {
+                "amplifyhosting": {
+                    "appId": "dtmxl3q3i7oix",
+                    "type": "cicd"
+                }
             }
         }
     },
@@ -27,11 +36,39 @@
             "UnauthRoleName": "amplify-socialsensing-prod-224245-unauthRole",
             "StackName": "amplify-socialsensing-prod-224245",
             "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-prod-224245/76208f10-6320-11ea-9f6c-06bdd06f2a66",
-            "AmplifyAppId": "drx2var758nmx"
+            "AmplifyAppId": "dtmxl3q3i7oix"
         },
         "categories": {
             "auth": {
                 "socialsensingf07a871c": {}
+            },
+            "function": {
+                "S3Triggerb3a090e2": {}
+            },
+            "hosting": {
+                "amplifyhosting": {
+                    "type": "cicd"
+                }
+            }
+        }
+    },
+    "master": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-socialsensing-master-202535-authRole",
+            "UnauthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-master-202535-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-master-202535-authRole",
+            "Region": "eu-west-2",
+            "DeploymentBucketName": "amplify-socialsensing-master-202535-deployment",
+            "UnauthRoleName": "amplify-socialsensing-master-202535-unauthRole",
+            "StackName": "amplify-socialsensing-master-202535",
+            "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-master-202535/b048a530-649f-11ea-aabe-0ab68d74e79c"
+        },
+        "categories": {
+            "auth": {
+                "socialsensingf07a871c": {}
+            },
+            "function": {
+                "S3Triggerb3a090e2": {}
             }
         }
     }

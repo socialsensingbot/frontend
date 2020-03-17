@@ -10,6 +10,9 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
   - [Running end-to-end tests] 
   - [Key files and folders for development] 
   - [The Application Structure] 
+- [The Structure of an Angular Application] 
+  - [Simple Development] 
+  - [Feature Branch Development] 
 - [Technology] 
   - [Angular] 
   - [The Structure of an Angular Application] 
@@ -314,6 +317,10 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 [Issue Tracking]: #issue-tracking
 [Authentication Component (auth)]: #authentication-component-auth
 [Sign-in Component (sign-in)]: #sign-in-component-sign-in
+[Simple Development]: #simple-development
+[Feature Branch Development]: #feature-branch-development
+
+
 
 
 
