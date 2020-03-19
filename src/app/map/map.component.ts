@@ -17,7 +17,7 @@ import {
   DomUtil,
   GeoJSON,
   latLng,
-  Layer,
+  Layer, LayerGroup,
   layerGroup,
   LeafletMouseEvent,
   Map,
@@ -76,8 +76,12 @@ export class MapComponent {
   private _searchParams: Observable<Params>;
   private _map: Map;
   private _legend: LegendControl;
-  private _numberLayers = {"stats": {}, "count": {}};
-  private _polyLayers = {};
+  private _numberLayers: { "stats": LayerGroup, "count": LayerGroup } = {"stats": null, "count": null};
+  private _polyLayers: { "county": LayerGroup, "coarse": LayerGroup, "fine": LayerGroup } = {
+    "county": null,
+    "coarse": null,
+    "fine":   null
+  };
   private _basemapControl: any;
   private _polygonData = {"county": fgsData, "coarse": coarseData, "fine": fineData};
   public _activeNumber: string = "stats";
@@ -101,8 +105,9 @@ export class MapComponent {
   private _defaultMax = 0;
   private _defaultMin = -24 * 60 + 1;
   private _changedPolys: boolean = false;
-  private _lcontrols = {};
+  private _lcontrols: { "numbers": Control.Layers, "polygon": Control.Layers } = {"numbers": null, "polygon": null};
   private _B: number = 1407;//countyStats["cambridgeshire"].length; //number of stats days
+  private _params: Params;
 
   updateSearch(params: Partial<Params>) {
     console.log("updateSearch");
@@ -154,10 +159,6 @@ export class MapComponent {
     console.log("onMapReady");
 
     this._map = map;
-
-    //Use the current query paramaters to update map state
-    this.route.queryParams.toPromise().then(params => this.updateMap(params)).catch(e => console.log(e));
-
     this.fetchJson()
         .then(() => this.init(map))
         .catch(err => console.log(err));
@@ -194,13 +195,55 @@ export class MapComponent {
   private updateMap(params: Params) {
     console.log("Updating map with params");
     console.log(params);
-    const {lng, lat, zoom} = params;
+    this._params= params;
+    const {lng, lat, zoom, active_number, active_polygon} = params;
     if (typeof lat != "undefined" && typeof lng != "undefined") {
       this.options.center = latLng(lat, lng);
     }
     if (typeof zoom != "undefined") {
       this.options.zoom = zoom;
     }
+
+
+    // if (typeof active_polys != "undefined") {
+    //   this.options.zoom = zoom;
+    // }
+
+    const numberLayerName = typeof active_number !== "undefined" ? active_number : "stats";
+    const numberLayer: LayerGroup = this._numberLayers[numberLayerName];
+    if (this._map) {
+      for (let layer in this._numberLayers) {
+        if (layer !== numberLayerName) {
+          console.log("Removing " + layer);
+          this._map.removeLayer(this._numberLayers[layer]);
+        }
+      }
+      for (let layer in this._numberLayers) {
+        if (layer === numberLayerName) {
+          console.log("Adding " + layer);
+          this._map.addLayer(this._numberLayers[layer]);
+
+        }
+      }
+    }
+    const polygonLayerName = typeof active_polygon !== "undefined" ? active_polygon : "county";
+    const polygonLayer: LayerGroup = this._polyLayers[polygonLayerName];
+    if (this._map) {
+      for (let layer in this._polyLayers) {
+        if (layer !== polygonLayerName) {
+          console.log("Removing " + layer);
+          this._map.removeLayer(this._polyLayers[layer]);
+        }
+      }
+      for (let layer in this._polyLayers) {
+        if (layer === polygonLayerName) {
+          console.log("Adding " + layer);
+          this._map.addLayer(this._polyLayers[layer]);
+
+        }
+      }
+    }
+
     return undefined;
   }
 
@@ -232,27 +275,12 @@ export class MapComponent {
     });
 
 
-    //Generate Leaflet Map
-    // var map = map('map',{
-    //   center: [53, -2],
-    //   zoom: 6
-    // });
-
-    //Add roads from mapbox
-    // var streets = tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg', {
-    //   maxZoom: 18,
-    //   attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-    //              '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-    //              'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-    //   id: 'mapbox.streets'
-    // }).addTo(map);
-
     //define the layers for the different counts
     this._numberLayers.stats = layerGroup().addTo(map);
     this._numberLayers.count = layerGroup();
 
     //layers for the different polygons
-    this._polyLayers["county"] = layerGroup().addTo(map); //This one is active
+    this._polyLayers["county"] = layerGroup().addTo(map);
     this._polyLayers["coarse"] = layerGroup();
     this._polyLayers["fine"] = layerGroup();
 
@@ -282,12 +310,17 @@ export class MapComponent {
     map.on('baselayerchange', (e: any) => {
       if (e.name in this._basemapControl["polygon"]) {
         this._activePolys = e.name;
+        this.updateSearch({active_polygon: e.name});
         this.resetLayers(true)
       } else {
         this._activeNumber = e.name;
+        this.updateSearch({active_number: e.name});
         this._legend.update()
       }
     });
+
+    //Use the current query parameters to update map state
+    this.updateMap(this._params)
   }
 
 
@@ -295,7 +328,6 @@ export class MapComponent {
     ////////////////////////////
     //count / stats toggle
     ////////////////////////////
-    this._lcontrols = {};
     for (let key in this._basemapControl) {
       // noinspection JSUnfilteredForInLoop
       this._lcontrols[key] = control.layers(this._basemapControl[key], {}).addTo(this._map);
