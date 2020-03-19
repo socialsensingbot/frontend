@@ -195,8 +195,8 @@ export class MapComponent {
   private updateMap(params: Params) {
     console.log("Updating map with params");
     console.log(params);
-    this._params= params;
-    const {lng, lat, zoom, active_number, active_polygon} = params;
+    this._params = params;
+    const {lng, lat, zoom, active_number, active_polygon,min_offset,max_offset} = params;
     if (typeof lat != "undefined" && typeof lng != "undefined") {
       this.options.center = latLng(lat, lng);
     }
@@ -243,6 +243,9 @@ export class MapComponent {
         }
       }
     }
+
+    if(typeof min_offset !== "undefined" && typeof min_offset !== "undefined")
+    ($(".timeslider") as any).slider("option", "values", [min_offset, max_offset]);
 
     return undefined;
   }
@@ -311,16 +314,19 @@ export class MapComponent {
       if (e.name in this._basemapControl["polygon"]) {
         this._activePolys = e.name;
         this.updateSearch({active_polygon: e.name});
-        this.resetLayers(true)
+        this.resetLayers(true);
       } else {
         this._activeNumber = e.name;
         this.updateSearch({active_number: e.name});
-        this._legend.update()
+        this._legend.update();
       }
     });
 
     //Use the current query parameters to update map state
-    this.updateMap(this._params)
+    this.updateMap(this._params);
+    // ($(".timeslider") as any).slider.options.values = [-1, 0];
+    // ($(".timeslider") as any).slider.values = [-1, 0];
+
   }
 
 
@@ -518,6 +524,7 @@ export class MapComponent {
 
                                              this._defaultMax = ui.values[1];
                                              this._defaultMin = ui.values[0];
+                                             this.updateSearch({min_offset: ui.values[0],max_offset:ui.values[1]});
                                              processData(this._tweetInfo, this._processedTweetInfo, this._polygonData,
                                                          this.stats,
                                                          this._B, this._timeKeys.slice(-ui.values[1], -ui.values[0]),
@@ -533,6 +540,9 @@ export class MapComponent {
                                                  this._timeKeys[-ui.values[1]], 1));
                                            }
                                          });
+        this.updateMap(this._params);
+
+
       });
 
       //Don't interact with the map while in the slider
