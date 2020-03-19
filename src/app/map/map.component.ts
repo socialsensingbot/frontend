@@ -421,6 +421,8 @@ export class MapComponent {
 
   zoomToFeature(e: LeafletMouseEvent) {
     console.log("zoomToFeature");
+    console.log(e.target.feature.properties.name);
+    this.updateSearch({"selected":e.target.feature.properties.name});
     this.displayText(e);
     this._oldClicked = this.clicked;
     this.clicked = e;
@@ -438,6 +440,13 @@ export class MapComponent {
   onEachFeature(feature: geojson.Feature<geojson.GeometryObject, any>, layer: Layer) {
     console.log("onEachFeature");
     const mc = this;
+    if(feature.properties.name === this._params.selected) {
+      console.log("Matched "+feature.properties.name);
+      dohighlightFeature(layer);
+      tinfo.update_table(feature,
+                         this._processedTweetInfo[this._activePolys]["embed"][feature.properties.name]);
+      tinfo.update_header();
+    }
     layer.on({
                mouseover: (e) => mc.highlightFeature(e),
                mouseout:  (e) => mc.resetHighlight(e),
