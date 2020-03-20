@@ -22,20 +22,21 @@ frontend:
       - node_modules/**/*
 test:
   phases:
-#    preTest:
-#      commands:
-#        - npm ci
+    preTest:
+      commands:
+        - npm ci
+         - npm install @angular/cli
 #        - npm install wait-on
 #        - npm install mocha@5.2.0 mochawesome mochawesome-merge mochawesome-report-generator
 #        - 'npm start & npx wait-on http://localhost:8080'
     test:
       commands:
-        - 'ng e2e'
+        - 'npx ng e2e'
 #    postTest:
 #      commands:
 #        - npx mochawesome-merge cypress/report/mochawesome-report/mochawesome*.json > cypress/report/mochawesome.json
-#  artifacts:
-#    baseDirectory: cypress
+  artifacts:
+    baseDirectory: cypress
 #    configFilePath: '**/mochawesome.json'
 #    files:
 #      - '**/*.png'
