@@ -10,12 +10,52 @@ import {coarseBox} from './coarseBox.js';
 import {getTimes, processData} from './processTweets';
 import {cleanDate, timeslider} from './timeSlider';
 import {Storage} from 'aws-amplify';
-import {control, Control, DomUtil, GeoJSON, latLng, layerGroup, Map, tileLayer} from 'leaflet';
+import {
+  control,
+  Control,
+  ControlOptions,
+  DomUtil,
+  GeoJSON,
+  latLng,
+  Layer, LayerGroup,
+  layerGroup,
+  LeafletMouseEvent,
+  Map,
+  tileLayer
+} from 'leaflet';
 import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/slider.js';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Observable} from "rxjs";
-import {switchMap} from "rxjs/operators";
+import * as geojson from "geojson";
+
+////////////////////////////
+//Legend
+////////////////////////////
+class LegendControl extends Control {
+  _div = DomUtil.create('div', 'legend');
+  private mapComp: MapComponent;
+
+
+  constructor(options: ControlOptions, mapComp: MapComponent) {
+    super(options);
+    this.mapComp = mapComp;
+  }
+
+  update() {
+    console.log("LegendControl.update()");
+
+    this._div.innerHTML = makeLegend((this.mapComp._colorData)[(this.mapComp._activeNumber)].values,
+                                     (this.mapComp._colorData)[(this.mapComp._activeNumber)].colors,
+                                     (this.mapComp._colorFunctions)[(this.mapComp._activeNumber)].getColor);
+  };
+
+  onAdd(map) {
+    console.log("LegendControl.onAdd()");
+    this.update();
+    return this._div;
+  };
+}
 
 
 @Component({
@@ -25,19 +65,54 @@ import {switchMap} from "rxjs/operators";
            })
 export class MapComponent {
   private twitter: any;
-  private tweetInfo: any = {};
-  stats_layer = layerGroup();
-  count_layer = layerGroup();
-  layer_polys = {"county": fgsData, "fine": fineBox, "coarse": coarseBox};
-  county_layer = layerGroup(); //dummy layers to fool layer control
-  coarse_layer = layerGroup();
-  fine_layer = layerGroup();
+  private _tweetInfo: any = {};
+  private stats_layer = layerGroup();
+  private count_layer = layerGroup();
+  private layer_polys = {"county": fgsData, "fine": fineBox, "coarse": coarseBox};
+  private county_layer = layerGroup(); //dummy layers to fool layer control
+  private coarse_layer = layerGroup();
+  private fine_layer = layerGroup();
 
-  _searchParams: Observable<Params>;
+  private _searchParams: Observable<Params>;
   private _map: Map;
+  private _legend: LegendControl;
+  private _numberLayers: { "stats": LayerGroup, "count": LayerGroup } = {"stats": null, "count": null};
+  private _polyLayers: { "county": LayerGroup, "coarse": LayerGroup, "fine": LayerGroup } = {
+    "county": null,
+    "coarse": null,
+    "fine":   null
+  };
+  private _basemapControl: any;
+  private _polygonData = {"county": fgsData, "coarse": coarseData, "fine": fineData};
+  public _activeNumber: string = "stats";
+  private _activePolys: string = "county";
+  private _geojson = {};
+  private _gridSizes = {"county": "county", "coarse": "15", "fine": "60"};
+  private _processedTweetInfo = {
+    "county": {"stats": {}, "count": {}, "embed": {}},
+    "coarse": {"stats": {}, "count": {}, "embed": {}},
+    "fine":   {"stats": {}, "count": {}, "embed": {}},
+  };
+  public _colorData = {
+    stats: {values: [5, 2.5, 1, 0.5], colors: ['#FEE5D9', '#FCAE91', '#FB6A4A', '#DE2D26', '#A50F15']},
+    count: {values: [150, 50, 20, 10], colors: ['#045A8D', '#2B8CBE', '#74A9CF', '#BDC9E1', '#F1EEF6']}
+  };
+
+  public _colorFunctions = {stats: {}, count: {}};
+  private _oldClicked: (LeafletMouseEvent | "") = "";
+  private clicked: (LeafletMouseEvent | "") = "";
+  private _timeKeys: any; //The times in the input JSON
+  private _defaultMax = 0;
+  private _defaultMin = -24 * 60 + 1;
+  private _changedPolys: boolean = false;
+  private _lcontrols: { "numbers": Control.Layers, "polygon": Control.Layers } = {"numbers": null, "polygon": null};
+  private _B: number = 1407;//countyStats["cambridgeshire"].length; //number of stats days
+  private _params: Params;
 
   updateSearch(params: Partial<Params>) {
-    this._router.navigate([], {
+    console.log("updateSearch");
+
+    return this._router.navigate([], {
       queryParams:         params,
       queryParamsHandling: 'merge'
     })
@@ -64,20 +139,36 @@ export class MapComponent {
   stats = {"county": {}, "coarse": {}, "fine": {}};
 
   constructor(private _router: Router, private route: ActivatedRoute) {
-    this._searchParams= this.route.queryParams;
+    //save the query parameter observable
+    this._searchParams = this.route.queryParams;
+
+    //Every time the search parameters change, the map will be updated
     this._searchParams.subscribe(params => this.updateMap(params));
-    this.fetchJson();
+
+    // Preload the cacheable JSON files asynchronously
+    // this gets called again in onMapReady()
+    // But the values should be in the browser cache by then
+    this.fetchJson().then(() => {});
   }
 
+  /**
+   * Called when the map element has finished initialising.
+   * @param map
+   */
   onMapReady(map: Map) {
+    console.log("onMapReady");
+
     this._map = map;
-    this.route.queryParams.toPromise().then(params => this.updateMap(params)).catch(e=>console.log(e));
     this.fetchJson()
-        .then(() => this.main(map))
+        .then(() => this.init(map))
         .catch(err => console.log(err));
   }
 
-  private fetchJson() {
+  /**
+   * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
+   */
+  private fetchJson(): Promise<any> {
+    console.log("fetchJson");
     return fetch("assets/data/county_stats.json")
       .then(response => response.json())
       .then(json => {
@@ -96,218 +187,188 @@ export class MapComponent {
         }));
   }
 
-  private updateMap(mapState: Params) {
-    console.log("Updaing with params");
-    console.log(mapState);
-    const {lng, lat, zoom} = mapState;
+  /**
+   * Update the map from the query parameters.
+   *
+   * @param params the new value for the query parameters.
+   */
+  private updateMap(params: Params) {
+    console.log("Updating map with params");
+    console.log(params);
+    this._params = params;
+    const {lng, lat, zoom, active_number, active_polygon,min_offset,max_offset} = params;
     if (typeof lat != "undefined" && typeof lng != "undefined") {
       this.options.center = latLng(lat, lng);
     }
-    if(typeof zoom != "undefined") {
-      this.options.zoom= zoom;
+    if (typeof zoom != "undefined") {
+      this.options.zoom = zoom;
     }
+
+
+    // if (typeof active_polys != "undefined") {
+    //   this.options.zoom = zoom;
+    // }
+
+    const numberLayerName = typeof active_number !== "undefined" ? active_number : "stats";
+    const numberLayer: LayerGroup = this._numberLayers[numberLayerName];
+    if (this._map) {
+      for (let layer in this._numberLayers) {
+        if (layer !== numberLayerName) {
+          console.log("Removing " + layer);
+          this._map.removeLayer(this._numberLayers[layer]);
+        }
+      }
+      for (let layer in this._numberLayers) {
+        if (layer === numberLayerName) {
+          console.log("Adding " + layer);
+          this._map.addLayer(this._numberLayers[layer]);
+
+        }
+      }
+    }
+    const polygonLayerName = typeof active_polygon !== "undefined" ? active_polygon : "county";
+    const polygonLayer: LayerGroup = this._polyLayers[polygonLayerName];
+    if (this._map) {
+      for (let layer in this._polyLayers) {
+        if (layer !== polygonLayerName) {
+          console.log("Removing " + layer);
+          this._map.removeLayer(this._polyLayers[layer]);
+        }
+      }
+      for (let layer in this._polyLayers) {
+        if (layer === polygonLayerName) {
+          console.log("Adding " + layer);
+          this._map.addLayer(this._polyLayers[layer]);
+
+        }
+      }
+    }
+
+    if(typeof min_offset !== "undefined" && typeof min_offset !== "undefined")
+    ($(".timeslider") as any).slider("option", "values", [min_offset, max_offset]);
+
     return undefined;
   }
 
-  private loadData() {
+  /**
+   * Loads the live data from S3 storage securely.
+   */
+  private loadLiveData() {
+    console.log("loadLiveData");
     return Storage.get("live.json")
                   .then((url: any) =>
                           fetch(url.toString())
                             .then(response => response.json()));
   }
 
-  private main(map: Map) {
 
-
-    map.addEventListener("dragend", event => {
-      this.updateSearch({lat: this._map.getCenter().lat, lng: this._map.getCenter().lng})
+  /**
+   * This method does all the heavy lifting and is called when
+   * the map is ready and data is loaded.
+   * @param map the leaflet.js Map
+   */
+  private init(map: Map) {
+    console.log("init");
+    map.addEventListener("dragend", () => {
+      return this.updateSearch({lat: this._map.getCenter().lat, lng: this._map.getCenter().lng})
     });
 
-    map.addEventListener("zoomend", event => {
-      this.updateSearch({zoom: this._map.getZoom()})
+    map.addEventListener("zoomend", () => {
+      return this.updateSearch({zoom: this._map.getZoom()})
     });
-    //Generate Leaflet Map
-    // var map = map('map',{
-    //   center: [53, -2],
-    //   zoom: 6
-    // });
 
-    //Add roads from mapbox
-    // var streets = tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg', {
-    //   maxZoom: 18,
-    //   attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-    //              '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-    //              'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-    //   id: 'mapbox.streets'
-    // }).addTo(map);
 
     //define the layers for the different counts
-    var number_layers = {};
-    number_layers["stats"] = layerGroup().addTo(map);
-    number_layers["count"] = layerGroup();
+    this._numberLayers.stats = layerGroup().addTo(map);
+    this._numberLayers.count = layerGroup();
 
     //layers for the different polygons
-    var poly_layers = {};
-    poly_layers["county"] = layerGroup().addTo(map); //This one is active
-    poly_layers["coarse"] = layerGroup();
-    poly_layers["fine"] = layerGroup();
-    var basemapControl = {"numbers": number_layers, "polygon": poly_layers};
+    this._polyLayers["county"] = layerGroup().addTo(map);
+    this._polyLayers["coarse"] = layerGroup();
+    this._polyLayers["fine"] = layerGroup();
 
-    //polygon outlines and counts/stats
-    var polygonData = {"county": fgsData, "coarse": coarseData, "fine": fineData};
-
-
-    //Set defaults
-    var active_number = "stats";
-    var active_polys = "county";
-
-    //data containers
-    var geojson = {}; //Layer manager
-    var grid_sizes = {"county": "county", "coarse": "15", "fine": "60"};
-    var processedTweetInfo = {
-      "county": {"stats": {}, "count": {}, "embed": {}},
-      "coarse": {"stats": {}, "count": {}, "embed": {}},
-      "fine":   {"stats": {}, "count": {}, "embed": {}},
-    }; //Processed input (summed over time)
+    this._basemapControl = {"numbers": this._numberLayers, "polygon": this._polyLayers};
 
     //The times in the input JSON
-    var time_keys;
-    var default_min = -24 * 60 + 1;
-    var default_max = 0;
+
     //var current_min = -default_min;
     //var current_max = -default_max;
-
-    //stats stuff
-    var B = 1407; //countyStats["cambridgeshire"].length; //number of stats days
-
-
-    //Clicked a county
-    let clicked: any = "";
-    var changed_polys = false;
-
-
-    //bind various function arguments to default
-    var colorData = {
-      stats: {values: [5, 2.5, 1, 0.5], colors: ['#FEE5D9', '#FCAE91', '#FB6A4A', '#DE2D26', '#A50F15']},
-      count: {values: [150, 50, 20, 10], colors: ['#045A8D', '#2B8CBE', '#74A9CF', '#BDC9E1', '#F1EEF6']}
-    };
-    var colorFunctions = {stats: {}, count: {}};
-    for (var key in colorData) {
-      colorFunctions[key].getColor = getColor.bind(null, colorData[key].values, colorData[key].colors);
-      colorFunctions[key].getFeatureStyle = getFeatureStyle.bind(null, colorData[key].values, colorData[key].colors,
-                                                                 key);
+    for (let key in this._colorData) {
+      this._colorFunctions[key].getColor = getColor.bind(null, this._colorData[key].values,
+                                                         this._colorData[key].colors);
+      this._colorFunctions[key].getFeatureStyle = getFeatureStyle.bind(null, this._colorData[key].values,
+                                                                       this._colorData[key].colors,
+                                                                       key);
     }
 
-    /////////////////////////
-    //React to Mouse
-    /////////////////////////
-    function highlightFeature(e) {
-      dohighlightFeature(e.target);
-      tinfo.update_header(e.target.feature);
-    }
 
-    function displayText(e) {
-      tinfo.update_table(e.target.feature, processedTweetInfo[active_polys]["embed"][e.target.feature.properties.name]);
-    }
+    this._legend = new LegendControl({}, this);
+    this._legend.addTo(map);
 
-    function resetHighlight(e) {
-      geojson[active_number].resetStyle(e.target);
-      tinfo.update_header();
-      if (clicked != "") {
-        dohighlightFeature(clicked.target);
+    this.setupTwitterPanel();
+    this.setupCountStatsToggle();
+    this.readData(); //reads data and sets up map
+    setInterval(() => this.readData(), 60000);
+
+    map.on('baselayerchange', (e: any) => {
+      if (e.name in this._basemapControl["polygon"]) {
+        this._activePolys = e.name;
+        this.updateSearch({active_polygon: e.name});
+        this.resetLayers(true);
+      } else {
+        this._activeNumber = e.name;
+        this.updateSearch({active_number: e.name});
+        this._legend.update();
       }
-    }
+    });
 
-    function zoomToFeature(e) {
-      displayText(e);
-      var old_clicked = clicked;
-      clicked = e;
-      e.target.setStyle({
-                          weight:      3,
-                          color:       '#FF00FF',
-                          dashArray:   '',
-                          fillOpacity: 0.4
-                        });
-      if (old_clicked != "") {
-        resetHighlight(old_clicked);
-      }
-    }
+    //Use the current query parameters to update map state
+    this.updateMap(this._params);
+    // ($(".timeslider") as any).slider.options.values = [-1, 0];
+    // ($(".timeslider") as any).slider.values = [-1, 0];
 
-    function onEachFeature(feature, layer) {
-      layer.on({
-                 mouseover: highlightFeature,
-                 mouseout:  resetHighlight,
-                 click:     zoomToFeature
-               });
-    }
+  }
 
 
-    ///////////////////////
-    //Add the polygons
-    ///////////////////////
-    function resetLayers(clear_click) {
-      for (key in basemapControl["numbers"]) {
-
-        number_layers[key].clearLayers();
-
-        geojson[key] = new GeoJSON(polygonData[active_polys], {
-          style:         colorFunctions[key].getFeatureStyle,
-          onEachFeature: onEachFeature
-        }).addTo(number_layers[key]);
-
-        if (clear_click) {
-          if (clicked != "") {
-            geojson[active_number].resetStyle(clicked);
-          }
-          clicked = "";
-        }
-      }
-    }
-
-
+  private setupCountStatsToggle() {
     ////////////////////////////
-    //Legend
+    //count / stats toggle
     ////////////////////////////
-
-    class LegendControl extends Control {
-      _div = DomUtil.create('div', 'legend');
-
-      update() {
-        this._div.innerHTML = makeLegend(colorData[active_number].values, colorData[active_number].colors,
-                                         colorFunctions[active_number].getColor);
-      };
-
-      onAdd(map) {
-        this.update();
-        return this._div;
-      };
+    for (let key in this._basemapControl) {
+      // noinspection JSUnfilteredForInLoop
+      this._lcontrols[key] = control.layers(this._basemapControl[key], {}).addTo(this._map);
+      // noinspection JSUnfilteredForInLoop
+      this._lcontrols[key].setPosition('topleft');
     }
 
-    var legend = new LegendControl();
-    legend.addTo(map);
+  }
+
+  private setupTwitterPanel() {
+    console.log("setupTwitterPanel");
 
     ////////////////////////////
     //Tweet Panel define Jquery mouse handling and minimise
     ////////////////////////////
-    tinfo.addTo(map);
+    tinfo.addTo(this._map);
 
-    $('.tinfo').on('mouseover', function (event) {
-      map.touchZoom.disable();
-      map.doubleClickZoom.disable();
-      map.scrollWheelZoom.disable();
-      map.boxZoom.disable();
-      map.keyboard.disable();
-      map.dragging.disable();
+    const $tinfo = $('.tinfo');
+    $tinfo.on('mouseover', () => {
+      this._map.touchZoom.disable();
+      this._map.doubleClickZoom.disable();
+      this._map.scrollWheelZoom.disable();
+      this._map.boxZoom.disable();
+      this._map.keyboard.disable();
+      this._map.dragging.disable();
     });
-    $('.tinfo').on('mouseleave', function (event) {
-      map.touchZoom.enable();
-      map.doubleClickZoom.enable();
-      map.scrollWheelZoom.enable();
-      map.boxZoom.enable();
-      map.keyboard.enable();
-      map.dragging.enable();
+    $tinfo.on('mouseleave', () => {
+      this._map.touchZoom.enable();
+      this._map.doubleClickZoom.enable();
+      this._map.scrollWheelZoom.enable();
+      this._map.boxZoom.enable();
+      this._map.keyboard.enable();
+      this._map.dragging.enable();
     });
-    $(".tinfo_button").on('click', function (event) {
+    $(".tinfo_button").on('click', function () {
       if ($(this).html() == "-") {
         $(this).html("+");
         $(".tinfo").css({
@@ -330,123 +391,188 @@ export class MapComponent {
         $(".tinfo_table_wrapper").show()
       }
     });
-
-    ////////////////////////////
-    //count / stats toggle
-    ////////////////////////////
-    var lcontrols = {};
-    for (key in basemapControl) {
-      lcontrols[key] = control.layers(basemapControl[key], {}).addTo(map);
-      lcontrols[key].setPosition('topleft');
-    }
-
-
-    //todo remove :any
-    map.on('baselayerchange', function (e: any) {
-      if (e.name in basemapControl["polygon"]) {
-        active_polys = e.name;
-        resetLayers(true)
-      } else {
-        active_number = e.name;
-        legend.update()
-      }
-    });
-
-
-    /////////////////////////////
-    //get datafiles & init
-    /////////////////////////////
-    const read_data = () => {
-      this.loadData()
-          .then((tweet_json) => {
-            this.tweetInfo = tweet_json;
-            time_keys = getTimes(this.tweetInfo);
-            processData(this.tweetInfo, processedTweetInfo, polygonData, this.stats, B,
-                        time_keys.slice(-default_max, -default_min), grid_sizes);
-            resetLayers(false);
-            tinfo.update_header();
-            initSlider();
-          }).catch(function (e) {
-        console.log("Loading data failed " + e);
-        console.log(e);
-      });
-
-    };
-
-    read_data(); //reads data and sets up map
-    setInterval(function () {
-      read_data();
-    }, 60000);
-
-
-    ///////////////////////////
-    //jQuery Slider, starup after reading JSON
-    ///////////////////////////
-    const initSlider = () => {
-      if (time_keys) {
-
-        timeslider.addTo(map);
-        default_min = Math.max(default_min, -(time_keys.length - 1));
-
-        //Add the initial header
-        //TODO: Convert to Angular Material Widget
-        $(function () {
-          //console.log("timeslider", cleanDate(time_keys[-default_min], 0), cleanDate(time_keys[-default_max], 1) )
-          $(".timeslider_input")
-            .val(cleanDate(time_keys[-default_min], 0) + " - " + cleanDate(time_keys[-default_max], 1));
-
-        });
-
-        //how to react to moving the slider
-        $(() => {
-          ($(".timeslider") as any).slider({
-                                             range:  true,
-                                             min:    -time_keys.length + 1,
-                                             max:    0,
-                                             values: [default_min, default_max],
-                                             slide:  (event, ui) => {
-
-                                               default_max = ui.values[1];
-                                               default_min = ui.values[0];
-                                               processData(this.tweetInfo, processedTweetInfo, polygonData, this.stats,
-                                                           B, time_keys.slice(-ui.values[1], -ui.values[0]),
-                                                           grid_sizes);
-                                               resetLayers(false);
-                                               tinfo.update_header();
-                                               if (clicked != "") {
-                                                 displayText(clicked);
-                                               }
-
-                                               $(".timeslider_input")
-                                                 .val(cleanDate(time_keys[-ui.values[0]], 0) + " - " + cleanDate(
-                                                   time_keys[-ui.values[1]], 1));
-                                             }
-                                           });
-        });
-
-        //Don't interact with the map while in the slider
-        $('.timeslider_container').on('mouseover', function (event) {
-          map.touchZoom.disable();
-          map.doubleClickZoom.disable();
-          map.scrollWheelZoom.disable();
-          map.boxZoom.disable();
-          map.keyboard.disable();
-          map.dragging.disable();
-        });
-        $('.timeslider_container').on('mouseleave', function (event) {
-          map.touchZoom.enable();
-          map.doubleClickZoom.enable();
-          map.scrollWheelZoom.enable();
-          map.boxZoom.enable();
-          map.keyboard.enable();
-          map.dragging.enable();
-        });
-
-      }
-    }
-
-
   }
 
+  /////////////////////////
+  //React to Mouse
+  /////////////////////////
+  public highlightFeature(e: LeafletMouseEvent) {
+    console.log("highlightFeature");
+    dohighlightFeature(e.target);
+    tinfo.update_header(e.target.feature);
+  }
 
+  public displayText(e: LeafletMouseEvent) {
+    console.log("displayText");
+    tinfo.update_table(e.target.feature,
+                       this._processedTweetInfo[this._activePolys]["embed"][e.target.feature.properties.name]);
+  }
+
+  public resetHighlight(e: LeafletMouseEvent) {
+    console.log("resetHighlight");
+
+
+    this._geojson[this._activeNumber].resetStyle(e.target);
+    tinfo.update_header();
+    if (this.clicked != "") {
+      dohighlightFeature(this.clicked.target);
+    }
+  }
+
+  zoomToFeature(e: LeafletMouseEvent) {
+    console.log("zoomToFeature");
+    console.log(e.target.feature.properties.name);
+    this.updateSearch({"selected":e.target.feature.properties.name});
+    this.displayText(e);
+    this._oldClicked = this.clicked;
+    this.clicked = e;
+    e.target.setStyle({
+                        weight:      3,
+                        color:       '#FF00FF',
+                        dashArray:   '',
+                        fillOpacity: 0.4
+                      });
+    if (this._oldClicked != "") {
+      this.resetHighlight(this._oldClicked);
+    }
+  }
+
+  onEachFeature(feature: geojson.Feature<geojson.GeometryObject, any>, layer: Layer) {
+    console.log("onEachFeature");
+    const mc = this;
+    if(feature.properties.name === this._params.selected) {
+      console.log("Matched "+feature.properties.name);
+      dohighlightFeature(layer);
+      tinfo.update_table(feature,
+                         this._processedTweetInfo[this._activePolys]["embed"][feature.properties.name]);
+      tinfo.update_header();
+    }
+    layer.on({
+               mouseover: (e) => mc.highlightFeature(e),
+               mouseout:  (e) => mc.resetHighlight(e),
+               click:     (e) => mc.zoomToFeature(e)
+             });
+  }
+
+  ///////////////////////
+  //Add the polygons
+  ///////////////////////
+  resetLayers(clear_click) {
+    console.log("resetLayers");
+
+    for (let key in this._basemapControl["numbers"]) {
+
+      // noinspection JSUnfilteredForInLoop
+      this._numberLayers[key].clearLayers();
+
+      // noinspection JSUnfilteredForInLoop
+      this._geojson[key] = new GeoJSON(this._polygonData[this._activePolys], {
+        style:         (feature) => this._colorFunctions[key].getFeatureStyle(feature),
+        onEachFeature: (f, l) => this.onEachFeature(f, l)
+      }).addTo(this._numberLayers[key]);
+
+      if (clear_click) {
+        console.log("resetLayers clear_click");
+        if (this.clicked != "") {
+          this._geojson[this._activeNumber].resetStyle(this.clicked);
+        }
+        this.clicked = "";
+      }
+    }
+  }
+
+  /////////////////////////////
+  //get datafiles & init
+  /////////////////////////////
+  readData() {
+    console.log("readData");
+    this.loadLiveData()
+        .then((tweet_json) => {
+          this._tweetInfo = tweet_json;
+          this._timeKeys = getTimes(this._tweetInfo);
+          processData(this._tweetInfo, this._processedTweetInfo, this._polygonData, this.stats, this._B,
+                      this._timeKeys.slice(-this._defaultMax, -this._defaultMin), this._gridSizes);
+          this.resetLayers(false);
+          tinfo.update_header();
+          this.initSlider();
+        }).catch((e) => {
+      console.log("Loading data failed " + e);
+      console.log(e);
+    });
+
+  };
+
+  ///////////////////////////
+  //jQuery Slider, starup after reading JSON
+  ///////////////////////////
+  initSlider() {
+    console.log("initSlider");
+    if (this._timeKeys) {
+
+      timeslider.addTo(this._map);
+      this._defaultMin = Math.max(this._defaultMin, -(this._timeKeys.length - 1));
+
+      //Add the initial header
+      //TODO: Convert to Angular Material Widget
+      $(() => {
+        //console.log("timeslider", cleanDate(time_keys[-default_min], 0), cleanDate(time_keys[-default_max], 1) )
+        $(".timeslider_input")
+          .val(
+            cleanDate(this._timeKeys[-this._defaultMin], 0) + " - " + cleanDate(this._timeKeys[-this._defaultMax], 1));
+
+      });
+
+      //how to react to moving the slider
+      $(() => {
+        ($(".timeslider") as any).slider({
+                                           range:  true,
+                                           min:    -this._timeKeys.length + 1,
+                                           max:    0,
+                                           values: [this._defaultMin, this._defaultMax],
+                                           slide:  (event, ui) => {
+
+                                             this._defaultMax = ui.values[1];
+                                             this._defaultMin = ui.values[0];
+                                             this.updateSearch({min_offset: ui.values[0],max_offset:ui.values[1]});
+                                             processData(this._tweetInfo, this._processedTweetInfo, this._polygonData,
+                                                         this.stats,
+                                                         this._B, this._timeKeys.slice(-ui.values[1], -ui.values[0]),
+                                                         this._gridSizes);
+                                             this.resetLayers(false);
+                                             tinfo.update_header();
+                                             if (this.clicked != "") {
+                                               this.displayText(this.clicked);
+                                             }
+
+                                             $(".timeslider_input")
+                                               .val(cleanDate(this._timeKeys[-ui.values[0]], 0) + " - " + cleanDate(
+                                                 this._timeKeys[-ui.values[1]], 1));
+                                           }
+                                         });
+        this.updateMap(this._params);
+
+
+      });
+
+      //Don't interact with the map while in the slider
+      const $timesliderContainer = $('.timeslider_container');
+      $timesliderContainer.on('mouseover', () => {
+        this._map.touchZoom.disable();
+        this._map.doubleClickZoom.disable();
+        this._map.scrollWheelZoom.disable();
+        this._map.boxZoom.disable();
+        this._map.keyboard.disable();
+        this._map.dragging.disable();
+      });
+      $timesliderContainer.on('mouseleave', () => {
+        this._map.touchZoom.enable();
+        this._map.doubleClickZoom.enable();
+        this._map.scrollWheelZoom.enable();
+        this._map.boxZoom.enable();
+        this._map.keyboard.enable();
+        this._map.dragging.enable();
+      });
+
+    }
+  }
 }
