@@ -1,0 +1,42 @@
+version: 0.1
+backend:
+  phases:
+    build:
+      commands:
+        - '# Execute Amplify CLI with the helper script'
+        - amplifyPush --simple
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: dist/frontend
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+test:
+  phases:
+#    preTest:
+#      commands:
+#        - npm ci
+#        - npm install wait-on
+#        - npm install mocha@5.2.0 mochawesome mochawesome-merge mochawesome-report-generator
+#        - 'npm start & npx wait-on http://localhost:8080'
+    test:
+      commands:
+        - 'ng e2e'
+#    postTest:
+#      commands:
+#        - npx mochawesome-merge cypress/report/mochawesome-report/mochawesome*.json > cypress/report/mochawesome.json
+#  artifacts:
+#    baseDirectory: cypress
+#    configFilePath: '**/mochawesome.json'
+#    files:
+#      - '**/*.png'
+#      - '**/*.mp4'

@@ -1,5 +1,5 @@
 import {AppPage} from './app.po';
-import {browser, logging} from 'protractor';
+import {browser, by, element, ExpectedConditions, logging} from 'protractor';
 
 describe('workspace-project App', () => {
   let page: AppPage;
@@ -8,9 +8,12 @@ describe('workspace-project App', () => {
     page = new AppPage();
   });
 
-  it('should display welcome message', () => {
+  it('Should login and be sent to the map', () => {
     page.navigateTo();
-    expect(page.getTitleText()).toEqual('frontend app is running!');
+    expect( page.hasMap()).toBe(false);
+    page.login();
+    browser.wait(ExpectedConditions.urlContains('/map'), 10000);
+    expect( page.hasMap()).toBe(true);
   });
 
   afterEach(async () => {
