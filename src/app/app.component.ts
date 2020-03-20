@@ -53,7 +53,7 @@ export class AppComponent {
   public logout() {
     this.isAuthenticated= false;
     Auth.signOut()
-        .then(data => this._router.navigate(['/']))
+        .then(data => this._router.navigate(['/'], {queryParamsHandling:"merge"}))
         .catch(err => console.log(err));
 
 

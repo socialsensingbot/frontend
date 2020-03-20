@@ -47,7 +47,7 @@ export class SignInComponent {
   signIn() {
     this.auth.signIn(this.emailInput.value, this.passwordInput.value)
         .then((user: CognitoUser | any) => {
-          this._router.navigate(['']);
+          this._router.navigate(['/map'],{queryParamsHandling:"merge"});
         })
         .catch((error: any) => {
           this._notification.show(error.message);
@@ -55,10 +55,10 @@ export class SignInComponent {
             case "UserNotConfirmedException":
               environment.confirm.email = this.emailInput.value;
               environment.confirm.password = this.passwordInput.value;
-              this._router.navigate(['auth/confirm']);
+              this._router.navigate(['auth/confirm'],{queryParamsHandling:"merge"});
               break;
             case "UsernameExistsException":
-              this._router.navigate(['auth/signin']);
+              this._router.navigate(['auth/signin'],{queryParamsHandling:"merge"});
               break;
           }
         })
