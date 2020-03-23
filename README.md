@@ -76,6 +76,11 @@ https://docs.aws.amazon.com/amplify/latest/userguide/running-tests.html
 https://docs.cypress.io/guides/getting-started/installing-cypress.html#Opening-Cypress
 
 End to end tests are peformed using [Cypress](https://cypress.io)
+
+To run the tests you need to run the following, substituting username and password.
+
+    npx cypress open -e TEST_AC_USER=<username>,TEST_AC_PASS=<password>
+
        
 ### Key files and folders for development
 
