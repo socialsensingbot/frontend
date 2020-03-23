@@ -4,10 +4,20 @@
     <option name="languageLevel" value="ES6" />
   </component>
   <component name="ProjectPlainTextFileTypeManager">
-    <file url="file://$PROJECT_DIR$/src/app/map/data/live.json" />
-    <file url="file://$PROJECT_DIR$/src/app/map/data/live_india.json" />
+    <file url="file://$PROJECT_DIR$/src/assets/data/coarse_indiastats.json" />
+    <file url="file://$PROJECT_DIR$/src/assets/data/coarse_stats.json" />
+    <file url="file://$PROJECT_DIR$/src/assets/data/county_stats.json" />
+    <file url="file://$PROJECT_DIR$/src/assets/data/fine_indiastats.json" />
+    <file url="file://$PROJECT_DIR$/src/assets/data/fine_stats.json" />
+    <file url="file://$PROJECT_DIR$/src/assets/data/state_indiastats.json" />
+    <file url="file://$PROJECT_DIR$/src/assets/data/stats_overlap_10x10.json" />
+    <file url="file://$PROJECT_DIR$/src/assets/data/stats_overlap_40x40.json" />
+    <file url="file://$PROJECT_DIR$/src/assets/data/stats_overlap_county.json" />
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" />
+  <component name="TaskProjectConfiguration">
+    <server type="GitHub" url="https://github.com" />
+  </component>
   <component name="UnicodeBrowser">
     <option name="fontName" value="Fira Code" />
   </component>
