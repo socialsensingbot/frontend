@@ -13,6 +13,9 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 - [The Development/Release Cycle]  
   - [Simple Development] 
   - [Feature Branch Development] 
+- [Design] 
+  - [Material Design] 
+  - [Angular Material] 
 - [Technology] 
   - [Angular] 
   - [The Structure of an Angular Application] 
@@ -72,10 +75,11 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 
 ### Running end-to-end tests
 
-https://docs.aws.amazon.com/amplify/latest/userguide/running-tests.html
-https://docs.cypress.io/guides/getting-started/installing-cypress.html#Opening-Cypress
+<https://docs.aws.amazon.com/amplify/latest/userguide/running-tests.html>
 
-End to end tests are peformed using [Cypress](https://cypress.io)
+<https://docs.cypress.io/guides/getting-started/installing-cypress.html#Opening-Cypress>
+
+End to end tests are peformed using [Cypress](https://cypress.io). All end to end (integration) tests will be executed on a build.
 
 To run the tests you need to run the following, substituting username and password.
 
@@ -195,6 +199,18 @@ Playground: <http://www.typescriptlang.org/play>
 
 Angular uses Typescript. Typescript is a type safe and more advanced version of JavaScript, it compiles down to JavaScript. Most of TypeScript will be familiar to use if you use recent versions of JavaScript. When adding new libraries you will need to make sure they are added the 'Angular way' so that you get the Typescript headers for type safety (and usually proper integration with Angular and it's lifecycle). Typescript is not scary - and can be learnt and implemented incrementally.
 
+## Design
+### Material Design
+
+<https://material.io/design/>
+
+The application has been set up to use Material design, Google's standardized design for web applications.
+
+### Angular Material
+
+<https://material.angular.io/>
+
+The implementation of [Material Design] for Angular is Angular Material. 
 
 
 #### The Structure of an Angular Application
@@ -327,6 +343,12 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 [Simple Development]: #simple-development
 [Feature Branch Development]: #feature-branch-development
 [The Development/Release Cycle]: #the-developmentrelease-cycle
+[Design]: #design
+[Material Design]: #material-design
+[Angular Material]: #angular-material
+
+
+
 
 
 
