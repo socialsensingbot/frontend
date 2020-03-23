@@ -14,12 +14,12 @@
       <button mat-button routerLink="/">{{title}}</button>
       <button mat-button routerLink="/"><mat-icon>home</mat-icon></button>
     </span>
-    <div fxLayout="row" fxShow="false" fxShow.gt-sm>
+    <div id="login" fxLayout="row" fxShow="false" fxShow.gt-sm>
       <button mat-button routerLink="/auth/signin" *ngIf="!isAuthenticated">
         <mat-icon>power_settings_new</mat-icon>
         Login
       </button>
-      <button mat-button *ngIf="isAuthenticated" (click)="logout()">
+      <button id="logout" mat-button *ngIf="isAuthenticated" (click)="logout()">
         <mat-icon>exit_to_app</mat-icon>
         Logout
       </button>
@@ -27,7 +27,7 @@
 <!--        <mat-icon>map</mat-icon>-->
 <!--        Map-->
 <!--      </button>-->
-      <button mat-button routerLink="/auth/signup" *ngIf="isSignup">
+      <button id="signup" mat-button routerLink="/auth/signup" *ngIf="isSignup">
         Signup (Dev Only)
       </button>
 
