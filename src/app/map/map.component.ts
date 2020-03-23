@@ -440,9 +440,14 @@ export class MapComponent {
   onEachFeature(feature: geojson.Feature<geojson.GeometryObject, any>, layer: Layer) {
     console.log("onEachFeature");
     const mc = this;
+    // If this feature is referenced in the URL query paramter selected
+    // e.g. ?...&selected=powys
+    // then highlight it and update Twitter
     if(feature.properties.name === this._params.selected) {
       console.log("Matched "+feature.properties.name);
+      //Put the selection outline around the feature
       dohighlightFeature(layer);
+      //Update the Twitter panel with the changes
       tinfo.update_table(feature,
                          this._processedTweetInfo[this._activePolys]["embed"][feature.properties.name]);
       tinfo.update_header();
