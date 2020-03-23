@@ -74,6 +74,8 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 
 https://docs.aws.amazon.com/amplify/latest/userguide/running-tests.html
 https://docs.cypress.io/guides/getting-started/installing-cypress.html#Opening-Cypress
+
+End to end tests are peformed using [Cypress](https://cypress.io)
        
 ### Key files and folders for development
 
