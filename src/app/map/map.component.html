@@ -1,5 +1,34 @@
-<div class="map"
+<mat-sidenav-container>
+  <mat-sidenav #sidenav [(opened)]="_showTweets" disableClose mode="side">
+    <button mat-icon-button class="draw-close-button" aria-label="Close" (click)="sidenav.toggle()">
+      <mat-icon>close</mat-icon>
+    </button>
+    <h4 *ngIf="twitterPanelHeader"><b>{{hoverRegion}}</b> {{hoverTweetCount}} Tweets. Exceedence probability {{hoverExceedenceProbability}}% </h4>
+    <h4 *ngIf="!twitterPanelHeader">Hover over a County</h4>
+    <twitter-panel [count]="tweetCount" [region]="selectedRegion" [exceedenceProbability]="exceedenceProbability" [embeds]="embeds" [showHeaderInfo]="twitterPanelHeader" [showTimeline]="showTwitterTimeline" ></twitter-panel>
+<!--    //div the tweets sit in-->
+<!--    this._div = DomUtil.create('div', 'tinfo');-->
+<!--    //minimise button-->
+<!--    this._button  = DomUtil.create('button', 'tinfo_button', this._div);-->
+<!--    this._button.innerHTML = '-';-->
+<!--    //headers-->
+<!--    this._h4  = DomUtil.create('h4', 'tinfo_h4', this._div);-->
+<!--    this._h4b  = DomUtil.create('h4', 'tinfo_h4b', this._div);-->
+<!--    //table of tweets-->
+<!--    this._table_wrapper  = DomUtil.create('div', 'tinfo_table_wrapper', this._div);-->
+<!--    this._table  = DomUtil.create('div', 'tinfo_table', this._table_wrapper);-->
+
+<!--    //separate the header info from the html element for some reason...-->
+<!--    this.header_info = "";-->
+<!--    this.header_infob = "";-->
+
+
+  </mat-sidenav>
+  <mat-sidenav-content>
+<div class="map" aria-label="Map"
      leaflet
      (leafletMapReady)="onMapReady($event)"
      [leafletOptions]="options">
 </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

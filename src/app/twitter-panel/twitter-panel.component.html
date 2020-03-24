@@ -1,0 +1,13 @@
+<div id="tinfo" class="tinfo">
+  <!--      <button id="tinfo_button" class="tinfo_button">-</button>-->
+  <div id="tinfo_table_wrapper" class="tinfo_table_wrapper">
+    <div id="tinfo_table" class="tinfo_table" *ngIf="showTimeline">
+      <h4 ><span *ngIf="embeds" style="color: black"><b>Showing {{count}} Tweets from {{region}}</b>:</span> Exceedence probability {{exceedenceProbability}}% </h4>
+
+      <table class=table_info >
+        <div #tinfoEmbeds [innerHTML]="embeds" [style.visibility]="ready ? 'visible' : 'hidden'"></div>
+    </table>
+    </div>
+  </div>
+</div>
+

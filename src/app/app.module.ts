@@ -22,6 +22,9 @@ import { AuthService } from './auth/auth.service';
 import {Router} from "@angular/router";
 import {HomeComponent} from "./home/home.component";
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
+import {MatSliderModule} from "@angular/material/slider";
+import {MatDrawer, MatSidenavModule} from "@angular/material/sidenav";
+import { TwitterPanelComponent } from './twitter-panel/twitter-panel.component';
 @NgModule({
             declarations: [
               AppComponent,
@@ -33,13 +36,16 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
               FilterPipe,
               SignInComponent,
               ConfirmCodeComponent,
-              HomeComponent
+              HomeComponent,
+              TwitterPanelComponent
             ],
             imports:      [
               BrowserModule,
               BrowserAnimationsModule,
               AmplifyAngularModule,
               MaterialModule,
+              MatSidenavModule,
+              MatSliderModule,
               AppRoutingModule,
               FormsModule,
               ReactiveFormsModule,
