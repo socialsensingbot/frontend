@@ -13,14 +13,14 @@ import {
   Control,
   ControlOptions,
   DomUtil,
-  GeoJSON,
+  GeoJSON, LatLng,
   latLng,
   Layer,
   LayerGroup,
   layerGroup,
   LeafletMouseEvent,
-  Map,
-  tileLayer
+  Map, Popup,
+  tileLayer, tooltip
 } from 'leaflet';
 import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/slider.js';
@@ -115,9 +115,7 @@ export class MapComponent {
   twitterPanelHeader: boolean;
   private timeslider: Control;
   public showTwitterTimeline: boolean;
-  public hoverRegion: string;
-  public hoverExceedenceProbability: number;
-  public hoverTweetCount: number;
+  // private _popup: Popup;
 
 
   updateSearch(params: Partial<Params>) {
@@ -282,11 +280,11 @@ export class MapComponent {
   private init(map: Map) {
     console.log("init");
     map.addEventListener("dragend", () => {
-      return this.updateSearch({lat: this._map.getCenter().lat, lng: this._map.getCenter().lng})
+      return this.ngZone.runOutsideAngular(()=>this.updateSearch({lat: this._map.getCenter().lat, lng: this._map.getCenter().lng}))
     });
 
     map.addEventListener("zoomend", () => {
-      return this.updateSearch({zoom: this._map.getZoom()})
+      return this.ngZone.runOutsideAngular(()=>this.updateSearch({zoom: this._map.getZoom()}));
     });
 
 
@@ -377,7 +375,6 @@ export class MapComponent {
   public highlightFeature(e: LeafletMouseEvent) {
     console.log("highlightFeature");
     dohighlightFeature(e.target);
-    this.update_header(e.target.feature);
   }
 
   public displayText(e: LeafletMouseEvent) {
@@ -386,19 +383,6 @@ export class MapComponent {
   }
 
 
-  update_header(props?: any) {
-    if (props && props.properties.count) {
-      this.hoverExceedenceProbability = Math.round(props.properties.stats * 100) / 100;
-      this.hoverRegion = props.properties.name;
-      this.hoverTweetCount = Math.round(props.properties.count * 100) / 100;
-      this.twitterPanelHeader = true;
-
-    } else {
-      this.twitterPanelHeader = false;
-
-    }
-
-  };
 
 
   update_table(props?: any) {
@@ -422,7 +406,6 @@ export class MapComponent {
 
 
     this._geojson[this._activeNumber].resetStyle(e.target);
-    this.update_header();
     if (this.clicked != "") {
       dohighlightFeature(this.clicked.target);
     }
@@ -458,8 +441,17 @@ export class MapComponent {
       dohighlightFeature(layer);
       //Update the Twitter panel with the changes
       this.update_table(feature);
-      this.update_header();
     }
+    const exceedenceProbability = Math.round(feature.properties.stats * 100) / 100;
+    const region = feature.properties.name;
+    const count = Math.round(feature.properties.count * 100) / 100;
+    const text= "" +
+      `<div>Region: ${ region }</div>` +
+      `<div>Count: ${ count }</div>` +
+      `<div>Exceedence Prob.: ${ exceedenceProbability }</div>`;
+
+    layer.bindTooltip(text);
+    // layer.bindPopup(this.popup.makeLayerPopup(feature.properties));
     layer.on({
                mouseover: (e) => this.ngZone.run(() => mc.highlightFeature(e)),
                mouseout:  (e) => this.ngZone.run(() => mc.resetHighlight(e)),
@@ -501,12 +493,12 @@ export class MapComponent {
     console.log("readData");
     this.loadLiveData()
         .then((tweet_json) => {
+          console.log("loadLiveData() completed");
           this._tweetInfo = tweet_json;
           this._timeKeys = getTimes(this._tweetInfo);
           processData(this._tweetInfo, this._processedTweetInfo, this._polygonData, this.stats, this._B,
                       this._timeKeys.slice(-this._defaultMax, -this._defaultMin), this._gridSizes);
           this.resetLayers(false);
-          this.update_header();
           this.initSlider();
         }).catch((e) => {
       console.log("Loading data failed " + e);
@@ -555,7 +547,6 @@ export class MapComponent {
                                                          this._B, this._timeKeys.slice(-ui.values[1], -ui.values[0]),
                                                          this._gridSizes);
                                              this.resetLayers(false);
-                                             this.update_header();
                                              if (this.clicked != "") {
                                                this.displayText(this.clicked);
                                              }

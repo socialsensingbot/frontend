@@ -1,0 +1,27 @@
+//Includes toolbar
+.content {
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  overflow:auto;
+  //border:1px solid green;
+
+}
+
+//Whole application except toolbar
+.content-inner {
+  position:absolute;
+  width:100%;
+
+  //top:0;
+  top:64px;
+  left:0;
+  right:0;
+  bottom:0;
+  //border:1px solid red;
+
+}
+
+

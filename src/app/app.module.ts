@@ -53,6 +53,7 @@ import { TwitterPanelComponent } from './twitter-panel/twitter-panel.component';
             ],
             providers:    [{
               provide: AmplifyService,
+
               useFactory:  () => {
                 return AmplifyModules({
                                         Auth,

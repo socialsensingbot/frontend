@@ -1,18 +1,17 @@
 
 
-.tinfo {
-  width: 41vw;
-  height: 100%;
-  overflow: hidden;
-  padding: 6px 8px;
-  font: 14px/16px Arial,
-  Helvetica, sans-serif;
-  background: white;
-  //background: rgba(255, 255, 255, 0.5);
-  //box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-  //border-radius: 5px;
-  -webkit-transition: height 1s;
-  transition: height 1s;
+.mat-draw-inner-container {
+  //max-height: 100%;
+  //min-height: 100%;
+  //overflow: auto;
+  //font: 14px/16px Arial,
+  //Helvetica, sans-serif;
+  //background: white;
+  ////background: rgba(255, 255, 255, 0.5);
+  ////box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  ////border-radius: 5px;
+  //-webkit-transition: height 1s;
+  //transition: height 1s;
 }
 
 .tinfo_h4 {
@@ -21,18 +20,20 @@
 }
 
 .tinfo_h4b {
-  padding: 5px 0 5px 0;
+  margin: 5px 0 5px 0;
   color: #000;
 }
 
 .tinfo_table_wrapper {
-  width: 100%;
-  height: 100%;
-  overflow: auto;
+  //width: 100%;
+  //height: 100%;
+  //max-height: 100%;
+  //min-height: 100%;
+  //overflow: auto;
 }
 
 .tinfo td, .tinfo th {
-  padding: 8px;
+  margin: 8px;
 }
 
 

@@ -1,5 +1,73 @@
 .draw-close-button {
-  position:absolute;
-  right:8px;
-  top:8px;
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  z-index:100;
+
+}
+
+//The Map
+
+.map {
+  //width: 100%;
+  //min-height: 768px;
+  //margin: auto;
+  //display: block;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  //position: relative;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+  position: absolute;
+  z-index:-10;
+}
+
+.map-outer {
+  //width: 100%;
+  //min-height: 768px;
+  //margin: auto;
+  display: block;
+  position: absolute;
+  //min-height: 100%;
+  //position: absolute;
+  //position: absolute;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+
+  //z-index:-10;
+}
+
+.tweet-drawer {
+  max-width: 41vw;
+  width:528px;
+}
+
+.tweets-outer {
+  //max-width: 41vw;
+  margin:12px;
+  max-height: 100%;
+  overflow: auto;
+  font: 14px/16px Arial,
+  Helvetica, sans-serif;
+  //background: white;
+  ////background: rgba(255, 255, 255, 0.5);
+  ////box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  ////border-radius: 5px;
+  //-webkit-transition: height 1s;
+  //transition: height 1s;
+}
+
+.tweets-header {
+  //position: rel;
+  z-index:10;
+  width:100%;
+  height:4em;
+  overflow:hidden;
+  background: white;
+
 }
