@@ -5,7 +5,7 @@
     </button>
     <div class="tweets-outer">
       <div class="tweets-header">
-        <h4 ><span *ngIf="embeds" style="color: black"><b>Showing {{tweetCount}} Tweets from {{selectedRegion}}</b>:</span> Exceedence probability {{exceedenceProbability}}% </h4>
+        <div class="tweets-heading" ><span *ngIf="embeds" style="color: black"><b>Showing {{tweetCount}} Tweets from {{selectedRegion}}</b>:</span> Exceedence probability {{exceedenceProbability}}% </div>
       </div>
       <twitter-panel [count]="tweetCount" [region]="selectedRegion" [exceedenceProbability]="exceedenceProbability"
                      [embeds]="embeds" [showHeaderInfo]="twitterPanelHeader"
