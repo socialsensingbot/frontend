@@ -5,7 +5,9 @@
     </button>
     <div class="tweets-outer">
       <div class="tweets-header">
-        <div class="tweets-heading" ><span *ngIf="embeds" style="color: black"><b>Showing {{tweetCount}} Tweets from {{selectedRegion}}</b>:</span> Exceedence probability {{exceedenceProbability}}% </div>
+        <div class="tweets-heading"><span *ngIf="embeds" style="color: black"><b>Showing {{tweetCount}}
+          Tweets from {{selectedRegion}}</b>:</span> Exceedence probability {{exceedenceProbability}}%
+        </div>
       </div>
       <twitter-panel [count]="tweetCount" [region]="selectedRegion" [exceedenceProbability]="exceedenceProbability"
                      [embeds]="embeds" [showHeaderInfo]="twitterPanelHeader"
@@ -18,6 +20,10 @@
          leaflet
          (leafletMapReady)="onMapReady($event)"
          [leafletOptions]="options">
+    </div>
+    <div class="date-slider">
+      <date-range-slider (dateRange)="sliderChange($event)" [timeKeys]="this.timeKeys"
+                         [options]="sliderOptions"></date-range-slider>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

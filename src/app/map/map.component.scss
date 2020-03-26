@@ -54,7 +54,7 @@
 
     .tweets-heading {
       font-size: 1.3em;
-      margin:1em;
+      margin: 1em;
       line-height: 1.5em;
     }
 
@@ -69,8 +69,24 @@
     Helvetica, sans-serif;
   }
 
+
 }
 
-
-
+.date-slider {
+  max-height: 6em;
+  min-height: 4em;
+  overflow: hidden;
+  bottom: 4em;
+  position: absolute;
+  background: none;
+  z-index: 10;
+  max-width:30vw;
+  min-width:30vw;
+  right:4em;
+  //margin: 2em auto;
+  date-range-slider {
+    margin: 0em auto;
+    min-height: 10em;
+  }
+}
 

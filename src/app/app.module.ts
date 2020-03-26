@@ -25,6 +25,8 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import {MatSliderModule} from "@angular/material/slider";
 import {MatDrawer, MatSidenavModule} from "@angular/material/sidenav";
 import { TwitterPanelComponent } from './twitter-panel/twitter-panel.component';
+import { DateRangeSliderComponent } from './date-range-slider/date-range-slider.component';
+import {Ng5SliderModule} from "ng5-slider";
 @NgModule({
             declarations: [
               AppComponent,
@@ -37,7 +39,8 @@ import { TwitterPanelComponent } from './twitter-panel/twitter-panel.component';
               SignInComponent,
               ConfirmCodeComponent,
               HomeComponent,
-              TwitterPanelComponent
+              TwitterPanelComponent,
+              DateRangeSliderComponent
             ],
             imports:      [
               BrowserModule,
@@ -49,6 +52,7 @@ import { TwitterPanelComponent } from './twitter-panel/twitter-panel.component';
               AppRoutingModule,
               FormsModule,
               ReactiveFormsModule,
+              Ng5SliderModule,
               LeafletModule.forRoot()
             ],
             providers:    [{
