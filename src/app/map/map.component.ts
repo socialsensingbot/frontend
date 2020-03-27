@@ -24,6 +24,8 @@ import * as geojson from "geojson";
 import {DateRange, DateRangeSliderOptions} from "../date-range-slider/date-range-slider.component";
 
 
+type ColorFunctions = { stats: any, count: any };
+
 @Component({
              selector:    'app-map',
              templateUrl: './map.component.html',
@@ -58,7 +60,7 @@ export class MapComponent implements OnInit, OnDestroy {
     count: {values: [150, 50, 20, 10], colors: ['#045A8D', '#2B8CBE', '#74A9CF', '#BDC9E1', '#F1EEF6']}
   };
 
-  public _colorFunctions = {stats: {}, count: {}};
+  public _colorFunctions:ColorFunctions = {stats: null, count: null};
   public showTwitterTimeline: boolean;
 
   private _defaultMax = 0;
@@ -282,13 +284,16 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this._basemapControl = {"numbers": this._numberLayers, "polygon": this._polyLayers};
 
+    const newColorFunctions:ColorFunctions = {stats:{},count:{}};
     for (let key in this._colorData) {
-      this._colorFunctions[key].getColor = getColor.bind(null, this._colorData[key].values,
+      newColorFunctions[key].getColor = getColor.bind(null, this._colorData[key].values,
                                                          this._colorData[key].colors);
-      this._colorFunctions[key].getFeatureStyle = getFeatureStyle.bind(null, this._colorData[key].values,
+      newColorFunctions[key].getFeatureStyle = getFeatureStyle.bind(null, this._colorData[key].values,
                                                                        this._colorData[key].colors,
                                                                        key);
     }
+    //This assignment triggers the change to the legend
+    this._colorFunctions= newColorFunctions;
 
 
     this.setupCountStatsToggle();

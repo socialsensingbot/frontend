@@ -21,11 +21,12 @@
          (leafletMapReady)="onMapReady($event)"
          [leafletOptions]="options">
     </div>
+    <map-legend class="legend" [activeNumber]="_activeNumber" [colorData]="_colorData" [colorFunctions]="_colorFunctions"></map-legend>
     <div class="date-slider">
       <date-range-slider (dateRange)="sliderChange($event)" [timeKeys]="this.timeKeys"
                          [options]="sliderOptions"></date-range-slider>
     </div>
-    <map-legend class="legend" [activeNumber]="_activeNumber" [colorData]="_colorData" [colorFunctions]="_colorFunctions"></map-legend>
+
     <mat-progress-bar *ngIf="loading" class="map-progress" mode="buffer"></mat-progress-bar>
   </mat-sidenav-content>
 </mat-sidenav-container>

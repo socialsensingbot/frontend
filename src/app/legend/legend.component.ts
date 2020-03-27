@@ -8,16 +8,15 @@ import {MapComponent} from "../map/map.component";
              styleUrls:   ['./legend.component.scss']
            })
 export class LegendComponent implements OnInit {
-  public getColor: (number) => string;
-  public values: number[];
+  public getColor: (number) => string= null;
+  public values: number[]=[];
   private colors: any[];
 
   @Input()
-  public set activeNumber(value: any) {
+  public set activeNumber(value: string) {
     this._activeNumber = value;
     if(this._colorData) {
-      this.values = (this._colorData)[(this._activeNumber)].values;
-      this.colors = (this._colorData)[(this._activeNumber)].colors;
+      ({values: this.values, colors: this.colors} = (this._colorData)[(this._activeNumber)]);
     }
     if(this._colorFunctions) {
       this.getColor = (this._colorFunctions)[(this._activeNumber)].getColor;
@@ -25,9 +24,9 @@ export class LegendComponent implements OnInit {
   }
 
   @Input()
-  public set colorFunctions(value: () => []) {
+  public set colorFunctions(value: { stats:(()=>any)[], count:(()=>any)[]}) {
     this._colorFunctions = value;
-    if(typeof this._activeNumber === "number") {
+    if(typeof this._activeNumber !== "undefined" && (this._colorFunctions)[(this._activeNumber)] !=null) {
       this.getColor = (this._colorFunctions)[(this._activeNumber)].getColor;
     }
   }
@@ -35,15 +34,14 @@ export class LegendComponent implements OnInit {
   @Input()
   public set colorData(value: any) {
     this._colorData = value;
-    if(typeof this._activeNumber === "number") {
-      this.values = (this._colorData)[(this._activeNumber)].values;
-      this.colors = (this._colorData)[(this._activeNumber)].colors;
+    if(typeof this._activeNumber !== "undefined") {
+      ({values: this.values, colors: this.colors} = (this._colorData)[(this._activeNumber)]);
     }
   }
 
   private _colorData: any;
-  private _activeNumber: any;
-  private _colorFunctions: () => [];
+  private _activeNumber: string="stats";
+  private _colorFunctions: { stats: (() => any)[]; count: (() => any)[] };
 
   constructor() { }
 
