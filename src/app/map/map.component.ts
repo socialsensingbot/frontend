@@ -24,7 +24,6 @@ import * as geojson from "geojson";
 import {DateRange, DateRangeSliderOptions} from "../date-range-slider/date-range-slider.component";
 
 
-
 @Component({
              selector:    'app-map',
              templateUrl: './map.component.html',
@@ -60,12 +59,19 @@ export class MapComponent implements OnInit, OnDestroy {
   };
 
   public _colorFunctions = {stats: {}, count: {}};
+  public showTwitterTimeline: boolean;
+
+  private _defaultMax = 0;
+  private _defaultMin = -24 * 60 + 1;
+  public sliderOptions: DateRangeSliderOptions = {
+    max:      0,
+    min:      this._defaultMin,
+    startMin: this._defaultMin,
+    startMax: this._defaultMax
+  };
   private _oldClicked: (LeafletMouseEvent | "") = "";
   private clicked: (LeafletMouseEvent | "") = "";
   private timeKeys: any; //The times in the input JSON
-  private _defaultMax = 0;
-  private _defaultMin = -24 * 60 + 1;
-  private _changedPolys: boolean = false;
   private _lcontrols: { "numbers": Control.Layers, "polygon": Control.Layers } = {"numbers": null, "polygon": null};
   private _B: number = 1407;//countyStats["cambridgeshire"].length; //number of stats days
   private _params: Params;
@@ -75,15 +81,11 @@ export class MapComponent implements OnInit, OnDestroy {
   tweetCount: number;
   _showTweets: boolean = false;
   twitterPanelHeader: boolean;
-  public showTwitterTimeline: boolean;
-  public sliderOptions: DateRangeSliderOptions = {
-    max:      0,
-    min:      this._defaultMin,
-    startMin: this._defaultMin,
-    startMax: this._defaultMax
-  };
   private _layersAreStale: boolean;
-  private resetLayersTimer: Subscription;
+  private _resetLayersTimer: Subscription;
+  public loading: boolean= false;
+  public ready: boolean = false;
+
 
 
   updateSearch(params: Partial<Params>) {
@@ -289,7 +291,6 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
 
-
     this.setupCountStatsToggle();
     this.readData(); //reads data and sets up map
     setInterval(() => this.readData(), 60000);
@@ -427,7 +428,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.resetLayersTimer = timer(0, 1000).subscribe(() => {
+    this._resetLayersTimer = timer(0, 1000).subscribe(() => {
       if (this._layersAreStale) {
         this.resetLayers(false);
         this.updateTweets();
@@ -437,7 +438,7 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.resetLayersTimer.unsubscribe();
+    this._resetLayersTimer.unsubscribe();
   }
 
   ///////////////////////
@@ -472,6 +473,7 @@ export class MapComponent implements OnInit, OnDestroy {
   /////////////////////////////
   readData() {
     console.log("readData");
+    this.loading= true;
     this.loadLiveData()
         .then((tweet_json) => {
           console.log("loadLiveData() completed");
@@ -481,9 +483,12 @@ export class MapComponent implements OnInit, OnDestroy {
                       this.timeKeys.slice(-this._defaultMax, -this._defaultMin), this._gridSizes);
           this.initSlider();
           this._layersAreStale = true;
+          this.ready= true;
+          this.loading= false;
         }).catch((e) => {
       console.log("Loading data failed " + e);
       console.log(e);
+      this.loading= false;
     });
 
   };
@@ -491,8 +496,6 @@ export class MapComponent implements OnInit, OnDestroy {
   ///////////////////////////
   //Slider, start after reading JSON
   ///////////////////////////
-
-
   initSlider() {
     console.log("initSlider");
     if (this.timeKeys) {

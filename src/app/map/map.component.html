@@ -26,5 +26,9 @@
                          [options]="sliderOptions"></date-range-slider>
     </div>
     <map-legend class="legend" [activeNumber]="_activeNumber" [colorData]="_colorData" [colorFunctions]="_colorFunctions"></map-legend>
+    <mat-progress-bar *ngIf="loading" class="map-progress" mode="buffer"></mat-progress-bar>
   </mat-sidenav-content>
 </mat-sidenav-container>
+
+<mat-spinner *ngIf="!ready"  class="map-spinner"></mat-spinner>
+
