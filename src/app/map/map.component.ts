@@ -414,7 +414,7 @@ export class MapComponent implements OnInit, OnDestroy {
     const text = "" +
       `<div>Region: ${region}</div>` +
       `<div>Count: ${count}</div>` +
-      `<div>Exceedence Prob.: ${exceedenceProbability}</div>`;
+      `<div>Exceedence: ${exceedenceProbability}</div>`;
 
     layer.bindTooltip(text);
     // layer.bindPopup(this.popup.makeLayerPopup(feature.properties));
