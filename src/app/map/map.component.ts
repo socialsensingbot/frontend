@@ -4,8 +4,6 @@ import {coarseData} from './coarse_bi';
 import {fineData} from './fine_bi';
 import {dohighlightFeature, getColor, getFeatureStyle} from './layerStyle';
 import {makeLegend} from './legend';
-import {fineBox} from './fineBox.js';
-import {coarseBox} from './coarseBox.js';
 import {getTimes, processData} from './processTweets';
 import {Storage} from 'aws-amplify';
 import {
@@ -13,22 +11,18 @@ import {
   Control,
   ControlOptions,
   DomUtil,
-  GeoJSON, LatLng,
-  latLng,
+  GeoJSON, latLng,
   Layer,
   LayerGroup,
   layerGroup,
   LeafletMouseEvent,
-  Map, Popup,
-  tileLayer, tooltip
+  Map, tileLayer,
 } from 'leaflet';
-import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/slider.js';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Observable, Subscription, timer} from "rxjs";
 import * as geojson from "geojson";
 import {DateRange, DateRangeSliderOptions} from "../date-range-slider/date-range-slider.component";
-import {switchMap} from "rxjs/operators";
 
 ////////////////////////////
 //Legend
@@ -65,15 +59,9 @@ class LegendControl extends Control {
              styleUrls:   ['./map.component.scss']
            })
 export class MapComponent implements OnInit, OnDestroy {
-  private twitter: any;
   private _tweetInfo: any = {};
   private stats_layer = layerGroup();
-  private count_layer = layerGroup();
-  private layer_polys = {"county": fgsData, "fine": fineBox, "coarse": coarseBox};
   private county_layer = layerGroup(); //dummy layers to fool layer control
-  private coarse_layer = layerGroup();
-  private fine_layer = layerGroup();
-
   private _searchParams: Observable<Params>;
   private _map: Map;
   private _legend: LegendControl;
@@ -297,6 +285,8 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   private init(map: Map) {
     console.log("init");
+
+    //Listeners to push map state into URL
     map.addEventListener("dragend", () => {
       return this.ngZone.runOutsideAngular(
         () => this.updateSearch({lat: this._map.getCenter().lat, lng: this._map.getCenter().lng}))
@@ -318,10 +308,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this._basemapControl = {"numbers": this._numberLayers, "polygon": this._polyLayers};
 
-    //The times in the input JSON
-
-    //var current_min = -default_min;
-    //var current_max = -default_max;
     for (let key in this._colorData) {
       this._colorFunctions[key].getColor = getColor.bind(null, this._colorData[key].values,
                                                          this._colorData[key].colors);
@@ -352,16 +338,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
     //Use the current query parameters to update map state
     this.updateMap(this._params);
-    // ($(".timeslider") as any).slider.options.values = [-1, 0];
-    // ($(".timeslider") as any).slider.values = [-1, 0];
-
-    // this.timeslider = new Control({position: 'topright'});
-    // this.timeslider.onAdd = function (map) {
-    //   this._div = DomUtil.create('div', 'timeslider_container');
-    //   this._input = DomUtil.create('input', 'timeslider_input', this._div);
-    //   this._slider = DomUtil.create('div', 'timeslider', this._div);
-    //   return this._div;
-    // };
 
 
   }
@@ -476,9 +452,7 @@ export class MapComponent implements OnInit, OnDestroy {
              });
   }
 
-  ///////////////////////
-  //Add the polygons
-  ///////////////////////
+
 
   ngOnInit() {
     this.resetLayersTimer = timer(0, 1000).subscribe(() => {
@@ -494,6 +468,9 @@ export class MapComponent implements OnInit, OnDestroy {
     this.resetLayersTimer.unsubscribe();
   }
 
+  ///////////////////////
+  //Add the polygons
+  ///////////////////////
   resetLayers(clear_click) {
     console.log("resetLayers");
 
@@ -540,7 +517,7 @@ export class MapComponent implements OnInit, OnDestroy {
   };
 
   ///////////////////////////
-  //jQuery Slider, starup after reading JSON
+  //Slider, start after reading JSON
   ///////////////////////////
 
 
@@ -555,72 +532,23 @@ export class MapComponent implements OnInit, OnDestroy {
         startMax: this._defaultMax
       };
 
-      // this.timeslider.addTo(this._map);
-      // this._defaultMin = Math.max(this._defaultMin, -(this.timeKeys.length - 1));
-
-      //Add the initial header
-      //TODO: Convert to Angular Material Widget
-      // $(() => {
-      //   //console.log("timeslider", cleanDate(time_keys[-default_min], 0), cleanDate(time_keys[-default_max], 1) )
-      //   $(".timeslider_input")
-      //     .val(
-      //       this.cleanDate(this.timeKeys[-this._defaultMin], 0) + " - " + this.cleanDate(
-      //       this.timeKeys[-this._defaultMax], 1));
-      //
-      // });
-
-      // //how to react to moving the slider
-      // $(() => {
-      //   ($(".timeslider") as any).slider({
-      //                                      range:  true,
-      //                                      min:    -this.timeKeys.length + 1,
-      //                                      max:    0,
-      //                                      values: [this._defaultMin, this._defaultMax],
-      //                                      slide:  (event, ui) => {
-      //
-      //                                        this._defaultMax = ui.values[1];
-      //                                        this._defaultMin = ui.values[0];
-      //                                        this.updateSearch({min_offset: ui.values[0], max_offset: ui.values[1]});
-      //                                        processData(this._tweetInfo, this._processedTweetInfo, this._polygonData,
-      //                                                    this.stats,
-      //                                                    this._B, this.timeKeys.slice(-ui.values[1], -ui.values[0]),
-      //                                                    this._gridSizes);
-      //                                        this.resetLayers(false);
-      //                                        if (this.clicked != "") {
-      //                                          this.displayText(this.clicked);
-      //                                        }
-      //
-      //                                        $(".timeslider_input")
-      //                                          .val(this.cleanDate(this.timeKeys[-ui.values[0]],
-      //                                                              0) + " - " + this.cleanDate(
-      //                                            this.timeKeys[-ui.values[1]], 1));
-      //                                      }
-      //                                    });
-      //   this.updateMap(this._params);
-      //
-      //
-      // });
-
-      //   //Don't interact with the map while in the slider
-      //   const $timesliderContainer = $('.timeslider_container');
-      //   $timesliderContainer.on('mouseover', () => {
-      //     this._map.touchZoom.disable();
-      //     this._map.doubleClickZoom.disable();
-      //     this._map.scrollWheelZoom.disable();
-      //     this._map.boxZoom.disable();
-      //     this._map.keyboard.disable();
-      //     this._map.dragging.disable();
-      //   });
-      //   $timesliderContainer.on('mouseleave', () => {
-      //     this._map.touchZoom.enable();
-      //     this._map.doubleClickZoom.enable();
-      //     this._map.scrollWheelZoom.enable();
-      //     this._map.boxZoom.enable();
-      //     this._map.keyboard.enable();
-      //     this._map.dragging.enable();
-      //   });
-      //
     }
+  }
+  private disableMap() {
+        this._map.touchZoom.disable();
+        this._map.doubleClickZoom.disable();
+        this._map.scrollWheelZoom.disable();
+        this._map.boxZoom.disable();
+        this._map.keyboard.disable();
+        this._map.dragging.disable();
+  }
+  private enableMap() {
+        this._map.touchZoom.enable();
+        this._map.doubleClickZoom.enable();
+        this._map.scrollWheelZoom.enable();
+        this._map.boxZoom.enable();
+        this._map.keyboard.enable();
+        this._map.dragging.enable();
   }
 
   private hideTweets() {

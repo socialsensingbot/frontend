@@ -27,6 +27,9 @@ export class DateRangeSliderComponent implements OnInit,OnDestroy {
 
 
   public set upperValue(value: number) {
+    if (typeof value !== "undefined") {
+      console.log("Undefined upper value");
+    }
     this._upperValue = value;
     if (typeof this.timeKeys !== "undefined") {
       console.log(value);
@@ -34,12 +37,15 @@ export class DateRangeSliderComponent implements OnInit,OnDestroy {
     }
   }
 
-  public get lowerValue(): number {
+  public get lowerValue():number {
     return this._lowerValue;
   }
 
 
   public set lowerValue(value: number) {
+    if (typeof value !== "undefined") {
+      console.log("Undefined lower value");
+    }
     this._lowerValue = value;
     if (typeof this.timeKeys !== "undefined") {
       console.log(value);
@@ -69,6 +75,8 @@ export class DateRangeSliderComponent implements OnInit,OnDestroy {
           default:
             return this.timeKeys[-value] ?  this.cleanDate(this.timeKeys[-value], 0).toDateString(): "";
         }
+      } else {
+        return "";
       }
     }
   };
