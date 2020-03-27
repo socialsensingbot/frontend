@@ -3,7 +3,6 @@ import {fgsData} from './county_bi';
 import {coarseData} from './coarse_bi';
 import {fineData} from './fine_bi';
 import {dohighlightFeature, getColor, getFeatureStyle} from './layerStyle';
-import {makeLegend} from './legend';
 import {getTimes, processData} from './processTweets';
 import {Storage} from 'aws-amplify';
 import {
@@ -24,33 +23,6 @@ import {Observable, Subscription, timer} from "rxjs";
 import * as geojson from "geojson";
 import {DateRange, DateRangeSliderOptions} from "../date-range-slider/date-range-slider.component";
 
-////////////////////////////
-//Legend
-////////////////////////////
-class LegendControl extends Control {
-  _div = DomUtil.create('div', 'legend');
-  private mapComp: MapComponent;
-
-
-  constructor(options: ControlOptions, mapComp: MapComponent) {
-    super(options);
-    this.mapComp = mapComp;
-  }
-
-  update() {
-    console.log("LegendControl.update()");
-
-    this._div.innerHTML = makeLegend((this.mapComp._colorData)[(this.mapComp._activeNumber)].values,
-                                     (this.mapComp._colorData)[(this.mapComp._activeNumber)].colors,
-                                     (this.mapComp._colorFunctions)[(this.mapComp._activeNumber)].getColor);
-  };
-
-  onAdd(map) {
-    console.log("LegendControl.onAdd()");
-    this.update();
-    return this._div;
-  };
-}
 
 
 @Component({
@@ -64,7 +36,7 @@ export class MapComponent implements OnInit, OnDestroy {
   private county_layer = layerGroup(); //dummy layers to fool layer control
   private _searchParams: Observable<Params>;
   private _map: Map;
-  private _legend: LegendControl;
+
   private _numberLayers: { "stats": LayerGroup, "count": LayerGroup } = {"stats": null, "count": null};
   private _polyLayers: { "county": LayerGroup, "coarse": LayerGroup, "fine": LayerGroup } = {
     "county": null,
@@ -203,13 +175,13 @@ export class MapComponent implements OnInit, OnDestroy {
     this._params = params;
     const {lng, lat, zoom, active_number, active_polygon, min_offset, max_offset} = params;
     if (typeof min_offset !== "undefined") {
-      this.sliderOptions.startMin=min_offset;
+      this.sliderOptions.startMin = min_offset;
       this._defaultMin = min_offset;
     }
 
     if (typeof max_offset !== "undefined") {
-      this._defaultMax= max_offset;
-      this.sliderOptions.startMax=max_offset;
+      this._defaultMax = max_offset;
+      this.sliderOptions.startMax = max_offset;
     }
 
     if (typeof lat != "undefined" && typeof lng != "undefined") {
@@ -317,8 +289,6 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
 
-    this._legend = new LegendControl({}, this);
-    this._legend.addTo(map);
 
     this.setupCountStatsToggle();
     this.readData(); //reads data and sets up map
@@ -332,7 +302,6 @@ export class MapComponent implements OnInit, OnDestroy {
       } else {
         this._activeNumber = e.name;
         this.updateSearch({active_number: e.name});
-        this._legend.update();
       }
     });
 
@@ -421,7 +390,8 @@ export class MapComponent implements OnInit, OnDestroy {
       this.resetHighlight(this._oldClicked);
     }
   }
-   toTitleCase(str) {
+
+  toTitleCase(str) {
     return str.replace(/\S+/g, str => str.charAt(0).toUpperCase() + str.substr(1).toLowerCase());
   }
 
@@ -454,7 +424,6 @@ export class MapComponent implements OnInit, OnDestroy {
                click:     (e) => this.ngZone.run(() => mc.zoomToFeature(e))
              });
   }
-
 
 
   ngOnInit() {
@@ -537,21 +506,23 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
   }
+
   private disableMap() {
-        this._map.touchZoom.disable();
-        this._map.doubleClickZoom.disable();
-        this._map.scrollWheelZoom.disable();
-        this._map.boxZoom.disable();
-        this._map.keyboard.disable();
-        this._map.dragging.disable();
+    this._map.touchZoom.disable();
+    this._map.doubleClickZoom.disable();
+    this._map.scrollWheelZoom.disable();
+    this._map.boxZoom.disable();
+    this._map.keyboard.disable();
+    this._map.dragging.disable();
   }
+
   private enableMap() {
-        this._map.touchZoom.enable();
-        this._map.doubleClickZoom.enable();
-        this._map.scrollWheelZoom.enable();
-        this._map.boxZoom.enable();
-        this._map.keyboard.enable();
-        this._map.dragging.enable();
+    this._map.touchZoom.enable();
+    this._map.doubleClickZoom.enable();
+    this._map.scrollWheelZoom.enable();
+    this._map.boxZoom.enable();
+    this._map.keyboard.enable();
+    this._map.dragging.enable();
   }
 
   private hideTweets() {

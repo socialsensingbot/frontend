@@ -44,12 +44,10 @@
   .tweets-header {
     //position: rel;
     z-index: 10;
-    max-height: 6em;
     margin-top: 1em;
     margin-right: auto;
     margin-left: auto;
     margin-bottom: 0;
-    overflow: hidden;
     //background: white;
 
     .tweets-heading {
@@ -75,7 +73,6 @@
 .date-slider {
   max-height: 6em;
   min-height: 4em;
-  overflow: hidden;
   bottom: 4em;
   position: absolute;
   background: none;
@@ -89,4 +86,20 @@
     min-height: 10em;
   }
 }
+
+
+.legend {
+  max-height: 8em;
+  min-height: 12em;
+  top: 4em;
+  position: absolute;
+  background: none;
+  z-index: 10;
+  max-width:6em;
+  min-width:4em;
+  right:4em;
+
+}
+
+
 

@@ -1,0 +1,7 @@
+<mat-card *ngIf="values">
+  <div class="legend-inner">
+    <span *ngFor="let value of values; let i = index">
+    <i [style.background]="this.getColor(value)"></i> {{value}}{{(values[i+1] ? '&ndash;' + values[i+1] : '&ndash;0')}}
+      </span>
+  </div>
+</mat-card>

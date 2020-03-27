@@ -27,6 +27,7 @@ import {MatDrawer, MatSidenavModule} from "@angular/material/sidenav";
 import { TwitterPanelComponent } from './twitter-panel/twitter-panel.component';
 import { DateRangeSliderComponent } from './date-range-slider/date-range-slider.component';
 import {Ng5SliderModule} from "ng5-slider";
+import { LegendComponent } from './legend/legend.component';
 @NgModule({
             declarations: [
               AppComponent,
@@ -40,7 +41,8 @@ import {Ng5SliderModule} from "ng5-slider";
               ConfirmCodeComponent,
               HomeComponent,
               TwitterPanelComponent,
-              DateRangeSliderComponent
+              DateRangeSliderComponent,
+              LegendComponent
             ],
             imports:      [
               BrowserModule,
