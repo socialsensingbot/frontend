@@ -214,10 +214,16 @@ export class MapComponent implements OnInit, OnDestroy {
     console.log(params);
     this._params = params;
     const {lng, lat, zoom, active_number, active_polygon, min_offset, max_offset} = params;
-    this._defaultMin= min_offset;
-    this._defaultMax= max_offset;
-    this.sliderOptions.startMin=min_offset;
-    this.sliderOptions.startMax=max_offset;
+    if (typeof min_offset !== "undefined") {
+      this.sliderOptions.startMin=min_offset;
+      this._defaultMin = min_offset;
+    }
+
+    if (typeof max_offset !== "undefined") {
+      this._defaultMax= max_offset;
+      this.sliderOptions.startMax=max_offset;
+    }
+
     if (typeof lat != "undefined" && typeof lng != "undefined") {
       this.options.center = latLng(lat, lng);
     }
