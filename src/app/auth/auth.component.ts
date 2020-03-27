@@ -17,7 +17,7 @@ export class AuthComponent implements OnInit {
       switch (event) {
         case "signIn":
           this._zone.run(() => {
-            this._router.navigate(['/']);
+            this._router.navigate(['/map']);
           });
           break;
         case "signOut":

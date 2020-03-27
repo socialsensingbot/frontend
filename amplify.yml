@@ -1,0 +1,42 @@
+version: 0.1
+backend:
+  phases:
+    build:
+      commands:
+        - '# Execute Amplify CLI with the helper script'
+        - amplifyPush --simple
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - NODE_OPTIONS="node --max_old_space_size=4096" npm run build || ( cat /tmp/ng*/angular-errors.log  && exit -1 )
+  artifacts:
+    baseDirectory: dist/frontend
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+test:
+  phases:
+    preTest:
+      commands:
+        - npm ci
+        - npm install wait-on
+        - npm install mocha@7.1.1 mochawesome mochawesome-merge mochawesome-report-generator
+        - 'npm start & npx wait-on http://localhost:4200'
+    test:
+      commands:
+        - 'npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"'
+    postTest:
+      commands:
+        - npx mochawesome-merge cypress/report/mochawesome-report/mochawesome*.json > cypress/report/mochawesome.json
+  artifacts:
+    baseDirectory: cypress
+    configFilePath: '**/mochawesome.json'
+    files:
+      - '**/*.png'
+      - '**/*.mp4'

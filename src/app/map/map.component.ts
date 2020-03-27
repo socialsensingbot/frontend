@@ -1,81 +1,43 @@
-import {Component} from '@angular/core';
+import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {fgsData} from './county_bi';
 import {coarseData} from './coarse_bi';
 import {fineData} from './fine_bi';
 import {dohighlightFeature, getColor, getFeatureStyle} from './layerStyle';
-import {makeLegend} from './legend';
-import {tinfo} from './tweetPanel';
-import {fineBox} from './fineBox.js';
-import {coarseBox} from './coarseBox.js';
 import {getTimes, processData} from './processTweets';
-import {cleanDate, timeslider} from './timeSlider';
 import {Storage} from 'aws-amplify';
 import {
   control,
   Control,
   ControlOptions,
   DomUtil,
-  GeoJSON,
-  latLng,
-  Layer, LayerGroup,
+  GeoJSON, latLng,
+  Layer,
+  LayerGroup,
   layerGroup,
   LeafletMouseEvent,
-  Map,
-  tileLayer
+  Map, tileLayer,
 } from 'leaflet';
-import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/slider.js';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {Observable} from "rxjs";
+import {Observable, Subscription, timer} from "rxjs";
 import * as geojson from "geojson";
-
-////////////////////////////
-//Legend
-////////////////////////////
-class LegendControl extends Control {
-  _div = DomUtil.create('div', 'legend');
-  private mapComp: MapComponent;
+import {DateRange, DateRangeSliderOptions} from "../date-range-slider/date-range-slider.component";
 
 
-  constructor(options: ControlOptions, mapComp: MapComponent) {
-    super(options);
-    this.mapComp = mapComp;
-  }
-
-  update() {
-    console.log("LegendControl.update()");
-
-    this._div.innerHTML = makeLegend((this.mapComp._colorData)[(this.mapComp._activeNumber)].values,
-                                     (this.mapComp._colorData)[(this.mapComp._activeNumber)].colors,
-                                     (this.mapComp._colorFunctions)[(this.mapComp._activeNumber)].getColor);
-  };
-
-  onAdd(map) {
-    console.log("LegendControl.onAdd()");
-    this.update();
-    return this._div;
-  };
-}
-
+type ColorFunctions = { stats: any, count: any };
 
 @Component({
              selector:    'app-map',
              templateUrl: './map.component.html',
              styleUrls:   ['./map.component.scss']
            })
-export class MapComponent {
-  private twitter: any;
+export class MapComponent implements OnInit, OnDestroy {
   private _tweetInfo: any = {};
   private stats_layer = layerGroup();
-  private count_layer = layerGroup();
-  private layer_polys = {"county": fgsData, "fine": fineBox, "coarse": coarseBox};
   private county_layer = layerGroup(); //dummy layers to fool layer control
-  private coarse_layer = layerGroup();
-  private fine_layer = layerGroup();
-
   private _searchParams: Observable<Params>;
   private _map: Map;
-  private _legend: LegendControl;
+
   private _numberLayers: { "stats": LayerGroup, "count": LayerGroup } = {"stats": null, "count": null};
   private _polyLayers: { "county": LayerGroup, "coarse": LayerGroup, "fine": LayerGroup } = {
     "county": null,
@@ -98,16 +60,35 @@ export class MapComponent {
     count: {values: [150, 50, 20, 10], colors: ['#045A8D', '#2B8CBE', '#74A9CF', '#BDC9E1', '#F1EEF6']}
   };
 
-  public _colorFunctions = {stats: {}, count: {}};
-  private _oldClicked: (LeafletMouseEvent | "") = "";
-  private clicked: (LeafletMouseEvent | "") = "";
-  private _timeKeys: any; //The times in the input JSON
+  public _colorFunctions:ColorFunctions = {stats: null, count: null};
+  public showTwitterTimeline: boolean;
+
   private _defaultMax = 0;
   private _defaultMin = -24 * 60 + 1;
-  private _changedPolys: boolean = false;
+  public sliderOptions: DateRangeSliderOptions = {
+    max:      0,
+    min:      this._defaultMin,
+    startMin: this._defaultMin,
+    startMax: this._defaultMax
+  };
+  private _oldClicked: (LeafletMouseEvent | "") = "";
+  private clicked: (LeafletMouseEvent | "") = "";
+  private timeKeys: any; //The times in the input JSON
   private _lcontrols: { "numbers": Control.Layers, "polygon": Control.Layers } = {"numbers": null, "polygon": null};
   private _B: number = 1407;//countyStats["cambridgeshire"].length; //number of stats days
   private _params: Params;
+  embeds: string;
+  selectedRegion: string;
+  exceedenceProbability: number;
+  tweetCount: number;
+  _showTweets: boolean = false;
+  twitterPanelHeader: boolean;
+  private _layersAreStale: boolean;
+  private _resetLayersTimer: Subscription;
+  public loading: boolean= false;
+  public ready: boolean = false;
+
+
 
   updateSearch(params: Partial<Params>) {
     console.log("updateSearch");
@@ -138,7 +119,7 @@ export class MapComponent {
 
   stats = {"county": {}, "coarse": {}, "fine": {}};
 
-  constructor(private _router: Router, private route: ActivatedRoute) {
+  constructor(private _router: Router, private route: ActivatedRoute, private ngZone: NgZone) {
     //save the query parameter observable
     this._searchParams = this.route.queryParams;
 
@@ -196,7 +177,17 @@ export class MapComponent {
     console.log("Updating map with params");
     console.log(params);
     this._params = params;
-    const {lng, lat, zoom, active_number, active_polygon,min_offset,max_offset} = params;
+    const {lng, lat, zoom, active_number, active_polygon, min_offset, max_offset} = params;
+    if (typeof min_offset !== "undefined") {
+      this.sliderOptions.startMin = min_offset;
+      this._defaultMin = min_offset;
+    }
+
+    if (typeof max_offset !== "undefined") {
+      this._defaultMax = max_offset;
+      this.sliderOptions.startMax = max_offset;
+    }
+
     if (typeof lat != "undefined" && typeof lng != "undefined") {
       this.options.center = latLng(lat, lng);
     }
@@ -244,8 +235,9 @@ export class MapComponent {
       }
     }
 
-    if(typeof min_offset !== "undefined" && typeof min_offset !== "undefined")
-    ($(".timeslider") as any).slider("option", "values", [min_offset, max_offset]);
+    // if (typeof min_offset !== "undefined" && typeof min_offset !== "undefined") {
+    //   ($(".timeslider") as any).slider("option", "values", [min_offset, max_offset]);
+    // }
 
     return undefined;
   }
@@ -269,12 +261,15 @@ export class MapComponent {
    */
   private init(map: Map) {
     console.log("init");
+
+    //Listeners to push map state into URL
     map.addEventListener("dragend", () => {
-      return this.updateSearch({lat: this._map.getCenter().lat, lng: this._map.getCenter().lng})
+      return this.ngZone.runOutsideAngular(
+        () => this.updateSearch({lat: this._map.getCenter().lat, lng: this._map.getCenter().lng}))
     });
 
     map.addEventListener("zoomend", () => {
-      return this.updateSearch({zoom: this._map.getZoom()})
+      return this.ngZone.runOutsideAngular(() => this.updateSearch({zoom: this._map.getZoom()}));
     });
 
 
@@ -289,23 +284,18 @@ export class MapComponent {
 
     this._basemapControl = {"numbers": this._numberLayers, "polygon": this._polyLayers};
 
-    //The times in the input JSON
-
-    //var current_min = -default_min;
-    //var current_max = -default_max;
+    const newColorFunctions:ColorFunctions = {stats:{},count:{}};
     for (let key in this._colorData) {
-      this._colorFunctions[key].getColor = getColor.bind(null, this._colorData[key].values,
+      newColorFunctions[key].getColor = getColor.bind(null, this._colorData[key].values,
                                                          this._colorData[key].colors);
-      this._colorFunctions[key].getFeatureStyle = getFeatureStyle.bind(null, this._colorData[key].values,
+      newColorFunctions[key].getFeatureStyle = getFeatureStyle.bind(null, this._colorData[key].values,
                                                                        this._colorData[key].colors,
                                                                        key);
     }
+    //This assignment triggers the change to the legend
+    this._colorFunctions= newColorFunctions;
 
 
-    this._legend = new LegendControl({}, this);
-    this._legend.addTo(map);
-
-    this.setupTwitterPanel();
     this.setupCountStatsToggle();
     this.readData(); //reads data and sets up map
     setInterval(() => this.readData(), 60000);
@@ -318,17 +308,22 @@ export class MapComponent {
       } else {
         this._activeNumber = e.name;
         this.updateSearch({active_number: e.name});
-        this._legend.update();
       }
     });
 
     //Use the current query parameters to update map state
     this.updateMap(this._params);
-    // ($(".timeslider") as any).slider.options.values = [-1, 0];
-    // ($(".timeslider") as any).slider.values = [-1, 0];
+
 
   }
 
+  //add = extra minutes
+  cleanDate(tstring, add) {
+    var date = new Date(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
+                        tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0);
+    //var date = new Date( tstring.substring(0,4), tstring.substring(4,6)-1, tstring.substring(6,8), +tstring.substring(8,10)+add, 0, 0, 0);
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString()
+  }
 
   private setupCountStatsToggle() {
     ////////////////////////////
@@ -343,55 +338,6 @@ export class MapComponent {
 
   }
 
-  private setupTwitterPanel() {
-    console.log("setupTwitterPanel");
-
-    ////////////////////////////
-    //Tweet Panel define Jquery mouse handling and minimise
-    ////////////////////////////
-    tinfo.addTo(this._map);
-
-    const $tinfo = $('.tinfo');
-    $tinfo.on('mouseover', () => {
-      this._map.touchZoom.disable();
-      this._map.doubleClickZoom.disable();
-      this._map.scrollWheelZoom.disable();
-      this._map.boxZoom.disable();
-      this._map.keyboard.disable();
-      this._map.dragging.disable();
-    });
-    $tinfo.on('mouseleave', () => {
-      this._map.touchZoom.enable();
-      this._map.doubleClickZoom.enable();
-      this._map.scrollWheelZoom.enable();
-      this._map.boxZoom.enable();
-      this._map.keyboard.enable();
-      this._map.dragging.enable();
-    });
-    $(".tinfo_button").on('click', function () {
-      if ($(this).html() == "-") {
-        $(this).html("+");
-        $(".tinfo").css({
-                          "height":     "5vh",
-                          "width":      "5vh",
-                          "transition": "all 1s",
-                        });
-        $(".tinfo_h4").hide();
-        $(".tinfo_h4b").hide();
-        $(".tinfo_table_wrapper").hide()
-      } else {
-        $(this).html("-");
-        $(".tinfo").css({
-                          "height":     "85vh",
-                          "width":      "41vw",
-                          "transition": "all 1s"
-                        });
-        $(".tinfo_h4").show();
-        $(".tinfo_h4b").show();
-        $(".tinfo_table_wrapper").show()
-      }
-    });
-  }
 
   /////////////////////////
   //React to Mouse
@@ -399,21 +345,35 @@ export class MapComponent {
   public highlightFeature(e: LeafletMouseEvent) {
     console.log("highlightFeature");
     dohighlightFeature(e.target);
-    tinfo.update_header(e.target.feature);
   }
 
   public displayText(e: LeafletMouseEvent) {
     console.log("displayText");
-    tinfo.update_table(e.target.feature,
-                       this._processedTweetInfo[this._activePolys]["embed"][e.target.feature.properties.name]);
+    this.update_table(e.target.feature);
   }
+
+
+  update_table(props?: any) {
+
+    if (props.properties.count > 0) {
+      this.exceedenceProbability = Math.round(props.properties.stats * 100) / 100;
+      this.selectedRegion = this.toTitleCase(props.properties.name);
+      this.tweetCount = Math.round(props.properties.count * 100) / 100;
+      this.embeds = this._processedTweetInfo[this._activePolys]["embed"][props.properties.name];
+      this.twitterPanelHeader = true;
+      this.showTwitterTimeline = true;
+      this.showTweets()
+    } else {
+      this.hideTweets()
+    }
+
+  };
 
   public resetHighlight(e: LeafletMouseEvent) {
     console.log("resetHighlight");
 
 
     this._geojson[this._activeNumber].resetStyle(e.target);
-    tinfo.update_header();
     if (this.clicked != "") {
       dohighlightFeature(this.clicked.target);
     }
@@ -422,7 +382,7 @@ export class MapComponent {
   zoomToFeature(e: LeafletMouseEvent) {
     console.log("zoomToFeature");
     console.log(e.target.feature.properties.name);
-    this.updateSearch({"selected":e.target.feature.properties.name});
+    this.updateSearch({"selected": e.target.feature.properties.name});
     this.displayText(e);
     this._oldClicked = this.clicked;
     this.clicked = e;
@@ -437,21 +397,53 @@ export class MapComponent {
     }
   }
 
+  toTitleCase(str) {
+    return str.replace(/\S+/g, str => str.charAt(0).toUpperCase() + str.substr(1).toLowerCase());
+  }
+
   onEachFeature(feature: geojson.Feature<geojson.GeometryObject, any>, layer: Layer) {
     console.log("onEachFeature");
     const mc = this;
-    if(feature.properties.name === this._params.selected) {
-      console.log("Matched "+feature.properties.name);
+    // If this feature is referenced in the URL query paramter selected
+    // e.g. ?...&selected=powys
+    // then highlight it and update Twitter
+    if (feature.properties.name === this._params.selected) {
+      console.log("Matched " + feature.properties.name);
+      //Put the selection outline around the feature
       dohighlightFeature(layer);
-      tinfo.update_table(feature,
-                         this._processedTweetInfo[this._activePolys]["embed"][feature.properties.name]);
-      tinfo.update_header();
+      //Update the Twitter panel with the changes
+      this.update_table(feature);
     }
+    const exceedenceProbability = Math.round(feature.properties.stats * 100) / 100;
+    const region = this.toTitleCase(feature.properties.name);
+    const count = Math.round(feature.properties.count * 100) / 100;
+    const text = "" +
+      `<div>Region: ${region}</div>` +
+      `<div>Count: ${count}</div>` +
+      `<div>Exceedence: ${exceedenceProbability}</div>`;
+
+    layer.bindTooltip(text);
+    // layer.bindPopup(this.popup.makeLayerPopup(feature.properties));
     layer.on({
-               mouseover: (e) => mc.highlightFeature(e),
-               mouseout:  (e) => mc.resetHighlight(e),
-               click:     (e) => mc.zoomToFeature(e)
+               mouseover: (e) => this.ngZone.run(() => mc.highlightFeature(e)),
+               mouseout:  (e) => this.ngZone.run(() => mc.resetHighlight(e)),
+               click:     (e) => this.ngZone.run(() => mc.zoomToFeature(e))
              });
+  }
+
+
+  ngOnInit() {
+    this._resetLayersTimer = timer(0, 1000).subscribe(() => {
+      if (this._layersAreStale) {
+        this.resetLayers(false);
+        this.updateTweets();
+        this._layersAreStale = false;
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this._resetLayersTimer.unsubscribe();
   }
 
   ///////////////////////
@@ -486,93 +478,83 @@ export class MapComponent {
   /////////////////////////////
   readData() {
     console.log("readData");
+    this.loading= true;
     this.loadLiveData()
         .then((tweet_json) => {
+          console.log("loadLiveData() completed");
           this._tweetInfo = tweet_json;
-          this._timeKeys = getTimes(this._tweetInfo);
+          this.timeKeys = getTimes(this._tweetInfo);
           processData(this._tweetInfo, this._processedTweetInfo, this._polygonData, this.stats, this._B,
-                      this._timeKeys.slice(-this._defaultMax, -this._defaultMin), this._gridSizes);
-          this.resetLayers(false);
-          tinfo.update_header();
+                      this.timeKeys.slice(-this._defaultMax, -this._defaultMin), this._gridSizes);
           this.initSlider();
+          this._layersAreStale = true;
+          this.ready= true;
+          this.loading= false;
         }).catch((e) => {
       console.log("Loading data failed " + e);
       console.log(e);
+      this.loading= false;
     });
 
   };
 
   ///////////////////////////
-  //jQuery Slider, starup after reading JSON
+  //Slider, start after reading JSON
   ///////////////////////////
   initSlider() {
     console.log("initSlider");
-    if (this._timeKeys) {
-
-      timeslider.addTo(this._map);
-      this._defaultMin = Math.max(this._defaultMin, -(this._timeKeys.length - 1));
-
-      //Add the initial header
-      //TODO: Convert to Angular Material Widget
-      $(() => {
-        //console.log("timeslider", cleanDate(time_keys[-default_min], 0), cleanDate(time_keys[-default_max], 1) )
-        $(".timeslider_input")
-          .val(
-            cleanDate(this._timeKeys[-this._defaultMin], 0) + " - " + cleanDate(this._timeKeys[-this._defaultMax], 1));
-
-      });
-
-      //how to react to moving the slider
-      $(() => {
-        ($(".timeslider") as any).slider({
-                                           range:  true,
-                                           min:    -this._timeKeys.length + 1,
-                                           max:    0,
-                                           values: [this._defaultMin, this._defaultMax],
-                                           slide:  (event, ui) => {
-
-                                             this._defaultMax = ui.values[1];
-                                             this._defaultMin = ui.values[0];
-                                             this.updateSearch({min_offset: ui.values[0],max_offset:ui.values[1]});
-                                             processData(this._tweetInfo, this._processedTweetInfo, this._polygonData,
-                                                         this.stats,
-                                                         this._B, this._timeKeys.slice(-ui.values[1], -ui.values[0]),
-                                                         this._gridSizes);
-                                             this.resetLayers(false);
-                                             tinfo.update_header();
-                                             if (this.clicked != "") {
-                                               this.displayText(this.clicked);
-                                             }
-
-                                             $(".timeslider_input")
-                                               .val(cleanDate(this._timeKeys[-ui.values[0]], 0) + " - " + cleanDate(
-                                                 this._timeKeys[-ui.values[1]], 1));
-                                           }
-                                         });
-        this.updateMap(this._params);
-
-
-      });
-
-      //Don't interact with the map while in the slider
-      const $timesliderContainer = $('.timeslider_container');
-      $timesliderContainer.on('mouseover', () => {
-        this._map.touchZoom.disable();
-        this._map.doubleClickZoom.disable();
-        this._map.scrollWheelZoom.disable();
-        this._map.boxZoom.disable();
-        this._map.keyboard.disable();
-        this._map.dragging.disable();
-      });
-      $timesliderContainer.on('mouseleave', () => {
-        this._map.touchZoom.enable();
-        this._map.doubleClickZoom.enable();
-        this._map.scrollWheelZoom.enable();
-        this._map.boxZoom.enable();
-        this._map.keyboard.enable();
-        this._map.dragging.enable();
-      });
+    if (this.timeKeys) {
+      this._defaultMin = Math.max(this._defaultMin, -(this.timeKeys.length - 1));
+      this.sliderOptions = {
+        max:      0,
+        min:      -this.timeKeys.length + 1,
+        startMin: this._defaultMin,
+        startMax: this._defaultMax
+      };
 
     }
+  }
+
+  private disableMap() {
+    this._map.touchZoom.disable();
+    this._map.doubleClickZoom.disable();
+    this._map.scrollWheelZoom.disable();
+    this._map.boxZoom.disable();
+    this._map.keyboard.disable();
+    this._map.dragging.disable();
+  }
+
+  private enableMap() {
+    this._map.touchZoom.enable();
+    this._map.doubleClickZoom.enable();
+    this._map.scrollWheelZoom.enable();
+    this._map.boxZoom.enable();
+    this._map.keyboard.enable();
+    this._map.dragging.enable();
+  }
+
+  private hideTweets() {
+    this._showTweets = false;
+  }
+
+  private showTweets() {
+    this._showTweets = true;
+  }
+
+  public sliderChange(range: DateRange) {
+    this._defaultMax = range.upper;
+    this._defaultMin = range.lower;
+    this.updateSearch({min_offset: range.lower, max_offset: range.upper});
+    this._layersAreStale = true;
+    if (this.clicked != "") {
+      this.displayText(this.clicked);
+    }
+  }
+
+  private updateTweets() {
+    processData(this._tweetInfo, this._processedTweetInfo, this._polygonData,
+                this.stats,
+                this._B, this.timeKeys.slice(-this._defaultMax, -this._defaultMin),
+                this._gridSizes);
   }
 }

@@ -22,6 +22,12 @@ import { AuthService } from './auth/auth.service';
 import {Router} from "@angular/router";
 import {HomeComponent} from "./home/home.component";
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
+import {MatSliderModule} from "@angular/material/slider";
+import {MatDrawer, MatSidenavModule} from "@angular/material/sidenav";
+import { TwitterPanelComponent } from './twitter-panel/twitter-panel.component';
+import { DateRangeSliderComponent } from './date-range-slider/date-range-slider.component';
+import {Ng5SliderModule} from "ng5-slider";
+import { LegendComponent } from './legend/legend.component';
 @NgModule({
             declarations: [
               AppComponent,
@@ -33,20 +39,27 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
               FilterPipe,
               SignInComponent,
               ConfirmCodeComponent,
-              HomeComponent
+              HomeComponent,
+              TwitterPanelComponent,
+              DateRangeSliderComponent,
+              LegendComponent
             ],
             imports:      [
               BrowserModule,
               BrowserAnimationsModule,
               AmplifyAngularModule,
               MaterialModule,
+              MatSidenavModule,
+              MatSliderModule,
               AppRoutingModule,
               FormsModule,
               ReactiveFormsModule,
+              Ng5SliderModule,
               LeafletModule.forRoot()
             ],
             providers:    [{
               provide: AmplifyService,
+
               useFactory:  () => {
                 return AmplifyModules({
                                         Auth,

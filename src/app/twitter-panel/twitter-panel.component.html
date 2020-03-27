@@ -1,0 +1,15 @@
+<div id="tinfo" class="tinfo">
+  <!--      <button id="tinfo_button" class="tinfo_button">-</button>-->
+  <div id="tinfo_table_wrapper" class="tinfo_table_wrapper">
+
+    <div id="tinfo_table" class="tinfo_table" *ngIf="showTimeline">
+      <table class=table_info >
+        <tr *ngIf="!ready"><td><mat-spinner class="tinfo-spinner"></mat-spinner></td></tr>
+        <div #tinfoEmbeds [innerHTML]="embeds" [style.visibility]="ready ? 'visible' : 'hidden'"></div>
+
+    </table>
+
+    </div>
+  </div>
+</div>
+
