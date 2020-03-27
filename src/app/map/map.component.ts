@@ -382,7 +382,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     if (props.properties.count > 0) {
       this.exceedenceProbability = Math.round(props.properties.stats * 100) / 100;
-      this.selectedRegion = props.properties.name;
+      this.selectedRegion = this.toTitleCase(props.properties.name);
       this.tweetCount = Math.round(props.properties.count * 100) / 100;
       this.embeds = this._processedTweetInfo[this._activePolys]["embed"][props.properties.name];
       this.twitterPanelHeader = true;
@@ -421,6 +421,9 @@ export class MapComponent implements OnInit, OnDestroy {
       this.resetHighlight(this._oldClicked);
     }
   }
+   toTitleCase(str) {
+    return str.replace(/\S+/g, str => str.charAt(0).toUpperCase() + str.substr(1).toLowerCase());
+  }
 
   onEachFeature(feature: geojson.Feature<geojson.GeometryObject, any>, layer: Layer) {
     console.log("onEachFeature");
@@ -436,7 +439,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this.update_table(feature);
     }
     const exceedenceProbability = Math.round(feature.properties.stats * 100) / 100;
-    const region = feature.properties.name;
+    const region = this.toTitleCase(feature.properties.name);
     const count = Math.round(feature.properties.count * 100) / 100;
     const text = "" +
       `<div>Region: ${region}</div>` +
