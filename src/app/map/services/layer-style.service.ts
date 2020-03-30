@@ -12,9 +12,9 @@ export class LayerStyleService {
  dohighlightFeature(layer){
     layer.setStyle({
                      weight: 3,
-                     color: '#FF00FF',
+                     color: '#ea1e63',
                      dashArray: '',
-                     fillOpacity: 0.4
+                     fillOpacity: 1.0
                    });
 
     if (!Browser.ie && !Browser.opera && !Browser.edge) {

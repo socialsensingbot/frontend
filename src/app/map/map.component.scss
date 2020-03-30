@@ -1,7 +1,7 @@
 .draw-close-button {
   position: absolute;
-  right: 1px;
-  top: -2px;
+  right: -8px;
+  top: -8px;
   z-index: 100;
 
 }
@@ -61,7 +61,7 @@
     //position: rel;
     z-index: 10;
     margin-top: 12px;
-    margin-right: 12px;
+    margin-right: 24px;
     margin-left: 14px;
     margin-bottom: 0;
     //background: white;
@@ -92,13 +92,14 @@
 .date-slider {
   max-height: 6em;
   min-height: 4em;
-  bottom: 4em;
+  bottom:28px;
   position: absolute;
   background: none;
   z-index: 10;
   max-width: 30vw;
   min-width: 30vw;
-  right: 4em;
+  right: 12px;
+  //border: 3px solid red;
   //margin: 2em auto;
   date-range-slider {
     margin: 0em auto;
@@ -109,14 +110,15 @@
 
 .legend {
   max-height: 8em;
-  min-height: 12em;
-  top: 4em;
+  min-height: 6em;
+  top: 12px;
   position: absolute;
   background: none;
+  //border: 3px solid red;
   z-index: 100;
   max-width: 6em;
   min-width: 4em;
-  right: 4em;
+  right: 10px;
 
 }
 
