@@ -20,7 +20,7 @@
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$app-primary: mat-palette($mat-indigo, 800);
+$app-primary: mat-palette($mat-light-blue, 800);
 $app-accent: mat-palette($mat-pink, 800);
 $app-active: mat-palette($mat-pink, 800);
 
@@ -139,23 +139,7 @@ a {
 
 
 
-.timeslider_container {
-  width: 32vw;
-  height: 10vh;
-}
 
-.timeslider {
-  width: 30vw;
-}
-
-.timeslider_input {
-  border: 0;
-  width: 32vw;
-  font-weight: bold;
-  font-size: 2vh;
-  background-color: transparent;
-  text-align: center;
-}
 
 
 //.leaflet-top.leaflet-left {

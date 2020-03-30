@@ -27,16 +27,16 @@
       <!--        <mat-icon>map</mat-icon>-->
       <!--        Map-->
       <!--      </button>-->
-      <button id="signup" mat-button routerLink="/auth/signup" *ngIf="isSignup">
-        Signup (Dev Only)
-      </button>
+<!--      <button id="signup" mat-button routerLink="/auth/signup" *ngIf="isSignup">-->
+<!--        Signup (Dev Only)-->
+<!--      </button>-->
 
     </div>
     <!--    <button mat-button [mat-menu-trigger-for]="menu" fxHide="false" fxHide.gt-sm>-->
     <!--      <mat-icon>menu</mat-icon>-->
     <!--    </button>-->
   </mat-toolbar>
-  <!-- <mat-menu x-position="before" #menu="matMenu">
+  <mat-menu x-position="before" #menu="matMenu">
      <button mat-menu-item routerLink="/">
        <mat-icon>home</mat-icon>
        Home
@@ -53,7 +53,7 @@
        <mat-icon>exit_to_app</mat-icon>
        Logout
      </button>
-   </mat-menu>-->
+   </mat-menu>
   <div class="content-inner">
     <router-outlet></router-outlet>
   </div>
