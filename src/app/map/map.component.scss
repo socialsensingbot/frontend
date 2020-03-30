@@ -1,7 +1,7 @@
 .draw-close-button {
   position: absolute;
-  right: 8px;
-  top: 8px;
+  right: 1px;
+  top: -2px;
   z-index: 100;
 
 }
@@ -62,15 +62,18 @@
   .tweets-header {
     //position: rel;
     z-index: 10;
-    margin-top: 1em;
-    margin-right: auto;
-    margin-left: auto;
+    margin-top: 12px;
+    margin-right: 12px;
+    margin-left: 14px;
     margin-bottom: 0;
     //background: white;
 
     .tweets-heading {
       font-size: 1.3em;
-      margin: 1em;
+      margin-top: 1.2em;
+      margin-right: 0em;
+      margin-left: 0;
+      margin-bottom: 0em;
       line-height: 1.5em;
     }
 
