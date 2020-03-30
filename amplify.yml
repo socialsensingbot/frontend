@@ -13,7 +13,7 @@ frontend:
         - mkdir -p dist/frontend
     build:
       commands:
-        - export NODE_OPTIONS="node --max_old_space_size=6000" npm run build || ( find /tmp -name angular-errors.log -exec cat {} \; && exit -1 )
+        - export NODE_OPTIONS="node --max_old_space_size=6000" npm run build
   artifacts:
     baseDirectory: dist/frontend
     files:

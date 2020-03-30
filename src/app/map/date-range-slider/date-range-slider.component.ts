@@ -69,11 +69,11 @@ export class DateRangeSliderComponent implements OnInit,OnDestroy {
       if (typeof this.timeKeys !== "undefined" && typeof this.timeKeys[-value] !== "undefined") {
         switch (label) {
           case LabelType.Low:
-            return this.timeKeys[-value] ? this.cleanDate(this.timeKeys[-value], 0).toDateString() : "";
+            return this.timeKeys[-value] ? this.cleanDate(this.timeKeys[-value], 0) : "";
           case LabelType.High:
-            return this.timeKeys[-value] ? this.cleanDate(this.timeKeys[-value], 1).toDateString(): "";
+            return this.timeKeys[-value] ? this.cleanDate(this.timeKeys[-value], 1): "";
           default:
-            return this.timeKeys[-value] ?  this.cleanDate(this.timeKeys[-value], 0).toDateString(): "";
+            return this.timeKeys[-value] ?  this.cleanDate(this.timeKeys[-value], 0): "";
         }
       } else {
         return "";
@@ -97,9 +97,14 @@ export class DateRangeSliderComponent implements OnInit,OnDestroy {
   }
 
 
-  cleanDate(tstring, add): Date {
-    return new Date(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
-                    tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0);
+  cleanDate(tstring, add): string {
+    const date = new Date(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
+                          tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0);
+    const ye = new Intl.DateTimeFormat('en', { year: '2-digit' }).format(date);
+    const mo = new Intl.DateTimeFormat('en', { month: 'short' }).format(date);
+    const da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(date);
+
+    return `${da}-${mo}-${ye}`;
     //var date = new Date( tstring.substring(0,4), tstring.substring(4,6)-1, tstring.substring(6,8), +tstring.substring(8,10)+add, 0, 0, 0);
 
   }
