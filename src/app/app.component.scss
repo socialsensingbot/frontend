@@ -6,6 +6,7 @@
   right:0;
   bottom:0;
   overflow:auto;
+
   //border:1px solid green;
 
 }
@@ -20,6 +21,7 @@
   left:0;
   right:0;
   bottom:0;
+  z-index: 0;
   //border:1px solid red;
 
 }
@@ -27,4 +29,7 @@
 
 .expanded-toolbar {
   z-index:10000;
+  box-shadow: 0px 0px 4px 1px rgba(17, 17, 17, 0.5);
+  overflow:visible;
+  position:absolute;
 }

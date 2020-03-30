@@ -9,33 +9,7 @@
 
 
 <div class="content" role="main">
-  <mat-toolbar color="primary" class="expanded-toolbar">
-    <span>
-      <button mat-button routerLink="/">{{title}}</button>
-      <button mat-button routerLink="/"><mat-icon>home</mat-icon></button>
-    </span>
-    <div id="login" fxLayout="row" fxShow="false" fxShow.gt-sm>
-      <button mat-button routerLink="/auth/signin" *ngIf="!isAuthenticated">
-        <mat-icon>power_settings_new</mat-icon>
-        Login
-      </button>
-      <button id="logout" mat-button *ngIf="isAuthenticated" (click)="logout()">
-        <mat-icon>exit_to_app</mat-icon>
-        Logout
-      </button>
-      <!--      <button mat-button *ngIf="isAuthenticated" routerLink="/map">-->
-      <!--        <mat-icon>map</mat-icon>-->
-      <!--        Map-->
-      <!--      </button>-->
-<!--      <button id="signup" mat-button routerLink="/auth/signup" *ngIf="isSignup">-->
-<!--        Signup (Dev Only)-->
-<!--      </button>-->
 
-    </div>
-    <!--    <button mat-button [mat-menu-trigger-for]="menu" fxHide="false" fxHide.gt-sm>-->
-    <!--      <mat-icon>menu</mat-icon>-->
-    <!--    </button>-->
-  </mat-toolbar>
   <mat-menu x-position="before" #menu="matMenu">
      <button mat-menu-item routerLink="/">
        <mat-icon>home</mat-icon>
@@ -54,9 +28,38 @@
        Logout
      </button>
    </mat-menu>
+
   <div class="content-inner">
     <router-outlet></router-outlet>
   </div>
+
+  <mat-toolbar color="primary" class="expanded-toolbar">
+    <span>
+      <button mat-button routerLink="/">{{title}}</button>
+      <button mat-button routerLink="/"><mat-icon>home</mat-icon></button>
+    </span>
+    <div id="login" fxLayout="row" fxShow="false" fxShow.gt-sm>
+      <button mat-button routerLink="/auth/signin" *ngIf="!isAuthenticated">
+        <mat-icon>power_settings_new</mat-icon>
+        Login
+      </button>
+      <button id="logout" mat-button *ngIf="isAuthenticated" (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon>
+        Logout
+      </button>
+      <!--      <button mat-button *ngIf="isAuthenticated" routerLink="/map">-->
+      <!--        <mat-icon>map</mat-icon>-->
+      <!--        Map-->
+      <!--      </button>-->
+      <!--      <button id="signup" mat-button routerLink="/auth/signup" *ngIf="isSignup">-->
+      <!--        Signup (Dev Only)-->
+      <!--      </button>-->
+
+    </div>
+    <!--    <button mat-button [mat-menu-trigger-for]="menu" fxHide="false" fxHide.gt-sm>-->
+    <!--      <mat-icon>menu</mat-icon>-->
+    <!--    </button>-->
+  </mat-toolbar>
   <!--  <mat-card>-->
   <!--    <mat-card-content>-->
   <!--      <form>-->
