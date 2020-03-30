@@ -26,12 +26,14 @@ import {NotificationService} from "../services/notification.service";
 import {PolygonData} from "./types";
 
 
-type ColorFunctions = { stats: any, count: any };
-type MapLayers = { "county": LayerGroup, "coarse": LayerGroup, "fine"?: LayerGroup };
-type NumberLayers = { "stats": LayerGroup, "count": LayerGroup };
-type TweetData = { stats: any; count: any; embed: any };
-type ColorData = { stats: { values: number[]; colors: string[] }; count: { values: number[]; colors: string[] } };
+type MapLayers = ByRegionType<LayerGroup>
+type NumberLayers = RegionData<LayerGroup, LayerGroup, LayerGroup>;
+type RegionData<R, S, T> = { stats: R; count: S; embed?: T };
+type ColorFunctions = RegionData<any, any, any>
+type ColorData = RegionData<{ colors: string[], values: number[] }, { colors: string[], values: number[] }, any>;
 type BasemapControl = { polygon: MapLayers; numbers: NumberLayers };
+
+type ByRegionType<T> = { fine: T; coarse: T; county: T };
 
 @Component({
              selector:    'app-map',
@@ -47,7 +49,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   private _numberLayers: NumberLayers = {"stats": null, "count": null};
   private _polyLayers: MapLayers = {"county": null, "coarse": null, "fine": null};
-  private _basemapControl: BasemapControl = {"numbers": this._numberLayers, "polygon": this._polyLayers};;
+  private _basemapControl: BasemapControl = {"numbers": this._numberLayers, "polygon": this._polyLayers};
   private _polygonData: { fine: PolygonData; coarse: PolygonData; county: PolygonData } = {
     "county": fgsData,
     "coarse": coarseData,
@@ -56,8 +58,13 @@ export class MapComponent implements OnInit, OnDestroy {
   public _activeNumber: string = "stats";
   private _activePolys: string = "county";
   private _geojson = {};
-  private _gridSizes = {"county": "county", "coarse": "15", "fine": "60"};
-  private _processedTweetInfo: { fine: TweetData; coarse: TweetData; county: TweetData } = {
+  private _gridSizes: ByRegionType<string> = {"county": "county", "coarse": "15", "fine": "60"};
+  private _stats: ByRegionType<RegionData<any, any, any>> = {
+    "county": {stats: {}, count: {}, embed: {}},
+    "coarse": {stats: {}, count: {}, embed: {}},
+    "fine":   {stats: {}, count: {}, embed: {}}
+  };
+  private _processedTweetInfo: ByRegionType<RegionData<any, any, any>> = {
     county: {stats: {}, count: {}, embed: {}},
     coarse: {stats: {}, count: {}, embed: {}},
     fine:   {stats: {}, count: {}, embed: {}},
@@ -123,7 +130,6 @@ export class MapComponent implements OnInit, OnDestroy {
     center: latLng([53, -2])
   };
 
-  stats = {"county": {}, "coarse": {}, "fine": {}};
 
   constructor(private _router: Router, private route: ActivatedRoute, private ngZone: NgZone,
               private _tweetProcessor: TweetProcessService, private _layerStyles: LayerStyleService,
@@ -164,18 +170,18 @@ export class MapComponent implements OnInit, OnDestroy {
     return fetch("assets/data/county_stats.json")
       .then(response => response.json())
       .then(json => {
-        this.stats.county = json;
+        this._stats.county = json;
       })
       .then(() =>
               fetch("assets/data/coarse_stats.json")
                 .then(response => response.json())
                 .then(json => {
-                  this.stats.coarse = json;
+                  this._stats.coarse = json;
                 }))
       .then(() => fetch("assets/data/fine_stats.json")
         .then(response => response.json())
         .then(json => {
-          this.stats.fine = json;
+          this._stats.fine = json;
         }));
   }
 
@@ -211,7 +217,7 @@ export class MapComponent implements OnInit, OnDestroy {
     //   this.options.zoom = zoom;
     // }
 
-    const numberLayerName:string = typeof active_number !== "undefined" ? active_number : "stats";
+    const numberLayerName: string = typeof active_number !== "undefined" ? active_number : "stats";
     const numberLayer: LayerGroup = this._numberLayers[numberLayerName];
     if (this._map) {
       for (let layer in this._numberLayers) {
@@ -228,7 +234,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
       }
     }
-    const polygonLayerName:string = typeof active_polygon !== "undefined" ? active_polygon : "county";
+    const polygonLayerName: string = typeof active_polygon !== "undefined" ? active_polygon : "county";
     const polygonLayer: LayerGroup = this._polyLayers[polygonLayerName];
     if (this._map) {
       for (let layer in this._polyLayers) {
@@ -292,7 +298,6 @@ export class MapComponent implements OnInit, OnDestroy {
     this._polyLayers["county"] = layerGroup().addTo(map);
     this._polyLayers["coarse"] = layerGroup();
     this._polyLayers["fine"] = layerGroup();
-
 
 
     const newColorFunctions: ColorFunctions = {stats: {}, count: {}};
@@ -396,12 +401,13 @@ export class MapComponent implements OnInit, OnDestroy {
     this.updateTwitterPanel(e.target.feature);
     this._oldClicked = this._clicked;
     this._clicked = e;
-    e.target.setStyle({
-                        weight:      3,
-                        color:       '#FF00FF',
-                        dashArray:   '',
-                        fillOpacity: 0.4
-                      });
+    this._layerStyles.dohighlightFeature(e.target);
+    // e.target.setStyle({
+    //                     weight:      3,
+    //                     color:       '#FF00FF',
+    //                     dashArray:   '',
+    //                     fillOpacity: 0.4
+    //                   });
     if (this._oldClicked != "") {
       this.resetHighlight(this._oldClicked);
     }
@@ -426,15 +432,17 @@ export class MapComponent implements OnInit, OnDestroy {
       //Update the Twitter panel with the changes
       this.updateTwitterPanel(feature);
     }
-    const exceedenceProbability = Math.round(feature.properties.stats * 100) / 100;
-    const region = this.toTitleCase(feature.properties.name);
-    const count = Math.round(feature.properties.count * 100) / 100;
+    const exceedenceProbability: number = Math.round(feature.properties.stats * 100) / 100;
+    const region:string = this.toTitleCase(feature.properties.name);
+    const count:number = Math.round(feature.properties.count * 100) / 100;
     let text = "" +
       `<div>Region: ${region}</div>`;
     if (count > 0) {
       text = text +
-        `<div>Count: ${count}</div>` +
-        `<div>Exceedence: ${exceedenceProbability}</div>`;
+        `<div>Count: ${count}</div>`;
+      if ("" + exceedenceProbability != "NaN") {
+        text = text + `<div>Exceedence: ${exceedenceProbability}</div>`;
+      }
     }
 
     layer.bindTooltip(text);
@@ -498,7 +506,7 @@ export class MapComponent implements OnInit, OnDestroy {
           console.log("loadLiveData() completed");
           this._tweetInfo = tweet_json;
           this.timeKeys = this._tweetProcessor.getTimes(this._tweetInfo);
-          this._tweetProcessor.processData(this._tweetInfo, this._processedTweetInfo, this._polygonData, this.stats,
+          this._tweetProcessor.processData(this._tweetInfo, this._processedTweetInfo, this._polygonData, this._stats,
                                            this._B,
                                            this.timeKeys.slice(-this._defaultMax, -this._defaultMin), this._gridSizes);
           this.initSlider();
@@ -571,7 +579,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   private updateTweets() {
     this._tweetProcessor.processData(this._tweetInfo, this._processedTweetInfo, this._polygonData,
-                                     this.stats,
+                                     this._stats,
                                      this._B, this.timeKeys.slice(-this._defaultMax, -this._defaultMin),
                                      this._gridSizes);
   }

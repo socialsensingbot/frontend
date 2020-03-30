@@ -17,21 +17,23 @@
   </mat-sidenav>
   <mat-sidenav-content>
     <div class="map-surround">
-    <div class="map" aria-label="Map"
-         leaflet
-         (leafletMapReady)="onMapReady($event)"
-         [leafletOptions]="options">
+      <div class="map" aria-label="Map"
+           leaflet
+           (leafletMapReady)="onMapReady($event)"
+           [leafletOptions]="options">
+      </div>
     </div>
-    </div>
-    <map-legend class="legend" [activeNumber]="_activeNumber" [colorData]="_colorData" [colorFunctions]="colorFunctions"></map-legend>
+    <map-legend class="legend" [activeNumber]="_activeNumber" [colorData]="_colorData"
+                [colorFunctions]="colorFunctions"></map-legend>
     <div class="date-slider">
       <date-range-slider (dateRange)="sliderChange($event)" [timeKeys]="this.timeKeys"
                          [options]="sliderOptions"></date-range-slider>
     </div>
 
     <mat-progress-bar *ngIf="loading" class="map-progress" mode="buffer"></mat-progress-bar>
+    <!--    <div class="map-inset-shadow"></div>-->
   </mat-sidenav-content>
 </mat-sidenav-container>
 
-<mat-spinner *ngIf="!ready"  class="map-spinner"></mat-spinner>
+<mat-spinner *ngIf="!ready" class="map-spinner"></mat-spinner>
 
