@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { LoaderService } from './loader.service';
+import { LayerStyleService } from './layer-style.service';
 
-describe('LoaderService', () => {
+describe('LayerStyleServiceService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: LoaderService = TestBed.get(LoaderService);
+    const service: LayerStyleService = TestBed.get(LayerStyleService);
     expect(service).toBeTruthy();
   });
 });

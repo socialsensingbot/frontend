@@ -1,5 +1,5 @@
 <mat-sidenav-container class="map-outer">
-  <mat-sidenav class="tweet-drawer" #sidenav [(opened)]="_showTweets" disableClose mode="side">
+  <mat-sidenav class="tweet-drawer" #sidenav [(opened)]="tweetsVisible" disableClose mode="side">
     <button mat-icon-button class="draw-close-button" aria-label="Close" (click)="sidenav.toggle()">
       <mat-icon>close</mat-icon>
     </button>
@@ -21,7 +21,7 @@
          (leafletMapReady)="onMapReady($event)"
          [leafletOptions]="options">
     </div>
-    <map-legend class="legend" [activeNumber]="_activeNumber" [colorData]="_colorData" [colorFunctions]="_colorFunctions"></map-legend>
+    <map-legend class="legend" [activeNumber]="_activeNumber" [colorData]="_colorData" [colorFunctions]="colorFunctions"></map-legend>
     <div class="date-slider">
       <date-range-slider (dateRange)="sliderChange($event)" [timeKeys]="this.timeKeys"
                          [options]="sliderOptions"></date-range-slider>

@@ -1,6 +1,4 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {ControlOptions, DomUtil} from "leaflet";
-import {MapComponent} from "../map/map.component";
 
 @Component({
              selector:    'map-legend',
