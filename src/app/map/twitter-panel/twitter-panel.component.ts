@@ -34,7 +34,9 @@ export class TwitterPanelComponent implements OnInit {
     (window as any).twttr.events.bind(
       'rendered',
        (event) =>{
-        this._ngZone.runOutsideAngular(()=> this.ready= true);
+        window.setTimeout(()=> {
+          this._ngZone.runOutsideAngular(()=> this.ready= true);
+        },500);
 
       }
     );
