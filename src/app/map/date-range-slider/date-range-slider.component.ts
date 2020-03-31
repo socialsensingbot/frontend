@@ -149,7 +149,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
   ngOnInit() {
 
 
-    this._emitTimer = timer(0, 1000).subscribe(() => {
+    this._emitTimer = timer(0, 100).subscribe(() => {
       //The active check is to ensure we do not emit an event while the slider is active.
       if (this._active) {
         this._active = false;
