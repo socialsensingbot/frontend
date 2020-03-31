@@ -1,3 +1,6 @@
+$right-hand-margin: 18px;
+$top-margin: 18px;
+$bottom-margin: 28px;
 .draw-close-button {
   position: absolute;
   right: -8px;
@@ -71,7 +74,7 @@
     //background: white;
 
     .tweets-heading {
-      font-size: 1.3em;
+      font-size: 1.2em;
       margin-top: 1.2em;
       margin-right: 0em;
       margin-left: 0;
@@ -86,10 +89,7 @@
 
     max-height: 100%;
     overflow: auto;
-    font: 14px/16px Arial,
-    Helvetica, sans-serif;
-
-
+    font-size: 16px;
   }
 
 
@@ -98,13 +98,13 @@
 .date-slider {
   max-height: 6em;
   min-height: 4em;
-  bottom:28px;
+  bottom: $bottom-margin;
   position: absolute;
   background: none;
   z-index: 10;
   max-width: 30vw;
   min-width: 30vw;
-  right: 12px;
+  right: $right-hand-margin;
   //border: 3px solid red;
   //margin: 2em auto;
   date-range-slider {
@@ -117,14 +117,14 @@
 .legend {
   max-height: 8em;
   min-height: 6em;
-  top: 10px;
+  top: $top-margin;
   position: absolute;
   background: none;
   //border: 3px solid red;
   z-index: 0;
   max-width: 6em;
   min-width: 3em;
-  right: 18px;
+  right: $right-hand-margin;
 
 }
 

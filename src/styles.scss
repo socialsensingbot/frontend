@@ -1,5 +1,6 @@
 @import '~@angular/material/theming';
 @import "~@aws-amplify/ui/src/Theme.css";
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 .amplify-block {
   @import "~@aws-amplify/ui/src/Angular";
@@ -50,7 +51,7 @@ html, body {
 
 body {
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: Helvetica, Roboto, "Segoe UI", Calibri, sans-serif;
 }
 
 form {
@@ -77,79 +78,4 @@ a {
 .active {
   color: mat-color($app-active);
 }
-
-
-//This needs to be factored out
-
-#button-wrapper {
-  position: absolute;
-  top: 20%;
-  left: 1%;
-  bottom: 0;
-  right: 0;
-  z-index: 2000;
-}
-
-.btnStyle {
-  width: 100px;
-  border-radius: 10%;
-  border: none;
-  margin: 0;
-  padding: 0;
-  color: #777;
-  background-color: white;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  box-shadow: 0 3px #999;
-  float: left;
-}
-
-.info {
-  width: 175px;
-  height: 50px;
-  padding: 6px 8px;
-  font: 14px/16px Arial, Helvetica, sans-serif;
-  background: white;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
-}
-
-.info h4 {
-  margin: 0 0 5px;
-  color: #777;
-}
-
-.date_lab {
-  width: 175px;
-  height: 20px;
-  padding: 6px 8px;
-  font: 14px/16px Arial, Helvetica, sans-serif;
-  background: white;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
-}
-
-.date_lab h4 {
-  margin: 0px 0px 0px 5px;
-  color: #777;
-}
-
-
-
-
-
-
-//.leaflet-top.leaflet-left {
-//  float: left;
-//}
-//
-//.leaflet-control-layers.leaflet-control {
-//  display: inline-block;
-//  float: none;
-//}
-
-
 
