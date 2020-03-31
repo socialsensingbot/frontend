@@ -99,17 +99,20 @@ export class MapComponent implements OnInit, OnDestroy {
   public twitterPanelHeader: boolean;
   private _layersAreStale: boolean;
   private _resetLayersTimer: Subscription;
+  private _stateUpdateTimer: Subscription;
   public loading: boolean = false;
   public ready: boolean = false;
+  private _stateIsStale: boolean;
+  private _newParams: Partial<Params>;
+  private _twitterIsStale: boolean;
+  private _twitterUpdateTimer: Subscription;
+  private _feature;
 
 
   updateSearch(params: Partial<Params>) {
     console.log("updateSearch");
-
-    return this._router.navigate([], {
-      queryParams:         params,
-      queryParamsHandling: 'merge'
-    })
+    this._newParams = params;
+    this._stateIsStale = true;
   }
 
   options = {
@@ -353,6 +356,21 @@ export class MapComponent implements OnInit, OnDestroy {
   public highlightFeature(e: LeafletMouseEvent) {
     console.log("highlightFeature()");
     this._layerStyles.dohighlightFeature(e.target);
+    const feature = e.target.feature;
+    const exceedenceProbability: number = Math.round(feature.properties.stats * 100) / 100;
+    const region: string = this.toTitleCase(feature.properties.name);
+    const count: number = Math.round(feature.properties.count * 100) / 100;
+    let text = "" +
+      `<div>Region: ${region}</div>`;
+    if (count > 0) {
+      text = text +
+        `<div>Count: ${count}</div>`;
+      if ("" + exceedenceProbability != "NaN") {
+        text = text + `<div>Exceedence: ${exceedenceProbability}</div>`;
+      }
+    }
+
+    e.target.bindTooltip(text).openTooltip();
   }
 
   /**
@@ -362,9 +380,7 @@ export class MapComponent implements OnInit, OnDestroy {
   private updateTwitterPanel(props?: any) {
     console.log("updateTwitterPanel()");
     if (props.properties.count > 0) {
-      this.exceedenceProbability = Math.round(props.properties.stats * 100) / 100;
-      this.selectedRegion = this.toTitleCase(props.properties.name);
-      this.tweetCount = Math.round(props.properties.count * 100) / 100;
+      this.updateTwitterHeader(props);
       this.embeds = this._processedTweetInfo[this._activePolys].embed[props.properties.name];
       this.twitterPanelHeader = true;
       this.showTwitterTimeline = true;
@@ -374,6 +390,12 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
   };
+
+  private updateTwitterHeader(props: any) {
+    this.exceedenceProbability = Math.round(props.properties.stats * 100) / 100;
+    this.selectedRegion = this.toTitleCase(props.properties.name);
+    this.tweetCount = Math.round(props.properties.count * 100) / 100;
+  }
 
   /**
    * Mouse out event.
@@ -417,7 +439,7 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   onEachFeature(feature: geojson.Feature<geojson.GeometryObject, any>, layer: Layer) {
-    console.log("onEachFeature");
+    // console.log("onEachFeature");
     const mc = this;
     // If this feature is referenced in the URL query paramter selected
     // e.g. ?...&selected=powys
@@ -429,42 +451,50 @@ export class MapComponent implements OnInit, OnDestroy {
       this._layerStyles.dohighlightFeature(layer);
 
       //Update the Twitter panel with the changes
-      this.updateTwitterPanel(feature);
-    }
-    const exceedenceProbability: number = Math.round(feature.properties.stats * 100) / 100;
-    const region: string = this.toTitleCase(feature.properties.name);
-    const count: number = Math.round(feature.properties.count * 100) / 100;
-    let text = "" +
-      `<div>Region: ${region}</div>`;
-    if (count > 0) {
-      text = text +
-        `<div>Count: ${count}</div>`;
-      if ("" + exceedenceProbability != "NaN") {
-        text = text + `<div>Exceedence: ${exceedenceProbability}</div>`;
-      }
+      this._feature= feature;
     }
 
-    layer.bindTooltip(text);
     layer.on({
-               mouseover: (e) => this.ngZone.run(() => mc.highlightFeature(e)),
-               mouseout:  (e) => this.ngZone.run(() => mc.resetHighlight(e)),
-               click:     (e) => this.ngZone.run(() => mc.zoomToFeature(e))
+               mouseover: (e) => this.ngZone.runOutsideAngular(() => mc.highlightFeature(e)),
+               mouseout:  (e) => this.ngZone.runOutsideAngular(() => mc.resetHighlight(e)),
+               click:     (e) => this.ngZone.runOutsideAngular(() => mc.zoomToFeature(e))
              });
   }
 
 
   ngOnInit() {
-    this._resetLayersTimer = timer(0, 1000).subscribe(() => {
+    this._resetLayersTimer = timer(0, 50).subscribe(() => {
       if (this._layersAreStale) {
         this.resetLayers(false);
-        this.updateTweets();
+        this.update();
         this._layersAreStale = false;
       }
     });
+
+    this._stateUpdateTimer = timer(0, 2000).subscribe(() => {
+      if (this._stateIsStale) {
+        this._router.navigate([], {
+          queryParams:         this._newParams,
+          queryParamsHandling: 'merge'
+        });
+        this._stateIsStale = false;
+      }
+    });
+
+    this._twitterUpdateTimer = timer(0, 2000).subscribe(() => {
+      if (this._twitterIsStale) {
+        this.updateTwitter();
+        this._twitterIsStale = false;
+      }
+    });
+
+
   }
 
   ngOnDestroy() {
     this._resetLayersTimer.unsubscribe();
+    this._stateUpdateTimer.unsubscribe();
+    this._twitterUpdateTimer.unsubscribe();
   }
 
   ///////////////////////
@@ -506,14 +536,6 @@ export class MapComponent implements OnInit, OnDestroy {
         this._tweetInfo = await this.loadLiveData();
         console.log("Loading live data completed");
         this.timeKeys = this._tweetProcessor.getTimes(this._tweetInfo);
-        //TODO: This has feature envy ...
-        this._tweetProcessor.processData(this._tweetInfo,
-                                         this._processedTweetInfo,
-                                         this._polygonData,
-                                         this._stats,
-                                         this._B,
-                                         this.timeKeys.slice(-this._defaultMax, -this._defaultMin),
-                                         this._gridSizes);
         this.initSlider();
         this._layersAreStale = true;
         this.ready = true;
@@ -530,6 +552,19 @@ export class MapComponent implements OnInit, OnDestroy {
 
   }
 
+
+  private update() {
+    this._tweetProcessor.processData(this._tweetInfo,
+                                     this._processedTweetInfo,
+                                     this._polygonData,
+                                     this._stats,
+                                     this._B,
+                                     this.timeKeys.slice(-this._defaultMax, -this._defaultMin),
+                                     this._gridSizes);
+    if (this._clicked != "") {
+      this.updateTwitterHeader(this._clicked.target.feature);
+    }
+  }
 
   ///////////////////////////
   //Slider, start after reading JSON
@@ -581,15 +616,16 @@ export class MapComponent implements OnInit, OnDestroy {
     this._defaultMin = lower;
     this.updateSearch({min_offset: lower, max_offset: upper});
     this._layersAreStale = true;
+    this._twitterIsStale = true;
+
+  }
+
+  private updateTwitter() {
     if (this._clicked != "") {
       this.updateTwitterPanel(this._clicked.target.feature);
     }
-  }
-
-  private updateTweets() {
-    this._tweetProcessor.processData(this._tweetInfo, this._processedTweetInfo, this._polygonData,
-                                     this._stats,
-                                     this._B, this.timeKeys.slice(-this._defaultMax, -this._defaultMin),
-                                     this._gridSizes);
+    if(this._feature !== null) {
+      this.updateTwitterPanel(this._feature);
+    }
   }
 }

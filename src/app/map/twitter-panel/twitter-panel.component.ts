@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, NgZone, OnInit} from '@angular/core';
 import * as $ from "jquery";
 
 @Component({
@@ -28,13 +28,14 @@ export class TwitterPanelComponent implements OnInit {
   @Input() showHeaderInfo: boolean = true;
   @Input() showTimeline: boolean;
 
-  constructor() { }
+  constructor(private _ngZone:NgZone) { }
 
   ngOnInit() {
     (window as any).twttr.events.bind(
       'rendered',
        (event) =>{
-        this.ready= true;
+        this._ngZone.runOutsideAngular(()=> this.ready= true);
+
       }
     );
 

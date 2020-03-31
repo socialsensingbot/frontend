@@ -16,21 +16,6 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
 
 
   /**
-   * Has the data changed since we last emitted an event?
-   */
-  private _stale: boolean = false;
-  /**
-   * Is the slider currently active?
-   */
-  private _active: boolean = false;
-
-  /**
-   * This timer is used to avoid over emitting change events on the slider.
-   */
-  private _emitTimer: Subscription;
-
-
-  /**
    * Time series data, keyed by one minute interval.
    */
   @Input() public timeKeyedData: any;
@@ -63,15 +48,14 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
    * @param value the offset in minutes (a negative number)
    */
   public set upperValue(value: number) {
-    this._active = true;
+
     if (typeof value === "undefined") {
       console.log("Undefined upper value");
     }
     this._upperValue = value;
     if (typeof this.timeKeyedData !== "undefined") {
       console.log(value);
-      this._stale = true;
-    }
+      this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));    }
   }
 
   public get lowerValue(): number {
@@ -84,15 +68,14 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
    * @param value the offset in minutes (a negative number)
    */
   public set lowerValue(value: number) {
-    this._active = true;
+
     if (typeof value === "undefined") {
       console.log("Undefined lower value");
     }
     this._lowerValue = value;
     if (typeof this.timeKeyedData !== "undefined") {
       console.log(value);
-      this._stale = true;
-
+      this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
     }
   }
 
@@ -149,22 +132,12 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
   ngOnInit() {
 
 
-    this._emitTimer = timer(0, 100).subscribe(() => {
-      //The active check is to ensure we do not emit an event while the slider is active.
-      if (this._active) {
-        this._active = false;
-      } else {
-        if (this._stale) {
-          this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
-          this._stale = false;
-        }
-      }
-    });
+
 
   }
 
   ngOnDestroy() {
-    this._emitTimer.unsubscribe();
+
   }
 
 
