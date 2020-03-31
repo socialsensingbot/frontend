@@ -8,51 +8,67 @@
 
 // We need to use ::ng-deep to overcome view encapsulation
 ::ng-deep {
-  .custom-slider .ng5-slider .ng5-slider-bar {
-    background: mat-color(mat-palette($mat-light-blue, 400), default, 0.5);
-    height: 2px;
-  }
+  .custom-slider {
+    .ng5-slider {
+      .ng5-slider-bar {
+        background: mat-color(mat-palette($mat-light-blue, 400), default, 0.5);
+        height: 2px;
+      }
 
-  .custom-slider .ng5-slider .ng5-slider-selection {
-    background: mat-color(mat-palette($mat-light-blue, 400), default, 0.5);
-  }
+      .ng5-slider-selection {
+        background: mat-color(mat-palette($mat-light-blue, 400), default, 0.5);
+      }
 
-  .custom-slider .ng5-slider .ng5-slider-pointer {
-    background-color: mat-color(mat-palette($mat-light-blue, 600));
-  }
+      .ng5-slider-pointer {
+        background-color: mat-color(mat-palette($mat-light-blue, 600));
+      }
 
-  //.custom-slider .ng5-slider .ng5-slider-pointer:after {
-  //  display: none;
-  //}
+      //.custom-slider .ng5-slider .ng5-slider-pointer:after {
+      //  display: none;
+      //}
 
-  .custom-slider .ng5-slider .ng5-slider-bubble {
-    bottom: 1.5em;
-  }
+      .ng5-slider-bubble {
+        bottom: 1.5em;
+      }
 
-  .custom-slider .ng5-slider .ng5-slider-limit {
-    font-weight: bold;
-    color: mat-color(mat-palette($mat-light-blue, 400));
-  }
+      .ng5-slider-limit {
+        font-weight: bold;
+        color: mat-color(mat-palette($mat-light-blue, 400));
+      }
 
-  .custom-slider .ng5-slider .ng5-slider-tick {
-    //width: 1px;
-    //height: 10px;
-    //margin-left: 4px;
-    //border-radius: 0;
-    background: mat-color(mat-palette($mat-light-blue, 400), default, 0.5);
-    //top: -1px;
-  }
+      .ng5-slider-tick {
+        //width: 1px;
+        //height: 10px;
+        //margin-left: 4px;
+        //border-radius: 0;
+        background: mat-color(mat-palette($mat-light-blue, 400), default, 0.5);
+        //top: -1px;
+      }
 
-  .custom-slider .ng5-slider .ng5-slider-tick.ng5-slider-selected {
-    background: mat-color(mat-palette($mat-light-blue, 400));
-  }
+      .ng5-slider-tick.ng5-slider-selected {
+        background: mat-color(mat-palette($mat-light-blue, 400));
+      }
 
-  .slider-date {
-    font-size:0.9em;
-    font-weight:bolder;
-  }
-  .slider-time {
-    font-size:0.8em;
-    font-weight: lighter;
+      .slider-date-time {
+        .slider-date {
+          font-size: 0.9em;
+          font-weight: bolder;
+        }
+
+        .slider-time {
+          font-size: 0.8em;
+          font-weight: lighter;
+        }
+      }
+
+      .ng5-slider-floor {
+        display: none;
+      }
+
+      .ng5-slider-ceil {
+        display: none;
+      }
+    }
+
   }
 }
