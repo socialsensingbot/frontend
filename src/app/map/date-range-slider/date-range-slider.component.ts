@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {LabelType, Options} from "ng5-slider";
-import {timer} from "rxjs";
+import {Subscription, timer} from "rxjs";
 
 @Component({
              selector:    'date-range-slider',
@@ -8,9 +8,39 @@ import {timer} from "rxjs";
              styleUrls:   ['./date-range-slider.component.scss']
            })
 
+/**
+ * This component provides a date range slider which periodically emits change
+ * events.
+ */
+export class DateRangeSliderComponent implements OnInit, OnDestroy {
 
-export class DateRangeSliderComponent implements OnInit,OnDestroy {
 
+  /**
+   * Has the data changed since we last emitted an event?
+   */
+  private _stale: boolean = false;
+  /**
+   * Is the slider currently active?
+   */
+  private _active: boolean = false;
+
+  /**
+   * This timer is used to avoid over emitting change events on the slider.
+   */
+  private _emitTimer: Subscription;
+
+
+  /**
+   * Time series data, keyed by one minute interval.
+   */
+  @Input() public timeKeyedData: any;
+
+
+  /**
+   * These are the options for *this* component, not the ng5-slider.
+   *
+   * The ng5-slider is configured through {@link this.sliderOptions}
+   */
   @Input()
   public set options(value: DateRangeSliderOptions) {
     this._options = value;
@@ -18,6 +48,7 @@ export class DateRangeSliderComponent implements OnInit,OnDestroy {
     this.sliderOptions.floor = value.min;
     this._lowerValue = value.startMin;
     this._upperValue = value.startMax;
+
   }
 
 
@@ -26,33 +57,49 @@ export class DateRangeSliderComponent implements OnInit,OnDestroy {
   }
 
 
+  /**
+   * This is called when the user slides the upper range on the slider.
+   *
+   * @param value the offset in minutes (a negative number)
+   */
   public set upperValue(value: number) {
-    if (typeof value !== "undefined") {
+    this._active = true;
+    if (typeof value === "undefined") {
       console.log("Undefined upper value");
     }
     this._upperValue = value;
-    if (typeof this.timeKeys !== "undefined") {
+    if (typeof this.timeKeyedData !== "undefined") {
       console.log(value);
-      this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
+      this._stale = true;
     }
   }
 
-  public get lowerValue():number {
+  public get lowerValue(): number {
     return this._lowerValue;
   }
 
-
+  /**
+   * This is called when the user slides the lower range on the slider.
+   *
+   * @param value the offset in minutes (a negative number)
+   */
   public set lowerValue(value: number) {
-    if (typeof value !== "undefined") {
+    this._active = true;
+    if (typeof value === "undefined") {
       console.log("Undefined lower value");
     }
     this._lowerValue = value;
-    if (typeof this.timeKeys !== "undefined") {
+    if (typeof this.timeKeyedData !== "undefined") {
       console.log(value);
-      this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
+      this._stale = true;
+
     }
   }
 
+  /**
+   * This is the output of the component and will emit date ranges
+   * when the the slider value changes. Changes are throttled by {@link _emitTimer}.
+   */
   @Output() dateRange = new EventEmitter<DateRange>();
 
   private _lowerValue: number = -1;
@@ -60,20 +107,28 @@ export class DateRangeSliderComponent implements OnInit,OnDestroy {
   private _upperValue: number = 0;
 
 
+  /**
+   * These are the options for the ng5-slider
+   *
+   * @see https://angular-slider.github.io/ng5-slider
+   */
   public sliderOptions: Options = {
-    floor:     0,
-    ceil:      0,
-    step:      24*60,
-    showTicks: true,
-    translate: (value: number, label: LabelType): string => {
-      if (typeof this.timeKeys !== "undefined" && typeof this.timeKeys[-value] !== "undefined") {
+    floor:        0,
+    ceil:         0,
+    step:         60,
+    showTicks:    false,
+    ticksTooltip: (value: number): string => {
+      return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0) : ""
+    },
+    translate:    (value: number, label: LabelType): string => {
+      if (typeof this.timeKeyedData !== "undefined" && typeof this.timeKeyedData[-value] !== "undefined") {
         switch (label) {
           case LabelType.Low:
-            return this.timeKeys[-value] ? this.cleanDate(this.timeKeys[-value], 0) : "";
+            return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0) : "";
           case LabelType.High:
-            return this.timeKeys[-value] ? this.cleanDate(this.timeKeys[-value], 1): "";
+            return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 1) : "";
           default:
-            return this.timeKeys[-value] ?  this.cleanDate(this.timeKeys[-value], 0): "";
+            return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0) : "";
         }
       } else {
         return "";
@@ -81,7 +136,10 @@ export class DateRangeSliderComponent implements OnInit,OnDestroy {
     }
   };
 
-  @Input() public timeKeys: any;
+
+  /**
+   * These are the options for *this* component, not the ng5-slider.
+   */
   private _options: DateRangeSliderOptions;
 
   constructor() {
@@ -90,21 +148,35 @@ export class DateRangeSliderComponent implements OnInit,OnDestroy {
 
   ngOnInit() {
 
+
+    this._emitTimer = timer(0, 1000).subscribe(() => {
+      //The active check is to ensure we do not emit an event while the slider is active.
+      if (this._active) {
+        this._active = false;
+      } else {
+        if (this._stale) {
+          this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
+          this._stale = false;
+        }
+      }
+    });
+
   }
 
   ngOnDestroy() {
-
+    this._emitTimer.unsubscribe();
   }
 
 
   cleanDate(tstring, add): string {
     const date = new Date(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
                           tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0);
-    const ye = new Intl.DateTimeFormat('en', { year: '2-digit' }).format(date);
-    const mo = new Intl.DateTimeFormat('en', { month: 'short' }).format(date);
-    const da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(date);
+    const ye = new Intl.DateTimeFormat('en', {year: '2-digit'}).format(date);
+    const mo = new Intl.DateTimeFormat('en', {month: 'short'}).format(date);
+    const da = new Intl.DateTimeFormat('en', {day: '2-digit'}).format(date);
+    const hr = new Intl.DateTimeFormat('en', {hour: '2-digit', hour12:true}).format(date);
 
-    return `${da}-${mo}-${ye}`;
+    return `<span class="slider-date-time"><span class='slider-time'>${hr}</span> <span class='slider-date'>${da}-${mo}-${ye}</span></span>`;
     //var date = new Date( tstring.substring(0,4), tstring.substring(4,6)-1, tstring.substring(6,8), +tstring.substring(8,10)+add, 0, 0, 0);
 
   }

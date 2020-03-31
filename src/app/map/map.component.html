@@ -26,7 +26,7 @@
     <map-legend class="legend" [activeNumber]="_activeNumber" [colorData]="_colorData"
                 [colorFunctions]="colorFunctions"></map-legend>
     <div class="date-slider">
-      <date-range-slider (dateRange)="sliderChange($event)" [timeKeys]="this.timeKeys"
+      <date-range-slider (dateRange)="sliderChange($event)" [timeKeyedData]="this.timeKeys"
                          [options]="sliderOptions"></date-range-slider>
     </div>
 

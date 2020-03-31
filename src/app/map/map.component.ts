@@ -2,7 +2,7 @@ import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {fgsData} from './county_bi';
 import {coarseData} from './coarse_bi';
 import {fineData} from './fine_bi';
-import {Storage} from 'aws-amplify';
+import {Auth, Storage} from 'aws-amplify';
 import {
   control,
   Control,
@@ -335,9 +335,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   //add = extra minutes
   private setupCountStatsToggle() {
-    ////////////////////////////
-    //count / stats toggle
-    ////////////////////////////
+    console.log("setupCountStatsToggle()");
     for (let key in this._basemapControl) {
       // noinspection JSUnfilteredForInLoop
       this._lcontrols[key] = control.layers(this._basemapControl[key], {}).addTo(this._map);
@@ -353,7 +351,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param e
    */
   public highlightFeature(e: LeafletMouseEvent) {
-    console.log("highlightFeature");
+    console.log("highlightFeature()");
     this._layerStyles.dohighlightFeature(e.target);
   }
 
@@ -362,6 +360,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param props
    */
   private updateTwitterPanel(props?: any) {
+    console.log("updateTwitterPanel()");
     if (props.properties.count > 0) {
       this.exceedenceProbability = Math.round(props.properties.stats * 100) / 100;
       this.selectedRegion = this.toTitleCase(props.properties.name);
@@ -433,8 +432,8 @@ export class MapComponent implements OnInit, OnDestroy {
       this.updateTwitterPanel(feature);
     }
     const exceedenceProbability: number = Math.round(feature.properties.stats * 100) / 100;
-    const region:string = this.toTitleCase(feature.properties.name);
-    const count:number = Math.round(feature.properties.count * 100) / 100;
+    const region: string = this.toTitleCase(feature.properties.name);
+    const count: number = Math.round(feature.properties.count * 100) / 100;
     let text = "" +
       `<div>Region: ${region}</div>`;
     if (count > 0) {
@@ -475,16 +474,16 @@ export class MapComponent implements OnInit, OnDestroy {
     console.log("resetLayers");
 
     for (let key in this._basemapControl["numbers"]) {
+      if (this._numberLayers[key] != null) {
+        // noinspection JSUnfilteredForInLoop
+        this._numberLayers[key].clearLayers();
 
-      // noinspection JSUnfilteredForInLoop
-      this._numberLayers[key].clearLayers();
-
-      // noinspection JSUnfilteredForInLoop
-      this._geojson[key] = new GeoJSON(this._polygonData[this._activePolys], {
-        style:         (feature) => this.colorFunctions[key].getFeatureStyle(feature),
-        onEachFeature: (f, l) => this.onEachFeature(f, l)
-      }).addTo(this._numberLayers[key]);
-
+        // noinspection JSUnfilteredForInLoop
+        this._geojson[key] = new GeoJSON(this._polygonData[this._activePolys], {
+          style:         (feature) => this.colorFunctions[key].getFeatureStyle(feature),
+          onEachFeature: (f, l) => this.onEachFeature(f, l)
+        }).addTo(this._numberLayers[key]);
+      }
       if (clear_click) {
         console.log("resetLayers clear_click");
         if (this._clicked != "") {
@@ -498,35 +497,45 @@ export class MapComponent implements OnInit, OnDestroy {
   /////////////////////////////
   //get datafiles & init
   /////////////////////////////
-  readData() {
-    console.log("readData");
+  async readData() {
+    console.log("readData()");
     this.loading = true;
-    this.loadLiveData()
-        .then((tweet_json) => {
-          console.log("loadLiveData() completed");
-          this._tweetInfo = tweet_json;
-          this.timeKeys = this._tweetProcessor.getTimes(this._tweetInfo);
-          this._tweetProcessor.processData(this._tweetInfo, this._processedTweetInfo, this._polygonData, this._stats,
-                                           this._B,
-                                           this.timeKeys.slice(-this._defaultMax, -this._defaultMin), this._gridSizes);
-          this.initSlider();
-          this._layersAreStale = true;
-          this.ready = true;
-          this.loading = false;
-        }).catch((e) => {
-      this._notify.show("Error while loading live map data");
-      console.log("Loading data failed " + e);
-      console.log(e);
-      this.loading = false;
-    });
+    const userInfo = await Auth.currentUserInfo();
+    if (userInfo != null) {
+      try {
+        this._tweetInfo = await this.loadLiveData();
+        console.log("Loading live data completed");
+        this.timeKeys = this._tweetProcessor.getTimes(this._tweetInfo);
+        //TODO: This has feature envy ...
+        this._tweetProcessor.processData(this._tweetInfo,
+                                         this._processedTweetInfo,
+                                         this._polygonData,
+                                         this._stats,
+                                         this._B,
+                                         this.timeKeys.slice(-this._defaultMax, -this._defaultMin),
+                                         this._gridSizes);
+        this.initSlider();
+        this._layersAreStale = true;
+        this.ready = true;
+        this.loading = false;
+      } catch (e) {
+        this._notify.show("Error while loading live map data");
+        console.log("Loading data failed " + e);
+        console.log(e);
+        this.loading = false;
+      }
+    } else {
+      console.log("User logged out, not loading live data");
+    }
 
-  };
+  }
+
 
   ///////////////////////////
   //Slider, start after reading JSON
   ///////////////////////////
   initSlider() {
-    console.log("initSlider");
+    console.log("initSlider()");
     if (this.timeKeys) {
       this._defaultMin = Math.max(this._defaultMin, -(this.timeKeys.length - 1));
       this.sliderOptions = {
@@ -566,13 +575,13 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   public sliderChange(range: DateRange) {
+    console.log("sliderChange()");
     const {lower, upper} = range;
     this._defaultMax = upper;
     this._defaultMin = lower;
     this.updateSearch({min_offset: lower, max_offset: upper});
     this._layersAreStale = true;
     if (this._clicked != "") {
-      console.log("displayText");
       this.updateTwitterPanel(this._clicked.target.feature);
     }
   }
