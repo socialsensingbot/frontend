@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+  hmr: false,
   confirm: {
     email: '',
     password: ''

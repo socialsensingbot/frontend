@@ -203,6 +203,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this._defaultMin = min_offset;
     }
 
+
     if (typeof max_offset !== "undefined") {
       this._defaultMax = max_offset;
       this.sliderOptions.startMax = max_offset;
@@ -255,10 +256,12 @@ export class MapComponent implements OnInit, OnDestroy {
       }
     }
 
+    if(active_polygon !== "undefined") {
+      this.showTweets();
+    }
     // if (typeof min_offset !== "undefined" && typeof min_offset !== "undefined") {
     //   ($(".timeslider") as any).slider("option", "values", [min_offset, max_offset]);
     // }
-
     return undefined;
   }
 
