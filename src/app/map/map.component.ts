@@ -451,7 +451,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this._layerStyles.dohighlightFeature(layer);
 
       //Update the Twitter panel with the changes
-      this._feature= feature;
+      this._feature = feature;
     }
 
     layer.on({
@@ -520,6 +520,7 @@ export class MapComponent implements OnInit, OnDestroy {
           this._geojson[this._activeNumber].resetStyle(this._clicked);
         }
         this._clicked = "";
+        this._feature = null;
       }
     }
   }
@@ -621,10 +622,13 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private updateTwitter() {
+    if (!this.tweetsVisible) {
+      this._clicked = "";
+      this._feature = null;
+    }
     if (this._clicked != "") {
       this.updateTwitterPanel(this._clicked.target.feature);
-    }
-    if(this._feature !== null) {
+    } else if (this._feature !== null) {
       this.updateTwitterPanel(this._feature);
     }
   }
