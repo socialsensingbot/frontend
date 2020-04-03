@@ -1,0 +1,271 @@
+# this is an auto generated file. This will be overwritten
+subscription OnCreateUserProfile($name: String!) {
+  onCreateUserProfile(name: $name) {
+    id
+    name
+    ignoreTweets {
+      items {
+        id
+        url
+        owner
+      }
+      nextToken
+    }
+    ignorePeople {
+      items {
+        id
+        twitterScreenName
+        owner
+      }
+      nextToken
+    }
+    irrelevant {
+      items {
+        id
+        url
+        owner
+      }
+      nextToken
+    }
+  }
+}
+subscription OnUpdateUserProfile($name: String!) {
+  onUpdateUserProfile(name: $name) {
+    id
+    name
+    ignoreTweets {
+      items {
+        id
+        url
+        owner
+      }
+      nextToken
+    }
+    ignorePeople {
+      items {
+        id
+        twitterScreenName
+        owner
+      }
+      nextToken
+    }
+    irrelevant {
+      items {
+        id
+        url
+        owner
+      }
+      nextToken
+    }
+  }
+}
+subscription OnDeleteUserProfile($name: String!) {
+  onDeleteUserProfile(name: $name) {
+    id
+    name
+    ignoreTweets {
+      items {
+        id
+        url
+        owner
+      }
+      nextToken
+    }
+    ignorePeople {
+      items {
+        id
+        twitterScreenName
+        owner
+      }
+      nextToken
+    }
+    irrelevant {
+      items {
+        id
+        url
+        owner
+      }
+      nextToken
+    }
+  }
+}
+subscription OnCreateTweetIgnore($owner: String!) {
+  onCreateTweetIgnore(owner: $owner) {
+    id
+    url
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}
+subscription OnUpdateTweetIgnore($owner: String!) {
+  onUpdateTweetIgnore(owner: $owner) {
+    id
+    url
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}
+subscription OnDeleteTweetIgnore($owner: String!) {
+  onDeleteTweetIgnore(owner: $owner) {
+    id
+    url
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}
+subscription OnCreateTweetIrrelevant($owner: String!) {
+  onCreateTweetIrrelevant(owner: $owner) {
+    id
+    url
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}
+subscription OnUpdateTweetIrrelevant($owner: String!) {
+  onUpdateTweetIrrelevant(owner: $owner) {
+    id
+    url
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}
+subscription OnDeleteTweetIrrelevant($owner: String!) {
+  onDeleteTweetIrrelevant(owner: $owner) {
+    id
+    url
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}
+subscription OnCreateTwitterUserIgnore($owner: String!) {
+  onCreateTwitterUserIgnore(owner: $owner) {
+    id
+    twitterScreenName
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}
+subscription OnUpdateTwitterUserIgnore($owner: String!) {
+  onUpdateTwitterUserIgnore(owner: $owner) {
+    id
+    twitterScreenName
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}
+subscription OnDeleteTwitterUserIgnore($owner: String!) {
+  onDeleteTwitterUserIgnore(owner: $owner) {
+    id
+    twitterScreenName
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}

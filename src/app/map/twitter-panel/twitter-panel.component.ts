@@ -12,6 +12,8 @@ import {
 import * as $ from "jquery";
 import {HttpClient} from "@angular/common/http";
 import {MatCheckboxChange} from "@angular/material/checkbox";
+import {Router} from "@angular/router";
+import {PreferenceService} from "../../pref/preference.service";
 
 @Component({
              selector:    'twitter-panel',
@@ -31,12 +33,20 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   @Input()
   public set embeds(val: any) {
     this._embeds = val;
-    if(typeof val !== "undefined") {
+    this.updateTweets();
+  }
+
+  private updateTweets() {
+    if (typeof this._embeds !== "undefined") {
       this.ready = false;
-      const regex=/(<blockquote(.*?)<\/blockquote>)/g;
-      this.tweets= val.match(regex).map(s=>s);
+      const regex = /(<blockquote(.*?)<\/blockquote>)/g;
+      this.tweets = this._embeds.match(regex).map(s => s).filter(s => !this.pref.isBlacklisted(s));
       console.log(this.tweets);
-      (window as any).twttr.widgets.load($("#tinfo")[0]);
+      if (this.tweets.length > 0) {
+        (window as any).twttr.widgets.load($("#tinfo")[0]);
+      } else {
+        this.ready = true;
+      }
     }
   }
 
@@ -47,9 +57,19 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   @Input() showHeaderInfo: boolean = true;
   @Input() showTimeline: boolean;
 
-  constructor(private _ngZone: NgZone) { }
+  constructor(private _ngZone: NgZone, public pref: PreferenceService  ) { }
 
   ngOnInit() {
+    if((window as any).twttr) {
+      this.bindTwitter();
+    } else {
+      setTimeout(()=> this.bindTwitter(),1000);
+    }
+
+
+  }
+
+  private bindTwitter() {
     (window as any).twttr.events.bind(
       'rendered',
       (event) => {
@@ -59,7 +79,7 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
 
       }
     );
-
+    this.updateTweets();
   }
 
   public show($event: any) {
@@ -72,5 +92,9 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
 
   public checked(i: number, $event: MatCheckboxChange) {
    //
+  }
+
+  public removeTweet(tweet) {
+    this.tweets.splice(this.tweets.indexOf(tweet), 1);
   }
 }

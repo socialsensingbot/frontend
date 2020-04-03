@@ -1,29 +1,46 @@
 {
-    "auth": {
-        "socialsensingf07a871c": {
-            "service": "Cognito",
-            "providerPlugin": "awscloudformation",
-            "dependsOn": [],
-            "customAuth": false
-        }
-    },
-    "function": {
-        "S3Triggerb3a090e2": {
-            "service": "Lambda",
-            "providerPlugin": "awscloudformation",
-            "build": true
-        }
-    },
-    "storage": {
-        "jsonstorage": {
-            "service": "S3",
-            "providerPlugin": "awscloudformation"
-        }
-    },
-    "hosting": {
-        "amplifyhosting": {
-            "service": "amplifyhosting",
-            "type": "cicd"
-        }
-    }
+	"auth": {
+		"socialsensingf07a871c": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": [],
+			"customAuth": false
+		}
+	},
+	"function": {
+		"S3Triggerb3a090e2": {
+			"service": "Lambda",
+			"providerPlugin": "awscloudformation",
+			"build": true
+		}
+	},
+	"storage": {
+		"jsonstorage": {
+			"service": "S3",
+			"providerPlugin": "awscloudformation"
+		}
+	},
+	"hosting": {
+		"amplifyhosting": {
+			"service": "amplifyhosting",
+			"type": "cicd"
+		}
+	},
+	"api": {
+		"socialsensing": {
+			"service": "AppSync",
+			"providerPlugin": "awscloudformation",
+			"output": {
+				"authConfig": {
+					"additionalAuthenticationProviders": [],
+					"defaultAuthentication": {
+						"authenticationType": "AMAZON_COGNITO_USER_POOLS",
+						"userPoolConfig": {
+							"userPoolId": "authsocialsensingf07a871c"
+						}
+					}
+				}
+			}
+		}
+	}
 }

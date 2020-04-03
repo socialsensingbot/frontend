@@ -1,8 +1,10 @@
 <div id="tinfo" class="tinfo">
   <mat-menu #appMenu="matMenu">
-    <button mat-menu-item>Ignore Sender</button>
-    <button mat-menu-item>Ignore Tweet</button>
-    <button mat-menu-item>Mark Irrelevant</button>
+    <ng-template matMenuContent let-tweet="tweet">
+      <button (click)="pref.ignoreSender(tweet) && removeTweet(tweet)" mat-menu-item>Ignore Sender</button>
+      <button (click)="pref.ignoreTweet(tweet) && removeTweet(tweet)" mat-menu-item>Ignore Tweet</button>
+      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet)" mat-menu-item>Mark Irrelevant</button>
+    </ng-template>
   </mat-menu>
 
 
@@ -10,18 +12,27 @@
   <div id="tinfo_table_wrapper" class="tinfo_table_wrapper">
 
     <div id="tinfo_table" class="app-twitter-table" *ngIf="showTimeline">
-      <div class=table_info >
-        <div *ngIf="!ready"><div><mat-spinner class="tinfo-spinner"></mat-spinner></div></div>
+      <div class=table_info>
+        <div *ngIf="!ready">
+          <div>
+            <mat-spinner class="tinfo-spinner"></mat-spinner>
+          </div>
+        </div>
         <div #tinfoEmbeds [style.visibility]="ready ? 'visible' : 'hidden'">
-           <div class="app-twitter-row" *ngFor="let tweet of tweets; let i = index">
-             <div class="app-twitter-tweet"><blockquote [innerHtml]="tweet"></blockquote></div><div class="app-twitter-item-menu"> <button mat-icon-button [matMenuTriggerFor]="appMenu">
-               <mat-icon>more_vert</mat-icon>
-             </button></div>
+          <div class="app-twitter-row" *ngFor="let tweet of tweets; let i = index">
+            <div class="app-twitter-tweet">
+              <blockquote [innerHtml]="tweet"></blockquote>
+            </div>
+            <div class="app-twitter-item-menu">
+              <button mat-icon-button [matMenuTriggerData]="{tweet:tweet}" [matMenuTriggerFor]="appMenu">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+            </div>
+          </div>
+
         </div>
 
-    </div>
-
+      </div>
     </div>
   </div>
-</div>
 

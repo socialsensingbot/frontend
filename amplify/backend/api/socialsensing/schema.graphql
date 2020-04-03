@@ -1,0 +1,30 @@
+type UserPreferences @model @auth(
+                            rules: [
+                              {allow: owner, operations: [create, update, delete, read]},
+                            ]){
+  id: ID!
+  ignoreTweets: [TweetIgnore] @connection(name: "UserTweetIgnores")
+  ignorePeople: [TwitterUserIgnore] @connection(name: "UserTwitterUserIgnores")
+  irrelevant: [TweetIrrelevant] @connection(name: "UserTweetIrrelevant")
+}
+
+type TweetIgnore @model @auth(rules: [ {allow: owner}]) {
+  id: ID!
+  url: String!
+  tweetId: String
+  user: UserPreferences @connection(name: "UserTweetIgnores")
+}
+
+type TweetIrrelevant @model  @auth(rules: [ {allow: owner}]) {
+  id: ID!
+  url: String!
+  tweetId: String
+  user: UserPreferences @connection(name: "UserTweetIrrelevant")
+}
+
+type TwitterUserIgnore @model  @auth(rules: [ {allow: owner}]) {
+  id: ID!
+  twitterScreenName: String!
+  user: UserPreferences @connection(name: "UserTwitterUserIgnores")
+}
+
