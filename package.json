@@ -34,7 +34,6 @@
     "leaflet": "^1.6.0",
     "ng5-slider": "^1.2.4",
     "rxjs": "~6.4.0",
-    "service": "^0.1.4",
     "tslib": "^1.10.0",
     "zone.js": "~0.9.1"
   },
@@ -48,7 +47,7 @@
     "@types/jasminewd2": "~2.0.3",
     "@types/jquery": "^3.3.33",
     "@types/node": "~8.9.4",
-    "codelyzer": "^5.0.0",
+    "codelyzer": "^5.2.2",
     "cypress": "^4.2.0",
     "cypress-intellij-reporter": "0.0.4",
     "jasmine-core": "~3.4.0",

@@ -13,9 +13,9 @@ import {
   createTwitterUserIgnore,
   createUserPreferences
 } from "../../graphql/mutations";
-import {CreateUserPreferencesInput, GetUserPreferencesQuery} from "../API.service";
+import { GetUserPreferencesQuery} from "../API.service";
 import {NotificationService} from "../services/notification.service";
-import {listToMaybe} from "codelyzer/util/function";
+
 
 @Injectable({
               providedIn: 'root'
