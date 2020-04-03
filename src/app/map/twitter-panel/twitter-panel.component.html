@@ -1,5 +1,5 @@
 <div class="tweets-header" *ngIf="ready">
-  <mat-card class="tweets-heading"><span style="color: black"><b>Showing {{tweets.length}} of {{count}}
+  <mat-card class="tweets-heading"><span style="color: black"><b>Showing {{tweets.length}}
     Tweets from {{region}}</b><br/></span>Exceedence probability {{exceedenceProbability}}%
   </mat-card>
 </div>
@@ -34,7 +34,7 @@
         </div>
         <div #tinfoEmbeds [style.visibility]="ready ? 'visible' : 'hidden'">
           <div class="app-twitter-row" *ngFor="let tweet of tweets; let i = index">
-            <mat-expansion-panel [style.visibility]="hidden[i] ? 'visible' : 'hidden'" class="twitter-card">
+            <mat-expansion-panel [style.display]="hidden[i] ? 'box' : 'none'" class="twitter-card">
               <mat-expansion-panel-header>
                 <mat-panel-title>
                   Tweet Hidden
@@ -45,8 +45,8 @@
                 <ng-container *ngTemplateOutlet="tweetEntry; context: {tweet:tweet}"></ng-container>
               </div>
             </mat-expansion-panel>
-            <mat-card class="twitter-card">
-              <ng-container [style.visibility]="!hidden[i] ? 'visible' : 'hidden'">
+            <mat-card class="twitter-card" [style.display]="!hidden[i] ? 'box' : 'none'">
+              <ng-container >
                 <ng-container *ngTemplateOutlet="tweetEntry; context: {tweet:tweet}"></ng-container>
               </ng-container>
             </mat-card>

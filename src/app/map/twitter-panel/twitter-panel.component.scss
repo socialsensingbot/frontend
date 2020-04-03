@@ -1,6 +1,6 @@
 
 .tinfo {
-  margin: 2px;
+  margin: 4px;
 }
 
 .tinfo h4 {
@@ -53,6 +53,7 @@
     align-items: center;
     //border: 1px solid blue;
     position: relative;
+    max-width:540px;
 
     .app-twitter-item-menu {
       position: absolute;
@@ -97,6 +98,7 @@
 
 .twitter-card {
   margin-bottom:8px;
+  margin-top:8px;
 }
 .EmbeddedTweet-tweet {
   margin:0;
