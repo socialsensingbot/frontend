@@ -4,11 +4,6 @@
       <mat-icon>close</mat-icon>
     </button>
     <div class="tweets-outer">
-      <div class="tweets-header">
-        <mat-card class="tweets-heading"><span *ngIf="embeds" style="color: black"><b>Showing {{tweetCount}}
-          Tweets from {{selectedRegion}}</b><br/></span>Exceedence probability {{exceedenceProbability}}%
-        </mat-card>
-      </div>
       <twitter-panel [count]="tweetCount" [region]="selectedRegion" [exceedenceProbability]="exceedenceProbability"
                      [embeds]="embeds" [showHeaderInfo]="twitterPanelHeader"
                      [showTimeline]="showTwitterTimeline"></twitter-panel>

@@ -1,3 +1,8 @@
+<div class="tweets-header" *ngIf="ready">
+  <mat-card class="tweets-heading"><span style="color: black"><b>Showing {{tweets.length}} of {{count}}
+    Tweets from {{region}}</b><br/></span>Exceedence probability {{exceedenceProbability}}%
+  </mat-card>
+</div>
 <div id="tinfo" class="tinfo">
   <mat-menu #appMenu="matMenu">
     <ng-template matMenuContent let-tweet="tweet">
@@ -7,7 +12,16 @@
     </ng-template>
   </mat-menu>
 
-
+  <ng-template #tweetEntry let-tweet="tweet">
+    <div class="app-twitter-tweet">
+      <blockquote [innerHtml]="tweet"></blockquote>
+    </div>
+    <div class="app-twitter-item-menu">
+      <button mat-icon-button [matMenuTriggerData]="{tweet:tweet}" [matMenuTriggerFor]="appMenu">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+    </div>
+  </ng-template>
   <!--      <button id="tinfo_button" class="tinfo_button">-</button>-->
   <div id="tinfo_table_wrapper" class="tinfo_table_wrapper">
 
@@ -20,14 +34,22 @@
         </div>
         <div #tinfoEmbeds [style.visibility]="ready ? 'visible' : 'hidden'">
           <div class="app-twitter-row" *ngFor="let tweet of tweets; let i = index">
-            <div class="app-twitter-tweet">
-              <blockquote [innerHtml]="tweet"></blockquote>
-            </div>
-            <div class="app-twitter-item-menu">
-              <button mat-icon-button [matMenuTriggerData]="{tweet:tweet}" [matMenuTriggerFor]="appMenu">
-                <mat-icon>more_vert</mat-icon>
-              </button>
-            </div>
+            <mat-expansion-panel [style.visibility]="hidden[i] ? 'visible' : 'hidden'" class="twitter-card">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  Tweet Hidden
+                </mat-panel-title>
+
+              </mat-expansion-panel-header>
+              <div class="hidden-tweet-container">
+                <ng-container *ngTemplateOutlet="tweetEntry; context: {tweet:tweet}"></ng-container>
+              </div>
+            </mat-expansion-panel>
+            <mat-card class="twitter-card">
+              <ng-container [style.visibility]="!hidden[i] ? 'visible' : 'hidden'">
+                <ng-container *ngTemplateOutlet="tweetEntry; context: {tweet:tweet}"></ng-container>
+              </ng-container>
+            </mat-card>
           </div>
 
         </div>
@@ -35,4 +57,6 @@
       </div>
     </div>
   </div>
+
+</div>
 

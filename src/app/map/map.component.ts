@@ -257,6 +257,7 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     if(active_polygon !== "undefined") {
+      this.updateTwitter();
       this.showTweets();
     }
     // if (typeof min_offset !== "undefined" && typeof min_offset !== "undefined") {

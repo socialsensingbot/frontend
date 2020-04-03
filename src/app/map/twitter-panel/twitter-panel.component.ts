@@ -27,7 +27,8 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   @Input() region: string;
   @Input() exceedenceProbability: string;
   private _embeds: string;
-  private tweets: string[];
+  public tweets: string[];
+  public hidden: boolean[]=[];
   ready: boolean;
 
   @Input()
@@ -40,7 +41,11 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
     if (typeof this._embeds !== "undefined") {
       this.ready = false;
       const regex = /(<blockquote(.*?)<\/blockquote>)/g;
-      this.tweets = this._embeds.match(regex).map(s => s).filter(s => !this.pref.isBlacklisted(s));
+      this.tweets = this._embeds.match(regex).map(s => s);
+      this.hidden=[];
+      this.tweets.forEach(tweet=>{
+        this.hidden.push(this.pref.isBlacklisted(tweet))
+      });
       console.log(this.tweets);
       if (this.tweets.length > 0) {
         (window as any).twttr.widgets.load($("#tinfo")[0]);
@@ -95,6 +100,6 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   }
 
   public removeTweet(tweet) {
-    this.tweets.splice(this.tweets.indexOf(tweet), 1);
+    this.hidden[this.tweets.indexOf(tweet)]=true;
   }
 }

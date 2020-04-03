@@ -1,6 +1,8 @@
 $right-hand-margin: 18px;
 $top-margin: 18px;
 $bottom-margin: 28px;
+$drawer-width: 560px;
+
 .draw-close-button {
   position: absolute;
   right: -8px;
@@ -50,9 +52,9 @@ $bottom-margin: 28px;
 }
 
 .tweet-drawer {
-  max-width: 540px;
-  width: 540px;
-  min-width: 540px;
+  max-width: $drawer-width;
+  width: $drawer-width;
+  min-width: $drawer-width;
   max-height: 100%;
   overflow: hidden;
   background: rgb(250, 250, 250);
@@ -64,25 +66,7 @@ $bottom-margin: 28px;
 
   }
 
-  .tweets-header {
-    //position: rel;
-    z-index: 10;
-    margin-top: 12px;
-    margin-right: 24px;
-    margin-left: 14px;
-    margin-bottom: 0;
-    //background: white;
 
-    .tweets-heading {
-      font-size: 1.2em;
-      margin-top: 1.2em;
-      margin-right: 0em;
-      margin-left: 0;
-      margin-bottom: 0em;
-      line-height: 1.5em;
-    }
-
-  }
 
 
   .tweets-outer {
