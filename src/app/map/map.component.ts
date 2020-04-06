@@ -269,7 +269,7 @@ export class MapComponent implements OnInit, OnDestroy {
   /**
    * Loads the live data from S3 storage securely.
    */
-  private loadLiveData() {
+  private async loadLiveData() {
     console.log("loadLiveData");
     return Storage.get("live.json")
                   .then((url: any) =>
@@ -283,7 +283,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * the map is ready and data is loaded.
    * @param map the leaflet.js Map
    */
-  private init(map: Map) {
+  private async init(map: Map) {
     console.log("init");
 
     //Listeners to push map state into URL
@@ -318,11 +318,6 @@ export class MapComponent implements OnInit, OnDestroy {
     //This assignment triggers the change to the legend
     this.colorFunctions = newColorFunctions;
 
-
-    this.setupCountStatsToggle();
-    this.readData(); //reads data and sets up map
-    setInterval(() => this.readData(), 60000);
-
     map.on('baselayerchange', (e: any) => {
       if (e.name in this._basemapControl.polygon) {
         this._activePolys = e.name;
@@ -336,6 +331,12 @@ export class MapComponent implements OnInit, OnDestroy {
 
     //Use the current query parameters to update map state
     this.updateMap(this._params);
+
+    this.setupCountStatsToggle();
+    await this.readData(); //reads data and sets up map
+    setInterval(() => this.readData(), 60000);
+
+
 
 
   }
@@ -443,7 +444,7 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   onEachFeature(feature: geojson.Feature<geojson.GeometryObject, any>, layer: Layer) {
-    // console.log("onEachFeature");
+    console.log("onEachFeature");
     const mc = this;
     // If this feature is referenced in the URL query paramter selected
     // e.g. ?...&selected=powys
@@ -469,9 +470,13 @@ export class MapComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this._resetLayersTimer = timer(0, 50).subscribe(() => {
       if (this._layersAreStale) {
-        this.resetLayers(false);
-        this.update();
-        this._layersAreStale = false;
+        try {
+          this.update();
+          this.resetLayers(false);
+          this._layersAreStale = false;
+        } catch (e) {
+          console.error(e);
+        }
       }
     });
 
@@ -505,9 +510,10 @@ export class MapComponent implements OnInit, OnDestroy {
   //Add the polygons
   ///////////////////////
   resetLayers(clear_click) {
-    console.log("resetLayers");
+    console.log("resetLayers("+clear_click+")");
 
     for (let key in this._basemapControl["numbers"]) {
+      console.log(key);
       if (this._numberLayers[key] != null) {
         // noinspection JSUnfilteredForInLoop
         this._numberLayers[key].clearLayers();
@@ -517,9 +523,11 @@ export class MapComponent implements OnInit, OnDestroy {
           style:         (feature) => this.colorFunctions[key].getFeatureStyle(feature),
           onEachFeature: (f, l) => this.onEachFeature(f, l)
         }).addTo(this._numberLayers[key]);
+      } else {
+        console.log("Null layer "+key);
       }
       if (clear_click) {
-        console.log("resetLayers clear_click");
+        console.log("resetLayers() clear_click");
         if (this._clicked != "") {
           this._geojson[this._activeNumber].resetStyle(this._clicked);
         }
