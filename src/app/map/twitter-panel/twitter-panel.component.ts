@@ -16,7 +16,7 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   @Input() exceedenceProbability: string;
   private _embeds: string;
   public tweets: string[];
-  public hidden: boolean[]=[];
+  public hidden: boolean[] = [];
   ready: boolean;
 
   @Input()
@@ -30,8 +30,8 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
       this.ready = false;
       const regex = /(<blockquote(.*?)<\/blockquote>)/g;
       this.tweets = this._embeds.match(regex).map(s => s);
-      this.hidden=[];
-      this.tweets.forEach(tweet=>{
+      this.hidden = [];
+      this.tweets.forEach(tweet => {
         this.hidden.push(this.pref.isBlacklisted(tweet))
       });
       console.log(this.tweets);
@@ -50,13 +50,13 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   @Input() showHeaderInfo: boolean = true;
   @Input() showTimeline: boolean;
 
-  constructor(private _ngZone: NgZone, public pref: PreferenceService  ) { }
+  constructor(private _ngZone: NgZone, public pref: PreferenceService) { }
 
   ngOnInit() {
-    if((window as any).twttr) {
+    if ((window as any).twttr) {
       this.bindTwitter();
     } else {
-      setTimeout(()=> this.bindTwitter(),1000);
+      setTimeout(() => this.bindTwitter(), 1000);
     }
 
 
@@ -83,23 +83,20 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
     console.log(changes);
     (window as any).twttr.widgets.load($("#tinfo")[0]);
   }
-
-  public checked(i: number, $event: MatCheckboxChange) {
-   //
-  }
-
   public removeTweet(tweet, $event: MouseEvent) {
-    this.showHide(tweet, true);
+    this.showHide();
 
   }
 
-  private showHide(tweet, hide: boolean) {
-    const i = this.tweets.indexOf(tweet);
-    this.hidden[i] = hide;
+  private showHide() {
+
+    for (let j = 0; j < this.tweets.length; j++) {
+      this.hidden[j] = this.pref.isBlacklisted(this.tweets[j]);
+    }
+
     window.setTimeout(() => {
-      const card = $(".twitter-card")[i][0];
-      (window as any).twttr.widgets.load(card);
-    }, 500);
+      (window as any).twttr.widgets.load($("#tinfo")[0]);
+    }, 10);
   }
 
   public sender(tweet) {
@@ -107,6 +104,26 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   }
 
   public showTweet(tweet, $event: MouseEvent) {
-    this.showHide(tweet, false);
+    this.showHide();
+  }
+
+  public async ignoreSender(tweet, $event: MouseEvent) {
+    await this.pref.ignoreSender(tweet);
+    this.removeTweet(tweet,$event)
+  }
+
+  public async unIgnoreSender(tweet, $event: MouseEvent) {
+    await this.pref.unIgnoreSender(tweet);
+    this.showTweet(tweet, $event)
+  }
+
+  public async ignoreTweet(tweet, $event: MouseEvent) {
+    await this.pref.ignoreTweet(tweet);
+    this.removeTweet(tweet, $event)
+  }
+
+  public async unIgnoreTweet(tweet, $event: MouseEvent) {
+    await this.pref.unIgnoreTweet(tweet);
+    this.showTweet(tweet, $event)
   }
 }

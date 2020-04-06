@@ -152,13 +152,13 @@ export class PreferenceService {
 
   }
 
-  public parseTweet(tweetURL: string) {
+  public parseTweet(blockquote: string) {
     //https://twitter.com/crickhowellhs/status/1051548078199717888?ref_src=twsrc%5Etfw%7Ctwcamp%5Etweetembed%7Ctwterm%5E1051548078199717888&ref_url=http%3A%2F%2Flocalhost%3A4200%2Fmap%3Fselected%3Dpowys%26min_offset%3D-3119%26max_offset%3D0
 
     // console.log(tweetURL);
     const regex = /.*<a href="https:\/\/twitter.com\/(\w+)\/status\/(\d+).*">.*<\/a><\/blockquote>/;
-    const sender = tweetURL.match(regex)[1];
-    const tweet = tweetURL.match(regex)[2];
+    const sender = blockquote.match(regex)[1];
+    const tweet = blockquote.match(regex)[2];
     return {tweet, sender, url: "https://twitter.com/" + sender + "status/" + tweet};
   }
 
@@ -178,7 +178,7 @@ export class PreferenceService {
     if (result.data.getTwitterUserIgnore) {
       const result = await API.graphql(graphqlOperation(deleteTwitterUserIgnore, { input: {id}}));
       console.log(result);
-      delete this._twitterUserBlackList[parsedURL.sender];
+      this._twitterUserBlackList=this._twitterUserBlackList.filter(i=> i !== parsedURL.sender);
     } else {
       this._notification.show("Not ignoring @" + parsedURL.sender)
     }
@@ -192,7 +192,7 @@ export class PreferenceService {
     if (result.data.getTweetIgnore) {
       const result = await API.graphql(graphqlOperation(deleteTweetIgnore,  {input: {id}}));
       console.log(result);
-      delete this._tweetBlackList[parsedURL.tweet];
+      this._tweetBlackList=this._tweetBlackList.filter(i=> i !== parsedURL.tweet);
     } else {
       this._notification.show("Not ignoring " + parsedURL.tweet);
     }
