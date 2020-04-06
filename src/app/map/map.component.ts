@@ -140,10 +140,7 @@ export class MapComponent implements OnInit, OnDestroy {
     //save the query parameter observable
     this._searchParams = this.route.queryParams;
 
-    //Every time the search parameters change, the map will be updated
-    this._searchParams.subscribe(params => this.updateMap(params));
-
-    // Preload the cacheable JSON files asynchronously
+       // Preload the cacheable JSON files asynchronously
     // this gets called again in onMapReady()
     // But the values should be in the browser cache by then
     this.fetchJson().then(() => {});
@@ -197,7 +194,7 @@ export class MapComponent implements OnInit, OnDestroy {
     console.log("Updating map with params");
     console.log(params);
     this._params = params;
-    const {lng, lat, zoom, active_number, active_polygon, min_offset, max_offset} = params;
+    const {lng, lat, zoom, active_number, selected, min_offset, max_offset} = params;
     if (typeof min_offset !== "undefined") {
       this.sliderOptions.startMin = min_offset;
       this._defaultMin = min_offset;
@@ -238,7 +235,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
       }
     }
-    const polygonLayerName: string = typeof active_polygon !== "undefined" ? active_polygon : "county";
+    const polygonLayerName: string = typeof selected !== "undefined" ? selected : "county";
     const polygonLayer: LayerGroup = this._polyLayers[polygonLayerName];
     if (this._map) {
       for (let layer in this._polyLayers) {
@@ -255,8 +252,9 @@ export class MapComponent implements OnInit, OnDestroy {
         }
       }
     }
+    this._twitterIsStale= true;
 
-    if(active_polygon !== "undefined") {
+    if(selected !== "undefined") {
       this.updateTwitter();
       this.showTweets();
     }
@@ -329,16 +327,15 @@ export class MapComponent implements OnInit, OnDestroy {
       }
     });
 
-    //Use the current query parameters to update map state
-    this.updateMap(this._params);
+    // //Use the current query parameters to update map state
+    // this.updateMap(this._params);
 
     this.setupCountStatsToggle();
     await this.readData(); //reads data and sets up map
     setInterval(() => this.readData(), 60000);
 
-
-
-
+    //Every time the search parameters change, the map will be updated
+    this._searchParams.subscribe(params => this.updateMap(params));
   }
 
   //add = extra minutes
