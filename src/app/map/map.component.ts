@@ -361,7 +361,7 @@ export class MapComponent implements OnInit, OnDestroy {
     const feature = e.target.feature;
     const exceedenceProbability: number = Math.round(feature.properties.stats * 100) / 100;
     const region: string = this.toTitleCase(feature.properties.name);
-    const count: number = Math.round(feature.properties.count * 100) / 100;
+    const count: number = feature.properties.count;
     let text = "" +
       `<div>Region: ${region}</div>`;
     if (count > 0) {
@@ -396,7 +396,7 @@ export class MapComponent implements OnInit, OnDestroy {
   private updateTwitterHeader(props: any) {
     this.exceedenceProbability = Math.round(props.properties.stats * 100) / 100;
     this.selectedRegion = this.toTitleCase(props.properties.name);
-    this.tweetCount = Math.round(props.properties.count * 100) / 100;
+    this.tweetCount = props.properties.count;
   }
 
   /**

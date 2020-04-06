@@ -17,6 +17,7 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   private _embeds: string;
   public tweets: string[];
   public hidden: boolean[] = [];
+  public visibleCount= 0;
   ready: boolean;
 
   @Input()
@@ -28,12 +29,14 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   private updateTweets() {
     if (typeof this._embeds !== "undefined") {
       this.ready = false;
+      console.log(this._embeds);
       const regex = /(<blockquote(.*?)<\/blockquote>)/g;
       this.tweets = this._embeds.match(regex).map(s => s);
       this.hidden = [];
       this.tweets.forEach(tweet => {
         this.hidden.push(this.pref.isBlacklisted(tweet))
       });
+      this.visibleCount= this.hidden.filter(i=>!i).length;
       console.log(this.tweets);
       if (this.tweets.length > 0) {
         (window as any).twttr.widgets.load($("#tinfo")[0]);
@@ -93,7 +96,7 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
     for (let j = 0; j < this.tweets.length; j++) {
       this.hidden[j] = this.pref.isBlacklisted(this.tweets[j]);
     }
-
+    this.visibleCount= this.hidden.filter(i=>!i).length;
     window.setTimeout(() => {
       (window as any).twttr.widgets.load($("#tinfo")[0]);
     }, 10);
