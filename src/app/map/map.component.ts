@@ -254,7 +254,7 @@ export class MapComponent implements OnInit, OnDestroy {
     }
     this._twitterIsStale= true;
 
-    if(selected !== "undefined") {
+    if(typeof selected !== "undefined") {
       this.updateTwitter();
       this.showTweets();
     }
