@@ -1,18 +1,6 @@
-import {
-  Component,
-  ElementRef,
-  Input,
-  NgZone,
-  OnChanges,
-  OnInit,
-  SimpleChanges,
-  ViewChild,
-  ViewRef
-} from '@angular/core';
+import {Component, ElementRef, Input, NgZone, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import * as $ from "jquery";
-import {HttpClient} from "@angular/common/http";
 import {MatCheckboxChange} from "@angular/material/checkbox";
-import {Router} from "@angular/router";
 import {PreferenceService} from "../../pref/preference.service";
 
 @Component({
@@ -101,15 +89,24 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   }
 
   public removeTweet(tweet, $event: MouseEvent) {
-    const i = this.tweets.indexOf(tweet);
-    this.hidden[i]=true;
-    window.setTimeout(() => {
-      (window as any).twttr.widgets.load($(".twitter-card")[i][0]);
-    }, 500);
+    this.showHide(tweet, true);
 
+  }
+
+  private showHide(tweet, hide: boolean) {
+    const i = this.tweets.indexOf(tweet);
+    this.hidden[i] = hide;
+    window.setTimeout(() => {
+      const card = $(".twitter-card")[i][0];
+      (window as any).twttr.widgets.load(card);
+    }, 500);
   }
 
   public sender(tweet) {
     return this.pref.parseTweet(tweet).sender;
+  }
+
+  public showTweet(tweet, $event: MouseEvent) {
+    this.showHide(tweet, false);
   }
 }

@@ -4,20 +4,24 @@
   </mat-card>
 </div>
 <div id="tinfo" class="tinfo">
-  <mat-menu #appMenu="matMenu">
-    <ng-template matMenuContent let-tweet="tweet">
-      <button (click)="pref.ignoreSender(tweet) && removeTweet(tweet,$event)" mat-menu-item>Ignore @{{sender(tweet)}}</button>
-      <button (click)="pref.ignoreTweet(tweet) && removeTweet(tweet,$event)" mat-menu-item>Ignore Tweet</button>
-<!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
-    </ng-template>
-  </mat-menu>
 
-  <ng-template #tweetEntry let-tweet="tweet">
+
+  <ng-template #tweetEntry let-tweet="tweet"  let-si="senderIgnore" let-ti="tweetIgnore">
+    <mat-menu #appMenu="matMenu">
+        <button *ngIf="!si" (click)="pref.ignoreSender(tweet);si=true;removeTweet(tweet,$event)" mat-menu-item>Ignore @{{sender(tweet)}}</button>
+        <button *ngIf="si" (click)="pref.unIgnoreSender(tweet);si=false;showTweet(tweet,$event)" mat-menu-item>Unignore @{{sender(tweet)}}</button>
+        <button *ngIf="!ti" (click)="pref.ignoreTweet(tweet);ti=true;removeTweet(tweet,$event)" mat-menu-item>Ignore Tweet
+        </button>
+        <button *ngIf="ti" (click)="pref.unIgnoreTweet(tweet);ti=false;showTweet(tweet,$event)" mat-menu-item>Unignore Tweet
+        </button>
+        <!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
+
+    </mat-menu>
     <div class="app-twitter-tweet">
       <blockquote [innerHtml]="tweet"></blockquote>
     </div>
     <div class="app-twitter-item-menu">
-      <button mat-icon-button [matMenuTriggerData]="{tweet:tweet}" [matMenuTriggerFor]="appMenu">
+      <button mat-icon-button [matMenuTriggerData]="{tweet:tweet,si:si,ti:ti}" [matMenuTriggerFor]="appMenu">
         <mat-icon>more_vert</mat-icon>
       </button>
     </div>
@@ -42,12 +46,14 @@
 
               </mat-expansion-panel-header>
               <div class="hidden-tweet-container">
-                <ng-container *ngTemplateOutlet="tweetEntry; context: {tweet:tweet}"></ng-container>
+                <ng-container
+                  *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
               </div>
             </mat-expansion-panel>
             <mat-card class="twitter-card" *ngIf="!hidden[i]">
-              <ng-container >
-                <ng-container *ngTemplateOutlet="tweetEntry; context: {tweet:tweet}"></ng-container>
+              <ng-container>
+                <ng-container
+                  *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
               </ng-container>
             </mat-card>
           </div>

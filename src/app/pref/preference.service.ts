@@ -11,7 +11,7 @@ import {
   createTweetIgnore,
   createTweetIrrelevant,
   createTwitterUserIgnore,
-  createUserPreferences
+  createUserPreferences, deleteTweetIgnore, deleteTwitterUserIgnore
 } from "../../graphql/mutations";
 import { GetUserPreferencesQuery} from "../API.service";
 import {NotificationService} from "../services/notification.service";
@@ -68,10 +68,10 @@ export class PreferenceService {
     if(result.data.listTweetIgnores) {
       this._tweetBlackList.push(...result.data.listTweetIgnores.items.map(i => i.tweetId));
     }
-    const result2 = await API.graphql(graphqlOperation(listTweetIrrelevants));
-    if(result2.data.listTweetIrrelevants) {
-      this._tweetBlackList.push(...result2.data.listTweetIrrelevants.items.map(i => i.tweetId));
-    }
+    // const result2 = await API.graphql(graphqlOperation(listTweetIrrelevants));
+    // if(result2.data.listTweetIrrelevants) {
+    //   this._tweetBlackList.push(...result2.data.listTweetIrrelevants.items.map(i => i.tweetId));
+    // }
     const result3 = await API.graphql(graphqlOperation(listTwitterUserIgnores));
     if(result3.data.listTwitterUserIgnores) {
       this._twitterUserBlackList.push(...result3.data.listTwitterUserIgnores.items.map(i => i.twitterScreenName));
@@ -95,7 +95,7 @@ export class PreferenceService {
   public async ignoreSender(tweet: string) {
     const parsedURL = this.parseTweet(tweet);
     const id = this._username + ":" + parsedURL.sender;
-    const result = await API.graphql(graphqlOperation(getTwitterUserIgnore, {id: id}));
+    const result = await API.graphql(graphqlOperation(getTwitterUserIgnore, {id}));
     console.log(result);
     if (!result.data.getTwitterUserIgnore) {
       const result = await API.graphql(graphqlOperation(createTwitterUserIgnore, {
@@ -108,19 +108,19 @@ export class PreferenceService {
     } else {
       this._notification.show("Already ignoring @" + parsedURL.sender)
     }
-
+    this._twitterUserBlackList.push(parsedURL.sender);
   }
 
 
   public async ignoreTweet(tweet: string) {
     const parsedURL = this.parseTweet(tweet);
     const id = this._username + ":" + parsedURL.tweet;
-    const result = await API.graphql(graphqlOperation(getTweetIgnore, {id: id}));
+    const result = await API.graphql(graphqlOperation(getTweetIgnore, {id}));
     console.log(result);
     if (!result.data.getTweetIgnore) {
       const result = await API.graphql(graphqlOperation(createTweetIgnore, {
         input: {
-          id:                id,
+          id,
           url:               parsedURL.url,
           tweetId:           parsedURL.tweet,
           tweetIgnoreUserId: this._username
@@ -129,18 +129,18 @@ export class PreferenceService {
     } else {
       this._notification.show("Already ignoring " + parsedURL.tweet);
     }
-
+    this._tweetBlackList.push(parsedURL.tweet);
   }
 
   public async markIrrelevant(tweet: string) {
     const parsedURL = this.parseTweet(tweet);
     const id = this._username + ":" + parsedURL.tweet;
-    const result = await API.graphql(graphqlOperation(getTweetIrrelevant, {id: id}));
+    const result = await API.graphql(graphqlOperation(getTweetIrrelevant, {id}));
     console.log(result);
     if (!result.data.getTweetIrrelevant) {
       const result = await API.graphql(graphqlOperation(createTweetIrrelevant, {
         input: {
-          id:                    id,
+          id,
           url:                   parsedURL.url,
           tweetId:               parsedURL.tweet,
           tweetIrrelevantUserId: this._username
@@ -155,10 +155,46 @@ export class PreferenceService {
   public parseTweet(tweetURL: string) {
     //https://twitter.com/crickhowellhs/status/1051548078199717888?ref_src=twsrc%5Etfw%7Ctwcamp%5Etweetembed%7Ctwterm%5E1051548078199717888&ref_url=http%3A%2F%2Flocalhost%3A4200%2Fmap%3Fselected%3Dpowys%26min_offset%3D-3119%26max_offset%3D0
 
-    console.log(tweetURL);
+    // console.log(tweetURL);
     const regex = /.*<a href="https:\/\/twitter.com\/(\w+)\/status\/(\d+).*">.*<\/a><\/blockquote>/;
     const sender = tweetURL.match(regex)[1];
     const tweet = tweetURL.match(regex)[2];
     return {tweet, sender, url: "https://twitter.com/" + sender + "status/" + tweet};
+  }
+
+  public isSenderIgnored(tweet) {
+    return this._twitterUserBlackList.includes(this.parseTweet(tweet).sender);
+  }
+
+  public isTweetIgnored(tweet) {
+    return this._tweetBlackList.includes(this.parseTweet(tweet).tweet);
+  }
+
+  public async unIgnoreSender(tweet) {
+    const parsedURL = this.parseTweet(tweet);
+    const id = this._username + ":" + parsedURL.sender;
+    const result = await API.graphql(graphqlOperation(getTwitterUserIgnore, {id}));
+    console.log(result);
+    if (result.data.getTwitterUserIgnore) {
+      const result = await API.graphql(graphqlOperation(deleteTwitterUserIgnore, { input: {id}}));
+      console.log(result);
+      delete this._twitterUserBlackList[parsedURL.sender];
+    } else {
+      this._notification.show("Not ignoring @" + parsedURL.sender)
+    }
+  }
+
+  public async unIgnoreTweet(tweet) {
+    const parsedURL = this.parseTweet(tweet);
+    const id = this._username + ":" + parsedURL.tweet;
+    const result = await API.graphql(graphqlOperation(getTweetIgnore, {id}));
+    console.log(result);
+    if (result.data.getTweetIgnore) {
+      const result = await API.graphql(graphqlOperation(deleteTweetIgnore,  {input: {id}}));
+      console.log(result);
+      delete this._tweetBlackList[parsedURL.tweet];
+    } else {
+      this._notification.show("Not ignoring " + parsedURL.tweet);
+    }
   }
 }
