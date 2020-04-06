@@ -152,7 +152,7 @@ export class PreferenceService {
 
   }
 
-  private parseTweet(tweetURL: string) {
+  public parseTweet(tweetURL: string) {
     //https://twitter.com/crickhowellhs/status/1051548078199717888?ref_src=twsrc%5Etfw%7Ctwcamp%5Etweetembed%7Ctwterm%5E1051548078199717888&ref_url=http%3A%2F%2Flocalhost%3A4200%2Fmap%3Fselected%3Dpowys%26min_offset%3D-3119%26max_offset%3D0
 
     console.log(tweetURL);

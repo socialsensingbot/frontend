@@ -6,9 +6,9 @@
 <div id="tinfo" class="tinfo">
   <mat-menu #appMenu="matMenu">
     <ng-template matMenuContent let-tweet="tweet">
-      <button (click)="pref.ignoreSender(tweet) && removeTweet(tweet)" mat-menu-item>Ignore Sender</button>
-      <button (click)="pref.ignoreTweet(tweet) && removeTweet(tweet)" mat-menu-item>Ignore Tweet</button>
-      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet)" mat-menu-item>Mark Irrelevant</button>
+      <button (click)="pref.ignoreSender(tweet) && removeTweet(tweet,$event)" mat-menu-item>Ignore @{{sender(tweet)}}</button>
+      <button (click)="pref.ignoreTweet(tweet) && removeTweet(tweet,$event)" mat-menu-item>Ignore Tweet</button>
+<!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
     </ng-template>
   </mat-menu>
 
@@ -34,7 +34,7 @@
         </div>
         <div #tinfoEmbeds [style.visibility]="ready ? 'visible' : 'hidden'">
           <div class="app-twitter-row" *ngFor="let tweet of tweets; let i = index">
-            <mat-expansion-panel [style.display]="hidden[i] ? 'box' : 'none'" class="twitter-card">
+            <mat-expansion-panel *ngIf="hidden[i]" class="twitter-card tc-expansion-panel">
               <mat-expansion-panel-header>
                 <mat-panel-title>
                   Tweet Hidden
@@ -45,7 +45,7 @@
                 <ng-container *ngTemplateOutlet="tweetEntry; context: {tweet:tweet}"></ng-container>
               </div>
             </mat-expansion-panel>
-            <mat-card class="twitter-card" [style.display]="!hidden[i] ? 'box' : 'none'">
+            <mat-card class="twitter-card" *ngIf="!hidden[i]">
               <ng-container >
                 <ng-container *ngTemplateOutlet="tweetEntry; context: {tweet:tweet}"></ng-container>
               </ng-container>

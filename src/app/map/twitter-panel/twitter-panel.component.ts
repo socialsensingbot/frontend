@@ -93,13 +93,23 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
 
   public ngOnChanges(changes: SimpleChanges): void {
     console.log(changes);
+    (window as any).twttr.widgets.load($("#tinfo")[0]);
   }
 
   public checked(i: number, $event: MatCheckboxChange) {
    //
   }
 
-  public removeTweet(tweet) {
-    this.hidden[this.tweets.indexOf(tweet)]=true;
+  public removeTweet(tweet, $event: MouseEvent) {
+    const i = this.tweets.indexOf(tweet);
+    this.hidden[i]=true;
+    window.setTimeout(() => {
+      (window as any).twttr.widgets.load($(".twitter-card")[i][0]);
+    }, 500);
+
+  }
+
+  public sender(tweet) {
+    return this.pref.parseTweet(tweet).sender;
   }
 }
