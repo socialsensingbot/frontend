@@ -1,7 +1,7 @@
 $right-hand-margin: 18px;
 $top-margin: 18px;
 $bottom-margin: 28px;
-$drawer-width: 560px;
+$drawer-width: 568px;
 
 .draw-close-button {
   position: absolute;
@@ -15,7 +15,9 @@ $drawer-width: 560px;
 .map-surround {
   height: 100%;
   width: 100%;
-  overflow: auto;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
   top: 0px;
   left: 0px;
   bottom: 0px;
@@ -72,7 +74,7 @@ $drawer-width: 560px;
   .tweets-outer {
 
     max-height: 100%;
-    overflow: auto;
+    overflow-x: hidden;
     font-size: 16px;
   }
 
