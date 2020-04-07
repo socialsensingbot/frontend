@@ -1,0 +1,307 @@
+# this is an auto generated file. This will be overwritten
+mutation CreateUserProfile(
+  $input: CreateUserProfileInput!
+  $condition: ModelUserProfileConditionInput
+) {
+  createUserProfile(input: $input, condition: $condition) {
+    id
+    name
+    ignoreTweets {
+      items {
+        id
+        url
+        owner
+      }
+      nextToken
+    }
+    ignorePeople {
+      items {
+        id
+        twitterScreenName
+        owner
+      }
+      nextToken
+    }
+    irrelevant {
+      items {
+        id
+        url
+        owner
+      }
+      nextToken
+    }
+  }
+}
+mutation UpdateUserProfile(
+  $input: UpdateUserProfileInput!
+  $condition: ModelUserProfileConditionInput
+) {
+  updateUserProfile(input: $input, condition: $condition) {
+    id
+    name
+    ignoreTweets {
+      items {
+        id
+        url
+        owner
+      }
+      nextToken
+    }
+    ignorePeople {
+      items {
+        id
+        twitterScreenName
+        owner
+      }
+      nextToken
+    }
+    irrelevant {
+      items {
+        id
+        url
+        owner
+      }
+      nextToken
+    }
+  }
+}
+mutation DeleteUserProfile(
+  $input: DeleteUserProfileInput!
+  $condition: ModelUserProfileConditionInput
+) {
+  deleteUserProfile(input: $input, condition: $condition) {
+    id
+    name
+    ignoreTweets {
+      items {
+        id
+        url
+        owner
+      }
+      nextToken
+    }
+    ignorePeople {
+      items {
+        id
+        twitterScreenName
+        owner
+      }
+      nextToken
+    }
+    irrelevant {
+      items {
+        id
+        url
+        owner
+      }
+      nextToken
+    }
+  }
+}
+mutation CreateTweetIgnore(
+  $input: CreateTweetIgnoreInput!
+  $condition: ModelTweetIgnoreConditionInput
+) {
+  createTweetIgnore(input: $input, condition: $condition) {
+    id
+    url
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}
+mutation UpdateTweetIgnore(
+  $input: UpdateTweetIgnoreInput!
+  $condition: ModelTweetIgnoreConditionInput
+) {
+  updateTweetIgnore(input: $input, condition: $condition) {
+    id
+    url
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}
+mutation DeleteTweetIgnore(
+  $input: DeleteTweetIgnoreInput!
+  $condition: ModelTweetIgnoreConditionInput
+) {
+  deleteTweetIgnore(input: $input, condition: $condition) {
+    id
+    url
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}
+mutation CreateTweetIrrelevant(
+  $input: CreateTweetIrrelevantInput!
+  $condition: ModelTweetIrrelevantConditionInput
+) {
+  createTweetIrrelevant(input: $input, condition: $condition) {
+    id
+    url
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}
+mutation UpdateTweetIrrelevant(
+  $input: UpdateTweetIrrelevantInput!
+  $condition: ModelTweetIrrelevantConditionInput
+) {
+  updateTweetIrrelevant(input: $input, condition: $condition) {
+    id
+    url
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}
+mutation DeleteTweetIrrelevant(
+  $input: DeleteTweetIrrelevantInput!
+  $condition: ModelTweetIrrelevantConditionInput
+) {
+  deleteTweetIrrelevant(input: $input, condition: $condition) {
+    id
+    url
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}
+mutation CreateTwitterUserIgnore(
+  $input: CreateTwitterUserIgnoreInput!
+  $condition: ModelTwitterUserIgnoreConditionInput
+) {
+  createTwitterUserIgnore(input: $input, condition: $condition) {
+    id
+    twitterScreenName
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}
+mutation UpdateTwitterUserIgnore(
+  $input: UpdateTwitterUserIgnoreInput!
+  $condition: ModelTwitterUserIgnoreConditionInput
+) {
+  updateTwitterUserIgnore(input: $input, condition: $condition) {
+    id
+    twitterScreenName
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}
+mutation DeleteTwitterUserIgnore(
+  $input: DeleteTwitterUserIgnoreInput!
+  $condition: ModelTwitterUserIgnoreConditionInput
+) {
+  deleteTwitterUserIgnore(input: $input, condition: $condition) {
+    id
+    twitterScreenName
+    user {
+      id
+      name
+      ignoreTweets {
+        nextToken
+      }
+      ignorePeople {
+        nextToken
+      }
+      irrelevant {
+        nextToken
+      }
+    }
+    owner
+  }
+}

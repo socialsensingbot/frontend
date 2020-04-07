@@ -11,7 +11,6 @@ import { MaterialModule } from './material/material.module';
 import { AppRoutingModule } from './app-routing.module';
 import { MapComponent } from './map/map.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import { LoaderComponent } from './loader/loader.component';
 import { SignUpComponent } from './auth/sign-up/sign-up.component';
 import { AuthComponent } from './auth/auth.component';
 import { CountryCodeSelectComponent } from './auth/country-code-select/country-code-select.component';
@@ -24,15 +23,14 @@ import {HomeComponent} from "./home/home.component";
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import {MatSliderModule} from "@angular/material/slider";
 import {MatDrawer, MatSidenavModule} from "@angular/material/sidenav";
-import { TwitterPanelComponent } from './twitter-panel/twitter-panel.component';
-import { DateRangeSliderComponent } from './date-range-slider/date-range-slider.component';
+import { TwitterPanelComponent } from './map/twitter-panel/twitter-panel.component';
+import { DateRangeSliderComponent } from './map/date-range-slider/date-range-slider.component';
 import {Ng5SliderModule} from "ng5-slider";
-import { LegendComponent } from './legend/legend.component';
+import { LegendComponent } from './map/legend/legend.component';
 @NgModule({
             declarations: [
               AppComponent,
               MapComponent,
-              LoaderComponent,
               SignUpComponent,
               AuthComponent,
               CountryCodeSelectComponent,
@@ -69,7 +67,7 @@ import { LegendComponent } from './legend/legend.component';
               }
             },AuthService],
             bootstrap:    [AppComponent],
-            entryComponents: [LoaderComponent, CountryCodeSelectComponent]
+            entryComponents: [CountryCodeSelectComponent]
           },)
 export class AppModule {
 }

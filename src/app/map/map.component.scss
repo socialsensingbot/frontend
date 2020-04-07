@@ -1,12 +1,31 @@
+$right-hand-margin: 18px;
+$top-margin: 18px;
+$bottom-margin: 28px;
+$drawer-width: 568px;
+
 .draw-close-button {
   position: absolute;
-  right: 8px;
-  top: 8px;
+  right: -8px;
+  top: -8px;
   z-index: 100;
 
 }
 
 //The Map
+.map-surround {
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+  position: absolute;
+  pointer-events: none;
+  box-shadow: inset 0px 0px 4px 1px rgba(17, 17, 17, 0.5);
+}
 
 .map {
   height: 100%;
@@ -18,7 +37,10 @@
   right: 0px;
   position: absolute;
   z-index: -10;
+  pointer-events:all;
+
 }
+
 
 .map-outer {
 
@@ -32,39 +54,28 @@
 }
 
 .tweet-drawer {
-  max-width: 41vw;
-  width: 540px;
+  max-width: $drawer-width;
+  width: $drawer-width;
+  min-width: $drawer-width;
   max-height: 100%;
-  min-width: 540px;
   overflow: hidden;
   background: rgb(250, 250, 250);
-  overflow: hidden;
+  //box-shadow: 0px 0px 4px rgba(17, 17, 17, 0.63);;
+  //overflow: hidden;
   text-align: center;
 
-  .tweets-header {
-    //position: rel;
-    z-index: 10;
-    margin-top: 1em;
-    margin-right: auto;
-    margin-left: auto;
-    margin-bottom: 0;
-    //background: white;
-
-    .tweets-heading {
-      font-size: 1.3em;
-      margin: 1em;
-      line-height: 1.5em;
-    }
+  @media screen and (max-width: 768px) {
 
   }
+
+
 
 
   .tweets-outer {
 
     max-height: 100%;
-    overflow: auto;
-    font: 14px/16px Arial,
-    Helvetica, sans-serif;
+    overflow-x: hidden;
+    font-size: 16px;
   }
 
 
@@ -73,13 +84,14 @@
 .date-slider {
   max-height: 6em;
   min-height: 4em;
-  bottom: 4em;
+  bottom: $bottom-margin;
   position: absolute;
   background: none;
   z-index: 10;
-  max-width:30vw;
-  min-width:30vw;
-  right:4em;
+  max-width: 30vw;
+  min-width: 30vw;
+  right: $right-hand-margin;
+  //border: 3px solid red;
   //margin: 2em auto;
   date-range-slider {
     margin: 0em auto;
@@ -90,37 +102,38 @@
 
 .legend {
   max-height: 8em;
-  min-height: 12em;
-  top: 4em;
+  min-height: 6em;
+  top: $top-margin;
   position: absolute;
   background: none;
-  z-index: 100;
-  max-width:6em;
-  min-width:4em;
-  right:4em;
+  //border: 3px solid red;
+  z-index: 0;
+  max-width: 6em;
+  min-width: 3em;
+  right: $right-hand-margin;
 
 }
 
 .map-spinner {
-  top:50vh;
-  bottom:50vh;
-  left:50vw;
-  right:50vw;
+  top: 50vh;
+  bottom: 50vh;
+  left: 50vw;
+  right: 50vw;
   padding-left: -100%;
   padding-top: -100%;
-  position:fixed;
-  z-index:1000;
+  position: fixed;
+  z-index: 1000;
   opacity: 0.4;
 }
 
 .map-progress {
-  top:0;
-  left:0;
-  right:0;
+  top: 0;
+  left: 0;
+  right: 0;
   //margin-left: -100%;
   //margin-top: -100%;
-  position:absolute;
-  z-index:1000;
+  position: absolute;
+  z-index: 1000;
 }
 
 

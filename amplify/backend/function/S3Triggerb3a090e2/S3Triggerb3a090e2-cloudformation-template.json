@@ -59,7 +59,7 @@
 				"Runtime": "nodejs10.x",
 				"Timeout": "25",
 				"Code": {
-					"S3Bucket": "amplify-socialsensing-prod-224245-deployment",
+					"S3Bucket": "amplify-socialsensing-dev-183906-deployment",
 					"S3Key": "amplify-builds/S3Triggerb3a090e2-504734464c74496c7751-build.zip"
 				}
 			}

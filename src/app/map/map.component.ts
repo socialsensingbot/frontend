@@ -2,29 +2,38 @@ import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {fgsData} from './county_bi';
 import {coarseData} from './coarse_bi';
 import {fineData} from './fine_bi';
-import {dohighlightFeature, getColor, getFeatureStyle} from './layerStyle';
-import {getTimes, processData} from './processTweets';
-import {Storage} from 'aws-amplify';
+import {Auth, Storage} from 'aws-amplify';
 import {
   control,
   Control,
-  ControlOptions,
-  DomUtil,
-  GeoJSON, latLng,
+  GeoJSON,
+  latLng,
   Layer,
   LayerGroup,
   layerGroup,
   LeafletMouseEvent,
-  Map, tileLayer,
+  Map,
+  tileLayer,
 } from 'leaflet';
 import 'jquery-ui/ui/widgets/slider.js';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Observable, Subscription, timer} from "rxjs";
 import * as geojson from "geojson";
-import {DateRange, DateRangeSliderOptions} from "../date-range-slider/date-range-slider.component";
+import {DateRange, DateRangeSliderOptions} from "./date-range-slider/date-range-slider.component";
+import {TweetProcessService} from "./services/tweet-process.service";
+import {getColor, getFeatureStyle, LayerStyleService} from "./services/layer-style.service";
+import {NotificationService} from "../services/notification.service";
+import {PolygonData} from "./types";
 
 
-type ColorFunctions = { stats: any, count: any };
+type MapLayers = ByRegionType<LayerGroup>
+type NumberLayers = RegionData<LayerGroup, LayerGroup, LayerGroup>;
+type RegionData<R, S, T> = { stats: R; count: S; embed?: T };
+type ColorFunctions = RegionData<any, any, any>
+type ColorData = RegionData<{ colors: string[], values: number[] }, { colors: string[], values: number[] }, any>;
+type BasemapControl = { polygon: MapLayers; numbers: NumberLayers };
+
+type ByRegionType<T> = { fine: T; coarse: T; county: T };
 
 @Component({
              selector:    'app-map',
@@ -33,34 +42,39 @@ type ColorFunctions = { stats: any, count: any };
            })
 export class MapComponent implements OnInit, OnDestroy {
   private _tweetInfo: any = {};
-  private stats_layer = layerGroup();
-  private county_layer = layerGroup(); //dummy layers to fool layer control
+  private _statsLayer: LayerGroup = layerGroup();
+  private _countyLayer: LayerGroup = layerGroup(); //dummy layers to fool layer control
   private _searchParams: Observable<Params>;
   private _map: Map;
 
-  private _numberLayers: { "stats": LayerGroup, "count": LayerGroup } = {"stats": null, "count": null};
-  private _polyLayers: { "county": LayerGroup, "coarse": LayerGroup, "fine": LayerGroup } = {
-    "county": null,
-    "coarse": null,
-    "fine":   null
+  private _numberLayers: NumberLayers = {"stats": null, "count": null};
+  private _polyLayers: MapLayers = {"county": null, "coarse": null, "fine": null};
+  private _basemapControl: BasemapControl = {"numbers": this._numberLayers, "polygon": this._polyLayers};
+  private _polygonData: { fine: PolygonData; coarse: PolygonData; county: PolygonData } = {
+    "county": fgsData,
+    "coarse": coarseData,
+    "fine":   fineData
   };
-  private _basemapControl: any;
-  private _polygonData = {"county": fgsData, "coarse": coarseData, "fine": fineData};
   public _activeNumber: string = "stats";
   private _activePolys: string = "county";
   private _geojson = {};
-  private _gridSizes = {"county": "county", "coarse": "15", "fine": "60"};
-  private _processedTweetInfo = {
-    "county": {"stats": {}, "count": {}, "embed": {}},
-    "coarse": {"stats": {}, "count": {}, "embed": {}},
-    "fine":   {"stats": {}, "count": {}, "embed": {}},
+  private _gridSizes: ByRegionType<string> = {"county": "county", "coarse": "15", "fine": "60"};
+  private _stats: ByRegionType<RegionData<any, any, any>> = {
+    "county": {stats: {}, count: {}, embed: {}},
+    "coarse": {stats: {}, count: {}, embed: {}},
+    "fine":   {stats: {}, count: {}, embed: {}}
   };
-  public _colorData = {
+  private _processedTweetInfo: ByRegionType<RegionData<any, any, any>> = {
+    county: {stats: {}, count: {}, embed: {}},
+    coarse: {stats: {}, count: {}, embed: {}},
+    fine:   {stats: {}, count: {}, embed: {}},
+  };
+  public _colorData: ColorData = {
     stats: {values: [5, 2.5, 1, 0.5], colors: ['#FEE5D9', '#FCAE91', '#FB6A4A', '#DE2D26', '#A50F15']},
     count: {values: [150, 50, 20, 10], colors: ['#045A8D', '#2B8CBE', '#74A9CF', '#BDC9E1', '#F1EEF6']}
   };
 
-  public _colorFunctions:ColorFunctions = {stats: null, count: null};
+  public colorFunctions: ColorFunctions = {stats: null, count: null};
   public showTwitterTimeline: boolean;
 
   private _defaultMax = 0;
@@ -72,31 +86,33 @@ export class MapComponent implements OnInit, OnDestroy {
     startMax: this._defaultMax
   };
   private _oldClicked: (LeafletMouseEvent | "") = "";
-  private clicked: (LeafletMouseEvent | "") = "";
+  private _clicked: (LeafletMouseEvent | "") = "";
   private timeKeys: any; //The times in the input JSON
   private _lcontrols: { "numbers": Control.Layers, "polygon": Control.Layers } = {"numbers": null, "polygon": null};
   private _B: number = 1407;//countyStats["cambridgeshire"].length; //number of stats days
   private _params: Params;
-  embeds: string;
-  selectedRegion: string;
-  exceedenceProbability: number;
-  tweetCount: number;
-  _showTweets: boolean = false;
-  twitterPanelHeader: boolean;
+  public embeds: string;
+  public selectedRegion: string;
+  public exceedenceProbability: number;
+  public tweetCount: number;
+  public tweetsVisible: boolean = false;
+  public twitterPanelHeader: boolean;
   private _layersAreStale: boolean;
   private _resetLayersTimer: Subscription;
-  public loading: boolean= false;
+  private _stateUpdateTimer: Subscription;
+  public loading: boolean = false;
   public ready: boolean = false;
-
+  private _stateIsStale: boolean;
+  private _newParams: Partial<Params>;
+  private _twitterIsStale: boolean;
+  private _twitterUpdateTimer: Subscription;
+  private _feature;
 
 
   updateSearch(params: Partial<Params>) {
     console.log("updateSearch");
-
-    return this._router.navigate([], {
-      queryParams:         params,
-      queryParamsHandling: 'merge'
-    })
+    this._newParams = params;
+    this._stateIsStale = true;
   }
 
   options = {
@@ -110,23 +126,21 @@ export class MapComponent implements OnInit, OnDestroy {
                          'Imagery © <a href="http://mapbox.com">Mapbox</a>',
           id:          'mapbox.streets'
         }),
-      this.stats_layer,
-      this.county_layer
+      this._statsLayer,
+      this._countyLayer
     ],
     zoom:   6,
     center: latLng([53, -2])
   };
 
-  stats = {"county": {}, "coarse": {}, "fine": {}};
 
-  constructor(private _router: Router, private route: ActivatedRoute, private ngZone: NgZone) {
+  constructor(private _router: Router, private route: ActivatedRoute, private ngZone: NgZone,
+              private _tweetProcessor: TweetProcessService, private _layerStyles: LayerStyleService,
+              private _notify: NotificationService) {
     //save the query parameter observable
     this._searchParams = this.route.queryParams;
 
-    //Every time the search parameters change, the map will be updated
-    this._searchParams.subscribe(params => this.updateMap(params));
-
-    // Preload the cacheable JSON files asynchronously
+       // Preload the cacheable JSON files asynchronously
     // this gets called again in onMapReady()
     // But the values should be in the browser cache by then
     this.fetchJson().then(() => {});
@@ -142,7 +156,10 @@ export class MapComponent implements OnInit, OnDestroy {
     this._map = map;
     this.fetchJson()
         .then(() => this.init(map))
-        .catch(err => console.log(err));
+        .catch(err => {
+          this._notify.show("Error while loading map data");
+          console.log(err);
+        });
   }
 
   /**
@@ -153,18 +170,18 @@ export class MapComponent implements OnInit, OnDestroy {
     return fetch("assets/data/county_stats.json")
       .then(response => response.json())
       .then(json => {
-        this.stats.county = json;
+        this._stats.county = json;
       })
       .then(() =>
               fetch("assets/data/coarse_stats.json")
                 .then(response => response.json())
                 .then(json => {
-                  this.stats.coarse = json;
+                  this._stats.coarse = json;
                 }))
       .then(() => fetch("assets/data/fine_stats.json")
         .then(response => response.json())
         .then(json => {
-          this.stats.fine = json;
+          this._stats.fine = json;
         }));
   }
 
@@ -177,11 +194,12 @@ export class MapComponent implements OnInit, OnDestroy {
     console.log("Updating map with params");
     console.log(params);
     this._params = params;
-    const {lng, lat, zoom, active_number, active_polygon, min_offset, max_offset} = params;
+    const {lng, lat, zoom, active_number, selected, min_offset, max_offset} = params;
     if (typeof min_offset !== "undefined") {
       this.sliderOptions.startMin = min_offset;
       this._defaultMin = min_offset;
     }
+
 
     if (typeof max_offset !== "undefined") {
       this._defaultMax = max_offset;
@@ -200,7 +218,7 @@ export class MapComponent implements OnInit, OnDestroy {
     //   this.options.zoom = zoom;
     // }
 
-    const numberLayerName = typeof active_number !== "undefined" ? active_number : "stats";
+    const numberLayerName: string = typeof active_number !== "undefined" ? active_number : "stats";
     const numberLayer: LayerGroup = this._numberLayers[numberLayerName];
     if (this._map) {
       for (let layer in this._numberLayers) {
@@ -217,7 +235,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
       }
     }
-    const polygonLayerName = typeof active_polygon !== "undefined" ? active_polygon : "county";
+    const polygonLayerName: string = typeof selected !== "undefined" ? selected : "county";
     const polygonLayer: LayerGroup = this._polyLayers[polygonLayerName];
     if (this._map) {
       for (let layer in this._polyLayers) {
@@ -234,18 +252,22 @@ export class MapComponent implements OnInit, OnDestroy {
         }
       }
     }
+    this._twitterIsStale= true;
 
+    if(typeof selected !== "undefined") {
+      this.updateTwitter();
+      this.showTweets();
+    }
     // if (typeof min_offset !== "undefined" && typeof min_offset !== "undefined") {
     //   ($(".timeslider") as any).slider("option", "values", [min_offset, max_offset]);
     // }
-
     return undefined;
   }
 
   /**
    * Loads the live data from S3 storage securely.
    */
-  private loadLiveData() {
+  private async loadLiveData() {
     console.log("loadLiveData");
     return Storage.get("live.json")
                   .then((url: any) =>
@@ -259,7 +281,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * the map is ready and data is loaded.
    * @param map the leaflet.js Map
    */
-  private init(map: Map) {
+  private async init(map: Map) {
     console.log("init");
 
     //Listeners to push map state into URL
@@ -282,26 +304,20 @@ export class MapComponent implements OnInit, OnDestroy {
     this._polyLayers["coarse"] = layerGroup();
     this._polyLayers["fine"] = layerGroup();
 
-    this._basemapControl = {"numbers": this._numberLayers, "polygon": this._polyLayers};
 
-    const newColorFunctions:ColorFunctions = {stats:{},count:{}};
+    const newColorFunctions: ColorFunctions = {stats: {}, count: {}};
     for (let key in this._colorData) {
-      newColorFunctions[key].getColor = getColor.bind(null, this._colorData[key].values,
-                                                         this._colorData[key].colors);
-      newColorFunctions[key].getFeatureStyle = getFeatureStyle.bind(null, this._colorData[key].values,
-                                                                       this._colorData[key].colors,
-                                                                       key);
+      newColorFunctions[key].getColor = getColor.bind(newColorFunctions[key], this._colorData[key].values,
+                                                      this._colorData[key].colors);
+      newColorFunctions[key].getFeatureStyle = getFeatureStyle.bind(newColorFunctions[key], this._colorData[key].values,
+                                                                    this._colorData[key].colors,
+                                                                    key);
     }
     //This assignment triggers the change to the legend
-    this._colorFunctions= newColorFunctions;
-
-
-    this.setupCountStatsToggle();
-    this.readData(); //reads data and sets up map
-    setInterval(() => this.readData(), 60000);
+    this.colorFunctions = newColorFunctions;
 
     map.on('baselayerchange', (e: any) => {
-      if (e.name in this._basemapControl["polygon"]) {
+      if (e.name in this._basemapControl.polygon) {
         this._activePolys = e.name;
         this.updateSearch({active_polygon: e.name});
         this.resetLayers(true);
@@ -311,24 +327,20 @@ export class MapComponent implements OnInit, OnDestroy {
       }
     });
 
-    //Use the current query parameters to update map state
-    this.updateMap(this._params);
+    // //Use the current query parameters to update map state
+    // this.updateMap(this._params);
 
+    this.setupCountStatsToggle();
+    await this.readData(); //reads data and sets up map
+    setInterval(() => this.readData(), 60000);
 
+    //Every time the search parameters change, the map will be updated
+    this._searchParams.subscribe(params => this.updateMap(params));
   }
 
   //add = extra minutes
-  cleanDate(tstring, add) {
-    var date = new Date(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
-                        tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0);
-    //var date = new Date( tstring.substring(0,4), tstring.substring(4,6)-1, tstring.substring(6,8), +tstring.substring(8,10)+add, 0, 0, 0);
-    return date.toLocaleDateString() + " " + date.toLocaleTimeString()
-  }
-
   private setupCountStatsToggle() {
-    ////////////////////////////
-    //count / stats toggle
-    ////////////////////////////
+    console.log("setupCountStatsToggle()");
     for (let key in this._basemapControl) {
       // noinspection JSUnfilteredForInLoop
       this._lcontrols[key] = control.layers(this._basemapControl[key], {}).addTo(this._map);
@@ -339,27 +351,39 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
 
-  /////////////////////////
-  //React to Mouse
-  /////////////////////////
+  /**
+   * Mouse over event.
+   * @param e
+   */
   public highlightFeature(e: LeafletMouseEvent) {
-    console.log("highlightFeature");
-    dohighlightFeature(e.target);
+    console.log("highlightFeature()");
+    this._layerStyles.dohighlightFeature(e.target);
+    const feature = e.target.feature;
+    const exceedenceProbability: number = Math.round(feature.properties.stats * 100) / 100;
+    const region: string = this.toTitleCase(feature.properties.name);
+    const count: number = feature.properties.count;
+    let text = "" +
+      `<div>Region: ${region}</div>`;
+    if (count > 0) {
+      text = text +
+        `<div>Count: ${count}</div>`;
+      if ("" + exceedenceProbability != "NaN") {
+        text = text + `<div>Exceedence: ${exceedenceProbability}</div>`;
+      }
+    }
+
+    e.target.bindTooltip(text).openTooltip();
   }
 
-  public displayText(e: LeafletMouseEvent) {
-    console.log("displayText");
-    this.update_table(e.target.feature);
-  }
-
-
-  update_table(props?: any) {
-
+  /**
+   * Update the Twitter panel
+   * @param props
+   */
+  private updateTwitterPanel(props?: any) {
+    console.log("updateTwitterPanel()");
     if (props.properties.count > 0) {
-      this.exceedenceProbability = Math.round(props.properties.stats * 100) / 100;
-      this.selectedRegion = this.toTitleCase(props.properties.name);
-      this.tweetCount = Math.round(props.properties.count * 100) / 100;
-      this.embeds = this._processedTweetInfo[this._activePolys]["embed"][props.properties.name];
+      this.updateTwitterHeader(props);
+      this.embeds = this._processedTweetInfo[this._activePolys].embed[props.properties.name];
       this.twitterPanelHeader = true;
       this.showTwitterTimeline = true;
       this.showTweets()
@@ -369,29 +393,44 @@ export class MapComponent implements OnInit, OnDestroy {
 
   };
 
+  private updateTwitterHeader(props: any) {
+    this.exceedenceProbability = Math.round(props.properties.stats * 100) / 100;
+    this.selectedRegion = this.toTitleCase(props.properties.name);
+    this.tweetCount = props.properties.count;
+  }
+
+  /**
+   * Mouse out event.
+   * @param e
+   */
   public resetHighlight(e: LeafletMouseEvent) {
     console.log("resetHighlight");
 
 
     this._geojson[this._activeNumber].resetStyle(e.target);
-    if (this.clicked != "") {
-      dohighlightFeature(this.clicked.target);
+    if (this._clicked != "") {
+      this._layerStyles.dohighlightFeature(this._clicked.target);
     }
   }
 
+  /**
+   * Mouse click event
+   * @param e
+   */
   zoomToFeature(e: LeafletMouseEvent) {
     console.log("zoomToFeature");
     console.log(e.target.feature.properties.name);
     this.updateSearch({"selected": e.target.feature.properties.name});
-    this.displayText(e);
-    this._oldClicked = this.clicked;
-    this.clicked = e;
-    e.target.setStyle({
-                        weight:      3,
-                        color:       '#FF00FF',
-                        dashArray:   '',
-                        fillOpacity: 0.4
-                      });
+    this.updateTwitterPanel(e.target.feature);
+    this._oldClicked = this._clicked;
+    this._clicked = e;
+    this._layerStyles.dohighlightFeature(e.target);
+    // e.target.setStyle({
+    //                     weight:      3,
+    //                     color:       '#FF00FF',
+    //                     dashArray:   '',
+    //                     fillOpacity: 0.4
+    //                   });
     if (this._oldClicked != "") {
       this.resetHighlight(this._oldClicked);
     }
@@ -409,66 +448,88 @@ export class MapComponent implements OnInit, OnDestroy {
     // then highlight it and update Twitter
     if (feature.properties.name === this._params.selected) {
       console.log("Matched " + feature.properties.name);
-      //Put the selection outline around the feature
-      dohighlightFeature(layer);
-      //Update the Twitter panel with the changes
-      this.update_table(feature);
-    }
-    const exceedenceProbability = Math.round(feature.properties.stats * 100) / 100;
-    const region = this.toTitleCase(feature.properties.name);
-    const count = Math.round(feature.properties.count * 100) / 100;
-    const text = "" +
-      `<div>Region: ${region}</div>` +
-      `<div>Count: ${count}</div>` +
-      `<div>Exceedence: ${exceedenceProbability}</div>`;
 
-    layer.bindTooltip(text);
-    // layer.bindPopup(this.popup.makeLayerPopup(feature.properties));
+      //Put the selection outline around the feature
+      this._layerStyles.dohighlightFeature(layer);
+
+      //Update the Twitter panel with the changes
+      this._feature = feature;
+    }
+
     layer.on({
-               mouseover: (e) => this.ngZone.run(() => mc.highlightFeature(e)),
-               mouseout:  (e) => this.ngZone.run(() => mc.resetHighlight(e)),
-               click:     (e) => this.ngZone.run(() => mc.zoomToFeature(e))
+               mouseover: (e) => this.ngZone.runOutsideAngular(() => mc.highlightFeature(e)),
+               mouseout:  (e) => this.ngZone.runOutsideAngular(() => mc.resetHighlight(e)),
+               click:     (e) => this.ngZone.runOutsideAngular(() => mc.zoomToFeature(e))
              });
   }
 
 
   ngOnInit() {
-    this._resetLayersTimer = timer(0, 1000).subscribe(() => {
+    this._resetLayersTimer = timer(0, 50).subscribe(() => {
       if (this._layersAreStale) {
-        this.resetLayers(false);
-        this.updateTweets();
-        this._layersAreStale = false;
+        try {
+          this.update();
+          this.resetLayers(false);
+          this._layersAreStale = false;
+        } catch (e) {
+          console.error(e);
+        }
       }
     });
+
+    this._stateUpdateTimer = timer(0, 2000).subscribe(() => {
+      if (this._stateIsStale) {
+        this._router.navigate([], {
+          queryParams:         this._newParams,
+          queryParamsHandling: 'merge'
+        });
+        this._stateIsStale = false;
+      }
+    });
+
+    this._twitterUpdateTimer = timer(0, 2000).subscribe(() => {
+      if (this._twitterIsStale) {
+        this.updateTwitter();
+        this._twitterIsStale = false;
+      }
+    });
+
+
   }
 
   ngOnDestroy() {
     this._resetLayersTimer.unsubscribe();
+    this._stateUpdateTimer.unsubscribe();
+    this._twitterUpdateTimer.unsubscribe();
   }
 
   ///////////////////////
   //Add the polygons
   ///////////////////////
   resetLayers(clear_click) {
-    console.log("resetLayers");
+    console.log("resetLayers("+clear_click+")");
 
     for (let key in this._basemapControl["numbers"]) {
+      console.log(key);
+      if (this._numberLayers[key] != null) {
+        // noinspection JSUnfilteredForInLoop
+        this._numberLayers[key].clearLayers();
 
-      // noinspection JSUnfilteredForInLoop
-      this._numberLayers[key].clearLayers();
-
-      // noinspection JSUnfilteredForInLoop
-      this._geojson[key] = new GeoJSON(this._polygonData[this._activePolys], {
-        style:         (feature) => this._colorFunctions[key].getFeatureStyle(feature),
-        onEachFeature: (f, l) => this.onEachFeature(f, l)
-      }).addTo(this._numberLayers[key]);
-
+        // noinspection JSUnfilteredForInLoop
+        this._geojson[key] = new GeoJSON(this._polygonData[this._activePolys], {
+          style:         (feature) => this.colorFunctions[key].getFeatureStyle(feature),
+          onEachFeature: (f, l) => this.onEachFeature(f, l)
+        }).addTo(this._numberLayers[key]);
+      } else {
+        console.log("Null layer "+key);
+      }
       if (clear_click) {
-        console.log("resetLayers clear_click");
-        if (this.clicked != "") {
-          this._geojson[this._activeNumber].resetStyle(this.clicked);
+        console.log("resetLayers() clear_click");
+        if (this._clicked != "") {
+          this._geojson[this._activeNumber].resetStyle(this._clicked);
         }
-        this.clicked = "";
+        this._clicked = "";
+        this._feature = null;
       }
     }
   }
@@ -476,33 +537,50 @@ export class MapComponent implements OnInit, OnDestroy {
   /////////////////////////////
   //get datafiles & init
   /////////////////////////////
-  readData() {
-    console.log("readData");
-    this.loading= true;
-    this.loadLiveData()
-        .then((tweet_json) => {
-          console.log("loadLiveData() completed");
-          this._tweetInfo = tweet_json;
-          this.timeKeys = getTimes(this._tweetInfo);
-          processData(this._tweetInfo, this._processedTweetInfo, this._polygonData, this.stats, this._B,
-                      this.timeKeys.slice(-this._defaultMax, -this._defaultMin), this._gridSizes);
-          this.initSlider();
-          this._layersAreStale = true;
-          this.ready= true;
-          this.loading= false;
-        }).catch((e) => {
-      console.log("Loading data failed " + e);
-      console.log(e);
-      this.loading= false;
-    });
+  async readData() {
+    console.log("readData()");
+    this.loading = true;
+    const userInfo = await Auth.currentUserInfo();
+    if (userInfo != null) {
+      try {
+        this._tweetInfo = await this.loadLiveData();
+        console.log("Loading live data completed");
+        this.timeKeys = this._tweetProcessor.getTimes(this._tweetInfo);
+        this.initSlider();
+        this._layersAreStale = true;
+        this.ready = true;
+        this.loading = false;
+      } catch (e) {
+        this._notify.show("Error while loading live map data");
+        console.log("Loading data failed " + e);
+        console.log(e);
+        this.loading = false;
+      }
+    } else {
+      console.log("User logged out, not loading live data");
+    }
 
-  };
+  }
+
+
+  private update() {
+    this._tweetProcessor.processData(this._tweetInfo,
+                                     this._processedTweetInfo,
+                                     this._polygonData,
+                                     this._stats,
+                                     this._B,
+                                     this.timeKeys.slice(-this._defaultMax, -this._defaultMin),
+                                     this._gridSizes);
+    if (this._clicked != "") {
+      this.updateTwitterHeader(this._clicked.target.feature);
+    }
+  }
 
   ///////////////////////////
   //Slider, start after reading JSON
   ///////////////////////////
   initSlider() {
-    console.log("initSlider");
+    console.log("initSlider()");
     if (this.timeKeys) {
       this._defaultMin = Math.max(this._defaultMin, -(this.timeKeys.length - 1));
       this.sliderOptions = {
@@ -534,27 +612,33 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private hideTweets() {
-    this._showTweets = false;
+    this.tweetsVisible = false;
   }
 
   private showTweets() {
-    this._showTweets = true;
+    this.tweetsVisible = true;
   }
 
   public sliderChange(range: DateRange) {
-    this._defaultMax = range.upper;
-    this._defaultMin = range.lower;
-    this.updateSearch({min_offset: range.lower, max_offset: range.upper});
+    console.log("sliderChange()");
+    const {lower, upper} = range;
+    this._defaultMax = upper;
+    this._defaultMin = lower;
+    this.updateSearch({min_offset: lower, max_offset: upper});
     this._layersAreStale = true;
-    if (this.clicked != "") {
-      this.displayText(this.clicked);
-    }
+    this._twitterIsStale = true;
+
   }
 
-  private updateTweets() {
-    processData(this._tweetInfo, this._processedTweetInfo, this._polygonData,
-                this.stats,
-                this._B, this.timeKeys.slice(-this._defaultMax, -this._defaultMin),
-                this._gridSizes);
+  private updateTwitter() {
+    if (!this.tweetsVisible) {
+      this._clicked = "";
+      this._feature = null;
+    }
+    if (this._clicked != "") {
+      this.updateTwitterPanel(this._clicked.target.feature);
+    } else if (this._feature !== null) {
+      this.updateTwitterPanel(this._feature);
+    }
   }
 }

@@ -10,9 +10,10 @@ frontend:
     preBuild:
       commands:
         - npm ci
+        - mkdir -p dist/frontend
     build:
       commands:
-        - NODE_OPTIONS="node --max_old_space_size=4096" npm run build || ( cat /tmp/ng*/angular-errors.log  && exit -1 )
+        - npm run build
   artifacts:
     baseDirectory: dist/frontend
     files:
@@ -30,6 +31,7 @@ test:
         - 'npm start & npx wait-on http://localhost:4200'
     test:
       commands:
+        - mkdir -p dist/frontend
         - 'npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"'
     postTest:
       commands:
