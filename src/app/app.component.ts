@@ -29,9 +29,9 @@ export class AppComponent  {
         .catch(err => console.log(err));
     auth.authState.subscribe((event: string) => {
       if (event === AuthService.SIGN_IN) {
-        this.checkSession();
         this.isAuthenticated = true;
         this.isSignup = false;
+        this.checkSession();
       }
       if (event === AuthService.SIGN_OUT) {
         this.user = undefined;
@@ -49,6 +49,7 @@ export class AppComponent  {
       console.log("Not authenticated");
       return;
     }
+    console.log("Authenticated");
     try {
       const userInfo = await Auth.currentUserInfo();
       if (userInfo) {
