@@ -16,8 +16,13 @@ export class AuthGuard implements CanActivate {
                .catch(() => {
                  console.log("Routing with preserved params ");
                  var search = location.search.substring(1);
-                 const params = JSON.parse(
-                   '{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}');
+                 let params;
+                 if (search.length > 0) {
+                   params = JSON.parse(
+                     '{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}');
+                 } else {
+                   params={};
+               }
                  this._router.navigate(['auth/signin'], {queryParams: params, queryParamsHandling: "merge"});
                  return false;
                });

@@ -1,4 +1,4 @@
-describe.only('Ignore tweets: ', function () {
+describe('Ignore tweets: ', function () {
 
   describe('ignore tweet', () => {
     it('by tweet', () => {
