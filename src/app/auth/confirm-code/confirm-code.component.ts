@@ -24,7 +24,7 @@ export class ConfirmCodeComponent implements OnInit {
 
   ngOnInit() {
     if (!this.email) {
-      this._router.navigate(['auth/signup']);
+      this._router.navigate(['auth/signup'],{queryParamsHandling:"merge"});
     } else {
       Auth.resendSignUp(this.email);
     }
@@ -45,9 +45,9 @@ export class ConfirmCodeComponent implements OnInit {
             environment.confirm.password) {
             Auth.signIn(this.email, environment.confirm.password)
                 .then(() => {
-                  this._router.navigate(['']);
+                  this._router.navigate([''],{queryParamsHandling:"merge"});
                 }).catch((error: any) => {
-              this._router.navigate(['auth/signin']);
+              this._router.navigate(['auth/signin'],{queryParamsHandling:"merge"});
             })
           }
         })

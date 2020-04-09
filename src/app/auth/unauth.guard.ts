@@ -17,7 +17,7 @@ export class UnauthGuard implements CanActivate {
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     return Auth.currentAuthenticatedUser()
             .then(() => {
-              this._router.navigate(['/']);
+              this._router.navigate(['/'],{queryParamsHandling:"merge"});
               return false;
             })
             .catch(() => {
