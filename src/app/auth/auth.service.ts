@@ -6,7 +6,6 @@ import { CognitoUser } from 'amazon-cognito-identity-js';
 
 export interface NewUser {
   email: string,
-  phone: string,
   password: string,
   firstName: string,
   lastName: string
@@ -42,8 +41,7 @@ export class AuthService {
       "attributes": {
         "email": user.email,
         "given_name": user.firstName,
-        "family_name": user.lastName,
-        "phone_number": user.phone
+        "family_name": user.lastName
       }
     });
   }

@@ -78,8 +78,7 @@ export class SignUpComponent implements OnInit {
       "email": this.emailInput.value,
       "password": this.passwordInput.value,
       "firstName": this.fnameInput.value,
-      "lastName": this.lnameInput.value,
-      "phone": this.countryCode + this.phoneInput.value
+      "lastName": this.lnameInput.value
     })
     .then((data) => {
       environment.confirm.email = this.emailInput.value;
