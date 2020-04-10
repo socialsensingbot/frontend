@@ -27,7 +27,7 @@ test:
       commands:
         - npm ci
         - npm install wait-on
-        - npm install mocha@7.1.1 mochawesome mochawesome-merge mochawesome-report-generator
+        - npm install mocha@7.1.1 mochawesome mochawesome-merge mochawesome-report-generator react react-dom
         - 'npm start & npx wait-on http://localhost:4200'
     test:
       commands:
