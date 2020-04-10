@@ -8,6 +8,7 @@ import {ConfirmCodeComponent} from './auth/confirm-code/confirm-code.component';
 import {AuthGuard} from './auth/auth.guard';
 import {UnauthGuard} from './auth/unauth.guard';
 import {HomeComponent} from './home/home.component';
+import {NewPassComponent} from "./auth/new-pass/new-pass.component";
 
 const routes: Routes = [
   {
@@ -16,6 +17,10 @@ const routes: Routes = [
         path:        'signin',
         component:   SignInComponent,
         canActivate: [UnauthGuard]
+      },
+      {
+        path:        'newpass',
+        component:   NewPassComponent
       },
       {
         path:        'signup',
