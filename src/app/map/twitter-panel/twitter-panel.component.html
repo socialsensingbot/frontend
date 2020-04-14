@@ -6,7 +6,7 @@
 <div id="tinfo" class="tinfo">
 
 
-  <ng-template #tweetEntry let-tweet="tweet" let-si="senderIgnore" let-ti="tweetIgnore">
+  <ng-template #tweetEntry let-tweet="tweet"  let-si="senderIgnore" let-ti="tweetIgnore">
     <mat-menu #appMenu="matMenu">
       <button *ngIf="!si" (click)="ignoreSender(tweet,$event); si= true" mat-menu-item>Ignore
         @{{sender(tweet)}}</button>
@@ -32,21 +32,21 @@
   <div id="tinfo_table_wrapper" class="tinfo_table_wrapper">
 
     <div id="tinfo_table" class="app-twitter-table" *ngIf="showTimeline">
-      <div class=table_info>
+      <div class="table_info">
         <div *ngIf="!ready">
           <div>
             <mat-spinner class="tinfo-spinner"></mat-spinner>
           </div>
         </div>
         <div #tinfoEmbeds [style.visibility]="ready ? 'visible' : 'hidden'">
-          <div [style.opacity]="animationHidden[i] ? 0.0 : 1.0" class="app-twitter-row atr-{{i}}" *ngFor="let tweet of tweets; let i = index">
-            <mat-card class="twitter-card" *ngIf="hidden[i] === false && !animationHidden[i]">
+          <div  class="app-twitter-row atr-{{i}}" *ngFor="let tweet of tweets; let i = index">
+            <mat-card class="twitter-card" *ngIf="hidden[i] === false">
               <ng-container>
                 <ng-container
                   *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
               </ng-container>
             </mat-card>
-            <mat-expansion-panel *ngIf="hidden[i] === true && !animationHidden[i]" class="twitter-card tc-expansion-panel">
+            <mat-expansion-panel *ngIf="hidden[i] === true" class="twitter-card tc-expansion-panel">
               <mat-expansion-panel-header>
                 <mat-panel-title>
                   Tweet Hidden

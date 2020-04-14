@@ -17,7 +17,6 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   private _embeds: string;
   public tweets: string[];
   public hidden: boolean[] = [];
-  public animationHidden: boolean[] = [];
   public visibleCount= 0;
   ready: boolean;
 
@@ -34,10 +33,8 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
       const regex = /(<blockquote(.*?)<\/blockquote>)/g;
       this.tweets = this._embeds.match(regex).map(s => s);
       this.hidden = [];
-      this.animationHidden = [];
       this.tweets.forEach(tweet => {
         this.hidden.push(this.pref.isBlacklisted(tweet))
-        this.animationHidden.push(true);
       });
       this.visibleCount= this.hidden.filter(i=>!i).length;
       console.log(this.tweets);
@@ -73,8 +70,9 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
     (window as any).twttr.events.bind(
       'rendered',
       (event) => {
+        console.log(event);
         window.setTimeout(() => {
-          this._ngZone.run(() => this.ready = true);
+          this._ngZone.run(() => {this.ready = true; event.target.parentNode.style.opacity=1.0;});
         }, 500);
 
       }
@@ -85,10 +83,9 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   private animateTweetAppearance() {
     let i = 0;
     const animatedReappear = () => {
-      if (i < this.animationHidden.length) {
+      if (i < this.tweets.length) {
         setTimeout(()=>this._ngZone.run(animatedReappear), 100);
         (window as any).twttr.widgets.load($(".atr-"+i+" blockquote"));
-        setTimeout(()=>this._ngZone.run(() => this.animationHidden[i] = false), 1000);
         console.log(i);
         i++;
       }
