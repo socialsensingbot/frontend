@@ -547,6 +547,7 @@ export class MapComponent implements OnInit, OnDestroy {
         console.log("Loading live data completed");
         this.timeKeys = this._tweetProcessor.getTimes(this._tweetInfo);
         this.initSlider();
+        this._twitterIsStale= true;
         this._layersAreStale = true;
         this.ready = true;
         this.loading = false;

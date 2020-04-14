@@ -1,4 +1,4 @@
-describe('URL State: ', function () {
+describe.only('URL State: ', function () {
 
   describe('select county', () => {
     it('when unauthorized and preserve state', () => {
@@ -25,7 +25,7 @@ describe('URL State: ', function () {
     });
   });
 
-  describe('select county and date range', () => {
+  describe.only('select county and date range', () => {
     it('when authorized and preserve state', () => {
       cy.visit("http://localhost:4200/map");
       cy.login();
@@ -36,8 +36,7 @@ describe('URL State: ', function () {
       cy.get(".slider-date-time .slider-date").should("contain.text","11-Oct-18");
       cy.get(".slider-date-time .slider-time").should("contain.text","05 AM");
       cy.get(".tweet-drawer", {timeout: 20000}).should("be.visible");
-      cy.get("twitter-panel", {timeout: 20000}).should("be.visible");
-      cy.get("twitter-panel .tweets-header  mat-card > span > b", {timeout: 30000}).should("contain.text","Showing 8 of 8 Tweets from Powys");
+      cy.get("twitter-panel .tweets-header  mat-card > span > b", {timeout: 40000}).should("contain.text","Showing 8 of 8 Tweets from Powys");
       cy.logout();
     });
   });
