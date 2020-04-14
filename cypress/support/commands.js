@@ -31,5 +31,9 @@ Cypress.Commands.add("login", () => {
 });
 
 Cypress.Commands.add("logout", () => {
-    cy.get('#logout').click();
+  cy.get('#logout').click();
+});
+
+Cypress.Commands.add("twitterPanelHeader", (text) => {
+  cy.get("twitter-panel .tweets-header  mat-card > span > b", {timeout: 40000}).should("contain.text",text);
 });
