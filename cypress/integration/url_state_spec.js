@@ -87,9 +87,10 @@ describe.only('URL State: ', function () {
       cy.login();
       cy.wait(10000);
       cy.visit(url);
+      cy.wait(10000);
       cy.url().should("equal", url);
       cy.get(".leaflet-control-zoom-in").click();
-      cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
+      cy.wait(10000); // The push state is not immediate (about 2s delay) (for performance)
       cy.url().should("equal", newUrl);
       cy.logout();
     });
