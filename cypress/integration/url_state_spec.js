@@ -46,7 +46,7 @@ describe.only('URL State: ', function () {
       cy.logout();
     });
   });
-  describe.only('select polygon type and count stats', () => {
+  describe('select polygon type and count stats', () => {
     const url = "http://localhost:4200/map?active_polygon=coarse&selected=123&active_number=count";
     it('when unauthorized and preserve state', () => {
       cy.visit(url);
@@ -69,7 +69,31 @@ describe.only('URL State: ', function () {
     });
   });
 
-
+  describe.only('select zoom', () => {
+    const url = "http://localhost:4200/map?zoom=7";
+    const newUrl = "http://localhost:4200/map?zoom=8";
+    it('when unauthorized and preserve state', () => {
+      cy.visit(url);
+      cy.login();
+      cy.wait(10000);
+      cy.url().should("equal", url);
+      cy.get(".leaflet-control-zoom-in").click();
+      cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
+      cy.url().should("equal", newUrl);
+      cy.logout();
+    });
+    it('when authorized and preserve state', () => {
+      cy.visit(url);
+      cy.login();
+      cy.wait(10000);
+      cy.visit(url);
+      cy.url().should("equal", url);
+      cy.get(".leaflet-control-zoom-in").click();
+      cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
+      cy.url().should("equal", newUrl);
+      cy.logout();
+    });
+  });
 
 
   describe('select county and date range', () => {
