@@ -22,6 +22,29 @@ describe.only('URL State: ', function () {
     });
   });
 
+  describe.only('select polygon type', () => {
+    it('when unauthorized and preserve state', () => {
+      cy.visit("http://localhost:4200/map?active_polygon=coarse&selected=123");
+      cy.login();
+      cy.wait(10000);
+      cy.url().should("equal", "http://localhost:4200/map?active_polygon=coarse&selected=123");
+      cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
+      cy.get("twitter-panel .tweets-header  mat-card > span > b", {timeout: 40000}).should("contain.text","Showing 36 of 44 Tweets from 123");
+      cy.logout();
+    });
+    it('when authorized and preserve state', () => {
+      cy.visit("http://localhost:4200/map?active_polygon=coarse&selected=123");
+      cy.login();
+      cy.wait(10000);
+      cy.visit("http://localhost:4200/map?active_polygon=coarse&selected=123");
+      cy.url().should("equal", "http://localhost:4200/map?active_polygon=coarse&selected=123");
+      cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
+      cy.get("twitter-panel .tweets-header  mat-card > span > b", {timeout: 40000}).should("contain.text","Showing 36 of 44 Tweets from 123");
+      cy.logout();
+    });
+  });
+
+
 
 
   describe('select county and date range', () => {

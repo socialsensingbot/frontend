@@ -194,7 +194,7 @@ export class MapComponent implements OnInit, OnDestroy {
     console.log("Updating map with params");
     console.log(params);
     this._params = params;
-    const {lng, lat, zoom, active_number, selected, min_offset, max_offset} = params;
+    const {lng, lat, zoom, active_number, active_polygon, selected, min_offset, max_offset} = params;
     if (typeof min_offset !== "undefined") {
       this.sliderOptions.startMin = min_offset;
       this._defaultMin = min_offset;
@@ -235,7 +235,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
       }
     }
-    const polygonLayerName: string = typeof selected !== "undefined" ? selected : "county";
+    const polygonLayerName: string = typeof active_polygon !== "undefined" ? active_polygon : "county";
     const polygonLayer: LayerGroup = this._polyLayers[polygonLayerName];
     if (this._map) {
       for (let layer in this._polyLayers) {
