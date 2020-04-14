@@ -17,6 +17,7 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   private _embeds: string;
   public tweets: string[];
   public hidden: boolean[] = [];
+  public animationHidden: boolean[] = [];
   public visibleCount= 0;
   ready: boolean;
 
@@ -33,16 +34,19 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
       const regex = /(<blockquote(.*?)<\/blockquote>)/g;
       this.tweets = this._embeds.match(regex).map(s => s);
       this.hidden = [];
+      this.animationHidden = [];
       this.tweets.forEach(tweet => {
         this.hidden.push(this.pref.isBlacklisted(tweet))
+        this.animationHidden.push(true);
       });
       this.visibleCount= this.hidden.filter(i=>!i).length;
       console.log(this.tweets);
       if (this.tweets.length > 0) {
-        (window as any).twttr.widgets.load($("#tinfo")[0]);
+        //
       } else {
         this.ready = true;
       }
+      this.animateTweetAppearance();
     }
   }
 
@@ -70,12 +74,27 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
       'rendered',
       (event) => {
         window.setTimeout(() => {
-          this._ngZone.runOutsideAngular(() => this.ready = true);
+          this._ngZone.run(() => this.ready = true);
         }, 500);
 
       }
     );
     this.updateTweets();
+  }
+
+  private animateTweetAppearance() {
+    let i = 0;
+    const animatedReappear = () => {
+      if (i < this.animationHidden.length) {
+        setTimeout(()=>this._ngZone.run(animatedReappear), 100);
+        (window as any).twttr.widgets.load($(".atr-"+i+" blockquote"));
+        setTimeout(()=>this._ngZone.run(() => this.animationHidden[i] = false), 1000);
+        console.log(i);
+        i++;
+      }
+
+    };
+    animatedReappear();
   }
 
   public show($event: any) {
@@ -86,6 +105,7 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
     console.log(changes);
     (window as any).twttr.widgets.load($("#tinfo")[0]);
   }
+
   public removeTweet(tweet, $event: MouseEvent) {
     this.showHide();
 

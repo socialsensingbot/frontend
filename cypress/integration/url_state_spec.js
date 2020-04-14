@@ -10,9 +10,6 @@ describe.only('URL State: ', function () {
 
       cy.logout();
     });
-  });
-
-  describe('select county', () => {
     it('when authorized and preserve state', () => {
       cy.visit("http://localhost:4200/map");
       cy.login();
@@ -25,7 +22,9 @@ describe.only('URL State: ', function () {
     });
   });
 
-  describe.only('select county and date range', () => {
+
+
+  describe('select county and date range', () => {
     it('when authorized and preserve state', () => {
       cy.visit("http://localhost:4200/map");
       cy.login();

@@ -71,7 +71,7 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 
 ### Running unit tests
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io). (TODO: At present I have not written any unit tests, these are all stubs. I've focussed on getting integration tests working.) 
 
 ### Running end-to-end tests
 
@@ -85,6 +85,7 @@ To run the tests you need to run the following, substituting username and passwo
 
     npx cypress open -e TEST_AC_USER=<username>,TEST_AC_PASS=<password>
 
+The test folder is [cypress](/cypress) and the tests themselves are in the [integration](/cypress/integration) folder.
        
 ### Key files and folders for development
 
