@@ -69,7 +69,7 @@ describe.only('URL State: ', function () {
     });
   });
 
-  describe.only('select zoom', () => {
+  describe('select zoom', () => {
     const url = "http://localhost:4200/map?zoom=7";
     const newUrl = "http://localhost:4200/map?zoom=8";
     it('when unauthorized and preserve state', () => {
@@ -95,6 +95,8 @@ describe.only('URL State: ', function () {
       cy.logout();
     });
   });
+
+  //TODO: TEST LAT/LNG
 
 
   describe('select county and date range', () => {
