@@ -2,7 +2,7 @@ describe('URL State: ', function () {
 
   describe('select county', () => {
     const url = "http://localhost:4200/map?selected=powys";
-    it('when unauthorized and preserve state', () => {
+    it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
       cy.wait(10000);
@@ -11,7 +11,7 @@ describe('URL State: ', function () {
 
       cy.logout();
     });
-    it('when authorized and preserve state', () => {
+    it('when authorized and load state', () => {
       cy.visit("http://localhost:4200/map");
       cy.login();
       cy.wait(10000);
@@ -25,7 +25,7 @@ describe('URL State: ', function () {
 
   describe('select polygon type', () => {
     const url = "http://localhost:4200/map?active_polygon=coarse&selected=123";
-    it('when unauthorized and preserve state', () => {
+    it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
       cy.wait(10000);
@@ -34,7 +34,7 @@ describe('URL State: ', function () {
       cy.twitterPanelHeader("Showing 36 of 44 Tweets from 123");
       cy.logout();
     });
-    it('when authorized and preserve state', () => {
+    it('when authorized and load state', () => {
       cy.visit(url);
       cy.login();
       cy.wait(10000);
@@ -47,7 +47,7 @@ describe('URL State: ', function () {
   });
   describe('select polygon type and count stats', () => {
     const url = "http://localhost:4200/map?active_polygon=coarse&selected=123&active_number=count";
-    it('when unauthorized and preserve state', () => {
+    it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
       cy.wait(10000);
@@ -56,7 +56,7 @@ describe('URL State: ', function () {
       cy.twitterPanelHeader("Showing 36 of 44 Tweets from 123");
       cy.logout();
     });
-    it('when authorized and preserve state', () => {
+    it('when authorized and load state', () => {
       cy.visit(url);
       cy.login();
       cy.wait(10000);
@@ -71,7 +71,7 @@ describe('URL State: ', function () {
   describe('select zoom', () => {
     const url = "http://localhost:4200/map?zoom=7";
     const newUrl = "http://localhost:4200/map?zoom=8";
-    it('when unauthorized and preserve state', () => {
+    it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
       cy.wait(10000);
@@ -81,7 +81,7 @@ describe('URL State: ', function () {
       cy.url().should("equal", newUrl);
       cy.logout();
     });
-    it('when authorized and preserve state', () => {
+    it('when authorized and load state', () => {
       cy.visit(url);
       cy.login();
       cy.wait(10000);
@@ -97,10 +97,39 @@ describe('URL State: ', function () {
 
   //TODO: TEST LAT/LNG
 
+  describe.only('select lat & lng', () => {
+    const url = "http://localhost:4200/map?zoom=11&lat=52.3336607715546&lng=0.05321502685546875";
+    const newUrl = "http://localhost:4200/map?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&selected=cambridgeshire";
+    it('when unauthorized and load state', () => {
+      cy.visit(url);
+      cy.login();
+      cy.wait(10000);
+      cy.url().should("equal", url);
+      cy.get(".mat-sidenav-content").click(500,500);
+      cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
+      cy.url().should("equal", newUrl);
+      cy.twitterPanelHeader("Showing 2 of 2 Tweets from Cambridgeshire");
+      cy.logout();
+    });
+    it('when authorized and load state', () => {
+      cy.visit(url);
+      cy.login();
+      cy.wait(10000);
+      cy.visit(url);
+      cy.wait(10000);
+      cy.url().should("equal", url);
+      cy.get(".mat-sidenav-content").click(500,500);
+      cy.wait(10000); // The push state is not immediate (about 2s delay) (for performance)
+      cy.url().should("equal", newUrl);
+      cy.twitterPanelHeader("Showing 2 of 2 Tweets from Cambridgeshire");
+      cy.logout();
+    });
+  });
+
 
   describe('select county and date range', () => {
     const url = "http://localhost:4200/map?selected=powys&min_offset=-5459&max_offset=-2819";
-    it('when authorized and preserve state', () => {
+    it('when authorized and load state', () => {
       cy.visit("http://localhost:4200/map");
       cy.login();
       cy.wait(10000);
