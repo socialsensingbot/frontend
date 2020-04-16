@@ -1,4 +1,4 @@
-describe.only('URL State: ', function () {
+describe('URL State: ', function () {
 
   describe('select county', () => {
     const url = "http://localhost:4200/map?selected=powys";
@@ -35,7 +35,6 @@ describe.only('URL State: ', function () {
       cy.logout();
     });
     it('when authorized and preserve state', () => {
-      const url = url;
       cy.visit(url);
       cy.login();
       cy.wait(10000);
