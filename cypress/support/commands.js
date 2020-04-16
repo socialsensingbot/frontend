@@ -28,10 +28,16 @@ Cypress.Commands.add("login", () => {
   cy.get('input[type=email]').type(Cypress.env("TEST_AC_USER"));
   cy.get('input[type=password]').type(Cypress.env("TEST_AC_PASS"));
   cy.get('.mat-button-base.mat-raised-button').contains('Sign In').click();
+  cy.wait(2000);
 });
 
 Cypress.Commands.add("logout", () => {
   cy.get('#logout').click();
+});
+
+Cypress.Commands.add("noSpinner", () => {
+  cy.wait(4000);
+  cy.get('mat-spinner',{timeout:60000}).should("not.be.visible");
 });
 
 Cypress.Commands.add("twitterPanelHeader", (text) => {

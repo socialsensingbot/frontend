@@ -1,11 +1,10 @@
-describe.only('URL State: ', function () {
+describe('URL State: ', function () {
 
   describe('select county', () => {
     const url = "http://localhost:4200/map?selected=powys";
     it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
-      cy.wait(10000);
       cy.url().should("equal", url);
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
 
@@ -14,7 +13,6 @@ describe.only('URL State: ', function () {
     it('when authorized and load state', () => {
       cy.visit("http://localhost:4200/map");
       cy.login();
-      cy.wait(10000);
       cy.visit(url);
       cy.url().should("equal", url);
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
@@ -28,7 +26,6 @@ describe.only('URL State: ', function () {
     it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
-      cy.wait(10000);
       cy.url().should("equal", url);
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
       cy.twitterPanelHeader("Showing 36 of 44 Tweets from 123");
@@ -37,7 +34,6 @@ describe.only('URL State: ', function () {
     it('when authorized and load state', () => {
       cy.visit(url);
       cy.login();
-      cy.wait(10000);
       cy.visit(url);
       cy.url().should("equal", url);
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
@@ -50,7 +46,6 @@ describe.only('URL State: ', function () {
     it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
-      cy.wait(10000);
       cy.url().should("equal", url);
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000}).should("have.attr","fill").should("eq","#2B8CBE");
       cy.twitterPanelHeader("Showing 36 of 44 Tweets from 123");
@@ -59,7 +54,6 @@ describe.only('URL State: ', function () {
     it('when authorized and load state', () => {
       cy.visit(url);
       cy.login();
-      cy.wait(10000);
       cy.visit(url);
       cy.url().should("equal", url);
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
@@ -68,29 +62,44 @@ describe.only('URL State: ', function () {
     });
   });
 
-  describe('select zoom', () => {
-    const url = "http://localhost:4200/map?zoom=7";
-    const newUrl = "http://localhost:4200/map?zoom=8";
-    it('when unauthorized and load state', () => {
+  describe.only('select zoom', () => {
+    const url = "http://localhost:4200/map";
+    const urlZoom6 = "http://localhost:4200/map?zoom=6"; //default zoom
+    const urlZoom7 = "http://localhost:4200/map?zoom=7";
+    const urlZoom8 = "http://localhost:4200/map?zoom=8";
+    it('default zoom', () => {
       cy.visit(url);
       cy.login();
-      cy.wait(10000);
       cy.url().should("equal", url);
+      cy.noSpinner();
       cy.get(".leaflet-control-zoom-in").click();
       cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
-      cy.url().should("equal", newUrl);
+      cy.url({timeout:30000}).should("equal", urlZoom7);
+      cy.get(".leaflet-control-zoom-out").click();
+      cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
+      cy.url({timeout:30000}).should("equal", urlZoom6);
+      cy.logout();
+    });
+
+    it('when unauthorized and load state', () => {
+      cy.visit(urlZoom7);
+      cy.login();
+      cy.url().should("equal", urlZoom7);
+      cy.noSpinner();
+      cy.get(".leaflet-control-zoom-in").click();
+      cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
+      cy.url({timeout:30000}).should("equal", urlZoom8);
       cy.logout();
     });
     it('when authorized and load state', () => {
-      cy.visit(url);
+      cy.visit(urlZoom7);
       cy.login();
-      cy.wait(10000);
-      cy.visit(url);
-      cy.wait(10000);
-      cy.url().should("equal", url);
+      cy.visit(urlZoom7);
+      cy.url().should("equal", urlZoom7);
+      cy.noSpinner();
       cy.get(".leaflet-control-zoom-in").click();
       cy.wait(10000); // The push state is not immediate (about 2s delay) (for performance)
-      cy.url().should("equal", newUrl);
+      cy.url({timeout:30000}).should("equal", urlZoom8);
       cy.logout();
     });
   });
@@ -102,7 +111,6 @@ describe.only('URL State: ', function () {
     it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
-      cy.wait(10000);
       cy.url().should("equal", url);
       cy.get(".mat-sidenav-content").click(500,500);
       cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
@@ -113,9 +121,7 @@ describe.only('URL State: ', function () {
     it('when authorized and load state', () => {
       cy.visit(url);
       cy.login();
-      cy.wait(10000);
       cy.visit(url);
-      cy.wait(10000);
       cy.url().should("equal", url);
       cy.get(".mat-sidenav-content").click(500,500);
       cy.wait(10000); // The push state is not immediate (about 2s delay) (for performance)
@@ -131,7 +137,6 @@ describe.only('URL State: ', function () {
     it('when authorized and load state', () => {
       cy.visit("http://localhost:4200/map");
       cy.login();
-      cy.wait(10000);
       cy.visit(url);
       cy.url().should("equal", url);
       cy.get(".slider-date-time", {timeout: 20000});

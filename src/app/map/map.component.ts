@@ -214,7 +214,7 @@ export class MapComponent implements OnInit, OnDestroy {
       newCentre = latLng(lat, lng);
     }
     if (typeof zoom !== "undefined") {
-      viewChange = newZoom != zoom;
+      viewChange = newZoom != zoom || viewChange;
       newZoom = zoom;
     }
     if (viewChange) {
