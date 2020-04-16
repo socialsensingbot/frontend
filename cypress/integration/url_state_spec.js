@@ -95,7 +95,6 @@ describe('URL State: ', function () {
     });
   });
 
-  //TODO: TEST LAT/LNG
 
   describe.only('select lat & lng', () => {
     const url = "http://localhost:4200/map?zoom=11&lat=52.3336607715546&lng=0.05321502685546875";
