@@ -96,7 +96,7 @@ describe('URL State: ', function () {
   });
 
 
-  describe.only('select lat & lng', () => {
+  describe('select lat & lng', () => {
     const url = "http://localhost:4200/map?zoom=11&lat=52.3336607715546&lng=0.05321502685546875";
     const newUrl = "http://localhost:4200/map?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&selected=cambridgeshire";
     it('when unauthorized and load state', () => {
