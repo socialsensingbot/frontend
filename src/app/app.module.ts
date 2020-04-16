@@ -27,6 +27,7 @@ import { TwitterPanelComponent } from './map/twitter-panel/twitter-panel.compone
 import { DateRangeSliderComponent } from './map/date-range-slider/date-range-slider.component';
 import {Ng5SliderModule} from "ng5-slider";
 import { LegendComponent } from './map/legend/legend.component';
+import {NewPassComponent} from "./auth/new-pass/new-pass.component";
 @NgModule({
             declarations: [
               AppComponent,
@@ -40,6 +41,7 @@ import { LegendComponent } from './map/legend/legend.component';
               HomeComponent,
               TwitterPanelComponent,
               DateRangeSliderComponent,
+              NewPassComponent,
               LegendComponent
             ],
             imports:      [

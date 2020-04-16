@@ -39,10 +39,11 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
       this.visibleCount= this.hidden.filter(i=>!i).length;
       console.log(this.tweets);
       if (this.tweets.length > 0) {
-        (window as any).twttr.widgets.load($("#tinfo")[0]);
+        //
       } else {
         this.ready = true;
       }
+      this.animateTweetAppearance();
     }
   }
 
@@ -69,13 +70,28 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
     (window as any).twttr.events.bind(
       'rendered',
       (event) => {
+        console.log(event);
         window.setTimeout(() => {
-          this._ngZone.runOutsideAngular(() => this.ready = true);
+          this._ngZone.run(() => {this.ready = true; event.target.parentNode.style.opacity=1.0;});
         }, 500);
 
       }
     );
     this.updateTweets();
+  }
+
+  private animateTweetAppearance() {
+    let i = 0;
+    const animatedReappear = () => {
+      if (i < this.tweets.length) {
+        setTimeout(()=>this._ngZone.run(animatedReappear), 100);
+        (window as any).twttr.widgets.load($(".atr-"+i+" blockquote"));
+        console.log(i);
+        i++;
+      }
+
+    };
+    animatedReappear();
   }
 
   public show($event: any) {
@@ -86,6 +102,7 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
     console.log(changes);
     (window as any).twttr.widgets.load($("#tinfo")[0]);
   }
+
   public removeTweet(tweet, $event: MouseEvent) {
     this.showHide();
 

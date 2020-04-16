@@ -30,11 +30,11 @@ export class SignUpComponent implements OnInit {
   get lnameInput() { return this.signupForm.get('lname'); }
   get phoneInput() { return this.signupForm.get('phone'); }
 
-  constructor( 
-    private _bottomSheet: MatBottomSheet, 
+  constructor(
+    private _bottomSheet: MatBottomSheet,
     private _authService: AuthService,
-    private _router: Router ) { 
-      
+    private _router: Router ) {
+
     }
 
   ngOnInit() {
@@ -78,13 +78,12 @@ export class SignUpComponent implements OnInit {
       "email": this.emailInput.value,
       "password": this.passwordInput.value,
       "firstName": this.fnameInput.value,
-      "lastName": this.lnameInput.value,
-      "phone": this.countryCode + this.phoneInput.value
+      "lastName": this.lnameInput.value
     })
     .then((data) => {
       environment.confirm.email = this.emailInput.value;
       environment.confirm.password = this.passwordInput.value;
-      this._router.navigate(['auth/confirm']);
+      this._router.navigate(['auth/confirm'],{queryParamsHandling:"merge"});
     })
     .catch((error) => console.log(error));
   }

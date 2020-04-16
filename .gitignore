@@ -15,7 +15,6 @@ chrome-profiler-events*.json
 speed-measure-plugin*.json
 
 # IDEs and editors
-/.idea
 .project
 .classpath
 .c9/
@@ -59,3 +58,7 @@ awsconfiguration.json
 amplifyconfiguration.json
 amplify-gradle-config.json
 amplifyxc.config
+
+#JetBrains
+/.idea/workspace.xml
+/cypress/videos/

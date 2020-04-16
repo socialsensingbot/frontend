@@ -47,7 +47,17 @@ export class SignInComponent {
   signIn() {
     this.auth.signIn(this.emailInput.value, this.passwordInput.value)
         .then((user: CognitoUser | any) => {
-          this._router.navigate(['/map'],{queryParamsHandling:"merge"});
+          if (user.challengeName === 'NEW_PASSWORD_REQUIRED') {
+            console.log(user.challengeName);
+            const { requiredAttributes } = user.challengeParam; // the array of required attributes, e.g ['email', 'phone_number']
+            this._router.navigate(['auth/newpass'],{queryParamsHandling:"merge",state:{
+              message:"Please Change your Temporary Password"
+              }});
+            return;
+          } else {
+            console.log(user.challengeName);// other situations
+            this._router.navigate(['/map'],{queryParamsHandling:"merge"});
+          }
         })
         .catch((error: any) => {
           this._notification.show(error.message);

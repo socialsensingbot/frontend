@@ -6,7 +6,7 @@
 <div id="tinfo" class="tinfo">
 
 
-  <ng-template #tweetEntry let-tweet="tweet" let-si="senderIgnore" let-ti="tweetIgnore">
+  <ng-template #tweetEntry let-tweet="tweet"  let-si="senderIgnore" let-ti="tweetIgnore">
     <mat-menu #appMenu="matMenu">
       <button *ngIf="!si" (click)="ignoreSender(tweet,$event); si= true" mat-menu-item>Ignore
         @{{sender(tweet)}}</button>
@@ -32,14 +32,14 @@
   <div id="tinfo_table_wrapper" class="tinfo_table_wrapper">
 
     <div id="tinfo_table" class="app-twitter-table" *ngIf="showTimeline">
-      <div class=table_info>
+      <div class="table_info">
         <div *ngIf="!ready">
           <div>
             <mat-spinner class="tinfo-spinner"></mat-spinner>
           </div>
         </div>
         <div #tinfoEmbeds [style.visibility]="ready ? 'visible' : 'hidden'">
-          <div class="app-twitter-row" *ngFor="let tweet of tweets; let i = index">
+          <div  class="app-twitter-row atr-{{i}}" *ngFor="let tweet of tweets; let i = index">
             <mat-card class="twitter-card" *ngIf="hidden[i] === false">
               <ng-container>
                 <ng-container

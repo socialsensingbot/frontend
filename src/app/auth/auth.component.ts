@@ -17,19 +17,19 @@ export class AuthComponent implements OnInit {
       switch (event) {
         case "signIn":
           this._zone.run(() => {
-            this._router.navigate(['/map']);
+            this._router.navigate(['/map'],{queryParamsHandling:"merge"});
           });
           break;
         case "signOut":
           this._zone.run(() => {
-            this._router.navigate(['/auth/signin']);
+            this._router.navigate(['/auth/signin'],{queryParamsHandling:"merge"});
           });
           break;
       }
     });
     Auth.currentAuthenticatedUser()
       .then(() => {
-        this._router.navigate(['/map']);
+        this._router.navigate(['/map'],{queryParamsHandling:"merge"});
       })
       .catch(() => {});
   }

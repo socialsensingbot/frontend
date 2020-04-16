@@ -140,7 +140,7 @@ export class MapComponent implements OnInit, OnDestroy {
     //save the query parameter observable
     this._searchParams = this.route.queryParams;
 
-       // Preload the cacheable JSON files asynchronously
+    // Preload the cacheable JSON files asynchronously
     // this gets called again in onMapReady()
     // But the values should be in the browser cache by then
     this.fetchJson().then(() => {});
@@ -194,7 +194,7 @@ export class MapComponent implements OnInit, OnDestroy {
     console.log("Updating map with params");
     console.log(params);
     this._params = params;
-    const {lng, lat, zoom, active_number, selected, min_offset, max_offset} = params;
+    const {lng, lat, zoom, active_number, active_polygon, selected, min_offset, max_offset} = params;
     if (typeof min_offset !== "undefined") {
       this.sliderOptions.startMin = min_offset;
       this._defaultMin = min_offset;
@@ -206,13 +206,20 @@ export class MapComponent implements OnInit, OnDestroy {
       this.sliderOptions.startMax = max_offset;
     }
 
-    if (typeof lat != "undefined" && typeof lng != "undefined") {
-      this.options.center = latLng(lat, lng);
+    let newCentre = this._map.getCenter();
+    let newZoom = this._map.getZoom();
+    let viewChange = false;
+    if (typeof lat !== "undefined" && typeof lng !== "undefined") {
+      viewChange = latLng(lat, lng) !== newCentre;
+      newCentre = latLng(lat, lng);
     }
-    if (typeof zoom != "undefined") {
-      this.options.zoom = zoom;
+    if (typeof zoom !== "undefined") {
+      viewChange = newZoom != zoom || viewChange;
+      newZoom = zoom;
     }
-
+    if (viewChange) {
+      this._map.setView(newCentre, newZoom);
+    }
 
     // if (typeof active_polys != "undefined") {
     //   this.options.zoom = zoom;
@@ -235,7 +242,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
       }
     }
-    const polygonLayerName: string = typeof selected !== "undefined" ? selected : "county";
+    const polygonLayerName: string = typeof active_polygon !== "undefined" ? active_polygon : "county";
     const polygonLayer: LayerGroup = this._polyLayers[polygonLayerName];
     if (this._map) {
       for (let layer in this._polyLayers) {
@@ -252,9 +259,9 @@ export class MapComponent implements OnInit, OnDestroy {
         }
       }
     }
-    this._twitterIsStale= true;
+    this._twitterIsStale = true;
 
-    if(typeof selected !== "undefined") {
+    if (typeof selected !== "undefined") {
       this.updateTwitter();
       this.showTweets();
     }
@@ -507,7 +514,7 @@ export class MapComponent implements OnInit, OnDestroy {
   //Add the polygons
   ///////////////////////
   resetLayers(clear_click) {
-    console.log("resetLayers("+clear_click+")");
+    console.log("resetLayers(" + clear_click + ")");
 
     for (let key in this._basemapControl["numbers"]) {
       console.log(key);
@@ -521,7 +528,7 @@ export class MapComponent implements OnInit, OnDestroy {
           onEachFeature: (f, l) => this.onEachFeature(f, l)
         }).addTo(this._numberLayers[key]);
       } else {
-        console.log("Null layer "+key);
+        console.log("Null layer " + key);
       }
       if (clear_click) {
         console.log("resetLayers() clear_click");
@@ -547,6 +554,7 @@ export class MapComponent implements OnInit, OnDestroy {
         console.log("Loading live data completed");
         this.timeKeys = this._tweetProcessor.getTimes(this._tweetInfo);
         this.initSlider();
+        this._twitterIsStale = true;
         this._layersAreStale = true;
         this.ready = true;
         this.loading = false;
