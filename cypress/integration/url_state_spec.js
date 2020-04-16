@@ -1,4 +1,4 @@
-describe('URL State: ', function () {
+describe.only('URL State: ', function () {
 
   describe('select county', () => {
     const url = "http://localhost:4200/map?selected=powys";
