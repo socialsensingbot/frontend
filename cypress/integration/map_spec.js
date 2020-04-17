@@ -63,17 +63,19 @@ describe('Map: ', function () {
       cy.visit(url);
       cy.wait(1000);
       cy.url().should("equal", url);
-      cy.get(".tweet-drawer", {timeout: 30000}).should("be.visible");
+      cy.noSpinner();
+      cy.twitterPanelVisible();
       cy.get("mat-sidenav button.draw-close-button", {timeout: 30000}).click();
-      cy.get(".tweet-drawer", {timeout: 3000}).should("not.be.visible");
+      cy.twitterPanelNotVisible();
       cy.logout();
     });
     it('is scrollable', () => {
       cy.visit(url);
       cy.wait(1000);
       cy.url().should("equal", url);
-      cy.get(".tweet-drawer", {timeout: 20000}).should("be.visible");
-      cy.get(".atr-1", {timeout: 20000}).should("be.visible");
+      cy.noSpinner();
+      cy.twitterPanelVisible();
+      cy.get(".atr-1", {timeout: 60000}).should("be.visible");
       cy.get('.tweets-outer').scrollTo('bottom');
       cy.get(".atr-1", {timeout: 20000}).should("not.be.visible");
       cy.logout();

@@ -6,6 +6,7 @@ describe('URL State: ', function () {
       cy.visit(url);
       cy.login();
       cy.url().should("equal", url);
+      cy.noSpinner();
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
 
       cy.logout();
@@ -15,6 +16,7 @@ describe('URL State: ', function () {
       cy.login();
       cy.visit(url);
       cy.url().should("equal", url);
+      cy.noSpinner();
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
 
       cy.logout();
@@ -27,8 +29,10 @@ describe('URL State: ', function () {
       cy.visit(url);
       cy.login();
       cy.url().should("equal", url);
+      cy.noSpinner();
+
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
-      cy.twitterPanelHeader("Showing 36 of 44 Tweets from 123");
+      cy.twitterPanelHeader("44 Tweets from 123");
       cy.logout();
     });
     it('when authorized and load state', () => {
@@ -36,8 +40,9 @@ describe('URL State: ', function () {
       cy.login();
       cy.visit(url);
       cy.url().should("equal", url);
+      cy.noSpinner();
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
-      cy.twitterPanelHeader("Showing 36 of 44 Tweets from 123");
+      cy.twitterPanelHeader("44 Tweets from 123");
       cy.logout();
     });
   });
@@ -47,8 +52,9 @@ describe('URL State: ', function () {
       cy.visit(url);
       cy.login();
       cy.url().should("equal", url);
+      cy.noSpinner();
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000}).should("have.attr","fill").should("eq","#2B8CBE");
-      cy.twitterPanelHeader("Showing 36 of 44 Tweets from 123");
+      cy.twitterPanelHeader("44 Tweets from 123");
       cy.logout();
     });
     it('when authorized and load state', () => {
@@ -56,8 +62,9 @@ describe('URL State: ', function () {
       cy.login();
       cy.visit(url);
       cy.url().should("equal", url);
+      cy.noSpinner();
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
-      cy.twitterPanelHeader("Showing 36 of 44 Tweets from 123");
+      cy.twitterPanelHeader("44 Tweets from 123");
       cy.logout();
     });
   });
@@ -112,6 +119,7 @@ describe('URL State: ', function () {
       cy.visit(url);
       cy.login();
       cy.url().should("equal", url);
+      cy.noSpinner();
       cy.get(".mat-sidenav-content").click(500,500);
       cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
       cy.url().should("equal", newUrl);
@@ -123,9 +131,10 @@ describe('URL State: ', function () {
       cy.login();
       cy.visit(url);
       cy.url().should("equal", url);
+      cy.noSpinner();
       cy.get(".mat-sidenav-content").click(500,500);
       cy.wait(10000); // The push state is not immediate (about 2s delay) (for performance)
-      cy.url().should("equal", newUrl);
+      cy.url({timeout:20000}).should("equal", newUrl);
       cy.twitterPanelHeader("Showing 2 of 2 Tweets from Cambridgeshire");
       cy.logout();
     });
@@ -139,6 +148,7 @@ describe('URL State: ', function () {
       cy.login();
       cy.visit(url);
       cy.url().should("equal", url);
+      cy.noSpinner();
       cy.get(".slider-date-time", {timeout: 20000});
       cy.get(".slider-date-time .slider-date").should("contain.text","11-Oct-18");
       cy.get(".slider-date-time .slider-time").should("contain.text","05 AM");

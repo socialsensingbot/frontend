@@ -1,4 +1,14 @@
-import {Component, ElementRef, Input, NgZone, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  NgZone,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import * as $ from "jquery";
 import {MatCheckboxChange} from "@angular/material/checkbox";
 import {PreferenceService} from "../../pref/preference.service";
@@ -8,7 +18,7 @@ import {PreferenceService} from "../../pref/preference.service";
              templateUrl: './twitter-panel.component.html',
              styleUrls:   ['./twitter-panel.component.scss']
            })
-export class TwitterPanelComponent implements OnInit, OnChanges {
+export class TwitterPanelComponent implements OnInit, OnChanges,OnDestroy {
 
   @ViewChild("tinfoEmbeds", {read: ElementRef, static: false}) tinfoEmbeds: ElementRef;
   @Input() count: number;
@@ -19,6 +29,8 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   public hidden: boolean[] = [];
   public visibleCount = 0;
   ready: boolean;
+  private _destroyed: boolean= false;
+  private _bound: any;
 
   @Input()
   public set embeds(val: any) {
@@ -27,6 +39,7 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   }
 
   private updateTweets() {
+    if(this._destroyed) return;
     if (typeof this._embeds !== "undefined") {
       this.ready = false;
       console.log(this._embeds);
@@ -67,10 +80,12 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   }
 
   private bindTwitter() {
-    (window as any).twttr.events.bind(
+    if(this._destroyed) return;
+    this._bound= (window as any).twttr.events.bind(
       'rendered',
       (event) => {
         console.log(event);
+        if(this._destroyed) return;
         window.setTimeout(() => {
           this._ngZone.run(() => {
             this.ready = true;
@@ -92,12 +107,16 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
 
       }
     );
+    console.log("Bound:");
+    console.log(this._bound);
     this.updateTweets();
   }
 
   private animateTweetAppearance() {
     let i = 0;
     const animatedReappear = () => {
+      if(this._destroyed) return;
+
       if (i < this.tweets.length) {
         setTimeout(() => this._ngZone.run(animatedReappear), 100);
         if ($(".atr-" + i + " blockquote").has("a")) {
@@ -138,6 +157,7 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
     }
     this.visibleCount = this.hidden.filter(i => !i).length;
     window.setTimeout(() => {
+      if(this._destroyed) return;
       (window as any).twttr.widgets.load($("#tinfo")[0]);
     }, 10);
   }
@@ -176,5 +196,12 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   public async unIgnoreTweet(tweet, $event: MouseEvent) {
     await this.pref.unIgnoreTweet(tweet);
     this.showTweet(tweet, $event)
+  }
+
+  public ngOnDestroy(): void {
+    this._destroyed= true;
+    if(this._bound > 0) {
+      (window as any).twttr.events.unbind(this._bound);
+    }
   }
 }
