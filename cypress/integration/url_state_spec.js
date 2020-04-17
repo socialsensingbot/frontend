@@ -62,7 +62,7 @@ describe('URL State: ', function () {
     });
   });
 
-  describe.only('select zoom', () => {
+  describe('select zoom', () => {
     const url = "http://localhost:4200/map";
     const urlZoom6 = "http://localhost:4200/map?zoom=6"; //default zoom
     const urlZoom7 = "http://localhost:4200/map?zoom=7";

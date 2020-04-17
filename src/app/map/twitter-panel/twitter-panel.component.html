@@ -40,13 +40,13 @@
         </div>
         <div #tinfoEmbeds [style.visibility]="ready ? 'visible' : 'hidden'">
           <div  class="app-twitter-row atr-{{i}}" *ngFor="let tweet of tweets; let i = index">
-            <mat-card class="twitter-card" *ngIf="hidden[i] === false">
+            <mat-card class="twitter-card" *ngIf="hidden[i] === false && !isPlaceholder(tweet)">
               <ng-container>
                 <ng-container
                   *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
               </ng-container>
             </mat-card>
-            <mat-expansion-panel *ngIf="hidden[i] === true" class="twitter-card tc-expansion-panel">
+            <mat-expansion-panel *ngIf="hidden[i] === true && !isPlaceholder(tweet)" class="twitter-card tc-expansion-panel">
               <mat-expansion-panel-header>
                 <mat-panel-title>
                   Tweet Hidden
@@ -58,7 +58,9 @@
                   *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
               </div>
             </mat-expansion-panel>
-
+            <mat-card class="twitter-card" *ngIf="isPlaceholder(tweet)">
+              <span class="tweet-no-longer-available">Tweet no longer available</span>
+            </mat-card>
           </div>
 
         </div>

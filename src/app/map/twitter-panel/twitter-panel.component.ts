@@ -17,7 +17,7 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
   private _embeds: string;
   public tweets: string[];
   public hidden: boolean[] = [];
-  public visibleCount= 0;
+  public visibleCount = 0;
   ready: boolean;
 
   @Input()
@@ -36,7 +36,7 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
       this.tweets.forEach(tweet => {
         this.hidden.push(this.pref.isBlacklisted(tweet))
       });
-      this.visibleCount= this.hidden.filter(i=>!i).length;
+      this.visibleCount = this.hidden.filter(i => !i).length;
       console.log(this.tweets);
       if (this.tweets.length > 0) {
         //
@@ -72,7 +72,22 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
       (event) => {
         console.log(event);
         window.setTimeout(() => {
-          this._ngZone.run(() => {this.ready = true; event.target.parentNode.style.opacity=1.0;});
+          this._ngZone.run(() => {
+            this.ready = true;
+            const parent = $(event.target).parent();
+            if (parent.has("blockquote.twitter-tweet-error")) {
+              parent.parent().find(".app-twitter-item-menu").hide();
+              parent.find("blockquote.twitter-tweet-error")
+                    .parent()
+                    .parent()
+                    .parent()
+                    .text("Tweet no longer available")
+                    .css("opacity", 1.0)
+                    .css("min-width", "516px")
+                    .css("text-align", "center");
+            }
+            event.target.parentNode.style.opacity = 1.0;
+          });
         }, 500);
 
       }
@@ -84,9 +99,17 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
     let i = 0;
     const animatedReappear = () => {
       if (i < this.tweets.length) {
-        setTimeout(()=>this._ngZone.run(animatedReappear), 100);
-        (window as any).twttr.widgets.load($(".atr-"+i+" blockquote"));
-        console.log(i);
+        setTimeout(() => this._ngZone.run(animatedReappear), 100);
+        if ($(".atr-" + i + " blockquote").has("a")) {
+          try {
+            (window as any).twttr.widgets.load($(".atr-" + i + " blockquote"));
+          } catch (e) {
+            $(".atr-" + i + " blockquote").text("Boom!")
+          }
+          console.log(i);
+        } else {
+          console.log("Skipping " + i);
+        }
         i++;
       }
 
@@ -113,15 +136,23 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
     for (let j = 0; j < this.tweets.length; j++) {
       this.hidden[j] = this.pref.isBlacklisted(this.tweets[j]);
     }
-    this.visibleCount= this.hidden.filter(i=>!i).length;
+    this.visibleCount = this.hidden.filter(i => !i).length;
     window.setTimeout(() => {
       (window as any).twttr.widgets.load($("#tinfo")[0]);
     }, 10);
   }
 
   public sender(tweet) {
-    return this.pref.parseTweet(tweet).sender;
+    const parsed = this.pref.parseTweet(tweet);
+    if (parsed != null) {
+      return parsed.sender;
+    }
   }
+
+  public isPlaceholder(tweet) {
+    return this.pref.parseTweet(tweet) == null;
+  }
+
 
   public showTweet(tweet, $event: MouseEvent) {
     this.showHide();
@@ -129,7 +160,7 @@ export class TwitterPanelComponent implements OnInit, OnChanges {
 
   public async ignoreSender(tweet, $event: MouseEvent) {
     await this.pref.ignoreSender(tweet);
-    this.removeTweet(tweet,$event)
+    this.removeTweet(tweet, $event)
   }
 
   public async unIgnoreSender(tweet, $event: MouseEvent) {
