@@ -37,9 +37,21 @@ Cypress.Commands.add("logout", () => {
 
 Cypress.Commands.add("noSpinner", () => {
   cy.wait(4000);
-  cy.get('mat-spinner',{timeout:60000}).should("not.be.visible");
+  cy.get('body').should(el => {
+    if (el) {
+      if (el.find("mat-spinner").length > 0) {
+        cy.get("mat-spinner").should("not.be.visible")
+      }
+    } else {
+    }
+  });
 });
 
 Cypress.Commands.add("twitterPanelHeader", (text) => {
-  cy.get("twitter-panel .tweets-header  mat-card > span > b", {timeout: 60000}).should("contain.text",text);
+  cy.get("twitter-panel .tweets-header  mat-card > span > b", {timeout: 60000}).should("contain.text", text);
+});
+Cypress.Commands.add("twitterPanelVisible", () => {
+  cy.get(".tweet-drawer", {timeout: 60000}).should("be.visible");
+});Cypress.Commands.add("twitterPanelNotVisible", () => {
+  cy.get(".tweet-drawer", {timeout: 60000}).should("not.be.visible");
 });

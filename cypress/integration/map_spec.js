@@ -7,16 +7,22 @@ describe('Map: ', function () {
 
   describe('Interact', () => {
     it('with the map', () => {
-      // Step 2: Take an action (Sign in)
       cy.get('.content-inner').click();
       cy.get('.map').click();
       cy.get('#logout').click();
       // cy.get('.leaflet-interactive:nth-child(174)').click();
 
     });
+
+    it('with a tooltip', () => {
+      cy.get('body > app-root > div > div > app-map > mat-sidenav-container > mat-sidenav-content > div.map-surround > div > div.leaflet-pane.leaflet-map-pane > div.leaflet-pane.leaflet-overlay-pane > svg > g > path:nth-child(174)',{timeout:60000}).trigger("mouseover",{force:true});
+      cy.get(".leaflet-tooltip-pane").get("div");
+      // cy.get('.leaflet-interactive:nth-child(174)').click();
+
+    });
   });
 
-  describe.only('Legend', () => {
+  describe('Legend', () => {
     const url = "http://localhost:4200/map?active_number=count";
     const legendEntry = "mat-sidenav-content > map-legend > mat-card > div > span:nth-child(1)";
     const statsControl = "div.leaflet-control-container > div.leaflet-top.leaflet-left > div:nth-child(2)";
@@ -57,17 +63,19 @@ describe('Map: ', function () {
       cy.visit(url);
       cy.wait(1000);
       cy.url().should("equal", url);
-      cy.get(".tweet-drawer", {timeout: 20000}).should("be.visible");
-      cy.get("mat-sidenav button.draw-close-button", {timeout: 1000}).click();
-      cy.get(".tweet-drawer", {timeout: 3000}).should("not.be.visible");
+      cy.noSpinner();
+      cy.twitterPanelVisible();
+      cy.get("mat-sidenav button.draw-close-button", {timeout: 30000}).click();
+      cy.twitterPanelNotVisible();
       cy.logout();
     });
     it('is scrollable', () => {
       cy.visit(url);
       cy.wait(1000);
       cy.url().should("equal", url);
-      cy.get(".tweet-drawer", {timeout: 20000}).should("be.visible");
-      cy.get(".atr-1", {timeout: 20000}).should("be.visible");
+      cy.noSpinner();
+      cy.twitterPanelVisible();
+      cy.get(".atr-1", {timeout: 60000}).should("be.visible");
       cy.get('.tweets-outer').scrollTo('bottom');
       cy.get(".atr-1", {timeout: 20000}).should("not.be.visible");
       cy.logout();
