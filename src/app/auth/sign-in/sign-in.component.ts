@@ -47,9 +47,14 @@ export class SignInComponent {
   signIn() {
     this.auth.signIn(this.emailInput.value, this.passwordInput.value)
         .then((user: CognitoUser | any) => {
+          /**
+           * If a user account is created by an admin in Cognito the password is
+           * temporary. The user will not be able to login until they have set this
+           * password. The following code detects that and sends them to the New Password
+           * page.
+           */
+          console.log(user.challengeName);
           if (user.challengeName === 'NEW_PASSWORD_REQUIRED') {
-            console.log(user.challengeName);
-            const { requiredAttributes } = user.challengeParam; // the array of required attributes, e.g ['email', 'phone_number']
             this._router.navigate(['auth/newpass'],{queryParamsHandling:"merge",state:{
               message:"Please Change your Temporary Password"
               }});
@@ -74,13 +79,4 @@ export class SignInComponent {
         })
   }
 
-  async signInWithFacebook() {
-    const socialResult = await this.auth.socialSignIn(AuthService.FACEBOOK);
-    console.log('fb Result:', socialResult);
-  }
-
-  async signInWithGoogle() {
-    const socialResult = await this.auth.socialSignIn(AuthService.GOOGLE);
-    console.log('google Result:', socialResult);
-  }
 }
