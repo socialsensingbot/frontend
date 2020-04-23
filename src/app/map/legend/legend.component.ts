@@ -21,6 +21,10 @@ export class LegendComponent implements OnInit {
     }
   }
 
+  public get activeNumber() {
+    return this._activeNumber;
+  }
+
   @Input()
   public set colorFunctions(value: { stats:(()=>any)[], count:(()=>any)[]}) {
     this._colorFunctions = value;

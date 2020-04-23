@@ -7,8 +7,7 @@
     "hmr": "ng serve --configuration hmr",
     "build": "ng build --verbose --progress",
     "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {

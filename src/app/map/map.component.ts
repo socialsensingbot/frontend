@@ -27,8 +27,8 @@ import {Hub} from "@aws-amplify/core";
 import {AuthService} from "../auth/auth.service";
 import {environment} from "../../environments/environment";
 
-type MapLayers = ByRegionType<LayerGroup>
-type NumberLayers = RegionData<LayerGroup, LayerGroup, LayerGroup>;
+type MapLayers = {"Local Authority": any, "Coarse Grid": any, "Fine Grid": any};
+type NumberLayers = {"Exceedence": any, "Tweet Count": any}
 type RegionData<R, S, T> = { stats: R; count: S; embed?: T };
 type ColorFunctions = RegionData<any, any, any>
 type ColorData = RegionData<{ colors: string[], values: number[] }, { colors: string[], values: number[] }, any>;
@@ -100,8 +100,10 @@ export class MapComponent implements OnInit, OnDestroy {
   private _countyLayer: LayerGroup = layerGroup(); //dummy layers to fool layer control
   private _map: Map;
 
-  private _numberLayers: NumberLayers = {stats: null, count: null};
-  private _polyLayers: MapLayers = {county: null, coarse: null, fine: null};
+  private _numberLayers: NumberLayers = {"Exceedence": null, "Tweet Count": null};
+  private _polyLayers: MapLayers = {"Local Authority": null, "Coarse Grid": null, "Fine Grid": null};
+  private _polyLayersNameMap = {"Local Authority": "county", "Coarse Grid": "coarse", "Fine Grid": "fine"};
+  private _numberLayersNameMap = {"Exceedence": "stats", "Tweet Count": "count"};
   private _basemapControl: BasemapControl = {"numbers": this._numberLayers, "polygon": this._polyLayers};
   private _polygonData: ByRegionType<PolygonData> = {
     county: fgsData,
@@ -312,16 +314,15 @@ export class MapComponent implements OnInit, OnDestroy {
 
     // This handles a change to the active_number value
     const numberLayerName: string = typeof active_number !== "undefined" ? active_number : STATS;
-    const numberLayer: LayerGroup = this._numberLayers[numberLayerName];
     if (this._map) {
       for (let layer in this._numberLayers) {
-        if (layer !== numberLayerName) {
+        if (this._numberLayersNameMap[layer] !== numberLayerName) {
           console.log("Removing " + layer);
           this._map.removeLayer(this._numberLayers[layer]);
         }
       }
       for (let layer in this._numberLayers) {
-        if (layer === numberLayerName) {
+        if (this._numberLayersNameMap[layer] === numberLayerName) {
           console.log("Adding " + layer);
           this._map.addLayer(this._numberLayers[layer]);
 
@@ -330,17 +331,16 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     // This handles a change to the active_polygon value
-    const polygonLayerName: string = typeof active_polygon !== "undefined" ? active_polygon : "county";
-    const polygonLayer: LayerGroup = this._polyLayers[polygonLayerName];
+    const polygonLayerName: string = typeof active_polygon !== "undefined" ? active_polygon : COUNTY;
     if (this._map) {
       for (let layer in this._polyLayers) {
-        if (layer !== polygonLayerName) {
+        if (this._polyLayersNameMap[layer] !== polygonLayerName) {
           console.log("Removing " + layer);
           this._map.removeLayer(this._polyLayers[layer]);
         }
       }
       for (let layer in this._polyLayers) {
-        if (layer === polygonLayerName) {
+        if (this._polyLayersNameMap[layer] === polygonLayerName) {
           console.log("Adding " + layer);
           this._map.addLayer(this._polyLayers[layer]);
 
@@ -393,13 +393,13 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
     //define the layers for the different counts
-    this._numberLayers.stats = layerGroup().addTo(map);
-    this._numberLayers.count = layerGroup();
+    this._numberLayers["Exceedence"] = layerGroup().addTo(map);
+    this._numberLayers["Tweet Count"] = layerGroup();
 
     //layers for the different polygons
-    this._polyLayers.county = layerGroup().addTo(map);
-    this._polyLayers.coarse = layerGroup();
-    this._polyLayers.fine = layerGroup();
+    this._polyLayers["Local Authority"] = layerGroup().addTo(map);
+    this._polyLayers["Coarse Grid"] = layerGroup();
+    this._polyLayers["Fine Grid"]= layerGroup();
 
 
     // Set up the color functions for the legend
@@ -415,13 +415,14 @@ export class MapComponent implements OnInit, OnDestroy {
     this.colorFunctions = newColorFunctions;
 
     map.on('baselayerchange', (e: any) => {
+      console.log("New baselayer "+e.name);
       if (e.name in this._basemapControl.polygon) {
-        this.activePolys = e.name;
-        this.updateSearch({active_polygon: e.name});
+        this.activePolys = this._polyLayersNameMap[e.name];
+        this.updateSearch({active_polygon: this.activePolys, selected:null});
         this.resetLayers(true);
       } else {
-        this.activeNumber = e.name;
-        this.updateSearch({active_number: e.name});
+        this.activeNumber = this._numberLayersNameMap[e.name];
+        this.updateSearch({active_number: this.activeNumber});
       }
     });
 
@@ -502,7 +503,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param e
    */
   featureLeft(e: LeafletMouseEvent) {
-    console.log("featureLeft()");
+    console.log("featureLeft("+this.activeNumber+")");
     this._geojson[this.activeNumber].resetStyle(e.target);
     if (this._clicked != "") {
       this._layerStyles.dohighlightFeature(this._clicked.target);
@@ -550,6 +551,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
       //Update the Twitter panel with the changes
       this._feature = feature;
+      this.showTweets();
     }
 
     //this.ngZone.run(...) is called because the event handler takes place outside of angular.
@@ -637,7 +639,8 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   resetLayers(clear_click) {
     console.log("resetLayers(" + clear_click + ")");
-
+    this.ready= false
+    this.hideTweets();
     for (let key in this._basemapControl.numbers) {
       console.log(key);
       if (this._numberLayers[key] != null) {
@@ -645,8 +648,8 @@ export class MapComponent implements OnInit, OnDestroy {
         this._numberLayers[key].clearLayers();
 
         // noinspection JSUnfilteredForInLoop
-        this._geojson[key] = new GeoJSON(this._polygonData[this.activePolys], {
-          style:         (feature) => this.colorFunctions[key].getFeatureStyle(feature),
+        this._geojson[this._numberLayersNameMap[key]] = new GeoJSON(this._polygonData[this.activePolys], {
+          style:         (feature) => this.colorFunctions[this._numberLayersNameMap[key]].getFeatureStyle(feature),
           onEachFeature: (f, l) => this.onEachFeature(f, l)
         }).addTo(this._numberLayers[key]);
       } else {
@@ -661,6 +664,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this._feature = null;
       }
     }
+    this.ready= true;
   }
 
   /**
