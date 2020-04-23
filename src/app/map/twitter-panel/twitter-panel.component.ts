@@ -10,15 +10,65 @@ import {
   ViewChild
 } from '@angular/core';
 import * as $ from "jquery";
-import {MatCheckboxChange} from "@angular/material/checkbox";
 import {PreferenceService} from "../../pref/preference.service";
+import {Hub} from "aws-amplify";
+
+
+let twitterBound = false;
+
+function twitterLoad(j: number) {
+  //todo: the use of setTimeout is very brittle, revisit.
+  if ((window as any).twttr && (window as any).twttr.widgets) {
+    setTimeout(() => {
+      (window as any).twttr.widgets.load($(".atr-" + j + " blockquote")[0]);
+    }, 500);
+  } else {
+    setTimeout(() => twitterLoad(j), 500);
+  }
+
+}
+
+function twitterInit() {
+  if ((window as any).twttr && (window as any).twttr.events) {
+    (window as any).twttr.events.bind(
+      'rendered',
+      (event) => {
+        console.log(event);
+        twitterBound = true;
+        Hub.dispatch("twitter-panel", {message: "render", event: "render", data: event.target});
+
+        window.setTimeout(() => {
+          const parent = $(event.target).parent();
+          if (parent.find("blockquote.twitter-tweet-error").length > 0) {
+            parent.parent().find(".app-twitter-item-menu").hide();
+            parent.find("blockquote.twitter-tweet-error")
+                  .parent()
+                  .parent()
+                  .parent()
+                  .text("Tweet no longer available")
+                  .css("opacity", 1.0)
+                  .css("min-width", "516px")
+                  .css("text-align", "center");
+          }
+          event.target.parentNode.style.opacity = 1.0;
+        }, 500);
+
+      }
+    );
+  } else {
+    setTimeout(() => twitterInit(), 500);
+  }
+}
+
+twitterInit();
 
 @Component({
              selector:    'twitter-panel',
              templateUrl: './twitter-panel.component.html',
              styleUrls:   ['./twitter-panel.component.scss']
            })
-export class TwitterPanelComponent implements OnInit, OnChanges,OnDestroy {
+export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
+
 
   @ViewChild("tinfoEmbeds", {read: ElementRef, static: false}) tinfoEmbeds: ElementRef;
   @Input() count: number;
@@ -29,17 +79,23 @@ export class TwitterPanelComponent implements OnInit, OnChanges,OnDestroy {
   public hidden: boolean[] = [];
   public visibleCount = 0;
   ready: boolean;
-  private _destroyed: boolean= false;
-  private _bound: any;
+  private _destroyed: boolean = false;
 
   @Input()
   public set embeds(val: any) {
-    this._embeds = val;
-    this.updateTweets();
+    if (val === this._embeds) {
+      console.log("No change to embeds");
+    } else {
+      this._embeds = val;
+      this.updateTweets();
+    }
   }
 
   private updateTweets() {
-    if(this._destroyed) return;
+    console.log("updateTweets()");
+    if (this._destroyed) {
+      return;
+    }
     if (typeof this._embeds !== "undefined") {
       this.ready = false;
       console.log(this._embeds);
@@ -53,6 +109,8 @@ export class TwitterPanelComponent implements OnInit, OnChanges,OnDestroy {
       console.log(this.tweets);
       if (this.tweets.length > 0) {
         //
+        // (window as any).twttr.widgets.load($("#tinfo")[0]);
+
       } else {
         this.ready = true;
       }
@@ -67,73 +125,38 @@ export class TwitterPanelComponent implements OnInit, OnChanges,OnDestroy {
   @Input() showHeaderInfo: boolean = true;
   @Input() showTimeline: boolean;
 
-  constructor(private _ngZone: NgZone, public pref: PreferenceService) { }
-
-  ngOnInit() {
-    if ((window as any).twttr) {
-      this.bindTwitter();
-    } else {
-      setTimeout(() => this.bindTwitter(), 1000);
-    }
-
-
-  }
-
-  private bindTwitter() {
-    if(this._destroyed) return;
-    this._bound= (window as any).twttr.events.bind(
-      'rendered',
-      (event) => {
-        console.log(event);
-        if(this._destroyed) return;
-        window.setTimeout(() => {
-          this._ngZone.run(() => {
-            this.ready = true;
-            const parent = $(event.target).parent();
-            if (parent.has("blockquote.twitter-tweet-error")) {
-              parent.parent().find(".app-twitter-item-menu").hide();
-              parent.find("blockquote.twitter-tweet-error")
-                    .parent()
-                    .parent()
-                    .parent()
-                    .text("Tweet no longer available")
-                    .css("opacity", 1.0)
-                    .css("min-width", "516px")
-                    .css("text-align", "center");
-            }
-            event.target.parentNode.style.opacity = 1.0;
-          });
-        }, 500);
-
+  constructor(private _ngZone: NgZone, public pref: PreferenceService) {
+    // Hub.listen("twitter-panel", (e) => {
+    //   if (e.payload.message === "update") {
+    //     this._ngZone.run(() => this.updateTweets());
+    //   }
+    // });
+    Hub.listen("twitter-panel", (e) => {
+      if (e.payload.message === "render") {
+        this._ngZone.run(() => this.ready = true);
       }
-    );
-    console.log("Bound:");
-    console.log(this._bound);
-    this.updateTweets();
+    });
+
   }
+
 
   private animateTweetAppearance() {
-    let i = 0;
-    const animatedReappear = () => {
-      if(this._destroyed) return;
-
+    const animatedReappear = (i: number) => {
+      if (this._destroyed) {
+        return;
+      }
       if (i < this.tweets.length) {
-        setTimeout(() => this._ngZone.run(animatedReappear), 100);
         if ($(".atr-" + i + " blockquote").has("a")) {
-          try {
-            (window as any).twttr.widgets.load($(".atr-" + i + " blockquote"));
-          } catch (e) {
-            $(".atr-" + i + " blockquote").text("Boom!")
-          }
-          console.log(i);
+          console.log("Loading tweet " + i);
+          twitterLoad(i);
         } else {
           console.log("Skipping " + i);
         }
-        i++;
+        setTimeout(() => this._ngZone.run(() => animatedReappear(i + 1)), 200);
       }
 
     };
-    animatedReappear();
+    animatedReappear(0);
   }
 
   public show($event: any) {
@@ -142,24 +165,24 @@ export class TwitterPanelComponent implements OnInit, OnChanges,OnDestroy {
 
   public ngOnChanges(changes: SimpleChanges): void {
     console.log(changes);
-    (window as any).twttr.widgets.load($("#tinfo")[0]);
+    // (window as any).twttr.widgets.load($("#tinfo")[0]);
   }
 
   public removeTweet(tweet, $event: MouseEvent) {
     this.showHide();
-
   }
 
   private showHide() {
 
+
     for (let j = 0; j < this.tweets.length; j++) {
-      this.hidden[j] = this.pref.isBlacklisted(this.tweets[j]);
+      const blacklisted = this.pref.isBlacklisted(this.tweets[j]);
+      if (blacklisted != this.hidden[j]) {
+        twitterLoad(j);
+        this.hidden[j] = blacklisted;
+      }
     }
     this.visibleCount = this.hidden.filter(i => !i).length;
-    window.setTimeout(() => {
-      if(this._destroyed) return;
-      (window as any).twttr.widgets.load($("#tinfo")[0]);
-    }, 10);
   }
 
   public sender(tweet) {
@@ -198,10 +221,11 @@ export class TwitterPanelComponent implements OnInit, OnChanges,OnDestroy {
     this.showTweet(tweet, $event)
   }
 
-  public ngOnDestroy(): void {
-    this._destroyed= true;
-    if(this._bound > 0) {
-      (window as any).twttr.events.unbind(this._bound);
-    }
+  ngOnInit(): void {
   }
+
+  public ngOnDestroy(): void {
+    this._destroyed = true;
+  }
+
 }

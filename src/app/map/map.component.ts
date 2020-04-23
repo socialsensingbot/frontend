@@ -23,6 +23,9 @@ import {DateRange, DateRangeSliderOptions} from "./date-range-slider/date-range-
 import {getColor, getFeatureStyle, LayerStyleService} from "./services/layer-style.service";
 import {NotificationService} from "../services/notification.service";
 import {Feature, PolygonData, Properties} from "./types";
+import {Hub} from "@aws-amplify/core";
+import {AuthService} from "../auth/auth.service";
+import {environment} from "../../environments/environment";
 
 type MapLayers = ByRegionType<LayerGroup>
 type NumberLayers = RegionData<LayerGroup, LayerGroup, LayerGroup>;
@@ -138,6 +141,8 @@ export class MapComponent implements OnInit, OnDestroy {
 
   private _feature;
 
+  private _loggedIn: boolean;
+
 
   // Timed action triggers //
   private _layersAreStale: boolean;
@@ -197,7 +202,9 @@ export class MapComponent implements OnInit, OnDestroy {
 
   constructor(private _router: Router, private route: ActivatedRoute, private ngZone: NgZone,
               private _layerStyles: LayerStyleService,
-              private _notify: NotificationService) {
+              private _notify: NotificationService,
+              private _auth: AuthService
+  ) {
     //save the query parameter observable
     this._searchParams = this.route.queryParams;
 
@@ -373,6 +380,7 @@ export class MapComponent implements OnInit, OnDestroy {
   private async init(map: Map) {
     console.log("init");
 
+
     //Listeners to push map state into URL
     map.addEventListener("dragend", () => {
       return this.ngZone.run(
@@ -418,6 +426,8 @@ export class MapComponent implements OnInit, OnDestroy {
     });
 
     this.setupCountStatsToggle();
+
+    this._loggedIn = await Auth.currentAuthenticatedUser() != null;
 
     //Initial data load
     await this.load();
@@ -479,6 +489,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this.embeds = this._twitterData[this.activePolys].embed[props.properties.name];
       this.twitterPanelHeader = true;
       this.showTwitterTimeline = true;
+      // Hub.dispatch("twitter-panel",{message:"update",event:"update"});
       this.showTweets()
     } else {
       this.hideTweets()
@@ -590,6 +601,14 @@ export class MapComponent implements OnInit, OnDestroy {
       }
     });
 
+    this._auth.authState.subscribe((event: string) => {
+      if (event === AuthService.SIGN_IN) {
+        this._loggedIn = true;
+      }
+      if (event === AuthService.SIGN_OUT) {
+        this._loggedIn = false;
+      }
+    });
 
   }
 
@@ -597,10 +616,18 @@ export class MapComponent implements OnInit, OnDestroy {
    * Clear up when the component is destroyed.
    */
   ngOnDestroy() {
-    this._loadTimer.unsubscribe();
-    this._resetLayersTimer.unsubscribe();
-    this._stateUpdateTimer.unsubscribe();
-    this._twitterUpdateTimer.unsubscribe();
+    if (this._loadTimer) {
+      this._loadTimer.unsubscribe();
+    }
+    if (this._resetLayersTimer) {
+      this._resetLayersTimer.unsubscribe();
+    }
+    if (this._stateUpdateTimer) {
+      this._stateUpdateTimer.unsubscribe();
+    }
+    if (this._twitterUpdateTimer) {
+      this._twitterUpdateTimer.unsubscribe();
+    }
   }
 
   /**
@@ -642,24 +669,30 @@ export class MapComponent implements OnInit, OnDestroy {
   async load() {
     console.log("readData()");
     this.loading = true;
-    const userInfo = await Auth.currentUserInfo();
-    if (userInfo != null) {
+    if (this._loggedIn) {
       try {
         this._newData = await this.loadLiveData();
-        console.log("Loading live data completed");
+        if (await Auth.currentAuthenticatedUser() !== null) {
+          console.log("Loading live data completed");
 
-        this.updateSliderFromData(this._newData);
+          this.updateSliderFromData(this._newData);
 
-        // Mark as stale to trigger a refresh
-        this._twitterIsStale = true;
-        this._layersAreStale = true;
+          // Mark as stale to trigger a refresh
+          this._twitterIsStale = true;
+          this._layersAreStale = true;
 
-        //We are no longer loading data (removes progress bar and spinners)
-        this.ready = true;
-        this.loading = false;
+          //We are no longer loading data (removes progress bar and spinners)
+          this.ready = true;
+          this.loading = false;
+        } else {
+          console.log("User logged out since load started, not loading live data");
+          this.ready = false;
+          this.loading = false;
+          this._newData = null;
+        }
 
       } catch (e) {
-        this._notify.show("Error while loading live map data");
+        this._notify.show("Error while loading live map data " + e);
         console.log("Loading data failed " + e);
         console.log(e);
         this.loading = false;
@@ -714,6 +747,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this.updateTweetsData(tweetInfo);
     this.updateRegionData();
+    this._twitterIsStale = true;
     // if (this._clicked != "") {
     //   this.updateTwitterHeader(this._clicked.target.feature);
     // }
@@ -725,7 +759,7 @@ export class MapComponent implements OnInit, OnDestroy {
   private clearProcessedTweetData() {
     for (const k in this._twitterData) {
       if (this._twitterData.hasOwnProperty(k)) {
-        for (const p in regionDataKeys) {
+        for (const p in (this._twitterData)[k as RegionType]) {
           (this._twitterData)[k as RegionType][p] = {};
         }
       }
@@ -747,6 +781,8 @@ export class MapComponent implements OnInit, OnDestroy {
             properties[STATS] = 0;
           }
         }
+      } else {
+        console.log("Skipping " + regionType)
       }
     }
   }

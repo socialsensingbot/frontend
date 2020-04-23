@@ -9,11 +9,14 @@ describe('Authentication:', function() {
 
       //Login
       cy.login();
+      cy.url().should("equal", 'http://localhost:4200/map');
       //Logout
       cy.logout();
+      cy.wait(4000);
+      cy.url().should("equal", 'http://localhost:4200/auth/signin');
       //Log back in
       cy.login();
-
+      cy.url().should("equal", 'http://localhost:4200/map');
     });
   });
 

@@ -28,6 +28,7 @@ import { DateRangeSliderComponent } from './map/date-range-slider/date-range-sli
 import {Ng5SliderModule} from "ng5-slider";
 import { LegendComponent } from './map/legend/legend.component';
 import {NewPassComponent} from "./auth/new-pass/new-pass.component";
+import {HttpClientModule} from "@angular/common/http";
 @NgModule({
             declarations: [
               AppComponent,
@@ -46,6 +47,7 @@ import {NewPassComponent} from "./auth/new-pass/new-pass.component";
             ],
             imports:      [
               BrowserModule,
+              HttpClientModule,
               BrowserAnimationsModule,
               AmplifyAngularModule,
               MaterialModule,
