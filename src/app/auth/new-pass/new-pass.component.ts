@@ -7,6 +7,10 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from 'src/environments/environment';
 import {Auth} from "aws-amplify";
 
+/**
+ * The New Password Component exists for when a user is forced by Cognito to change their
+ * password. Primarily that is to allow the user to change the Admin set temporary password.
+ */
 @Component({
              selector:    'app-new-pass',
              templateUrl: './new-pass.component.html',

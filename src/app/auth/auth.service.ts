@@ -11,6 +11,10 @@ export interface NewUser {
   lastName: string
 }
 
+/**
+ * A support service for managing authentication. Wraps the Amplify Auth.xxx requests.
+ * See https://docs.amplify.aws/lib/auth/getting-started?platform=js
+ */
 @Injectable({
               providedIn: 'root'
             })
@@ -23,8 +27,6 @@ export class AuthService {
 
   public static SIGN_IN = 'signIn';
   public static SIGN_OUT = 'signOut';
-  public static FACEBOOK = CognitoHostedUIIdentityProvider.Facebook;
-  public static GOOGLE = CognitoHostedUIIdentityProvider.Google;
 
   constructor() {
     Hub.listen('auth', (data) => {
@@ -62,13 +64,6 @@ export class AuthService {
     return Auth.signOut()
                .then(() => this.loggedIn = false)
   }
-
-  socialSignIn(provider: CognitoHostedUIIdentityProvider): Promise<ICredentials> {
-    return Auth.federatedSignIn({
-                                  'provider': provider
-                                });
-  }
-
   public completeNewPassword(password: any): Promise<any> {
     console.log("completeNewPassword()");
     return new Promise((resolve, reject) => {

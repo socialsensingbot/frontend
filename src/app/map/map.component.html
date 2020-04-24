@@ -18,10 +18,10 @@
            [leafletOptions]="options">
       </div>
     </div>
-    <map-legend class="legend" [activeNumber]="_activeNumber" [colorData]="_colorData"
+    <map-legend class="legend" [activeNumber]="activeNumber" [colorData]="colorData"
                 [colorFunctions]="colorFunctions"></map-legend>
     <div class="date-slider">
-      <date-range-slider (dateRange)="sliderChange($event)" [timeKeyedData]="this.timeKeys"
+      <date-range-slider (dateRange)="sliderChange($event)" [timeKeyedData]="this._timeKeys"
                          [options]="sliderOptions"></date-range-slider>
     </div>
 
