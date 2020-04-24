@@ -27,8 +27,8 @@ import {Hub} from "@aws-amplify/core";
 import {AuthService} from "../auth/auth.service";
 import {environment} from "../../environments/environment";
 
-type MapLayers = {"Local Authority": any, "Coarse Grid": any, "Fine Grid": any};
-type NumberLayers = {"Exceedence": any, "Tweet Count": any}
+type MapLayers = { "Local Authority": any, "Coarse Grid": any, "Fine Grid": any };
+type NumberLayers = { "Exceedence": any, "Tweet Count": any }
 type RegionData<R, S, T> = { stats: R; count: S; embed?: T };
 type ColorFunctions = RegionData<any, any, any>
 type ColorData = RegionData<{ colors: string[], values: number[] }, { colors: string[], values: number[] }, any>;
@@ -399,7 +399,7 @@ export class MapComponent implements OnInit, OnDestroy {
     //layers for the different polygons
     this._polyLayers["Local Authority"] = layerGroup().addTo(map);
     this._polyLayers["Coarse Grid"] = layerGroup();
-    this._polyLayers["Fine Grid"]= layerGroup();
+    this._polyLayers["Fine Grid"] = layerGroup();
 
 
     // Set up the color functions for the legend
@@ -415,10 +415,10 @@ export class MapComponent implements OnInit, OnDestroy {
     this.colorFunctions = newColorFunctions;
 
     map.on('baselayerchange', (e: any) => {
-      console.log("New baselayer "+e.name);
+      console.log("New baselayer " + e.name);
       if (e.name in this._basemapControl.polygon) {
         this.activePolys = this._polyLayersNameMap[e.name];
-        this.updateSearch({active_polygon: this.activePolys, selected:null});
+        this.updateSearch({active_polygon: this.activePolys, selected: null});
         this.resetLayers(true);
       } else {
         this.activeNumber = this._numberLayersNameMap[e.name];
@@ -503,7 +503,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param e
    */
   featureLeft(e: LeafletMouseEvent) {
-    console.log("featureLeft("+this.activeNumber+")");
+    console.log("featureLeft(" + this.activeNumber + ")");
     this._geojson[this.activeNumber].resetStyle(e.target);
     if (this._clicked != "") {
       this._layerStyles.dohighlightFeature(this._clicked.target);
@@ -639,7 +639,7 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   resetLayers(clear_click) {
     console.log("resetLayers(" + clear_click + ")");
-    this.ready= false
+    this.ready = false
     this.hideTweets();
     for (let key in this._basemapControl.numbers) {
       console.log(key);
@@ -664,7 +664,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this._feature = null;
       }
     }
-    this.ready= true;
+    this.ready = true;
   }
 
   /**
@@ -673,8 +673,8 @@ export class MapComponent implements OnInit, OnDestroy {
   async load() {
     console.log("readData()");
     this.loading = true;
-    if (this._loggedIn) {
-      try {
+    try {
+      if (await Auth.currentAuthenticatedUser() !== null) {
         this._newData = await this.loadLiveData();
         if (await Auth.currentAuthenticatedUser() !== null) {
           console.log("Loading live data completed");
@@ -694,15 +694,15 @@ export class MapComponent implements OnInit, OnDestroy {
           this.loading = false;
           this._newData = null;
         }
-
-      } catch (e) {
-        this._notify.show("Error while loading live map data " + e);
-        console.log("Loading data failed " + e);
-        console.log(e);
-        this.loading = false;
+      } else {
+        console.log("User logged out, not loading live data");
       }
-    } else {
-      console.log("User logged out, not loading live data");
+
+    } catch (e) {
+      console.log(e);
+      this.loading = false;
+      this.ready = false;
+      this._newData = null;
     }
 
   }
