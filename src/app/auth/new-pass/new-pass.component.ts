@@ -5,7 +5,8 @@ import {CognitoUser} from '@aws-amplify/auth';
 import {NotificationService} from 'src/app/services/notification.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from 'src/environments/environment';
-import {Auth} from "aws-amplify";
+import {Auth, Logger} from "aws-amplify";
+const log = new Logger("new-pass");
 
 /**
  * The New Password Component exists for when a user is forced by Cognito to change their
@@ -63,9 +64,9 @@ export class NewPassComponent implements OnInit {
   }
 
   changePass() {
-    console.log("changePass()");
+    log.debug("changePass()");
     return this.auth.completeNewPassword(this.passwordInput.value).then(() => {
-      console.log("completed new password");
+      log.debug("completed new password");
       this._router.navigate(['/map'], {queryParamsHandling: "merge"});
     }).catch(e => console.error(e));
   }

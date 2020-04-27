@@ -4,6 +4,8 @@ import {environment} from 'src/environments/environment';
 import {Router} from '@angular/router';
 import Auth from '@aws-amplify/auth';
 import {NotificationService} from 'src/app/services/notification.service';
+import {Logger} from "aws-amplify";
+const log = new Logger('confirm-code');
 
 @Component({
              selector:    'app-confirm-code',
@@ -39,7 +41,7 @@ export class ConfirmCodeComponent implements OnInit {
   confirmCode() {
     Auth.confirmSignUp(this.email, this.codeInput.value)
         .then((data: any) => {
-          console.log(data);
+          log.debug(data);
           if (data === 'SUCCESS' &&
             environment.confirm.email &&
             environment.confirm.password) {
@@ -52,7 +54,7 @@ export class ConfirmCodeComponent implements OnInit {
           }
         })
         .catch((error: any) => {
-          console.log(error);
+          log.debug(error);
           this._notification.show(error.message);
         })
   }

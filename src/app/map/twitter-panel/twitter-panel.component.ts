@@ -11,8 +11,9 @@ import {
 } from '@angular/core';
 import * as $ from "jquery";
 import {PreferenceService} from "../../pref/preference.service";
-import {Hub} from "aws-amplify";
+import {Hub, Logger} from "aws-amplify";
 
+const log = new Logger('twitter-panel');
 
 let twitterBound = false;
 
@@ -33,7 +34,7 @@ function twitterInit() {
     (window as any).twttr.events.bind(
       'rendered',
       (event) => {
-        console.log(event);
+        log.debug(event);
         twitterBound = true;
         Hub.dispatch("twitter-panel", {message: "render", event: "render", data: event.target});
 
@@ -84,7 +85,7 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
   @Input()
   public set embeds(val: any) {
     if (val === this._embeds) {
-      console.log("No change to embeds");
+      log.debug("No change to embeds");
     } else {
       this._embeds = val;
       this.updateTweets();
@@ -92,13 +93,13 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
   }
 
   private updateTweets() {
-    console.log("updateTweets()");
+    log.debug("updateTweets()");
     if (this._destroyed) {
       return;
     }
     if (typeof this._embeds !== "undefined") {
       this.ready = false;
-      console.log(this._embeds);
+      log.debug(this._embeds);
       const regex = /(<blockquote(.*?)<\/blockquote>)/g;
       this.tweets = this._embeds.match(regex).map(s => s);
       this.hidden = [];
@@ -106,7 +107,7 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
         this.hidden.push(this.pref.isBlacklisted(tweet))
       });
       this.visibleCount = this.hidden.filter(i => !i).length;
-      console.log(this.tweets);
+      log.debug(this.tweets);
       if (this.tweets.length > 0) {
         //
         // (window as any).twttr.widgets.load($("#tinfo")[0]);
@@ -147,10 +148,10 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
       }
       if (i < this.tweets.length) {
         if ($(".atr-" + i + " blockquote").has("a")) {
-          console.log("Loading tweet " + i);
+          log.debug("Loading tweet " + i);
           twitterLoad(i);
         } else {
-          console.log("Skipping " + i);
+          log.debug("Skipping " + i);
         }
         setTimeout(() => this._ngZone.run(() => animatedReappear(i + 1)), 200);
       }
@@ -160,11 +161,11 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
   }
 
   public show($event: any) {
-    console.log($event);
+    log.debug($event);
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes);
+    log.debug(changes);
     // (window as any).twttr.widgets.load($("#tinfo")[0]);
   }
 

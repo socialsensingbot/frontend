@@ -2,7 +2,7 @@ import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {fgsData} from './county_bi';
 import {coarseData} from './coarse_bi';
 import {fineData} from './fine_bi';
-import {Auth, Storage} from 'aws-amplify';
+import {Auth, Logger, Storage} from 'aws-amplify';
 import {
   control,
   Control,
@@ -30,19 +30,27 @@ import {environment} from "../../environments/environment";
 type MapLayers = { "Local Authority": any, "Coarse Grid": any, "Fine Grid": any };
 type NumberLayers = { "Exceedence": any, "Tweet Count": any }
 type RegionData<R, S, T> = { stats: R; count: S; embed?: T };
-type ColorFunctions = RegionData<any, any, any>
+type ColorFunctionObject = { getColor(), getFeatureStyle(feature: geojson.Feature<geojson.GeometryObject, any>) }
+type ColorFunctions = RegionData<ColorFunctionObject, ColorFunctionObject, ColorFunctionObject>
 type ColorData = RegionData<{ colors: string[], values: number[] }, { colors: string[], values: number[] }, any>;
 type BasemapControl = { polygon: MapLayers; numbers: NumberLayers };
 
 type ByRegionType<T> = {
-  [index in RegionType]: T;
+  [index in PolygonLayerShortName]: T;
 };
 
-type RegionType = "county" | "coarse" | "fine";
-const regionTypes: RegionType[] = ["county", "coarse", "fine"];
+type PolygonLayerFullName = "Local Authority" | "Coarse Grid" | "Fine Grid";
+type PolygonLayerShortName = "county" | "coarse" | "fine";
+type NumberLayerShortName = "stats" | "count" ;
+type NumberLayerFullName = "Exceedence" | "Tweet Count" ;
+const polygonLayerFullNames: PolygonLayerFullName[] = ["Local Authority", "Coarse Grid", "Fine Grid"];
+const polygonLayerShortNames: PolygonLayerShortName[] = ["county", "coarse", "fine"];
+const numberLayerFullNames: NumberLayerFullName[] = ["Exceedence", "Tweet Count"];
+const numberLayerShortNames: NumberLayerShortName[] = ["stats", "count"];
+
 const regionDataKeys: string[] = ["stats", "count", "embed"];
 
-const MAX_TWEETS = 500;
+const MAX_TWEETS = 100;
 // These are provided as constants to reduce the chance of typos changing functionality
 const FEATURES = "features";
 const COUNT = "count";
@@ -62,6 +70,8 @@ class TimeSlice {
   tweets: string[];
 }
 
+const log = new Logger('map');
+
 @Component({
              selector:    'app-map',
              templateUrl: './map.component.html',
@@ -71,14 +81,14 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   /**
-   * A temporary field which holds new data that's come in from the server
+   * The unprocessed twitter data that's come in from the server
    * or null if the data has been processed.
    */
-  private _newData: TimeSlice[] | null = null;
+  private _rawTwitterData: TimeSlice[] | null = null;
   /**
    * This is the processed data from the server.
    *
-   * @see _newData for the unprocessed data.
+   * @see _rawTwitterData for the unprocessed data.
    */
   private _twitterData: ByRegionType<RegionData<any, number[], string[]>> = {
     county: {stats: {}, count: [], embed: []},
@@ -105,14 +115,14 @@ export class MapComponent implements OnInit, OnDestroy {
   private _polyLayersNameMap = {"Local Authority": "county", "Coarse Grid": "coarse", "Fine Grid": "fine"};
   private _numberLayersNameMap = {"Exceedence": "stats", "Tweet Count": "count"};
   private _basemapControl: BasemapControl = {"numbers": this._numberLayers, "polygon": this._polyLayers};
-  private _polygonData: ByRegionType<PolygonData> = {
+  private _polygonData: ByRegionType<PolygonData | geojson.GeoJsonObject> = {
     county: fgsData,
     coarse: coarseData,
     fine:   fineData
   };
-  public activeNumber: string = STATS;
-  public activePolys: string = COUNTY;
-  private _geojson = {};
+  public activeNumberLayerShortName: NumberLayerShortName = STATS;
+  public activePolyLayerShortName: PolygonLayerShortName = COUNTY;
+  private _geojson: { stats: GeoJSON, count: GeoJSON } = {stats: null, count: null};
   private _gridSizes: ByRegionType<string> = {county: COUNTY, coarse: "15", fine: "60"};
 
   private _dateMax = 0;
@@ -201,6 +211,11 @@ export class MapComponent implements OnInit, OnDestroy {
     center: latLng([53, -2])
   };
 
+  /**
+   * A flag that prevents more than one simultaneous update to the map.
+   */
+  private _updating: boolean;
+
 
   constructor(private _router: Router, private route: ActivatedRoute, private ngZone: NgZone,
               private _layerStyles: LayerStyleService,
@@ -213,7 +228,7 @@ export class MapComponent implements OnInit, OnDestroy {
     // Preload the cacheable stats files asynchronously
     // this gets called again in onMapReady()
     // But the values should be in the browser cache by then
-    this.loadStats().then(() => {console.log("Prefetched the stats files.")});
+    this.loadStats().then(() => {log.debug("Prefetched the stats files.")});
   }
 
   /**
@@ -221,14 +236,14 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param map
    */
   onMapReady(map: Map) {
-    console.log("onMapReady");
+    log.debug("onMapReady");
 
     this._map = map;
     this.loadStats()
         .then(() => this.init(map))
         .catch(err => {
           this._notify.show("Error while loading map data");
-          console.log(err);
+          log.debug(err);
         });
   }
 
@@ -236,7 +251,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
    */
   private loadStats(): Promise<any> {
-    console.log("loadStats()");
+    log.debug("loadStats()");
     return fetch("assets/data/county_stats.json")
       .then(response => response.json())
       .then(json => {
@@ -263,7 +278,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param params the parameter values to merge into the current URL.
    */
   updateSearch(params: Partial<Params>) {
-    console.log("updateSearch");
+    log.debug("updateSearch");
 
     // Merge the params to change into _newParams which holds the
     // next set of parameters to add to the URL state.
@@ -277,8 +292,8 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param params the new value for the query parameters.
    */
   private updateMapFromQueryParams(params: Params) {
-    console.log("updateMapFromQueryParams()");
-    console.log("Params:", params);
+    log.debug("updateMapFromQueryParams()");
+    log.debug("Params:", params);
     this._params = params;
     const {lng, lat, zoom, active_number, active_polygon, selected, min_offset, max_offset} = params;
 
@@ -317,13 +332,13 @@ export class MapComponent implements OnInit, OnDestroy {
     if (this._map) {
       for (let layer in this._numberLayers) {
         if (this._numberLayersNameMap[layer] !== numberLayerName) {
-          console.log("Removing " + layer);
+          log.debug("Removing " + layer);
           this._map.removeLayer(this._numberLayers[layer]);
         }
       }
       for (let layer in this._numberLayers) {
         if (this._numberLayersNameMap[layer] === numberLayerName) {
-          console.log("Adding " + layer);
+          log.debug("Adding " + layer);
           this._map.addLayer(this._numberLayers[layer]);
 
         }
@@ -335,23 +350,22 @@ export class MapComponent implements OnInit, OnDestroy {
     if (this._map) {
       for (let layer in this._polyLayers) {
         if (this._polyLayersNameMap[layer] !== polygonLayerName) {
-          console.log("Removing " + layer);
+          log.debug("Removing " + layer);
           this._map.removeLayer(this._polyLayers[layer]);
         }
       }
       for (let layer in this._polyLayers) {
         if (this._polyLayersNameMap[layer] === polygonLayerName) {
-          console.log("Adding " + layer);
+          log.debug("Adding " + layer);
           this._map.addLayer(this._polyLayers[layer]);
 
         }
       }
     }
-    this._twitterIsStale = true;
 
     // If a polygon (region) is selected update Twitter panel.
     if (typeof selected !== "undefined") {
-      this.updateTwitter();
+      this._twitterIsStale;
       this.showTweets();
     }
     // if (typeof min_offset !== "undefined" && typeof min_offset !== "undefined") {
@@ -364,7 +378,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * Loads the live data from S3 storage securely.
    */
   private async loadLiveData() {
-    console.log("loadLiveData");
+    log.debug("loadLiveData");
     return Storage.get("live.json")
                   .then((url: any) =>
                           fetch(url.toString())
@@ -378,7 +392,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param map the leaflet.js Map
    */
   private async init(map: Map) {
-    console.log("init");
+    log.debug("init");
 
 
     //Listeners to push map state into URL
@@ -403,45 +417,47 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
     // Set up the color functions for the legend
-    const newColorFunctions: ColorFunctions = {stats: {}, count: {}};
-    for (let key in this.colorData) {
-      newColorFunctions[key].getColor = getColor.bind(newColorFunctions[key], this.colorData[key].values,
-                                                      this.colorData[key].colors);
-      newColorFunctions[key].getFeatureStyle = getFeatureStyle.bind(newColorFunctions[key], this.colorData[key].values,
-                                                                    this.colorData[key].colors,
-                                                                    key);
+    const newColorFunctions: ColorFunctions = {stats: null, count: null};
+    for (let key of numberLayerShortNames) {
+      newColorFunctions[key] = {
+        getColor:        getColor.bind(newColorFunctions[key], this.colorData[key].values,
+                                       this.colorData[key].colors),
+        getFeatureStyle: getFeatureStyle.bind(newColorFunctions[key], this.colorData[key].values,
+                                              this.colorData[key].colors,
+                                              key)
+      };
     }
     //This assignment triggers the change to the legend
     this.colorFunctions = newColorFunctions;
 
     map.on('baselayerchange', (e: any) => {
-      console.log("New baselayer " + e.name);
+      log.debug("New baselayer " + e.name);
       if (e.name in this._basemapControl.polygon) {
-        this.activePolys = this._polyLayersNameMap[e.name];
-        this.updateSearch({active_polygon: this.activePolys, selected: null});
+        this.activePolyLayerShortName = this._polyLayersNameMap[e.name];
+        this.updateSearch({active_polygon: this.activePolyLayerShortName, selected: null});
         this.resetLayers(true);
       } else {
-        this.activeNumber = this._numberLayersNameMap[e.name];
-        this.updateSearch({active_number: this.activeNumber});
+        this.activeNumberLayerShortName = this._numberLayersNameMap[e.name];
+        this.updateSearch({active_number: this.activeNumberLayerShortName});
       }
     });
 
     this.setupCountStatsToggle();
 
     this._loggedIn = await Auth.currentAuthenticatedUser() != null;
+    this._searchParams.subscribe(params => this._params= params);
 
     //Initial data load
     await this.load();
 
-    //Every time the search parameters change, the map will be updated
-    this._searchParams.subscribe(params => this.updateMapFromQueryParams(params));
+    this.updateMapFromQueryParams(this._params);
 
     // Schedule periodic data loads from the server
     this._loadTimer = timer(60000, 60000).subscribe(() => this.load());
   }
 
   private setupCountStatsToggle() {
-    console.log("setupCountStatsToggle()");
+    log.debug("setupCountStatsToggle()");
     for (let key in this._basemapControl) {
       // noinspection JSUnfilteredForInLoop
       this._lcontrols[key] = control.layers(this._basemapControl[key], {}).addTo(this._map);
@@ -457,7 +473,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param e
    */
   featureEntered(e: LeafletMouseEvent) {
-    console.log("highlightFeature()");
+    log.debug("highlightFeature()");
     this._layerStyles.dohighlightFeature(e.target);
     const feature = e.target.feature;
     const exceedenceProbability: number = Math.round(feature.properties.stats * 100) / 100;
@@ -481,13 +497,13 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param props
    */
   updateTwitterPanel(props?: any) {
-    console.log("updateTwitterPanel()");
+    log.debug("updateTwitterPanel()");
     if (props.properties.count > 0) {
-      console.log("updateTwitterHeader()");
+      log.debug("updateTwitterHeader()");
       this.exceedenceProbability = Math.round(props.properties.stats * 100) / 100;
       this.selectedRegion = this.toTitleCase(props.properties.name);
       this.tweetCount = props.properties.count;
-      this.embeds = this._twitterData[this.activePolys].embed[props.properties.name];
+      this.embeds = this._twitterData[this.activePolyLayerShortName].embed[props.properties.name];
       this.twitterPanelHeader = true;
       this.showTwitterTimeline = true;
       // Hub.dispatch("twitter-panel",{message:"update",event:"update"});
@@ -503,8 +519,8 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param e
    */
   featureLeft(e: LeafletMouseEvent) {
-    console.log("featureLeft(" + this.activeNumber + ")");
-    this._geojson[this.activeNumber].resetStyle(e.target);
+    log.debug("featureLeft(" + this.activeNumberLayerShortName + ")");
+    this._geojson[this.activeNumberLayerShortName].resetStyle(e.target);
     if (this._clicked != "") {
       this._layerStyles.dohighlightFeature(this._clicked.target);
     }
@@ -515,8 +531,8 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param e
    */
   featureClicked(e: LeafletMouseEvent) {
-    console.log("featureClicked()");
-    console.log(e.target.feature.properties.name);
+    log.debug("featureClicked()");
+    log.debug(e.target.feature.properties.name);
     this.updateSearch({selected: e.target.feature.properties.name});
     this.updateTwitterPanel(e.target.feature);
     this._oldClicked = this._clicked;
@@ -538,13 +554,13 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   onEachFeature(feature: geojson.Feature<geojson.GeometryObject, any>, layer: Layer) {
-    console.log("onEachFeature()");
+    log.verbose("onEachFeature()");
 
     // If this feature is referenced in the URL query paramter selected
     // e.g. ?...&selected=powys
     // then highlight it and update Twitter
     if (feature.properties.name === this._params.selected) {
-      console.log("Matched " + feature.properties.name);
+      log.debug("Matched " + feature.properties.name);
 
       //Put the selection outline around the feature
       this._layerStyles.dohighlightFeature(layer);
@@ -571,12 +587,11 @@ export class MapComponent implements OnInit, OnDestroy {
     // of a flag and queued events. The throttling is acheived by the the periodicity of the
     // schedulers execution.
 
-    this._resetLayersTimer = timer(0, 50).subscribe(() => {
+    this._resetLayersTimer = timer(0, 100).subscribe(() => {
       if (this._layersAreStale) {
         try {
-          if (this._newData != null) {
-            this.updateData(this._newData);
-            this._newData = null;
+          if (this._rawTwitterData != null) {
+            this.updateData(this._rawTwitterData);
           }
           this.resetLayers(false);
           this._layersAreStale = false;
@@ -638,27 +653,30 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param clear_click clears the selected polygon
    */
   resetLayers(clear_click) {
-    console.log("resetLayers(" + clear_click + ")");
+    log.debug("resetLayers(" + clear_click + ")");
     this.ready = false
     this.hideTweets();
-    for (let key in this._basemapControl.numbers) {
-      console.log(key);
-      if (this._numberLayers[key] != null) {
+    for (let key of numberLayerFullNames) {
+      log.debug(key);
+      const layerGroup = this._numberLayers[key];
+      if (layerGroup != null) {
         // noinspection JSUnfilteredForInLoop
-        this._numberLayers[key].clearLayers();
+        layerGroup.clearLayers();
 
         // noinspection JSUnfilteredForInLoop
-        this._geojson[this._numberLayersNameMap[key]] = new GeoJSON(this._polygonData[this.activePolys], {
-          style:         (feature) => this.colorFunctions[this._numberLayersNameMap[key]].getFeatureStyle(feature),
-          onEachFeature: (f, l) => this.onEachFeature(f, l)
-        }).addTo(this._numberLayers[key]);
+        const shortNumberLayerName = this.shortNumberLayerName(key);
+        this._geojson[shortNumberLayerName] = new GeoJSON(
+          <geojson.GeoJsonObject>this._polygonData[this.activePolyLayerShortName], {
+            style:         (feature) => this.colorFunctions[shortNumberLayerName].getFeatureStyle(feature),
+            onEachFeature: (f, l) => this.onEachFeature(f, l)
+          }).addTo(layerGroup);
       } else {
-        console.log("Null layer " + key);
+        log.debug("Null layer " + key);
       }
       if (clear_click) {
-        console.log("resetLayers() clear_click");
+        log.debug("resetLayers() clear_click");
         if (this._clicked != "") {
-          this._geojson[this.activeNumber].resetStyle(this._clicked);
+          this._geojson[this.activeNumberLayerShortName].resetStyle(this._clicked.layer);
         }
         this._clicked = "";
         this._feature = null;
@@ -667,19 +685,23 @@ export class MapComponent implements OnInit, OnDestroy {
     this.ready = true;
   }
 
+  private shortNumberLayerName(key: NumberLayerFullName): NumberLayerShortName {
+    return <NumberLayerShortName>this._numberLayersNameMap[key];
+  }
+
   /**
    * Read the live.json data file and process contents.
    */
   async load() {
-    console.log("readData()");
+    log.debug("readData()");
     this.loading = true;
     try {
       if (await Auth.currentAuthenticatedUser() !== null) {
-        this._newData = await this.loadLiveData();
+        this._rawTwitterData = await this.loadLiveData();
         if (await Auth.currentAuthenticatedUser() !== null) {
-          console.log("Loading live data completed");
+          log.debug("Loading live data completed");
 
-          this.updateSliderFromData(this._newData);
+          this.updateSliderFromData(this._rawTwitterData);
 
           // Mark as stale to trigger a refresh
           this._twitterIsStale = true;
@@ -689,20 +711,18 @@ export class MapComponent implements OnInit, OnDestroy {
           this.ready = true;
           this.loading = false;
         } else {
-          console.log("User logged out since load started, not loading live data");
+          log.debug("User logged out since load started, not loading live data");
           this.ready = false;
           this.loading = false;
-          this._newData = null;
         }
       } else {
-        console.log("User logged out, not loading live data");
+        log.debug("User logged out, not loading live data");
       }
 
     } catch (e) {
-      console.log(e);
+      log.debug(e);
       this.loading = false;
       this.ready = false;
-      this._newData = null;
     }
 
   }
@@ -742,16 +762,29 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param tweetInfo the data from the server.
    */
   private updateData(tweetInfo: TimeSlice[]) {
-    console.log("update()")
-    console.log("Processing data");
+    log.debug("update()")
+    if (this._updating) {
+      log.debug("Update already running.")
+      return;
+    }
+    this._updating = true;
+
+    log.debug("Updating data");
     this._timeKeys = this.getTimes(tweetInfo);
+    // For performance reasons we need to do the
+    // next part without triggering Angular
+    try {
+      this.ngZone.runOutsideAngular(() => {
+        this.clearMapFeatures();
+        this.clearProcessedTweetData();
 
-    this.clearMapFeatures();
-    this.clearProcessedTweetData();
-
-    this.updateTweetsData(tweetInfo);
-    this.updateRegionData();
-    this._twitterIsStale = true;
+        this.updateTweetsData(tweetInfo);
+        this.updateRegionData();
+      });
+    } finally {
+      log.debug("update() end");
+      this._updating = false;
+    }
     // if (this._clicked != "") {
     //   this.updateTwitterHeader(this._clicked.target.feature);
     // }
@@ -763,8 +796,8 @@ export class MapComponent implements OnInit, OnDestroy {
   private clearProcessedTweetData() {
     for (const k in this._twitterData) {
       if (this._twitterData.hasOwnProperty(k)) {
-        for (const p in (this._twitterData)[k as RegionType]) {
-          (this._twitterData)[k as RegionType][p] = {};
+        for (const p in (this._twitterData)[k as PolygonLayerShortName]) {
+          (this._twitterData)[k as PolygonLayerShortName][p] = {};
         }
       }
     }
@@ -776,17 +809,17 @@ export class MapComponent implements OnInit, OnDestroy {
   private clearMapFeatures() {
     for (const regionType in this._twitterData) { //counties, coarse, fine
       if (this._twitterData.hasOwnProperty(regionType)) {
-        const features = (this._polygonData)[regionType as RegionType].features;
+        const features = (<PolygonData>this._polygonData[regionType as PolygonLayerShortName]).features;
         for (let i = 0; i < features.length; i++) {
           const properties = features[i].properties;
           const place = properties.name;
-          if (place in (this._twitterData)[regionType as RegionType].count) {
+          if (place in (this._twitterData)[regionType as PolygonLayerShortName].count) {
             properties[COUNT] = 0;
             properties[STATS] = 0;
           }
         }
       } else {
-        console.log("Skipping " + regionType)
+        log.debug("Skipping " + regionType)
       }
     }
   }
@@ -804,7 +837,7 @@ export class MapComponent implements OnInit, OnDestroy {
     for (const i in _timeKeys.slice(-_dateMax, -_dateMin)) { //all times
       var timeKey = (_timeKeys.slice(-_dateMax, -_dateMin))[i];
       for (const regionType in _twitterData) { //counties, coarse, fine
-        console.assert(regionTypes.includes(regionType as RegionType));
+        console.assert(polygonLayerShortNames.includes(regionType as PolygonLayerShortName));
         if (_twitterData.hasOwnProperty(regionType)) {
           const timeslicedData: TimeSlice = (tweetInfo)[timeKey];
           for (const place in timeslicedData[(_gridSizes)[regionType]]) { //all counties/boxes
@@ -826,11 +859,11 @@ export class MapComponent implements OnInit, OnDestroy {
                 }
               }
             } else {
-              console.log("Skipping " + place);
+              log.debug("Skipping " + place);
             }
           }
         } else {
-          console.log("Skipping " + regionType);
+          log.debug("Skipping " + regionType);
         }
       }
     }
@@ -844,13 +877,13 @@ export class MapComponent implements OnInit, OnDestroy {
     var tdiff = _timeKeys.slice(-_dateMax, -_dateMin).length / 1440;
     for (const regionType in _twitterData) { //counties, coarse, fine
       if (_twitterData.hasOwnProperty(regionType)) {
-        console.assert(regionTypes.includes(regionType as RegionType));
-        const regionData: PolygonData = (_polygonData)[regionType as RegionType];
+        console.assert(polygonLayerShortNames.includes(regionType as PolygonLayerShortName));
+        const regionData: PolygonData = <PolygonData>(_polygonData)[regionType as PolygonLayerShortName];
         const features: Feature[] = regionData.features;
         for (let i = 0; i < features.length; i++) {
           const featureProperties: Properties = features[i].properties;
           const place = featureProperties.name;
-          const tweetRegionInfo: RegionData<any, number[], string[]> = _twitterData[regionType as RegionType];
+          const tweetRegionInfo: RegionData<any, number[], string[]> = _twitterData[regionType as PolygonLayerShortName];
           if (place in tweetRegionInfo.count) {
             const wt = tweetRegionInfo.count[place];
             let stats_wt = 0;
@@ -878,7 +911,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * Update the date slider after a data update.
    */
   updateSliderFromData(data: TimeSlice[]) {
-    console.log("updateSliderFromData()");
+    log.debug("updateSliderFromData()");
     this._timeKeys = this.getTimes(data);
     this._dateMin = Math.max(this._dateMin, -(this._timeKeys.length - 1));
     this.sliderOptions = {
@@ -894,7 +927,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * Hides the tweet drawer/panel.
    */
   private hideTweets() {
-    console.log("hideTweets()");
+    log.debug("hideTweets()");
     this.tweetsVisible = false;
   }
 
@@ -902,7 +935,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * Reveals the tweet drawer/panel.
    */
   private showTweets() {
-    console.log("showTweets()");
+    log.debug("showTweets()");
     this.tweetsVisible = true;
   }
 
@@ -913,15 +946,24 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param range the user selected upper and lower date range.
    */
   public sliderChange(range: DateRange) {
-    console.log("sliderChange()");
     const {lower, upper} = range;
+    log.info("sliderChange(" + lower + "->" + upper + ")");
     this._dateMax = upper;
     this._dateMin = lower;
     this.updateSearch({min_offset: lower, max_offset: upper});
     // Triggers updates with the state flags
     this._layersAreStale = true;
-    this._twitterIsStale = true;
 
+
+  }
+
+  /**
+   * Triggered when the user has finished sliding the slider.
+   * @param $event
+   */
+  public sliderChangeOnEnd($event: any) {
+    log.debug("sliderChangeOnEnd()");
+    this._twitterIsStale = true;
   }
 
   /**
@@ -929,7 +971,7 @@ export class MapComponent implements OnInit, OnDestroy {
    *
    */
   private updateTwitter() {
-    console.log("updateTwitter()");
+    log.debug("updateTwitter()");
     if (!this.tweetsVisible) {
       this._clicked = "";
       this._feature = null;

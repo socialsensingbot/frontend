@@ -5,6 +5,8 @@ import {CognitoUser} from '@aws-amplify/auth';
 import {NotificationService} from 'src/app/services/notification.service';
 import {Router} from '@angular/router';
 import {environment} from 'src/environments/environment';
+import {Logger} from "aws-amplify";
+const log = new Logger('sign-in');
 
 @Component({
              selector:    'app-sign-in',
@@ -53,14 +55,14 @@ export class SignInComponent {
            * password. The following code detects that and sends them to the New Password
            * page.
            */
-          console.log(user.challengeName);
+          log.debug(user.challengeName);
           if (user.challengeName === 'NEW_PASSWORD_REQUIRED') {
             this._router.navigate(['auth/newpass'],{queryParamsHandling:"merge",state:{
               message:"Please Change your Temporary Password"
               }});
             return;
           } else {
-            console.log(user.challengeName);// other situations
+            log.debug(user.challengeName);// other situations
             this._router.navigate(['/map'],{queryParamsHandling:"merge"});
           }
         })

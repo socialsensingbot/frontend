@@ -1,6 +1,8 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {LabelType, Options} from "ng5-slider";
 import {Subscription, timer} from "rxjs";
+import {Logger} from "aws-amplify";
+const log = new Logger('date-range');
 
 @Component({
              selector:    'date-range-slider',
@@ -14,6 +16,8 @@ import {Subscription, timer} from "rxjs";
  */
 export class DateRangeSliderComponent implements OnInit, OnDestroy {
 
+
+  @Output() public onEnd= new EventEmitter<any>()
 
   /**
    * Time series data, keyed by one minute interval.
@@ -50,11 +54,11 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
   public set upperValue(value: number) {
 
     if (typeof value === "undefined") {
-      console.log("Undefined upper value");
+      log.debug("Undefined upper value");
     }
     this._upperValue = value;
     if (typeof this.timeKeyedData !== "undefined") {
-      console.log(value);
+      log.debug(value);
       this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));    }
   }
 
@@ -70,11 +74,11 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
   public set lowerValue(value: number) {
 
     if (typeof value === "undefined") {
-      console.log("Undefined lower value");
+      log.debug("Undefined lower value");
     }
     this._lowerValue = value;
     if (typeof this.timeKeyedData !== "undefined") {
-      console.log(value);
+      log.debug(value);
       this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
     }
   }
@@ -124,6 +128,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
    * These are the options for *this* component, not the ng5-slider.
    */
   private _options: DateRangeSliderOptions;
+
 
   constructor() {
 

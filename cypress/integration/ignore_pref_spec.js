@@ -15,7 +15,7 @@ describe('Ignore tweets: ', function () {
         }
         cy.get(secondTweet + " mat-icon").should("be.visible").click({force: true});
         cy.get(menu2ndOpt).then(el => {
-          console.log("'" + el.text() + "'")
+          log.debug("'" + el.text() + "'")
           if (el.text().trim() === "Ignore Tweet") {
             cy.get(menu2ndOpt).click();
             cy.get(secondTweet + " mat-expansion-panel mat-panel-title", {timeout: 30000}).should('be.visible').click();
