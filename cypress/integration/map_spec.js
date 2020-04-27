@@ -2,6 +2,7 @@ describe('Map: ', function () {
   // Step 1: setup the application state
   beforeEach(function () {
     cy.visit('http://localhost:4200/map');
+    cy.stubLiveJson("live-old");
     cy.login();
   });
 
@@ -15,7 +16,9 @@ describe('Map: ', function () {
     });
 
     it('with a tooltip', () => {
-      cy.get('body > app-root > div > div > app-map > mat-sidenav-container > mat-sidenav-content > div.map-surround > div > div.leaflet-pane.leaflet-map-pane > div.leaflet-pane.leaflet-overlay-pane > svg > g > path:nth-child(174)',{timeout:60000}).trigger("mouseover",{force:true});
+      cy.get(
+        'body > app-root > div > div > app-map > mat-sidenav-container > mat-sidenav-content > div.map-surround > div > div.leaflet-pane.leaflet-map-pane > div.leaflet-pane.leaflet-overlay-pane > svg > g > path:nth-child(174)',
+        {timeout: 60000}).trigger("mouseover", {force: true});
       cy.get(".leaflet-tooltip-pane").get("div");
       // cy.get('.leaflet-interactive:nth-child(174)').click();
 

@@ -1,5 +1,7 @@
 describe('URL State: ', function () {
-
+  beforeEach(()=> {
+    cy.stubLiveJson("live-old");
+  })
   describe('select county', () => {
     const url = "http://localhost:4200/map?selected=powys";
     it('when unauthorized and load state', () => {

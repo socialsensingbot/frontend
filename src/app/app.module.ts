@@ -29,6 +29,7 @@ import {Ng5SliderModule} from "ng5-slider";
 import { LegendComponent } from './map/legend/legend.component';
 import {NewPassComponent} from "./auth/new-pass/new-pass.component";
 import {HttpClientModule} from "@angular/common/http";
+import {NgEventBus} from "ng-event-bus";
 @NgModule({
             declarations: [
               AppComponent,
@@ -69,7 +70,7 @@ import {HttpClientModule} from "@angular/common/http";
                                         Interactions
                                       });
               }
-            },AuthService],
+            },AuthService,NgEventBus],
             bootstrap:    [AppComponent],
             entryComponents: [CountryCodeSelectComponent]
           },)

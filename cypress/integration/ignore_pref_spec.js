@@ -1,5 +1,7 @@
 describe('Ignore tweets: ', function () {
-
+  beforeEach(()=> {
+    cy.stubLiveJson("live-old");
+  })
   describe('ignore tweet', () => {
     const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
     const test = () => {
