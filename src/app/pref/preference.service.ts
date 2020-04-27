@@ -30,7 +30,7 @@ export class PreferenceService {
         log.debug("Resolved username " + this._userInfo.username);
         resolve(this._userInfo.username)
       } else {
-        log.debug("Waiting for username.");
+        log.verbose("Waiting for username.");
         setTimeout(loop, 100);
       }
     };

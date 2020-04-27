@@ -26,6 +26,7 @@ import {Feature, PolygonData, Properties} from "./types";
 import {Hub} from "@aws-amplify/core";
 import {AuthService} from "../auth/auth.service";
 import {environment} from "../../environments/environment";
+import {HttpClient} from "@angular/common/http";
 
 type MapLayers = { "Local Authority": any, "Coarse Grid": any, "Fine Grid": any };
 type NumberLayers = { "Exceedence": any, "Tweet Count": any }
@@ -129,7 +130,7 @@ export class MapComponent implements OnInit, OnDestroy {
   private _dateMin = -24 * 60 + 1;
   private _oldClicked: (LeafletMouseEvent | "") = "";
   private _clicked: (LeafletMouseEvent | "") = "";
-  private _timeKeys: any; //The times in the input JSON
+  public timeKeyedData: any; //The times in the input JSON
   private _lcontrols: { numbers: Control.Layers, polygon: Control.Layers } = {numbers: null, polygon: null};
 
   private _B: number = 1407;//countyStats["cambridgeshire"].length; //number of stats days
@@ -220,7 +221,8 @@ export class MapComponent implements OnInit, OnDestroy {
   constructor(private _router: Router, private route: ActivatedRoute, private ngZone: NgZone,
               private _layerStyles: LayerStyleService,
               private _notify: NotificationService,
-              private _auth: AuthService
+              private _auth: AuthService,
+              private _http: HttpClient
   ) {
     //save the query parameter observable
     this._searchParams = this.route.queryParams;
@@ -377,12 +379,10 @@ export class MapComponent implements OnInit, OnDestroy {
   /**
    * Loads the live data from S3 storage securely.
    */
-  private async loadLiveData() {
+  private async loadLiveData():Promise<TimeSlice[]> {
     log.debug("loadLiveData");
-    return Storage.get("live.json")
-                  .then((url: any) =>
-                          fetch(url.toString())
-                            .then(response => response.json()));
+    return <Promise<TimeSlice[]>>Storage.get("live.json")
+                  .then((url: any) => this._http.get(url.toString(), {observe: "body", responseType: "json"}).toPromise());
   }
 
 
@@ -445,7 +445,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.setupCountStatsToggle();
 
     this._loggedIn = await Auth.currentAuthenticatedUser() != null;
-    this._searchParams.subscribe(params => this._params= params);
+    this._searchParams.subscribe(params => this._params = params);
 
     //Initial data load
     await this.load();
@@ -770,7 +770,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this._updating = true;
 
     log.debug("Updating data");
-    this._timeKeys = this.getTimes(tweetInfo);
+    this.timeKeyedData = this.getTimes(tweetInfo);
     // For performance reasons we need to do the
     // next part without triggering Angular
     try {
@@ -832,10 +832,10 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   private updateTweetsData(tweetInfo: TimeSlice[]) {
 
-    const {_dateMin, _dateMax, _gridSizes, _twitterData, _timeKeys} = this;
+    const {_dateMin, _dateMax, _gridSizes, _twitterData, timeKeyedData} = this;
 
-    for (const i in _timeKeys.slice(-_dateMax, -_dateMin)) { //all times
-      var timeKey = (_timeKeys.slice(-_dateMax, -_dateMin))[i];
+    for (const i in timeKeyedData.slice(-_dateMax, -_dateMin)) { //all times
+      var timeKey = (timeKeyedData.slice(-_dateMax, -_dateMin))[i];
       for (const regionType in _twitterData) { //counties, coarse, fine
         console.assert(polygonLayerShortNames.includes(regionType as PolygonLayerShortName));
         if (_twitterData.hasOwnProperty(regionType)) {
@@ -873,8 +873,8 @@ export class MapComponent implements OnInit, OnDestroy {
    * Updates the data stored in the polygon data of the leaflet layers.
    */
   private updateRegionData() {
-    const {_stats, _dateMin, _polygonData, _dateMax, _B, _twitterData, _timeKeys} = this;
-    var tdiff = _timeKeys.slice(-_dateMax, -_dateMin).length / 1440;
+    const {_stats, _dateMin, _polygonData, _dateMax, _B, _twitterData, timeKeyedData} = this;
+    var tdiff = timeKeyedData.slice(-_dateMax, -_dateMin).length / 1440;
     for (const regionType in _twitterData) { //counties, coarse, fine
       if (_twitterData.hasOwnProperty(regionType)) {
         console.assert(polygonLayerShortNames.includes(regionType as PolygonLayerShortName));
@@ -912,11 +912,12 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   updateSliderFromData(data: TimeSlice[]) {
     log.debug("updateSliderFromData()");
-    this._timeKeys = this.getTimes(data);
-    this._dateMin = Math.max(this._dateMin, -(this._timeKeys.length - 1));
+    this.timeKeyedData = this.getTimes(data);
+    log.info("Latest data is dated at: " + this.timeKeyedData[this.timeKeyedData.length - 1])
+    this._dateMin = Math.max(this._dateMin, -(this.timeKeyedData.length - 1));
     this.sliderOptions = {
       max:      0,
-      min:      -this._timeKeys.length + 1,
+      min:      -this.timeKeyedData.length + 1,
       startMin: this._dateMin,
       startMax: this._dateMax
     };

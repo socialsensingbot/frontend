@@ -52,6 +52,31 @@ Cypress.Commands.add("twitterPanelHeader", (text) => {
 });
 Cypress.Commands.add("twitterPanelVisible", () => {
   cy.get(".tweet-drawer", {timeout: 60000}).should("be.visible");
-});Cypress.Commands.add("twitterPanelNotVisible", () => {
+});
+
+Cypress.Commands.add("twitterPanelNotVisible", () => {
   cy.get(".tweet-drawer", {timeout: 60000}).should("not.be.visible");
+});
+Cypress.Commands.add("stubLiveJson", (file) => {
+  // Alternatively you can use CommonJS syntax:
+// require('./commands')
+// sets up cy.server, so cypress knows to
+// prepare network responses
+  cy.server();
+// this is where we tell cypress to intercept
+// certain XHR calls,
+// and to stub in our fixture instead
+  cy.route({
+             // our example is a GET call, but you could also
+             // have a POST, if you're pushing data up
+             method: "GET",
+             // more on the URL below
+             url: /.*\/public\/live.json?.*/g,
+             // the fixture: shortcut will know to
+             // look in cypress/fixtures,
+             // unless you configure cypress to
+             // put it somewhere else
+             response: "fixture:"+file+".json"
+           });
+
 });
