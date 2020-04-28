@@ -6,6 +6,8 @@ import { CountryCode } from '../country-code-select/country-codes';
 import { AuthService } from '../auth.service';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
+import {Logger} from "aws-amplify";
+const log = new Logger('sign-up');
 
 @Component({
   selector: 'app-sign-up',
@@ -85,7 +87,7 @@ export class SignUpComponent implements OnInit {
       environment.confirm.password = this.passwordInput.value;
       this._router.navigate(['auth/confirm'],{queryParamsHandling:"merge"});
     })
-    .catch((error) => console.log(error));
+    .catch((error) => log.debug(error));
   }
 
 }

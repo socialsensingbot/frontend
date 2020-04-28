@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {API, graphqlOperation} from "aws-amplify";
+import {API, graphqlOperation, Logger} from "aws-amplify";
 import {
   getTweetIgnore,
   getTweetIrrelevant,
@@ -16,7 +16,7 @@ import {
 import {GetUserPreferencesQuery} from "../API.service";
 import {NotificationService} from "../services/notification.service";
 import {BehaviorSubject, Observable} from "rxjs";
-
+const log = new Logger('pref-service');
 
 @Injectable({
               providedIn: 'root'
@@ -27,10 +27,10 @@ export class PreferenceService {
   private _username: Promise<string> = new Promise<string>((resolve) => {
     const loop = () => {
       if (this._userInfo != null) {
-        console.log("Resolved username " + this._userInfo.username);
+        log.debug("Resolved username " + this._userInfo.username);
         resolve(this._userInfo.username)
       } else {
-        console.log("Waiting for username.");
+        log.verbose("Waiting for username.");
         setTimeout(loop, 100);
       }
     };
@@ -44,30 +44,30 @@ export class PreferenceService {
 
   public async init(userInfo: any) {
     this._userInfo = userInfo;
-    console.log("** Preference Service Initializing **");
-    console.log(userInfo);
+    log.debug("** Preference Service Initializing **");
+    log.debug(userInfo);
     try {
       const data: GetUserPreferencesQuery = await this.getUserPref(userInfo);
       if (!data) {
-        console.log("No existing preferences.");
+        log.debug("No existing preferences.");
         const newProfile = {
           input: {
             id: userInfo.username
           }
         };
         await API.graphql(graphqlOperation(createUserPreferences, newProfile));
-        console.log("Created new preferences.");
+        log.debug("Created new preferences.");
         this._preferences = (await this.getUserPref(userInfo)).getUserPreferences;
       } else {
-        console.log("Existing preferences.");
+        log.debug("Existing preferences.");
         this._preferences = data.getUserPreferences;
 
       }
-      console.log(this._preferences);
+      log.debug(this._preferences);
       this.readBlacklist();
-      console.log("** Preference Service Initialized **");
+      log.debug("** Preference Service Initialized **");
     } catch (e) {
-      console.log("** Preferences Service Failed to Initialize **");
+      log.debug("** Preferences Service Failed to Initialize **");
       console.error(e);
     }
   }
@@ -93,15 +93,15 @@ export class PreferenceService {
     if (result3.data.listTwitterUserIgnores) {
       this._twitterUserBlackList.push(...result3.data.listTwitterUserIgnores.items.map(i => i.twitterScreenName));
     }
-    console.log(this._tweetBlackList);
-    console.log(this._twitterUserBlackList);
+    log.debug(this._tweetBlackList);
+    log.debug(this._twitterUserBlackList);
 
   }
 
   private async getUserPref(userInfo: any): Promise<GetUserPreferencesQuery> {
     const result = await API.graphql(graphqlOperation(getUserPreferences, {id: userInfo.username}));
-    console.log("Retrieved preferences.");
-    console.log(result);
+    log.debug("Retrieved preferences.");
+    log.debug(result);
     return result.data;
   }
 
@@ -117,7 +117,7 @@ export class PreferenceService {
     }
     const id = (await this._username) + ":" + parsed.sender;
     const result = await API.graphql(graphqlOperation(getTwitterUserIgnore, {id}));
-    console.log(result);
+    log.debug(result);
     if (!result.data.getTwitterUserIgnore) {
       const result = await API.graphql(graphqlOperation(createTwitterUserIgnore, {
         input: {
@@ -146,7 +146,7 @@ export class PreferenceService {
 
     const id = (await this._username) + ":" + parsed.tweet;
     const result = await API.graphql(graphqlOperation(getTweetIgnore, {id}));
-    console.log(result);
+    log.debug(result);
     if (!result.data.getTweetIgnore) {
       const result = await API.graphql(graphqlOperation(createTweetIgnore, {
         input: {
@@ -171,7 +171,7 @@ export class PreferenceService {
 
     const id = (await this._username) + ":" + parsed.tweet;
     const result = await API.graphql(graphqlOperation(getTweetIrrelevant, {id}));
-    console.log(result);
+    log.debug(result);
     if (!result.data.getTweetIrrelevant) {
       const result = await API.graphql(graphqlOperation(createTweetIrrelevant, {
         input: {
@@ -190,7 +190,7 @@ export class PreferenceService {
   public parseTweet(blockquote: string) : {tweet:string, sender: string, url: string} | null {
     //https://twitter.com/crickhowellhs/status/1051548078199717888?ref_src=twsrc%5Etfw%7Ctwcamp%5Etweetembed%7Ctwterm%5E1051548078199717888&ref_url=http%3A%2F%2Flocalhost%3A4200%2Fmap%3Fselected%3Dpowys%26min_offset%3D-3119%26max_offset%3D0
 
-    // console.log(tweetURL);
+    // log.debug(tweetURL);
     const regex = /.*<a href="https:\/\/twitter.com\/(\w+)\/status\/(\d+).*">.*<\/a><\/blockquote>/;
     const matched = blockquote.match(regex);
     if (matched == null) {
@@ -230,7 +230,7 @@ export class PreferenceService {
     this._twitterUserBlackList = this._twitterUserBlackList.filter(i => i !== parsed.sender);
     const id = (await this._username) + ":" + parsed.sender;
     const result = await API.graphql(graphqlOperation(getTwitterUserIgnore, {id}));
-    console.log(result);
+    log.debug(result);
     if (result.data.getTwitterUserIgnore) {
       const result = await API.graphql(graphqlOperation(deleteTwitterUserIgnore, {input: {id}}));
     } else {
@@ -248,10 +248,10 @@ export class PreferenceService {
     const id = (await this._username) + ":" + parsed.tweet;
     this._tweetBlackList = this._tweetBlackList.filter(i => i !== parsed.tweet);
     const result = await API.graphql(graphqlOperation(getTweetIgnore, {id}));
-    console.log(result);
+    log.debug(result);
     if (result.data.getTweetIgnore) {
       const result = await API.graphql(graphqlOperation(deleteTweetIgnore, {input: {id}}));
-      console.log(result);
+      log.debug(result);
     } else {
       this._notification.show("Not ignoring " + parsed.tweet);
     }

@@ -3,6 +3,7 @@ import Auth, {CognitoHostedUIIdentityProvider} from '@aws-amplify/auth';
 import {Hub, ICredentials} from '@aws-amplify/core';
 import {Subject, Observable} from 'rxjs';
 import {CognitoUser} from 'amazon-cognito-identity-js';
+import {Logger} from "aws-amplify";
 
 export interface NewUser {
   email: string,
@@ -10,6 +11,7 @@ export interface NewUser {
   firstName: string,
   lastName: string
 }
+const log = new Logger('auth');
 
 /**
  * A support service for managing authentication. Wraps the Amplify Auth.xxx requests.
@@ -65,10 +67,10 @@ export class AuthService {
                .then(() => this.loggedIn = false)
   }
   public completeNewPassword(password: any): Promise<any> {
-    console.log("completeNewPassword()");
+    log.debug("completeNewPassword()");
     return new Promise((resolve, reject) => {
 
-                                        console.log("completeNewPassword() authState");
+                                        log.debug("completeNewPassword() authState");
                                         Auth.completeNewPassword(this._user, password,       /* the new password*/ {}).then(user => {
                                           this.loggedIn = true;
                                           resolve(user);

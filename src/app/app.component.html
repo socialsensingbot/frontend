@@ -5,10 +5,10 @@
        <mat-icon>home</mat-icon>
        Home
      </button>
-     <button mat-menu-item routerLink="/map">
-       <mat-icon>map</mat-icon>
-       Map
-     </button>
+<!--     <button mat-menu-item routerLink="/map">-->
+<!--       <mat-icon>map</mat-icon>-->
+<!--       Map-->
+<!--     </button>-->
      <button mat-menu-item routerLink="/login" *ngIf="!isAuthenticated">
        <mat-icon>power_settings_new</mat-icon>
        Login
@@ -25,9 +25,10 @@
 
   <mat-toolbar color="primary" class="expanded-toolbar">
     <span>
-      <button mat-button routerLink="/">{{title}}</button>
-      <button mat-button routerLink="/"><mat-icon>home</mat-icon></button>
+      <button class="logo-button" mat-button routerLink="/"><img src="/assets/icon-white/Icon24@2x.png"/> SOCIAL SENSING</button>
+<!--      <button mat-button routerLink="/"><mat-icon>home</mat-icon></button>-->
     </span>
+    <span class="menu-spacer">&nbsp;</span>
     <div id="login" fxLayout="row" fxShow="false" fxShow.gt-sm>
       <button mat-button routerLink="/auth/signin" *ngIf="!isAuthenticated">
         <mat-icon>power_settings_new</mat-icon>
@@ -67,13 +68,3 @@
 
 
 </div>
-
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * The content above * * * * * * * * * * * -->
-<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * -->
-<!-- * * * * * * * * * * and can be replaced. * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * End of Placeholder * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-
-

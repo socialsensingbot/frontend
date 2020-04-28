@@ -1,5 +1,7 @@
 describe('Ignore tweets: ', function () {
-
+  beforeEach(()=> {
+    cy.stubLiveJson("live-old");
+  })
   describe('ignore tweet', () => {
     const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
     const test = () => {
@@ -15,7 +17,7 @@ describe('Ignore tweets: ', function () {
         }
         cy.get(secondTweet + " mat-icon").should("be.visible").click({force: true});
         cy.get(menu2ndOpt).then(el => {
-          console.log("'" + el.text() + "'")
+          console.debug("'" + el.text() + "'")
           if (el.text().trim() === "Ignore Tweet") {
             cy.get(menu2ndOpt).click();
             cy.get(secondTweet + " mat-expansion-panel mat-panel-title", {timeout: 30000}).should('be.visible').click();

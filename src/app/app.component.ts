@@ -1,11 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {AmplifyService} from 'aws-amplify-angular';
 import {AuthService} from "./auth/auth.service";
-import {API, Auth, graphqlOperation} from "aws-amplify";
+import {API, Auth, graphqlOperation, Logger} from "aws-amplify";
 import {NavigationEnd, NavigationExtras, NavigationStart, Router} from "@angular/router";
 import {environment} from "../environments/environment";
 import {PreferenceService} from "./pref/preference.service";
 import {filter, map} from "rxjs/operators";
+const log = new Logger('app');
 
 @Component({
              selector:    'app-root',
@@ -26,7 +27,7 @@ export class AppComponent  {
     Auth.currentAuthenticatedUser({bypassCache: true})
         .then(user => this.isAuthenticated = (user != null))
         .then(() => this.checkSession())
-        .catch(err => console.log(err));
+        .catch(err => log.debug(err));
     auth.authState.subscribe((event: string) => {
       if (event === AuthService.SIGN_IN) {
         this.isAuthenticated = true;
@@ -44,12 +45,12 @@ export class AppComponent  {
   }
 
   async checkSession() {
-    console.log("checkSession()");
+    log.debug("checkSession()");
     if (!this.isAuthenticated) {
-      console.log("Not authenticated");
+      log.debug("Not authenticated");
       return;
     }
-    console.log("Authenticated");
+    log.debug("Authenticated");
     try {
       const userInfo = await Auth.currentUserInfo();
       if (userInfo) {
@@ -72,7 +73,7 @@ export class AppComponent  {
     this.isAuthenticated = false;
     Auth.signOut()
         .then(data => this._router.navigate(['/'], {queryParamsHandling: "merge"}))
-        .catch(err => console.log(err));
+        .catch(err => log.debug(err));
 
 
   }
@@ -86,7 +87,7 @@ export class AppComponent  {
   //         }
   //
   //         const params = routeEvent.url.split('?')[1];
-  //         console.log(routeEvent.url);
+  //         log.debug(routeEvent.url);
   //
   //         if (params) {
   //           routeParams = params;

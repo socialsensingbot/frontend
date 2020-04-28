@@ -1,4 +1,4 @@
-
+import * as geojson from "geojson";
   export interface Properties {
     name: string;
     count: number;
@@ -16,8 +16,8 @@
     type: string;
   }
 
-  export interface PolygonData {
-    type: string;
+  export interface PolygonData extends geojson.GeoJsonObject {
+    // type: string;
     features: Feature[];
   }
 

@@ -2,6 +2,8 @@ import {Injectable} from '@angular/core';
 import {CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router} from '@angular/router';
 import {Observable} from 'rxjs';
 import Auth from '@aws-amplify/auth';
+import {Logger} from "aws-amplify";
+const log = new Logger('auth-guard');
 
 /**
  * THe AuthGuard prevents access to routes without prior authentication. If the user
@@ -21,7 +23,7 @@ export class AuthGuard implements CanActivate {
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     return Auth.currentAuthenticatedUser().then(() => { return true; })
                .catch(() => {
-                 console.log("Routing with preserved params ");
+                 log.debug("Routing with preserved params ");
                  // The following is a fix for this really infuriating issue in Angular
                  // https://github.com/angular/angular/issues/12664
                  // Basically Angular loses the query paremeters such that the usual
