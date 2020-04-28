@@ -1,5 +1,5 @@
 <mat-card class="legend-card" *ngIf="values.length > 0 && this.getColor">
-  <mat-card-title>{{activeNumber == "count" ? "Tweet Count" : "Exceedence"}}</mat-card-title>
+  <mat-card-title>{{activeNumber == "count" ? "Tweet Count" : "Exceedance"}}</mat-card-title>
   <div class="legend-inner">
     <span *ngFor="let value of values; let i = index">
     <i [style.background]="getColor(value)"></i> {{value}}{{(values[i+1] ? '&ndash;' + values[i+1] : '&ndash;0')}}

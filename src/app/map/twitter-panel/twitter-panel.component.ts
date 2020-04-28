@@ -74,7 +74,7 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
   @ViewChild("tinfoEmbeds", {read: ElementRef, static: false}) tinfoEmbeds: ElementRef;
   @Input() count: number;
   @Input() region: string;
-  @Input() exceedenceProbability: string;
+  @Input() exceedanceProbability: string;
   private _embeds: string;
   public tweets: string[];
   public hidden: boolean[] = [];
