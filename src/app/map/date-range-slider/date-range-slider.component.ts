@@ -24,7 +24,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
   public set timeKeyedData(value: any) {
     log.debug("Received new time-keyed data")
     this._timeKeyedData = value;
-    this.manualRefresh.emit();
+    this.refresh.emit();
   }
 
 
@@ -105,7 +105,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
   private _upperValue: number = 0;
 
   /** Used to trigger manual refresh of the labels */
-  public   manualRefresh: EventEmitter<void> = new EventEmitter<void>();
+  public   refresh: EventEmitter<void> = new EventEmitter<void>();
 
   /**
    * These are the options for the ng5-slider

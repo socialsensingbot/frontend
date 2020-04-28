@@ -5,7 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "hmr": "ng serve --configuration hmr",
-    "build": "ng build --verbose --progress",
+    "build": "ng build --verbose --aot",
+    "build-prod": "ng build --verbose --prod",
     "test": "ng test",
     "lint": "ng lint"
   },

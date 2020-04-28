@@ -1,4 +1,7 @@
 version: 0.1
+env:
+  variables:
+    NODE_OPTIONS: --max-old-space-size=2048
 backend:
   phases:
     build:
@@ -13,7 +16,7 @@ frontend:
         - mkdir -p dist/frontend
     build:
       commands:
-        - npm run build
+        - if [ "${AWS_BRANCH}" = "master" ]; then  npm run-script build-prod; else npm run-script build ; fi
   artifacts:
     baseDirectory: dist/frontend
     files:
