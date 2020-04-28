@@ -4,6 +4,7 @@ import {coarseData} from './coarse_bi';
 import {fineData} from './fine_bi';
 import {Auth, Logger, Storage} from 'aws-amplify';
 import {
+  Browser,
   control,
   Control,
   GeoJSON,
@@ -23,9 +24,7 @@ import {DateRange, DateRangeSliderOptions} from "./date-range-slider/date-range-
 import {getColor, getFeatureStyle, LayerStyleService} from "./services/layer-style.service";
 import {NotificationService} from "../services/notification.service";
 import {Feature, PolygonData, Properties} from "./types";
-import {Hub} from "@aws-amplify/core";
 import {AuthService} from "../auth/auth.service";
-import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 
 type MapLayers = { "Local Authority": any, "Coarse Grid": any, "Fine Grid": any };
@@ -379,10 +378,12 @@ export class MapComponent implements OnInit, OnDestroy {
   /**
    * Loads the live data from S3 storage securely.
    */
-  private async loadLiveData():Promise<TimeSlice[]> {
-    log.debug("loadLiveData");
+  private async loadLiveData(): Promise<TimeSlice[]> {
+    log.debug("loadLiveData()");
     return <Promise<TimeSlice[]>>Storage.get("live.json")
-                  .then((url: any) => this._http.get(url.toString(), {observe: "body", responseType: "json"}).toPromise());
+                                        .then((url: any) => this._http.get(url.toString(),
+                                                                           {observe: "body", responseType: "json"})
+                                                                .toPromise());
   }
 
 
@@ -473,12 +474,13 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param e
    */
   featureEntered(e: LeafletMouseEvent) {
-    log.debug("highlightFeature()");
-    this._layerStyles.dohighlightFeature(e.target);
+    log.debug("featureEntered()");
     const feature = e.target.feature;
     const exceedenceProbability: number = Math.round(feature.properties.stats * 100) / 100;
     const region: string = this.toTitleCase(feature.properties.name);
     const count: number = feature.properties.count;
+    this.highlight(e,1);
+
     let text = "" +
       `<div>Region: ${region}</div>`;
     if (count > 0) {
@@ -490,6 +492,23 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     e.target.bindTooltip(text).openTooltip();
+  }
+
+  private highlight(e: LeafletMouseEvent, weight: number = 3) {
+    const feature = e.target.feature;
+    const count: number = feature.properties.count;
+    e.target.setStyle({
+                        stroke:      true,
+                        weight,
+                        color:       '#EA1E63',
+                        dashArray:   '',
+                        fillOpacity: count > 0 ? 1.0 : 0.0,
+                        fill:        count > 0
+                      });
+
+    if (!Browser.ie && !Browser.opera && !Browser.edge) {
+      e.target.bringToFront();
+    }
   }
 
   /**
@@ -520,9 +539,9 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   featureLeft(e: LeafletMouseEvent) {
     log.debug("featureLeft(" + this.activeNumberLayerShortName + ")");
-    this._geojson[this.activeNumberLayerShortName].resetStyle(e.target);
+    this._geojson[this.activeNumberLayerShortName].resetStyle(e.propagatedFrom);
     if (this._clicked != "") {
-      this._layerStyles.dohighlightFeature(this._clicked.target);
+      this.highlight(this._clicked);
     }
   }
 
@@ -537,7 +556,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.updateTwitterPanel(e.target.feature);
     this._oldClicked = this._clicked;
     this._clicked = e;
-    this._layerStyles.dohighlightFeature(e.target);
+    this.highlight(e,3);
     if (this._oldClicked != "") {
       this.featureLeft(this._oldClicked);
     }
@@ -553,7 +572,7 @@ export class MapComponent implements OnInit, OnDestroy {
     return str.replace(/\S+/g, str => str.charAt(0).toUpperCase() + str.substr(1).toLowerCase());
   }
 
-  onEachFeature(feature: geojson.Feature<geojson.GeometryObject, any>, layer: Layer) {
+  onEachFeature(feature: geojson.Feature<geojson.GeometryObject, any>, layer: GeoJSON) {
     log.verbose("onEachFeature()");
 
     // If this feature is referenced in the URL query paramter selected
@@ -563,7 +582,17 @@ export class MapComponent implements OnInit, OnDestroy {
       log.debug("Matched " + feature.properties.name);
 
       //Put the selection outline around the feature
-      this._layerStyles.dohighlightFeature(layer);
+      layer.setStyle({
+                       stroke:      true,
+                       weight:      3,
+                       color:       '#ea1e63',
+                       dashArray:   '',
+                       fillOpacity: feature.properties.count > 0 ? 1.0 : 0.0
+                     });
+
+      if (!Browser.ie && !Browser.opera && !Browser.edge) {
+        layer.bringToFront();
+      }
 
       //Update the Twitter panel with the changes
       this._feature = feature;
@@ -668,7 +697,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this._geojson[shortNumberLayerName] = new GeoJSON(
           <geojson.GeoJsonObject>this._polygonData[this.activePolyLayerShortName], {
             style:         (feature) => this.colorFunctions[shortNumberLayerName].getFeatureStyle(feature),
-            onEachFeature: (f, l) => this.onEachFeature(f, l)
+            onEachFeature: (f, l) => this.onEachFeature(f, <GeoJSON>l)
           }).addTo(layerGroup);
       } else {
         log.debug("Null layer " + key);

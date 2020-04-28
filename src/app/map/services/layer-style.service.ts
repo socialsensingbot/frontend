@@ -7,26 +7,6 @@ import {Browser} from "leaflet";
 export class LayerStyleService {
 
   constructor() { }
-
-
- dohighlightFeature(layer){
-    layer.setStyle({
-                     weight: 3,
-                     color: '#ea1e63',
-                     dashArray: '',
-                     fillOpacity: 1.0
-                   });
-
-    if (!Browser.ie && !Browser.opera && !Browser.edge) {
-      layer.bringToFront();
-    }
-
-  }
-
-
-
-
-
 }
 
 export function getColor(values, colors, d){
