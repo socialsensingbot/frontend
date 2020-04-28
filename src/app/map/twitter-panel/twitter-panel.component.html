@@ -8,13 +8,13 @@
 
   <ng-template #tweetEntry let-tweet="tweet"  let-si="senderIgnore" let-ti="tweetIgnore">
     <mat-menu #appMenu="matMenu">
-      <button *ngIf="!si" (click)="ignoreSender(tweet,$event); si= true" mat-menu-item>Ignore
+      <button *ngIf="!si" (click)="ignoreSender(tweet,$event);" mat-menu-item>Ignore
         @{{sender(tweet)}}</button>
-      <button *ngIf="si" (click)="unIgnoreSender(tweet,$event);si=false" mat-menu-item>Unignore
+      <button *ngIf="si" (click)="unIgnoreSender(tweet,$event);" mat-menu-item>Unignore
         @{{sender(tweet)}}</button>
-      <button *ngIf="!ti" (click)="ignoreTweet(tweet,$event); ti= true" mat-menu-item>Ignore Tweet
+      <button *ngIf="!ti" (click)="ignoreTweet(tweet,$event);" mat-menu-item>Ignore Tweet
       </button>
-      <button *ngIf="ti" (click)="unIgnoreTweet(tweet,$event);ti=false" mat-menu-item>Unignore Tweet
+      <button *ngIf="ti" (click)="unIgnoreTweet(tweet,$event);" mat-menu-item>Unignore Tweet
       </button>
       <!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
 
