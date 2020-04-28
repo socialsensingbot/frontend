@@ -36,7 +36,7 @@ test:
       commands:
         - mkdir -p dist/frontend
         - 'npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-chrome,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"'
-        - 'npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser firefox --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-firefox,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"'
+#        - 'npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser firefox --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-firefox,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"'
     postTest:
       commands:
         - npx mochawesome-merge cypress/report/mochawesome-report-chrome/mochawesome*.json cypress/report/mochawesome-report-firefox/mochawesome*.json> cypress/report/mochawesome.json
