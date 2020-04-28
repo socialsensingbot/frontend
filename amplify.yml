@@ -16,7 +16,7 @@ frontend:
         - mkdir -p dist/frontend
     build:
       commands:
-        - if [ "${AWS_BRANCH}" = "master" ]; then  ng build --prod; else ng build --aot --verbose ; fi
+        - if [ "${AWS_BRANCH}" = "master" ]; then  npm build-prod; else npm build ; fi
   artifacts:
     baseDirectory: dist/frontend
     files:
