@@ -140,7 +140,7 @@ export class MapComponent implements OnInit, OnDestroy {
   /**
    * The current URL parameters, this is updated by a subscriber to this.route.queryParams.
    */
-  private _params: Params;
+  private _params: Params= null;
   /**
    * A subscription to the URL search parameters state.
    */
@@ -446,12 +446,18 @@ export class MapComponent implements OnInit, OnDestroy {
     this.setupCountStatsToggle();
 
     this._loggedIn = await Auth.currentAuthenticatedUser() != null;
-    this._searchParams.subscribe(params => this._params = params);
+
+
 
     //Initial data load
     await this.load();
 
-    this.updateMapFromQueryParams(this._params);
+    this._searchParams.subscribe(params => {
+      if(this._params === null) {
+        this._params = params
+        this.updateMapFromQueryParams(this._params);
+      }
+    });
 
     // Schedule periodic data loads from the server
     this._loadTimer = timer(60000, 60000).subscribe(() => this.load());
