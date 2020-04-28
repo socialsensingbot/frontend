@@ -22,6 +22,8 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 - [AWS Services]
   - [AWS Amplify] 
   - [AWS Cognito] 
+    - [Creating a Live User] 
+    - [Setting a Users Password] 
   - [AWS Route 53] 
   - [AWS S3 & CloudFront] 
 - [Branches, Environments and Deployments] 
@@ -243,6 +245,7 @@ I recommend you familiarize yourself with this guide: <https://angular.io/guide/
   
 ## AWS Services 
 
+Please make sure you have an AWS credential profile on your local machine called 'socialsensing' as those credentials will be used in various scripts. See <https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html>
 
 ### AWS Amplify
 
@@ -268,9 +271,28 @@ Please now read about [Branches, Environments and Deployments] to understand wha
 
 <https://aws.amazon.com/cognito/>
 
-This is what is used for user management, you will see there are two user pools, one for production and one for development.
+This is what is used for user management, you will see there are two user pools, one for [production](https://eu-west-2.console.aws.amazon.com/cognito/users/?region=eu-west-2#/pool/eu-west-2_dkJC8ZcOU/details?_k=9e2wps) and one for [development](https://eu-west-2.console.aws.amazon.com/cognito/users/?region=eu-west-2#/pool/eu-west-2_L3RQGANbS/details?_k=kpehkf). 
 
- todo: More details here
+#### Creating a Live User
+
+<https://docs.aws.amazon.com/cli/latest/reference/cognito-idp/admin-create-user.html>
+
+There is a script in the bin directory called create-user.sh and is used as follows
+
+```
+    ./bin/create-user.sh <email> <passsword>
+```
+
+#### Setting a Users Password
+
+<https://docs.aws.amazon.com/cli/latest/reference/cognito-idp/admin-set-user-password.html>
+
+There is a script in the bin directory called set-live-password.sh and is used as follows
+
+```
+    ./bin/set-live-password.sh <user> <passsword>
+```
+
 
 ### AWS S3 & CloudFront
 
@@ -347,6 +369,10 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 [Design]: #design
 [Material Design]: #material-design
 [Angular Material]: #angular-material
+[Creating a Live User]: #creating-a-live-user
+[Setting a Users Password]: #setting-a-users-password
+
+
 
 
 
