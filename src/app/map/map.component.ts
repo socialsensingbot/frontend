@@ -243,8 +243,8 @@ export class MapComponent implements OnInit, OnDestroy {
     this.loadStats()
         .then(() => this.init(map))
         .catch(err => {
-          this._notify.show("Error while loading map data");
-          log.debug(err);
+          // this._notify.show("Error while loading map data");
+          log.warn(err);
         });
   }
 
