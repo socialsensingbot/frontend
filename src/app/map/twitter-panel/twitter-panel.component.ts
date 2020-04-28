@@ -101,7 +101,8 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
       this.ready = false;
       log.debug(this._embeds);
       const regex = /(<blockquote(.*?)<\/blockquote>)/g;
-      this.tweets = this._embeds.match(regex).map(s => s);
+      const matched = this._embeds.match(regex);
+      this.tweets = matched ? matched.map(s => s) : [];
       this.hidden = [];
       this.tweets.forEach(tweet => {
         this.hidden.push(this.pref.isBlacklisted(tweet))
