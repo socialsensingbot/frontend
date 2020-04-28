@@ -13,7 +13,6 @@ frontend:
         - mkdir -p dist/frontend
     build:
       commands:
-        - npm run build
         - if [ "${AWS_BRANCH}" = "master" ]; then  ng build --prod; elif; ng build --verbose --progress; fi
   artifacts:
     baseDirectory: dist/frontend
