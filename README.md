@@ -245,6 +245,8 @@ I recommend you familiarize yourself with this guide: <https://angular.io/guide/
   
 ## AWS Services 
 
+You'll need to [install the AWS command line](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) first. Then create credentials in the IAM console.
+
 Please make sure you have an AWS credential profile on your local machine called 'socialsensing' as those credentials will be used in various scripts. See <https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html>
 
 ### AWS Amplify
