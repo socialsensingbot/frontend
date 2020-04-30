@@ -534,7 +534,7 @@ export class MapComponent implements OnInit, OnDestroy {
       // Hub.dispatch("twitter-panel",{message:"update",event:"update"});
       this.showTweets()
     } else {
-      this.hideTweets()
+      this.showTwitterTimeline = false;
     }
 
   };
