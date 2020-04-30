@@ -523,10 +523,10 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   updateTwitterPanel(props?: any) {
     log.debug("updateTwitterPanel()");
+    this.selectedRegion = this.toTitleCase(props.properties.name);
     if (props.properties.count > 0) {
       log.debug("updateTwitterHeader()");
       this.exceedanceProbability = Math.round(props.properties.stats * 100) / 100;
-      this.selectedRegion = this.toTitleCase(props.properties.name);
       this.tweetCount = props.properties.count;
       this.embeds = this._twitterData[this.activePolyLayerShortName].embed[props.properties.name];
       this.twitterPanelHeader = true;
@@ -534,7 +534,12 @@ export class MapComponent implements OnInit, OnDestroy {
       // Hub.dispatch("twitter-panel",{message:"update",event:"update"});
       this.showTweets()
     } else {
+      this.twitterPanelHeader = true;
       this.showTwitterTimeline = false;
+      this.tweetCount= 0;
+      this.exceedanceProbability= 0;
+      this.embeds="";
+
     }
 
   };
