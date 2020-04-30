@@ -1,4 +1,4 @@
-describe('Map: ', function () {
+describe('Date time: ', function () {
   // Step 1: setup the application state
   beforeEach(function () {
     cy.visit('http://localhost:4200/map');
