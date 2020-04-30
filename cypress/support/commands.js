@@ -28,7 +28,7 @@ Cypress.Commands.add("login", () => {
   cy.get('input[type=email]').type(Cypress.env("TEST_AC_USER"));
   cy.get('input[type=password]').type(Cypress.env("TEST_AC_PASS"));
   cy.get('.mat-button-base.mat-raised-button').contains('Sign In').click();
-  cy.wait(2000);
+  cy.url({timeout: 10000}).should("not.contain","auth/signin")
 });
 
 Cypress.Commands.add("logout", () => {
@@ -36,11 +36,10 @@ Cypress.Commands.add("logout", () => {
 });
 
 Cypress.Commands.add("noSpinner", () => {
-  cy.wait(4000);
   cy.get('body').should(el => {
     if (el) {
       if (el.find("mat-spinner").length > 0) {
-        cy.get("mat-spinner").should("not.be.visible")
+        cy.get("mat-spinner",{timeout:10000}).should("not.be.visible")
       }
     } else {
     }
@@ -56,6 +55,8 @@ Cypress.Commands.add("twitterPanelVisible", () => {
 
 Cypress.Commands.add("twitterPanelNotVisible", () => {
   cy.get(".tweet-drawer", {timeout: 60000}).should("not.be.visible");
+});Cypress.Commands.add("pushStateDelay", () => {
+  cy.wait(500);
 });
 Cypress.Commands.add("stubLiveJson", (file) => {
   // Alternatively you can use CommonJS syntax:

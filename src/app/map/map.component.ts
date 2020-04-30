@@ -215,6 +215,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * A flag that prevents more than one simultaneous update to the map.
    */
   private _updating: boolean;
+  private _selectedFeatureName: string;
 
 
   constructor(private _router: Router, private route: ActivatedRoute, private ngZone: NgZone,
@@ -329,13 +330,16 @@ export class MapComponent implements OnInit, OnDestroy {
     // }
 
     // This handles a change to the active_number value
-    const numberLayerName: string = typeof active_number !== "undefined" ? active_number : STATS;
+    const numberLayerName: NumberLayerShortName = typeof active_number !== "undefined" ? active_number : STATS;
+    this.activeNumberLayerShortName = numberLayerName;
+
     if (this._map) {
       for (let layer in this._numberLayers) {
         if (this._numberLayersNameMap[layer] !== numberLayerName) {
           log.debug("Removing " + layer);
           this._map.removeLayer(this._numberLayers[layer]);
         }
+        this.activeNumberLayerShortName = numberLayerName;
       }
       for (let layer in this._numberLayers) {
         if (this._numberLayersNameMap[layer] === numberLayerName) {
@@ -347,7 +351,9 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     // This handles a change to the active_polygon value
-    const polygonLayerName: string = typeof active_polygon !== "undefined" ? active_polygon : COUNTY;
+    const polygonLayerName: PolygonLayerShortName = typeof active_polygon !== "undefined" ? active_polygon : COUNTY;
+    this.activePolyLayerShortName= polygonLayerName;
+
     if (this._map) {
       for (let layer in this._polyLayers) {
         if (this._polyLayersNameMap[layer] !== polygonLayerName) {
@@ -366,6 +372,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     // If a polygon (region) is selected update Twitter panel.
     if (typeof selected !== "undefined") {
+      this._selectedFeatureName= selected;
       this._twitterIsStale;
       this.showTweets();
     }
@@ -523,10 +530,10 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   updateTwitterPanel(props?: any) {
     log.debug("updateTwitterPanel()");
+    this.selectedRegion = this.toTitleCase(props.properties.name);
     if (props.properties.count > 0) {
       log.debug("updateTwitterHeader()");
       this.exceedanceProbability = Math.round(props.properties.stats * 100) / 100;
-      this.selectedRegion = this.toTitleCase(props.properties.name);
       this.tweetCount = props.properties.count;
       this.embeds = this._twitterData[this.activePolyLayerShortName].embed[props.properties.name];
       this.twitterPanelHeader = true;
@@ -534,7 +541,12 @@ export class MapComponent implements OnInit, OnDestroy {
       // Hub.dispatch("twitter-panel",{message:"update",event:"update"});
       this.showTweets()
     } else {
-      this.hideTweets()
+      this.twitterPanelHeader = true;
+      this.showTwitterTimeline = false;
+      this.tweetCount= 0;
+      this.exceedanceProbability= 0;
+      this.embeds="";
+
     }
 
   };
@@ -558,6 +570,7 @@ export class MapComponent implements OnInit, OnDestroy {
   featureClicked(e: LeafletMouseEvent) {
     log.debug("featureClicked()");
     log.debug(e.target.feature.properties.name);
+    this._selectedFeatureName= e.target.feature.properties.name;
     this.updateSearch({selected: e.target.feature.properties.name});
     this.updateTwitterPanel(e.target.feature);
     this._oldClicked = this._clicked;
@@ -584,7 +597,7 @@ export class MapComponent implements OnInit, OnDestroy {
     // If this feature is referenced in the URL query paramter selected
     // e.g. ?...&selected=powys
     // then highlight it and update Twitter
-    if (feature.properties.name === this._params.selected) {
+    if (feature.properties.name === this._selectedFeatureName) {
       log.debug("Matched " + feature.properties.name);
 
       //Put the selection outline around the feature
@@ -636,7 +649,7 @@ export class MapComponent implements OnInit, OnDestroy {
       }
     });
 
-    this._stateUpdateTimer = timer(0, 2000).subscribe(() => {
+    this._stateUpdateTimer = timer(0, 200).subscribe(() => {
       if (this._stateIsStale) {
         this._router.navigate([], {
           queryParams:         this._newParams,
