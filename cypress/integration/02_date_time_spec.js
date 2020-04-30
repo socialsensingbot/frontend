@@ -7,6 +7,7 @@ describe('Date time: ', function () {
   });
 
   describe('select county and date range', () => {
+    console.debug("Tests https://github.com/socialsensingbot/frontend/issues/67");
     const url = "http://localhost:4200/map?selected=west%20sussex&min_offset=-659&max_offset=-179&zoom=5";
     it('with no tweets', () => {
       cy.visit(url);
