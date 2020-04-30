@@ -62,3 +62,4 @@ amplifyxc.config
 #JetBrains
 /.idea/workspace.xml
 /cypress/videos/
+/cypress/report/

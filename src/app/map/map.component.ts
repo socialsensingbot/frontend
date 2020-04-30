@@ -28,7 +28,7 @@ import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
 
 type MapLayers = { "Local Authority": any, "Coarse Grid": any, "Fine Grid": any };
-type NumberLayers = { "Exceedence": any, "Tweet Count": any }
+type NumberLayers = { "Exceedance": any, "Tweet Count": any }
 type RegionData<R, S, T> = { stats: R; count: S; embed?: T };
 type ColorFunctionObject = { getColor(), getFeatureStyle(feature: geojson.Feature<geojson.GeometryObject, any>) }
 type ColorFunctions = RegionData<ColorFunctionObject, ColorFunctionObject, ColorFunctionObject>
@@ -42,10 +42,10 @@ type ByRegionType<T> = {
 type PolygonLayerFullName = "Local Authority" | "Coarse Grid" | "Fine Grid";
 type PolygonLayerShortName = "county" | "coarse" | "fine";
 type NumberLayerShortName = "stats" | "count" ;
-type NumberLayerFullName = "Exceedence" | "Tweet Count" ;
+type NumberLayerFullName = "Exceedance" | "Tweet Count" ;
 const polygonLayerFullNames: PolygonLayerFullName[] = ["Local Authority", "Coarse Grid", "Fine Grid"];
 const polygonLayerShortNames: PolygonLayerShortName[] = ["county", "coarse", "fine"];
-const numberLayerFullNames: NumberLayerFullName[] = ["Exceedence", "Tweet Count"];
+const numberLayerFullNames: NumberLayerFullName[] = ["Exceedance", "Tweet Count"];
 const numberLayerShortNames: NumberLayerShortName[] = ["stats", "count"];
 
 const regionDataKeys: string[] = ["stats", "count", "embed"];
@@ -110,10 +110,10 @@ export class MapComponent implements OnInit, OnDestroy {
   private _countyLayer: LayerGroup = layerGroup(); //dummy layers to fool layer control
   private _map: Map;
 
-  private _numberLayers: NumberLayers = {"Exceedence": null, "Tweet Count": null};
+  private _numberLayers: NumberLayers = {"Exceedance": null, "Tweet Count": null};
   private _polyLayers: MapLayers = {"Local Authority": null, "Coarse Grid": null, "Fine Grid": null};
   private _polyLayersNameMap = {"Local Authority": "county", "Coarse Grid": "coarse", "Fine Grid": "fine"};
-  private _numberLayersNameMap = {"Exceedence": "stats", "Tweet Count": "count"};
+  private _numberLayersNameMap = {"Exceedance": "stats", "Tweet Count": "count"};
   private _basemapControl: BasemapControl = {"numbers": this._numberLayers, "polygon": this._polyLayers};
   private _polygonData: ByRegionType<PolygonData | geojson.GeoJsonObject> = {
     county: fgsData,
@@ -140,7 +140,7 @@ export class MapComponent implements OnInit, OnDestroy {
   /**
    * The current URL parameters, this is updated by a subscriber to this.route.queryParams.
    */
-  private _params: Params;
+  private _params: Params= null;
   /**
    * A subscription to the URL search parameters state.
    */
@@ -171,7 +171,7 @@ export class MapComponent implements OnInit, OnDestroy {
   //The UI state fields
   public embeds: string;
   public selectedRegion: string;
-  public exceedenceProbability: number;
+  public exceedanceProbability: number;
   public tweetCount: number;
   public tweetsVisible: boolean = false;
   public twitterPanelHeader: boolean;
@@ -243,8 +243,8 @@ export class MapComponent implements OnInit, OnDestroy {
     this.loadStats()
         .then(() => this.init(map))
         .catch(err => {
-          this._notify.show("Error while loading map data");
-          log.debug(err);
+          // this._notify.show("Error while loading map data");
+          log.warn(err);
         });
   }
 
@@ -408,7 +408,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
     //define the layers for the different counts
-    this._numberLayers["Exceedence"] = layerGroup().addTo(map);
+    this._numberLayers["Exceedance"] = layerGroup().addTo(map);
     this._numberLayers["Tweet Count"] = layerGroup();
 
     //layers for the different polygons
@@ -446,12 +446,18 @@ export class MapComponent implements OnInit, OnDestroy {
     this.setupCountStatsToggle();
 
     this._loggedIn = await Auth.currentAuthenticatedUser() != null;
-    this._searchParams.subscribe(params => this._params = params);
+
+
 
     //Initial data load
     await this.load();
 
-    this.updateMapFromQueryParams(this._params);
+    this._searchParams.subscribe(params => {
+      if(this._params === null) {
+        this._params = params
+        this.updateMapFromQueryParams(this._params);
+      }
+    });
 
     // Schedule periodic data loads from the server
     this._loadTimer = timer(60000, 60000).subscribe(() => this.load());
@@ -476,7 +482,7 @@ export class MapComponent implements OnInit, OnDestroy {
   featureEntered(e: LeafletMouseEvent) {
     log.debug("featureEntered()");
     const feature = e.target.feature;
-    const exceedenceProbability: number = Math.round(feature.properties.stats * 100) / 100;
+    const exceedanceProbability: number = Math.round(feature.properties.stats * 100) / 100;
     const region: string = this.toTitleCase(feature.properties.name);
     const count: number = feature.properties.count;
     this.highlight(e,1);
@@ -486,8 +492,8 @@ export class MapComponent implements OnInit, OnDestroy {
     if (count > 0) {
       text = text +
         `<div>Count: ${count}</div>`;
-      if ("" + exceedenceProbability != "NaN") {
-        text = text + `<div>Exceedence: ${exceedenceProbability}</div>`;
+      if ("" + exceedanceProbability != "NaN") {
+        text = text + `<div>Exceedance: ${exceedanceProbability}</div>`;
       }
     }
 
@@ -519,7 +525,7 @@ export class MapComponent implements OnInit, OnDestroy {
     log.debug("updateTwitterPanel()");
     if (props.properties.count > 0) {
       log.debug("updateTwitterHeader()");
-      this.exceedenceProbability = Math.round(props.properties.stats * 100) / 100;
+      this.exceedanceProbability = Math.round(props.properties.stats * 100) / 100;
       this.selectedRegion = this.toTitleCase(props.properties.name);
       this.tweetCount = props.properties.count;
       this.embeds = this._twitterData[this.activePolyLayerShortName].embed[props.properties.name];
