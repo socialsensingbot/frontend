@@ -257,6 +257,25 @@ The region is eu-west-2.
 
 Please make sure you have an AWS credential profile on your local machine called 'socialsensing' as those credentials will be used in various scripts. See <https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html>
 
+Your ~/.aws/credentials file should look like:
+
+```
+[default]
+aws_access_key_id=AKIAZ74O2XPJWDOOTT3D
+aws_secret_access_key=MfiH/sdg676534567fhu+iC5olNF77DsTpmZuEx
+
+[socialsensing]
+aws_access_key_id=AKIAZ74O2XPJWDOOTT3D
+aws_secret_access_key=MfiH/sdg676534567fhu+iC5olNF77DsTpmZuEx
+```
+
+You will need to add the following to your ```~/.aws/config``` file
+
+```
+[profile socialsensing]
+region=eu-west-2
+```
+
 ### AWS Amplify
 
 <https://aws-amplify.github.io/docs/js/start?platform=angular>
