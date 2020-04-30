@@ -37,6 +37,7 @@ describe('Map: ', function () {
 
     it('has correct default', () => {
       cy.visit("http://localhost:4200/map");
+      cy.get(legendEntry,{timeout:30000});
       cy.get(legendEntry).get("i").should("have.attr", "style").should("contain", statsFirstLegendColour)
       cy.get(legendEntry).should("have.text", statsFirstLegendVal);
     });

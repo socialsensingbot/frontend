@@ -330,13 +330,16 @@ export class MapComponent implements OnInit, OnDestroy {
     // }
 
     // This handles a change to the active_number value
-    const numberLayerName: string = typeof active_number !== "undefined" ? active_number : STATS;
+    const numberLayerName: NumberLayerShortName = typeof active_number !== "undefined" ? active_number : STATS;
+    this.activeNumberLayerShortName = numberLayerName;
+    
     if (this._map) {
       for (let layer in this._numberLayers) {
         if (this._numberLayersNameMap[layer] !== numberLayerName) {
           log.debug("Removing " + layer);
           this._map.removeLayer(this._numberLayers[layer]);
         }
+        this.activeNumberLayerShortName = numberLayerName;
       }
       for (let layer in this._numberLayers) {
         if (this._numberLayersNameMap[layer] === numberLayerName) {
@@ -348,7 +351,9 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     // This handles a change to the active_polygon value
-    const polygonLayerName: string = typeof active_polygon !== "undefined" ? active_polygon : COUNTY;
+    const polygonLayerName: PolygonLayerShortName = typeof active_polygon !== "undefined" ? active_polygon : COUNTY;
+    this.activePolyLayerShortName= polygonLayerName;
+
     if (this._map) {
       for (let layer in this._polyLayers) {
         if (this._polyLayersNameMap[layer] !== polygonLayerName) {
