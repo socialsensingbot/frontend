@@ -245,7 +245,9 @@ I recommend you familiarize yourself with this guide: <https://angular.io/guide/
   
 ## AWS Services 
 
-You'll need to [install the AWS command line](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) first. Then create credentials in the IAM console.
+**Before you use any AWS service**
+
+You'll need to [install the AWS command line](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) first. Then create credentials in the [IAM console](https://console.aws.amazon.com/iam/home?region=eu-west-2#) .
 
 Please make sure you have an AWS credential profile on your local machine called 'socialsensing' as those credentials will be used in various scripts. See <https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html>
 
@@ -261,11 +263,11 @@ During development you will very rarely need to interact with AWS Amplify. The f
 
 The Amplify Console is probably the most useful place to start:
 
-https://eu-west-2.console.aws.amazon.com/amplify/home?region=eu-west-2&#/d2iqaupxgo2qh0
+<https://eu-west-2.console.aws.amazon.com/amplify/home?region=eu-west-2&#/d2iqaupxgo2qh0>
 
 And the user guide:
 
-https://aws.amazon.com/amplify/console/
+<https://aws.amazon.com/amplify/console/>
 
 Please now read about [Branches, Environments and Deployments] to understand what the different environments are for.
  
@@ -302,6 +304,8 @@ These are used for deployment of the [SPA](https://en.wikipedia.org/wiki/Single-
 
 The app is 100% stateless and serverless from a deployment perspective - this means that it can be deployed, reverted smoothly and has no server to go down.
 
+Typically you won't interact with these services directly while working on or maintaining the app. The S3/Cloudfront deployment is managed by amplify.
+
 ### AWS Route 53
 
 Currently the GoDaddy registry for socialsensing.com points to AWS Route 53 for all DNS records. 
@@ -310,7 +314,7 @@ Route 53 is Amazon's DNS service. It ties heavily into the whole AWS stack as re
 
 The recordset is:
 
-https://console.aws.amazon.com/route53/home?region=eu-west-2#resource-record-sets:Z1LO4TCPI221J5
+<https://console.aws.amazon.com/route53/home?region=eu-west-2#resource-record-sets:Z1LO4TCPI221J5>
 
 And within this recordset are the entries for the live and development environments which [AWS Amplify] Console manages.
 
