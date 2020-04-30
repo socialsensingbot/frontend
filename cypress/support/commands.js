@@ -56,6 +56,8 @@ Cypress.Commands.add("twitterPanelVisible", () => {
 
 Cypress.Commands.add("twitterPanelNotVisible", () => {
   cy.get(".tweet-drawer", {timeout: 60000}).should("not.be.visible");
+});Cypress.Commands.add("pushStateDelay", () => {
+  cy.wait(500);
 });
 Cypress.Commands.add("stubLiveJson", (file) => {
   // Alternatively you can use CommonJS syntax:

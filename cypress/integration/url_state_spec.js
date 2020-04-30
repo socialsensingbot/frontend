@@ -82,10 +82,10 @@ describe('URL State: ', function () {
       cy.url().should("equal", url);
       cy.noSpinner();
       cy.get(".leaflet-control-zoom-in").click();
-      cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
+      cy.pushStateDelay(); // The push state is not immediate
       cy.url({timeout:30000}).should("equal", urlZoom7);
       cy.get(".leaflet-control-zoom-out").click();
-      cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
+      cy.pushStateDelay(); // The push state is not immediate
       cy.url({timeout:30000}).should("equal", urlZoom6);
       cy.logout();
     });
@@ -96,7 +96,7 @@ describe('URL State: ', function () {
       cy.url().should("equal", urlZoom7);
       cy.noSpinner();
       cy.get(".leaflet-control-zoom-in").click();
-      cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
+      cy.pushStateDelay(); // The push state is not immediate
       cy.url({timeout:30000}).should("equal", urlZoom8);
       cy.logout();
     });
@@ -107,7 +107,7 @@ describe('URL State: ', function () {
       cy.url().should("equal", urlZoom7);
       cy.noSpinner();
       cy.get(".leaflet-control-zoom-in").click();
-      cy.wait(10000); // The push state is not immediate (about 2s delay) (for performance)
+      cy.pushStateDelay(); // The push state is not immediate
       cy.url({timeout:30000}).should("equal", urlZoom8);
       cy.logout();
     });
@@ -123,7 +123,7 @@ describe('URL State: ', function () {
       cy.url().should("equal", url);
       cy.noSpinner();
       cy.get(".mat-sidenav-content").click(500,500);
-      cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
+      cy.pushStateDelay(); // The push state is not immediate
       cy.url().should("equal", newUrl);
       cy.twitterPanelHeader("Showing 2 of 2 Tweets from Cambridgeshire");
       cy.logout();
@@ -135,7 +135,7 @@ describe('URL State: ', function () {
       cy.url().should("equal", url);
       cy.noSpinner();
       cy.get(".mat-sidenav-content").click(500,500);
-      cy.wait(10000); // The push state is not immediate (about 2s delay) (for performance)
+      cy.pushStateDelay(); // The push state is not immediate
       cy.url({timeout:20000}).should("equal", newUrl);
       cy.twitterPanelHeader("Showing 2 of 2 Tweets from Cambridgeshire");
       cy.logout();

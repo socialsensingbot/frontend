@@ -215,6 +215,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * A flag that prevents more than one simultaneous update to the map.
    */
   private _updating: boolean;
+  private _selectedFeatureName: string;
 
 
   constructor(private _router: Router, private route: ActivatedRoute, private ngZone: NgZone,
@@ -366,6 +367,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     // If a polygon (region) is selected update Twitter panel.
     if (typeof selected !== "undefined") {
+      this._selectedFeatureName= selected;
       this._twitterIsStale;
       this.showTweets();
     }
@@ -563,6 +565,7 @@ export class MapComponent implements OnInit, OnDestroy {
   featureClicked(e: LeafletMouseEvent) {
     log.debug("featureClicked()");
     log.debug(e.target.feature.properties.name);
+    this._selectedFeatureName= e.target.feature.properties.name;
     this.updateSearch({selected: e.target.feature.properties.name});
     this.updateTwitterPanel(e.target.feature);
     this._oldClicked = this._clicked;
@@ -589,7 +592,7 @@ export class MapComponent implements OnInit, OnDestroy {
     // If this feature is referenced in the URL query paramter selected
     // e.g. ?...&selected=powys
     // then highlight it and update Twitter
-    if (feature.properties.name === this._params.selected) {
+    if (feature.properties.name === this._selectedFeatureName) {
       log.debug("Matched " + feature.properties.name);
 
       //Put the selection outline around the feature
@@ -641,7 +644,7 @@ export class MapComponent implements OnInit, OnDestroy {
       }
     });
 
-    this._stateUpdateTimer = timer(0, 2000).subscribe(() => {
+    this._stateUpdateTimer = timer(0, 200).subscribe(() => {
       if (this._stateIsStale) {
         this._router.navigate([], {
           queryParams:         this._newParams,
