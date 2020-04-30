@@ -249,6 +249,12 @@ I recommend you familiarize yourself with this guide: <https://angular.io/guide/
 
 You'll need to [install the AWS command line](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) first. Then create credentials in the [IAM console](https://console.aws.amazon.com/iam/home?region=eu-west-2#) .
 
+Next run 
+
+```aws configure```
+
+The region is eu-west-2.
+
 Please make sure you have an AWS credential profile on your local machine called 'socialsensing' as those credentials will be used in various scripts. See <https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html>
 
 ### AWS Amplify
