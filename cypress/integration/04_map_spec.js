@@ -68,6 +68,7 @@ describe('Map: ', function () {
       cy.url().should("equal", url);
       cy.noSpinner();
       cy.twitterPanelVisible();
+      cy.get("mat-sidenav button.draw-close-button", {timeout: 30000}).should("be.visible");
       cy.get("mat-sidenav button.draw-close-button", {timeout: 30000}).click();
       cy.twitterPanelNotVisible();
       cy.logout();
