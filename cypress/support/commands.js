@@ -27,6 +27,7 @@ Cypress.Commands.add("login", () => {
   //Login
   cy.get('input[type=email]').type(Cypress.env("TEST_AC_USER"));
   cy.get('input[type=password]').type(Cypress.env("TEST_AC_PASS"));
+  cy.get('.mat-button-base.mat-raised-button').contains('Sign In');
   cy.get('.mat-button-base.mat-raised-button').contains('Sign In').click();
   cy.url({timeout: 10000}).should("not.contain","auth/signin")
 });

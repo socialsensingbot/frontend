@@ -55,7 +55,7 @@ describe('URL State: ', function () {
       cy.login();
       cy.url().should("equal", url);
       cy.noSpinner();
-      cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000}).should("have.attr","fill").should("eq","#2B8CBE");
+      cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 60000}).should("have.attr","fill").should("eq","#2B8CBE");
       cy.twitterPanelHeader("44 Tweets from 123");
       cy.logout();
     });
@@ -65,7 +65,7 @@ describe('URL State: ', function () {
       cy.visit(url);
       cy.url().should("equal", url);
       cy.noSpinner();
-      cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
+      cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 60000});
       cy.twitterPanelHeader("44 Tweets from 123");
       cy.logout();
     });
