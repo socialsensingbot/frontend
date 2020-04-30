@@ -36,11 +36,10 @@ Cypress.Commands.add("logout", () => {
 });
 
 Cypress.Commands.add("noSpinner", () => {
-  cy.wait(4000);
   cy.get('body').should(el => {
     if (el) {
       if (el.find("mat-spinner").length > 0) {
-        cy.get("mat-spinner").should("not.be.visible")
+        cy.get("mat-spinner",{timeout:10000}).should("not.be.visible")
       }
     } else {
     }

@@ -332,7 +332,7 @@ export class MapComponent implements OnInit, OnDestroy {
     // This handles a change to the active_number value
     const numberLayerName: NumberLayerShortName = typeof active_number !== "undefined" ? active_number : STATS;
     this.activeNumberLayerShortName = numberLayerName;
-    
+
     if (this._map) {
       for (let layer in this._numberLayers) {
         if (this._numberLayersNameMap[layer] !== numberLayerName) {
