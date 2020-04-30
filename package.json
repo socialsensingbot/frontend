@@ -29,7 +29,7 @@
     "aws-amplify": "^2.2.6",
     "aws-amplify-angular": "^4.1.7",
     "hammerjs": "^2.0.8",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "jquery-ui": "^1.12.1",
     "leaflet": "^1.6.0",
     "ng-event-bus": "^1.1.0",
