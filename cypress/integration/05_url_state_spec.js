@@ -156,7 +156,7 @@ describe('URL State: ', function () {
   });
 
 
-  describe('select county and date range', () => {
+  describe.only('select county and date range', () => {
     const url = "http://localhost:4200/map?selected=powys&min_offset=-5459&max_offset=-2819";
     it('when authorized and load state', () => {
       cy.visit("http://localhost:4200/map");
@@ -165,9 +165,11 @@ describe('URL State: ', function () {
       cy.url().should("equal", url);
       cy.noSpinner();
       cy.get(".slider-date-time", {timeout: 20000});
-      cy.get(".slider-date-time .slider-date").should("contain.text","11-Oct-18");
-      cy.get(".slider-date-time .slider-time").should("contain.text","5 AM");
+      cy.url().should("equal", url);
+      cy.get(".slider-date-time-min .slider-date",{timeout: 20000}).should("contain.text","11-Oct-18");
+      cy.get(".slider-date-time-min .slider-time").should("contain.text","5 AM");
       cy.get(".tweet-drawer", {timeout: 20000}).should("be.visible");
+      cy.url().should("equal", url);
       cy.twitterPanelHeader("Showing 8 of 8 Tweets from Powys");
 
       cy.logout();

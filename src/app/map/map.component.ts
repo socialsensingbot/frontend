@@ -308,12 +308,12 @@ export class MapComponent implements OnInit, OnDestroy {
 
     // These handle the date slider min_offset & max_offset values
     if (typeof min_offset !== "undefined") {
-      this.sliderOptions.startMin = min_offset;
+      this.sliderOptions={...this.sliderOptions,startMin: min_offset};
       this._dateMin = min_offset;
     }
     if (typeof max_offset !== "undefined") {
       this._dateMax = max_offset;
-      this.sliderOptions.startMax = max_offset;
+      this.sliderOptions={...this.sliderOptions,startMax: max_offset};
     }
 
     // This handles the fact that the zoom and lat/lng can change independently of each other
