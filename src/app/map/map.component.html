@@ -18,10 +18,10 @@
            [leafletOptions]="options">
       </div>
     </div>
-    <map-legend *ngIf="ready" class="legend" [activeNumber]="activeNumberLayerShortName" [colorData]="colorData"
+    <map-legend class="legend" [activeNumber]="activeNumberLayerShortName" [colorData]="colorData"
                 [colorFunctions]="colorFunctions"></map-legend>
     <div class="date-slider">
-      <date-range-slider [style.visibility]="ready ? 'visible' : 'hidden'" (dateRange)="sliderChange($event)" [timeKeyedData]="timeKeyedData"
+      <date-range-slider (dateRange)="sliderChange($event)" [timeKeyedData]="timeKeyedData"
                          (onEnd)="sliderChangeOnEnd($event)"
                          [options]="sliderOptions"></date-range-slider>
     </div>
