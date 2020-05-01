@@ -140,7 +140,7 @@ export class MapComponent implements OnInit, OnDestroy {
   /**
    * The current URL parameters, this is updated by a subscriber to this.route.queryParams.
    */
-  private _params: Params= null;
+  private _params: boolean= null;
   /**
    * A subscription to the URL search parameters state.
    */
@@ -280,7 +280,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param params the parameter values to merge into the current URL.
    */
   updateSearch(params: Partial<Params>) {
-    log.debug("updateSearch");
+    log.debug("updateSearch(",params,")");
 
     // Merge the params to change into _newParams which holds the
     // next set of parameters to add to the URL state.
@@ -296,7 +296,6 @@ export class MapComponent implements OnInit, OnDestroy {
   private updateMapFromQueryParams(params: Params) {
     log.debug("updateMapFromQueryParams()");
     log.debug("Params:", params);
-    this._params = params;
     const {lng, lat, zoom, active_number, active_polygon, selected, min_offset, max_offset} = params;
 
     // These handle the date slider min_offset & max_offset values
@@ -403,16 +402,6 @@ export class MapComponent implements OnInit, OnDestroy {
     log.debug("init");
 
 
-    //Listeners to push map state into URL
-    map.addEventListener("dragend", () => {
-      return this.ngZone.run(
-        () => this.updateSearch({lat: this._map.getCenter().lat, lng: this._map.getCenter().lng}))
-    });
-
-    map.addEventListener("zoomend", () => {
-      return this.ngZone.run(() => this.updateSearch({zoom: this._map.getZoom()}));
-    });
-
 
     //define the layers for the different counts
     this._numberLayers["Exceedance"] = layerGroup().addTo(map);
@@ -438,17 +427,6 @@ export class MapComponent implements OnInit, OnDestroy {
     //This assignment triggers the change to the legend
     this.colorFunctions = newColorFunctions;
 
-    map.on('baselayerchange', (e: any) => {
-      log.debug("New baselayer " + e.name);
-      if (e.name in this._basemapControl.polygon) {
-        this.activePolyLayerShortName = this._polyLayersNameMap[e.name];
-        this.updateSearch({active_polygon: this.activePolyLayerShortName, selected: null});
-        this.resetLayers(true);
-      } else {
-        this.activeNumberLayerShortName = this._numberLayersNameMap[e.name];
-        this.updateSearch({active_number: this.activeNumberLayerShortName});
-      }
-    });
 
     this.setupCountStatsToggle();
 
@@ -460,11 +438,34 @@ export class MapComponent implements OnInit, OnDestroy {
     await this.load();
 
     this._searchParams.subscribe(params => {
-      if(this._params === null) {
-        this._params = params
-        this.updateMapFromQueryParams(this._params);
+      if(!this._params) {
+        this._params = true
+        this.updateMapFromQueryParams(params);
+        //Listeners to push map state into URL
+        map.addEventListener("dragend", () => {
+          return this.ngZone.run(
+            () => this.updateSearch({lat: this._map.getCenter().lat, lng: this._map.getCenter().lng}))
+        });
+
+        map.addEventListener("zoomend", (event) => {
+          return this.ngZone.run(() => this.updateSearch({zoom:this._map.getZoom()}));
+        });
+
+        map.on('baselayerchange', (e: any) => {
+          log.debug("New baselayer " + e.name);
+          if (e.name in this._basemapControl.polygon) {
+            this.activePolyLayerShortName = this._polyLayersNameMap[e.name];
+            this.updateSearch({active_polygon: this.activePolyLayerShortName, selected: null});
+            this.resetLayers(true);
+          } else {
+            this.activeNumberLayerShortName = this._numberLayersNameMap[e.name];
+            this.updateSearch({active_number: this.activeNumberLayerShortName});
+          }
+        });
+
       }
     });
+
 
     // Schedule periodic data loads from the server
     this._loadTimer = timer(60000, 60000).subscribe(() => this.load());
