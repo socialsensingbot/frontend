@@ -44,7 +44,7 @@ export class UIExecutionService {
           task.execute()
         } else {
           console.warn(`Skipped task ${task.name} on execution queue, state ${this._state} should be one of ${task.waitForStates}`)
-          this._queue.push(task)
+          // this._queue.push(task)
         }
 
       }

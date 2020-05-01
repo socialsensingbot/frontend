@@ -281,13 +281,13 @@ export class MapComponent implements OnInit, OnDestroy {
    *
    * @param params the parameter values to merge into the current URL.
    */
-  updateSearch(params: Partial<Params>) {
+  async updateSearch(params: Partial<Params>) {
     log.debug("updateSearch(", params, ")");
 
     // Merge the params to change into _newParams which holds the
     // next set of parameters to add to the URL state.
-    this._newParams = {...this._newParams, ...params};
-    this._exec.queue("Update URL Query Params", ["ready"], () => {
+    return this._exec.queue("Update URL Query Params", ["ready"], () => {
+      this._newParams = {...this._newParams, ...params};
       this._router.navigate([], {
         queryParams:         this._newParams,
         queryParamsHandling: 'merge'
@@ -408,7 +408,7 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   private async init(map: Map) {
     log.debug("init");
-
+    const zoomControl = map.zoomControl.remove();
 
     //define the layers for the different counts
     this._numberLayers["Exceedance"] = layerGroup().addTo(map);
@@ -435,7 +435,6 @@ export class MapComponent implements OnInit, OnDestroy {
     this.colorFunctions = newColorFunctions;
 
 
-    this.setupCountStatsToggle();
 
     this._loggedIn = await Auth.currentAuthenticatedUser() != null;
 
@@ -448,7 +447,6 @@ export class MapComponent implements OnInit, OnDestroy {
         this._exec.queue("Initial Search Params", ["ready", "no-params"],
                          () => {
                            this._params = true;
-
                            this.updateMapFromQueryParams(params);
                            //Listeners to push map state into URL
                            map.addEventListener("dragend", () => {
@@ -475,6 +473,8 @@ export class MapComponent implements OnInit, OnDestroy {
                              }
                            });
                            this._exec.state("ready");
+                           map.addControl(zoomControl);
+                           this.addToggleControls();
                            return this.updateLayers().then(()=>this._twitterIsStale = true);
 
                          });
@@ -487,8 +487,8 @@ export class MapComponent implements OnInit, OnDestroy {
     this._loadTimer = timer(60000, 60000).subscribe(() => this.load());
   }
 
-  private setupCountStatsToggle() {
-    log.debug("setupCountStatsToggle()");
+  private addToggleControls() {
+    log.debug("addToggleControls()");
     for (let key in this._basemapControl) {
       // noinspection JSUnfilteredForInLoop
       this._lcontrols[key] = control.layers(this._basemapControl[key], {}).addTo(this._map);
@@ -1006,12 +1006,13 @@ export class MapComponent implements OnInit, OnDestroy {
     log.info("sliderChange(" + lower + "->" + upper + ")");
     this._dateMax = upper;
     this._dateMin = lower;
-    this.updateSearch({min_offset: lower, max_offset: upper});
-    this._exec.queue("Update Layers from Slider Change", ["data-loaded", "ready"], () => {
+    this.sliderOptions = {...this.sliderOptions, startMin: this._dateMin, startMax: this._dateMax};
+    this._exec.queue("Update Layers from Slider Change", ["ready"], async () => {
                        // Mark as stale to trigger a refresh
-                       this._twitterIsStale = true;
+                       await this.updateSearch({min_offset: this._dateMin, max_offset: this._dateMax});
                        this.updateData(this._rawTwitterData);
                        this.resetLayers(false);
+                       this._twitterIsStale = true;
                      }
     );
 

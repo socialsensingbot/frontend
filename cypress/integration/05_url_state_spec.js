@@ -1,4 +1,4 @@
-const zoomDuration = 3000;
+const zoomDuration = 1000;
 describe('URL State: ', function () {
   beforeEach(()=> {
     cy.stubLiveJson("live-old");
@@ -82,6 +82,7 @@ describe('URL State: ', function () {
       cy.login();
       cy.url().should("equal", url);
       cy.noSpinner();
+      cy.wait(zoomDuration)
       cy.get(".leaflet-control-zoom-in").should("be.visible");
       cy.get(".leaflet-control-zoom-in").click();
       //zoom delay
@@ -99,6 +100,7 @@ describe('URL State: ', function () {
       cy.login();
       cy.url().should("equal", urlZoom7);
       cy.noSpinner();
+      cy.wait(zoomDuration)
       cy.get(".leaflet-control-zoom-in");
       cy.get(".leaflet-control-zoom-in").click();
       //zoom delay
@@ -113,6 +115,7 @@ describe('URL State: ', function () {
       cy.visit(urlZoom7);
       cy.url().should("equal", urlZoom7);
       cy.noSpinner();
+      cy.wait(zoomDuration)
       cy.get(".leaflet-control-zoom-in");
       cy.get(".leaflet-control-zoom-in").click();
       //zoom delay
