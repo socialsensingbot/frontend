@@ -1,14 +1,16 @@
+<ng-container *ngIf="ready">
 <div class="tweets-header" *ngIf="tweets.length > 0">
   <mat-card class="tweets-heading"><span style="color: black"><b>Showing {{visibleCount}} of {{tweets.length}}
     Tweets from {{region}}</b><br/></span>Exceedance probability {{exceedanceProbability}}%
   </mat-card>
 </div>
-<div class="tweets-header" *ngIf="tweets.length == 0">
+<div class="tweets-header" *ngIf="tweets.length === 0">
   <mat-card *ngIf="region" class="tweets-heading"><span style="color: black"><b>No Tweets from {{region}}</b><br/></span>
   </mat-card>
   <mat-card *ngIf="!region" class="tweets-heading"><span style="color: black"><b>Loading ...</b><br/></span>
   </mat-card>
 </div>
+</ng-container>
 <div id="tinfo" class="tinfo">
 
 

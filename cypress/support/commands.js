@@ -25,28 +25,40 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 Cypress.Commands.add("login", () => {
   //Login
+  cy.url({timeout: 30000}).should("contain","auth/signin")
   cy.get('input[type=email]').type(Cypress.env("TEST_AC_USER"));
   cy.get('input[type=password]').type(Cypress.env("TEST_AC_PASS"));
+  cy.get('.mat-button-base.mat-raised-button').contains('Sign In');
   cy.get('.mat-button-base.mat-raised-button').contains('Sign In').click();
-  cy.url({timeout: 10000}).should("not.contain","auth/signin")
+  cy.url({timeout: 30000}).should("not.contain","auth/signin")
 });
 
 Cypress.Commands.add("logout", () => {
   cy.get('#logout').click();
 });
 
+Cypress.Commands.add("visitAndWait", (url) => {
+  cy.visit(url);
+  cy.url().should("equal", url);
+  cy.noSpinner();
+});
+
 Cypress.Commands.add("noSpinner", () => {
+  cy.get('.map');
+  cy.get("mat-spinner",{timeout:30000}).should("not.be.visible");
   cy.get('body').should(el => {
     if (el) {
       if (el.find("mat-spinner").length > 0) {
-        cy.get("mat-spinner",{timeout:10000}).should("not.be.visible")
-      }
+        cy.get("mat-spinner",{timeout:30000}).should("not.be.visible");
+      } else {}
     } else {
     }
   });
 });
 
 Cypress.Commands.add("twitterPanelHeader", (text) => {
+  cy.get("twitter-panel .tweets-header");
+  cy.get(".tinfo-spinner").should("not.be.visible");
   cy.get("twitter-panel .tweets-header  mat-card > span > b", {timeout: 60000}).should("contain.text", text);
 });
 Cypress.Commands.add("twitterPanelVisible", () => {
