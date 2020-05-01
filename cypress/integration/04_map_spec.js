@@ -37,18 +37,19 @@ describe('Map: ', function () {
 
     it('has correct default', () => {
       cy.visitAndWait("http://localhost:4200/map");
-      cy.get(legendEntry,{timeout:30000});
+      cy.get(legendEntry).should("be.visible");
       cy.get(legendEntry).get("i").should("have.attr", "style").should("contain", statsFirstLegendColour)
       cy.get(legendEntry).should("have.text", statsFirstLegendVal);
     });
     it('changes from URL', () => {
-      cy.visit(url);
-      cy.url().should("equal", url);
+      cy.visitAndWait(url);
+      cy.get(legendEntry).should("be.visible");
       cy.get(legendEntry).get("i").should("have.attr", "style").should("contain", countFirstLegendColour)
       cy.get(legendEntry).should("have.text", countFirstLegendVal);
     });
     it('changes when stats layer is changed', () => {
       cy.visitAndWait(url);
+      cy.get(legendEntry).should("be.visible");
       cy.get(legendEntry).get("i").should("have.attr", "style").should("contain", countFirstLegendColour)
       cy.get(legendEntry).should("have.text", countFirstLegendVal);
       cy.get(statsControl).trigger("mouseover")
