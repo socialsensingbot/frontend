@@ -26,6 +26,7 @@ import {NotificationService} from "../services/notification.service";
 import {Feature, PolygonData, Properties} from "./types";
 import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
+import {UIExecutionService} from "../services/uiexecution.service";
 
 type MapLayers = { "Local Authority": any, "Coarse Grid": any, "Fine Grid": any };
 type NumberLayers = { "Exceedance": any, "Tweet Count": any }
@@ -140,7 +141,7 @@ export class MapComponent implements OnInit, OnDestroy {
   /**
    * The current URL parameters, this is updated by a subscriber to this.route.queryParams.
    */
-  private _params: boolean= null;
+  private _params: boolean = null;
   /**
    * A subscription to the URL search parameters state.
    */
@@ -222,7 +223,8 @@ export class MapComponent implements OnInit, OnDestroy {
               private _layerStyles: LayerStyleService,
               private _notify: NotificationService,
               private _auth: AuthService,
-              private _http: HttpClient
+              private _http: HttpClient,
+              private _exec: UIExecutionService
   ) {
     //save the query parameter observable
     this._searchParams = this.route.queryParams;
@@ -280,12 +282,18 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param params the parameter values to merge into the current URL.
    */
   updateSearch(params: Partial<Params>) {
-    log.debug("updateSearch(",params,")");
+    log.debug("updateSearch(", params, ")");
 
     // Merge the params to change into _newParams which holds the
     // next set of parameters to add to the URL state.
     this._newParams = {...this._newParams, ...params};
-    this._stateIsStale = true;
+    this._exec.queue("Update URL Query Params", ["ready"], () => {
+      this._router.navigate([], {
+        queryParams:         this._newParams,
+        queryParamsHandling: 'merge'
+      });
+    })
+
   }
 
   /**
@@ -351,7 +359,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     // This handles a change to the active_polygon value
     const polygonLayerName: PolygonLayerShortName = typeof active_polygon !== "undefined" ? active_polygon : COUNTY;
-    this.activePolyLayerShortName= polygonLayerName;
+    this.activePolyLayerShortName = polygonLayerName;
 
     if (this._map) {
       for (let layer in this._polyLayers) {
@@ -371,7 +379,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     // If a polygon (region) is selected update Twitter panel.
     if (typeof selected !== "undefined") {
-      this._selectedFeatureName= selected;
+      this._selectedFeatureName = selected;
       this._twitterIsStale;
       this.showTweets();
     }
@@ -400,7 +408,6 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   private async init(map: Map) {
     log.debug("init");
-
 
 
     //define the layers for the different counts
@@ -432,38 +439,47 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this._loggedIn = await Auth.currentAuthenticatedUser() != null;
 
+    this._exec.state("map-init");
 
 
-    //Initial data load
     await this.load();
-
     this._searchParams.subscribe(params => {
-      if(!this._params) {
-        this._params = true
-        this.updateMapFromQueryParams(params);
-        //Listeners to push map state into URL
-        map.addEventListener("dragend", () => {
-          return this.ngZone.run(
-            () => this.updateSearch({lat: this._map.getCenter().lat, lng: this._map.getCenter().lng}))
-        });
+      if (!this._params) {
+        this._exec.queue("Initial Search Params", ["ready", "no-params"],
+                         () => {
+                           this._params = true;
 
-        map.addEventListener("zoomend", (event) => {
-          return this.ngZone.run(() => this.updateSearch({zoom:this._map.getZoom()}));
-        });
+                           this.updateMapFromQueryParams(params);
+                           //Listeners to push map state into URL
+                           map.addEventListener("dragend", () => {
+                             return this.ngZone.run(
+                               () => this.updateSearch(
+                                 {lat: this._map.getCenter().lat, lng: this._map.getCenter().lng}))
+                           });
 
-        map.on('baselayerchange', (e: any) => {
-          log.debug("New baselayer " + e.name);
-          if (e.name in this._basemapControl.polygon) {
-            this.activePolyLayerShortName = this._polyLayersNameMap[e.name];
-            this.updateSearch({active_polygon: this.activePolyLayerShortName, selected: null});
-            this.resetLayers(true);
-          } else {
-            this.activeNumberLayerShortName = this._numberLayersNameMap[e.name];
-            this.updateSearch({active_number: this.activeNumberLayerShortName});
-          }
-        });
+                           map.addEventListener("zoomend", (event) => {
+                             return this.ngZone.run(() => this.updateSearch({zoom: this._map.getZoom()}));
+                           });
 
+                           map.on('baselayerchange', (e: any) => {
+                             log.debug("New baselayer " + e.name);
+                             if (e.name in this._basemapControl.polygon) {
+                               this.activePolyLayerShortName = this._polyLayersNameMap[e.name];
+                               this.updateSearch({active_polygon: this.activePolyLayerShortName, selected: null});
+                               this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
+                                 this.resetLayers(true);
+                               });
+                             } else {
+                               this.activeNumberLayerShortName = this._numberLayersNameMap[e.name];
+                               this.updateSearch({active_number: this.activeNumberLayerShortName});
+                             }
+                           });
+                           this._exec.state("ready");
+                           return this.updateLayers().then(()=>this._twitterIsStale = true);
+
+                         });
       }
+
     });
 
 
@@ -493,7 +509,7 @@ export class MapComponent implements OnInit, OnDestroy {
     const exceedanceProbability: number = Math.round(feature.properties.stats * 100) / 100;
     const region: string = this.toTitleCase(feature.properties.name);
     const count: number = feature.properties.count;
-    this.highlight(e,1);
+    this.highlight(e, 1);
 
     let text = "" +
       `<div>Region: ${region}</div>`;
@@ -544,9 +560,9 @@ export class MapComponent implements OnInit, OnDestroy {
     } else {
       this.twitterPanelHeader = true;
       this.showTwitterTimeline = false;
-      this.tweetCount= 0;
-      this.exceedanceProbability= 0;
-      this.embeds="";
+      this.tweetCount = 0;
+      this.exceedanceProbability = 0;
+      this.embeds = "";
 
     }
 
@@ -571,12 +587,12 @@ export class MapComponent implements OnInit, OnDestroy {
   featureClicked(e: LeafletMouseEvent) {
     log.debug("featureClicked()");
     log.debug(e.target.feature.properties.name);
-    this._selectedFeatureName= e.target.feature.properties.name;
+    this._selectedFeatureName = e.target.feature.properties.name;
     this.updateSearch({selected: e.target.feature.properties.name});
     this.updateTwitterPanel(e.target.feature);
     this._oldClicked = this._clicked;
     this._clicked = e;
-    this.highlight(e,3);
+    this.highlight(e, 3);
     if (this._oldClicked != "") {
       this.featureLeft(this._oldClicked);
     }
@@ -605,7 +621,7 @@ export class MapComponent implements OnInit, OnDestroy {
       layer.setStyle({
                        stroke:      true,
                        weight:      3,
-                       color:       '#ea1e63',
+                       color:       '#EA1E63',
                        dashArray:   '',
                        fillOpacity: feature.properties.count > 0 ? 1.0 : 0.0
                      });
@@ -636,29 +652,8 @@ export class MapComponent implements OnInit, OnDestroy {
     // of a flag and queued events. The throttling is acheived by the the periodicity of the
     // schedulers execution.
 
-    this._resetLayersTimer = timer(0, 100).subscribe(() => {
-      if (this._layersAreStale) {
-        try {
-          if (this._rawTwitterData != null) {
-            this.updateData(this._rawTwitterData);
-          }
-          this.resetLayers(false);
-          this._layersAreStale = false;
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    });
+    this._exec.start();
 
-    this._stateUpdateTimer = timer(0, 200).subscribe(() => {
-      if (this._stateIsStale) {
-        this._router.navigate([], {
-          queryParams:         this._newParams,
-          queryParamsHandling: 'merge'
-        });
-        this._stateIsStale = false;
-      }
-    });
 
     this._twitterUpdateTimer = timer(0, 2000).subscribe(() => {
       if (this._twitterIsStale) {
@@ -684,12 +679,6 @@ export class MapComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this._loadTimer) {
       this._loadTimer.unsubscribe();
-    }
-    if (this._resetLayersTimer) {
-      this._resetLayersTimer.unsubscribe();
-    }
-    if (this._stateUpdateTimer) {
-      this._stateUpdateTimer.unsubscribe();
     }
     if (this._twitterUpdateTimer) {
       this._twitterUpdateTimer.unsubscribe();
@@ -742,40 +731,57 @@ export class MapComponent implements OnInit, OnDestroy {
    * Read the live.json data file and process contents.
    */
   async load() {
-    log.debug("readData()");
+    log.debug("load()");
     this.loading = true;
     try {
-      if (await Auth.currentAuthenticatedUser() !== null) {
-        this._rawTwitterData = await this.loadLiveData();
-        if (await Auth.currentAuthenticatedUser() !== null) {
+
+      await this._exec.queue("Load Data", ["ready", "map-init", "data-loaded", "data-load-failed"], () => {
+        return this.loadLiveData().then(i => {
+          this._rawTwitterData = i;
+          this._exec.state("data-loaded");
           log.debug("Loading live data completed");
+        }).catch(e => {
+          log.error(e);
+        });
+      });
 
-          this.updateSliderFromData(this._rawTwitterData);
+      await this._exec.queue("Update Slider", ["ready", "data-loaded"],
+                             () => {this.updateSliderFromData(this._rawTwitterData);});
 
-          // Mark as stale to trigger a refresh
-          this._twitterIsStale = true;
-          this._layersAreStale = true;
+      await this.updateLayers();
 
-          //We are no longer loading data (removes progress bar and spinners)
-          this.ready = true;
-          this.loading = false;
-        } else {
-          log.debug("User logged out since load started, not loading live data");
-          this.ready = false;
-          this.loading = false;
-        }
-      } else {
-        log.debug("User logged out, not loading live data");
-      }
+      this._twitterIsStale = true;
+
 
     } catch (e) {
-      log.debug(e);
+      this._exec.state("data-load-failed");
+      setTimeout(() => {
+        this.ngZone.run(() => this.load())
+      }, 5000);
+      log.error(e);
       this.loading = false;
       this.ready = false;
     }
 
   }
 
+
+  private async updateLayers() {
+    return this._exec.queue("Update Layers", ["ready", "data-loaded"], () => {
+                             // Mark as stale to trigger a refresh
+                             this._exec.state("data-refresh");
+                             this.updateData(this._rawTwitterData);
+                             this.resetLayers(false);
+                             if (this._params) {
+                               this._exec.state("ready");
+                             } else {
+                               this._exec.state("no-params");
+                             }
+                             this.ready = true;
+                             this.loading = false;
+                           }
+    );
+  }
 
   /**
    *
@@ -1001,8 +1007,13 @@ export class MapComponent implements OnInit, OnDestroy {
     this._dateMax = upper;
     this._dateMin = lower;
     this.updateSearch({min_offset: lower, max_offset: upper});
-    // Triggers updates with the state flags
-    this._layersAreStale = true;
+    this._exec.queue("Update Layers from Slider Change", ["data-loaded", "ready"], () => {
+                       // Mark as stale to trigger a refresh
+                       this._twitterIsStale = true;
+                       this.updateData(this._rawTwitterData);
+                       this.resetLayers(false);
+                     }
+    );
 
 
   }
@@ -1022,14 +1033,19 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   private updateTwitter() {
     log.debug("updateTwitter()");
-    if (!this.tweetsVisible) {
-      this._clicked = "";
-      this._feature = null;
-    }
-    if (this._clicked != "") {
-      this.updateTwitterPanel(this._clicked.target.feature);
-    } else if (this._feature !== null) {
-      this.updateTwitterPanel(this._feature);
-    }
+    this._exec.queue("Update Twitter", ["ready"], () => {
+      // Mark as stale to trigger a refresh
+      if (!this.tweetsVisible) {
+        this._clicked = "";
+        this._feature = null;
+      }
+      if (this._clicked != "") {
+        this.updateTwitterPanel(this._clicked.target.feature);
+      } else if (this._feature) {
+        this.updateTwitterPanel(this._feature);
+      }
+    });
+
+
   }
 }
