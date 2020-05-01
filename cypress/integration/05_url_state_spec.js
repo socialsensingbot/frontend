@@ -156,7 +156,7 @@ describe('URL State: ', function () {
   });
 
 
-  describe.only('select county and date range', () => {
+  describe('select county and date range', () => {
     const url = "http://localhost:4200/map?selected=powys&min_offset=-5459&max_offset=-2819";
     it('when authorized and load state', () => {
       cy.visit("http://localhost:4200/map");
