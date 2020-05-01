@@ -18,7 +18,7 @@ import {hmrBootstrap} from "./hmr";
 
 if (environment.production) {
   enableProdMode();
-  Amplify.Logger.LOG_LEVEL = 'INFO';
+  Amplify.Logger.LOG_LEVEL = 'WARN';
 } else {
   Amplify.Logger.LOG_LEVEL = 'DEBUG';
 }

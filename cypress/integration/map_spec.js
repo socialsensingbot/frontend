@@ -36,20 +36,19 @@ describe('Map: ', function () {
     const countFirstLegendVal = " 150–50 ";
 
     it('has correct default', () => {
-      cy.visitAndWait("http://localhost:4200/map");
-      cy.get(legendEntry).should("be.visible");
+      cy.visit("http://localhost:4200/map");
       cy.get(legendEntry).get("i").should("have.attr", "style").should("contain", statsFirstLegendColour)
       cy.get(legendEntry).should("have.text", statsFirstLegendVal);
     });
     it('changes from URL', () => {
-      cy.visitAndWait(url);
-      cy.get(legendEntry).should("be.visible");
+      cy.visit(url);
+      cy.url().should("equal", url);
       cy.get(legendEntry).get("i").should("have.attr", "style").should("contain", countFirstLegendColour)
       cy.get(legendEntry).should("have.text", countFirstLegendVal);
     });
     it('changes when stats layer is changed', () => {
-      cy.visitAndWait(url);
-      cy.get(legendEntry).should("be.visible");
+      cy.visit(url);
+      cy.url().should("equal", url);
       cy.get(legendEntry).get("i").should("have.attr", "style").should("contain", countFirstLegendColour)
       cy.get(legendEntry).should("have.text", countFirstLegendVal);
       cy.get(statsControl).trigger("mouseover")
@@ -64,15 +63,20 @@ describe('Map: ', function () {
   describe('Twitter drawer', () => {
     const url = "http://localhost:4200/map?selected=powys&min_offset=-5459&max_offset=-2819";
     it('can be closed', () => {
-      cy.visitAndWait(url);
+      cy.visit(url);
+      cy.wait(1000);
+      cy.url().should("equal", url);
+      cy.noSpinner();
       cy.twitterPanelVisible();
-      cy.get("mat-sidenav button.draw-close-button", {timeout: 30000}).should("be.visible");
       cy.get("mat-sidenav button.draw-close-button", {timeout: 30000}).click();
       cy.twitterPanelNotVisible();
       cy.logout();
     });
     it('is scrollable', () => {
-      cy.visitAndWait(url);
+      cy.visit(url);
+      cy.wait(1000);
+      cy.url().should("equal", url);
+      cy.noSpinner();
       cy.twitterPanelVisible();
       cy.get(".atr-1", {timeout: 60000}).should("be.visible");
       cy.get('.tweets-outer').scrollTo('bottom');
