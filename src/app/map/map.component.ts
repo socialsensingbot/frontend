@@ -532,8 +532,7 @@ export class MapComponent implements OnInit, OnDestroy {
                         weight,
                         color:       '#EA1E63',
                         dashArray:   '',
-                        fillOpacity: count > 0 ? 1.0 : 0.0,
-                        fill:        count > 0
+                        fillOpacity: count > 0 ? 1.0 : 0.5,
                       });
 
     if (!Browser.ie && !Browser.opera && !Browser.edge) {
@@ -623,7 +622,7 @@ export class MapComponent implements OnInit, OnDestroy {
                        weight:      3,
                        color:       '#EA1E63',
                        dashArray:   '',
-                       fillOpacity: feature.properties.count > 0 ? 1.0 : 0.0
+                       fillOpacity: feature.properties.count > 0 ? 1.0 : 0.01
                      });
 
       if (!Browser.ie && !Browser.opera && !Browser.edge) {
