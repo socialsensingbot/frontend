@@ -10,6 +10,9 @@ export class LayerStyleService {
 }
 
 export function getColor(values, colors, d){
+  if(d == 0) {
+    return "#000000"
+  }
   for(var i=0; i<values.length; i++){
     if(d > values[i]){ return colors[i]; }
   }
@@ -17,7 +20,7 @@ export function getColor(values, colors, d){
 }
 
 export function getFill(d) {
-  return (d == 0)  ? 0 : 0.7;
+  return (d == 0)  ? 0.1 : 0.7;
 }
 
 export function getFeatureStyle(values, colors, layer_type, feature){

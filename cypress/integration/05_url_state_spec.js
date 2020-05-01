@@ -1,3 +1,4 @@
+const zoomDuration = 1000;
 describe('URL State: ', function () {
   beforeEach(()=> {
     cy.stubLiveJson("live-old");
@@ -55,7 +56,7 @@ describe('URL State: ', function () {
       cy.login();
       cy.url().should("equal", url);
       cy.noSpinner();
-      cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000}).should("have.attr","fill").should("eq","#2B8CBE");
+      cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 60000}).should("have.attr","fill").should("eq","#2B8CBE");
       cy.twitterPanelHeader("44 Tweets from 123");
       cy.logout();
     });
@@ -65,7 +66,7 @@ describe('URL State: ', function () {
       cy.visit(url);
       cy.url().should("equal", url);
       cy.noSpinner();
-      cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
+      cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 60000});
       cy.twitterPanelHeader("44 Tweets from 123");
       cy.logout();
     });
@@ -81,11 +82,15 @@ describe('URL State: ', function () {
       cy.login();
       cy.url().should("equal", url);
       cy.noSpinner();
+      cy.wait(zoomDuration)
+      cy.get(".leaflet-control-zoom-in").should("be.visible");
       cy.get(".leaflet-control-zoom-in").click();
-      cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
+      //zoom delay
+      cy.wait(zoomDuration)
+      cy.pushStateDelay(); // The push state is not immediate
       cy.url({timeout:30000}).should("equal", urlZoom7);
       cy.get(".leaflet-control-zoom-out").click();
-      cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
+      cy.pushStateDelay(); // The push state is not immediate
       cy.url({timeout:30000}).should("equal", urlZoom6);
       cy.logout();
     });
@@ -95,8 +100,12 @@ describe('URL State: ', function () {
       cy.login();
       cy.url().should("equal", urlZoom7);
       cy.noSpinner();
+      cy.wait(zoomDuration)
+      cy.get(".leaflet-control-zoom-in");
       cy.get(".leaflet-control-zoom-in").click();
-      cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
+      //zoom delay
+      cy.wait(zoomDuration)
+      cy.pushStateDelay(); // The push state is not immediate
       cy.url({timeout:30000}).should("equal", urlZoom8);
       cy.logout();
     });
@@ -106,8 +115,12 @@ describe('URL State: ', function () {
       cy.visit(urlZoom7);
       cy.url().should("equal", urlZoom7);
       cy.noSpinner();
+      cy.wait(zoomDuration)
+      cy.get(".leaflet-control-zoom-in");
       cy.get(".leaflet-control-zoom-in").click();
-      cy.wait(10000); // The push state is not immediate (about 2s delay) (for performance)
+      //zoom delay
+      cy.wait(zoomDuration)
+      cy.pushStateDelay(); // The push state is not immediate
       cy.url({timeout:30000}).should("equal", urlZoom8);
       cy.logout();
     });
@@ -123,7 +136,7 @@ describe('URL State: ', function () {
       cy.url().should("equal", url);
       cy.noSpinner();
       cy.get(".mat-sidenav-content").click(500,500);
-      cy.wait(4000); // The push state is not immediate (about 2s delay) (for performance)
+      cy.pushStateDelay(); // The push state is not immediate
       cy.url().should("equal", newUrl);
       cy.twitterPanelHeader("Showing 2 of 2 Tweets from Cambridgeshire");
       cy.logout();
@@ -135,7 +148,7 @@ describe('URL State: ', function () {
       cy.url().should("equal", url);
       cy.noSpinner();
       cy.get(".mat-sidenav-content").click(500,500);
-      cy.wait(10000); // The push state is not immediate (about 2s delay) (for performance)
+      cy.pushStateDelay(); // The push state is not immediate
       cy.url({timeout:20000}).should("equal", newUrl);
       cy.twitterPanelHeader("Showing 2 of 2 Tweets from Cambridgeshire");
       cy.logout();
@@ -152,10 +165,11 @@ describe('URL State: ', function () {
       cy.url().should("equal", url);
       cy.noSpinner();
       cy.get(".slider-date-time", {timeout: 20000});
-      cy.get(".slider-date-time .slider-date").should("contain.text","11-Oct-18");
-      cy.get(".slider-date-time .slider-time").should("contain.text","5 AM");
+      cy.url().should("equal", url);
+      cy.get(".slider-date-time-min .slider-date",{timeout: 20000}).should("contain.text","11-Oct-18");
+      cy.get(".slider-date-time-min .slider-time").should("contain.text","5 AM");
       cy.get(".tweet-drawer", {timeout: 20000}).should("be.visible");
-      cy.get("twitter-panel .tweets-header  mat-card > span > b", {timeout: 40000}).should("contain.text","Showing 8 of 8 Tweets from Powys");
+      cy.url().should("equal", url);
       cy.twitterPanelHeader("Showing 8 of 8 Tweets from Powys");
 
       cy.logout();
