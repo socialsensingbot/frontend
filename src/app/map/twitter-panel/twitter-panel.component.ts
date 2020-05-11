@@ -109,11 +109,10 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
       });
       this.visibleCount = this.hidden.filter(i => !i).length;
       log.debug(this.tweets);
-      if (this.tweets.length > 0) {
-        //
-        // (window as any).twttr.widgets.load($("#tinfo")[0]);
-
+      if (this.tweets.length - this.hidden.length > 0) {
+        log.debug("Waiting for tweets to load before marking as ready.")
       } else {
+        log.debug("No tweets to load so marking as ready.")
         this.ready = true;
       }
       this.animateTweetAppearance();
