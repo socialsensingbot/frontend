@@ -1,16 +1,16 @@
 # Script to run the for the Amplify Console CI Cypress testing
 cd $(dirname $0)
 cd ..
-tests="cypress/integration/quick/**/*"
+tests="cypress/integration/quick/**"
 
 if  [[ "${AWS_BRANCH}" = feature* ]]
-then  tests="cypress/integration/quick/**/*"
+then  tests="cypress/integration/quick/**"
 fi
 if  [[ "${AWS_BRANCH}" = release* ]]
-then  tests="cypress/integration/**/*"
+then  tests="cypress/integration/**"
 fi
 if  [[ "${AWS_BRANCH}" = develop ]]
-then  tests="cypress/integration/**/*"
+then  tests="cypress/integration/**"
 fi
 if  [[ "${AWS_BRANCH}" = staging ]]
 then
