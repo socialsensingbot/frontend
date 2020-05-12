@@ -1,4 +1,4 @@
-<mat-card class="example-card" *ngIf="_timeKeyedData">
+<mat-card class="example-card" *ngIf="timeKeyedData">
   <div class="slider-surround custom-slider">
     <ng5-slider [manualRefresh]="refresh" [(value)]="lowerValue" [(highValue)]="upperValue" [options]="sliderOptions" (userChangeEnd)="onEnd.emit($event)"></ng5-slider>
   </div>

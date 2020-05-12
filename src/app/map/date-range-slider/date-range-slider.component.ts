@@ -24,7 +24,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
   /**
    * Time series data, keyed by one minute interval.
    */
-  private _timeKeyedData: any;
+  public timeKeyedData: any;
 
   /**
    * These are the options for *this* component, not the ng5-slider.
@@ -58,7 +58,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
       log.debug("Undefined upper value");
     }
     this._upperValue = value;
-    if (typeof this._timeKeyedData !== "undefined") {
+    if (typeof this.timeKeyedData !== "undefined") {
       log.debug(value);
       this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));    }
   }
@@ -79,7 +79,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
       log.debug("Undefined lower value");
     }
     this._lowerValue = value;
-    if (typeof this._timeKeyedData !== "undefined") {
+    if (typeof this.timeKeyedData !== "undefined") {
       log.debug(value);
       this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
     }
@@ -109,17 +109,17 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     step:         60,
     showTicks:    false,
     ticksTooltip: (value: number): string => {
-      return this._timeKeyedData[-value] ? this.cleanDate(this._timeKeyedData[-value], 0,"") : ""
+      return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0, "") : ""
     },
     translate:    (value: number, label: LabelType): string => {
-      if (typeof this._timeKeyedData !== "undefined" && typeof this._timeKeyedData[-value] !== "undefined") {
+      if (typeof this.timeKeyedData !== "undefined" && typeof this.timeKeyedData[-value] !== "undefined") {
         switch (label) {
           case LabelType.Low:
-            return this._timeKeyedData[-value] ? this.cleanDate(this._timeKeyedData[-value], 0,"min") : "";
+            return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0, "min") : "";
           case LabelType.High:
-            return this._timeKeyedData[-value] ? this.cleanDate(this._timeKeyedData[-value], 1,"max") : "";
+            return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 1, "max") : "";
           default:
-            return this._timeKeyedData[-value] ? this.cleanDate(this._timeKeyedData[-value], 0,"") : "";
+            return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0, "") : "";
         }
       } else {
         return "";
@@ -142,7 +142,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.timeKeySub = this._data.timeKeyUpdate.subscribe(i => {
       log.debug("Received new time-keyed data")
-      this._timeKeyedData = i;
+      this.timeKeyedData = i;
       this.refresh.emit();
     });
   }
