@@ -145,10 +145,7 @@ export class MapComponent implements OnInit, OnDestroy {
     center: latLng([53, -2])
   };
 
-  /**
-   * A flag that prevents more than one simultaneous update to the map.
-   */
-  private _updating: boolean;
+
   private _selectedFeatureName: string;
 
 
