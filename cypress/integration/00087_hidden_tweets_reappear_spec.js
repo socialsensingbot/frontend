@@ -31,7 +31,7 @@ describe('Issue https://github.com/socialsensingbot/frontend/issues/87 : ', func
             cy.get(menu2ndOpt).contains("Unignore Tweet");
             expectHiddenAfterRefresh = false;
           } else if (el.text().trim() === "Unignore Tweet") {
-            cy.get(menu2ndOpt).click();
+            cy.get(menu2ndOpt).click({force: true});
             cy.wait(4000);
             cy.get(secondTweet + " mat-icon", {timeout: 30000}).click({force: true});
             cy.get(menu2ndOpt).contains("Ignore Tweet");
