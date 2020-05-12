@@ -81,7 +81,8 @@ export class PreferenceService {
   }
 
   private async readBlacklist() {
-    const result = await API.graphql(graphqlOperation(listTweetIgnores));
+    //todo: this is a hardcoded limit to fix https://github.com/socialsensingbot/frontend/issues/87
+    const result = await API.graphql(graphqlOperation(listTweetIgnores,{limit:10000}));
     if (result.data.listTweetIgnores) {
       this._tweetBlackList.push(...result.data.listTweetIgnores.items.map(i => i.tweetId));
     }
@@ -89,7 +90,8 @@ export class PreferenceService {
     // if(result2.data.listTweetIrrelevants) {
     //   this._tweetBlackList.push(...result2.data.listTweetIrrelevants.items.map(i => i.tweetId));
     // }
-    const result3 = await API.graphql(graphqlOperation(listTwitterUserIgnores));
+    //todo: this is a hardcoded limit to fix https://github.com/socialsensingbot/frontend/issues/87
+    const result3 = await API.graphql(graphqlOperation(listTwitterUserIgnores,{limit:10000}));
     if (result3.data.listTwitterUserIgnores) {
       this._twitterUserBlackList.push(...result3.data.listTwitterUserIgnores.items.map(i => i.twitterScreenName));
     }
