@@ -7,7 +7,7 @@ describe('Issue https://github.com/socialsensingbot/frontend/issues/87 : ', func
   beforeEach(() => {
     cy.stubLiveJson("live-old");
   })
-  describe.only("Hidden tweets reappearing after refresh", () => {
+  describe("Hidden tweets reappearing after refresh", () => {
 
     const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
     const test = (refresh,count) => {

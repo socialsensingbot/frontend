@@ -3,6 +3,7 @@ import {LabelType, Options} from "ng5-slider";
 import {Subscription, timer} from "rxjs";
 import {Hub, Logger} from "aws-amplify";
 import {NgEventBus} from "ng-event-bus";
+import {MapDataService} from "../services/map-data.service";
 const log = new Logger('date-range');
 
 @Component({
@@ -16,16 +17,6 @@ const log = new Logger('date-range');
  * events.
  */
 export class DateRangeSliderComponent implements OnInit, OnDestroy {
-  public get timeKeyedData(): any {
-    return this._timeKeyedData;
-  }
-
-  @Input()
-  public set timeKeyedData(value: any) {
-    log.debug("Received new time-keyed data")
-    this._timeKeyedData = value;
-    this.refresh.emit();
-  }
 
 
   @Output() public onEnd= new EventEmitter<any>()
@@ -142,15 +133,22 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
    */
   private _options: DateRangeSliderOptions;
 
-  constructor() {
+  constructor(private _data: MapDataService) {
 
   }
 
-  ngOnInit() {
+  private timeKeySub: Subscription;
 
+  ngOnInit() {
+    this.timeKeySub = this._data.timeKeyUpdate.subscribe(i => {
+      log.debug("Received new time-keyed data")
+      this._timeKeyedData = i;
+      this.refresh.emit();
+    });
   }
 
   ngOnDestroy() {
+    this.timeKeySub.unsubscribe();
   }
 
 
