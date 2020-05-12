@@ -15,7 +15,6 @@ Amplify.configure(awsconfig);
 import {AppModule} from './app/app.module';
 import {environment} from './environments/environment';
 import {hmrBootstrap} from "./hmr";
-
 if (environment.production) {
   enableProdMode();
   Amplify.Logger.LOG_LEVEL = 'INFO';
@@ -23,9 +22,14 @@ if (environment.production) {
   Amplify.Logger.LOG_LEVEL = 'DEBUG';
 }
 
+
 if(window.location.search.indexOf('__debug__') >= 0) {
   Amplify.Logger.LOG_LEVEL = 'VERBOSE';
 }
+
+log.info("**********************************")
+log.info("*** Social Sensing Version "+environment.version);
+log.info("**********************************")
 
 const bootstrap = () => platformBrowserDynamic().bootstrapModule(AppModule);
 
