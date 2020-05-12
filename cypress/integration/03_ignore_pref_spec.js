@@ -9,6 +9,8 @@ describe('Ignore tweets: ', function () {
       cy.login();
       cy.noSpinner();
       const secondTweet = "twitter-panel .atr-1";
+      cy.get(".tweet-drawer", {timeout: 30000}).should("be.visible");
+      cy.get(secondTweet, {timeout: 30000}).should("be.visible");
       cy.get(secondTweet, {timeout: 30000}).then(row => {
         if (row.find("mat-expansion-panel").length > 0) {
           cy.get(secondTweet + " mat-expansion-panel mat-panel-title", {timeout: 30000}).should('be.visible').click();
