@@ -81,7 +81,8 @@ export class PreferenceService {
   }
 
   private async readBlacklist() {
-    const result = await API.graphql(graphqlOperation(listTweetIgnores));
+    //todo: this is a hardcoded limit to fix https://github.com/socialsensingbot/frontend/issues/87
+    const result = await API.graphql(graphqlOperation(listTweetIgnores,{limit:10000}));
     if (result.data.listTweetIgnores) {
       this._tweetBlackList.push(...result.data.listTweetIgnores.items.map(i => i.tweetId));
     }
@@ -89,7 +90,8 @@ export class PreferenceService {
     // if(result2.data.listTweetIrrelevants) {
     //   this._tweetBlackList.push(...result2.data.listTweetIrrelevants.items.map(i => i.tweetId));
     // }
-    const result3 = await API.graphql(graphqlOperation(listTwitterUserIgnores));
+    //todo: this is a hardcoded limit to fix https://github.com/socialsensingbot/frontend/issues/87
+    const result3 = await API.graphql(graphqlOperation(listTwitterUserIgnores,{limit:10000}));
     if (result3.data.listTwitterUserIgnores) {
       this._twitterUserBlackList.push(...result3.data.listTwitterUserIgnores.items.map(i => i.twitterScreenName));
     }
@@ -115,7 +117,9 @@ export class PreferenceService {
       console.error("Shouldn't be trying to ignore sender on an unparseable tweet.");
       return;
     }
-    const id = (await this._username) + ":" + parsed.sender;
+    //#87 the value of the await needs to be in a temp variable
+    const username = await this._username;
+    const id = username + ":" + parsed.sender;
     const result = await API.graphql(graphqlOperation(getTwitterUserIgnore, {id}));
     log.debug(result);
     if (!result.data.getTwitterUserIgnore) {
@@ -123,7 +127,7 @@ export class PreferenceService {
         input: {
           id:                      id,
           twitterScreenName:       parsed.sender,
-          twitterUserIgnoreUserId: (await this._username)
+          twitterUserIgnoreUserId: username
         }
       }));
     } else {
@@ -144,7 +148,8 @@ export class PreferenceService {
       return;
     }
 
-    const id = (await this._username) + ":" + parsed.tweet;
+    const username = await this._username;
+    const id = username + ":" + parsed.tweet;
     const result = await API.graphql(graphqlOperation(getTweetIgnore, {id}));
     log.debug(result);
     if (!result.data.getTweetIgnore) {
@@ -153,7 +158,7 @@ export class PreferenceService {
           id,
           url:               parsed.url,
           tweetId:           parsed.tweet,
-          tweetIgnoreUserId: await (this._username)
+          tweetIgnoreUserId: username
         }
       }));
     } else {
@@ -162,30 +167,30 @@ export class PreferenceService {
     this._tweetBlackList.push(parsed.tweet);
   }
 
-  public async markIrrelevant(tweet: string) {
-    const parsed = this.parseTweet(tweet);
-    if(parsed == null) {
-      console.error("Shouldn't be trying to mark irrelevant tweet on an unparseable tweet.");
-      return;
-    }
-
-    const id = (await this._username) + ":" + parsed.tweet;
-    const result = await API.graphql(graphqlOperation(getTweetIrrelevant, {id}));
-    log.debug(result);
-    if (!result.data.getTweetIrrelevant) {
-      const result = await API.graphql(graphqlOperation(createTweetIrrelevant, {
-        input: {
-          id,
-          url:                   parsed.url,
-          tweetId:               parsed.tweet,
-          tweetIrrelevantUserId: (await this._username)
-        }
-      }));
-    } else {
-      this._notification.show("Already marked irrelevant " + parsed.tweet);
-    }
-
-  }
+  // public async markIrrelevant(tweet: string) {
+  //   const parsed = this.parseTweet(tweet);
+  //   if(parsed == null) {
+  //     console.error("Shouldn't be trying to mark irrelevant tweet on an unparseable tweet.");
+  //     return;
+  //   }
+  //
+  //   const id = (await this._username) + ":" + parsed.tweet;
+  //   const result = await API.graphql(graphqlOperation(getTweetIrrelevant, {id}));
+  //   log.debug(result);
+  //   if (!result.data.getTweetIrrelevant) {
+  //     const result = await API.graphql(graphqlOperation(createTweetIrrelevant, {
+  //       input: {
+  //         id,
+  //         url:                   parsed.url,
+  //         tweetId:               parsed.tweet,
+  //         tweetIrrelevantUserId: (await this._username)
+  //       }
+  //     }));
+  //   } else {
+  //     this._notification.show("Already marked irrelevant " + parsed.tweet);
+  //   }
+  //
+  // }
 
   public parseTweet(blockquote: string) : {tweet:string, sender: string, url: string} | null {
     //https://twitter.com/crickhowellhs/status/1051548078199717888?ref_src=twsrc%5Etfw%7Ctwcamp%5Etweetembed%7Ctwterm%5E1051548078199717888&ref_url=http%3A%2F%2Flocalhost%3A4200%2Fmap%3Fselected%3Dpowys%26min_offset%3D-3119%26max_offset%3D0

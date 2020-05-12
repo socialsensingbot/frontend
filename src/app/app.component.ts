@@ -17,6 +17,7 @@ export class AppComponent  {
 
 
   title = 'SocialSensing.com';
+  public isDev: boolean = !environment.production;
   user: any;
   usernameAttributes = "email";
   isAuthenticated: boolean;
