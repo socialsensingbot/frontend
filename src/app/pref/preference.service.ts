@@ -115,6 +115,7 @@ export class PreferenceService {
       console.error("Shouldn't be trying to ignore sender on an unparseable tweet.");
       return;
     }
+    //#87 the value of the await needs to be in a temp variable
     const username = await this._username;
     const id = username + ":" + parsed.sender;
     const result = await API.graphql(graphqlOperation(getTwitterUserIgnore, {id}));
