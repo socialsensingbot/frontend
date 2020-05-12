@@ -1,10 +1,26 @@
 # Script to run the for the Amplify Console CI Cypress testing
 cd $(dirname $0)
 cd ..
-tests="cypress/integration/quick/**"
+tests="cypress/integration/quick/**/*"
 
-if  [ "${AWS_BRANCH}" = "develop" ]
-then  tests="cypress/integration/**"
+if  [[ "${AWS_BRANCH}" = feature* ]]
+then  tests="cypress/integration/quick/**/*"
+fi
+if  [[ "${AWS_BRANCH}" = release* ]]
+then  tests="cypress/integration/**/*"
+fi
+if  [[ "${AWS_BRANCH}" = develop ]]
+then  tests="cypress/integration/**/*"
+fi
+if  [[ "${AWS_BRANCH}" = staging ]]
+then
+  echo "Tests must not be run on STAGING"
+  exit 1
+fi
+if  [[ "${AWS_BRANCH}" = staging ]]
+then
+  echo "Tests must not be run on MASTER"
+  exit 1
 fi
 
 
