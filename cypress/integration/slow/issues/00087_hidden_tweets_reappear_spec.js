@@ -15,26 +15,24 @@ describe('Issue https://github.com/socialsensingbot/frontend/issues/87 : ', func
       const secondTweet = "twitter-panel .atr-"+count;
       let expectHiddenAfterRefresh = false;
       cy.get(".tweet-drawer", {timeout: 30000}).should("be.visible");
-      cy.get(secondTweet, {timeout: 30000}).scrollIntoView().should("be.visible");
       cy.get(secondTweet, {timeout: 30000}).then(row => {
-        if (row.find("mat-expansion-panel").length > 0) {
-          cy.get(secondTweet + " mat-expansion-panel mat-panel-title", {timeout: 30000}).should('be.visible').click({force: true});
-
+        if (row.hasClass("atr-hidden")) {
+          cy.get(".hidden-tweet-container mat-panel-title", {timeout: 30000}).scrollIntoView().should('be.visible').click({force: true});
         } else {
           cy.get(secondTweet + " twitter-widget", {timeout: 60000});
-
         }
 
-        cy.get(secondTweet + " mat-icon").should("be.visible").click({force: true});
+        cy.get(secondTweet + " mat-icon",{timeout: 30000}).click({force: true});
         cy.get(menu2ndOpt).then(el => {
           console.debug("'" + el.text() + "'")
           if (el.text().trim() === "Ignore Tweet") {
             cy.get(menu2ndOpt).click();
-            cy.get(secondTweet + " mat-expansion-panel mat-panel-title", {timeout: 30000}).should('be.visible').click({force: true});
+            cy.wait(4000);
             cy.get(secondTweet + " mat-icon", {timeout: 30000}).click({force: true});
             cy.get(menu2ndOpt).contains("Unignore Tweet");
             expectHiddenAfterRefresh = false;
           } else if (el.text().trim() === "Unignore Tweet") {
+            cy.get(".hidden-tweet-container mat-panel-title", {timeout: 30000}).scrollIntoView().should('be.visible').click({force: true});
             cy.get(menu2ndOpt).click({force: true});
             cy.wait(4000);
             cy.get(secondTweet + " mat-icon", {timeout: 30000}).click({force: true});
@@ -48,9 +46,9 @@ describe('Issue https://github.com/socialsensingbot/frontend/issues/87 : ', func
           cy.noSpinner();
         }
         if (expectHiddenAfterRefresh) {
-          cy.get(secondTweet + " mat-expansion-panel mat-panel-title", {timeout: 30000}).should('be.visible');
+          cy.get(secondTweet + ".atr-hidden", {timeout: 30000}).should('be.visible');
         } else {
-          cy.get(secondTweet + " twitter-widget", {timeout: 60000});
+          cy.get(secondTweet + ".atr-visible", {timeout: 60000});
         }
       });
     };

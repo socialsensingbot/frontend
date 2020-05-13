@@ -53,8 +53,8 @@
     align-items: center;
     //border: 1px solid blue;
     position: relative;
-    max-width:548px;
-    min-width:548px;
+    max-width:540px;
+    min-width:540px;
     transition: opacity 0.5s ease-in-out;
 
     .app-twitter-item-menu {
@@ -110,5 +110,16 @@
 
 .hidden-tweet-container{
   position:relative;
+  max-width:540px;
+  background-color: #eee;
+  .app-twitter-row {
+    max-width:540px;
+    left:-8px;
+    .app-twitter-item-menu {
+      right: 8px;
+      top: -8px;
+      //border: 1px solid red;
+    }
+  }
 }
 
