@@ -45,11 +45,11 @@ Cypress.Commands.add("visitAndWait", (url) => {
 
 Cypress.Commands.add("noSpinner", () => {
   cy.get('.map');
-  cy.get("mat-spinner",{timeout:30000}).should("not.be.visible");
+  cy.get("mat-spinner",{timeout:60000}).should("not.be.visible");
   cy.get('body').should(el => {
     if (el) {
       if (el.find("mat-spinner").length > 0) {
-        cy.get("mat-spinner",{timeout:30000}).should("not.be.visible");
+        cy.get("mat-spinner",{timeout:60000}).should("not.be.visible");
       } else {}
     } else {
     }
