@@ -14,16 +14,7 @@ describe('URL State: ', function () {
 
       cy.logout();
     });
-    it('when authorized and load state', () => {
-      cy.visit("http://localhost:4200/map");
-      cy.login();
-      cy.visit(url);
-      cy.url().should("equal", url);
-      cy.noSpinner();
-      cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
 
-      cy.logout();
-    });
   });
 
   describe('select polygon type', () => {
@@ -38,16 +29,7 @@ describe('URL State: ', function () {
       cy.twitterPanelHeader("44 Tweets from 123");
       cy.logout();
     });
-    it('when authorized and load state', () => {
-      cy.visit(url);
-      cy.login();
-      cy.visit(url);
-      cy.url().should("equal", url);
-      cy.noSpinner();
-      cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
-      cy.twitterPanelHeader("44 Tweets from 123");
-      cy.logout();
-    });
+
   });
   describe('select polygon type and count stats', () => {
     const url = "http://localhost:4200/map?active_polygon=coarse&selected=123&active_number=count";
@@ -63,9 +45,7 @@ describe('URL State: ', function () {
     it('when authorized and load state', () => {
       cy.visit(url);
       cy.login();
-      cy.visit(url);
-      cy.url().should("equal", url);
-      cy.noSpinner();
+      cy.visitAndWait(url);
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 60000});
       cy.twitterPanelHeader("44 Tweets from 123");
       cy.logout();
@@ -109,21 +89,7 @@ describe('URL State: ', function () {
       cy.url({timeout:30000}).should("equal", urlZoom8);
       cy.logout();
     });
-    it('when authorized and load state', () => {
-      cy.visit(urlZoom7);
-      cy.login();
-      cy.visit(urlZoom7);
-      cy.url().should("equal", urlZoom7);
-      cy.noSpinner();
-      cy.wait(zoomDuration)
-      cy.get(".leaflet-control-zoom-in");
-      cy.get(".leaflet-control-zoom-in").click();
-      //zoom delay
-      cy.wait(zoomDuration)
-      cy.pushStateDelay(); // The push state is not immediate
-      cy.url({timeout:30000}).should("equal", urlZoom8);
-      cy.logout();
-    });
+
   });
 
 
@@ -141,18 +107,6 @@ describe('URL State: ', function () {
       cy.twitterPanelHeader("Showing 2 of 2 Tweets from Cambridgeshire");
       cy.logout();
     });
-    it('when authorized and load state', () => {
-      cy.visit(url);
-      cy.login();
-      cy.visit(url);
-      cy.url().should("equal", url);
-      cy.noSpinner();
-      cy.get(".mat-sidenav-content").click(500,500);
-      cy.pushStateDelay(); // The push state is not immediate
-      cy.url({timeout:20000}).should("equal", newUrl);
-      cy.twitterPanelHeader("Showing 2 of 2 Tweets from Cambridgeshire");
-      cy.logout();
-    });
   });
 
 
@@ -161,9 +115,7 @@ describe('URL State: ', function () {
     it('when authorized and load state', () => {
       cy.visit("http://localhost:4200/map");
       cy.login();
-      cy.visit(url);
-      cy.url().should("equal", url);
-      cy.noSpinner();
+      cy.visitAndWait(url);
       cy.get(".slider-date-time", {timeout: 20000});
       cy.url().should("equal", url);
       cy.get(".slider-date-time-min .slider-date",{timeout: 20000}).should("contain.text","11-Oct-18");

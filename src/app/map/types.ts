@@ -33,6 +33,7 @@ export type BasemapControl = { polygon: MapLayers; numbers: NumberLayers };
 export type ByRegionType<T> = {
   [index in PolygonLayerShortName]: T;
 };
+export type Stats = ByRegionType<RegionData<any, any, any>>;
 
 export type PolygonLayerFullName = "Local Authority" | "Coarse Grid" | "Fine Grid";
 export type PolygonLayerShortName = "county" | "coarse" | "fine";

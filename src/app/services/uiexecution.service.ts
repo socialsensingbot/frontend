@@ -23,6 +23,13 @@ class ExecutionTask {
 
 type UIState= "init"|"map-init"|"data-loaded"|"ready"|"no-params"|"data-refresh"|"data-load-failed";
 
+/**
+ * The UIExecutionService is responsible for making sure
+ * certain tasks are executed in serial and that they are only executed
+ * if the internal state machine is in the correct state.
+ *
+ * The effect of this is to give a deterministic start up process.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -43,7 +50,7 @@ export class UIExecutionService {
         if(task.waitForStates === null || task.waitForStates.indexOf(this._state) >= 0) {
           task.execute()
         } else {
-          console.warn(`Skipped task ${task.name} on execution queue, state ${this._state} should be one of ${task.waitForStates}`)
+          console.error(`Skipped out of sequence task ${task.name} on execution queue, state ${this._state} should be one of ${task.waitForStates}`)
           // this._queue.push(task)
         }
 

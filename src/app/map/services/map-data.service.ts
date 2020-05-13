@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable, NgZone} from '@angular/core';
-import {ByRegionType, COUNTY, PolygonLayerShortName, polygonLayerShortNames, RegionData} from "../types";
+import {ByRegionType, COUNTY, PolygonLayerShortName, polygonLayerShortNames, RegionData, Stats} from "../types";
 import {Logger, Storage} from "aws-amplify";
 import {HttpClient} from "@angular/common/http";
 import {UIExecutionService} from "../../services/uiexecution.service";
@@ -14,6 +14,8 @@ class TimeSlice {
 const MAX_TWEETS = 100;
 
 const log = new Logger('map-data');
+
+
 
 @Injectable({
               providedIn: 'root'
@@ -31,15 +33,15 @@ export class MapDataService {
    *
    * @see _rawTwitterData for the unprocessed data.
    */
-  private _twitterData: ByRegionType<RegionData<any, number[], string[]>> = {
-    county: {stats: {}, count: [], embed: []},
-    coarse: {stats: {}, count: [], embed: []},
-    fine:   {stats: {}, count: [], embed: []},
-  };
+  private _twitterData: Stats = Object.freeze({
+                                                county: Object.freeze({stats: {}, count: {}, embed: {}}),
+                                                coarse: Object.freeze({stats: {}, count: {}, embed: {}}),
+                                                fine:   Object.freeze({stats: {}, count: {}, embed: {}}),
+                                              });
   /**
    * This is the semi static stats data which is loaded from assets/data.
    */
-  private _stats: ByRegionType<RegionData<any, any, any>> = {
+  private _stats: Stats = {
     county: {stats: {}, count: {}, embed: {}},
     coarse: {stats: {}, count: {}, embed: {}},
     fine:   {stats: {}, count: {}, embed: {}}
@@ -47,35 +49,59 @@ export class MapDataService {
 
   public timeKeyedData: any; //The times in the input JSON
 
-  private _gridSizes: ByRegionType<string> = {county: COUNTY, coarse: "15", fine: "60"};
+  private _gridSizes: ByRegionType<string> = Object.freeze({county: COUNTY, coarse: "15", fine: "60"});
 
 
   private _B: number = 1407;//countyStats["cambridgeshire"].length; //number of stats days
   private _updating: boolean;
+  private _statsLoaded: any;
 
   constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService) { }
 
   /**
    * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
    */
-  public loadStats(): Promise<any> {
+  public loadStats(): Promise<Stats> {
     log.debug("loadStats()");
+    if (this._statsLoaded) {
+      log.debug("Stats already loaded;")
+      return new Promise(r => r(this._stats));
+    }
     return fetch("assets/data/county_stats.json")
       .then(response => response.json())
       .then(json => {
-        this._stats.county = json;
+        if (!this._statsLoaded) {
+          this._stats.county = Object.freeze(json);
+        }
       })
-      .then(() =>
-              fetch("assets/data/coarse_stats.json")
-                .then(response => response.json())
-                .then(json => {
-                  this._stats.coarse = json;
-                }))
-      .then(() => fetch("assets/data/fine_stats.json")
-        .then(response => response.json())
-        .then(json => {
-          this._stats.fine = json;
-        }));
+      .then(() => {
+        if (!this._statsLoaded) {
+          fetch("assets/data/coarse_stats.json")
+            .then(response => response.json())
+            .then(json => {
+              this._stats.coarse = Object.freeze(json);
+
+            })
+        } else {
+          return this._stats;
+        }
+      })
+      .then(() => {
+        if (!this._statsLoaded) {
+          fetch("assets/data/fine_stats.json")
+            .then(response => response.json())
+            .then(json => {
+              if (!this._statsLoaded) {
+                this._stats.fine = Object.freeze(json);
+                this._statsLoaded = true;
+                Object.freeze(this._stats);
+              }
+              return this._stats;
+            })
+        } else {
+          return this._stats;
+        }
+      });
   }
 
   /**
@@ -103,6 +129,8 @@ export class MapDataService {
   }
 
   public embeds(activePolyLayerShortName: PolygonLayerShortName, name: any): string {
+    log.debug(`embeds(${activePolyLayerShortName},${name})`);
+    log.debug(JSON.stringify(this._twitterData[activePolyLayerShortName].embed[name]));
     return this._twitterData[activePolyLayerShortName].embed[name];
   }
 
@@ -139,10 +167,12 @@ export class MapDataService {
     // next part without triggering Angular
     try {
 
-        this.clearProcessedTweetData();
-        this.updateTweetsData(_dateMin, _dateMax);
+
+      this.updateTweetsData(_dateMin, _dateMax);
 
 
+    } catch (e) {
+      log.error(e);
     } finally {
       log.debug("update() end");
       this._updating = false;
@@ -156,13 +186,11 @@ export class MapDataService {
    * Clears down the {@link _twitterData} field.
    */
   private clearProcessedTweetData() {
-    for (const k in this._twitterData) {
-      if (this._twitterData.hasOwnProperty(k)) {
-        for (const p in (this._twitterData)[k as PolygonLayerShortName]) {
-          (this._twitterData)[k as PolygonLayerShortName][p] = {};
-        }
-      }
-    }
+    this._twitterData= {
+                                        county:{stats: {}, count: {}, embed: {}},
+                                        coarse: {stats: {}, count: {}, embed: {}},
+                                        fine:  {stats: {}, count: {}, embed: {}},
+                                      };
   }
 
 
@@ -173,9 +201,8 @@ export class MapDataService {
    * @param tweetInfo the raw data to process.
    */
   private updateTweetsData(_dateMin, _dateMax) {
-
+    this.clearProcessedTweetData();
     const {_twitterData, timeKeyedData, _gridSizes} = this;
-
     for (const i in timeKeyedData.slice(-_dateMax, -_dateMin)) { //all times
       var timeKey = (timeKeyedData.slice(-_dateMax, -_dateMin))[i];
       for (const regionType in _twitterData) { //counties, coarse, fine
@@ -186,6 +213,7 @@ export class MapDataService {
             if (timeslicedData[(_gridSizes)[regionType]].hasOwnProperty(place)) {
               //add the counts
               const wt = timeslicedData[(_gridSizes)[regionType]][place]["w"];
+
               const tweetsByPolygon: RegionData<any, number[], string[]> = (_twitterData)[regionType];
               if (place in tweetsByPolygon.count) {
                 tweetsByPolygon.count[place] += wt;
@@ -197,7 +225,7 @@ export class MapDataService {
                 const tweetcode_id = timeslicedData[(_gridSizes)[regionType]][place]["i"][i];
                 const tweetcode: string = timeslicedData.tweets[tweetcode_id]; //html of the tweet
                 if (tweetcode != "" && tweetsByPolygon.count[place] < MAX_TWEETS) {
-                  tweetsByPolygon.embed[place] += "<tr><td>" + tweetcode + "</td></tr>"
+                  tweetsByPolygon.embed[place] += "<tr><td>" + tweetcode + "</td></tr>";
                 }
               }
             } else {

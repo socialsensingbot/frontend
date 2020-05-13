@@ -5,9 +5,8 @@ describe('Ignore tweets: ', function () {
   describe('ignore tweet', () => {
     const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
     const test = () => {
-      cy.visit("http://localhost:4200/map?selected=powys");
       cy.login();
-      cy.noSpinner();
+      cy.visitAndWait("http://localhost:4200/map?selected=powys");
       const secondTweet = "twitter-panel .atr-1";
       cy.get(".tweet-drawer", {timeout: 30000}).should("be.visible");
       cy.get(secondTweet, {timeout: 30000}).should("be.visible");

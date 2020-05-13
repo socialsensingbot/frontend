@@ -430,18 +430,21 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param props
    */
   updateTwitterPanel(props?: any) {
-    log.debug("updateTwitterPanel()");
+    log.debug(`updateTwitterPanel(${JSON.stringify(props.properties)})`);
     this.selectedRegion = this.toTitleCase(props.properties.name);
     if (props.properties.count > 0) {
-      log.debug("updateTwitterHeader()");
+      log.debug("Count > 0");
       this.exceedanceProbability = Math.round(props.properties.stats * 100) / 100;
       this.tweetCount = props.properties.count;
+      log.debug(`this.activePolyLayerShortName=${this.activePolyLayerShortName}`);
       this.embeds = this._data.embeds(this.activePolyLayerShortName, props.properties.name);
+      log.debug(this.embeds);
       this.twitterPanelHeader = true;
       this.showTwitterTimeline = true;
       // Hub.dispatch("twitter-panel",{message:"update",event:"update"});
       this.showTweets()
     } else {
+      log.debug(`Count == ${props.properties.count}`);
       this.twitterPanelHeader = true;
       this.showTwitterTimeline = false;
       this.tweetCount = 0;
@@ -639,7 +642,8 @@ export class MapComponent implements OnInit, OnDestroy {
         if (place in tweetRegionInfo.count) {
           const exceedance = this._data.exceedance(place, tweetRegionInfo.count[place], this._dateMin, this._dateMax,
                                                    regionType);
-          tweetRegionInfo[place] = exceedance;
+          //todo: this should happen in the MapDataService
+          tweetRegionInfo.stats[place] = exceedance;
           featureProperties["count"] = tweetRegionInfo.count[place];
           featureProperties["stats"] = exceedance;
         }
