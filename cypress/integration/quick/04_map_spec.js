@@ -61,7 +61,7 @@ describe('Map: ', function () {
   });
 
 
-  describe.only('Twitter drawer', () => {
+  describe('Twitter drawer', () => {
     const url = "http://localhost:4200/map?selected=powys&min_offset=-5459&max_offset=-2819";
     it('can be closed', () => {
       cy.visitAndWait(url);
