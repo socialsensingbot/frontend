@@ -41,7 +41,7 @@ import {
 } from "./types";
 import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
-import {DUPLICATE_REASON, UIExecutionService} from "../services/uiexecution.service";
+import {DUPLICATE_REASON, UIExecutionService, UIState} from "../services/uiexecution.service";
 import {ColorCodeService} from "./services/color-code.service";
 import {MapDataService} from "./data/map-data.service";
 import {ProcessedPolygonData} from "./data/processed-data";
@@ -116,7 +116,7 @@ export class MapComponent implements OnInit, OnDestroy {
   public tweetCount: number;
   public tweetsVisible: boolean = false;
   public twitterPanelHeader: boolean;
-  public loading: boolean = false;
+  public activity: boolean = false;
   public ready: boolean = false;
   public sliderOptions: DateRangeSliderOptions = {
     max:      0,
@@ -150,6 +150,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   private _selectedFeatureName: string;
   private _updating: boolean;
+  private _stateSub: Subscription;
 
 
   constructor(private _router: Router,
@@ -326,7 +327,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this._loggedIn = await Auth.currentAuthenticatedUser() != null;
 
-    this._exec.state("map-init");
+    this._exec.changeState("map-init");
 
 
     await this.load();
@@ -353,14 +354,16 @@ export class MapComponent implements OnInit, OnDestroy {
                                this.activePolyLayerShortName = this._polyLayersNameMap[e.name];
                                this.updateSearch({active_polygon: this.activePolyLayerShortName, selected: null});
                                this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
+                                 this.ready = false;
                                  this.resetLayers(true);
+                                 this.ready = true;
                                });
                              } else {
                                this.activeNumberLayerShortName = this._numberLayersNameMap[e.name];
                                this.updateSearch({active_number: this.activeNumberLayerShortName});
                              }
                            });
-                           this._exec.state("ready");
+                           this._exec.changeState("ready");
                            map.addControl(zoomControl);
                            this.addToggleControls();
                            return this.updateLayers().then(() => this._twitterIsStale = true);
@@ -544,7 +547,11 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this._exec.start();
 
-
+    this._stateSub = this._exec.state.subscribe((state: UIState) => {
+      if (state === "ready") {
+        this.ready = true;
+      }
+    });
     this._twitterUpdateTimer = timer(0, 2000).subscribe(() => {
       if (this._twitterIsStale) {
         this.updateTwitter();
@@ -552,7 +559,7 @@ export class MapComponent implements OnInit, OnDestroy {
       }
     });
 
-    this._auth.authState.subscribe((event: string) => {
+    this._auth.state.subscribe((event: string) => {
       if (event === AuthService.SIGN_IN) {
         this._loggedIn = true;
       }
@@ -573,6 +580,9 @@ export class MapComponent implements OnInit, OnDestroy {
     if (this._twitterUpdateTimer) {
       this._twitterUpdateTimer.unsubscribe();
     }
+    if (this._stateSub) {
+      this._stateSub.unsubscribe();
+    }
   }
 
   /**
@@ -582,7 +592,6 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   resetLayers(clear_click) {
     log.debug("resetLayers(" + clear_click + ")");
-    this.ready = false
     this.hideTweets();
     for (let key of numberLayerFullNames) {
       log.debug(key);
@@ -610,7 +619,6 @@ export class MapComponent implements OnInit, OnDestroy {
         this._feature = null;
       }
     }
-    this.ready = true;
   }
 
   /**
@@ -669,24 +677,24 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   async load() {
     log.debug("load()");
-    this.loading = true;
+    this.activity = true;
     try {
       await this._data.load();
       await this._exec.queue("Update Slider", ["ready", "data-loaded"],
                              () => {this.updateSliderFromData();});
 
-      this.updateLayers();
+      await this.updateLayers();
 
       this._twitterIsStale = true;
 
 
     } catch (e) {
-      this._exec.state("data-load-failed");
+      this._exec.changeState("data-load-failed");
       setTimeout(() => {
         this._zone.run(() => this.load())
       }, 5000);
       log.error(e);
-      this.loading = false;
+      this.activity = false;
       this.ready = false;
     }
 
@@ -697,22 +705,24 @@ export class MapComponent implements OnInit, OnDestroy {
     return this._exec.queue("Update Layers", ["ready", "data-loaded"], async () => {
                               // Mark as stale to trigger a refresh
                               if (!this._updating) {
+                                this.activity = true;
                                 this._updating = true;
                                 try {
 
-                                  this._exec.state("data-refresh");
+                                  this._exec.changeState("data-refresh");
                                   this._data.updateData(this._dateMin, this._dateMax);
                                   this.clearMapFeatures();
                                   this.updateRegionData();
                                   this.resetLayers(false);
                                   if (this._params) {
-                                    this._exec.state("ready");
+
+                                    this._exec.changeState("ready");
                                   } else {
-                                    this._exec.state("no-params");
+                                    this._exec.changeState("no-params");
                                   }
-                                  this.ready = true;
+
                                 } finally {
-                                  this.loading = false;
+                                  this.activity = false;
                                   this._updating = false;
                                 }
                               } else {

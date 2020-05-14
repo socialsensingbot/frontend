@@ -1,4 +1,4 @@
-describe('Issue https://github.com/socialsensingbot/frontend/issues/87 : ', function () {
+describe('Hidden Tweets Reappear : https://github.com/socialsensingbot/frontend/issues/87 : ', function () {
   before(() => {
     cy.visit("http://localhost:4200/map?selected=carmarthenshire");
     cy.login();

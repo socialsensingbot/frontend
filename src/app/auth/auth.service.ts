@@ -25,7 +25,7 @@ export class AuthService {
   public loggedIn: boolean;
   private _authState: Subject<CognitoUser | any> = new Subject<CognitoUser | any>();
   private _user: CognitoUser;
-  authState: Observable<CognitoUser | any> = this._authState.asObservable();
+  public state: Observable<CognitoUser | any> = this._authState.asObservable();
 
   public static SIGN_IN = 'signIn';
   public static SIGN_OUT = 'signOut';

@@ -29,7 +29,22 @@ export class NotificationService implements OnDestroy {
    * @param toast  {MatSnackBar}
    */
   constructor(
-    private toast: MatSnackBar) {}
+    private toast: MatSnackBar) {
+    window.onerror = (message, file, line, col, e) => {
+      log.error(e)
+      this.error(message);
+      return false;
+    };
+    window.addEventListener("error", (e) => {
+      log.error(e);
+      this.error(e.message);
+      return false;
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+      log.error(e);
+      this.error(e.reason);
+    })
+  }
 
   /**
    * Unsubscribe from the config state

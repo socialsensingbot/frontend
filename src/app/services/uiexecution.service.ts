@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {Observable, Subscription, timer} from "rxjs";
 import {Auth, Logger} from "aws-amplify";
 
@@ -29,7 +29,7 @@ class ExecutionTask {
   }
 }
 
-type UIState = "init" | "map-init" | "data-loaded" | "ready" | "no-params" | "data-refresh" | "data-load-failed";
+export type UIState = "init" | "map-init" | "data-loaded" | "ready" | "no-params" | "data-refresh" | "data-load-failed";
 
 export const DUPLICATE_REASON = "duplicate";
 
@@ -49,6 +49,8 @@ export class UIExecutionService {
   private _executionTimer: Subscription;
   private _pause: boolean;
   private _state: UIState = "init";
+  public state = new EventEmitter<UIState>();
+
   private dedupSet: Set<any> = new Set<any>();
 
   constructor() { }
@@ -113,8 +115,9 @@ export class UIExecutionService {
     })
   }
 
-  public state(state: UIState) {
-    this._state = state;
-    log.info("*** STATE " + state.toUpperCase().replace("-", " ") + " ***");
+  public changeState(newState: UIState) {
+    this._state = newState;
+    this.state.emit(newState);
+    log.info("*** STATE " + newState.toUpperCase().replace("-", " ") + " ***");
   }
 }

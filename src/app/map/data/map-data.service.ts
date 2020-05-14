@@ -115,7 +115,7 @@ export class MapDataService {
     return this._exec.queue("Load Data", ["ready", "map-init", "data-loaded", "data-load-failed"], async () => {
       this._rawTwitterData = await this.loadLiveData() as TimeSlice[];
       this.timeKeyedData = this.getTimes();
-      this._exec.state("data-loaded");
+      this._exec.changeState("data-loaded");
       log.debug("Loading live data completed", this._rawTwitterData);
     });
 

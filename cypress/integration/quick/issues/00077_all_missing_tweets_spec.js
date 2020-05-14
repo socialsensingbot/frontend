@@ -1,4 +1,4 @@
-describe('Missing tweets: ', function () {
+describe('Missing tweets : https://github.com/socialsensingbot/frontend/issues/85', function () {
   beforeEach(function () {
     cy.visit('http://localhost:4200/map');
     cy.stubLiveJson("live-03-05-2020");
@@ -6,7 +6,6 @@ describe('Missing tweets: ', function () {
   });
 
   describe('select county with only missing tweets', () => {
-    console.debug("Tests https://github.com/socialsensingbot/frontend/issues/67");
     const url = "http://localhost:4200/map?min_offset=-1460&max_offset=-20&selected=roscommon";
     it('should say how many tweets there are in total', () => {
       cy.visit(url);

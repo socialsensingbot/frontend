@@ -29,7 +29,7 @@ export class AppComponent  {
         .then(user => this.isAuthenticated = (user != null))
         .then(() => this.checkSession())
         .catch(err => log.debug(err));
-    auth.authState.subscribe((event: string) => {
+    auth.state.subscribe((event: string) => {
       if (event === AuthService.SIGN_IN) {
         this.isAuthenticated = true;
         this.isSignup = false;
