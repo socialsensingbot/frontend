@@ -41,7 +41,7 @@ import {
 } from "./types";
 import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
-import {UIExecutionService} from "../services/uiexecution.service";
+import {DUPLICATE_REASON, UIExecutionService} from "../services/uiexecution.service";
 import {ColorCodeService} from "./services/color-code.service";
 import {MapDataService} from "./data/map-data.service";
 import {ProcessedPolygonData} from "./data/processed-data";
@@ -149,6 +149,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   private _selectedFeatureName: string;
+  private _updating: boolean;
 
 
   constructor(private _router: Router,
@@ -674,7 +675,7 @@ export class MapComponent implements OnInit, OnDestroy {
       await this._exec.queue("Update Slider", ["ready", "data-loaded"],
                              () => {this.updateSliderFromData();});
 
-      await this.updateLayers();
+      this.updateLayers();
 
       this._twitterIsStale = true;
 
@@ -695,20 +696,34 @@ export class MapComponent implements OnInit, OnDestroy {
   private async updateLayers() {
     return this._exec.queue("Update Layers", ["ready", "data-loaded"], async () => {
                               // Mark as stale to trigger a refresh
-                              this._exec.state("data-refresh");
-                              this._data.updateData(this._dateMin, this._dateMax);
-                              this.clearMapFeatures();
-                              this.updateRegionData();
-                              this.resetLayers(false);
-                              if (this._params) {
-                                this._exec.state("ready");
+                              if (!this._updating) {
+                                this._updating = true;
+                                try {
+
+                                  this._exec.state("data-refresh");
+                                  this._data.updateData(this._dateMin, this._dateMax);
+                                  this.clearMapFeatures();
+                                  this.updateRegionData();
+                                  this.resetLayers(false);
+                                  if (this._params) {
+                                    this._exec.state("ready");
+                                  } else {
+                                    this._exec.state("no-params");
+                                  }
+                                  this.ready = true;
+                                } finally {
+                                  this.loading = false;
+                                  this._updating = false;
+                                }
                               } else {
-                                this._exec.state("no-params");
+                                console.log("Update in progress so skipping this update");
                               }
-                              this.ready = true;
-                              this.loading = false;
                             }
-    );
+      , `${this._dateMin} ${this._dateMax}`).catch(e => {
+      if (e !== DUPLICATE_REASON) {
+        console.error(e);
+      }
+    });
   }
 
 
@@ -740,17 +755,8 @@ export class MapComponent implements OnInit, OnDestroy {
     this._dateMax = upper;
     this._dateMin = lower;
     this.sliderOptions = {...this.sliderOptions, startMin: this._dateMin, startMax: this._dateMax};
-    this._exec.queue("Update Layers from Slider Change", ["ready"], async () => {
-                       // Mark as stale to trigger a refresh
-                       await this.updateSearch({min_offset: this._dateMin, max_offset: this._dateMax});
-                       await this._data.updateData(lower, upper);
-                       this.clearMapFeatures();
-                       this.updateRegionData();
 
-                       this.resetLayers(false);
-                       this._twitterIsStale = true;
-                     }
-    );
+    this.updateLayers();
 
 
   }
