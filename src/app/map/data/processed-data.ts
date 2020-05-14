@@ -150,8 +150,8 @@ export class ProcessedData {
   constructor(dateMin: number, dateMax: number, timeKeyedData, _rawTwitterData, _statsRefData: Stats) {
 
     this.county = new ProcessedPolygonData("county", dateMin, dateMax, _statsRefData, timeKeyedData, _rawTwitterData);
-    this.coarse = new ProcessedPolygonData("county", dateMin, dateMax, _statsRefData, timeKeyedData, _rawTwitterData);
-    this.fine = new ProcessedPolygonData("county", dateMin, dateMax, _statsRefData, timeKeyedData, _rawTwitterData);
+    this.coarse = new ProcessedPolygonData("coarse", dateMin, dateMax, _statsRefData, timeKeyedData, _rawTwitterData);
+    this.fine = new ProcessedPolygonData("fine", dateMin, dateMax, _statsRefData, timeKeyedData, _rawTwitterData);
 
 
   }
