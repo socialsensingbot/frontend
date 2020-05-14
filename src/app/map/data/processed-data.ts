@@ -133,7 +133,7 @@ export class ProcessedPolygonData {
   }
 
   public tweetsForPlace(name: string) {
-    return this._tweets[name];
+    return (typeof this._tweets[name] !== "undefined") ? this._tweets[name] : [];
   }
 }
 
