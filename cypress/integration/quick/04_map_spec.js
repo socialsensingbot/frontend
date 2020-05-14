@@ -61,7 +61,7 @@ describe('Map: ', function () {
   });
 
 
-  describe('Twitter drawer', () => {
+  describe.only('Twitter drawer', () => {
     const url = "http://localhost:4200/map?selected=powys&min_offset=-5459&max_offset=-2819";
     it('can be closed', () => {
       cy.visitAndWait(url);
@@ -74,7 +74,7 @@ describe('Map: ', function () {
     it('is scrollable', () => {
       cy.visitAndWait(url);
       cy.twitterPanelVisible();
-      cy.get(".atr-1", {timeout: 60000}).should("be.visible");
+      cy.get(".atr-1", {timeout: 60000}).scrollIntoView().should("be.visible");
       cy.get('.tweets-outer').scrollTo('bottom');
       cy.get(".atr-1", {timeout: 20000}).should("not.be.visible");
       cy.logout();

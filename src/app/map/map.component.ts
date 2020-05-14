@@ -110,7 +110,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   //The UI state fields
-  public embeds: Tweet[];
+  public tweets: Tweet[] = [];
   public selectedRegion: string;
   public exceedanceProbability: number;
   public tweetCount: number;
@@ -443,8 +443,8 @@ export class MapComponent implements OnInit, OnDestroy {
       this.exceedanceProbability = Math.round(props.properties.stats * 100) / 100;
       this.tweetCount = props.properties.count;
       log.debug(`this.activePolyLayerShortName=${this.activePolyLayerShortName}`);
-      this.embeds = this._data.embeds(this.activePolyLayerShortName, props.properties.name);
-      log.debug(this.embeds);
+      this.tweets = this._data.embeds(this.activePolyLayerShortName, props.properties.name);
+      log.debug(this.tweets);
       this.twitterPanelHeader = true;
       this.showTwitterTimeline = true;
       // Hub.dispatch("twitter-panel",{message:"update",event:"update"});
@@ -455,7 +455,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this.showTwitterTimeline = false;
       this.tweetCount = 0;
       this.exceedanceProbability = 0;
-      this.embeds = [];
+      this.tweets = [];
 
     }
 
