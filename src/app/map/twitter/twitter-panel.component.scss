@@ -47,14 +47,20 @@
 .app-twitter-table {
   display: flex;
 
+  .date-separator {
+    opacity: 0.4;
+    margin-top: 1em;
+    margin-bottom: 1em;
+  }
+
   .app-twitter-row {
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: center;
     //border: 1px solid blue;
     position: relative;
-    max-width:540px;
-    min-width:540px;
+    max-width: 540px;
+    min-width: 540px;
     transition: opacity 0.5s ease-in-out;
 
     .app-twitter-item-menu {

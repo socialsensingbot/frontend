@@ -35,6 +35,8 @@ export class ProcessedPolygonData {
 
   constructor(private _name: PolygonLayerShortName, dateMin: number, dateMax: number, private _statsRefData: Stats,
               private timeKeyedData: any, _rawTwitterData: any) {
+
+    const start = new Date();
     this._tdiff = timeKeyedData.slice(-dateMax, -dateMin).length / 1440;
     for (const i in timeKeyedData.slice(-dateMax, -dateMin)) { //all times
       var timeKey = (timeKeyedData.slice(-dateMax, -dateMin))[i];
@@ -55,9 +57,9 @@ export class ProcessedPolygonData {
           }
           for (const i in timeslicedData[this._gridSizes[_name]][place]["i"]) {
             const tweetcode_id = timeslicedData[(this._gridSizes)[_name]][place]["i"][i];
-            const tweetcode: string = timeslicedData.tweets[tweetcode_id]; //html of the tweet
-            if (tweetcode != "" && this._counts[place] < MAX_TWEETS) {
-              this._tweets[place].push(new Tweet(tweetcode_id, tweetcode, i, _name, place));
+            const tweetHtml: string = timeslicedData.tweets[tweetcode_id]; //html of the tweet
+            if (tweetHtml != "" && this._counts[place] < MAX_TWEETS) {
+              this._tweets[place].push(new Tweet(tweetcode_id, tweetHtml, timeKey, _name, place));
             }
           }
         } else {
@@ -82,6 +84,7 @@ export class ProcessedPolygonData {
       }
       this._stats[place] = stats_wt;
     }
+    log.info(`Processed data for ${this._name} in ${(new Date().getTime() - start.getTime()) / 1000.0}s`);
   }
 
   public hasPlace(place: string) {

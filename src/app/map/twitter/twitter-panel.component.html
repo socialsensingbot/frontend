@@ -68,6 +68,7 @@
           </mat-expansion-panel>
 
           <div class="app-twitter-row atr-visible atr-{{i}}" *ngFor="let tweet of tweets; let i = index">
+            <div class="date-separator" *ngIf="isNewDate(i)">{{tweet.date | date:"mediumDate"}}</div>
             <mat-card class="twitter-card" *ngIf="hidden[i] === false && !isPlaceholder(tweet)">
               <ng-container>
                 <ng-container

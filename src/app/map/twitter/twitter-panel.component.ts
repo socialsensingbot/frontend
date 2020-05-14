@@ -224,4 +224,7 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
     this._destroyed = true;
   }
 
+  public isNewDate(i: number) {
+    return i > 0 && this.tweets[i - 1].day !== this.tweets[i].day;
+  }
 }
