@@ -84,6 +84,10 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
 
   @Input()
   public set tweets(val: Tweet[]) {
+    if (val == null) {
+      this.ready = false;
+      return;
+    }
     if (val === this._tweets) {
       log.debug("No change to embeds");
     } else {

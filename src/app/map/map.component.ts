@@ -110,7 +110,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   //The UI state fields
-  public tweets: Tweet[] = [];
+  public tweets: Tweet[] = null;
   public selectedRegion: string;
   public exceedanceProbability: number;
   public tweetCount: number;
