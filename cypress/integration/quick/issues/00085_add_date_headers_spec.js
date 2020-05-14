@@ -1,4 +1,4 @@
-describe.only('Date headers : https://github.com/socialsensingbot/frontend/issues/85', function () {
+describe('Date headers : https://github.com/socialsensingbot/frontend/issues/85', function () {
   beforeEach(function () {
     cy.visit('http://localhost:4200/map');
     cy.stubLiveJson("live-old");
