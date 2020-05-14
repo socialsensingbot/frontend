@@ -1,20 +1,21 @@
 import {EventEmitter, Injectable, NgZone} from '@angular/core';
-import {ByRegionType, COUNTY, PolygonLayerShortName, polygonLayerShortNames, RegionData, Stats} from "../types";
+import {
+  ByRegionType,
+  COUNTY,
+  PolygonLayerShortName,
+  polygonLayerShortNames,
+  RegionData,
+  Stats,
+  TimeSlice
+} from "../types";
 import {Logger, Storage} from "aws-amplify";
 import {HttpClient} from "@angular/common/http";
 import {UIExecutionService} from "../../services/uiexecution.service";
+import {ProcessedData, ProcessedPolygonData, TweetMap} from "./processed-data";
+import {Tweet} from "../twitter/tweet";
 
-//TODO: types for the data
-class TimeSlice {
-  [index: string]: any;
-
-  tweets: string[];
-}
-
-const MAX_TWEETS = 100;
 
 const log = new Logger('map-data');
-
 
 
 @Injectable({
@@ -33,11 +34,7 @@ export class MapDataService {
    *
    * @see _rawTwitterData for the unprocessed data.
    */
-  private _twitterData: Stats = Object.freeze({
-                                                county: Object.freeze({stats: {}, count: {}, embed: {}}),
-                                                coarse: Object.freeze({stats: {}, count: {}, embed: {}}),
-                                                fine:   Object.freeze({stats: {}, count: {}, embed: {}}),
-                                              });
+  private _twitterData: ProcessedData = null;
   /**
    * This is the semi static stats data which is loaded from assets/data.
    */
@@ -49,10 +46,7 @@ export class MapDataService {
 
   public timeKeyedData: any; //The times in the input JSON
 
-  private _gridSizes: ByRegionType<string> = Object.freeze({county: COUNTY, coarse: "15", fine: "60"});
 
-
-  private _B: number = 1407;//countyStats["cambridgeshire"].length; //number of stats days
   private _updating: boolean;
   private _statsLoaded: any;
 
@@ -128,10 +122,9 @@ export class MapDataService {
 
   }
 
-  public embeds(activePolyLayerShortName: PolygonLayerShortName, name: any): string {
+  public embeds(activePolyLayerShortName: PolygonLayerShortName, name: any): Tweet[] {
     log.debug(`embeds(${activePolyLayerShortName},${name})`);
-    log.debug(JSON.stringify(this._twitterData[activePolyLayerShortName].embed[name]));
-    return this._twitterData[activePolyLayerShortName].embed[name];
+    return this._twitterData.embeds(activePolyLayerShortName, name);
   }
 
 
@@ -183,80 +176,15 @@ export class MapDataService {
   }
 
   /**
-   * Clears down the {@link _twitterData} field.
-   */
-  private clearProcessedTweetData() {
-    this._twitterData= {
-                                        county:{stats: {}, count: {}, embed: {}},
-                                        coarse: {stats: {}, count: {}, embed: {}},
-                                        fine:  {stats: {}, count: {}, embed: {}},
-                                      };
-  }
-
-
-  /**
    * Updates the {@link _twitterData} field to contain a processed
    * version of the incoming TimeSlice[] data.
    *
    * @param tweetInfo the raw data to process.
    */
   private updateTweetsData(_dateMin, _dateMax) {
-    this.clearProcessedTweetData();
-    const {_twitterData, timeKeyedData, _gridSizes} = this;
-    for (const i in timeKeyedData.slice(-_dateMax, -_dateMin)) { //all times
-      var timeKey = (timeKeyedData.slice(-_dateMax, -_dateMin))[i];
-      for (const regionType in _twitterData) { //counties, coarse, fine
-        console.assert(polygonLayerShortNames.includes(regionType as PolygonLayerShortName));
-        if (_twitterData.hasOwnProperty(regionType)) {
-          const timeslicedData: TimeSlice = (this._rawTwitterData)[timeKey];
-          for (const place in timeslicedData[(_gridSizes)[regionType]]) { //all counties/boxes
-            if (timeslicedData[(_gridSizes)[regionType]].hasOwnProperty(place)) {
-              //add the counts
-              const wt = timeslicedData[(_gridSizes)[regionType]][place]["w"];
-
-              const tweetsByPolygon: RegionData<any, number[], string[]> = (_twitterData)[regionType];
-              if (place in tweetsByPolygon.count) {
-                tweetsByPolygon.count[place] += wt;
-              } else {
-                tweetsByPolygon.count[place] = wt;
-                tweetsByPolygon.embed[place] = ""
-              }
-              for (const i in timeslicedData[_gridSizes[regionType]][place]["i"]) {
-                const tweetcode_id = timeslicedData[(_gridSizes)[regionType]][place]["i"][i];
-                const tweetcode: string = timeslicedData.tweets[tweetcode_id]; //html of the tweet
-                if (tweetcode != "" && tweetsByPolygon.count[place] < MAX_TWEETS) {
-                  tweetsByPolygon.embed[place] += "<tr><td>" + tweetcode + "</td></tr>";
-                }
-              }
-            } else {
-              log.debug("Skipping " + place);
-            }
-          }
-        } else {
-          log.debug("Skipping " + regionType);
-        }
-      }
-    }
+    this._twitterData = new ProcessedData(_dateMin, _dateMax, this.timeKeyedData, this._rawTwitterData, this._stats);
   }
 
-
-  /**
-   *
-   * @param place
-   * @param val
-   * @param poly
-   * @param B
-   * @param statsData
-   */
-  getStatsIdx(place, val, poly, stats) {
-
-    for (let i = 0; i < this._B; i++) {
-      if (val <= stats[poly][place][i]) {
-        return i;
-      }
-    }
-    return this._B;
-  }
 
   public entryCount(): number {
     if (this.timeKeyedData) {
@@ -276,33 +204,16 @@ export class MapDataService {
 
 
   public regionTypes(): PolygonLayerShortName[] {
-    return Object.keys(this._twitterData).map(i => i as PolygonLayerShortName);
+    //Object.keys(this._twitterData).map(i => i as PolygonLayerShortName)
+    return this._twitterData.regionTypes();
   }
 
-  public regionCounts(regionType: PolygonLayerShortName) {
-    return (this._twitterData)[regionType].count;
+
+  public regionData(regionType: PolygonLayerShortName): ProcessedPolygonData {
+    return this._twitterData.regionData(regionType);
   }
 
-  public tDiff(_dateMin: number, _dateMax: number) {
-    return this.timeKeyedData.slice(-_dateMax, -_dateMin).length / 1440;
-  }
-
-  public regionData(regionType: PolygonLayerShortName): RegionData<any, number[], string[]> {
-    return this._twitterData[regionType as PolygonLayerShortName];
-  }
-
-  public exceedance(place, tweetCount, _dateMin: number, _dateMax: number, regionType) {
-    const tdiff = this.tDiff(_dateMin, _dateMax);
-    let stats_wt = 0;
-    if (tweetCount) {
-      var as_day = tweetCount / tdiff; //average # tweets per day arraiving at a constant rate
-      stats_wt = this.getStatsIdx(place, as_day, regionType, this._stats); //number of days with fewer tweets
-      //exceedance probability = rank / (#days + 1) = p
-      //rank(t) = #days - #days_with_less_than(t)
-      //prob no events in N days = (1-p)^N
-      //prob event in N days = 1 - (1-p)^N
-      stats_wt = 100 * (1 - Math.pow(1 - ((this._B + 1 - stats_wt) / (this._B + 1)), tdiff));
-    }
-    return stats_wt;
+  public places(regionType: PolygonLayerShortName): Set<string> {
+    return this._twitterData.regionData(regionType).places();
   }
 }

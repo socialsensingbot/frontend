@@ -3,7 +3,7 @@ import {LabelType, Options} from "ng5-slider";
 import {Subscription, timer} from "rxjs";
 import {Hub, Logger} from "aws-amplify";
 import {NgEventBus} from "ng-event-bus";
-import {MapDataService} from "../services/map-data.service";
+import {MapDataService} from "../data/map-data.service";
 const log = new Logger('date-range');
 
 @Component({

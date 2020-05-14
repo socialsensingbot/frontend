@@ -29,7 +29,7 @@
 
     </mat-menu>
     <div class="app-twitter-tweet">
-      <blockquote [innerHtml]="tweet"></blockquote>
+      <blockquote [innerHtml]="tweet.html"></blockquote>
     </div>
     <div class="app-twitter-item-menu">
       <button mat-icon-button [matMenuTriggerData]="{tweet:tweet,si:si,ti:ti}" [matMenuTriggerFor]="appMenu">

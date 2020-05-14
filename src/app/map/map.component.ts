@@ -43,7 +43,9 @@ import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
 import {UIExecutionService} from "../services/uiexecution.service";
 import {ColorCodeService} from "./services/color-code.service";
-import {MapDataService} from "./services/map-data.service";
+import {MapDataService} from "./data/map-data.service";
+import {ProcessedPolygonData} from "./data/processed-data";
+import {Tweet} from "./twitter/tweet";
 
 
 const log = new Logger('map');
@@ -108,7 +110,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   //The UI state fields
-  public embeds: string;
+  public embeds: Tweet[];
   public selectedRegion: string;
   public exceedanceProbability: number;
   public tweetCount: number;
@@ -449,7 +451,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this.showTwitterTimeline = false;
       this.tweetCount = 0;
       this.exceedanceProbability = 0;
-      this.embeds = "";
+      this.embeds = [];
 
     }
 
@@ -619,7 +621,7 @@ export class MapComponent implements OnInit, OnDestroy {
       for (let i = 0; i < features.length; i++) {
         const properties = features[i].properties;
         const place = properties.name;
-        if (place in this._data.regionCounts(regionType as PolygonLayerShortName)) {
+        if (place in this._data.places(regionType as PolygonLayerShortName)) {
           properties.count = 0;
           properties["stats"] = 0;
         }
@@ -638,14 +640,12 @@ export class MapComponent implements OnInit, OnDestroy {
       for (let i = 0; i < features.length; i++) {
         const featureProperties: Properties = features[i].properties;
         const place = featureProperties.name;
-        const tweetRegionInfo: RegionData<any, number[], string[]> = this._data.regionData(regionType);
-        if (place in tweetRegionInfo.count) {
-          const exceedance = this._data.exceedance(place, tweetRegionInfo.count[place], this._dateMin, this._dateMax,
-                                                   regionType);
-          //todo: this should happen in the MapDataService
-          tweetRegionInfo.stats[place] = exceedance;
-          featureProperties["count"] = tweetRegionInfo.count[place];
-          featureProperties["stats"] = exceedance;
+        const tweetRegionInfo: ProcessedPolygonData = this._data.regionData(regionType);
+        if (tweetRegionInfo.hasPlace(place)) {
+          featureProperties["count"] = tweetRegionInfo.countForPlace(place);
+          featureProperties["stats"] = tweetRegionInfo.exceedanceForPlace(place);
+        } else {
+          log.verbose("No data for " + place);
         }
       }
 

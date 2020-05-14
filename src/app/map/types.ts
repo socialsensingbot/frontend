@@ -51,3 +51,10 @@ export const regionDataKeys: string[] = ["stats", "count", "embed"];
 export const STATS = "stats";
 export const COUNTY = "county";
 
+//TODO: types for the data
+export class TimeSlice {
+  [index: string]: any;
+
+  tweets: string[];
+}
+

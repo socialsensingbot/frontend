@@ -12,6 +12,7 @@ import {
 import * as $ from "jquery";
 import {PreferenceService} from "../../pref/preference.service";
 import {Hub, Logger} from "aws-amplify";
+import {Tweet} from "./tweet";
 
 const log = new Logger('twitter-panel');
 
@@ -75,19 +76,18 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
   @Input() count: number;
   @Input() region: string;
   @Input() exceedanceProbability: string;
-  private _embeds: string;
-  public tweets: string[]= [];
+  private _tweets: Tweet[];
   public hidden: boolean[] = [];
   public visibleCount = 0;
   ready: boolean;
   private _destroyed: boolean = false;
 
   @Input()
-  public set embeds(val: any) {
-    if (val === this._embeds) {
+  public set tweets(val: Tweet[]) {
+    if (val === this._tweets) {
       log.debug("No change to embeds");
     } else {
-      this._embeds = val;
+      this._tweets = val;
       this.updateTweets();
     }
   }
@@ -97,12 +97,8 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
     if (this._destroyed) {
       return;
     }
-    if (typeof this._embeds !== "undefined") {
+    if (typeof this._tweets !== "undefined") {
       this.ready = false;
-      log.debug(this._embeds);
-      const regex = /(<blockquote(.*?)<\/blockquote>)/g;
-      const matched = this._embeds.match(regex);
-      this.tweets = matched ? matched.map(s => s) : [];
       this.hidden = [];
       this.tweets.forEach(tweet => {
         this.hidden.push(this.pref.isBlacklisted(tweet))
@@ -119,8 +115,8 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
     }
   }
 
-  public get embeds(): any {
-    return this._embeds;
+  public get tweets(): Tweet[] {
+    return this._tweets;
   }
 
   @Input() showHeaderInfo: boolean = true;
@@ -187,14 +183,13 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
   }
 
   public sender(tweet) {
-    const parsed = this.pref.parseTweet(tweet);
-    if (parsed != null) {
-      return parsed.sender;
-    }
+
+    return tweet.sender;
+
   }
 
   public isPlaceholder(tweet) {
-    return this.pref.parseTweet(tweet) == null;
+    return !tweet.valid;
   }
 
 

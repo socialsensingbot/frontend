@@ -16,6 +16,7 @@ import {
 import {GetUserPreferencesQuery} from "../API.service";
 import {NotificationService} from "../services/notification.service";
 import {BehaviorSubject, Observable} from "rxjs";
+import {Tweet} from "../map/twitter/tweet";
 const log = new Logger('pref-service');
 
 @Injectable({
@@ -72,17 +73,16 @@ export class PreferenceService {
     }
   }
 
-  public isBlacklisted(tweet: string): boolean {
-    const parsed = this.parseTweet(tweet);
-    if(parsed == null) {
+  public isBlacklisted(tweet: Tweet): boolean {
+    if (!tweet.valid) {
       return false;
     }
-    return this._tweetBlackList.includes(parsed.tweet) || this._twitterUserBlackList.includes(parsed.sender);
+    return this._tweetBlackList.includes(tweet.id) || this._twitterUserBlackList.includes(tweet.sender);
   }
 
   private async readBlacklist() {
     //todo: this is a hardcoded limit to fix https://github.com/socialsensingbot/frontend/issues/87
-    const result = await API.graphql(graphqlOperation(listTweetIgnores,{limit:10000}));
+    const result = await API.graphql(graphqlOperation(listTweetIgnores, {limit: 10000}));
     if (result.data.listTweetIgnores) {
       this._tweetBlackList.push(...result.data.listTweetIgnores.items.map(i => i.tweetId));
     }
@@ -111,29 +111,28 @@ export class PreferenceService {
     this._preferences = null;
   }
 
-  public async ignoreSender(tweet: string) {
-    const parsed = this.parseTweet(tweet);
-    if(parsed == null) {
+  public async ignoreSender(tweet: Tweet) {
+    if (!tweet.valid) {
       console.error("Shouldn't be trying to ignore sender on an unparseable tweet.");
       return;
     }
     //#87 the value of the await needs to be in a temp variable
     const username = await this._username;
-    const id = username + ":" + parsed.sender;
+    const id = username + ":" + tweet.sender;
     const result = await API.graphql(graphqlOperation(getTwitterUserIgnore, {id}));
     log.debug(result);
     if (!result.data.getTwitterUserIgnore) {
       const result = await API.graphql(graphqlOperation(createTwitterUserIgnore, {
         input: {
           id:                      id,
-          twitterScreenName:       parsed.sender,
+          twitterScreenName:       tweet.sender,
           twitterUserIgnoreUserId: username
         }
       }));
     } else {
-      this._notification.show("Already ignoring @" + parsed.sender)
+      this._notification.show("Already ignoring @" + tweet.sender)
     }
-    this._twitterUserBlackList.push(parsed.sender);
+    this._twitterUserBlackList.push(tweet.sender);
   }
 
 
@@ -141,30 +140,29 @@ export class PreferenceService {
     await this._username;
   }
 
-  public async ignoreTweet(tweet: string) {
-    const parsed = this.parseTweet(tweet);
-    if(parsed == null) {
+  public async ignoreTweet(tweet: Tweet) {
+    if (!tweet.valid) {
       console.error("Shouldn't be trying to ignore tweet on an unparseable tweet.");
       return;
     }
 
     const username = await this._username;
-    const id = username + ":" + parsed.tweet;
+    const id = username + ":" + tweet.id;
     const result = await API.graphql(graphqlOperation(getTweetIgnore, {id}));
     log.debug(result);
     if (!result.data.getTweetIgnore) {
       const result = await API.graphql(graphqlOperation(createTweetIgnore, {
         input: {
           id,
-          url:               parsed.url,
-          tweetId:           parsed.tweet,
+          url:               tweet.url,
+          tweetId:           tweet.id,
           tweetIgnoreUserId: username
         }
       }));
     } else {
-      this._notification.show("Already ignoring " + parsed.tweet);
+      this._notification.show("Already ignoring " + tweet.id);
     }
-    this._tweetBlackList.push(parsed.tweet);
+    this._tweetBlackList.push(tweet.id);
   }
 
   // public async markIrrelevant(tweet: string) {
@@ -192,73 +190,57 @@ export class PreferenceService {
   //
   // }
 
-  public parseTweet(blockquote: string) : {tweet:string, sender: string, url: string} | null {
-    //https://twitter.com/crickhowellhs/status/1051548078199717888?ref_src=twsrc%5Etfw%7Ctwcamp%5Etweetembed%7Ctwterm%5E1051548078199717888&ref_url=http%3A%2F%2Flocalhost%3A4200%2Fmap%3Fselected%3Dpowys%26min_offset%3D-3119%26max_offset%3D0
-
-    // log.debug(tweetURL);
-    const regex = /.*<a href="https:\/\/twitter.com\/(\w+)\/status\/(\d+).*">.*<\/a><\/blockquote>/;
-    const matched = blockquote.match(regex);
-    if (matched == null) {
-      return null;
-    }
-    const sender = matched[1];
-    const tweet = matched[2];
-    return {tweet, sender, url: "https://twitter.com/" + sender + "status/" + tweet};
-  }
 
   public isSenderIgnored(tweet) {
-    const parsed = this.parseTweet(tweet);
-    if(parsed == null) {
+    if (!tweet.valid) {
       console.error("Shouldn't be trying to check ignored sender on an unparseable tweet.");
       return;
     }
 
-    return this._twitterUserBlackList.includes(parsed.sender);
+    return this._twitterUserBlackList.includes(tweet.sender);
   }
 
-  public isTweetIgnored(tweet) {
-    const parsed = this.parseTweet(tweet);
-    if(parsed == null) {
+  public isTweetIgnored(tweet: Tweet) {
+    if (!tweet.valid) {
       console.error("Shouldn't be trying to ignore tweet on an unparseable tweet.");
       return;
     }
-    return this._tweetBlackList.includes(parsed.tweet);
+    return this._tweetBlackList.includes(tweet.id);
   }
 
   public async unIgnoreSender(tweet) {
-    const parsed = this.parseTweet(tweet);
-    if(parsed == null) {
+
+    if (!tweet.valid) {
       console.error("Shouldn't be trying to un-ignore sender on an unparseable tweet.");
       return;
     }
 
-    this._twitterUserBlackList = this._twitterUserBlackList.filter(i => i !== parsed.sender);
-    const id = (await this._username) + ":" + parsed.sender;
+    this._twitterUserBlackList = this._twitterUserBlackList.filter(i => i !== tweet.sender);
+    const id = (await this._username) + ":" + tweet.sender;
     const result = await API.graphql(graphqlOperation(getTwitterUserIgnore, {id}));
     log.debug(result);
     if (result.data.getTwitterUserIgnore) {
       const result = await API.graphql(graphqlOperation(deleteTwitterUserIgnore, {input: {id}}));
     } else {
-      this._notification.show("Not ignoring @" + parsed.sender)
+      this._notification.show("Not ignoring @" + tweet.sender)
     }
   }
 
   public async unIgnoreTweet(tweet) {
-    const parsed = this.parseTweet(tweet);
-    if(parsed == null) {
+    if (!tweet.valid) {
       console.error("Shouldn't be trying to un-ignore tweet on an unparseable tweet.");
       return;
     }
 
-    const id = (await this._username) + ":" + parsed.tweet;
-    this._tweetBlackList = this._tweetBlackList.filter(i => i !== parsed.tweet);
+    const id = (await this._username) + ":" + tweet.id;
+    this._tweetBlackList = this._tweetBlackList.filter(i => i !== tweet.id);
     const result = await API.graphql(graphqlOperation(getTweetIgnore, {id}));
     log.debug(result);
     if (result.data.getTweetIgnore) {
       const result = await API.graphql(graphqlOperation(deleteTweetIgnore, {input: {id}}));
       log.debug(result);
     } else {
-      this._notification.show("Not ignoring " + parsed.tweet);
+      this._notification.show("Not ignoring " + tweet.id);
     }
   }
 }
