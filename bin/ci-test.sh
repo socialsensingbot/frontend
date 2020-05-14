@@ -25,7 +25,7 @@ fi
 
 
 function test() {
-  npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-chrome,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" --spec ${tests}
+  npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-chrome,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" --spec "${tests}"
 #npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser firefox --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-firefox,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"
 }
 

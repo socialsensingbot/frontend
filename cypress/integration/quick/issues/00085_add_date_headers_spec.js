@@ -1,4 +1,4 @@
-describe('Date headers : https://github.com/socialsensingbot/frontend/issues/85', function () {
+describe.only('Date headers : https://github.com/socialsensingbot/frontend/issues/85', function () {
   beforeEach(function () {
     cy.visit('http://localhost:4200/map');
     cy.stubLiveJson("live-old");
@@ -13,7 +13,7 @@ describe('Date headers : https://github.com/socialsensingbot/frontend/issues/85'
       cy.url().should("equal", url);
       cy.noSpinner();
       cy.url().should("equal", url);
-      cy.get(".tweet-drawer", {timeout: 20000}).should("be.visible");
+      cy.get(".tweet-drawer", {timeout: 60000}).should("be.visible");
       cy.get(".date-separator").should("not.exist");
     });
   });
@@ -26,7 +26,7 @@ describe('Date headers : https://github.com/socialsensingbot/frontend/issues/85'
       cy.url().should("equal", url);
       cy.noSpinner();
       cy.url().should("equal", url);
-      cy.get(".tweet-drawer", {timeout: 20000}).should("be.visible");
+      cy.get(".tweet-drawer", {timeout: 60000}).should("be.visible");
       cy.get(".date-separator").should("exist");
     });
   });
