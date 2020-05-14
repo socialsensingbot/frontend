@@ -354,9 +354,9 @@ export class MapComponent implements OnInit, OnDestroy {
                                this.activePolyLayerShortName = this._polyLayersNameMap[e.name];
                                this.updateSearch({active_polygon: this.activePolyLayerShortName, selected: null});
                                this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
-                                 this.ready = false;
+                                 this.activity = true;
                                  this.resetLayers(true);
-                                 this.ready = true;
+                                 this.activity = false;
                                });
                              } else {
                                this.activeNumberLayerShortName = this._numberLayersNameMap[e.name];
@@ -695,7 +695,6 @@ export class MapComponent implements OnInit, OnDestroy {
       }, 5000);
       log.error(e);
       this.activity = false;
-      this.ready = false;
     }
 
   }
