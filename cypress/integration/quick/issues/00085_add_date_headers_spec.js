@@ -1,4 +1,4 @@
-describe.only('Date headers : https://github.com/socialsensingbot/frontend/issues/85', function () {
+describe('Date headers : https://github.com/socialsensingbot/frontend/issues/85', function () {
   beforeEach(function () {
     cy.visit('http://localhost:4200/map');
     cy.stubLiveJson("live-old");
@@ -30,5 +30,7 @@ describe.only('Date headers : https://github.com/socialsensingbot/frontend/issue
       cy.get(".date-separator").should("exist");
     });
   });
+
+  //todo: test different scenarios
 
 });
