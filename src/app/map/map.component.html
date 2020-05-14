@@ -25,7 +25,7 @@
                          [options]="sliderOptions"></date-range-slider>
     </div>
 
-    <mat-progress-bar *ngIf="activity" class="map-progress" mode="indeterminate"></mat-progress-bar>
+    <mat-progress-bar *ngIf="activity && ready" class="map-progress" mode="indeterminate"></mat-progress-bar>
     <!--    <div class="map-inset-shadow"></div>-->
   </mat-sidenav-content>
 </mat-sidenav-container>
