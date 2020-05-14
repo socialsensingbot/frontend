@@ -27,7 +27,6 @@ export class NotificationService implements OnDestroy {
   /**
    * Constructor
    * @param toast  {MatSnackBar}
-   * @param configService {ConfigurationService}
    */
   constructor(
     private toast: MatSnackBar) {}
@@ -64,7 +63,7 @@ export class NotificationService implements OnDestroy {
       console.error(e);
     } else {
       log.error(e);
-      return this.toast.open(`ERROR: ${e.toString()} (this will not appear in production)`, "got it", {
+      return this.toast.open(`ERROR: ${e.toString()} (this message will not appear in production)`, "got it", {
         duration:   30000,
         politeness: "assertive",
       });

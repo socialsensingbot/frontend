@@ -76,7 +76,7 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
   @Input() count: number;
   @Input() region: string;
   @Input() exceedanceProbability: string;
-  private _tweets: Tweet[];
+  private _tweets: Tweet[] = [];
   public hidden: boolean[] = [];
   public visibleCount = 0;
   ready: boolean;
