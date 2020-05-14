@@ -1,13 +1,17 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { MatSnackBar, MatSnackBarRef } from '@angular/material';
-import { Subscription } from 'rxjs';
+import {Injectable, OnDestroy} from '@angular/core';
+import {MatSnackBar, MatSnackBarRef} from '@angular/material';
+import {Subscription} from 'rxjs';
+import {environment} from "../../environments/environment";
+import {Logger} from "aws-amplify";
+
+const log = new Logger('map');
 
 /**
  * Provides an abstract wrapper around showing a MatSnackbar
  * notification based on global environment or API provided
  * configuration.
- * 
- * This class Listens for the authentication state to change. 
+ *
+ * This class Listens for the authentication state to change.
  * Once the state becomes authenticated, retrieve the startup
  * configuration from the API service. Once de-authenticated
  * set the _params to undefined and unsubscribe.
@@ -19,14 +23,15 @@ export class NotificationService implements OnDestroy {
 
   // Configuration api subscription
   private _configState: Subscription;
+
   /**
    * Constructor
    * @param toast  {MatSnackBar}
    * @param configService {ConfigurationService}
    */
-  constructor( 
-    private toast:MatSnackBar) {}
-  
+  constructor(
+    private toast: MatSnackBar) {}
+
   /**
    * Unsubscribe from the config state
    * when the component is destroyed, and remove
@@ -50,8 +55,20 @@ export class NotificationService implements OnDestroy {
         duration: toastTimeout
       });
     } else {
-      return this.toast.open(message, buttonLabel, {
+      return this.toast.open(message, buttonLabel, {});
+    }
+  }
+
+  error(e: any) {
+    if (environment.production) {
+      console.error(e);
+    } else {
+      log.error(e);
+      return this.toast.open(`ERROR: ${e.toString()} (this will not appear in production)`, "got it", {
+        duration:   30000,
+        politeness: "assertive",
       });
+
     }
   }
 }

@@ -1,18 +1,11 @@
 import {EventEmitter, Injectable, NgZone} from '@angular/core';
-import {
-  ByRegionType,
-  COUNTY,
-  PolygonLayerShortName,
-  polygonLayerShortNames,
-  RegionData,
-  Stats,
-  TimeSlice
-} from "../types";
+import {PolygonLayerShortName, Stats, TimeSlice} from "../types";
 import {Logger, Storage} from "aws-amplify";
 import {HttpClient} from "@angular/common/http";
 import {UIExecutionService} from "../../services/uiexecution.service";
-import {ProcessedData, ProcessedPolygonData, TweetMap} from "./processed-data";
+import {ProcessedData, ProcessedPolygonData} from "./processed-data";
 import {Tweet} from "../twitter/tweet";
+import {NotificationService} from "../../services/notification.service";
 
 
 const log = new Logger('map-data');
@@ -50,7 +43,8 @@ export class MapDataService {
   private _updating: boolean;
   private _statsLoaded: any;
 
-  constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService) { }
+  constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
+              private _notify: NotificationService) { }
 
   /**
    * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
@@ -70,19 +64,22 @@ export class MapDataService {
       })
       .then(() => {
         if (!this._statsLoaded) {
-          fetch("assets/data/coarse_stats.json")
+          return fetch("assets/data/coarse_stats.json")
             .then(response => response.json())
             .then(json => {
               this._stats.coarse = Object.freeze(json);
-
-            })
+              return json;
+            }).catch(e => {
+              this._notify.error(e)
+              return e;
+            });
         } else {
           return this._stats;
         }
       })
       .then(() => {
         if (!this._statsLoaded) {
-          fetch("assets/data/fine_stats.json")
+          return fetch("assets/data/fine_stats.json")
             .then(response => response.json())
             .then(json => {
               if (!this._statsLoaded) {
@@ -91,6 +88,9 @@ export class MapDataService {
                 Object.freeze(this._stats);
               }
               return this._stats;
+            }).catch(e => {
+              this._notify.error(e)
+              return e;
             })
         } else {
           return this._stats;
