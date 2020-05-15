@@ -101,7 +101,8 @@ describe('URL State: ', function () {
       cy.login();
       cy.url().should("equal", url);
       cy.noSpinner();
-      cy.get(".mat-sidenav-content").click(500,500);
+      cy.get(".leaflet-pane");
+      cy.get(".mat-sidenav-content").click(500, 500);
       cy.pushStateDelay(); // The push state is not immediate
       cy.url().should("equal", newUrl);
       cy.twitterPanelHeader("Showing 2 of 2 Tweets from Cambridgeshire");

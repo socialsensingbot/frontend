@@ -297,7 +297,7 @@ export class MapComponent implements OnInit, OnDestroy {
     if (typeof selected !== "undefined") {
       this._selectedFeatureName = selected;
       this._twitterIsStale;
-      this.showTweets();
+      // this.showTweets();
     }
     // if (typeof min_offset !== "undefined" && typeof min_offset !== "undefined") {
     //   ($(".timeslider") as any).slider("option", "values", [min_offset, max_offset]);
@@ -330,7 +330,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this._exec.changeState("map-init");
 
 
-    await this.load();
+    await this.load(true);
     this._searchParams.subscribe(params => {
       if (!this._params) {
         this._exec.queue("Initial Search Params", ["ready", "no-params"],
@@ -366,7 +366,7 @@ export class MapComponent implements OnInit, OnDestroy {
                            this._exec.changeState("ready");
                            map.addControl(zoomControl);
                            this.addToggleControls();
-                           return this.updateLayers().then(() => this._twitterIsStale = true);
+                           return this.updateLayers("From Parameters").then(() => this._twitterIsStale = true);
 
                          });
       }
@@ -592,7 +592,7 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   resetLayers(clear_click) {
     log.debug("resetLayers(" + clear_click + ")");
-    this.hideTweets();
+    // this.hideTweets();
     for (let key of numberLayerFullNames) {
       log.debug(key);
       const layerGroup = this._numberLayers[key];
@@ -675,7 +675,7 @@ export class MapComponent implements OnInit, OnDestroy {
   /**
    * Read the live.json data file and process contents.
    */
-  async load() {
+  async load(first: boolean = false) {
     log.debug("load()");
     this.activity = true;
     try {
@@ -683,7 +683,11 @@ export class MapComponent implements OnInit, OnDestroy {
       await this._exec.queue("Update Slider", ["ready", "data-loaded"],
                              () => {this.updateSliderFromData();});
 
-      await this.updateLayers();
+      if (first) {
+        this._exec.changeState("no-params");
+      } else {
+        await this.updateLayers("Data Load");
+      }
 
       this._twitterIsStale = true;
 
@@ -700,8 +704,8 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
 
-  private async updateLayers() {
-    return this._exec.queue("Update Layers", ["ready", "data-loaded"], async () => {
+  private async updateLayers(reason: string = "") {
+    return this._exec.queue("Update Layers: " + reason, ["ready", "data-loaded"], async () => {
                               // Mark as stale to trigger a refresh
                               if (!this._updating) {
                                 this.activity = true;
@@ -749,7 +753,9 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   private showTweets() {
     log.debug("showTweets()");
-    this.tweetsVisible = true;
+    this._exec.queue("Show Tweets", ["ready"], () => {
+      this.tweetsVisible = true;
+    });
   }
 
   /**
@@ -765,7 +771,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this._dateMin = lower;
     this.sliderOptions = {...this.sliderOptions, startMin: this._dateMin, startMax: this._dateMax};
 
-    this.updateLayers();
+    this.updateLayers("Slider Change");
 
 
   }

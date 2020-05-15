@@ -14,8 +14,8 @@ describe('Date time: ', function () {
       cy.url().should("equal", url);
       cy.get(".slider-date-time", {timeout: 20000});
       cy.get(".slider-date-time-max .slider-date").should("contain.text","15-Oct-18");
-      cy.get(".slider-date-time-max .slider-time").should("contain.text","12 AM");
-      cy.get(".tweet-drawer", {timeout: 20000}).should("be.visible");
+      cy.get(".slider-date-time-max .slider-time").should("contain.text", "12 AM");
+      cy.get(".tweet-drawer", {timeout: 60000}).should("be.visible");
       cy.url().should("equal", url);
       cy.twitterPanelHeader("No Tweets from Scottish Borders");
 

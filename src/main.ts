@@ -19,6 +19,21 @@ if (environment.production) {
   enableProdMode();
   Amplify.Logger.LOG_LEVEL = 'INFO';
 } else {
+  window.onerror = (message, file, line, col, e) => {
+    log.error(e)
+    window.alert(message);
+    return false;
+  };
+  window.addEventListener("error", (e) => {
+    log.error(e);
+    window.alert(e.message);
+    return false;
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    log.error(e);
+    window.alert(e.reason);
+
+  })
   Amplify.Logger.LOG_LEVEL = 'DEBUG';
 }
 

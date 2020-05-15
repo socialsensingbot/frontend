@@ -62,8 +62,11 @@ Cypress.Commands.add("noSpinner", () => {
 });
 
 Cypress.Commands.add("twitterPanelHeader", (text) => {
-  cy.get("twitter-panel .tweets-header", {timeout: LONG_TIMEOUT});
+  cy.get("twitter-panel");
   cy.get(".tinfo-spinner").should("not.be.visible");
+  cy.wait(1000);
+  cy.get(".tinfo-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  cy.get("twitter-panel .tweets-header", {timeout: LONG_TIMEOUT});
   cy.get("twitter-panel .tweets-header  mat-card > span > b", {timeout: LONG_TIMEOUT}).should("contain.text", text);
 });
 Cypress.Commands.add("twitterPanelVisible", () => {

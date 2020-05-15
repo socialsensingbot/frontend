@@ -15,9 +15,9 @@ describe('Ignore tweets: ', function () {
         if (row.hasClass("atr-hidden")) {
           cy.get(".hidden-tweet-container mat-panel-title", {timeout: 30000}).should('be.visible').click();
         } else {
-          cy.get(secondTweet + " twitter-widget", {timeout: 60000});
+          cy.get(secondTweet + " twitter-widget", {timeout: 60000}).should('be.visible');
         }
-        cy.get(secondTweet + " mat-icon").should("be.visible").click({force: true});
+        cy.get(secondTweet + " mat-icon", {timeout: 60000}).should("be.visible").click({force: true});
         cy.get(menu2ndOpt);
         cy.get(menu2ndOpt).then(el => {
           console.debug("'" + el.text() + "'")

@@ -83,9 +83,11 @@ export class Tweet {
       const regex = /.*<a href="https:\/\/twitter.com\/(\w+)\/status\/(\d+).*">.*<\/a><\/blockquote>/;
       const matched = this._html.match(regex);
       this._valid = (matched != null);
-      this._sender = matched[1];
-      console.assert(this._id == matched[2]);
-      this._url = "https://twitter.com/" + this._sender + "status/" + this._id
+      if (matched) {
+        this._sender = matched[1];
+        console.assert(this._id == matched[2]);
+        this._url = "https://twitter.com/" + this._sender + "status/" + this._id
+      }
       this._date = new Date(Number(this._internalDateString.substring(0, 4)),
                             Number(this._internalDateString.substring(4, 6)) - 1,
                             Number(this._internalDateString.substring(6, 8)),
@@ -95,6 +97,7 @@ export class Tweet {
       this._month = new Intl.DateTimeFormat('en', {month: 'short'}).format(this._date);
       this._day = new Intl.DateTimeFormat('en', {day: '2-digit'}).format(this._date);
       this._hour = new Intl.DateTimeFormat('en', {hour: '2-digit', hour12: true}).format(this._date);
+
       this._init = true;
     }
   }

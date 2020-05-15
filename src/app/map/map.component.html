@@ -20,7 +20,7 @@
     </div>
     <map-legend *ngIf="ready" class="legend" [activeNumber]="activeNumberLayerShortName"></map-legend>
     <div class="date-slider">
-      <date-range-slider [style.visibility]="ready ? 'visible' : 'hidden'" (dateRange)="sliderChange($event)"
+      <date-range-slider [style.opacity]="ready ? '1.0' : '0.0'" (dateRange)="sliderChange($event)"
                          (onEnd)="sliderChangeOnEnd($event)"
                          [options]="sliderOptions"></date-range-slider>
     </div>

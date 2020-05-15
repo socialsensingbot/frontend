@@ -76,16 +76,17 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
   @Input() count: number;
   @Input() region: string;
   @Input() exceedanceProbability: string;
-  private _tweets: Tweet[] = [];
+  private _tweets: Tweet[] | null = null;
   public hidden: boolean[] = [];
   public visibleCount = 0;
-  ready: boolean;
+  public ready: boolean;
   private _destroyed: boolean = false;
 
   @Input()
-  public set tweets(val: Tweet[]) {
-    if (val == null) {
-      this.ready = false;
+  public set tweets(val: Tweet[] | null) {
+    if (val === null) {
+      // this.ready = false;
+      this._tweets = null;
       return;
     }
     if (val === this._tweets) {
@@ -101,22 +102,21 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
     if (this._destroyed) {
       return;
     }
-    if (typeof this._tweets !== "undefined") {
-      this.ready = false;
-      this.hidden = [];
-      this.tweets.forEach(tweet => {
-        this.hidden.push(this.pref.isBlacklisted(tweet))
-      });
-      this.visibleCount = this.hidden.filter(i => !i).length;
-      log.debug(this.tweets);
-      if (this.tweets.length - this.hidden.length > 0) {
-        log.debug("Waiting for tweets to load before marking as ready.")
-      } else {
-        log.debug("No tweets to load so marking as ready.")
-        this.ready = true;
-      }
-      this.animateTweetAppearance();
+    this.ready = false;
+    this.hidden = [];
+    this.tweets.forEach(tweet => {
+      this.hidden.push(this.pref.isBlacklisted(tweet))
+    });
+    this.visibleCount = this.hidden.filter(i => !i).length;
+    this.ready = true;
+    log.debug(this.tweets);
+    if (this.tweets.length - this.hidden.length > 0) {
+      log.debug("Waiting for tweets to load before marking as ready.")
+    } else {
+      log.debug("No tweets to load so marking as ready.")
     }
+    this.animateTweetAppearance();
+
   }
 
   public get tweets(): Tweet[] {

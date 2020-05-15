@@ -1,4 +1,4 @@
-import {Injectable, OnDestroy} from '@angular/core';
+import {Injectable, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {MatSnackBar, MatSnackBarRef} from '@angular/material';
 import {Subscription} from 'rxjs';
 import {environment} from "../../environments/environment";
@@ -17,9 +17,10 @@ const log = new Logger('map');
  * set the _params to undefined and unsubscribe.
  */
 @Injectable({
-  providedIn: 'root'
-})
-export class NotificationService implements OnDestroy {
+              providedIn: 'root'
+            })
+export class NotificationService implements OnDestroy, OnInit {
+
 
   // Configuration api subscription
   private _configState: Subscription;
@@ -29,20 +30,24 @@ export class NotificationService implements OnDestroy {
    * @param toast  {MatSnackBar}
    */
   constructor(
-    private toast: MatSnackBar) {
+    private toast: MatSnackBar, private _zone: NgZone) {
+
+  }
+
+  ngOnInit(): void {
     window.onerror = (message, file, line, col, e) => {
       log.error(e)
-      this.error(message);
+      this._zone.run(() => this.error(message));
       return false;
     };
     window.addEventListener("error", (e) => {
       log.error(e);
-      this.error(e.message);
+      this._zone.run(() => this.error(e.message));
       return false;
     });
     window.addEventListener('unhandledrejection', (e) => {
       log.error(e);
-      this.error(e.reason);
+      this._zone.run(() => this.error(e.reason));
     })
   }
 
