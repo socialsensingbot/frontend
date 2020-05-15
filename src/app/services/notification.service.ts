@@ -78,7 +78,7 @@ export class NotificationService implements OnDestroy, OnInit {
     }
   }
 
-  error(e: any) {
+  public error(e: any) {
     if (environment.production) {
       console.error(e);
     } else {
