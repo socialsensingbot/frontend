@@ -32,6 +32,7 @@ import {HttpClientModule} from "@angular/common/http";
 import {NgEventBus} from "ng-event-bus";
 import {NotificationService} from "./services/notification.service";
 import {InfiniteScrollModule} from "ngx-infinite-scroll";
+import {NgForageModule} from "ngforage";
 
 export class NotificationErrorHandler implements ErrorHandler {
   constructor(private _notify: NotificationService) {}
@@ -70,6 +71,7 @@ export class NotificationErrorHandler implements ErrorHandler {
               ReactiveFormsModule,
               Ng5SliderModule,
               InfiniteScrollModule,
+              NgForageModule.forRoot(),
               LeafletModule.forRoot()
             ],
             providers:       [{

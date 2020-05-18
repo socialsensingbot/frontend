@@ -73,8 +73,8 @@ export class Tweet {
     return this._place;
   }
 
-  constructor(private _id: string, private _html: string, private _internalDateString: string,
-              private _poly: PolygonLayerShortName, private _place: string) {
+  constructor(private _id: string = null, private _html: string = null, private _internalDateString: string = null,
+              private _poly: PolygonLayerShortName = null, private _place: string = null) {
   }
 
   private lazyInit() {
@@ -100,5 +100,23 @@ export class Tweet {
 
       this._init = true;
     }
+  }
+
+  public populate(i: Tweet): Tweet {
+    this._id = i._id;
+    this._html = i._html;
+    this._internalDateString = i._internalDateString;
+    this._poly = i._poly;
+    this._place = i._place;
+    this._date = i._date;
+    this._year = i._year;
+    this._month = i._month;
+    this._day = i._day;
+    this._hour = i._hour;
+    this._sender = i._sender;
+    this._url = i._url;
+    this._valid = i._valid;
+    this._init = i._init;
+    return this;
   }
 }

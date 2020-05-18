@@ -58,7 +58,7 @@ function twitterInit() {
           } catch (e) {
             log.debug(e);
           }
-        }, 500);
+        }, 50);
 
       }
     );
@@ -89,12 +89,12 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
   private _destroyed: boolean = false;
 
   // Infinite scroll start: https://github.com/socialsensingbot/frontend/issues/10
-  private readonly PAGE_SIZE = 30;
+  private readonly PAGE_SIZE = 20;
   public scrollDistance = 4;
   public scrollUpDistance = 4;
   public throttle = 300;
   public direction: string;
-  public maxTweets = this.PAGE_SIZE * 2;
+  public maxTweets = this.PAGE_SIZE * 3;
 
   // Infinite scroll end
 
@@ -151,8 +151,8 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
       log.debug("Waiting for tweets to load before marking as ready.")
     } else {
       log.debug("No tweets to load so marking as ready.")
+      this.ready = true;
     }
-    this.ready = true;
   }
 
   public get tweets(): Tweet[] {

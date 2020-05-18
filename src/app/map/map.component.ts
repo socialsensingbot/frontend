@@ -202,7 +202,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     // Merge the params to change into _newParams which holds the
     // next set of parameters to add to the URL state.
-    return this._exec.queue("Update URL Query Params", ["ready"], () => {
+    return this._exec.queue("Update URL Query Params", ["ready", "data-refresh"], () => {
       this._newParams = {...this._newParams, ...params};
       this._router.navigate([], {
         queryParams:         this._newParams,
@@ -705,17 +705,17 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   private async updateLayers(reason: string = "") {
-    return this._exec.queue("Update Layers: " + reason, ["ready", "data-loaded"], async () => {
-                              // Mark as stale to trigger a refresh
-                              if (!this._updating) {
-                                this.activity = true;
-                                this._updating = true;
-                                try {
+    return await this._exec.queue("Update Layers: " + reason, ["ready", "data-loaded"], async () => {
+                                    // Mark as stale to trigger a refresh
+                                    if (!this._updating) {
+                                      this.activity = true;
+                                      this._updating = true;
+                                      try {
 
-                                  this._exec.changeState("data-refresh");
-                                  this._data.updateData(this._dateMin, this._dateMax);
-                                  this.clearMapFeatures();
-                                  this.updateRegionData();
+                                        this._exec.changeState("data-refresh");
+                                        await this._data.updateData(this._dateMin, this._dateMax);
+                                        this.clearMapFeatures();
+                                        this.updateRegionData();
                                   this.resetLayers(false);
                                   if (this._params) {
 

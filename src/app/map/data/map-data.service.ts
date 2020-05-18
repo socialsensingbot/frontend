@@ -1,11 +1,12 @@
 import {EventEmitter, Injectable, NgZone} from '@angular/core';
 import {PolygonLayerShortName, Stats, TimeSlice} from "../types";
-import {Logger, Storage} from "aws-amplify";
+import {Cache, Logger, Storage} from "aws-amplify";
 import {HttpClient} from "@angular/common/http";
 import {UIExecutionService} from "../../services/uiexecution.service";
 import {ProcessedData, ProcessedPolygonData} from "./processed-data";
 import {Tweet} from "../twitter/tweet";
 import {NotificationService} from "../../services/notification.service";
+import {NgForageCache} from "ngforage";
 
 
 const log = new Logger('map-data');
@@ -44,7 +45,7 @@ export class MapDataService {
   private _statsLoaded: any;
 
   constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
-              private _notify: NotificationService) { }
+              private _notify: NotificationService, private readonly cache: NgForageCache) { }
 
   /**
    * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
@@ -145,7 +146,7 @@ export class MapDataService {
    *
    * @param tweetInfo the data from the server.
    */
-  public updateData(_dateMin, _dateMax) {
+  public async updateData(_dateMin, _dateMax) {
     log.debug("update()")
     if (this._updating) {
       log.debug("Update already running.")
@@ -155,7 +156,6 @@ export class MapDataService {
 
     log.debug("Updating data");
     this.timeKeyedData = this.getTimes();
-    this.timeKeyUpdate.emit(this.timeKeyedData);
     // For performance reasons we need to do the
     // next part without triggering Angular
     try {
@@ -170,6 +170,7 @@ export class MapDataService {
       log.debug("update() end");
       this._updating = false;
     }
+    this.timeKeyUpdate.emit(this.timeKeyedData);
     // if (this._clicked != "") {
     //   this.updateTwitterHeader(this._clicked.target.feature);
     // }
@@ -181,10 +182,25 @@ export class MapDataService {
    *
    * @param tweetInfo the raw data to process.
    */
-  private updateTweetsData(_dateMin, _dateMax) {
-    this._twitterData = new ProcessedData(_dateMin, _dateMax, this.timeKeyedData, this._rawTwitterData, this._stats);
+  private async updateTweetsData(_dateMin, _dateMax) {
+    const key = this.createKey(_dateMin, _dateMax);
+    const cacheValue: ProcessedData = await this.cache.getItem(key) as ProcessedData;
+    if (cacheValue != null) {
+      console.info("Retrieved tweet data from cache.");
+      console.log(cacheValue);
+      this._twitterData = new ProcessedData().populate(cacheValue);
+    } else {
+      console.info("Tweet data not in cache.");
+      this._twitterData = new ProcessedData(_dateMin, _dateMax, this.timeKeyedData, this._rawTwitterData, this._stats);
+      this.cache.setItem(key, this._twitterData);
+    }
   }
 
+
+  private createKey(_dateMin, _dateMax) {
+    const key = `${_dateMin}:${_dateMax}:${this.timeKeyedData}`;
+    return key;
+  }
 
   public entryCount(): number {
     if (this.timeKeyedData) {

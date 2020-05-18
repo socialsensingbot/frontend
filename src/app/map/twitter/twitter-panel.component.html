@@ -20,6 +20,11 @@
       </mat-card>
     </div>
   </ng-container>
+  <div *ngIf="!ready">
+    <div>
+      <mat-spinner class="tinfo-spinner"></mat-spinner>
+    </div>
+  </div>
   <div id="tinfo" class="tinfo">
 
 
@@ -50,12 +55,8 @@
 
       <div id="tinfo_table" class="app-twitter-table" *ngIf="showTimeline">
         <div class="table_info">
-          <div *ngIf="!ready">
-            <div>
-              <mat-spinner class="tinfo-spinner"></mat-spinner>
-            </div>
-          </div>
-          <div #tinfoEmbeds [style.visibility]="ready ? 'visible' : 'hidden'"
+
+        <div #tinfoEmbeds [style.visibility]="ready ? 'visible' : 'hidden'"
           >
             <mat-expansion-panel class="twitter-card tc-expansion-panel hidden-tweet-container "
                                  *ngIf="tweets.length - visibleCount != 0">

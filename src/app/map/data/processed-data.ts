@@ -27,71 +27,74 @@ export class ExceedanceMap {
 
 
 export class ProcessedPolygonData {
-  private _gridSizes: ByRegionType<string> = Object.freeze({county: COUNTY, coarse: "15", fine: "60"});
+  private readonly _gridSizes: ByRegionType<string> = Object.freeze({county: COUNTY, coarse: "15", fine: "60"});
 
-  private _B: number = 1407;//countyStats["cambridgeshire"].length; //number of stats days
-  private _tdiff: number;
+  private readonly _B: number = 1407;//countyStats["cambridgeshire"].length; //number of stats days
   private _places: Set<string> = new Set<string>();
+  private _stats: ExceedanceMap = new ExceedanceMap();
+  private _counts: CountMap = new CountMap();
+  private _tweets: TweetMap = new TweetMap();
 
-  constructor(private _name: PolygonLayerShortName, dateMin: number, dateMax: number, private _statsRefData: Stats,
-              private timeKeyedData: any, _rawTwitterData: any) {
+  constructor(private _name: PolygonLayerShortName = null, dateMin: number = 0, dateMax: number = 0,
+              _statsRefData: Stats = null,
+              timeKeyedData: any = null, _rawTwitterData: any = null) {
 
-    const start = new Date();
-    this._tdiff = timeKeyedData.slice(-dateMax, -dateMin).length / 1440;
-    for (const i in timeKeyedData.slice(-dateMax, -dateMin)) { //all times
-      var timeKey = (timeKeyedData.slice(-dateMax, -dateMin))[i];
-      console.assert(polygonLayerShortNames.includes(this._name));
-      const timeslicedData: TimeSlice = (_rawTwitterData)[timeKey];
-      for (const place in timeslicedData[(this._gridSizes)[_name]]) { //all counties/boxes
-        if (timeslicedData[(this._gridSizes)[_name]].hasOwnProperty(place)) {
-          //add the counts
-          const wt = timeslicedData[(this._gridSizes)[_name]][place]["w"];
+    if (_rawTwitterData == null) {
+      //creating empty class for deserializing
+    } else {
+      const start = new Date();
+      const tdiff = timeKeyedData.slice(-dateMax, -dateMin).length / 1440;
+      for (const i in timeKeyedData.slice(-dateMax, -dateMin)) { //all times
+        var timeKey = (timeKeyedData.slice(-dateMax, -dateMin))[i];
+        console.assert(polygonLayerShortNames.includes(this._name));
+        const timeslicedData: TimeSlice = (_rawTwitterData)[timeKey];
+        for (const place in timeslicedData[(this._gridSizes)[_name]]) { //all counties/boxes
+          if (timeslicedData[(this._gridSizes)[_name]].hasOwnProperty(place)) {
+            //add the counts
+            const wt = timeslicedData[(this._gridSizes)[_name]][place]["w"];
 
 
-          if (this.hasPlace(place)) {
-            this._counts[place] += wt;
-          } else {
-            this._counts[place] = wt;
-            this._tweets[place] = [];
-            this._places.add(place);
-          }
-          for (const i in timeslicedData[this._gridSizes[_name]][place]["i"]) {
-            const tweetcode_id = timeslicedData[(this._gridSizes)[_name]][place]["i"][i];
-            const tweetHtml: string = timeslicedData.tweets[tweetcode_id]; //html of the tweet
+            if (this.hasPlace(place)) {
+              this._counts[place] += wt;
+            } else {
+              this._counts[place] = wt;
+              this._tweets[place] = [];
+              this._places.add(place);
+            }
+            for (const i in timeslicedData[this._gridSizes[_name]][place]["i"]) {
+              const tweetcode_id = timeslicedData[(this._gridSizes)[_name]][place]["i"][i];
+              const tweetHtml: string = timeslicedData.tweets[tweetcode_id]; //html of the tweet
               this._tweets[place].push(new Tweet(tweetcode_id, tweetHtml, timeKey, _name, place));
+            }
+          } else {
+            log.debug("Skipping " + place);
           }
-        } else {
-          log.debug("Skipping " + place);
         }
-      }
 
 
-    }
-    log.debug("Places: ", this._places);
-    for (const place of this._places) {
-      const tweetCount = this._counts[place]
-      let stats_wt = 0;
-      if (tweetCount) {
-        var as_day = tweetCount / this._tdiff; //average # tweets per day arraiving at a constant rate
-        stats_wt = this.getStatsIdx(place, as_day, this._statsRefData); //number of days with fewer tweets
-        //exceedance probability = rank / (#days + 1) = p
-        //rank(t) = #days - #days_with_less_than(t)
-        //prob no events in N days = (1-p)^N
-        //prob event in N days = 1 - (1-p)^N
-        stats_wt = 100 * (1 - Math.pow(1 - ((this._B + 1 - stats_wt) / (this._B + 1)), this._tdiff));
       }
-      this._stats[place] = stats_wt;
+      log.debug("Places: ", this._places);
+      for (const place of this._places) {
+        const tweetCount = this._counts[place]
+        let stats_wt = 0;
+        if (tweetCount) {
+          var as_day = tweetCount / tdiff; //average # tweets per day arraiving at a constant rate
+          stats_wt = this.getStatsIdx(place, as_day, _statsRefData); //number of days with fewer tweets
+          //exceedance probability = rank / (#days + 1) = p
+          //rank(t) = #days - #days_with_less_than(t)
+          //prob no events in N days = (1-p)^N
+          //prob event in N days = 1 - (1-p)^N
+          stats_wt = 100 * (1 - Math.pow(1 - ((this._B + 1 - stats_wt) / (this._B + 1)), tdiff));
+        }
+        this._stats[place] = stats_wt;
+      }
+      log.info(`Processed data for ${this._name} in ${(new Date().getTime() - start.getTime()) / 1000.0}s`);
     }
-    log.info(`Processed data for ${this._name} in ${(new Date().getTime() - start.getTime()) / 1000.0}s`);
   }
 
   public hasPlace(place: string) {
     return this._places.has(place);
   }
-
-  private _stats: ExceedanceMap = new ExceedanceMap();
-  private _counts: CountMap = new CountMap();
-  private _tweets: TweetMap = new TweetMap();
 
 
   /**
@@ -133,6 +136,18 @@ export class ProcessedPolygonData {
   public tweetsForPlace(name: string) {
     return (typeof this._tweets[name] !== "undefined") ? this._tweets[name] : null;
   }
+
+  public populate(data: ProcessedPolygonData): ProcessedPolygonData {
+    this._counts = data._counts;
+    this._stats = data._stats;
+    this._name = data._name;
+    this._tweets = data._tweets;
+    for (const i in this._tweets) {
+      this._tweets[i] = this._tweets[i].map(i => new Tweet().populate(i))
+    }
+    this._places = data._places;
+    return this;
+  }
 }
 
 const MAX_TWEETS = 100;
@@ -145,7 +160,8 @@ export class ProcessedData {
   public fine: ProcessedPolygonData;
 
 
-  constructor(dateMin: number, dateMax: number, timeKeyedData, _rawTwitterData, _statsRefData: Stats) {
+  constructor(dateMin: number = 0, dateMax: number = 0, timeKeyedData = [], _rawTwitterData = {},
+              _statsRefData: Stats = null) {
 
     this.county = new ProcessedPolygonData("county", dateMin, dateMax, _statsRefData, timeKeyedData, _rawTwitterData);
     this.coarse = new ProcessedPolygonData("coarse", dateMin, dateMax, _statsRefData, timeKeyedData, _rawTwitterData);
@@ -175,5 +191,12 @@ export class ProcessedData {
 
   public regionData(regionType: PolygonLayerShortName): ProcessedPolygonData {
     return this.layer(regionType)
+  }
+
+  public populate(cacheValue: ProcessedData) {
+    this.county = new ProcessedPolygonData().populate(cacheValue.county);
+    this.coarse = new ProcessedPolygonData().populate(cacheValue.coarse);
+    this.fine = new ProcessedPolygonData().populate(cacheValue.fine);
+    return this;
   }
 }
