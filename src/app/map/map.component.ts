@@ -716,22 +716,22 @@ export class MapComponent implements OnInit, OnDestroy {
                                         await this._data.updateData(this._dateMin, this._dateMax);
                                         this.clearMapFeatures();
                                         this.updateRegionData();
-                                  this.resetLayers(false);
-                                  if (this._params) {
+                                        this.resetLayers(false);
+                                        if (this._params) {
 
-                                    this._exec.changeState("ready");
-                                  } else {
-                                    this._exec.changeState("no-params");
+                                          this._exec.changeState("ready");
+                                        } else {
+                                          this._exec.changeState("no-params");
+                                        }
+
+                                      } finally {
+                                        this.activity = false;
+                                        this._updating = false;
+                                      }
+                                    } else {
+                                      console.log("Update in progress so skipping this update");
+                                    }
                                   }
-
-                                } finally {
-                                  this.activity = false;
-                                  this._updating = false;
-                                }
-                              } else {
-                                console.log("Update in progress so skipping this update");
-                              }
-                            }
       , `${this._dateMin} ${this._dateMax}`).catch(e => {
       if (e !== DUPLICATE_REASON) {
         console.error(e);

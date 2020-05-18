@@ -43,9 +43,10 @@ export class ProcessedPolygonData {
       //creating empty class for deserializing
     } else {
       const start = new Date();
-      const tdiff = timeKeyedData.slice(-dateMax, -dateMin).length / 1440;
-      for (const i in timeKeyedData.slice(-dateMax, -dateMin)) { //all times
-        var timeKey = (timeKeyedData.slice(-dateMax, -dateMin))[i];
+      const timeSlice = timeKeyedData.slice(-dateMax, -dateMin);
+      const tdiff = timeSlice.length / 1440;
+      for (const i in timeSlice) { //all times
+        var timeKey = timeSlice[i];
         console.assert(polygonLayerShortNames.includes(this._name));
         const timeslicedData: TimeSlice = (_rawTwitterData)[timeKey];
         for (const place in timeslicedData[(this._gridSizes)[_name]]) { //all counties/boxes
