@@ -58,9 +58,7 @@ export class ProcessedPolygonData {
           for (const i in timeslicedData[this._gridSizes[_name]][place]["i"]) {
             const tweetcode_id = timeslicedData[(this._gridSizes)[_name]][place]["i"][i];
             const tweetHtml: string = timeslicedData.tweets[tweetcode_id]; //html of the tweet
-            if (tweetHtml != "" && this._counts[place] < MAX_TWEETS) {
               this._tweets[place].push(new Tweet(tweetcode_id, tweetHtml, timeKey, _name, place));
-            }
           }
         } else {
           log.debug("Skipping " + place);

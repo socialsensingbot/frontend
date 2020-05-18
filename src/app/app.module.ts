@@ -31,6 +31,7 @@ import {NewPassComponent} from "./auth/new-pass/new-pass.component";
 import {HttpClientModule} from "@angular/common/http";
 import {NgEventBus} from "ng-event-bus";
 import {NotificationService} from "./services/notification.service";
+import {InfiniteScrollModule} from "ngx-infinite-scroll";
 
 export class NotificationErrorHandler implements ErrorHandler {
   constructor(private _notify: NotificationService) {}
@@ -68,6 +69,7 @@ export class NotificationErrorHandler implements ErrorHandler {
               FormsModule,
               ReactiveFormsModule,
               Ng5SliderModule,
+              InfiniteScrollModule,
               LeafletModule.forRoot()
             ],
             providers:       [{

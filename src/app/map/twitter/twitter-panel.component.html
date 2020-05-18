@@ -1,83 +1,96 @@
-<ng-container *ngIf="ready">
-  <div class="tweets-header" *ngIf="tweets.length > 0">
-    <mat-card class="tweets-heading"><span style="color: black"><b>Showing {{visibleCount}} of {{tweets.length}}
-      Tweets from {{region}}</b><br/></span>Exceedance probability {{exceedanceProbability}}%
-    </mat-card>
-  </div>
-  <div class="tweets-header" *ngIf="tweets.length === 0">
-    <mat-card *ngIf="region" class="tweets-heading"><span
-      style="color: black"><b>No Tweets from {{region}}</b><br/></span>
-    </mat-card>
-    <mat-card *ngIf="!region" class="tweets-heading"><span style="color: black"><b>Loading ...</b><br/></span>
-    </mat-card>
-  </div>
-</ng-container>
-<div id="tinfo" class="tinfo">
+<div class="tweets-outer" infinite-scroll
+     [infiniteScrollDistance]="scrollDistance"
+     [infiniteScrollUpDistance]="scrollUpDistance"
+     [infiniteScrollThrottle]="throttle"
+     [scrollWindow]="false"
+     (scrolled)="onScrollDown($event)"
+     (scrolledUp)="onUp($event)">
 
-
-  <ng-template #tweetEntry let-tweet="tweet" let-si="senderIgnore" let-ti="tweetIgnore">
-    <mat-menu #appMenu="matMenu">
-      <button *ngIf="!si" (click)="ignoreSender(tweet,$event);" mat-menu-item>Ignore
-        @{{sender(tweet)}}</button>
-      <button *ngIf="si" (click)="unIgnoreSender(tweet,$event);" mat-menu-item>Unignore
-        @{{sender(tweet)}}</button>
-      <button *ngIf="!ti" (click)="ignoreTweet(tweet,$event);" mat-menu-item>Ignore Tweet
-      </button>
-      <button *ngIf="ti" (click)="unIgnoreTweet(tweet,$event);" mat-menu-item>Unignore Tweet
-      </button>
-      <!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
-
-    </mat-menu>
-    <div class="app-twitter-tweet">
-      <blockquote [innerHtml]="tweet.html"></blockquote>
+  <ng-container *ngIf="ready">
+    <div class="tweets-header" *ngIf="tweets.length > 0">
+      <mat-card class="tweets-heading"><span style="color: black"><b>Showing {{visibleCount}} of {{tweets.length}}
+        Tweets from {{region}}</b><br/></span>Exceedance probability {{exceedanceProbability}}%
+      </mat-card>
     </div>
-    <div class="app-twitter-item-menu">
-      <button mat-icon-button [matMenuTriggerData]="{tweet:tweet,si:si,ti:ti}" [matMenuTriggerFor]="appMenu">
-        <mat-icon>more_vert</mat-icon>
-      </button>
+    <div class="tweets-header" *ngIf="tweets.length === 0">
+      <mat-card *ngIf="region" class="tweets-heading"><span
+        style="color: black"><b>No Tweets from {{region}}</b><br/></span>
+      </mat-card>
+      <mat-card *ngIf="!region" class="tweets-heading"><span style="color: black"><b>Loading ...</b><br/></span>
+      </mat-card>
     </div>
-  </ng-template>
-  <!--      <button id="tinfo_button" class="tinfo_button">-</button>-->
-  <div id="tinfo_table_wrapper" class="tinfo_table_wrapper">
+  </ng-container>
+  <div id="tinfo" class="tinfo">
 
-    <div id="tinfo_table" class="app-twitter-table" *ngIf="showTimeline">
-      <div class="table_info">
-        <div *ngIf="!ready">
-          <div>
-            <mat-spinner class="tinfo-spinner"></mat-spinner>
+
+    <ng-template #tweetEntry let-tweet="tweet" let-si="senderIgnore" let-ti="tweetIgnore">
+      <mat-menu #appMenu="matMenu">
+        <button *ngIf="!si" (click)="ignoreSender(tweet,$event);" mat-menu-item>Ignore
+          @{{sender(tweet)}}</button>
+        <button *ngIf="si" (click)="unIgnoreSender(tweet,$event);" mat-menu-item>Unignore
+          @{{sender(tweet)}}</button>
+        <button *ngIf="!ti" (click)="ignoreTweet(tweet,$event);" mat-menu-item>Ignore Tweet
+        </button>
+        <button *ngIf="ti" (click)="unIgnoreTweet(tweet,$event);" mat-menu-item>Unignore Tweet
+        </button>
+        <!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
+
+      </mat-menu>
+      <div class="app-twitter-tweet">
+        <blockquote [innerHtml]="tweet.html"></blockquote>
+      </div>
+      <div class="app-twitter-item-menu">
+        <button mat-icon-button [matMenuTriggerData]="{tweet:tweet,si:si,ti:ti}" [matMenuTriggerFor]="appMenu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+      </div>
+    </ng-template>
+    <!--      <button id="tinfo_button" class="tinfo_button">-</button>-->
+    <div id="tinfo_table_wrapper" class="tinfo_table_wrapper">
+
+      <div id="tinfo_table" class="app-twitter-table" *ngIf="showTimeline">
+        <div class="table_info">
+          <div *ngIf="!ready">
+            <div>
+              <mat-spinner class="tinfo-spinner"></mat-spinner>
+            </div>
           </div>
-        </div>
-        <div #tinfoEmbeds [style.visibility]="ready ? 'visible' : 'hidden'">
-          <mat-expansion-panel class="twitter-card tc-expansion-panel hidden-tweet-container " *ngIf="tweets.length - visibleCount != 0">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                {{tweets.length - visibleCount}} Hidden
-              </mat-panel-title>
+          <div #tinfoEmbeds [style.visibility]="ready ? 'visible' : 'hidden'"
+          >
+            <mat-expansion-panel class="twitter-card tc-expansion-panel hidden-tweet-container "
+                                 *ngIf="tweets.length - visibleCount != 0">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{tweets.length - visibleCount}} Hidden
+                </mat-panel-title>
 
-            </mat-expansion-panel-header>
-            <div class="app-twitter-row" *ngFor="let tweet of tweets; let i = index">
+              </mat-expansion-panel-header>
+              <div class="app-twitter-row" *ngFor="let tweet of tweets; let i = index">
 
-              <div *ngIf="hidden[i] === true && !isPlaceholder(tweet)" class="atr-hidden atr-{{i}}">
-                <ng-container
-                  *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
+                <div *ngIf="hidden[i] === true && !isPlaceholder(tweet)" class="atr-hidden atr-{{i}}">
+                  <ng-container
+                    *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
+                </div>
+                <mat-card class="twitter-card" *ngIf="isPlaceholder(tweet)">
+                  <span class="tweet-no-longer-available">Tweet no longer available</span>
+                </mat-card>
               </div>
+            </mat-expansion-panel>
+
+          </div>
+          <div class="app-twitter-row atr-visible atr-{{i}}" *ngFor="let tweet of tweets; let i = index">
+            <div class="date-separator" *ngIf="isNewDate(i)">{{tweet.date | date:"mediumDate"}}</div>
+            <ng-container *ngIf="i < maxTweets">
+              <mat-card class="twitter-card" *ngIf="hidden[i] === false && !isPlaceholder(tweet)">
+                <ng-container>
+                  <ng-container
+                    *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
+                </ng-container>
+              </mat-card>
               <mat-card class="twitter-card" *ngIf="isPlaceholder(tweet)">
                 <span class="tweet-no-longer-available">Tweet no longer available</span>
               </mat-card>
-            </div>
-          </mat-expansion-panel>
-
-          <div class="app-twitter-row atr-visible atr-{{i}}" *ngFor="let tweet of tweets; let i = index">
-            <div class="date-separator" *ngIf="isNewDate(i)">{{tweet.date | date:"mediumDate"}}</div>
-            <mat-card class="twitter-card" *ngIf="hidden[i] === false && !isPlaceholder(tweet)">
-              <ng-container>
-                <ng-container
-                  *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
-              </ng-container>
-            </mat-card>
-            <mat-card class="twitter-card" *ngIf="isPlaceholder(tweet)">
-              <span class="tweet-no-longer-available">Tweet no longer available</span>
-            </mat-card>
+            </ng-container>
           </div>
 
         </div>
@@ -85,6 +98,5 @@
       </div>
     </div>
   </div>
-
 </div>
 

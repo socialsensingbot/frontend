@@ -770,7 +770,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this._dateMax = upper;
     this._dateMin = lower;
     this.sliderOptions = {...this.sliderOptions, startMin: this._dateMin, startMax: this._dateMax};
-
+    this.updateSearch({min_offset: lower, max_offset: upper});
     this.updateLayers("Slider Change");
 
 
