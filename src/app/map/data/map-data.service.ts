@@ -7,6 +7,7 @@ import {ProcessedData, ProcessedPolygonData} from "./processed-data";
 import {Tweet} from "../twitter/tweet";
 import {NotificationService} from "../../services/notification.service";
 import {NgForageCache} from "ngforage";
+import {CachedItem} from "ngforage/lib/cache/cached-item";
 
 
 const log = new Logger('map-data');
@@ -184,15 +185,15 @@ export class MapDataService {
    */
   private async updateTweetsData(_dateMin, _dateMax) {
     const key = this.createKey(_dateMin, _dateMax);
-    const cacheValue: ProcessedData = await this.cache.getItem(key) as ProcessedData;
-    if (cacheValue != null) {
+    const cacheValue: CachedItem<ProcessedData> = await this.cache.getCached(key);
+    if (cacheValue != null && !cacheValue.expired && cacheValue.hasData) {
       console.info("Retrieved tweet data from cache.");
       console.log(cacheValue);
-      this._twitterData = new ProcessedData().populate(cacheValue);
+      this._twitterData = new ProcessedData().populate(cacheValue.data);
     } else {
       console.info("Tweet data not in cache.");
       this._twitterData = new ProcessedData(_dateMin, _dateMax, this.timeKeyedData, this._rawTwitterData, this._stats);
-      this.cache.setItem(key, this._twitterData);
+      this.cache.setCached(key, this._twitterData, 24 * 60 * 60 * 1000);
     }
   }
 
