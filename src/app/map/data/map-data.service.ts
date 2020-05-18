@@ -6,7 +6,7 @@ import {UIExecutionService} from "../../services/uiexecution.service";
 import {ProcessedData, ProcessedPolygonData} from "./processed-data";
 import {Tweet} from "../twitter/tweet";
 import {NotificationService} from "../../services/notification.service";
-import {NgForageCache} from "ngforage";
+import {NgForage, NgForageCache} from "ngforage";
 import {CachedItem} from "ngforage/lib/cache/cached-item";
 
 
@@ -46,7 +46,8 @@ export class MapDataService {
   private _statsLoaded: any;
 
   constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
-              private _notify: NotificationService, private readonly cache: NgForageCache) { }
+              private _notify: NotificationService, private readonly cache: NgForageCache,
+              private readonly ngf: NgForage) { }
 
   /**
    * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
