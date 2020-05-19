@@ -125,7 +125,7 @@ export class MapDataService {
 
   }
 
-  public embeds(activePolyLayerShortName: PolygonLayerShortName, name: any): Tweet[] {
+  public tweets(activePolyLayerShortName: PolygonLayerShortName, name: any): Tweet[] {
     log.debug(`embeds(${activePolyLayerShortName},${name})`);
     return this._twitterData.embeds(activePolyLayerShortName, name);
   }

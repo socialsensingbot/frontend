@@ -90,7 +90,7 @@ export class UIExecutionService {
 
   }
 
-  public queue(name: String, waitForStates: UIState[] | null, task: () => any, dedup: String = null) {
+  public queue(name: String, waitForStates: UIState[] | null, task: () => any, dedup: any = null) {
 
     return new Promise<any>((resolve, reject) => {
       let dedupKey = null;

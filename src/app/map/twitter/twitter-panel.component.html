@@ -2,13 +2,14 @@
      [infiniteScrollDistance]="scrollDistance"
      [infiniteScrollUpDistance]="scrollUpDistance"
      [infiniteScrollThrottle]="throttle"
+     alwaysCallback="true"
      [scrollWindow]="false"
      (scrolled)="onScrollDown($event)"
      (scrolledUp)="onUp($event)">
 
   <ng-container *ngIf="ready">
     <div class="tweets-header" *ngIf="tweets.length > 0">
-      <mat-card class="tweets-heading"><span style="color: black"><b>Showing {{visibleCount}} of {{tweets.length}}
+      <mat-card class="tweets-heading"><span style="color: black"><b>Showing {{visibleCount}} of {{tweetCount}}
         Tweets from {{region}}</b><br/></span>Exceedance probability {{exceedanceProbability}}%
       </mat-card>
     </div>
@@ -56,7 +57,7 @@
       <div id="tinfo_table" class="app-twitter-table" *ngIf="showTimeline">
         <div class="table_info">
 
-        <div #tinfoEmbeds [style.visibility]="ready ? 'visible' : 'hidden'"
+          <div #tinfoEmbeds [style.visibility]="ready ? 'visible' : 'hidden'"
           >
             <mat-expansion-panel class="twitter-card tc-expansion-panel hidden-tweet-container "
                                  *ngIf="tweets.length - visibleCount != 0">
@@ -79,25 +80,43 @@
             </mat-expansion-panel>
 
           </div>
-          <div class="app-twitter-row atr-visible atr-{{i}}" *ngFor="let tweet of tweets; let i = index">
-            <div class="date-separator" *ngIf="isNewDate(i)">{{tweet.date | date:"mediumDate"}}</div>
-            <ng-container *ngIf="i < maxTweets">
-              <mat-card class="twitter-card" *ngIf="hidden[i] === false && !isPlaceholder(tweet)">
-                <ng-container>
-                  <ng-container
-                    *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
-                </ng-container>
-              </mat-card>
-              <mat-card class="twitter-card" *ngIf="isPlaceholder(tweet)">
-                <span class="tweet-no-longer-available">Tweet no longer available</span>
-              </mat-card>
+          <div class="tweet-page tweet-page-{{p}}" *ngFor="let page of pages; let p= index">
+            <span style="display:none">This Page {{p}} ({{page.start}}) has {{page.tweets.length}} tweets.</span>
+            <div class="scroll-spinner-outer" *ngIf="p == 0 && p < minPage">
+              <mat-spinner diameter="24" class="scroll-spinner"></mat-spinner>
+            </div>
+            <div class="app-twitter-row atr-visible atr-{{i}}" *ngFor="let tweet of page.tweets; let i = index">
+              <div class="date-separator" *ngIf="isNewDate(i + page.start)">{{tweet.date | date:"mediumDate"}}</div>
+              <ng-container *ngIf="page.page <= maxPage">
+                <mat-card class="twitter-card" *ngIf="hidden[i + page.start] === false && !isPlaceholder(tweet)"
+                          [style.visibilty]="page.page < minPage ? 'hidden':'visible'">
+                  <ng-container>
+                    <ng-container
+                      *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i + page.start,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
+                  </ng-container>
+                </mat-card>
+                <mat-card class="twitter-card" *ngIf="isPlaceholder(tweet)">
+                  <span class="tweet-no-longer-available">Tweet no longer available</span>
+                </mat-card>
+              </ng-container>
+            </div>
+            <ng-container *ngIf="p == pages.length -1">
+              <div class="scroll-spinner-outer" *ngIf="p > maxPage">
+                <mat-spinner diameter="24" class="scroll-spinner"></mat-spinner>
+              </div>
+              <div class="scroll-spinner-outer" *ngIf="p == maxPage">
+                <span> ~ </span>
+              </div>
             </ng-container>
           </div>
 
         </div>
 
       </div>
+
     </div>
   </div>
+  <
 </div>
+
 

@@ -13,19 +13,20 @@ import * as $ from "jquery";
 import {PreferenceService} from "../../pref/preference.service";
 import {Hub, Logger} from "aws-amplify";
 import {Tweet} from "./tweet";
+import {IInfiniteScrollEvent} from "ngx-infinite-scroll";
 
 const log = new Logger('twitter-panel');
 
 let twitterBound = false;
 
-function twitterLoad(j: number) {
+function twitterLoad(page: number) {
   //todo: the use of setTimeout is very brittle, revisit.
   if ((window as any).twttr && (window as any).twttr.widgets) {
     setTimeout(() => {
-      (window as any).twttr.widgets.load($(".atr-" + j + " blockquote")[0]);
+      (window as any).twttr.widgets.load($(".tweet-page-" + page)[0]);
     }, 50);
   } else {
-    setTimeout(() => twitterLoad(j), 500);
+    setTimeout(() => twitterLoad(page), 500);
   }
 
 }
@@ -69,6 +70,12 @@ function twitterInit() {
 
 twitterInit();
 
+
+class TweetPage {
+
+  constructor(public page: number, public start: number, public tweets: Tweet[]) {}
+}
+
 @Component({
              selector:    'twitter-panel',
              templateUrl: './twitter-panel.component.html',
@@ -84,19 +91,46 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
   private _tweets: Tweet[] | null = null;
   public hidden: boolean[] = [];
   public loaded: boolean[] = [];
+  public tweetCount = 0;
   public visibleCount = 0;
   public ready: boolean;
   private _destroyed: boolean = false;
 
   // Infinite scroll start: https://github.com/socialsensingbot/frontend/issues/10
   private readonly PAGE_SIZE = 20;
+  private readonly INITIAL_PAGES = 3;
   public scrollDistance = 4;
   public scrollUpDistance = 4;
   public throttle = 300;
   public direction: string;
-  public maxTweets = this.PAGE_SIZE * 3;
+  public maxPage = this.INITIAL_PAGES;
+  public minPage = 0;
 
   // Infinite scroll end
+
+  @Input() showHeaderInfo: boolean = true;
+  @Input() showTimeline: boolean;
+  public moreToShow: boolean;
+  public pages: TweetPage[] = [];
+
+  constructor(private _zone: NgZone, public pref: PreferenceService) {
+    // Hub.listen("twitter-panel", (e) => {
+    //   if (e.payload.message === "update") {
+    //     this._zone.run(() => this.updateTweets());
+    //   }
+    // });
+    Hub.listen("twitter-panel", (e) => {
+      if (e.payload.message === "render") {
+        this._zone.run(() => this.ready = true);
+      }
+    });
+    Hub.listen("twitter-panel", (e) => {
+      if (e.payload.message === "refresh") {
+        this._zone.run(() => this.updateTweets(this._tweets));
+      }
+    });
+
+  }
 
   @Input()
   public set tweets(val: Tweet[] | null) {
@@ -104,48 +138,71 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
       // this.ready = false;
       this._tweets = [];
       this.ready = false;
+      this.tweetCount = 0;
       console.log("Tweets reset");
       return;
     }
-    if (val === this._tweets) {
-      log.debug("No change to embeds");
-    } else {
-      this.updateTweets(val);
-    }
+
+    this.updateTweets(val);
+
   }
 
   private updateTweets(val: Tweet[]) {
+    this.tweetCount = val.length;
     log.debug("updateTweets()");
     if (this._destroyed) {
       return;
     }
-    for (let i = 0; i < val.length; i++) {
-      const tweet = val[i];
-      if (i >= this.hidden.length) {
-        this.hidden.push(true);
-      }
-      if (i >= this.loaded.length) {
-        this.loaded.push(false);
-      }
-      if (i >= this.tweets.length) {
-        this._tweets.push(tweet);
-      } else {
-        if (this._tweets[i].id !== tweet.id) {
-          this._tweets[i] = tweet;
-          this.loaded[i] = false;
+    let changed = false;
+    if (val.length != this._tweets.length) {
+      changed = true;
+    } else {
+      for (let i = 0; i < val.length; i++) {
+        if (this._tweets[i].id !== val[i].id) {
+          changed = true;
         }
       }
-      const blacklisted = this.pref.isBlacklisted(tweet);
-      if (this.hidden[i] !== blacklisted) {
-        this.hidden[i] = blacklisted;
-      }
-
-      if (i < this.maxTweets) {
-        this.appearTweet(i)
-      }
+    }
+    if (!changed) {
+      log.debug("No change, returning from updateTweets()");
+      return;
     }
 
-    this.visibleCount = this.hidden.filter(i => !i).length;
+    if (this.pages.length !== Math.ceil(val.length / this.PAGE_SIZE)) {
+      this.pages.length = Math.ceil(val.length / this.PAGE_SIZE)
+    }
+    if (val.length !== this._tweets.length) {
+      this._tweets.length = val.length;
+    }
+    if (this.hidden.length !== val.length) {
+      this.hidden.length = val.length;
+    }
+    if (this.loaded.length !== val.length) {
+      this.loaded.length = val.length;
+    }
+    for (let i = 0; i < val.length; i++) {
+      const page = Math.floor(i / this.PAGE_SIZE);
+      const tweetOnPage = i % this.PAGE_SIZE;
+      if (tweetOnPage === 0) {
+        this.pages[page] = new TweetPage(page, i, []);
+      }
+      const tweet = val[i];
+      if (tweetOnPage >= this.pages[page].tweets.length) {
+        this.pages[page].tweets.push(tweet)
+      } else {
+        this.pages[page].tweets[i] = tweet;
+
+      }
+
+
+      this._tweets[i] = tweet;
+      if (this._tweets[i] && this._tweets[i].id !== tweet.id) {
+        this._tweets[i] = tweet;
+      }
+      this.hidden[i] = this.pref.isBlacklisted(tweet);
+    }
+
+
     log.debug(this.tweets);
     if (this.tweets.length - this.hidden.length > 0) {
       log.debug("Waiting for tweets to load before marking as ready.")
@@ -153,6 +210,10 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
       log.debug("No tweets to load so marking as ready.")
       this.ready = true;
     }
+    for (let i = this.minPage; i <= this.maxPage; i++) {
+      this.animateTweetAppearance(i);
+    }
+    this.moreToShow = this.maxPage < this.pages.length;
   }
 
   public get tweets(): Tweet[] {
@@ -177,18 +238,14 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
   }
 
 
-  private animateTweetAppearance(start: number) {
-    const animatedReappear = (i: number) => {
-      if (this._destroyed) {
-        return;
-      }
-      if (i < this.maxTweets) {
-        this.appearTweet(i);
-        setTimeout(() => this._ngZone.run(() => animatedReappear(i + 1)), 50);
-      }
-
-    };
-    animatedReappear(start);
+  private animateTweetAppearance(page: number) {
+    if (typeof this.loaded[page] === undefined) {
+      this.loaded[page] = false;
+    }
+    console.log("Loading tweets by page " + page);
+    if (!this.loaded[page]) {
+      twitterLoad(page);
+    }
   }
 
   private appearTweet(i: number) {
@@ -286,16 +343,40 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
     } else {
       this.maxTweets = this.tweets.length
     }
-    log.debug(this.maxTweets);
-    if (oldMax != this.maxTweets) {
-      this.animateTweetAppearance(0);
+    if (this.minPage < this.pages.length - this.INITIAL_PAGES - 1) {
+      this.minPage += 1;
+    } else {
+      this.minPage = Math.max(this.pages.length - this.INITIAL_PAGES - 1, 0);
     }
+    log.debug(this.maxPage);
+    if (oldMax != this.maxPage) {
+      this.animateTweetAppearance(oldMax);
+    }
+    console.log("New max page " + this.maxPage)
+    console.log("New min page " + this.minPage)
   }
 
-  onUp(ev) {
-    console.log('scrolled up!', ev);
+  onUp($event: IInfiniteScrollEvent) {
+    console.log('scrolled up!', $event);
 
     this.direction = 'up';
+    const oldMin = this.minPage;
+    if ($event.currentScrollPosition == 0) {
+      this.maxPage = this.INITIAL_PAGES;
+      this.minPage = 0;
+    }
+    if (this.maxPage > this.INITIAL_PAGES) {
+      this.maxPage -= 1;
+
+    }
+    if (this.minPage > 0) {
+      this.minPage -= 1;
+    }
+    if (oldMin != this.minPage) {
+      this.animateTweetAppearance(this.minPage);
+    }
+    console.log("New max page " + this.maxPage)
+    console.log("New min page " + this.minPage)
 
     // if (this.maxTweets > 100) {
     //   this.maxTweets -= this.PAGE_SIZE;

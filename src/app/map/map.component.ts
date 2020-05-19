@@ -2,7 +2,7 @@ import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {fgsData} from './county_bi';
 import {coarseData} from './coarse_bi';
 import {fineData} from './fine_bi';
-import {Auth, Logger} from 'aws-amplify';
+import {Auth, Hub, Logger} from 'aws-amplify';
 import {
   Browser,
   control,
@@ -443,7 +443,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this.exceedanceProbability = Math.round(props.properties.stats * 100) / 100;
       this.tweetCount = props.properties.count;
       log.debug(`this.activePolyLayerShortName=${this.activePolyLayerShortName}`);
-      this.tweets = this._data.embeds(this.activePolyLayerShortName, props.properties.name);
+      this.tweets = this._data.tweets(this.activePolyLayerShortName, props.properties.name);
       log.debug(this.tweets);
       this.twitterPanelHeader = true;
       this.showTwitterTimeline = true;
@@ -552,9 +552,9 @@ export class MapComponent implements OnInit, OnDestroy {
         this.ready = true;
       }
     });
-    this._twitterUpdateTimer = timer(0, 2000).subscribe(() => {
+    this._twitterUpdateTimer = timer(0, 2000).subscribe(async () => {
       if (this._twitterIsStale) {
-        this.updateTwitter();
+        await this.updateTwitter();
         this._twitterIsStale = false;
       }
     });
@@ -753,7 +753,7 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   private showTweets() {
     log.debug("showTweets()");
-    this._exec.queue("Show Tweets", ["ready"], () => {
+    this._exec.queue("Tweets Visible", ["ready"], () => {
       this.tweetsVisible = true;
     });
   }
@@ -805,9 +805,9 @@ export class MapComponent implements OnInit, OnDestroy {
    * Update the twitter panel using the currently selected feature.
    *
    */
-  private updateTwitter() {
+  private async updateTwitter() {
     log.debug("updateTwitter()");
-    this._exec.queue("Update Twitter", ["ready"], () => {
+    await this._exec.queue("Update Twitter", ["ready"], () => {
       // Mark as stale to trigger a refresh
       if (!this.tweetsVisible) {
         this._clicked = "";
