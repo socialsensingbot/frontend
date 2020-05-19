@@ -59,7 +59,7 @@ function twitterInit() {
           } catch (e) {
             log.debug(e);
           }
-        }, 50);
+        }, 100);
 
       }
     );
@@ -205,10 +205,12 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
 
 
     log.debug(this.tweets);
-    if (this.tweets.length - this.hidden.length > 0) {
-      log.debug("Waiting for tweets to load before marking as ready.")
+    this.visibleCount = this.hidden.filter(i => !i).length;
+    if (this.visibleCount > 0) {
+      log.debug("Waiting for tweets to load before marking as ready.");
+      this.ready = true;
     } else {
-      log.debug("No tweets to load so marking as ready.")
+      log.debug("No tweets to load so marking as ready.");
       this.ready = true;
     }
     for (let i = this.minPage; i <= this.maxPage; i++) {
@@ -219,23 +221,6 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
 
   public get tweets(): Tweet[] {
     return this._tweets;
-  }
-
-  @Input() showHeaderInfo: boolean = true;
-  @Input() showTimeline: boolean;
-
-  constructor(private _ngZone: NgZone, public pref: PreferenceService) {
-    // Hub.listen("twitter-panel", (e) => {
-    //   if (e.payload.message === "update") {
-    //     this._ngZone.run(() => this.updateTweets());
-    //   }
-    // });
-    Hub.listen("twitter-panel", (e) => {
-      if (e.payload.message === "render") {
-        this._ngZone.run(() => this.ready = true);
-      }
-    });
-
   }
 
 
@@ -338,11 +323,13 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
     console.log('scrolled down!!', ev);
     //add items
     this.direction = 'down'
-    const oldMax = this.maxTweets;
-    if (this.maxTweets < this.tweets.length - this.PAGE_SIZE) {
-      this.maxTweets += this.PAGE_SIZE;
+    const oldMax = this.maxPage;
+    if (this.maxPage < this.pages.length - 1) {
+      this.moreToShow = true;
+      this.maxPage += 1;
     } else {
-      this.maxTweets = this.tweets.length
+      this.moreToShow = false;
+      this.maxPage = this.pages.length - 1
     }
     if (this.minPage < this.pages.length - this.INITIAL_PAGES - 1) {
       this.minPage += 1;
