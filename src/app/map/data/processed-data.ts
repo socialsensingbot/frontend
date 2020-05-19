@@ -39,7 +39,7 @@ export class ProcessedPolygonData {
               _statsRefData: Stats = null,
               timeKeyedData: any = null, _rawTwitterData: any = null) {
 
-    if (_rawTwitterData == null) {
+    if (_rawTwitterData === null) {
       //creating empty class for deserializing
     } else {
       const start = new Date();
@@ -146,13 +146,10 @@ export class ProcessedPolygonData {
     for (const i in this._tweets) {
       this._tweets[i] = this._tweets[i].map(i => new Tweet().populate(i))
     }
-    this._places = data._places;
+    this._places = new Set(data._places);
     return this;
   }
 }
-
-const MAX_TWEETS = 100;
-
 export class ProcessedData {
 
 
@@ -161,7 +158,7 @@ export class ProcessedData {
   public fine: ProcessedPolygonData;
 
 
-  constructor(dateMin: number = 0, dateMax: number = 0, timeKeyedData = [], _rawTwitterData = {},
+  constructor(dateMin: number = 0, dateMax: number = 0, timeKeyedData = null, _rawTwitterData = null,
               _statsRefData: Stats = null) {
 
     this.county = new ProcessedPolygonData("county", dateMin, dateMax, _statsRefData, timeKeyedData, _rawTwitterData);

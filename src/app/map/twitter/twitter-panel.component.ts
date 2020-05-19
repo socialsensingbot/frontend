@@ -165,6 +165,7 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
     }
     if (!changed) {
       log.debug("No change, returning from updateTweets()");
+      this.ready = true;
       return;
     }
 

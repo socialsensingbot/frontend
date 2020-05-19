@@ -191,6 +191,7 @@ export class MapDataService {
       console.info("Retrieved tweet data from cache.");
       console.log(cacheValue);
       this._twitterData = new ProcessedData().populate(cacheValue.data);
+      console.log(this._twitterData)
     } else {
       console.info("Tweet data not in cache.");
       this._twitterData = new ProcessedData(_dateMin, _dateMax, this.timeKeyedData, this._rawTwitterData, this._stats);
