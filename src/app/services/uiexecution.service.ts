@@ -1,6 +1,7 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {Observable, Subscription, timer} from "rxjs";
 import {Auth, Logger} from "aws-amplify";
+import {NotificationService} from "./notification.service";
 
 const log = new Logger('uiexecution');
 
@@ -8,7 +9,7 @@ class ExecutionTask {
 
   constructor(private _resolve: (value?: any) => void, private _reject: (reason?: any) => void,
               private _task: () => any, public name: String, public waitForStates: UIState[] | null,
-              private _dedup: string) {
+              private _dedup: string, private _notify: NotificationService) {
 
   }
 
@@ -23,7 +24,7 @@ class ExecutionTask {
       this._resolve(this._task());
     } catch (e) {
       log.error("ERROR Executing " + this.name)
-      log.error(e);
+      this._notify.error(e);
       this._reject(e);
     }
   }
@@ -53,7 +54,7 @@ export class UIExecutionService {
 
   private dedupSet: Set<any> = new Set<any>();
 
-  constructor() { }
+  constructor(private _notify: NotificationService) { }
 
   public async start() {
     await Auth.currentAuthenticatedUser() !== null
@@ -67,7 +68,7 @@ export class UIExecutionService {
             this.dedupSet.delete(task.dedup);
           }
         } else {
-          console.error(
+          log.warn(
             `Skipped out of sequence task ${task.name} on execution queue, state ${this._state} should be one of ${task.waitForStates}`)
           // this._queue.push(task)
         }
@@ -109,7 +110,7 @@ export class UIExecutionService {
 
         }
       }
-      const executionTask = new ExecutionTask(resolve, reject, task, name, waitForStates, dedupKey);
+      const executionTask = new ExecutionTask(resolve, reject, task, name, waitForStates, dedupKey, this._notify);
       this._queue.push(executionTask);
       log.debug(`Added ${name} to queue`);
     })

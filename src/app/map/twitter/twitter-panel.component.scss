@@ -126,8 +126,8 @@ $tweetWidth: 540px;
           }
 
           .app-twitter-tweet {
-            display: flex;
-
+            //display: flex;
+            //flex-direction: column;
             //border: 1px solid green;
             blockquote {
               opacity: 1.0;

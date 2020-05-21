@@ -71,14 +71,7 @@ describe('Map: ', function () {
       cy.twitterPanelNotVisible();
       cy.logout();
     });
-    it('is scrollable', () => {
-      cy.visitAndWait(url);
-      cy.twitterPanelVisible();
-      cy.get(".atr-1", {timeout: 60000}).scrollIntoView().should("be.visible");
-      cy.get('.tweets-outer').scrollTo('bottom');
-      cy.get(".atr-1", {timeout: 20000}).should("not.be.visible");
-      cy.logout();
-    });
+
   });
 
 

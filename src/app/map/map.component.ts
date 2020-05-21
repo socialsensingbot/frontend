@@ -697,7 +697,7 @@ export class MapComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         this._zone.run(() => this.load())
       }, 5000);
-      log.error(e);
+      this._notify.error(e)
       this.activity = false;
     }
 

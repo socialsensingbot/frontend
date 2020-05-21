@@ -41,7 +41,7 @@ export class PreferenceService {
   private _twitterUserBlackList: string[] = [];
   private _userInfo: any = null;
 
-  constructor(private _notification: NotificationService) { }
+  constructor(private _notify: NotificationService) { }
 
   public async init(userInfo: any) {
     this._userInfo = userInfo;
@@ -69,7 +69,7 @@ export class PreferenceService {
       log.debug("** Preference Service Initialized **");
     } catch (e) {
       log.debug("** Preferences Service Failed to Initialize **");
-      console.error(e);
+      this._notify.error(e);
     }
   }
 
@@ -113,7 +113,7 @@ export class PreferenceService {
 
   public async ignoreSender(tweet: Tweet) {
     if (!tweet.valid) {
-      console.error("Shouldn't be trying to ignore sender on an unparseable tweet.");
+      this._notify.error("Shouldn't be trying to ignore sender on an unparseable tweet.");
       return;
     }
     //#87 the value of the await needs to be in a temp variable
@@ -130,7 +130,7 @@ export class PreferenceService {
         }
       }));
     } else {
-      this._notification.show("Already ignoring @" + tweet.sender)
+      this._notify.show("Already ignoring @" + tweet.sender)
     }
     this._twitterUserBlackList.push(tweet.sender);
   }
@@ -142,7 +142,7 @@ export class PreferenceService {
 
   public async ignoreTweet(tweet: Tweet) {
     if (!tweet.valid) {
-      console.error("Shouldn't be trying to ignore tweet on an unparseable tweet.");
+      this._notify.error("Shouldn't be trying to ignore tweet on an unparseable tweet.");
       return;
     }
 
@@ -160,7 +160,7 @@ export class PreferenceService {
         }
       }));
     } else {
-      this._notification.show("Already ignoring " + tweet.id);
+      this._notify.show("Already ignoring " + tweet.id);
     }
     this._tweetBlackList.push(tweet.id);
   }
@@ -185,7 +185,7 @@ export class PreferenceService {
   //       }
   //     }));
   //   } else {
-  //     this._notification.show("Already marked irrelevant " + parsed.tweet);
+  //     this._notify.show("Already marked irrelevant " + parsed.tweet);
   //   }
   //
   // }
@@ -193,7 +193,7 @@ export class PreferenceService {
 
   public isSenderIgnored(tweet) {
     if (!tweet.valid) {
-      console.error("Shouldn't be trying to check ignored sender on an unparseable tweet.");
+      this._notify.error("Shouldn't be trying to check ignored sender on an unparseable tweet.");
       return;
     }
 
@@ -202,7 +202,7 @@ export class PreferenceService {
 
   public isTweetIgnored(tweet: Tweet) {
     if (!tweet.valid) {
-      console.error("Shouldn't be trying to ignore tweet on an unparseable tweet.");
+      this._notify.error("Shouldn't be trying to ignore tweet on an unparseable tweet.");
       return;
     }
     return this._tweetBlackList.includes(tweet.id);
@@ -211,7 +211,7 @@ export class PreferenceService {
   public async unIgnoreSender(tweet) {
 
     if (!tweet.valid) {
-      console.error("Shouldn't be trying to un-ignore sender on an unparseable tweet.");
+      this._notify.error("Shouldn't be trying to un-ignore sender on an unparseable tweet.");
       return;
     }
 
@@ -222,13 +222,13 @@ export class PreferenceService {
     if (result.data.getTwitterUserIgnore) {
       const result = await API.graphql(graphqlOperation(deleteTwitterUserIgnore, {input: {id}}));
     } else {
-      this._notification.show("Not ignoring @" + tweet.sender)
+      this._notify.show("Not ignoring @" + tweet.sender)
     }
   }
 
   public async unIgnoreTweet(tweet) {
     if (!tweet.valid) {
-      console.error("Shouldn't be trying to un-ignore tweet on an unparseable tweet.");
+      this._notify.error("Shouldn't be trying to un-ignore tweet on an unparseable tweet.");
       return;
     }
 
@@ -240,7 +240,7 @@ export class PreferenceService {
       const result = await API.graphql(graphqlOperation(deleteTweetIgnore, {input: {id}}));
       log.debug(result);
     } else {
-      this._notification.show("Not ignoring " + tweet.id);
+      this._notify.show("Not ignoring " + tweet.id);
     }
   }
 }

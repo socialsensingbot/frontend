@@ -161,13 +161,7 @@ export class MapDataService {
     // For performance reasons we need to do the
     // next part without triggering Angular
     try {
-
-
-      this.updateTweetsData(_dateMin, _dateMax);
-
-
-    } catch (e) {
-      log.error(e);
+      await this.updateTweetsData(_dateMin, _dateMax);
     } finally {
       log.debug("update() end");
       this._updating = false;

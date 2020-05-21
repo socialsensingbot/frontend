@@ -21,12 +21,12 @@ if (environment.production) {
 } else {
   window.onerror = (message, file, line, col, e) => {
     log.error(e)
-    window.alert(message);
+    window.alert(`${file}(${line}:${col}): ${message}`);
     return false;
   };
   window.addEventListener("error", (e) => {
     log.error(e);
-    window.alert(e.message);
+    window.alert(`${e.filename}(${e.lineno}:${e.colno}): ${e.message}`);
     return false;
   });
   window.addEventListener('unhandledrejection', (e) => {

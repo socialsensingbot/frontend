@@ -1,0 +1,19 @@
+{
+  "getUserPreferences": {
+    "data": {
+      "getUserPreferences": {
+        "id": "434fd82f-3a65-4c66-85c1-b701f2b7ca81",
+        "ignoreTweets": {
+          "nextToken": null
+        },
+        "ignorePeople": {
+          "nextToken": null
+        },
+        "irrelevant": {
+          "nextToken": null
+        },
+        "owner": "434fd82f-3a65-4c66-85c1-b701f2b7ca81"
+      }
+    }
+  }
+}

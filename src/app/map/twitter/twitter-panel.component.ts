@@ -44,18 +44,20 @@ function twitterInit() {
           const parent = $(event.target).parent();
           if (parent.find("blockquote.twitter-tweet-error").length > 0) {
             parent.parent().find(".app-twitter-item-menu").hide();
-            parent.find("blockquote.twitter-tweet-error")
-                  .parent()
-                  .parent()
-                  .parent()
-                  .text("Tweet no longer available")
-                  .css("opacity", 1.0)
-                  .css("min-width", "516px")
-                  .css("text-align", "center");
+            const cardInner = parent.find("blockquote.twitter-tweet-error")
+                                    .parent()
+                                    .parent();
+
+            cardInner.parent().css("opacity", 1.0)
+                     .css("min-width", "516px")
+                     .css("text-align", "center");
+
+
+            cardInner.text("Tweet no longer available");
           }
           try {
-            event.target.parentNode.parentNode.parentNode.parentNode.style.opacity = 1.0;
-            event.target.parentNode.parentNode.parentNode.parentNode.style.maxHeight = "100%";
+            event.target.parentNode.parentNode.parentNode.parentNode.parentNode.style.opacity = 1.0;
+            event.target.parentNode.parentNode.parentNode.parentNode.parentNode.style.maxHeight = "100%";
           } catch (e) {
             log.debug(e);
           }

@@ -23,6 +23,7 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+import "cypress-graphql-mock";
 
 const LONG_TIMEOUT = 60000;
 
@@ -75,7 +76,8 @@ Cypress.Commands.add("twitterPanelVisible", () => {
 
 Cypress.Commands.add("twitterPanelNotVisible", () => {
   cy.get(".tweet-drawer", {timeout: LONG_TIMEOUT}).should("not.be.visible");
-});Cypress.Commands.add("pushStateDelay", () => {
+});
+Cypress.Commands.add("pushStateDelay", () => {
   cy.wait(500);
 });
 Cypress.Commands.add("stubLiveJson", (file) => {
@@ -90,14 +92,94 @@ Cypress.Commands.add("stubLiveJson", (file) => {
   cy.route({
              // our example is a GET call, but you could also
              // have a POST, if you're pushing data up
-             method: "GET",
+             method:   "GET",
              // more on the URL below
-             url: /.*\/public\/live.json?.*/g,
+             url:      /.*\/public\/live.json?.*/g,
              // the fixture: shortcut will know to
              // look in cypress/fixtures,
              // unless you configure cypress to
              // put it somewhere else
-             response: "fixture:"+file+".json"
+             response: "fixture:" + file + ".json"
            });
 
 });
+
+function patchXhrUsing(makeResponse) {
+  return (rawResponse) => {
+    console.log("RESPONSE:", rawResponse.xhr.response);
+    const {xhr} = rawResponse;
+    Object.defineProperty(xhr.__proto__, 'response', {writable: true});
+    xhr.response = JSON.stringify(makeResponse(rawResponse));
+    rawResponse.response = xhr.response;
+    return rawResponse;
+  }
+}
+
+Cypress.Commands.add("mockGraphQL", () => {
+  cy.server({
+
+              onAnyRequest: (route, proxy) => {
+
+                if (!route || !route.url || typeof route.url["indexOf"] === "undefined") {
+                  return;
+                }
+                const {xhr} = proxy;
+                if (route.url.indexOf('/graphql') >= 0) {
+                  const {body} = proxy.request;
+                  if (body && body.query && body.query.indexOf(
+                    "ListTweetIgnores") >= 0) {
+                    route.response = {
+                      "data": {
+                        "listTweetIgnores": {
+                          items: []
+                        }
+                      }
+                    };
+
+
+                  }
+
+                  if (body && body.query && body.query.indexOf(
+                    "ListTwitterUserIgnores") >= 0) {
+                    route.response = {
+                      "data": {
+                        "listTwitterUserIgnores": {
+                          items: []
+                        }
+
+                      }
+                    };
+
+                  }
+                  if (body && body.query && body.query.indexOf(
+                    "GetUserPreferences") >= 0) {
+                    console.log("GetUserPreferences");
+                    route.response = {
+                      "data": {
+                        "getUserPreferences": {
+                          "id":           "434fd82f-3a65-4c66-85c1-b701f2b7ca81",
+                          "ignoreTweets": {
+                            "nextToken": null
+                          },
+                          "ignorePeople": {
+                            "nextToken": null
+                          },
+                          "irrelevant":   {
+                            "nextToken": null
+                          },
+                          "owner":        "434fd82f-3a65-4c66-85c1-b701f2b7ca81"
+                        }
+                      }
+                    };
+
+
+                  }
+
+                }
+                console.log("RESPONSE: ", route, proxy);
+              }
+
+            });
+  cy.route("POST", "/graphql", {});
+});
+

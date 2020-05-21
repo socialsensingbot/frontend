@@ -6,6 +6,7 @@ import {NavigationEnd, NavigationExtras, NavigationStart, Router} from "@angular
 import {environment} from "../environments/environment";
 import {PreferenceService} from "./pref/preference.service";
 import {filter, map} from "rxjs/operators";
+import {NotificationService} from "./services/notification.service";
 const log = new Logger('app');
 
 @Component({
@@ -24,7 +25,8 @@ export class AppComponent  {
   public isSignup: boolean = !environment.production;
 
   constructor(private amplifyService: AmplifyService, public auth: AuthService,
-              private _router: Router, private _pref: PreferenceService) {
+              private _router: Router, private _pref: PreferenceService,
+              private _notify: NotificationService) {
     Auth.currentAuthenticatedUser({bypassCache: true})
         .then(user => this.isAuthenticated = (user != null))
         .then(() => this.checkSession())
@@ -66,7 +68,7 @@ export class AppComponent  {
 
       }
     } catch (error) {
-      console.error('no session: ', error);
+      this._notify.error(error)
     }
   }
 
