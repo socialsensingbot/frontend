@@ -7,7 +7,7 @@ describe('Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/1
     cy.login();
   });
 
-  describe.only('scroll', () => {
+  describe('scroll', () => {
     const url = "http://localhost:4200/map?selected=carmarthenshire&min_offset=-5399&max_offset=0&lat=53.00817326643286&lng=-2.0104980468750004";
 
     it('row changes', () => {
@@ -30,7 +30,7 @@ describe('Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/1
       cy.wait(1000);
 
       cy.log(
-        "There should be 3 pages of 20 tweets loaded at any time. The first page should not now contain any tweets tweets and the fourth page should contain 20 tweets.");
+        "There should be 3 pages of 20 tweets loaded at any time. The first page should not now contain any tweets and the fourth page should contain 20 tweets.");
 
       cy.get("twitter-panel").find('.tweet-page .twitter-card').its('length').should('eq', 60);
       cy.get(".tweet-page-0 .twitter-card").should("not.exist");
