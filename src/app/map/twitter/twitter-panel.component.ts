@@ -105,7 +105,7 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
   public scrollUpDistance = 4;
   public throttle = 300;
   public direction: string;
-  public maxPage = this.INITIAL_PAGES;
+  public maxPage = this.INITIAL_PAGES - 1;
   public minPage = 0;
 
   // Infinite scroll end
@@ -215,10 +215,14 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
       log.debug("No tweets to load so marking as ready.");
       this.ready = true;
     }
+    this.loadPagesOfTweets();
+    this.moreToShow = this.maxPage < this.pages.length;
+  }
+
+  private loadPagesOfTweets() {
     for (let i = this.minPage; i <= this.maxPage; i++) {
       this.animateTweetAppearance(i);
     }
-    this.moreToShow = this.maxPage < this.pages.length;
   }
 
   public get tweets(): Tweet[] {
@@ -333,14 +337,14 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
       this.moreToShow = false;
       this.maxPage = this.pages.length - 1
     }
-    if (this.minPage < this.pages.length - this.INITIAL_PAGES - 1) {
+    if (this.minPage <= this.pages.length - this.INITIAL_PAGES) {
       this.minPage += 1;
     } else {
-      this.minPage = Math.max(this.pages.length - this.INITIAL_PAGES - 1, 0);
+      this.minPage = Math.max(this.pages.length - this.INITIAL_PAGES, 0);
     }
     log.debug(this.maxPage);
     if (oldMax != this.maxPage) {
-      this.animateTweetAppearance(oldMax);
+      this.loadPagesOfTweets();
     }
     console.log("New max page " + this.maxPage)
     console.log("New min page " + this.minPage)
@@ -352,10 +356,10 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
     this.direction = 'up';
     const oldMin = this.minPage;
     if ($event.currentScrollPosition == 0) {
-      this.maxPage = this.INITIAL_PAGES;
+      this.maxPage = this.INITIAL_PAGES - 1;
       this.minPage = 0;
     }
-    if (this.maxPage > this.INITIAL_PAGES) {
+    if (this.maxPage >= this.INITIAL_PAGES) {
       this.maxPage -= 1;
 
     }
@@ -363,7 +367,7 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
       this.minPage -= 1;
     }
     if (oldMin != this.minPage) {
-      this.animateTweetAppearance(this.minPage);
+      this.loadPagesOfTweets();
     }
     console.log("New max page " + this.maxPage)
     console.log("New min page " + this.minPage)

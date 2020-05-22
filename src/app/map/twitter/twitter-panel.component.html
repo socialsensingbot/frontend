@@ -74,8 +74,8 @@
                   <ng-container
                     *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
                 </div>
-                <mat-card class="twitter-card" *ngIf="isPlaceholder(tweet)">
-                  <blockquote>
+                <mat-card class="twitter-card" *ngIf="hidden[i] === true && isPlaceholder(tweet)">
+                  <blockquote class="tweet-placeholder">
                     <span class="tweet-no-longer-available">Tweet no longer available</span>
                   </blockquote>
                 </mat-card>
@@ -92,7 +92,7 @@
                  [style.opacity]="isPlaceholder(tweet) ? 1.0 : 0.0"
                  *ngFor="let tweet of page.tweets; let i = index">
               <div class="date-separator" *ngIf="isNewDate(i + page.start)">{{tweet.date | date:"mediumDate"}}</div>
-              <ng-container *ngIf="page.page <= maxPage">
+              <ng-container *ngIf="page.page <= maxPage && page.page >= minPage">
                 <mat-card class="twitter-card" *ngIf="hidden[i + page.start] === false && !isPlaceholder(tweet)"
                           [style.visibilty]="page.page < minPage ? 'hidden':'visible'">
                   <ng-container>
@@ -101,7 +101,9 @@
                   </ng-container>
                 </mat-card>
                 <mat-card class="twitter-card" *ngIf="isPlaceholder(tweet)">
-                  <span class="tweet-no-longer-available">Tweet no longer available</span>
+                  <blockquote class="tweet-placeholder">
+                    <span class="tweet-no-longer-available">Tweet no longer available</span>
+                  </blockquote>
                 </mat-card>
               </ng-container>
             </div>
