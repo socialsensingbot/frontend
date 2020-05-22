@@ -24,6 +24,7 @@ function twitterLoad(page: number) {
   if ((window as any).twttr && (window as any).twttr.widgets) {
     setTimeout(() => {
       (window as any).twttr.widgets.load($(".tweet-page-" + page)[0]);
+      (window as any).twttr.widgets.load($("mat-expansion-panel")[0]);
     }, 50);
   } else {
     setTimeout(() => twitterLoad(page), 500);
@@ -44,20 +45,19 @@ function twitterInit() {
           const parent = $(event.target).parent();
           if (parent.find("blockquote.twitter-tweet-error").length > 0) {
             parent.parent().find(".app-twitter-item-menu").hide();
-            const cardInner = parent.find("blockquote.twitter-tweet-error")
-                                    .parent()
-                                    .parent();
+            const atr = parent.parents(".app-twitter-row");
 
-            cardInner.parent().css("opacity", 1.0)
-                     .css("min-width", "516px")
-                     .css("text-align", "center");
+            atr.css("opacity", 1.0)
+               .css("min-width", "516px")
+               .css("text-align", "center");
 
 
-            cardInner.text("Tweet no longer available");
+            atr.find("blockquote").text("Tweet no longer available");
           }
           try {
-            event.target.parentNode.parentNode.parentNode.parentNode.parentNode.style.opacity = 1.0;
-            event.target.parentNode.parentNode.parentNode.parentNode.parentNode.style.maxHeight = "100%";
+            const atr = $(event.target).parents(".app-twitter-row");
+            atr.css("opacity", 1.0);
+            atr.css("max-height", "100%");
           } catch (e) {
             log.debug(e);
           }

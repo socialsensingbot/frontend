@@ -67,14 +67,17 @@
                 </mat-panel-title>
 
               </mat-expansion-panel-header>
-              <div class="app-twitter-row" *ngFor="let tweet of tweets; let i = index">
+              <div class="app-twitter-row" [style.opacity]="isPlaceholder(tweet) ? 1.0 : 0.0"
+                   *ngFor="let tweet of tweets; let i = index">
 
                 <div *ngIf="hidden[i] === true && !isPlaceholder(tweet)" class="atr-hidden atr-{{i}}">
                   <ng-container
                     *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
                 </div>
                 <mat-card class="twitter-card" *ngIf="isPlaceholder(tweet)">
-                  <span class="tweet-no-longer-available">Tweet no longer available</span>
+                  <blockquote>
+                    <span class="tweet-no-longer-available">Tweet no longer available</span>
+                  </blockquote>
                 </mat-card>
               </div>
             </mat-expansion-panel>
@@ -86,6 +89,7 @@
               <mat-spinner diameter="24" class="scroll-spinner"></mat-spinner>
             </div>
             <div class="app-twitter-row atr-visible atr-{{i+ page.start}}"
+                 [style.opacity]="isPlaceholder(tweet) ? 1.0 : 0.0"
                  *ngFor="let tweet of page.tweets; let i = index">
               <div class="date-separator" *ngIf="isNewDate(i + page.start)">{{tweet.date | date:"mediumDate"}}</div>
               <ng-container *ngIf="page.page <= maxPage">
