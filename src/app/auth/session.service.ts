@@ -1,6 +1,11 @@
 import {Injectable, OnDestroy, OnInit} from '@angular/core';
 import {API, Auth, graphqlOperation, Logger} from "aws-amplify";
-import {APIService, OnCreateUserSessionSubscription} from "../API.service";
+import {
+  APIService,
+  CreateUserSessionMutation,
+  GetUserSessionQuery,
+  OnCreateUserSessionSubscription
+} from "../API.service";
 import {NotificationService} from "../services/notification.service";
 import {Subscription, timer} from "rxjs";
 
@@ -19,6 +24,7 @@ export class SessionService implements OnInit, OnDestroy {
   private _heartbeatTimer: Subscription;
   private _fingerprint: string = `${navigator.appName}:${navigator.appCodeName}:${navigator.platform}:${navigator.appVersion.substring(
     0, 4).trim()}:${navigator.javaEnabled()}:${screen.width}:${screen.height}`;
+  private _session: CreateUserSessionMutation;
 
   constructor(private _notify: NotificationService, private _api: APIService) {
 
@@ -47,6 +53,8 @@ export class SessionService implements OnInit, OnDestroy {
         this.newSession(userInfo);
       }
 
+      this._session = await this.getOrCreateSession(userInfo);
+
       this._sessionSubscription = await API.graphql(
         graphqlOperation(
           `subscription OnCreateUserSession($owner: String!) {
@@ -57,36 +65,58 @@ export class SessionService implements OnInit, OnDestroy {
           owner
         }
       }`
-          , {owner: userInfo.username})).subscribe((sub: OnCreateUserSessionSubscription) => {
+          , {owner: userInfo.username})).subscribe((subObj: any) => {
         this._sessionId = window.localStorage.getItem(SESSION_TOKEN);
-        if (sub.id !== this._sessionId) {
+        const sub: OnCreateUserSessionSubscription = subObj.value.data.onCreateUserSession;
+        if (!sub.id) {
+          log.warn('Invalid id for sub', sub);
+        }
+
+        if (sub.id && sub.id !== this._sessionId) {
           log.debug(`${sub.owner} is not ${userInfo.username}`);
-          log.debug(userInfo);
-          this.moreThanOneSession();
+          log.debug(sub);
+          this.moreThanOneSession(Date.parse(this._session.createdAt) < Date.parse(sub.createdAt));
         }
       });
+      return;
+    }
+  }
 
-
+  private async getOrCreateSession(userInfo, fail = false): Promise<GetUserSessionQuery> {
+    try {
       const existingSession = await this._api.GetUserSession(this._sessionId);
       if (existingSession) {
         if (existingSession.open) {
           this.moreThanOnce();
+          return existingSession;
         } else {
           this.newSession(userInfo);
-          await this._api.CreateUserSession({
-                                              id:          this._sessionId,
-                                              fingerprint: this._fingerprint,
-                                              open:        true
-                                            });
+          await this.createSession();
+          return this._api.GetUserSession(this._sessionId);
         }
       } else {
-        await this._api.CreateUserSession({
-                                            id:          this._sessionId,
-                                            fingerprint: this._fingerprint,
-                                            open:        true
-                                          });
+        await this.createSession();
+        return this._api.GetUserSession(this._sessionId);
+      }
+    } catch (e) {
+      if (fail) {
+        throw e;
+      } else {
+        //Potential race condition here with another window logging in so we retry (but fail next time for real)
+        return this.getOrCreateSession(userInfo, true);
       }
     }
+  }
+
+  private async createSession(): Promise<CreateUserSessionMutation> {
+    const client = await (await fetch('https://ipapi.co/json/')).text();
+
+    return this._api.CreateUserSession({
+                                         id:          this._sessionId,
+                                         fingerprint: this._fingerprint,
+                                         client,
+                                         open:        true
+                                       });
   }
 
   private newSession(userInfo) {
@@ -101,8 +131,8 @@ export class SessionService implements OnInit, OnDestroy {
     window.localStorage.setItem(SESSION_END, "" + (new Date().getTime() + 1000 * this.sessionDurationInSeconds));
   }
 
-  private moreThanOneSession() {
-    this._notify.show("You are logged in more than once, in future this session will be logged out.");
+  private moreThanOneSession(oldest: boolean = false) {
+    this._notify.show("You are logged in more than once, in future this session will be logged out.", "OK", 30);
   }
 
   private moreThanOnce() {

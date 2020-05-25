@@ -8,9 +8,8 @@ query GetUserPreferences($id: ID!) {
     ignorePeople {
       nextToken
     }
-    irrelevant {
-      nextToken
-    }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -22,6 +21,8 @@ query ListUserPreferencess(
   listUserPreferencess(filter: $filter, limit: $limit, nextToken: $nextToken) {
     items {
       id
+      createdAt
+      updatedAt
       owner
     }
     nextToken
@@ -31,7 +32,10 @@ query GetUserSession($id: ID!) {
   getUserSession(id: $id) {
     id
     fingerprint
+    client
     open
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -44,7 +48,10 @@ query ListUserSessions(
     items {
       id
       fingerprint
+      client
       open
+      createdAt
+      updatedAt
       owner
     }
     nextToken
@@ -60,6 +67,8 @@ query GetGroupPreferences($id: ID!) {
       nextToken
     }
     group
+    createdAt
+    updatedAt
   }
 }
 query ListGroupPreferencess(
@@ -71,6 +80,8 @@ query ListGroupPreferencess(
     items {
       id
       group
+      createdAt
+      updatedAt
     }
     nextToken
   }
@@ -83,7 +94,11 @@ query GetGroupTweetIgnore($id: ID!) {
     group {
       id
       group
+      createdAt
+      updatedAt
     }
+    createdAt
+    updatedAt
   }
 }
 query ListGroupTweetIgnores(
@@ -96,6 +111,8 @@ query ListGroupTweetIgnores(
       id
       url
       tweetId
+      createdAt
+      updatedAt
     }
     nextToken
   }
@@ -107,7 +124,11 @@ query GetGroupTwitterUserIgnore($id: ID!) {
     group {
       id
       group
+      createdAt
+      updatedAt
     }
+    createdAt
+    updatedAt
   }
 }
 query ListGroupTwitterUserIgnores(
@@ -123,6 +144,8 @@ query ListGroupTwitterUserIgnores(
     items {
       id
       twitterScreenName
+      createdAt
+      updatedAt
     }
     nextToken
   }
@@ -134,8 +157,12 @@ query GetTweetIgnore($id: ID!) {
     tweetId
     user {
       id
+      createdAt
+      updatedAt
       owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -149,6 +176,8 @@ query ListTweetIgnores(
       id
       url
       tweetId
+      createdAt
+      updatedAt
       owner
     }
     nextToken
@@ -160,8 +189,12 @@ query GetTwitterUserIgnore($id: ID!) {
     twitterScreenName
     user {
       id
+      createdAt
+      updatedAt
       owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -178,33 +211,8 @@ query ListTwitterUserIgnores(
     items {
       id
       twitterScreenName
-      owner
-    }
-    nextToken
-  }
-}
-query GetTweetIrrelevant($id: ID!) {
-  getTweetIrrelevant(id: $id) {
-    id
-    url
-    tweetId
-    user {
-      id
-      owner
-    }
-    owner
-  }
-}
-query ListTweetIrrelevants(
-  $filter: ModelTweetIrrelevantFilterInput
-  $limit: Int
-  $nextToken: String
-) {
-  listTweetIrrelevants(filter: $filter, limit: $limit, nextToken: $nextToken) {
-    items {
-      id
-      url
-      tweetId
+      createdAt
+      updatedAt
       owner
     }
     nextToken

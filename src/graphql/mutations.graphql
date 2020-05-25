@@ -11,9 +11,8 @@ mutation CreateUserPreferences(
     ignorePeople {
       nextToken
     }
-    irrelevant {
-      nextToken
-    }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -29,9 +28,8 @@ mutation UpdateUserPreferences(
     ignorePeople {
       nextToken
     }
-    irrelevant {
-      nextToken
-    }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -47,9 +45,8 @@ mutation DeleteUserPreferences(
     ignorePeople {
       nextToken
     }
-    irrelevant {
-      nextToken
-    }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -60,7 +57,10 @@ mutation CreateUserSession(
   createUserSession(input: $input, condition: $condition) {
     id
     fingerprint
+    client
     open
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -71,7 +71,10 @@ mutation UpdateUserSession(
   updateUserSession(input: $input, condition: $condition) {
     id
     fingerprint
+    client
     open
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -82,7 +85,10 @@ mutation DeleteUserSession(
   deleteUserSession(input: $input, condition: $condition) {
     id
     fingerprint
+    client
     open
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -99,6 +105,8 @@ mutation CreateGroupPreferences(
       nextToken
     }
     group
+    createdAt
+    updatedAt
   }
 }
 mutation UpdateGroupPreferences(
@@ -114,6 +122,8 @@ mutation UpdateGroupPreferences(
       nextToken
     }
     group
+    createdAt
+    updatedAt
   }
 }
 mutation DeleteGroupPreferences(
@@ -129,6 +139,8 @@ mutation DeleteGroupPreferences(
       nextToken
     }
     group
+    createdAt
+    updatedAt
   }
 }
 mutation CreateGroupTweetIgnore(
@@ -142,7 +154,11 @@ mutation CreateGroupTweetIgnore(
     group {
       id
       group
+      createdAt
+      updatedAt
     }
+    createdAt
+    updatedAt
   }
 }
 mutation UpdateGroupTweetIgnore(
@@ -156,7 +172,11 @@ mutation UpdateGroupTweetIgnore(
     group {
       id
       group
+      createdAt
+      updatedAt
     }
+    createdAt
+    updatedAt
   }
 }
 mutation DeleteGroupTweetIgnore(
@@ -170,7 +190,11 @@ mutation DeleteGroupTweetIgnore(
     group {
       id
       group
+      createdAt
+      updatedAt
     }
+    createdAt
+    updatedAt
   }
 }
 mutation CreateGroupTwitterUserIgnore(
@@ -183,7 +207,11 @@ mutation CreateGroupTwitterUserIgnore(
     group {
       id
       group
+      createdAt
+      updatedAt
     }
+    createdAt
+    updatedAt
   }
 }
 mutation UpdateGroupTwitterUserIgnore(
@@ -196,7 +224,11 @@ mutation UpdateGroupTwitterUserIgnore(
     group {
       id
       group
+      createdAt
+      updatedAt
     }
+    createdAt
+    updatedAt
   }
 }
 mutation DeleteGroupTwitterUserIgnore(
@@ -209,7 +241,11 @@ mutation DeleteGroupTwitterUserIgnore(
     group {
       id
       group
+      createdAt
+      updatedAt
     }
+    createdAt
+    updatedAt
   }
 }
 mutation CreateTweetIgnore(
@@ -222,8 +258,12 @@ mutation CreateTweetIgnore(
     tweetId
     user {
       id
+      createdAt
+      updatedAt
       owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -237,8 +277,12 @@ mutation UpdateTweetIgnore(
     tweetId
     user {
       id
+      createdAt
+      updatedAt
       owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -252,8 +296,12 @@ mutation DeleteTweetIgnore(
     tweetId
     user {
       id
+      createdAt
+      updatedAt
       owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -266,8 +314,12 @@ mutation CreateTwitterUserIgnore(
     twitterScreenName
     user {
       id
+      createdAt
+      updatedAt
       owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -280,8 +332,12 @@ mutation UpdateTwitterUserIgnore(
     twitterScreenName
     user {
       id
+      createdAt
+      updatedAt
       owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -294,53 +350,12 @@ mutation DeleteTwitterUserIgnore(
     twitterScreenName
     user {
       id
+      createdAt
+      updatedAt
       owner
     }
-    owner
-  }
-}
-mutation CreateTweetIrrelevant(
-  $input: CreateTweetIrrelevantInput!
-  $condition: ModelTweetIrrelevantConditionInput
-) {
-  createTweetIrrelevant(input: $input, condition: $condition) {
-    id
-    url
-    tweetId
-    user {
-      id
-      owner
-    }
-    owner
-  }
-}
-mutation UpdateTweetIrrelevant(
-  $input: UpdateTweetIrrelevantInput!
-  $condition: ModelTweetIrrelevantConditionInput
-) {
-  updateTweetIrrelevant(input: $input, condition: $condition) {
-    id
-    url
-    tweetId
-    user {
-      id
-      owner
-    }
-    owner
-  }
-}
-mutation DeleteTweetIrrelevant(
-  $input: DeleteTweetIrrelevantInput!
-  $condition: ModelTweetIrrelevantConditionInput
-) {
-  deleteTweetIrrelevant(input: $input, condition: $condition) {
-    id
-    url
-    tweetId
-    user {
-      id
-      owner
-    }
+    createdAt
+    updatedAt
     owner
   }
 }

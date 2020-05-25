@@ -27,11 +27,13 @@ export type DeleteUserPreferencesInput = {
 export type CreateUserSessionInput = {
   id?: string | null;
   fingerprint?: string | null;
+  client?: string | null;
   open: boolean;
 };
 
 export type ModelUserSessionConditionInput = {
   fingerprint?: ModelStringInput | null;
+  client?: ModelStringInput | null;
   open?: ModelBooleanInput | null;
   and?: Array<ModelUserSessionConditionInput | null> | null;
   or?: Array<ModelUserSessionConditionInput | null> | null;
@@ -87,6 +89,7 @@ export type ModelBooleanInput = {
 export type UpdateUserSessionInput = {
   id: string;
   fingerprint?: string | null;
+  client?: string | null;
   open?: boolean | null;
 };
 
@@ -212,32 +215,6 @@ export type DeleteTwitterUserIgnoreInput = {
   id?: string | null;
 };
 
-export type CreateTweetIrrelevantInput = {
-  id?: string | null;
-  url: string;
-  tweetId?: string | null;
-  tweetIrrelevantUserId?: string | null;
-};
-
-export type ModelTweetIrrelevantConditionInput = {
-  url?: ModelStringInput | null;
-  tweetId?: ModelStringInput | null;
-  and?: Array<ModelTweetIrrelevantConditionInput | null> | null;
-  or?: Array<ModelTweetIrrelevantConditionInput | null> | null;
-  not?: ModelTweetIrrelevantConditionInput | null;
-};
-
-export type UpdateTweetIrrelevantInput = {
-  id: string;
-  url?: string | null;
-  tweetId?: string | null;
-  tweetIrrelevantUserId?: string | null;
-};
-
-export type DeleteTweetIrrelevantInput = {
-  id?: string | null;
-};
-
 export type ModelUserPreferencesFilterInput = {
   id?: ModelIDInput | null;
   and?: Array<ModelUserPreferencesFilterInput | null> | null;
@@ -264,6 +241,7 @@ export type ModelIDInput = {
 export type ModelUserSessionFilterInput = {
   id?: ModelIDInput | null;
   fingerprint?: ModelStringInput | null;
+  client?: ModelStringInput | null;
   open?: ModelBooleanInput | null;
   and?: Array<ModelUserSessionFilterInput | null> | null;
   or?: Array<ModelUserSessionFilterInput | null> | null;
@@ -312,15 +290,6 @@ export type ModelTwitterUserIgnoreFilterInput = {
   not?: ModelTwitterUserIgnoreFilterInput | null;
 };
 
-export type ModelTweetIrrelevantFilterInput = {
-  id?: ModelIDInput | null;
-  url?: ModelStringInput | null;
-  tweetId?: ModelStringInput | null;
-  and?: Array<ModelTweetIrrelevantFilterInput | null> | null;
-  or?: Array<ModelTweetIrrelevantFilterInput | null> | null;
-  not?: ModelTweetIrrelevantFilterInput | null;
-};
-
 export type CreateUserPreferencesMutation = {
   __typename: "UserPreferences";
   id: string;
@@ -332,10 +301,8 @@ export type CreateUserPreferencesMutation = {
     __typename: "ModelTwitterUserIgnoreConnection";
     nextToken: string | null;
   } | null;
-  irrelevant: {
-    __typename: "ModelTweetIrrelevantConnection";
-    nextToken: string | null;
-  } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -350,10 +317,8 @@ export type UpdateUserPreferencesMutation = {
     __typename: "ModelTwitterUserIgnoreConnection";
     nextToken: string | null;
   } | null;
-  irrelevant: {
-    __typename: "ModelTweetIrrelevantConnection";
-    nextToken: string | null;
-  } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -368,10 +333,8 @@ export type DeleteUserPreferencesMutation = {
     __typename: "ModelTwitterUserIgnoreConnection";
     nextToken: string | null;
   } | null;
-  irrelevant: {
-    __typename: "ModelTweetIrrelevantConnection";
-    nextToken: string | null;
-  } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -379,7 +342,10 @@ export type CreateUserSessionMutation = {
   __typename: "UserSession";
   id: string;
   fingerprint: string | null;
+  client: string | null;
   open: boolean;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -387,7 +353,10 @@ export type UpdateUserSessionMutation = {
   __typename: "UserSession";
   id: string;
   fingerprint: string | null;
+  client: string | null;
   open: boolean;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -395,7 +364,10 @@ export type DeleteUserSessionMutation = {
   __typename: "UserSession";
   id: string;
   fingerprint: string | null;
+  client: string | null;
   open: boolean;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -411,6 +383,8 @@ export type CreateGroupPreferencesMutation = {
     nextToken: string | null;
   } | null;
   group: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type UpdateGroupPreferencesMutation = {
@@ -425,6 +399,8 @@ export type UpdateGroupPreferencesMutation = {
     nextToken: string | null;
   } | null;
   group: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type DeleteGroupPreferencesMutation = {
@@ -439,6 +415,8 @@ export type DeleteGroupPreferencesMutation = {
     nextToken: string | null;
   } | null;
   group: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type CreateGroupTweetIgnoreMutation = {
@@ -450,7 +428,11 @@ export type CreateGroupTweetIgnoreMutation = {
     __typename: "GroupPreferences";
     id: string;
     group: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type UpdateGroupTweetIgnoreMutation = {
@@ -462,7 +444,11 @@ export type UpdateGroupTweetIgnoreMutation = {
     __typename: "GroupPreferences";
     id: string;
     group: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type DeleteGroupTweetIgnoreMutation = {
@@ -474,7 +460,11 @@ export type DeleteGroupTweetIgnoreMutation = {
     __typename: "GroupPreferences";
     id: string;
     group: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type CreateGroupTwitterUserIgnoreMutation = {
@@ -485,7 +475,11 @@ export type CreateGroupTwitterUserIgnoreMutation = {
     __typename: "GroupPreferences";
     id: string;
     group: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type UpdateGroupTwitterUserIgnoreMutation = {
@@ -496,7 +490,11 @@ export type UpdateGroupTwitterUserIgnoreMutation = {
     __typename: "GroupPreferences";
     id: string;
     group: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type DeleteGroupTwitterUserIgnoreMutation = {
@@ -507,7 +505,11 @@ export type DeleteGroupTwitterUserIgnoreMutation = {
     __typename: "GroupPreferences";
     id: string;
     group: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type CreateTweetIgnoreMutation = {
@@ -518,8 +520,12 @@ export type CreateTweetIgnoreMutation = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -531,8 +537,12 @@ export type UpdateTweetIgnoreMutation = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -544,8 +554,12 @@ export type DeleteTweetIgnoreMutation = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -556,8 +570,12 @@ export type CreateTwitterUserIgnoreMutation = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -568,8 +586,12 @@ export type UpdateTwitterUserIgnoreMutation = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -580,47 +602,12 @@ export type DeleteTwitterUserIgnoreMutation = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null;
-  owner: string | null;
-};
-
-export type CreateTweetIrrelevantMutation = {
-  __typename: "TweetIrrelevant";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    owner: string | null;
-  } | null;
-  owner: string | null;
-};
-
-export type UpdateTweetIrrelevantMutation = {
-  __typename: "TweetIrrelevant";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    owner: string | null;
-  } | null;
-  owner: string | null;
-};
-
-export type DeleteTweetIrrelevantMutation = {
-  __typename: "TweetIrrelevant";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    owner: string | null;
-  } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -635,10 +622,8 @@ export type GetUserPreferencesQuery = {
     __typename: "ModelTwitterUserIgnoreConnection";
     nextToken: string | null;
   } | null;
-  irrelevant: {
-    __typename: "ModelTweetIrrelevantConnection";
-    nextToken: string | null;
-  } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -647,6 +632,8 @@ export type ListUserPreferencessQuery = {
   items: Array<{
     __typename: "UserPreferences";
     id: string;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null> | null;
   nextToken: string | null;
@@ -656,7 +643,10 @@ export type GetUserSessionQuery = {
   __typename: "UserSession";
   id: string;
   fingerprint: string | null;
+  client: string | null;
   open: boolean;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -666,7 +656,10 @@ export type ListUserSessionsQuery = {
     __typename: "UserSession";
     id: string;
     fingerprint: string | null;
+    client: string | null;
     open: boolean;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null> | null;
   nextToken: string | null;
@@ -684,6 +677,8 @@ export type GetGroupPreferencesQuery = {
     nextToken: string | null;
   } | null;
   group: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type ListGroupPreferencessQuery = {
@@ -692,6 +687,8 @@ export type ListGroupPreferencessQuery = {
     __typename: "GroupPreferences";
     id: string;
     group: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null> | null;
   nextToken: string | null;
 };
@@ -705,7 +702,11 @@ export type GetGroupTweetIgnoreQuery = {
     __typename: "GroupPreferences";
     id: string;
     group: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type ListGroupTweetIgnoresQuery = {
@@ -715,6 +716,8 @@ export type ListGroupTweetIgnoresQuery = {
     id: string;
     url: string;
     tweetId: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null> | null;
   nextToken: string | null;
 };
@@ -727,7 +730,11 @@ export type GetGroupTwitterUserIgnoreQuery = {
     __typename: "GroupPreferences";
     id: string;
     group: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type ListGroupTwitterUserIgnoresQuery = {
@@ -736,6 +743,8 @@ export type ListGroupTwitterUserIgnoresQuery = {
     __typename: "GroupTwitterUserIgnore";
     id: string;
     twitterScreenName: string;
+    createdAt: string;
+    updatedAt: string;
   } | null> | null;
   nextToken: string | null;
 };
@@ -748,8 +757,12 @@ export type GetTweetIgnoreQuery = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -760,6 +773,8 @@ export type ListTweetIgnoresQuery = {
     id: string;
     url: string;
     tweetId: string | null;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null> | null;
   nextToken: string | null;
@@ -772,8 +787,12 @@ export type GetTwitterUserIgnoreQuery = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -783,31 +802,8 @@ export type ListTwitterUserIgnoresQuery = {
     __typename: "TwitterUserIgnore";
     id: string;
     twitterScreenName: string;
-    owner: string | null;
-  } | null> | null;
-  nextToken: string | null;
-};
-
-export type GetTweetIrrelevantQuery = {
-  __typename: "TweetIrrelevant";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    owner: string | null;
-  } | null;
-  owner: string | null;
-};
-
-export type ListTweetIrrelevantsQuery = {
-  __typename: "ModelTweetIrrelevantConnection";
-  items: Array<{
-    __typename: "TweetIrrelevant";
-    id: string;
-    url: string;
-    tweetId: string | null;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null> | null;
   nextToken: string | null;
@@ -824,10 +820,8 @@ export type OnCreateUserPreferencesSubscription = {
     __typename: "ModelTwitterUserIgnoreConnection";
     nextToken: string | null;
   } | null;
-  irrelevant: {
-    __typename: "ModelTweetIrrelevantConnection";
-    nextToken: string | null;
-  } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -842,10 +836,8 @@ export type OnUpdateUserPreferencesSubscription = {
     __typename: "ModelTwitterUserIgnoreConnection";
     nextToken: string | null;
   } | null;
-  irrelevant: {
-    __typename: "ModelTweetIrrelevantConnection";
-    nextToken: string | null;
-  } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -860,10 +852,8 @@ export type OnDeleteUserPreferencesSubscription = {
     __typename: "ModelTwitterUserIgnoreConnection";
     nextToken: string | null;
   } | null;
-  irrelevant: {
-    __typename: "ModelTweetIrrelevantConnection";
-    nextToken: string | null;
-  } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -871,7 +861,10 @@ export type OnCreateUserSessionSubscription = {
   __typename: "UserSession";
   id: string;
   fingerprint: string | null;
+  client: string | null;
   open: boolean;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -879,7 +872,10 @@ export type OnUpdateUserSessionSubscription = {
   __typename: "UserSession";
   id: string;
   fingerprint: string | null;
+  client: string | null;
   open: boolean;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -887,7 +883,10 @@ export type OnDeleteUserSessionSubscription = {
   __typename: "UserSession";
   id: string;
   fingerprint: string | null;
+  client: string | null;
   open: boolean;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -903,6 +902,8 @@ export type OnCreateGroupPreferencesSubscription = {
     nextToken: string | null;
   } | null;
   group: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type OnUpdateGroupPreferencesSubscription = {
@@ -917,6 +918,8 @@ export type OnUpdateGroupPreferencesSubscription = {
     nextToken: string | null;
   } | null;
   group: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type OnDeleteGroupPreferencesSubscription = {
@@ -931,6 +934,8 @@ export type OnDeleteGroupPreferencesSubscription = {
     nextToken: string | null;
   } | null;
   group: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type OnCreateGroupTweetIgnoreSubscription = {
@@ -942,7 +947,11 @@ export type OnCreateGroupTweetIgnoreSubscription = {
     __typename: "GroupPreferences";
     id: string;
     group: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type OnUpdateGroupTweetIgnoreSubscription = {
@@ -954,7 +963,11 @@ export type OnUpdateGroupTweetIgnoreSubscription = {
     __typename: "GroupPreferences";
     id: string;
     group: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type OnDeleteGroupTweetIgnoreSubscription = {
@@ -966,7 +979,11 @@ export type OnDeleteGroupTweetIgnoreSubscription = {
     __typename: "GroupPreferences";
     id: string;
     group: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type OnCreateGroupTwitterUserIgnoreSubscription = {
@@ -977,7 +994,11 @@ export type OnCreateGroupTwitterUserIgnoreSubscription = {
     __typename: "GroupPreferences";
     id: string;
     group: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type OnUpdateGroupTwitterUserIgnoreSubscription = {
@@ -988,7 +1009,11 @@ export type OnUpdateGroupTwitterUserIgnoreSubscription = {
     __typename: "GroupPreferences";
     id: string;
     group: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type OnDeleteGroupTwitterUserIgnoreSubscription = {
@@ -999,7 +1024,11 @@ export type OnDeleteGroupTwitterUserIgnoreSubscription = {
     __typename: "GroupPreferences";
     id: string;
     group: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type OnCreateTweetIgnoreSubscription = {
@@ -1010,8 +1039,12 @@ export type OnCreateTweetIgnoreSubscription = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -1023,8 +1056,12 @@ export type OnUpdateTweetIgnoreSubscription = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -1036,8 +1073,12 @@ export type OnDeleteTweetIgnoreSubscription = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -1048,8 +1089,12 @@ export type OnCreateTwitterUserIgnoreSubscription = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -1060,8 +1105,12 @@ export type OnUpdateTwitterUserIgnoreSubscription = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -1072,47 +1121,12 @@ export type OnDeleteTwitterUserIgnoreSubscription = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    createdAt: string;
+    updatedAt: string;
     owner: string | null;
   } | null;
-  owner: string | null;
-};
-
-export type OnCreateTweetIrrelevantSubscription = {
-  __typename: "TweetIrrelevant";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    owner: string | null;
-  } | null;
-  owner: string | null;
-};
-
-export type OnUpdateTweetIrrelevantSubscription = {
-  __typename: "TweetIrrelevant";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    owner: string | null;
-  } | null;
-  owner: string | null;
-};
-
-export type OnDeleteTweetIrrelevantSubscription = {
-  __typename: "TweetIrrelevant";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    owner: string | null;
-  } | null;
+  createdAt: string;
+  updatedAt: string;
   owner: string | null;
 };
 
@@ -1136,10 +1150,8 @@ export class APIService {
             __typename
             nextToken
           }
-          irrelevant {
-            __typename
-            nextToken
-          }
+          createdAt
+          updatedAt
           owner
         }
       }`;
@@ -1154,7 +1166,6 @@ export class APIService {
     )) as any;
     return <CreateUserPreferencesMutation>response.data.createUserPreferences;
   }
-
   async UpdateUserPreferences(
     input: UpdateUserPreferencesInput,
     condition?: ModelUserPreferencesConditionInput
@@ -1171,10 +1182,8 @@ export class APIService {
             __typename
             nextToken
           }
-          irrelevant {
-            __typename
-            nextToken
-          }
+          createdAt
+          updatedAt
           owner
         }
       }`;
@@ -1189,7 +1198,6 @@ export class APIService {
     )) as any;
     return <UpdateUserPreferencesMutation>response.data.updateUserPreferences;
   }
-
   async DeleteUserPreferences(
     input: DeleteUserPreferencesInput,
     condition?: ModelUserPreferencesConditionInput
@@ -1206,10 +1214,8 @@ export class APIService {
             __typename
             nextToken
           }
-          irrelevant {
-            __typename
-            nextToken
-          }
+          createdAt
+          updatedAt
           owner
         }
       }`;
@@ -1224,7 +1230,6 @@ export class APIService {
     )) as any;
     return <DeleteUserPreferencesMutation>response.data.deleteUserPreferences;
   }
-
   async CreateUserSession(
     input: CreateUserSessionInput,
     condition?: ModelUserSessionConditionInput
@@ -1234,7 +1239,10 @@ export class APIService {
           __typename
           id
           fingerprint
+          client
           open
+          createdAt
+          updatedAt
           owner
         }
       }`;
@@ -1249,7 +1257,6 @@ export class APIService {
     )) as any;
     return <CreateUserSessionMutation>response.data.createUserSession;
   }
-
   async UpdateUserSession(
     input: UpdateUserSessionInput,
     condition?: ModelUserSessionConditionInput
@@ -1259,7 +1266,10 @@ export class APIService {
           __typename
           id
           fingerprint
+          client
           open
+          createdAt
+          updatedAt
           owner
         }
       }`;
@@ -1274,7 +1284,6 @@ export class APIService {
     )) as any;
     return <UpdateUserSessionMutation>response.data.updateUserSession;
   }
-
   async DeleteUserSession(
     input: DeleteUserSessionInput,
     condition?: ModelUserSessionConditionInput
@@ -1284,7 +1293,10 @@ export class APIService {
           __typename
           id
           fingerprint
+          client
           open
+          createdAt
+          updatedAt
           owner
         }
       }`;
@@ -1299,7 +1311,6 @@ export class APIService {
     )) as any;
     return <DeleteUserSessionMutation>response.data.deleteUserSession;
   }
-
   async CreateGroupPreferences(
     input: CreateGroupPreferencesInput,
     condition?: ModelGroupPreferencesConditionInput
@@ -1317,6 +1328,8 @@ export class APIService {
             nextToken
           }
           group
+          createdAt
+          updatedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1330,7 +1343,6 @@ export class APIService {
     )) as any;
     return <CreateGroupPreferencesMutation>response.data.createGroupPreferences;
   }
-
   async UpdateGroupPreferences(
     input: UpdateGroupPreferencesInput,
     condition?: ModelGroupPreferencesConditionInput
@@ -1348,6 +1360,8 @@ export class APIService {
             nextToken
           }
           group
+          createdAt
+          updatedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1361,7 +1375,6 @@ export class APIService {
     )) as any;
     return <UpdateGroupPreferencesMutation>response.data.updateGroupPreferences;
   }
-
   async DeleteGroupPreferences(
     input: DeleteGroupPreferencesInput,
     condition?: ModelGroupPreferencesConditionInput
@@ -1379,6 +1392,8 @@ export class APIService {
             nextToken
           }
           group
+          createdAt
+          updatedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1392,7 +1407,6 @@ export class APIService {
     )) as any;
     return <DeleteGroupPreferencesMutation>response.data.deleteGroupPreferences;
   }
-
   async CreateGroupTweetIgnore(
     input: CreateGroupTweetIgnoreInput,
     condition?: ModelGroupTweetIgnoreConditionInput
@@ -1407,7 +1421,11 @@ export class APIService {
             __typename
             id
             group
+            createdAt
+            updatedAt
           }
+          createdAt
+          updatedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1421,7 +1439,6 @@ export class APIService {
     )) as any;
     return <CreateGroupTweetIgnoreMutation>response.data.createGroupTweetIgnore;
   }
-
   async UpdateGroupTweetIgnore(
     input: UpdateGroupTweetIgnoreInput,
     condition?: ModelGroupTweetIgnoreConditionInput
@@ -1436,7 +1453,11 @@ export class APIService {
             __typename
             id
             group
+            createdAt
+            updatedAt
           }
+          createdAt
+          updatedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1450,7 +1471,6 @@ export class APIService {
     )) as any;
     return <UpdateGroupTweetIgnoreMutation>response.data.updateGroupTweetIgnore;
   }
-
   async DeleteGroupTweetIgnore(
     input: DeleteGroupTweetIgnoreInput,
     condition?: ModelGroupTweetIgnoreConditionInput
@@ -1465,7 +1485,11 @@ export class APIService {
             __typename
             id
             group
+            createdAt
+            updatedAt
           }
+          createdAt
+          updatedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1479,7 +1503,6 @@ export class APIService {
     )) as any;
     return <DeleteGroupTweetIgnoreMutation>response.data.deleteGroupTweetIgnore;
   }
-
   async CreateGroupTwitterUserIgnore(
     input: CreateGroupTwitterUserIgnoreInput,
     condition?: ModelGroupTwitterUserIgnoreConditionInput
@@ -1493,7 +1516,11 @@ export class APIService {
             __typename
             id
             group
+            createdAt
+            updatedAt
           }
+          createdAt
+          updatedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1509,7 +1536,6 @@ export class APIService {
       response.data.createGroupTwitterUserIgnore
     );
   }
-
   async UpdateGroupTwitterUserIgnore(
     input: UpdateGroupTwitterUserIgnoreInput,
     condition?: ModelGroupTwitterUserIgnoreConditionInput
@@ -1523,7 +1549,11 @@ export class APIService {
             __typename
             id
             group
+            createdAt
+            updatedAt
           }
+          createdAt
+          updatedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1539,7 +1569,6 @@ export class APIService {
       response.data.updateGroupTwitterUserIgnore
     );
   }
-
   async DeleteGroupTwitterUserIgnore(
     input: DeleteGroupTwitterUserIgnoreInput,
     condition?: ModelGroupTwitterUserIgnoreConditionInput
@@ -1553,7 +1582,11 @@ export class APIService {
             __typename
             id
             group
+            createdAt
+            updatedAt
           }
+          createdAt
+          updatedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1569,7 +1602,6 @@ export class APIService {
       response.data.deleteGroupTwitterUserIgnore
     );
   }
-
   async CreateTweetIgnore(
     input: CreateTweetIgnoreInput,
     condition?: ModelTweetIgnoreConditionInput
@@ -1583,8 +1615,12 @@ export class APIService {
           user {
             __typename
             id
+            createdAt
+            updatedAt
             owner
           }
+          createdAt
+          updatedAt
           owner
         }
       }`;
@@ -1599,7 +1635,6 @@ export class APIService {
     )) as any;
     return <CreateTweetIgnoreMutation>response.data.createTweetIgnore;
   }
-
   async UpdateTweetIgnore(
     input: UpdateTweetIgnoreInput,
     condition?: ModelTweetIgnoreConditionInput
@@ -1613,8 +1648,12 @@ export class APIService {
           user {
             __typename
             id
+            createdAt
+            updatedAt
             owner
           }
+          createdAt
+          updatedAt
           owner
         }
       }`;
@@ -1629,7 +1668,6 @@ export class APIService {
     )) as any;
     return <UpdateTweetIgnoreMutation>response.data.updateTweetIgnore;
   }
-
   async DeleteTweetIgnore(
     input: DeleteTweetIgnoreInput,
     condition?: ModelTweetIgnoreConditionInput
@@ -1643,8 +1681,12 @@ export class APIService {
           user {
             __typename
             id
+            createdAt
+            updatedAt
             owner
           }
+          createdAt
+          updatedAt
           owner
         }
       }`;
@@ -1659,7 +1701,6 @@ export class APIService {
     )) as any;
     return <DeleteTweetIgnoreMutation>response.data.deleteTweetIgnore;
   }
-
   async CreateTwitterUserIgnore(
     input: CreateTwitterUserIgnoreInput,
     condition?: ModelTwitterUserIgnoreConditionInput
@@ -1672,8 +1713,12 @@ export class APIService {
           user {
             __typename
             id
+            createdAt
+            updatedAt
             owner
           }
+          createdAt
+          updatedAt
           owner
         }
       }`;
@@ -1690,7 +1735,6 @@ export class APIService {
       response.data.createTwitterUserIgnore
     );
   }
-
   async UpdateTwitterUserIgnore(
     input: UpdateTwitterUserIgnoreInput,
     condition?: ModelTwitterUserIgnoreConditionInput
@@ -1703,8 +1747,12 @@ export class APIService {
           user {
             __typename
             id
+            createdAt
+            updatedAt
             owner
           }
+          createdAt
+          updatedAt
           owner
         }
       }`;
@@ -1721,7 +1769,6 @@ export class APIService {
       response.data.updateTwitterUserIgnore
     );
   }
-
   async DeleteTwitterUserIgnore(
     input: DeleteTwitterUserIgnoreInput,
     condition?: ModelTwitterUserIgnoreConditionInput
@@ -1734,8 +1781,12 @@ export class APIService {
           user {
             __typename
             id
+            createdAt
+            updatedAt
             owner
           }
+          createdAt
+          updatedAt
           owner
         }
       }`;
@@ -1752,97 +1803,6 @@ export class APIService {
       response.data.deleteTwitterUserIgnore
     );
   }
-
-  async CreateTweetIrrelevant(
-    input: CreateTweetIrrelevantInput,
-    condition?: ModelTweetIrrelevantConditionInput
-  ): Promise<CreateTweetIrrelevantMutation> {
-    const statement = `mutation CreateTweetIrrelevant($input: CreateTweetIrrelevantInput!, $condition: ModelTweetIrrelevantConditionInput) {
-        createTweetIrrelevant(input: $input, condition: $condition) {
-          __typename
-          id
-          url
-          tweetId
-          user {
-            __typename
-            id
-            owner
-          }
-          owner
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <CreateTweetIrrelevantMutation>response.data.createTweetIrrelevant;
-  }
-
-  async UpdateTweetIrrelevant(
-    input: UpdateTweetIrrelevantInput,
-    condition?: ModelTweetIrrelevantConditionInput
-  ): Promise<UpdateTweetIrrelevantMutation> {
-    const statement = `mutation UpdateTweetIrrelevant($input: UpdateTweetIrrelevantInput!, $condition: ModelTweetIrrelevantConditionInput) {
-        updateTweetIrrelevant(input: $input, condition: $condition) {
-          __typename
-          id
-          url
-          tweetId
-          user {
-            __typename
-            id
-            owner
-          }
-          owner
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <UpdateTweetIrrelevantMutation>response.data.updateTweetIrrelevant;
-  }
-
-  async DeleteTweetIrrelevant(
-    input: DeleteTweetIrrelevantInput,
-    condition?: ModelTweetIrrelevantConditionInput
-  ): Promise<DeleteTweetIrrelevantMutation> {
-    const statement = `mutation DeleteTweetIrrelevant($input: DeleteTweetIrrelevantInput!, $condition: ModelTweetIrrelevantConditionInput) {
-        deleteTweetIrrelevant(input: $input, condition: $condition) {
-          __typename
-          id
-          url
-          tweetId
-          user {
-            __typename
-            id
-            owner
-          }
-          owner
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <DeleteTweetIrrelevantMutation>response.data.deleteTweetIrrelevant;
-  }
-
   async GetUserPreferences(id: string): Promise<GetUserPreferencesQuery> {
     const statement = `query GetUserPreferences($id: ID!) {
         getUserPreferences(id: $id) {
@@ -1856,10 +1816,8 @@ export class APIService {
             __typename
             nextToken
           }
-          irrelevant {
-            __typename
-            nextToken
-          }
+          createdAt
+          updatedAt
           owner
         }
       }`;
@@ -1871,7 +1829,6 @@ export class APIService {
     )) as any;
     return <GetUserPreferencesQuery>response.data.getUserPreferences;
   }
-
   async ListUserPreferencess(
     filter?: ModelUserPreferencesFilterInput,
     limit?: number,
@@ -1883,6 +1840,8 @@ export class APIService {
           items {
             __typename
             id
+            createdAt
+            updatedAt
             owner
           }
           nextToken
@@ -1903,14 +1862,16 @@ export class APIService {
     )) as any;
     return <ListUserPreferencessQuery>response.data.listUserPreferencess;
   }
-
   async GetUserSession(id: string): Promise<GetUserSessionQuery> {
     const statement = `query GetUserSession($id: ID!) {
         getUserSession(id: $id) {
           __typename
           id
           fingerprint
+          client
           open
+          createdAt
+          updatedAt
           owner
         }
       }`;
@@ -1922,7 +1883,6 @@ export class APIService {
     )) as any;
     return <GetUserSessionQuery>response.data.getUserSession;
   }
-
   async ListUserSessions(
     filter?: ModelUserSessionFilterInput,
     limit?: number,
@@ -1935,7 +1895,10 @@ export class APIService {
             __typename
             id
             fingerprint
+            client
             open
+            createdAt
+            updatedAt
             owner
           }
           nextToken
@@ -1956,7 +1919,6 @@ export class APIService {
     )) as any;
     return <ListUserSessionsQuery>response.data.listUserSessions;
   }
-
   async GetGroupPreferences(id: string): Promise<GetGroupPreferencesQuery> {
     const statement = `query GetGroupPreferences($id: ID!) {
         getGroupPreferences(id: $id) {
@@ -1971,6 +1933,8 @@ export class APIService {
             nextToken
           }
           group
+          createdAt
+          updatedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1981,7 +1945,6 @@ export class APIService {
     )) as any;
     return <GetGroupPreferencesQuery>response.data.getGroupPreferences;
   }
-
   async ListGroupPreferencess(
     filter?: ModelGroupPreferencesFilterInput,
     limit?: number,
@@ -1994,6 +1957,8 @@ export class APIService {
             __typename
             id
             group
+            createdAt
+            updatedAt
           }
           nextToken
         }
@@ -2013,7 +1978,6 @@ export class APIService {
     )) as any;
     return <ListGroupPreferencessQuery>response.data.listGroupPreferencess;
   }
-
   async GetGroupTweetIgnore(id: string): Promise<GetGroupTweetIgnoreQuery> {
     const statement = `query GetGroupTweetIgnore($id: ID!) {
         getGroupTweetIgnore(id: $id) {
@@ -2025,7 +1989,11 @@ export class APIService {
             __typename
             id
             group
+            createdAt
+            updatedAt
           }
+          createdAt
+          updatedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -2036,7 +2004,6 @@ export class APIService {
     )) as any;
     return <GetGroupTweetIgnoreQuery>response.data.getGroupTweetIgnore;
   }
-
   async ListGroupTweetIgnores(
     filter?: ModelGroupTweetIgnoreFilterInput,
     limit?: number,
@@ -2050,6 +2017,8 @@ export class APIService {
             id
             url
             tweetId
+            createdAt
+            updatedAt
           }
           nextToken
         }
@@ -2069,7 +2038,6 @@ export class APIService {
     )) as any;
     return <ListGroupTweetIgnoresQuery>response.data.listGroupTweetIgnores;
   }
-
   async GetGroupTwitterUserIgnore(
     id: string
   ): Promise<GetGroupTwitterUserIgnoreQuery> {
@@ -2082,7 +2050,11 @@ export class APIService {
             __typename
             id
             group
+            createdAt
+            updatedAt
           }
+          createdAt
+          updatedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -2095,7 +2067,6 @@ export class APIService {
       response.data.getGroupTwitterUserIgnore
     );
   }
-
   async ListGroupTwitterUserIgnores(
     filter?: ModelGroupTwitterUserIgnoreFilterInput,
     limit?: number,
@@ -2108,6 +2079,8 @@ export class APIService {
             __typename
             id
             twitterScreenName
+            createdAt
+            updatedAt
           }
           nextToken
         }
@@ -2129,7 +2102,6 @@ export class APIService {
       response.data.listGroupTwitterUserIgnores
     );
   }
-
   async GetTweetIgnore(id: string): Promise<GetTweetIgnoreQuery> {
     const statement = `query GetTweetIgnore($id: ID!) {
         getTweetIgnore(id: $id) {
@@ -2140,8 +2112,12 @@ export class APIService {
           user {
             __typename
             id
+            createdAt
+            updatedAt
             owner
           }
+          createdAt
+          updatedAt
           owner
         }
       }`;
@@ -2153,7 +2129,6 @@ export class APIService {
     )) as any;
     return <GetTweetIgnoreQuery>response.data.getTweetIgnore;
   }
-
   async ListTweetIgnores(
     filter?: ModelTweetIgnoreFilterInput,
     limit?: number,
@@ -2167,6 +2142,8 @@ export class APIService {
             id
             url
             tweetId
+            createdAt
+            updatedAt
             owner
           }
           nextToken
@@ -2187,7 +2164,6 @@ export class APIService {
     )) as any;
     return <ListTweetIgnoresQuery>response.data.listTweetIgnores;
   }
-
   async GetTwitterUserIgnore(id: string): Promise<GetTwitterUserIgnoreQuery> {
     const statement = `query GetTwitterUserIgnore($id: ID!) {
         getTwitterUserIgnore(id: $id) {
@@ -2197,8 +2173,12 @@ export class APIService {
           user {
             __typename
             id
+            createdAt
+            updatedAt
             owner
           }
+          createdAt
+          updatedAt
           owner
         }
       }`;
@@ -2210,7 +2190,6 @@ export class APIService {
     )) as any;
     return <GetTwitterUserIgnoreQuery>response.data.getTwitterUserIgnore;
   }
-
   async ListTwitterUserIgnores(
     filter?: ModelTwitterUserIgnoreFilterInput,
     limit?: number,
@@ -2223,6 +2202,8 @@ export class APIService {
             __typename
             id
             twitterScreenName
+            createdAt
+            updatedAt
             owner
           }
           nextToken
@@ -2244,64 +2225,6 @@ export class APIService {
     return <ListTwitterUserIgnoresQuery>response.data.listTwitterUserIgnores;
   }
 
-  async GetTweetIrrelevant(id: string): Promise<GetTweetIrrelevantQuery> {
-    const statement = `query GetTweetIrrelevant($id: ID!) {
-        getTweetIrrelevant(id: $id) {
-          __typename
-          id
-          url
-          tweetId
-          user {
-            __typename
-            id
-            owner
-          }
-          owner
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      id
-    };
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <GetTweetIrrelevantQuery>response.data.getTweetIrrelevant;
-  }
-
-  async ListTweetIrrelevants(
-    filter?: ModelTweetIrrelevantFilterInput,
-    limit?: number,
-    nextToken?: string
-  ): Promise<ListTweetIrrelevantsQuery> {
-    const statement = `query ListTweetIrrelevants($filter: ModelTweetIrrelevantFilterInput, $limit: Int, $nextToken: String) {
-        listTweetIrrelevants(filter: $filter, limit: $limit, nextToken: $nextToken) {
-          __typename
-          items {
-            __typename
-            id
-            url
-            tweetId
-            owner
-          }
-          nextToken
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {};
-    if (filter) {
-      gqlAPIServiceArguments.filter = filter;
-    }
-    if (limit) {
-      gqlAPIServiceArguments.limit = limit;
-    }
-    if (nextToken) {
-      gqlAPIServiceArguments.nextToken = nextToken;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <ListTweetIrrelevantsQuery>response.data.listTweetIrrelevants;
-  }
-
   OnCreateUserPreferencesListener: Observable<OnCreateUserPreferencesSubscription> = API.graphql(
     graphqlOperation(
       `subscription OnCreateUserPreferences($owner: String!) {
@@ -2316,10 +2239,8 @@ export class APIService {
             __typename
             nextToken
           }
-          irrelevant {
-            __typename
-            nextToken
-          }
+          createdAt
+          updatedAt
           owner
         }
       }`
@@ -2340,10 +2261,8 @@ export class APIService {
             __typename
             nextToken
           }
-          irrelevant {
-            __typename
-            nextToken
-          }
+          createdAt
+          updatedAt
           owner
         }
       }`
@@ -2364,10 +2283,8 @@ export class APIService {
             __typename
             nextToken
           }
-          irrelevant {
-            __typename
-            nextToken
-          }
+          createdAt
+          updatedAt
           owner
         }
       }`
@@ -2381,7 +2298,10 @@ export class APIService {
           __typename
           id
           fingerprint
+          client
           open
+          createdAt
+          updatedAt
           owner
         }
       }`
@@ -2395,7 +2315,10 @@ export class APIService {
           __typename
           id
           fingerprint
+          client
           open
+          createdAt
+          updatedAt
           owner
         }
       }`
@@ -2409,7 +2332,10 @@ export class APIService {
           __typename
           id
           fingerprint
+          client
           open
+          createdAt
+          updatedAt
           owner
         }
       }`
@@ -2431,6 +2357,8 @@ export class APIService {
             nextToken
           }
           group
+          createdAt
+          updatedAt
         }
       }`
     )
@@ -2451,6 +2379,8 @@ export class APIService {
             nextToken
           }
           group
+          createdAt
+          updatedAt
         }
       }`
     )
@@ -2471,6 +2401,8 @@ export class APIService {
             nextToken
           }
           group
+          createdAt
+          updatedAt
         }
       }`
     )
@@ -2488,7 +2420,11 @@ export class APIService {
             __typename
             id
             group
+            createdAt
+            updatedAt
           }
+          createdAt
+          updatedAt
         }
       }`
     )
@@ -2506,7 +2442,11 @@ export class APIService {
             __typename
             id
             group
+            createdAt
+            updatedAt
           }
+          createdAt
+          updatedAt
         }
       }`
     )
@@ -2524,7 +2464,11 @@ export class APIService {
             __typename
             id
             group
+            createdAt
+            updatedAt
           }
+          createdAt
+          updatedAt
         }
       }`
     )
@@ -2541,7 +2485,11 @@ export class APIService {
             __typename
             id
             group
+            createdAt
+            updatedAt
           }
+          createdAt
+          updatedAt
         }
       }`
     )
@@ -2558,7 +2506,11 @@ export class APIService {
             __typename
             id
             group
+            createdAt
+            updatedAt
           }
+          createdAt
+          updatedAt
         }
       }`
     )
@@ -2575,7 +2527,11 @@ export class APIService {
             __typename
             id
             group
+            createdAt
+            updatedAt
           }
+          createdAt
+          updatedAt
         }
       }`
     )
@@ -2592,8 +2548,12 @@ export class APIService {
           user {
             __typename
             id
+            createdAt
+            updatedAt
             owner
           }
+          createdAt
+          updatedAt
           owner
         }
       }`
@@ -2611,8 +2571,12 @@ export class APIService {
           user {
             __typename
             id
+            createdAt
+            updatedAt
             owner
           }
+          createdAt
+          updatedAt
           owner
         }
       }`
@@ -2630,8 +2594,12 @@ export class APIService {
           user {
             __typename
             id
+            createdAt
+            updatedAt
             owner
           }
+          createdAt
+          updatedAt
           owner
         }
       }`
@@ -2648,8 +2616,12 @@ export class APIService {
           user {
             __typename
             id
+            createdAt
+            updatedAt
             owner
           }
+          createdAt
+          updatedAt
           owner
         }
       }`
@@ -2666,8 +2638,12 @@ export class APIService {
           user {
             __typename
             id
+            createdAt
+            updatedAt
             owner
           }
+          createdAt
+          updatedAt
           owner
         }
       }`
@@ -2684,68 +2660,15 @@ export class APIService {
           user {
             __typename
             id
+            createdAt
+            updatedAt
             owner
           }
+          createdAt
+          updatedAt
           owner
         }
       }`
     )
   ) as Observable<OnDeleteTwitterUserIgnoreSubscription>;
-
-  OnCreateTweetIrrelevantListener: Observable<OnCreateTweetIrrelevantSubscription> = API.graphql(
-    graphqlOperation(
-      `subscription OnCreateTweetIrrelevant($owner: String!) {
-        onCreateTweetIrrelevant(owner: $owner) {
-          __typename
-          id
-          url
-          tweetId
-          user {
-            __typename
-            id
-            owner
-          }
-          owner
-        }
-      }`
-    )
-  ) as Observable<OnCreateTweetIrrelevantSubscription>;
-
-  OnUpdateTweetIrrelevantListener: Observable<OnUpdateTweetIrrelevantSubscription> = API.graphql(
-    graphqlOperation(
-      `subscription OnUpdateTweetIrrelevant($owner: String!) {
-        onUpdateTweetIrrelevant(owner: $owner) {
-          __typename
-          id
-          url
-          tweetId
-          user {
-            __typename
-            id
-            owner
-          }
-          owner
-        }
-      }`
-    )
-  ) as Observable<OnUpdateTweetIrrelevantSubscription>;
-
-  OnDeleteTweetIrrelevantListener: Observable<OnDeleteTweetIrrelevantSubscription> = API.graphql(
-    graphqlOperation(
-      `subscription OnDeleteTweetIrrelevant($owner: String!) {
-        onDeleteTweetIrrelevant(owner: $owner) {
-          __typename
-          id
-          url
-          tweetId
-          user {
-            __typename
-            id
-            owner
-          }
-          owner
-        }
-      }`
-    )
-  ) as Observable<OnDeleteTweetIrrelevantSubscription>;
 }

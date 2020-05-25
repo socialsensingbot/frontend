@@ -5,15 +5,15 @@ type UserPreferences @model @auth(
   id: ID!
   ignoreTweets: [TweetIgnore] @connection(name: "UserTweetIgnores")
   ignorePeople: [TwitterUserIgnore] @connection(name: "UserTwitterUserIgnores")
-  irrelevant: [TweetIrrelevant] @connection(name: "UserTweetIrrelevant")
 }
 
-type UserSession @model @auth(
+type UserSession @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" }) @auth(
   rules: [
     {allow: owner},
   ]){
   id: ID!
   fingerprint: String
+  client: AWSJSON
   open: Boolean!
 }
 
@@ -26,7 +26,7 @@ type GroupPreferences @model @auth(rules: [{allow: groups, groupsField: "group"}
 }
 
 
-type GroupTweetIgnore @model  @auth(rules: [{allow: groups}]) {
+type GroupTweetIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" })  @auth(rules: [{allow: groups}]) {
   id: ID!
   url: String!
   tweetId: String
@@ -34,7 +34,7 @@ type GroupTweetIgnore @model  @auth(rules: [{allow: groups}]) {
 }
 
 
-type GroupTwitterUserIgnore @model  @auth(rules: [{allow: groups}]) {
+type GroupTwitterUserIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" })   @auth(rules: [{allow: groups}]) {
   id: ID!
   twitterScreenName: String!
   group: GroupPreferences @connection(name: "GroupTwitterUserIgnores")
@@ -54,13 +54,4 @@ type TwitterUserIgnore @model  @auth(rules: [ {allow: owner}]) {
   id: ID!
   twitterScreenName: String!
   user: UserPreferences @connection(name: "UserTwitterUserIgnores")
-}
-
-#To be deleted
-
-type TweetIrrelevant @model  @auth(rules: [ {allow: owner}]) {
-  id: ID!
-  url: String!
-  tweetId: String
-  user: UserPreferences @connection(name: "UserTweetIrrelevant")
 }

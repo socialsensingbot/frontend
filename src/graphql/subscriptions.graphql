@@ -8,9 +8,8 @@ subscription OnCreateUserPreferences($owner: String!) {
     ignorePeople {
       nextToken
     }
-    irrelevant {
-      nextToken
-    }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -23,9 +22,8 @@ subscription OnUpdateUserPreferences($owner: String!) {
     ignorePeople {
       nextToken
     }
-    irrelevant {
-      nextToken
-    }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -38,9 +36,8 @@ subscription OnDeleteUserPreferences($owner: String!) {
     ignorePeople {
       nextToken
     }
-    irrelevant {
-      nextToken
-    }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -48,7 +45,10 @@ subscription OnCreateUserSession($owner: String!) {
   onCreateUserSession(owner: $owner) {
     id
     fingerprint
+    client
     open
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -56,7 +56,10 @@ subscription OnUpdateUserSession($owner: String!) {
   onUpdateUserSession(owner: $owner) {
     id
     fingerprint
+    client
     open
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -64,7 +67,10 @@ subscription OnDeleteUserSession($owner: String!) {
   onDeleteUserSession(owner: $owner) {
     id
     fingerprint
+    client
     open
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -78,6 +84,8 @@ subscription OnCreateGroupPreferences {
       nextToken
     }
     group
+    createdAt
+    updatedAt
   }
 }
 subscription OnUpdateGroupPreferences {
@@ -90,6 +98,8 @@ subscription OnUpdateGroupPreferences {
       nextToken
     }
     group
+    createdAt
+    updatedAt
   }
 }
 subscription OnDeleteGroupPreferences {
@@ -102,6 +112,8 @@ subscription OnDeleteGroupPreferences {
       nextToken
     }
     group
+    createdAt
+    updatedAt
   }
 }
 subscription OnCreateGroupTweetIgnore {
@@ -112,7 +124,11 @@ subscription OnCreateGroupTweetIgnore {
     group {
       id
       group
+      createdAt
+      updatedAt
     }
+    createdAt
+    updatedAt
   }
 }
 subscription OnUpdateGroupTweetIgnore {
@@ -123,7 +139,11 @@ subscription OnUpdateGroupTweetIgnore {
     group {
       id
       group
+      createdAt
+      updatedAt
     }
+    createdAt
+    updatedAt
   }
 }
 subscription OnDeleteGroupTweetIgnore {
@@ -134,7 +154,11 @@ subscription OnDeleteGroupTweetIgnore {
     group {
       id
       group
+      createdAt
+      updatedAt
     }
+    createdAt
+    updatedAt
   }
 }
 subscription OnCreateGroupTwitterUserIgnore {
@@ -144,7 +168,11 @@ subscription OnCreateGroupTwitterUserIgnore {
     group {
       id
       group
+      createdAt
+      updatedAt
     }
+    createdAt
+    updatedAt
   }
 }
 subscription OnUpdateGroupTwitterUserIgnore {
@@ -154,7 +182,11 @@ subscription OnUpdateGroupTwitterUserIgnore {
     group {
       id
       group
+      createdAt
+      updatedAt
     }
+    createdAt
+    updatedAt
   }
 }
 subscription OnDeleteGroupTwitterUserIgnore {
@@ -164,7 +196,11 @@ subscription OnDeleteGroupTwitterUserIgnore {
     group {
       id
       group
+      createdAt
+      updatedAt
     }
+    createdAt
+    updatedAt
   }
 }
 subscription OnCreateTweetIgnore($owner: String!) {
@@ -174,8 +210,12 @@ subscription OnCreateTweetIgnore($owner: String!) {
     tweetId
     user {
       id
+      createdAt
+      updatedAt
       owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -186,8 +226,12 @@ subscription OnUpdateTweetIgnore($owner: String!) {
     tweetId
     user {
       id
+      createdAt
+      updatedAt
       owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -198,8 +242,12 @@ subscription OnDeleteTweetIgnore($owner: String!) {
     tweetId
     user {
       id
+      createdAt
+      updatedAt
       owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -209,8 +257,12 @@ subscription OnCreateTwitterUserIgnore($owner: String!) {
     twitterScreenName
     user {
       id
+      createdAt
+      updatedAt
       owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -220,8 +272,12 @@ subscription OnUpdateTwitterUserIgnore($owner: String!) {
     twitterScreenName
     user {
       id
+      createdAt
+      updatedAt
       owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -231,44 +287,12 @@ subscription OnDeleteTwitterUserIgnore($owner: String!) {
     twitterScreenName
     user {
       id
+      createdAt
+      updatedAt
       owner
     }
-    owner
-  }
-}
-subscription OnCreateTweetIrrelevant($owner: String!) {
-  onCreateTweetIrrelevant(owner: $owner) {
-    id
-    url
-    tweetId
-    user {
-      id
-      owner
-    }
-    owner
-  }
-}
-subscription OnUpdateTweetIrrelevant($owner: String!) {
-  onUpdateTweetIrrelevant(owner: $owner) {
-    id
-    url
-    tweetId
-    user {
-      id
-      owner
-    }
-    owner
-  }
-}
-subscription OnDeleteTweetIrrelevant($owner: String!) {
-  onDeleteTweetIrrelevant(owner: $owner) {
-    id
-    url
-    tweetId
-    user {
-      id
-      owner
-    }
+    createdAt
+    updatedAt
     owner
   }
 }

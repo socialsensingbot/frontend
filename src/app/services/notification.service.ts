@@ -67,11 +67,10 @@ export class NotificationService implements OnDestroy, OnInit {
    * @param buttonLabel {string}
    * @returns {MatSnackBarRef}
    */
-  show(message: string, buttonLabel: string = 'OK'): MatSnackBarRef<any> {
-    const toastTimeout = 8000;
+  show(message: string, buttonLabel: string = 'OK', toastTimeout = 8): MatSnackBarRef<any> {
     if (toastTimeout > 0) {
       return this.toast.open(message, buttonLabel, {
-        duration: toastTimeout
+        duration: toastTimeout * 1000
       });
     } else {
       return this.toast.open(message, buttonLabel, {});
