@@ -1,52 +1,128 @@
 # this is an auto generated file. This will be overwritten
-query GetUserProfile($id: ID!) {
-  getUserProfile(id: $id) {
+query GetUserPreferences($id: ID!) {
+  getUserPreferences(id: $id) {
     id
-    name
     ignoreTweets {
-      items {
-        id
-        url
-        owner
-      }
       nextToken
     }
     ignorePeople {
-      items {
-        id
-        twitterScreenName
-        owner
-      }
       nextToken
     }
     irrelevant {
-      items {
-        id
-        url
-        owner
-      }
       nextToken
     }
+    owner
   }
 }
-query ListUserProfiles(
-  $filter: ModelUserProfileFilterInput
+query ListUserPreferencess(
+  $filter: ModelUserPreferencesFilterInput
   $limit: Int
   $nextToken: String
 ) {
-  listUserProfiles(filter: $filter, limit: $limit, nextToken: $nextToken) {
+  listUserPreferencess(filter: $filter, limit: $limit, nextToken: $nextToken) {
     items {
       id
-      name
-      ignoreTweets {
-        nextToken
-      }
-      ignorePeople {
-        nextToken
-      }
-      irrelevant {
-        nextToken
-      }
+      owner
+    }
+    nextToken
+  }
+}
+query GetUserSession($id: ID!) {
+  getUserSession(id: $id) {
+    id
+    fingerprint
+    open
+    owner
+  }
+}
+query ListUserSessions(
+  $filter: ModelUserSessionFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listUserSessions(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      fingerprint
+      open
+      owner
+    }
+    nextToken
+  }
+}
+query GetGroupPreferences($id: ID!) {
+  getGroupPreferences(id: $id) {
+    id
+    ignoreTweets {
+      nextToken
+    }
+    ignorePeople {
+      nextToken
+    }
+    group
+  }
+}
+query ListGroupPreferencess(
+  $filter: ModelGroupPreferencesFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listGroupPreferencess(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      group
+    }
+    nextToken
+  }
+}
+query GetGroupTweetIgnore($id: ID!) {
+  getGroupTweetIgnore(id: $id) {
+    id
+    url
+    tweetId
+    group {
+      id
+      group
+    }
+  }
+}
+query ListGroupTweetIgnores(
+  $filter: ModelGroupTweetIgnoreFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listGroupTweetIgnores(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      url
+      tweetId
+    }
+    nextToken
+  }
+}
+query GetGroupTwitterUserIgnore($id: ID!) {
+  getGroupTwitterUserIgnore(id: $id) {
+    id
+    twitterScreenName
+    group {
+      id
+      group
+    }
+  }
+}
+query ListGroupTwitterUserIgnores(
+  $filter: ModelGroupTwitterUserIgnoreFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listGroupTwitterUserIgnores(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      twitterScreenName
     }
     nextToken
   }
@@ -55,18 +131,10 @@ query GetTweetIgnore($id: ID!) {
   getTweetIgnore(id: $id) {
     id
     url
+    tweetId
     user {
       id
-      name
-      ignoreTweets {
-        nextToken
-      }
-      ignorePeople {
-        nextToken
-      }
-      irrelevant {
-        nextToken
-      }
+      owner
     }
     owner
   }
@@ -80,48 +148,7 @@ query ListTweetIgnores(
     items {
       id
       url
-      user {
-        id
-        name
-      }
-      owner
-    }
-    nextToken
-  }
-}
-query GetTweetIrrelevant($id: ID!) {
-  getTweetIrrelevant(id: $id) {
-    id
-    url
-    user {
-      id
-      name
-      ignoreTweets {
-        nextToken
-      }
-      ignorePeople {
-        nextToken
-      }
-      irrelevant {
-        nextToken
-      }
-    }
-    owner
-  }
-}
-query ListTweetIrrelevants(
-  $filter: ModelTweetIrrelevantFilterInput
-  $limit: Int
-  $nextToken: String
-) {
-  listTweetIrrelevants(filter: $filter, limit: $limit, nextToken: $nextToken) {
-    items {
-      id
-      url
-      user {
-        id
-        name
-      }
+      tweetId
       owner
     }
     nextToken
@@ -133,16 +160,7 @@ query GetTwitterUserIgnore($id: ID!) {
     twitterScreenName
     user {
       id
-      name
-      ignoreTweets {
-        nextToken
-      }
-      ignorePeople {
-        nextToken
-      }
-      irrelevant {
-        nextToken
-      }
+      owner
     }
     owner
   }
@@ -160,10 +178,33 @@ query ListTwitterUserIgnores(
     items {
       id
       twitterScreenName
-      user {
-        id
-        name
-      }
+      owner
+    }
+    nextToken
+  }
+}
+query GetTweetIrrelevant($id: ID!) {
+  getTweetIrrelevant(id: $id) {
+    id
+    url
+    tweetId
+    user {
+      id
+      owner
+    }
+    owner
+  }
+}
+query ListTweetIrrelevants(
+  $filter: ModelTweetIrrelevantFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listTweetIrrelevants(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      url
+      tweetId
       owner
     }
     nextToken
