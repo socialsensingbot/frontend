@@ -18,7 +18,7 @@ export class SessionService implements OnInit, OnDestroy {
   private readonly sessionDurationInSeconds = 60 * 30;
   private _heartbeatTimer: Subscription;
   private _fingerprint: string = `${navigator.appName}:${navigator.appCodeName}:${navigator.platform}:${navigator.appVersion.substring(
-    0, 4)}:${navigator.javaEnabled()}:${screen.width}:${screen.height}`;
+    0, 4).trim()}:${navigator.javaEnabled()}:${screen.width}:${screen.height}`;
 
   constructor(private _notify: NotificationService, private _api: APIService) {
 
