@@ -17,6 +17,8 @@ export class SessionService implements OnInit, OnDestroy {
   private _sessionSubscription: any;
   private readonly sessionDurationInSeconds = 60 * 30;
   private _heartbeatTimer: Subscription;
+  private _fingerprint: string = `${navigator.appName}:${navigator.appCodeName}:${navigator.platform}:${navigator.appVersion.substring(
+    0, 4)}:${navigator.javaEnabled()}:${screen.width}:${screen.height}`;
 
   constructor(private _notify: NotificationService, private _api: APIService) {
 
@@ -64,8 +66,6 @@ export class SessionService implements OnInit, OnDestroy {
         }
       });
 
-      const fingerprint = `${userInfo.attributes.email}::${navigator.appName}:${navigator.appCodeName}:${navigator.platform}:${navigator.appVersion.substring(
-        0, 4)}:${navigator.javaEnabled()}:${screen.width}: ${screen.height}`;
 
       const existingSession = await this._api.GetUserSession(this._sessionId);
       if (existingSession) {
@@ -75,14 +75,14 @@ export class SessionService implements OnInit, OnDestroy {
           this.newSession(userInfo);
           await this._api.CreateUserSession({
                                               id:          this._sessionId,
-                                              fingerprint: fingerprint,
+                                              fingerprint: this._fingerprint,
                                               open:        true
                                             });
         }
       } else {
         await this._api.CreateUserSession({
                                             id:          this._sessionId,
-                                            fingerprint: fingerprint,
+                                            fingerprint: this._fingerprint,
                                             open:        true
                                           });
       }
@@ -91,7 +91,8 @@ export class SessionService implements OnInit, OnDestroy {
 
   private newSession(userInfo) {
     log.info("New session");
-    this._sessionId = userInfo.attributes.email + ":" + Math.floor(Math.random() * 10000000000) + ":" + new Date();
+    this._sessionId = userInfo.attributes.email + ":" + this._fingerprint + ":" + Math.floor(
+      Math.random() * 1000000000000);
     window.localStorage.setItem(SESSION_TOKEN, this._sessionId);
     this.heartbeat();
   }
