@@ -59,15 +59,15 @@ describe('Hidden Tweets Reappear : https://github.com/socialsensingbot/frontend/
       });
     };
     //The actual bug was a lack of paging, so we need to do over 2*10 ignores to see the failure for certain.
-    for(let i= 0; i < 21; i++) {
-      it('toggle tweet '+i, ()=>test(false,i));
+    for (let i = 0; i < 11; i++) {
+      it('toggle tweet ' + i, () => test(false, i));
     }
-    it('toggle tweet with refresh', ()=>test(true,22));
+    it('toggle tweet with refresh', () => test(true, 12));
 
-    for(let i= 0; i < 21; i++) {
-      it('toggle tweet again '+i, ()=>test(false,i));
+    for (let i = 0; i < 11; i++) {
+      it('toggle tweet again ' + i, () => test(false, i));
     }
-    it('toggle tweet again with refresh', ()=>test(true, 22));
+    it('toggle tweet again with refresh', () => test(true, 12));
   });
 
 
