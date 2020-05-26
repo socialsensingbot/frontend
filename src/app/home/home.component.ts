@@ -12,7 +12,8 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
 
-    this._router.navigate(['/map'],{queryParamsHandling:"merge"});
+    console.error("Ended up at the home component ...?");
+    this._router.navigate(['/map'], {queryParamsHandling: "merge"});
   }
 
 }

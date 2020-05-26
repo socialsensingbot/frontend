@@ -43,7 +43,7 @@ Cypress.Commands.add("logout", () => {
 
 Cypress.Commands.add("visitAndWait", (url) => {
   cy.visit(url);
-  cy.url().should("equal", url);
+  cy.url({timeou: 20000}).should("equal", url);
   cy.noSpinner();
 });
 

@@ -16,31 +16,11 @@ const log = new Logger('app');
              templateUrl: './app.component.html',
              styleUrls:   ['./app.component.scss']
            })
-export class AppComponent implements OnInit, OnDestroy {
-  private _sessionSubscription: any;
-  private _sessionId: string;
-
-  ngOnDestroy(): void {
-
-    this._sessionSubscription.unsubscribe();
-
-  }
-
-  ngOnInit(): void {
-    Auth.currentAuthenticatedUser()
-        .then(() => {
-          this._router.navigate(['/map'], {queryParamsHandling: "merge"});
-        }).then(() => {
-
-    });
-
-  }
-
+export class AppComponent {
 
   title = 'SocialSensing.com';
   public isDev: boolean = !environment.production;
   user: any;
-  usernameAttributes = "email";
   isAuthenticated: boolean;
   public isSignup: boolean = !environment.production;
 
@@ -67,6 +47,8 @@ export class AppComponent implements OnInit, OnDestroy {
       }
     });
 
+    this._router.events.subscribe((val) => log.verbose("Router Event: ", val));
+
   }
 
   async checkSession() {
@@ -80,7 +62,7 @@ export class AppComponent implements OnInit, OnDestroy {
       const userInfo = await Auth.currentUserInfo();
       if (userInfo) {
         await this._pref.init(userInfo);
-        this._session.open(userInfo);
+        await this._session.open(userInfo);
       }
 
       if (userInfo && userInfo.attributes.profile) {

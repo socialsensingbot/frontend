@@ -11,7 +11,6 @@ describe('Date time: ', function () {
     const url = "http://localhost:4200/map?selected=scottish%20borders&min_offset=-1439&max_offset=0&zoom=5";
     it('with no tweets', () => {
       cy.visitAndWait(url);
-      cy.url().should("equal", url);
       cy.get(".slider-date-time", {timeout: 20000});
       cy.get(".slider-date-time-max .slider-date").should("contain.text","15-Oct-18");
       cy.get(".slider-date-time-max .slider-time").should("contain.text", "12 AM");
