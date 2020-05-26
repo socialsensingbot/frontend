@@ -362,9 +362,46 @@ The quick tests are run during builds of feature and release branches and can be
 
 The slow tests are run during builds of release branches (or manually) only and can be found in [integration/slow](/cypress/integration/slow), tests that are directly related to issues are in the [integration/slow/issues](/cypress/integration/slow/issues) folder and are prefixed with the issue id from GitHub. The difference is simply how long a test takes to run.
 
-The [fixtures](/cypress/fixtures) folder contains data used to stub out services for testing purposes. In our case this is the live.json data retrieved from S3. In the commands.js file you will see how they are used. More on that later.
+### Writing custom commands
+
+<https://docs.cypress.io/api/cypress-api/custom-commands.html>
+
+The [commands.js](cypress/support/commands.js) file contains custom commands that can be used in Cypress tests. They are very straightforward to write and basically are defined like:
+
+```javascript
+Cypress.Commands.add("twitterPanelHeader", (text) => {
+  cy.get("twitter-panel");
+  cy.get(".tinfo-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  cy.wait(1000);
+  cy.get(".tinfo-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  cy.get("twitter-panel .tweets-header", {timeout: LONG_TIMEOUT});
+  cy.get("twitter-panel .tweets-header  mat-card > span > b", {timeout: LONG_TIMEOUT}).should("contain.text", text);
+});
+```
+
+and used like
+
+```javascript
+ describe('select county and date range', () => {
+    const url = "http://localhost:4200/map?selected=scottish%20borders&min_offset=-1439&max_offset=0&zoom=5";
+    it('with no tweets', () => {
+      cy.visitAndWait(url);
+      cy.get(".slider-date-time", {timeout: 20000});
+      cy.get(".slider-date-time-max .slider-date").should("contain.text","15-Oct-18");
+      cy.get(".slider-date-time-max .slider-time").should("contain.text", "12 AM");
+      cy.get(".tweet-drawer", {timeout: 60000}).should("be.visible");
+      cy.url().should("equal", url);
+      
+      cy.twitterPanelHeader("No Tweets from Scottish Borders");
+
+      cy.logout();
+    });
+  });
+```
 
 ### Using Fixtures and Stubbing Services
+
+The [fixtures](/cypress/fixtures) folder contains data used to stub out services for testing purposes. In our case this is the live.json data retrieved from S3. In the commands.js file you will see how they are used.
 
 This is a huge topic please, please read the Cypress docs on fixtures and the ```cy.route(...)``` command. But let's quickly focus in on the key parts:
 
@@ -417,6 +454,22 @@ This is a work in progress, the initial hack just turns off all tweet ignores an
 ```
 
 It is a complex subject that had me wracking my brains for hours. The solution I've done is sub par but works. Expect more work on this at a later date.    
+
+
+
+### Retries
+
+The [Cypress Retries Plugin](https://github.com/Bkucera/cypress-plugin-retries) is used to make Cypress retry flakey tests. In the [cypress.json](cypress.json) file we configure the retries.
+
+```json
+{
+  "env": {
+    "RETRIES": 2
+  }
+}
+```
+
+The retry count is overidden by the CYPRESS_RETRIES environment variable in the [Amplify Console](https://eu-west-2.console.aws.amazon.com/amplify/home?region=eu-west-2#/dtmxl3q3i7oix/settings/variables).
 
 ##  Issue Tracking 
 
