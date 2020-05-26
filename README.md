@@ -326,6 +326,11 @@ The app is 100% stateless and serverless from a deployment perspective - this me
 
 Typically you won't interact with these services directly while working on or maintaining the app. The S3/Cloudfront deployment is managed by amplify.
 
+
+### GraphQL & AWS DynamoDB
+
+TODO:
+
 ### AWS Route 53
 
 Currently the GoDaddy registry for socialsensing.com points to AWS Route 53 for all DNS records. 
