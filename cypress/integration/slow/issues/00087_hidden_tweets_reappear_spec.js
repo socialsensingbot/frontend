@@ -47,8 +47,7 @@ describe('Hidden Tweets Reappear : https://github.com/socialsensingbot/frontend/
           expectHiddenAfterRefresh = true;
         }
         if(refresh) {
-          cy.visit("http://localhost:4200/map?selected=carmarthenshire");
-          cy.login();
+          cy.visit(url);
           cy.noSpinner();
         }
         if (expectHiddenAfterRefresh) {
