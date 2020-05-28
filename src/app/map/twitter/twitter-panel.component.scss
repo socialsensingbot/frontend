@@ -134,9 +134,6 @@ $tweetWidth: 540px;
           //border: 1px solid green;
           width: 100%;
 
-          .tweet-load-spinner {
-            opacity: 0.2;
-          }
 
           ::ng-deep {
 
@@ -214,6 +211,7 @@ $tweetWidth: 540px;
     mat-spinner {
       display: block;
       margin: 10px auto;
+      opacity: 0.2;
     }
   }
 
