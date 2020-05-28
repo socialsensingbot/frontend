@@ -24,7 +24,6 @@ function twitterLoad(page: number) {
   if ((window as any).twttr && (window as any).twttr.widgets) {
     setTimeout(() => {
       (window as any).twttr.widgets.load($(".tweet-page-" + page)[0]);
-      (window as any).twttr.widgets.load($("mat-expansion-panel")[0]);
     }, 50);
   } else {
     setTimeout(() => twitterLoad(page), 500);
@@ -43,9 +42,10 @@ function twitterInit() {
 
         window.setTimeout(() => {
           const parent = $(event.target).parent();
+          const atr = parent.parents(".app-twitter-row");
           if (parent.find("blockquote.twitter-tweet-error").length > 0) {
             parent.parent().find(".app-twitter-item-menu").hide();
-            const atr = parent.parents(".app-twitter-row");
+
 
             atr.css("opacity", 1.0)
                .css("min-width", "516px")
@@ -53,10 +53,15 @@ function twitterInit() {
 
 
             atr.find("blockquote").text("Tweet no longer available");
+          } else {
+            atr.find("blockquote").addClass("tweet-rendered");
           }
+          if ($(event.target).parents(".twitter-card").length > 0) {
+            $(event.target).parents(".twitter-card").find(".mat-spinner").hide();
+          }
+          atr.find(".tweet-loading-placeholder").remove();
           try {
             const atr = $(event.target).parents(".app-twitter-row");
-            atr.css("opacity", 1.0);
             atr.css("max-height", "100%");
           } catch (e) {
             log.debug(e);
@@ -121,11 +126,11 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
     //     this._zone.run(() => this.updateTweets());
     //   }
     // });
-    Hub.listen("twitter-panel", (e) => {
-      if (e.payload.message === "render") {
-        this._zone.run(() => this.ready = true);
-      }
-    });
+    // Hub.listen("twitter-panel", (e) => {
+    //   if (e.payload.message === "render") {
+    //     this._zone.run(() => this.ready = true);
+    //   }
+    // });
     Hub.listen("twitter-panel", (e) => {
       if (e.payload.message === "refresh") {
         this._zone.run(() => this.updateTweets(this._tweets));
@@ -217,10 +222,11 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
     }
     this.loadPagesOfTweets();
     this.moreToShow = this.maxPage < this.pages.length;
+    (window as any).twttr.widgets.load($("mat-expansion-panel")[0]);
   }
 
   private loadPagesOfTweets() {
-    for (let i = this.minPage; i <= this.maxPage; i++) {
+    for (let i = 0; i <= this.maxPage; i++) {
       this.animateTweetAppearance(i);
     }
   }
@@ -237,6 +243,7 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
     log.debug("Loading tweets by page " + page);
     if (!this.loaded[page]) {
       twitterLoad(page);
+      // this.loaded[page]= true;
     }
   }
 

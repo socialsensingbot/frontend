@@ -116,8 +116,8 @@ $tweetWidth: 540px;
         position: relative;
         max-width: $tweetWidth;
         min-width: $tweetWidth;
-        transition: opacity 0.8s ease-in-out;
-        opacity: 0;
+
+
         //max-height: 0;
 
         .app-twitter-item-menu {
@@ -132,15 +132,54 @@ $tweetWidth: 540px;
           //display: flex;
           //flex-direction: column;
           //border: 1px solid green;
-          blockquote {
-            opacity: 1.0;
-            margin: 0;
+          width: 100%;
+
+          .tweet-load-spinner {
+            opacity: 0.2;
           }
+
+          ::ng-deep {
+
+            blockquote {
+              opacity: 0.0;
+              transition: opacity 0.8s ease-in-out;
+            }
+
+            .tweet-text blockquote {
+              display: none;
+              margin: 12px;
+              font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
+              background-color: rgba(0, 0, 0, 0);
+              list-style: none;
+              line-height: 1.3125;
+              min-width: 0px;
+              overflow-wrap: break-word;
+
+              ::ng-deep {
+                a {
+                  text-decoration: none;
+                  cursor: pointer;
+                  color: rgb(27, 149, 224);
+                }
+              }
+            }
+
+            blockquote.tweet-placeholder {
+              opacity: 1.0;
+              margin: 12px;
+              display: block;
+            }
+
+            blockquote.tweet-rendered {
+              opacity: 1.0;
+              margin: 0px;
+              display: block;
+            }
+
+          }
+
         }
 
-        blockquote.tweet-placeholder {
-          opacity: 1.0;
-        }
 
       }
     }
@@ -170,7 +209,12 @@ $tweetWidth: 540px;
   .twitter-card {
     margin-bottom: 8px;
     margin-top: 8px;
+    width: 100%;
 
+    mat-spinner {
+      display: block;
+      margin: 10px auto;
+    }
   }
 
   .EmbeddedTweet-tweet {
