@@ -11,10 +11,10 @@
     <div class="tweets-header" *ngIf="tweets.length > 0">
       <mat-card class="tweets-heading"><span style="color: black"><b>Showing {{visibleCount}} of {{tweetCount}}
         Tweets from {{region}}</b><br/></span>
-        <help-span page="help-and-support#exceedance"
-                   matTooltip="Exceedance probability is calculated by comparing the current level of tweet activity with historical tweet activity.">
+        <help page="help-and-support#exceedance"
+              tooltip="Exceedance probability is calculated by comparing the current level of tweet activity with historical tweet activity.">
           Exceedance probability
-        </help-span>
+        </help>
         {{exceedanceProbability}}%
       </mat-card>
     </div>

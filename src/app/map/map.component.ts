@@ -729,12 +729,12 @@ export class MapComponent implements OnInit, OnDestroy {
                                         this._updating = false;
                                       }
                                     } else {
-                                      console.log("Update in progress so skipping this update");
+                                      log.debug("Update in progress so skipping this update");
                                     }
                                   }
       , `${this._dateMin} ${this._dateMax}`).catch(e => {
       if (e !== DUPLICATE_REASON) {
-        console.error(e);
+        log.error(e);
       }
     });
   }

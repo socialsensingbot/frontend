@@ -182,12 +182,12 @@ export class MapDataService {
     const key = this.createKey(_dateMin, _dateMax);
     const cacheValue: CachedItem<ProcessedData> = await this.cache.getCached(key);
     if (cacheValue != null && !cacheValue.expired && cacheValue.hasData) {
-      console.info("Retrieved tweet data from cache.");
-      console.log(cacheValue);
+      log.info("Retrieved tweet data from cache.");
+      log.debug(cacheValue);
       this._twitterData = new ProcessedData().populate(cacheValue.data);
-      console.log(this._twitterData)
+      log.debug(this._twitterData)
     } else {
-      console.info("Tweet data not in cache.");
+      log.info("Tweet data not in cache.");
       this._twitterData = new ProcessedData(_dateMin, _dateMax, this.timeKeyedData, this._rawTwitterData, this._stats);
       this.cache.setCached(key, this._twitterData, 24 * 60 * 60 * 1000);
     }

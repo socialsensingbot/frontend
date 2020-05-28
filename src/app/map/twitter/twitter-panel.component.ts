@@ -141,7 +141,7 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
       this._tweets = [];
       this.ready = false;
       this.tweetCount = 0;
-      console.log("Tweets reset");
+      log.debug("Tweets reset");
       return;
     }
 
@@ -234,7 +234,7 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
     if (typeof this.loaded[page] === undefined) {
       this.loaded[page] = false;
     }
-    console.log("Loading tweets by page " + page);
+    log.debug("Loading tweets by page " + page);
     if (!this.loaded[page]) {
       twitterLoad(page);
     }
@@ -326,7 +326,7 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
 
 
   onScrollDown(ev) {
-    console.log('scrolled down!!', ev);
+    log.debug('scrolled down!!', ev);
     //add items
     this.direction = 'down'
     const oldMax = this.maxPage;
@@ -346,12 +346,12 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
     if (oldMax != this.maxPage) {
       this.loadPagesOfTweets();
     }
-    console.log("New max page " + this.maxPage)
-    console.log("New min page " + this.minPage)
+    log.debug("New max page " + this.maxPage)
+    log.debug("New min page " + this.minPage)
   }
 
   onUp($event: IInfiniteScrollEvent) {
-    console.log('scrolled up!', $event);
+    log.debug('scrolled up!', $event);
 
     this.direction = 'up';
     const oldMin = this.minPage;
@@ -369,8 +369,8 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
     if (oldMin != this.minPage) {
       this.loadPagesOfTweets();
     }
-    console.log("New max page " + this.maxPage)
-    console.log("New min page " + this.minPage)
+    log.debug("New max page " + this.maxPage)
+    log.debug("New min page " + this.minPage)
 
     // if (this.maxTweets > 100) {
     //   this.maxTweets -= this.PAGE_SIZE;

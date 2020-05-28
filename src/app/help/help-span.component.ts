@@ -1,9 +1,12 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {MatDialog} from "@angular/material/dialog";
 import {HelpDialogComponent} from "./help-dialog.component";
+import {Logger} from "aws-amplify";
+
+const log = new Logger('help-span');
 
 @Component({
-             selector:  'help-span',
+             selector:  'help',
              template:  '<span class="help-span" [matTooltip]="tooltip" (click)="openDialog()"><ng-content></ng-content></span>',
              styleUrls: ['./help-span.component.scss']
            })
@@ -26,7 +29,7 @@ export class HelpSpanComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`);
+      log.verbose(`Dialog result: ${result}`);
     });
   }
 

@@ -4,7 +4,7 @@ import {HelpDialogComponent} from "./help-dialog.component";
 
 @Component({
              selector:  'help-icon',
-             template:  '<mat-icon (click)="openDialog()">help</mat-icon>',
+             template:  '<button mat-button><mat-icon (click)="openDialog()">help</mat-icon></button>',
              styleUrls: ['./help-icon.component.scss']
            })
 export class HelpIconComponent implements OnInit {
@@ -25,8 +25,9 @@ export class HelpIconComponent implements OnInit {
 
   openDialog() {
     const dialogRef = this.dialog.open(HelpDialogComponent, {
-      data: {
-        page: this._page
+      width: "80%", height: "80%",
+      data:  {
+        page: "help-and-support"
       }
     });
 
