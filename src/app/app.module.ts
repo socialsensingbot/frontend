@@ -33,6 +33,9 @@ import {NgEventBus} from "ng-event-bus";
 import {NotificationService} from "./services/notification.service";
 import {InfiniteScrollModule} from "ngx-infinite-scroll";
 import {NgForageConfig, NgForageModule} from "ngforage";
+import {HelpIconComponent} from './help/help-icon.component';
+import {HelpSpanComponent} from "./help/help-span.component";
+import {HelpDialogComponent} from './help/help-dialog.component';
 
 export class NotificationErrorHandler implements ErrorHandler {
   constructor(private _notify: NotificationService) {}
@@ -56,7 +59,10 @@ export class NotificationErrorHandler implements ErrorHandler {
               TwitterPanelComponent,
               DateRangeSliderComponent,
               NewPassComponent,
-              LegendComponent
+              LegendComponent,
+              HelpIconComponent,
+              HelpDialogComponent,
+              HelpSpanComponent
             ],
             imports:         [
               BrowserModule,
@@ -90,7 +96,7 @@ export class NotificationErrorHandler implements ErrorHandler {
             },
                               AuthService, NgEventBus],
             bootstrap:       [AppComponent],
-            entryComponents: [CountryCodeSelectComponent]
+            entryComponents: [CountryCodeSelectComponent, HelpDialogComponent]
           },)
 export class AppModule {
   public constructor(ngfConfig: NgForageConfig) {
