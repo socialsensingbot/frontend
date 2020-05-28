@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {MatDialog} from "@angular/material/dialog";
 import {HelpDialogComponent} from "./help-dialog.component";
 import {Logger} from "aws-amplify";
+import {DomSanitizer} from "@angular/platform-browser";
 
 const log = new Logger('help-span');
 
@@ -18,13 +19,13 @@ export class HelpSpanComponent implements OnInit {
   public tooltip: string;
 
 
-  constructor(public dialog: MatDialog) {}
+  constructor(public dialog: MatDialog, private sanitizer: DomSanitizer) {}
 
   openDialog() {
     const dialogRef = this.dialog.open(HelpDialogComponent, {
       width: "80%", height: "80%",
       data:  {
-        page: this.page
+        page: this.sanitizer.bypassSecurityTrustResourceUrl('https://socialsensing.com/' + this.page)
       }
     });
 

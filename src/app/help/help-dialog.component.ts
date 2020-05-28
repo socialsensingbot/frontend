@@ -11,6 +11,6 @@ export class HelpDialogComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: any, private sanitizer: DomSanitizer) {}
 
   public page() {
-    return this.sanitizer.bypassSecurityTrustResourceUrl('https://socialsensing.com/' + this.data.page);
+    return this.data.page;
   }
 }
