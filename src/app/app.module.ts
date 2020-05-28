@@ -33,7 +33,7 @@ import {NgEventBus} from "ng-event-bus";
 import {NotificationService} from "./services/notification.service";
 import {InfiniteScrollModule} from "ngx-infinite-scroll";
 import {NgForageConfig, NgForageModule} from "ngforage";
-import {HelpIconComponent} from './help/help-icon.component';
+import {HelpButtonComponent} from './help/help-button.component';
 import {HelpSpanComponent} from "./help/help-span.component";
 import {HelpDialogComponent} from './help/help-dialog.component';
 
@@ -60,7 +60,7 @@ export class NotificationErrorHandler implements ErrorHandler {
               DateRangeSliderComponent,
               NewPassComponent,
               LegendComponent,
-              HelpIconComponent,
+              HelpButtonComponent,
               HelpDialogComponent,
               HelpSpanComponent
             ],

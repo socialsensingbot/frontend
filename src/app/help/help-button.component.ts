@@ -4,11 +4,11 @@ import {HelpDialogComponent} from "./help-dialog.component";
 import {DomSanitizer} from "@angular/platform-browser";
 
 @Component({
-             selector:  'help-icon',
-             template:  '<button mat-button><mat-icon (click)="openDialog()">help</mat-icon></button>',
-             styleUrls: ['./help-icon.component.scss']
+             selector:  'help-button',
+             template:  '<button mat-button class="help-button"><mat-icon class="help-button-icon" (click)="openDialog()">help</mat-icon></button>',
+             styleUrls: ['./help-button.component.scss']
            })
-export class HelpIconComponent implements OnInit {
+export class HelpButtonComponent implements OnInit {
 
   public get page(): any {
     return this._page;
