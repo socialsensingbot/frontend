@@ -56,9 +56,9 @@ function twitterInit() {
           } else {
             atr.find("blockquote").addClass("tweet-rendered");
           }
-          if ($(event.target).parents(".app-twitter-row").length > 0) {
-            $(event.target).parents(".app-twitter-row").find("mat-spinner").hide();
-            $(event.target).parents(".app-twitter-row").find(".app-twitter-item-menu").show();
+          if (atr.length > 0) {
+            atr.find("mat-spinner").hide();
+            atr.find(".app-twitter-item-menu").css("opacity", 1.0);
           }
           atr.find(".tweet-loading-placeholder").remove();
           try {

@@ -72,7 +72,7 @@
                 </mat-panel-title>
 
               </mat-expansion-panel-header>
-              <div class="app-twitter-row" [style.opacity]="isPlaceholder(tweet) ? 1.0 : 0.0"
+              <div class="app-twitter-row"
                    *ngFor="let tweet of tweets; let i = index">
 
                 <div *ngIf="hidden[i] === true && !isPlaceholder(tweet)" class="atr-hidden atr-{{i}}">
@@ -81,9 +81,9 @@
                     *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
                 </div>
                 <mat-card class="twitter-card" *ngIf="hidden[i] === true && isPlaceholder(tweet)">
-                  <blockquote class="tweet-placeholder">
+                  <div class="tweet-placeholder">
                     <span class="tweet-no-longer-available">Tweet no longer available</span>
-                  </blockquote>
+                  </div>
                 </mat-card>
               </div>
             </mat-expansion-panel>
@@ -106,9 +106,9 @@
                   </ng-container>
                 </div>
                 <div class="twitter-card" *ngIf="isPlaceholder(tweet)">
-                  <blockquote class="tweet-placeholder">
+                  <div class="tweet-placeholder">
                     <span class="tweet-no-longer-available">Tweet no longer available</span>
-                  </blockquote>
+                  </div>
                 </div>
               </ng-container>
             </div>

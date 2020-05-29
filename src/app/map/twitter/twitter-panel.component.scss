@@ -11,8 +11,11 @@ $tweetMargin: 8px;
   overflow-x: hidden;
   overflow-y: scroll;
   font-size: 16px;
-  width: $tweetWidth;
-  margin-right: 16px;
+  width: 568px;
+  max-width: 568px;
+  min-width: $tweetWidth + 16px;
+  margin: 0;
+  padding: 0;
 
   .tinfo {
     margin: 4px;
@@ -115,10 +118,11 @@ $tweetMargin: 8px;
         flex-wrap: nowrap;
         align-items: center;
         height: 100%;
+        min-height: 32px;
         //border: 1px solid blue;
         position: relative;
-        max-width: $tweetWidth;
-        min-width: $tweetWidth;
+        max-width: 540px;
+        min-width: 500px;
 
 
         //max-height: 0;
@@ -129,7 +133,7 @@ $tweetMargin: 8px;
           top: 8px;
           z-index: 10;
           opacity: 0.0;
-          transition: opacity 0.8s ease-in-out;
+          transition: opacity 2s ease-in-out;
           //border: 1px solid red;
         }
 
@@ -166,11 +170,7 @@ $tweetMargin: 8px;
               }
             }
 
-            blockquote.tweet-placeholder {
-              opacity: 1.0;
-              margin: 12px;
-              display: block;
-            }
+
 
             blockquote.tweet-rendered {
               opacity: 1.0;
@@ -186,6 +186,14 @@ $tweetMargin: 8px;
       }
     }
 
+  }
+
+  .tweet-placeholder {
+    opacity: 1.0;
+    margin: 16px;
+    display: block;
+    max-width: 540px;
+    width: 100%;
   }
 
   .tweets-header {
@@ -233,8 +241,7 @@ $tweetMargin: 8px;
     border: 1px solid rgb(204, 214, 221);
     overflow-x: hidden;
     overflow-y: hidden;
-    max-width: $tweetWidth;
-    min-width: $tweetWidth - $tweetMargin * 2;
+    max-width: 500px;
     width: 100%;
 
 
@@ -247,7 +254,7 @@ $tweetMargin: 8px;
 
   .hidden-tweet-container {
     position: relative;
-    max-width: $tweetWidth - $tweetMargin * 2;
+    max-width: 500px + 24px;
     background-color: #eee;
     margin: 8px;
 
