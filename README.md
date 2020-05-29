@@ -326,6 +326,11 @@ The app is 100% stateless and serverless from a deployment perspective - this me
 
 Typically you won't interact with these services directly while working on or maintaining the app. The S3/Cloudfront deployment is managed by amplify.
 
+
+### GraphQL & AWS DynamoDB
+
+TODO:
+
 ### AWS Route 53
 
 Currently the GoDaddy registry for socialsensing.com points to AWS Route 53 for all DNS records. 
@@ -401,13 +406,13 @@ and used like
 
 ### Using Fixtures and Stubbing Services
 
-The [fixtures](/cypress/fixtures) folder contains data used to stub out services for testing purposes. In our case this is the live.json data retrieved from S3. In the commands.js file you will see how they are used.
+The [fixtures](/cypress/fixtures) folder contains data used to stub out remote services for testing purposes. In our case this is the live.json data retrieved from S3. In the commands.js file you will see how they are used.
 
 This is a huge topic please, please read the Cypress docs on fixtures and the ```cy.route(...)``` command. But let's quickly focus in on the key parts:
 
 #### Live.json
 
-The live.json file is usually retrieved from securely by the app. However certain bugs only manifest with sepcific data. For example a region where every tweet has been deleted. So to test those issues we need to capture the live.json for the issue. Save it in the [fixtures](/cypress/fixtures) folder and then tell the test we're writing to use that data set.
+The live.json file is usually retrieved from S3 securely by the app. However certain bugs only manifest with sepcific data. For example a region where every tweet has been deleted. So to test those issues we need to capture the live.json for the issue then save it to the [fixtures](/cypress/fixtures) folder and then tell the test we're writing to use that data set.
  
 You will see something like this in [commands.js](cypress/support/commands.js)
 
@@ -454,8 +459,6 @@ This is a work in progress, the initial hack just turns off all tweet ignores an
 ```
 
 It is a complex subject that had me wracking my brains for hours. The solution I've done is sub par but works. Expect more work on this at a later date.    
-
-
 
 ### Retries
 
