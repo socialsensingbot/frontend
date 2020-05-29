@@ -121,19 +121,19 @@ $tweetMargin: 8px;
         min-height: 32px;
         //border: 1px solid blue;
         position: relative;
-        max-width: 540px;
-        min-width: 500px;
+        max-width: 500px + $tweetMargin * 2;
+        min-width: 500px + $tweetMargin * 2;
 
 
         //max-height: 0;
 
         .app-twitter-item-menu {
           position: absolute;
-          right: -8px;
+          right: -24px;
           top: 8px;
           z-index: 10;
           opacity: 0.0;
-          transition: opacity 2s ease-in-out;
+          transition: opacity 2s ease-in-out 2s;
           //border: 1px solid red;
         }
 
@@ -169,7 +169,6 @@ $tweetMargin: 8px;
                 }
               }
             }
-
 
 
             blockquote.tweet-rendered {
@@ -254,17 +253,17 @@ $tweetMargin: 8px;
 
   .hidden-tweet-container {
     position: relative;
-    max-width: 500px + 24px;
+    max-width: 500px + 32px;
     background-color: #eee;
     margin: 8px;
 
     .app-twitter-row {
       max-width: $tweetWidth;
-      left: -8px;
+      left: -16px;
 
       .app-twitter-item-menu {
         right: 8px;
-        top: -8px;
+        top: -16px;
         //border: 1px solid red;
       }
     }
