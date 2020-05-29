@@ -64,7 +64,7 @@
 
           <div #tinfoEmbeds [style.visibility]="ready ? 'visible' : 'hidden'"
           >
-            <mat-expansion-panel class="twitter-card tc-expansion-panel hidden-tweet-container "
+            <mat-expansion-panel class="tc-expansion-panel hidden-tweet-container "
                                  *ngIf="tweets.length - visibleCount != 0">
               <mat-expansion-panel-header>
                 <mat-panel-title>
@@ -98,18 +98,18 @@
                  *ngFor="let tweet of page.tweets; let i = index">
               <div class="date-separator" *ngIf="isNewDate(i + page.start)">{{tweet.date | date:"mediumDate"}}</div>
               <ng-container *ngIf="page.page <= maxPage">
-                <mat-card class="twitter-card" *ngIf="hidden[i + page.start] === false && !isPlaceholder(tweet)">
+                <div class="twitter-card-surround" *ngIf="hidden[i + page.start] === false && !isPlaceholder(tweet)">
                   <mat-spinner diameter="24" class="tweet-load-spinner"></mat-spinner>
                   <ng-container>
                     <ng-container
                       *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i + page.start,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
                   </ng-container>
-                </mat-card>
-                <mat-card class="twitter-card" *ngIf="isPlaceholder(tweet)">
+                </div>
+                <div class="twitter-card" *ngIf="isPlaceholder(tweet)">
                   <blockquote class="tweet-placeholder">
                     <span class="tweet-no-longer-available">Tweet no longer available</span>
                   </blockquote>
-                </mat-card>
+                </div>
               </ng-container>
             </div>
             <ng-container *ngIf="p == pages.length -1">

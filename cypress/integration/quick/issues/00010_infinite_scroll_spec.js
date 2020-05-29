@@ -30,10 +30,10 @@ describe('Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/1
       cy.wait(1000);
 
       cy.log(
-        "There should be 3 pages of 20 tweets loaded at any time. The first page should not now contain any tweets and the fourth page should contain 20 tweets.");
+        "There should be 3 pages of 20 tweets loaded at any time. The first page should not have any visible tweets and the fourth page should contain 20 tweets.");
 
-      cy.get("twitter-panel").find('.tweet-page .twitter-card').its('length').should('eq', 60);
-      cy.get(".tweet-page-0 .twitter-card").should("not.exist");
+      cy.get("twitter-panel").find('.tweet-page .twitter-card').its('length').should('be.gt', 60);
+      cy.get(".tweet-page-0 .twitter-card").should("not.be.visible");
       cy.get(".tweet-page-3").find('.twitter-card').its('length').should('eq', 20);
       cy.get(".atr-0", {timeout: 20000}).should("not.be.visible");
 

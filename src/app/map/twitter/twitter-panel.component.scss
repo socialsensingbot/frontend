@@ -1,4 +1,5 @@
 $tweetWidth: 540px;
+$tweetMargin: 8px;
 .tweets-outer {
   display: flex;
   align-items: stretch;
@@ -10,6 +11,8 @@ $tweetWidth: 540px;
   overflow-x: hidden;
   overflow-y: scroll;
   font-size: 16px;
+  width: $tweetWidth;
+  margin-right: 16px;
 
   .tinfo {
     margin: 4px;
@@ -125,6 +128,8 @@ $tweetWidth: 540px;
           right: -8px;
           top: 8px;
           z-index: 10;
+          opacity: 0.0;
+          transition: opacity 0.8s ease-in-out;
           //border: 1px solid red;
         }
 
@@ -203,9 +208,8 @@ $tweetWidth: 540px;
 
   }
 
-  .twitter-card {
-    margin-bottom: 8px;
-    margin-top: 8px;
+  .twitter-card-surround {
+    margin: $tweetMargin;
     width: 100%;
 
     mat-spinner {
@@ -215,6 +219,27 @@ $tweetWidth: 540px;
     }
   }
 
+  .twitter-card {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    box-sizing: border-box;
+    display: block;
+    margin: $tweetMargin;
+    min-height: 48px;
+    padding: 0px;
+    position: relative;
+    z-index: 0;
+    border-image: initial;
+    border-radius: 14px;
+    border: 1px solid rgb(204, 214, 221);
+    overflow-x: hidden;
+    overflow-y: hidden;
+    max-width: $tweetWidth;
+    min-width: $tweetWidth - $tweetMargin * 2;
+    width: 100%;
+
+
+  }
+
   .EmbeddedTweet-tweet {
     margin: 0;
     padding: 0;
@@ -222,8 +247,9 @@ $tweetWidth: 540px;
 
   .hidden-tweet-container {
     position: relative;
-    max-width: $tweetWidth;
+    max-width: $tweetWidth - $tweetMargin * 2;
     background-color: #eee;
+    margin: 8px;
 
     .app-twitter-row {
       max-width: $tweetWidth;
