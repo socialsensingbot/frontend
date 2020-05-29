@@ -12,7 +12,7 @@ $tweetMargin: 8px;
   overflow-y: scroll;
   font-size: 16px;
   width: 568px;
-  max-width: 568px;
+  max-width: 564px;
   min-width: $tweetWidth + 16px;
   margin: 0;
   padding: 0;
@@ -129,8 +129,8 @@ $tweetMargin: 8px;
 
         .app-twitter-item-menu {
           position: absolute;
-          right: -24px;
-          top: 8px;
+          right: -32px;
+          top: 0px;
           z-index: 10;
           opacity: 0.0;
           transition: opacity 2s ease-in-out 2s;
@@ -262,8 +262,8 @@ $tweetMargin: 8px;
       left: -16px;
 
       .app-twitter-item-menu {
-        right: 8px;
-        top: -16px;
+        right: -16px !important;
+        top: -8px !important;
         //border: 1px solid red;
       }
     }
