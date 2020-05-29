@@ -95,20 +95,6 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   private _newParams: Partial<Params>;
 
-
-  private _feature;
-
-  private _loggedIn: boolean;
-
-
-  // Timed action triggers //
-  private _twitterIsStale: boolean;
-
-  // Timers for timed actions //
-  private _twitterUpdateTimer: Subscription;
-  private _loadTimer: Subscription;
-
-
   //The UI state fields
   public tweets: Tweet[] = null;
   public selectedRegion: string;
@@ -126,7 +112,23 @@ export class MapComponent implements OnInit, OnDestroy {
   };
 
 
+  private _feature;
+
+  private _loggedIn: boolean;
+
+
+  // Timed action triggers //
+  private _twitterIsStale: boolean;
+
+  // Timers for timed actions //
+  private _twitterUpdateTimer: Subscription;
+  private _loadTimer: Subscription;
+
+
   public showTwitterTimeline: boolean;
+  private _selectedFeatureName: string;
+  private _updating: boolean;
+  private _stateSub: Subscription;
 
 
   public options: any = {
@@ -148,9 +150,6 @@ export class MapComponent implements OnInit, OnDestroy {
   };
 
 
-  private _selectedFeatureName: string;
-  private _updating: boolean;
-  private _stateSub: Subscription;
 
 
   constructor(private _router: Router,
