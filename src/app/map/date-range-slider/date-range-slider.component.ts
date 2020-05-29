@@ -1,8 +1,10 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {LabelType, Options} from "ng5-slider";
 import {Subscription, timer} from "rxjs";
-import {Hub, Logger} from "aws-amplify";
+import {Cache, Hub, Logger} from "aws-amplify";
 import {NgEventBus} from "ng-event-bus";
+import {MapDataService} from "../data/map-data.service";
+
 const log = new Logger('date-range');
 
 @Component({
@@ -16,24 +18,15 @@ const log = new Logger('date-range');
  * events.
  */
 export class DateRangeSliderComponent implements OnInit, OnDestroy {
-  public get timeKeyedData(): any {
-    return this._timeKeyedData;
-  }
-
-  @Input()
-  public set timeKeyedData(value: any) {
-    log.debug("Received new time-keyed data")
-    this._timeKeyedData = value;
-    this.refresh.emit();
-  }
 
 
-  @Output() public onEnd= new EventEmitter<any>()
+  @Output() public onEnd = new EventEmitter<any>()
 
   /**
    * Time series data, keyed by one minute interval.
    */
-  private _timeKeyedData: any;
+  public timeKeyedData: any;
+  private cache: any = {};
 
   /**
    * These are the options for *this* component, not the ng5-slider.
@@ -62,14 +55,15 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
    * @param value the offset in minutes (a negative number)
    */
   public set upperValue(value: number) {
-    log.debug("Upper value changed to "+value);
+    log.debug("Upper value changed to " + value);
     if (typeof value === "undefined") {
       log.debug("Undefined upper value");
     }
     this._upperValue = value;
-    if (typeof this._timeKeyedData !== "undefined") {
+    if (typeof this.timeKeyedData !== "undefined") {
       log.debug(value);
-      this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));    }
+      this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
+    }
   }
 
   public get lowerValue(): number {
@@ -82,13 +76,13 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
    * @param value the offset in minutes (a negative number)
    */
   public set lowerValue(value: number) {
-    log.debug("Lower value changed to "+value);
+    log.debug("Lower value changed to " + value);
 
     if (typeof value === "undefined") {
       log.debug("Undefined lower value");
     }
     this._lowerValue = value;
-    if (typeof this._timeKeyedData !== "undefined") {
+    if (typeof this.timeKeyedData !== "undefined") {
       log.debug(value);
       this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
     }
@@ -105,7 +99,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
   private _upperValue: number = 0;
 
   /** Used to trigger manual refresh of the labels */
-  public   refresh: EventEmitter<void> = new EventEmitter<void>();
+  public refresh: EventEmitter<void> = new EventEmitter<void>();
 
   /**
    * These are the options for the ng5-slider
@@ -118,17 +112,17 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     step:         60,
     showTicks:    false,
     ticksTooltip: (value: number): string => {
-      return this._timeKeyedData[-value] ? this.cleanDate(this._timeKeyedData[-value], 0,"") : ""
+      return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0, "") : ""
     },
     translate:    (value: number, label: LabelType): string => {
-      if (typeof this._timeKeyedData !== "undefined" && typeof this._timeKeyedData[-value] !== "undefined") {
+      if (typeof this.timeKeyedData !== "undefined" && typeof this.timeKeyedData[-value] !== "undefined") {
         switch (label) {
           case LabelType.Low:
-            return this._timeKeyedData[-value] ? this.cleanDate(this._timeKeyedData[-value], 0,"min") : "";
+            return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0, "min") : "";
           case LabelType.High:
-            return this._timeKeyedData[-value] ? this.cleanDate(this._timeKeyedData[-value], 1,"max") : "";
+            return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 1, "max") : "";
           default:
-            return this._timeKeyedData[-value] ? this.cleanDate(this._timeKeyedData[-value], 0,"") : "";
+            return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0, "") : "";
         }
       } else {
         return "";
@@ -142,28 +136,43 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
    */
   private _options: DateRangeSliderOptions;
 
-  constructor() {
+  constructor(private _data: MapDataService) {
 
   }
 
-  ngOnInit() {
+  private timeKeySub: Subscription;
 
+  ngOnInit() {
+    this.timeKeySub = this._data.timeKeyUpdate.subscribe(i => {
+      log.debug("Received new time-keyed data")
+      this.timeKeyedData = i;
+      this.refresh.emit();
+    });
   }
 
   ngOnDestroy() {
+    this.timeKeySub.unsubscribe();
   }
 
 
-  cleanDate(tstring, add,label): string {
-    const date = new Date(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
-                          tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0);
-    const ye = new Intl.DateTimeFormat('en', {year: '2-digit'}).format(date);
-    const mo = new Intl.DateTimeFormat('en', {month: 'short'}).format(date);
-    const da = new Intl.DateTimeFormat('en', {day: '2-digit'}).format(date);
-    const hr = new Intl.DateTimeFormat('en', {hour: '2-digit', hour12:true}).format(date);
+  cleanDate(tstring, add, label): string {
+    const key = ":clean-date:" + tstring + ":" + add + ":" + label;
+    const cachedItem = this.cache[key];
+    if (cachedItem != null) {
+      return cachedItem;
+    } else {
+      const date = new Date(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
+                            tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0);
+      const ye = new Intl.DateTimeFormat('en', {year: '2-digit'}).format(date);
+      const mo = new Intl.DateTimeFormat('en', {month: 'short'}).format(date);
+      const da = new Intl.DateTimeFormat('en', {day: '2-digit'}).format(date);
+      const hr = new Intl.DateTimeFormat('en', {hour: '2-digit', hour12: true}).format(date);
 
-    return `<span class="slider-date-time slider-date-time-${label}"><span class='slider-time'>${hr}</span> <span class='slider-date'>${da}-${mo}-${ye}</span></span>`;
-    //var date = new Date( tstring.substring(0,4), tstring.substring(4,6)-1, tstring.substring(6,8), +tstring.substring(8,10)+add, 0, 0, 0);
+      const text = `<span class="slider-date-time slider-date-time-${label}"><span class='slider-time'>${hr}</span> <span class='slider-date'>${da}-${mo}-${ye}</span></span>`;
+      //var date = new Date( tstring.substring(0,4), tstring.substring(4,6)-1, tstring.substring(6,8), +tstring.substring(8,10)+add, 0, 0, 0);
+      this.cache[key] = text;
+      return text;
+    }
 
   }
 

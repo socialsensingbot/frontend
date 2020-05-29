@@ -22,7 +22,8 @@ export class AuthGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     return Auth.currentAuthenticatedUser().then(() => { return true; })
-               .catch(() => {
+               .catch((e) => {
+                 log.debug(e);
                  log.debug("Routing with preserved params ");
                  // The following is a fix for this really infuriating issue in Angular
                  // https://github.com/angular/angular/issues/12664

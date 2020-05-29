@@ -1,111 +1,221 @@
 # this is an auto generated file. This will be overwritten
-subscription OnCreateUserProfile($name: String!) {
-  onCreateUserProfile(name: $name) {
+subscription OnCreateUserPreferences($owner: String!) {
+  onCreateUserPreferences(owner: $owner) {
     id
-    name
     ignoreTweets {
-      items {
-        id
-        url
-        owner
-      }
       nextToken
     }
     ignorePeople {
-      items {
-        id
-        twitterScreenName
-        owner
-      }
       nextToken
     }
-    irrelevant {
-      items {
-        id
-        url
-        owner
-      }
-      nextToken
-    }
+    createdAt
+    updatedAt
+    owner
   }
 }
-subscription OnUpdateUserProfile($name: String!) {
-  onUpdateUserProfile(name: $name) {
+subscription OnUpdateUserPreferences($owner: String!) {
+  onUpdateUserPreferences(owner: $owner) {
     id
-    name
     ignoreTweets {
-      items {
-        id
-        url
-        owner
-      }
       nextToken
     }
     ignorePeople {
-      items {
-        id
-        twitterScreenName
-        owner
-      }
       nextToken
     }
-    irrelevant {
-      items {
-        id
-        url
-        owner
-      }
-      nextToken
-    }
+    createdAt
+    updatedAt
+    owner
   }
 }
-subscription OnDeleteUserProfile($name: String!) {
-  onDeleteUserProfile(name: $name) {
+subscription OnDeleteUserPreferences($owner: String!) {
+  onDeleteUserPreferences(owner: $owner) {
     id
-    name
     ignoreTweets {
-      items {
-        id
-        url
-        owner
-      }
       nextToken
     }
     ignorePeople {
-      items {
-        id
-        twitterScreenName
-        owner
-      }
       nextToken
     }
-    irrelevant {
-      items {
-        id
-        url
-        owner
-      }
+    createdAt
+    updatedAt
+    owner
+  }
+}
+subscription OnCreateUserSession($owner: String!) {
+  onCreateUserSession(owner: $owner) {
+    id
+    fingerprint
+    client
+    open
+    createdAt
+    updatedAt
+    owner
+  }
+}
+subscription OnUpdateUserSession($owner: String!) {
+  onUpdateUserSession(owner: $owner) {
+    id
+    fingerprint
+    client
+    open
+    createdAt
+    updatedAt
+    owner
+  }
+}
+subscription OnDeleteUserSession($owner: String!) {
+  onDeleteUserSession(owner: $owner) {
+    id
+    fingerprint
+    client
+    open
+    createdAt
+    updatedAt
+    owner
+  }
+}
+subscription OnCreateGroupPreferences {
+  onCreateGroupPreferences {
+    id
+    ignoreTweets {
       nextToken
     }
+    ignorePeople {
+      nextToken
+    }
+    group
+    createdAt
+    updatedAt
+  }
+}
+subscription OnUpdateGroupPreferences {
+  onUpdateGroupPreferences {
+    id
+    ignoreTweets {
+      nextToken
+    }
+    ignorePeople {
+      nextToken
+    }
+    group
+    createdAt
+    updatedAt
+  }
+}
+subscription OnDeleteGroupPreferences {
+  onDeleteGroupPreferences {
+    id
+    ignoreTweets {
+      nextToken
+    }
+    ignorePeople {
+      nextToken
+    }
+    group
+    createdAt
+    updatedAt
+  }
+}
+subscription OnCreateGroupTweetIgnore {
+  onCreateGroupTweetIgnore {
+    id
+    url
+    tweetId
+    group {
+      id
+      group
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}
+subscription OnUpdateGroupTweetIgnore {
+  onUpdateGroupTweetIgnore {
+    id
+    url
+    tweetId
+    group {
+      id
+      group
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}
+subscription OnDeleteGroupTweetIgnore {
+  onDeleteGroupTweetIgnore {
+    id
+    url
+    tweetId
+    group {
+      id
+      group
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}
+subscription OnCreateGroupTwitterUserIgnore {
+  onCreateGroupTwitterUserIgnore {
+    id
+    twitterScreenName
+    group {
+      id
+      group
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}
+subscription OnUpdateGroupTwitterUserIgnore {
+  onUpdateGroupTwitterUserIgnore {
+    id
+    twitterScreenName
+    group {
+      id
+      group
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}
+subscription OnDeleteGroupTwitterUserIgnore {
+  onDeleteGroupTwitterUserIgnore {
+    id
+    twitterScreenName
+    group {
+      id
+      group
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
   }
 }
 subscription OnCreateTweetIgnore($owner: String!) {
   onCreateTweetIgnore(owner: $owner) {
     id
     url
+    tweetId
     user {
       id
-      name
-      ignoreTweets {
-        nextToken
-      }
-      ignorePeople {
-        nextToken
-      }
-      irrelevant {
-        nextToken
-      }
+      createdAt
+      updatedAt
+      owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -113,19 +223,15 @@ subscription OnUpdateTweetIgnore($owner: String!) {
   onUpdateTweetIgnore(owner: $owner) {
     id
     url
+    tweetId
     user {
       id
-      name
-      ignoreTweets {
-        nextToken
-      }
-      ignorePeople {
-        nextToken
-      }
-      irrelevant {
-        nextToken
-      }
+      createdAt
+      updatedAt
+      owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -133,79 +239,15 @@ subscription OnDeleteTweetIgnore($owner: String!) {
   onDeleteTweetIgnore(owner: $owner) {
     id
     url
+    tweetId
     user {
       id
-      name
-      ignoreTweets {
-        nextToken
-      }
-      ignorePeople {
-        nextToken
-      }
-      irrelevant {
-        nextToken
-      }
+      createdAt
+      updatedAt
+      owner
     }
-    owner
-  }
-}
-subscription OnCreateTweetIrrelevant($owner: String!) {
-  onCreateTweetIrrelevant(owner: $owner) {
-    id
-    url
-    user {
-      id
-      name
-      ignoreTweets {
-        nextToken
-      }
-      ignorePeople {
-        nextToken
-      }
-      irrelevant {
-        nextToken
-      }
-    }
-    owner
-  }
-}
-subscription OnUpdateTweetIrrelevant($owner: String!) {
-  onUpdateTweetIrrelevant(owner: $owner) {
-    id
-    url
-    user {
-      id
-      name
-      ignoreTweets {
-        nextToken
-      }
-      ignorePeople {
-        nextToken
-      }
-      irrelevant {
-        nextToken
-      }
-    }
-    owner
-  }
-}
-subscription OnDeleteTweetIrrelevant($owner: String!) {
-  onDeleteTweetIrrelevant(owner: $owner) {
-    id
-    url
-    user {
-      id
-      name
-      ignoreTweets {
-        nextToken
-      }
-      ignorePeople {
-        nextToken
-      }
-      irrelevant {
-        nextToken
-      }
-    }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -215,17 +257,12 @@ subscription OnCreateTwitterUserIgnore($owner: String!) {
     twitterScreenName
     user {
       id
-      name
-      ignoreTweets {
-        nextToken
-      }
-      ignorePeople {
-        nextToken
-      }
-      irrelevant {
-        nextToken
-      }
+      createdAt
+      updatedAt
+      owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -235,17 +272,12 @@ subscription OnUpdateTwitterUserIgnore($owner: String!) {
     twitterScreenName
     user {
       id
-      name
-      ignoreTweets {
-        nextToken
-      }
-      ignorePeople {
-        nextToken
-      }
-      irrelevant {
-        nextToken
-      }
+      createdAt
+      updatedAt
+      owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }
@@ -255,17 +287,12 @@ subscription OnDeleteTwitterUserIgnore($owner: String!) {
     twitterScreenName
     user {
       id
-      name
-      ignoreTweets {
-        nextToken
-      }
-      ignorePeople {
-        nextToken
-      }
-      irrelevant {
-        nextToken
-      }
+      createdAt
+      updatedAt
+      owner
     }
+    createdAt
+    updatedAt
     owner
   }
 }

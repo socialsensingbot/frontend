@@ -1,0 +1,260 @@
+$tweetWidth: 540px;
+$tweetMargin: 8px;
+.tweets-outer {
+  display: block;
+  height: 100%;
+  max-height: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  font-size: 16px;
+  width: 568px;
+  max-width: 564px;
+  min-width: $tweetWidth + 16px;
+  margin: 0;
+  padding: 0;
+
+  .tinfo {
+    margin: 4px;
+    height: 100%;
+
+    h4 {
+      margin: 12px;
+      color: #777;
+    }
+  }
+
+
+  .tinfo_h4b {
+    margin: 5px 0 5px 0;
+    color: #000;
+  }
+
+  .tinfo_table_wrapper {
+    //width: 100%;
+    //height: 100%;
+    //max-height: 100%;
+    //min-height: 100%;
+    //overflow: auto;
+  }
+
+  .tinfo td, .tinfo th {
+    margin: 8px;
+  }
+
+
+  .tinfo tr:hover {
+    background-color: #ddd;
+  }
+
+  .tinfo th {
+    border: 1px solid #ddd;
+    padding: 0;
+    text-align: left;
+    margin: 0;
+    color: #777;
+  }
+
+  .tinfo-spinner {
+    margin: 2em auto;
+    margin-top: 24px;
+    opacity: 0.4;
+  }
+
+  .app-twitter-table {
+    display: block;
+    height: 100%;
+
+    .table_info {
+      display: block;
+      height: 100%;
+
+      .date-separator {
+        opacity: 0.4;
+        margin-top: 1em;
+        margin-bottom: 1em;
+      }
+
+      .scroll-spinner-outer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: $tweetWidth;
+        text-align: center;
+        max-width: $tweetWidth;
+
+        span {
+          opacity: 0.3;
+        }
+
+        .scroll-spinner {
+          height: 24px;
+          width: 24px;
+          margin: 0 auto;
+
+        }
+      }
+
+      .tweet-page {
+        display: flex;
+        align-items: stretch;
+        flex-direction: column;
+        height: 100%;
+
+      }
+
+      .app-twitter-row {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        //border: 1px solid blue;
+        position: relative;
+        max-width: 500px + $tweetMargin * 2;
+        min-width: 500px + $tweetMargin * 2;
+
+
+        //max-height: 0;
+
+        .app-twitter-item-menu {
+          position: absolute;
+          right: -32px;
+          top: 0px;
+          z-index: 10;
+          opacity: 0.0;
+          transition: opacity 2s ease-in-out 2s;
+          //border: 1px solid red;
+        }
+
+        .app-twitter-tweet {
+          //display: flex;
+          //flex-direction: column;
+          //border: 1px solid green;
+          width: 100%;
+          min-height: 32px;
+
+          ::ng-deep {
+
+            blockquote {
+              opacity: 0.0;
+              transition: opacity 0.8s ease-in-out;
+            }
+
+            .tweet-text blockquote {
+              display: none;
+              margin: 12px;
+              font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
+              background-color: rgba(0, 0, 0, 0);
+              list-style: none;
+              line-height: 1.3125;
+              min-width: 0px;
+              overflow-wrap: break-word;
+
+              ::ng-deep {
+                a {
+                  text-decoration: none;
+                  cursor: pointer;
+                  color: rgb(27, 149, 224);
+                }
+              }
+            }
+
+
+            blockquote.tweet-rendered {
+              opacity: 1.0;
+              margin: 0px;
+              display: block;
+            }
+
+          }
+
+        }
+
+
+      }
+    }
+
+  }
+
+  .tweet-placeholder {
+    opacity: 1.0;
+    margin: 16px;
+    display: block;
+    max-width: 540px;
+    width: 100%;
+  }
+
+  .tweets-header {
+    //position: rel;
+    z-index: 10;
+    top: 84px;
+    margin-right: 14px;
+    margin-left: 14px;
+    margin-bottom: 0;
+    //background: white;
+
+    .tweets-heading {
+      font-size: 1.2em;
+      margin-top: 1.2em;
+      margin-right: 0em;
+      margin-left: 0;
+      margin-bottom: 0em;
+      line-height: 1.5em;
+    }
+
+  }
+
+  .twitter-card-surround {
+    margin: $tweetMargin;
+    width: 100%;
+
+    mat-spinner {
+      display: block;
+      margin: 10px auto;
+      opacity: 0.2;
+    }
+  }
+
+  .twitter-card {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    box-sizing: border-box;
+    display: block;
+    margin: $tweetMargin;
+    min-height: 48px;
+    padding: 0px;
+    position: relative;
+    z-index: 0;
+    border-image: initial;
+    border-radius: 14px;
+    border: 1px solid rgb(204, 214, 221);
+    overflow-x: hidden;
+    overflow-y: hidden;
+    max-width: 500px;
+    width: 100%;
+
+
+  }
+
+  .EmbeddedTweet-tweet {
+    margin: 0;
+    padding: 0;
+  }
+
+  .hidden-tweet-container {
+    position: relative;
+    max-width: 500px + 32px;
+    background-color: #eee;
+    margin: 8px;
+
+    .app-twitter-row {
+      max-width: $tweetWidth;
+      left: -16px;
+
+      .app-twitter-item-menu {
+        right: -16px !important;
+        top: -8px !important;
+        //border: 1px solid red;
+      }
+    }
+  }
+}
+

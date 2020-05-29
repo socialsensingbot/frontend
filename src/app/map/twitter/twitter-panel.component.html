@@ -1,0 +1,133 @@
+<div class="tweets-outer" infinite-scroll
+     [infiniteScrollDistance]="scrollDistance"
+     [infiniteScrollUpDistance]="scrollUpDistance"
+     [infiniteScrollThrottle]="throttle"
+     alwaysCallback="true"
+     [scrollWindow]="false"
+     (scrolled)="onScrollDown($event)"
+     (scrolledUp)="onUp($event)">
+
+  <ng-container *ngIf="ready">
+    <div class="tweets-header" *ngIf="tweets.length > 0">
+      <mat-card class="tweets-heading"><span style="color: black"><b>Showing {{visibleCount}} of {{tweetCount}}
+        Tweets from {{region}}</b><br/></span>
+        <help page="help-and-support#exceedance"
+              tooltip="Exceedance probability is calculated by comparing the current level of tweet activity with historical tweet activity.">
+          Exceedance probability
+        </help>
+        {{exceedanceProbability}}%
+      </mat-card>
+    </div>
+    <div class="tweets-header" *ngIf="tweets.length === 0">
+      <mat-card *ngIf="region" class="tweets-heading"><span
+        style="color: black"><b>No Tweets from {{region}}</b><br/></span>
+      </mat-card>
+      <mat-card *ngIf="!region" class="tweets-heading"><span style="color: black"><b>Loading ...</b><br/></span>
+      </mat-card>
+    </div>
+  </ng-container>
+  <div *ngIf="!ready">
+    <div>
+      <mat-spinner class="tinfo-spinner"></mat-spinner>
+    </div>
+  </div>
+  <div id="tinfo" class="tinfo">
+
+
+    <ng-template #tweetEntry let-tweet="tweet" let-si="senderIgnore" let-ti="tweetIgnore">
+      <mat-menu #appMenu="matMenu">
+        <button *ngIf="!si" (click)="ignoreSender(tweet,$event);" mat-menu-item>Ignore
+          @{{sender(tweet)}}</button>
+        <button *ngIf="si" (click)="unIgnoreSender(tweet,$event);" mat-menu-item>Unignore
+          @{{sender(tweet)}}</button>
+        <button *ngIf="!ti" (click)="ignoreTweet(tweet,$event);" mat-menu-item>Ignore Tweet
+        </button>
+        <button *ngIf="ti" (click)="unIgnoreTweet(tweet,$event);" mat-menu-item>Unignore Tweet
+        </button>
+        <!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
+
+      </mat-menu>
+      <div class="app-twitter-tweet app-twitter-row-active">
+        <div class="tweet-text" [innerHtml]="tweet.html"></div>
+      </div>
+      <div class="app-twitter-item-menu">
+        <button mat-icon-button [matMenuTriggerData]="{tweet:tweet,si:si,ti:ti}" [matMenuTriggerFor]="appMenu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+      </div>
+    </ng-template>
+    <!--      <button id="tinfo_button" class="tinfo_button">-</button>-->
+    <div id="tinfo_table_wrapper" class="tinfo_table_wrapper">
+
+      <div id="tinfo_table" class="app-twitter-table" *ngIf="showTimeline">
+        <div class="table_info">
+
+          <div #tinfoEmbeds [style.visibility]="ready ? 'visible' : 'hidden'"
+          >
+            <mat-expansion-panel class="tc-expansion-panel hidden-tweet-container "
+                                 *ngIf="tweets.length - visibleCount != 0">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{tweets.length - visibleCount}} Hidden
+                </mat-panel-title>
+
+              </mat-expansion-panel-header>
+              <div class="app-twitter-row"
+                   *ngFor="let tweet of tweets; let i = index">
+
+                <div *ngIf="hidden[i] === true && !isPlaceholder(tweet)" class="atr-hidden atr-{{i}}">
+                  <!--                  <div class="tweet-loading-placeholder" [innerHtml]="tweet.html"></div>-->
+                  <ng-container
+                    *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
+                </div>
+                <mat-card class="twitter-card" *ngIf="hidden[i] === true && isPlaceholder(tweet)">
+                  <div class="tweet-placeholder app-twitter-row-active">
+                    <span class="tweet-no-longer-available">Tweet no longer available</span>
+                  </div>
+                </mat-card>
+              </div>
+            </mat-expansion-panel>
+
+          </div>
+          <div class="tweet-page tweet-page-{{p}}" *ngFor="let page of pages; let p= index">
+            <span style="display:none">This Page {{p}} ({{page.start}}) has {{page.tweets.length}} tweets.</span>
+            <div class="scroll-spinner-outer" *ngIf="p == 0 && p < minPage">
+              <mat-spinner diameter="24" class="scroll-spinner"></mat-spinner>
+            </div>
+            <div class="app-twitter-row atr-visible atr-{{i+ page.start}}"
+                 *ngFor="let tweet of page.tweets; let i = index">
+              <div class="date-separator" *ngIf="isNewDate(i + page.start)">{{tweet.date | date:"mediumDate"}}</div>
+              <ng-container *ngIf="page.page <= maxPage">
+                <div class="twitter-card-surround" *ngIf="hidden[i + page.start] === false && !isPlaceholder(tweet)">
+                  <mat-spinner diameter="24" class="tweet-load-spinner"></mat-spinner>
+                  <ng-container>
+                    <ng-container
+                      *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i + page.start,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
+                  </ng-container>
+                </div>
+                <div class="twitter-card" *ngIf="isPlaceholder(tweet)">
+                  <div class="tweet-placeholder app-twitter-row-active">
+                    <span class="tweet-no-longer-available">Tweet no longer available</span>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+            <ng-container *ngIf="p == pages.length -1">
+              <div class="scroll-spinner-outer" *ngIf="p > maxPage">
+                <mat-spinner diameter="24" class="scroll-spinner"></mat-spinner>
+              </div>
+              <div class="scroll-spinner-outer" *ngIf="p == maxPage">
+                <span> ~ </span>
+              </div>
+            </ng-container>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+

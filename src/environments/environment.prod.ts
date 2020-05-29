@@ -1,9 +1,9 @@
 export const environment = {
   production: true,
-  version: "1.0.2",
-  hmr: false,
-  confirm: {
-    email: '',
+  version:    "1.1",
+  hmr:        false,
+  confirm:    {
+    email:    '',
     password: ''
   }
 };
