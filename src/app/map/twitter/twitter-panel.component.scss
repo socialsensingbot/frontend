@@ -117,8 +117,6 @@ $tweetMargin: 8px;
         flex-direction: row;
         flex-wrap: nowrap;
         align-items: center;
-        height: 100%;
-        min-height: 32px;
         //border: 1px solid blue;
         position: relative;
         max-width: 500px + $tweetMargin * 2;
@@ -142,7 +140,7 @@ $tweetMargin: 8px;
           //flex-direction: column;
           //border: 1px solid green;
           width: 100%;
-
+          min-height: 32px;
 
           ::ng-deep {
 

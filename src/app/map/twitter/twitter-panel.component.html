@@ -47,7 +47,7 @@
         <!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
 
       </mat-menu>
-      <div class="app-twitter-tweet">
+      <div class="app-twitter-tweet app-twitter-row-active">
         <div class="tweet-text" [innerHtml]="tweet.html"></div>
       </div>
       <div class="app-twitter-item-menu">
@@ -81,7 +81,7 @@
                     *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
                 </div>
                 <mat-card class="twitter-card" *ngIf="hidden[i] === true && isPlaceholder(tweet)">
-                  <div class="tweet-placeholder">
+                  <div class="tweet-placeholder app-twitter-row-active">
                     <span class="tweet-no-longer-available">Tweet no longer available</span>
                   </div>
                 </mat-card>
@@ -106,7 +106,7 @@
                   </ng-container>
                 </div>
                 <div class="twitter-card" *ngIf="isPlaceholder(tweet)">
-                  <div class="tweet-placeholder">
+                  <div class="tweet-placeholder app-twitter-row-active">
                     <span class="tweet-no-longer-available">Tweet no longer available</span>
                   </div>
                 </div>

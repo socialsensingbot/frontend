@@ -42,28 +42,28 @@ function twitterInit() {
 
         window.setTimeout(() => {
           const parent = $(event.target).parent();
-          const atr = parent.parents(".app-twitter-row");
-          if (parent.find("blockquote.twitter-tweet-error").length > 0) {
-            parent.parent().find(".app-twitter-item-menu").hide();
+          const atr = $(event.target).parents(".app-twitter-row");
+          const blockquote = atr.find("blockquote");
+          if (atr.find("blockquote.twitter-tweet-error").length > 0) {
+            const error = atr.find("blockquote.twitter-tweet-error");
+            error.find(".app-twitter-item-menu").hide();
 
 
-            atr.css("opacity", 1.0)
-               .css("min-width", "516px")
-               .css("text-align", "center");
+            error.css("opacity", 1.0)
+                 .css("min-width", "516px")
+                 .css("text-align", "center");
 
 
-            atr.find("blockquote").text("Tweet no longer available");
+            error.text("Tweet no longer available");
           } else {
-            atr.find("blockquote").addClass("tweet-rendered");
+            blockquote.addClass("tweet-rendered");
           }
-          if (atr.length > 0) {
-            atr.find("mat-spinner").hide();
-            atr.find(".app-twitter-item-menu").css("opacity", 1.0);
-          }
-          atr.find(".tweet-loading-placeholder").remove();
           try {
-            const atr = $(event.target).parents(".app-twitter-row");
-            atr.css("max-height", "100%");
+            if (atr.length > 0) {
+              atr.find("mat-spinner").hide();
+              atr.find(".app-twitter-item-menu").css("opacity", 1.0);
+              atr.find(".tweet-loading-placeholder").remove();
+            }
           } catch (e) {
             log.debug(e);
           }
