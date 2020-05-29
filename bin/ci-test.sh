@@ -5,15 +5,15 @@ tests="cypress/integration/quick/**"
 
 if [[ "${AWS_BRANCH}" == feature* ]]; then
   tests="cypress/integration/quick/**"
-  browsers="chrome"
+  browsers="electron"
 fi
 if [[ "${AWS_BRANCH}" == release* ]]; then
   tests="cypress/integration/**"
-  browsers="chrome"
+  browsers="electron"
 fi
-if [[ "${AWS_BRANCH}" == develop ]]; then
+if [[ "${AWS_BRANCH}" == "" ]]; then
   tests="cypress/integration/**"
-  browsers="chrome"
+  browsers="edge firefox chrome"
 fi
 if [[ "${AWS_BRANCH}" == staging ]]; then
   echo "Tests must not be run on STAGING"
