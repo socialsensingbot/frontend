@@ -5,12 +5,15 @@ tests="cypress/integration/quick/**"
 
 if [[ "${AWS_BRANCH}" == feature* ]]; then
   tests="cypress/integration/quick/**"
+  browsers="chrome"
 fi
 if [[ "${AWS_BRANCH}" == release* ]]; then
   tests="cypress/integration/**"
+  browsers="chrome"
 fi
 if [[ "${AWS_BRANCH}" == develop ]]; then
   tests="cypress/integration/**"
+  browsers="chrome"
 fi
 if [[ "${AWS_BRANCH}" == staging ]]; then
   echo "Tests must not be run on STAGING"
@@ -22,8 +25,10 @@ if [[ "${AWS_BRANCH}" == master ]]; then
 fi
 
 function test() {
-  npx cypress run -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-chrome,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" --spec "${tests}"
-  #npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser firefox --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-firefox,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"
+  for browser in "$@"; do
+    npx cypress run -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --reporter mochawesome --reporter-options --browser ${browser} "reportDir=cypress/report/mochawesome-report-${browser},overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" --spec "${tests}"
+    #npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser firefox --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-firefox,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"
+  done
 }
 
-test
+test $browsers

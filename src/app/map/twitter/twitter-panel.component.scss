@@ -1,10 +1,7 @@
 $tweetWidth: 540px;
 $tweetMargin: 8px;
 .tweets-outer {
-  display: flex;
-  align-items: stretch;
-  flex-direction: column;
-  justify-content: center;
+  display: block;
   height: 100%;
   max-height: 100%;
   min-height: 100%;
@@ -19,8 +16,6 @@ $tweetMargin: 8px;
 
   .tinfo {
     margin: 4px;
-    display: flex;
-    align-items: stretch;
     height: 100%;
 
     h4 {
@@ -67,16 +62,11 @@ $tweetMargin: 8px;
   }
 
   .app-twitter-table {
-    display: flex;
-    align-items: stretch;
-    min-height: 100%;
+    display: block;
     height: 100%;
 
     .table_info {
-      display: flex;
-      align-items: stretch;
-      flex-direction: column;
-      min-height: 100%;
+      display: block;
       height: 100%;
 
       .date-separator {
@@ -109,7 +99,7 @@ $tweetMargin: 8px;
         display: flex;
         align-items: stretch;
         flex-direction: column;
-
+        height: 100%;
 
       }
 
@@ -196,7 +186,7 @@ $tweetMargin: 8px;
   .tweets-header {
     //position: rel;
     z-index: 10;
-    margin-top: 84px;
+    top: 84px;
     margin-right: 14px;
     margin-left: 14px;
     margin-bottom: 0;
