@@ -153,7 +153,7 @@ export class PreferenceService {
 
   public isTweetIgnored(tweet: Tweet) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to ignore tweet on an unparseable tweet.");
+      this._notify.error("Shouldn't be trying to check tweet ignored on an unparseable tweet.");
       return;
     }
     return this._tweetBlackList.includes(tweet.id);
