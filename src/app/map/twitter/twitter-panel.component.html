@@ -2,7 +2,7 @@
 
   <ng-container *ngIf="ready">
     <div class="tweets-header" *ngIf="tweets.length > 0">
-      <span style="color: black">{{region}}:</span>
+      <span class="tweets-heading" style="color: black">{{region}}:</span>
       <help page="help-and-support#exceedance"
             tooltip="Exceedance probability is calculated by comparing the current level of tweet activity with historical tweet activity.">
         Exceedance probability
@@ -10,11 +10,11 @@
       {{exceedanceProbability}}%
     </div>
     <div class="tweets-header" *ngIf="tweets.length === 0">
-      <mat-card *ngIf="region" class="tweets-heading"><span
-        style="color: black"><b>No Tweets from {{region}}</b><br/></span>
-      </mat-card>
-      <mat-card *ngIf="!region" class="tweets-heading"><span style="color: black"><b>Loading ...</b><br/></span>
-      </mat-card>
+      <span *ngIf="region" class="tweets-heading"
+            style="color: black">No Tweets from {{region}}<br/></span>
+
+      <span *ngIf="!region" class="tweets-heading" style="color: black">Loading ...<br/></span>
+
     </div>
   </ng-container>
   <div *ngIf="!ready">

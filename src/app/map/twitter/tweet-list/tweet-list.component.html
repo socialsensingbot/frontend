@@ -37,7 +37,7 @@
     <div class="scroll-spinner-outer" *ngIf="p == 0 && p < minPage">
       <mat-spinner diameter="24" class="scroll-spinner"></mat-spinner>
     </div>
-    <div class="app-twitter-row atr-{{group}} atr-{{i+ page.start}}"
+    <div class="app-twitter-row atr-{{group}} atr-{{i+ page.start}} app-twitter-id-{{tweet.id}}"
          *ngFor="let tweet of page.tweets; let i = index">
       <div class="date-separator" *ngIf="isNewDate(i + page.start)">{{tweet.date | date:"mediumDate"}}</div>
       <ng-container *ngIf="page.page <= maxPage">

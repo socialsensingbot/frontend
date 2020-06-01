@@ -1,3 +1,5 @@
+const twitterIdClass = ".app-twitter-id-1051568984070479874";
+
 describe('Hidden Tweets Reappear : https://github.com/socialsensingbot/frontend/issues/87 : ', function () {
   before(() => {
   })
@@ -12,48 +14,43 @@ describe('Hidden Tweets Reappear : https://github.com/socialsensingbot/frontend/
       cy.visit(url);
       cy.login();
       cy.visitAndWait(url);
-      const tweetHidden = ".atr-0.atr-hidden";
-      const tweetVisible = ".atr-0.atr-visible";
+      const tweetHidden = twitterIdClass + ".atr-0.atr-hidden";
+      const tweetVisible = twitterIdClass + ".atr-0.atr-visible";
       cy.get(".tweet-drawer", {timeout: 30000}).should("be.visible");
-      cy.get(".atr-0", {timeout: 30000}).then(panel => {
+      cy.get(".table_info", {timeout: 30000}).then(panel => {
         let expectHiddenAfterRefresh;
-        if (panel.hasClass("atr-hidden")) {
-          cy.get(".hidden-tweet-container mat-panel-title", {timeout: 30000}).should('be.visible');
-          cy.get(".hidden-tweet-container mat-panel-title",
-                 {timeout: 30000}).scrollIntoView().should('be.visible').click({force: true});
-          cy.get(tweetHidden + " mat-icon", {timeout: 60000}).should("be.visible").click({force: true});
-          cy.get(menu2ndOpt).click();
-          cy.wait(1000);
-          cy.get(".hidden-tweet-container mat-panel-title",
-                 {timeout: 30000}).scrollIntoView().should('be.visible').click({force: true});
-          cy.get(tweetVisible + " mat-icon", {timeout: 30000}).click({force: true});
-          cy.get(menu2ndOpt).contains("Ignore Tweet");
-          expectHiddenAfterRefresh = false;
-
-        } else {
+        if (panel.find(twitterIdClass).length > 0) {
           cy.get(tweetVisible, {timeout: 60000});
           cy.get(tweetVisible, {timeout: 60000}).should('be.visible');
-          cy.get(tweetVisible + " .twitter-tweet", {timeout: 60000});
-          cy.get(tweetVisible + " .twitter-tweet", {timeout: 60000}).should('be.visible');
-          cy.get(tweetVisible + " mat-icon", {timeout: 60000}).should("be.visible").click({force: true});
+          cy.get(tweetVisible + " .app-twitter-tweet", {timeout: 60000});
+          cy.get(tweetVisible + " .app-twitter-tweet", {timeout: 60000}).should('be.visible');
+          cy.get(tweetVisible + " .mat-icon", {timeout: 60000}).click({force: true});
           cy.get(menu2ndOpt).click();
-          cy.get(".hidden-tweet-container mat-panel-title",
-                 {timeout: 30000}).scrollIntoView().should('be.visible').click({force: true});
-          cy.wait(1000);
+          cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000}).click();
+          cy.wait(4000);
           cy.get(tweetHidden, {timeout: 60000});
-          cy.get(tweetHidden + " .twitter-tweet", {timeout: 60000});
-          cy.get(tweetHidden + " mat-icon", {timeout: 30000}).click({force: true});
+          cy.get(tweetHidden + " .app-twitter-tweet", {timeout: 60000});
+          cy.get(tweetHidden + " .mat-icon", {timeout: 30000}).click({force: true});
           cy.get(menu2ndOpt).contains("Unignore Tweet");
           expectHiddenAfterRefresh = true;
+        } else {
+          cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000}).click({force: true});
+          cy.get(tweetHidden + " .mat-icon", {timeout: 60000}).click({force: true});
+          cy.get(menu2ndOpt).click();
+          cy.wait(4000);
+          cy.get(".mat-tab-label:nth-child(1)", {timeout: 30000}).click({force: true});
+          cy.get(tweetVisible + " .mat-icon", {timeout: 30000}).click({force: true});
+          cy.get(menu2ndOpt).contains("Ignore Tweet");
+          expectHiddenAfterRefresh = false;
         }
-        if(refresh) {
+        if (refresh) {
           cy.visit(url);
           cy.noSpinner();
         }
         if (expectHiddenAfterRefresh) {
           cy.get(tweetHidden, {timeout: 30000}).should('be.visible');
         } else {
-          cy.get(tweetVisible + ".atr-visible", {timeout: 60000});
+          cy.get(tweetVisible, {timeout: 60000});
         }
       });
     };
