@@ -29,21 +29,21 @@
     <div id="tinfo_table_wrapper" class="tinfo_table_wrapper">
 
       <div id="tinfo_table" class="app-twitter-table" *ngIf="showTimeline">
-        <div class="table_info">
+        <div class="table_info" [style.visibility]="ready ? 'visible' : 'hidden'">
 
-          <div #tinfoEmbeds [style.visibility]="ready ? 'visible' : 'hidden'"
-          >
-            <mat-tab-group>
-              <mat-tab label="{{visibleTweets.length}} Tweets">
+
+          <mat-tab-group (selectedTabChange)="update(null)">
+            <mat-tab label="{{visibleTweets.length}} Tweets">
+              <ng-template matTabContent>
                 <app-tweet-list group="visible" [tweets]="visibleTweets" (update)="update($event)"></app-tweet-list>
-              </mat-tab>
-              <mat-tab label="{{tweets.length - visibleTweets.length}} Ignored">
+              </ng-template>
+            </mat-tab>
+            <mat-tab label="{{tweets.length - visibleTweets.length}} Ignored">
+              <ng-template matTabContent>
                 <app-tweet-list group="hidden" [tweets]="hiddenTweets" (update)="update($event)"></app-tweet-list>
-              </mat-tab>
+              </ng-template>
+            </mat-tab>
             </mat-tab-group>
-
-
-          </div>
 
 
         </div>
