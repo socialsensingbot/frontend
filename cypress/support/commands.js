@@ -77,6 +77,44 @@ Cypress.Commands.add("twitterPanelVisible", () => {
 Cypress.Commands.add("twitterPanelNotVisible", () => {
   cy.get(".tweet-drawer", {timeout: LONG_TIMEOUT}).should("not.be.visible");
 });
+Cypress.Commands.add("tweetsVisible", (count) => {
+  cy.get("twitter-panel").find('.tweet-page .atr-visible .twitter-tweet', {timeout: LONG_TIMEOUT}).its('length').should(
+    'eq',
+    count);
+});
+Cypress.Commands.add("tweetCountTotal", (sum) => {
+  cy.get(".mat-tab-label:nth-child(1)").then(header => {
+    const headerParts = header.text().trim().split(" ");
+    const visibleCount = +headerParts[0];
+    cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000})
+      .then(title => {
+              const hiddenCount = +title.text().trimLeft().split(" ")[0];
+              expect(hiddenCount + visibleCount).equals(sum);
+            }
+      );
+
+  })
+});
+
+Cypress.Commands.add("tweetCount", (vis, hid) => {
+  cy.get(".mat-tab-label:nth-child(1)").then(header => {
+    const headerParts = header.text().trim().split(" ");
+    const visibleCount = +headerParts[0];
+    const totalCount = vis + hid;
+    cy.get(".tweets-outer").find('.atr-visible').its('length').should('eq', vis);
+
+    cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000}).click()
+      .then(title => {
+              const hiddenCount = +title.text().trimLeft().split(" ")[0];
+              cy.get(".tweets-outer").find('.atr-hidden').its('length').should('eq', hid);
+
+            }
+      );
+
+  })
+});
+
+
 Cypress.Commands.add("pushStateDelay", () => {
   cy.wait(500);
 });

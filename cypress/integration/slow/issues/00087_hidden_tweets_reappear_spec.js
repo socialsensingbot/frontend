@@ -1,19 +1,22 @@
 const twitterIdClass = ".app-twitter-id-1051568984070479874";
 
 describe('Hidden Tweets Reappear : https://github.com/socialsensingbot/frontend/issues/87 : ', function () {
+
   before(() => {
   })
+
   beforeEach(() => {
+    cy.visit(url);
+    cy.login();
+    cy.visitAndWait(url);
     cy.stubLiveJson("live-old");
   })
+
   describe("Hidden tweets reappearing after refresh", () => {
 
     const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
     const url = "http://localhost:4200/map?selected=carmarthenshire";
     const test = (refresh, count) => {
-      cy.visit(url);
-      cy.login();
-      cy.visitAndWait(url);
       const tweetHidden = twitterIdClass + ".atr-0.atr-hidden";
       const tweetVisible = twitterIdClass + ".atr-0.atr-visible";
       cy.get(".tweet-drawer", {timeout: 30000}).should("be.visible");
