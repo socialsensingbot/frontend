@@ -32,6 +32,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
       - [Using Fixtures and Stubbing Services] 
         - [Live.json] 
         - [GraphQL (DynamoDB access)] 
+      - [Cross-Browser Testing] 
 - [Issue Tracking] 
 
 # Getting Started
@@ -474,6 +475,11 @@ The [Cypress Retries Plugin](https://github.com/Bkucera/cypress-plugin-retries) 
 
 The retry count is overidden by the CYPRESS_RETRIES environment variable in the [Amplify Console](https://eu-west-2.console.aws.amazon.com/amplify/home?region=eu-west-2#/dtmxl3q3i7oix/settings/variables).
 
+
+### Cross-Browser Testing
+
+At present this is not automated but there is a script that runs through all the main browsers supported by cypress in ```bin/test-browsers.sh``` pass the path to the test or tests as the first argument.
+
 ##  Issue Tracking 
 
 The issues are tracked at:
@@ -527,6 +533,8 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 [The Branches]: #the-branches
 [The Process]: #the-process
 [Live.json]: #livejson
+[Cross-Browser Testing]: #cross-browser-testing
+
 
 
 
