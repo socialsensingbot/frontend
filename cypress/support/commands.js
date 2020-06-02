@@ -43,7 +43,7 @@ Cypress.Commands.add("logout", () => {
 
 Cypress.Commands.add("visitAndWait", (url) => {
   cy.visit(url);
-  cy.url({timeou: 20000}).should("equal", url);
+  cy.url({timeout: 20000}).should("equal", url);
   cy.noSpinner();
 });
 
@@ -114,6 +114,20 @@ Cypress.Commands.add("tweetCount", (vis, hid) => {
   })
 });
 
+
+Cypress.Commands.add("moveMinDateSliderLeft", (times) => {
+  for (let i = 0; i < times; i++) {
+    cy.get(".ng5-slider-pointer-min").type('{pagedown}');
+    cy.wait(1000);
+  }
+});
+
+Cypress.Commands.add("moveMinDateSliderRight", (times) => {
+  for (let i = 0; i < times; i++) {
+    cy.get(".ng5-slider-pointer-min").type('{pageup}');
+    cy.wait(1000);
+  }
+});
 
 Cypress.Commands.add("pushStateDelay", () => {
   cy.wait(500);
