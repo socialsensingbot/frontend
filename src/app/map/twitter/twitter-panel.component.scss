@@ -73,7 +73,7 @@ $tweetMargin: 8px;
   .tinfo-spinner {
     margin: 2em auto;
     margin-top: 24px;
-    opacity: 0.4;
+    opacity: 0.3;
   }
 
   .mat-tab-body {
@@ -154,3 +154,6 @@ $tweetMargin: 8px;
 
 }
 
+.app-twitter-refresh-btn {
+  opacity: 0.4;
+}

@@ -1,25 +1,15 @@
 import {
     Component,
-    ElementRef,
     Input,
     NgZone,
     OnChanges,
-    OnDestroy,
-    OnInit,
-    SimpleChanges,
-    ViewChild
+    SimpleChanges
 } from '@angular/core';
-import * as $ from "jquery";
 import {PreferenceService} from "../../pref/preference.service";
 import {Hub, Logger} from "aws-amplify";
 import {Tweet} from "./tweet";
-import {IInfiniteScrollEvent} from "ngx-infinite-scroll";
 
 const log = new Logger('twitter-panel');
-
-let twitterBound = false;
-
-
 @Component({
                selector:    'twitter-panel',
                templateUrl: './twitter-panel.component.html',
@@ -35,6 +25,7 @@ export class TwitterPanelComponent implements OnChanges {
     public visibleTweets: Tweet[] = [];
 
     public ready: boolean;
+    public tweetsReady: boolean;
     private _destroyed: boolean = false;
 
 
@@ -77,10 +68,8 @@ export class TwitterPanelComponent implements OnChanges {
         if (this._destroyed) {
             return;
         }
-
-
         this.update(null);
-        this.ready = true;
+        this.tweetsReady = true;
     }
 
 
@@ -98,8 +87,19 @@ export class TwitterPanelComponent implements OnChanges {
 
         this.visibleTweets = this._tweets.filter(i => !this.pref.isBlacklisted(i));
         this.hiddenTweets = this._tweets.filter(i => this.pref.isBlacklisted(i));
-
+        this.ready = true;
+        this.tweetsReady = true;
     }
 
 
+    public refresh() {
+        const tweets = this.tweets
+        this.tweets = [];
+        this.ready = false;
+        this.tweetsReady = false;
+        setTimeout(() => this._zone.run(() => {
+            this.tweets = tweets;
+            this.tweetsReady = true
+        }), 50);
+    }
 }
