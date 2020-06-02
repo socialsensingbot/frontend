@@ -24,12 +24,11 @@ echo
 function test() {
   for browser in "$@"; do
     echo "TESTING WITH: $browser"
-    if npx cypress run -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser ${browser} --headless --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-${browser},overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" --spec "${tests}"
-    then
-        echo "PASSED"
+    if npx cypress run -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser ${browser} --headless --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-${browser},overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" --spec "${tests}"; then
+      echo "PASSED"
     else
-        echo "FAILED: $browser"
-        exit 1
+      echo "FAILED: $browser"
+      exit 1
     fi
   done
 }
