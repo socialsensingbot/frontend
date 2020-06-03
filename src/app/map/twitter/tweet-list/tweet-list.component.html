@@ -48,9 +48,11 @@
               *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i + page.start,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
           </ng-container>
         </div>
-        <div class="twitter-card" *ngIf="isPlaceholder(tweet)">
-          <div class="tweet-placeholder app-twitter-row-active">
-            <span class="tweet-no-longer-available">Tweet no longer available</span>
+        <div class="twitter-card-surround" *ngIf="isPlaceholder(tweet)">
+          <div class="twitter-card">
+            <div class="tweet-placeholder app-twitter-row-active">
+              <span class="tweet-no-longer-available">Tweet no longer available</span>
+            </div>
           </div>
         </div>
       </ng-container>
