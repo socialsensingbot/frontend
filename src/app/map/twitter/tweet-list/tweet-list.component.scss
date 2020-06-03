@@ -17,6 +17,10 @@ $tweetMargin: 8px;
 
   }
 
+  .tweet-text {
+    height: 100%;
+  }
+
   .app-twitter-row {
     flex-direction: row;
     flex-wrap: nowrap;
@@ -55,6 +59,7 @@ $tweetMargin: 8px;
 
         .tweet-text blockquote {
           display: none;
+          opacity: 0.0;
           margin: 12px;
           font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
           background-color: rgba(0, 0, 0, 0);

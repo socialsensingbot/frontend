@@ -42,8 +42,9 @@ function twitterInit() {
 
             error.css("opacity", 1.0)
                  .css("min-width", "516px")
+                 .css("display", "block")
                  .css("text-align", "center");
-
+            error.parent().addClass("twitter-card");
 
             error.text("Tweet no longer available");
           } else {
