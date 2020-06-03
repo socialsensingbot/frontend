@@ -59,8 +59,7 @@ const testHide = (refresh, count, inc) => {
 
 };
 
-
-describe('Hidden Tweets Reappear : https://github.com/socialsensingbot/frontend/issues/87 : ', function () {
+describe('Testing #87 & #107', function () {
 
   beforeEach(() => {
     cy.stubLiveJson("live-old");
@@ -76,25 +75,38 @@ describe('Hidden Tweets Reappear : https://github.com/socialsensingbot/frontend/
   });
 
 
-  describe("Hidden tweets reappearing after refresh", () => {
+  it('Hidden Tweets Reappear : https://github.com/socialsensingbot/frontend/issues/87 : ', () => {
+    cy.get(".tweet-drawer", {timeout: 30000});
+    cy.log("Cleaning up.");
+    cy.clickTweetTab(2);
+    for (let i = 0; i < 40; i++) {
+      testUnhide(false, i, false);
+    }
+    cy.log("Cleaned up.");
+    let hideCount = 0;
+    cy.clickTweetTab(1);
+    for (let i = 0; i < 40; i++) {
+      testHide(false, hideCount, () => hideCount++);
+    }
+    checkTabCounts(2);
 
 
-    it('toggle tweets with refresh in middle', () => {
-      cy.get(".tweet-drawer", {timeout: 30000});
-      cy.log("Cleaning up.");
-      cy.clickTweetTab(2);
-      for (let i = 0; i < 40; i++) {
-        testUnhide(false, i, false);
-      }
-      cy.log("Cleaned up.");
-      let hideCount = 0;
-      cy.clickTweetTab(1);
-      for (let i = 0; i < 12; i++) {
-        testHide(false, hideCount, () => hideCount++);
-      }
-      checkTabCounts(2);
-
-
+  });
+  it('More than 30 ignores fails : https://github.com/socialsensingbot/frontend/issues/105 : ', () => {
+    cy.get(".tweet-drawer", {timeout: 30000});
+    cy.log("Cleaning up.");
+    cy.clickTweetTab(2);
+    for (let i = 0; i < 80; i++) {
+      testUnhide(false, i, false);
+    }
+    cy.log("Cleaned up.");
+    let hideCount = 0;
+    cy.clickTweetTab(1);
+    for (let i = 0; i < 40; i++) {
+      testHide(false, hideCount, () => hideCount++);
+    }
+    cy.withTweetCounts((vis1, hid1) => {
+      expect(hid1).toBeGreaterThan(30);
     });
   });
 
