@@ -1,9 +1,12 @@
 # Script to run headless cross browser tests on local machine.
 cd $(dirname $0) || exit 1
 cd .. || exit 1
-tests="$1"
-browsers="chrome:canary edge:canary firefox:dev edge firefox chrome electron "
 
+tests="$1"
+browsers="chrome:canary edge:canary edge firefox chrome electron "
+
+echo
+echo
 echo "Running against the following browsers: $browsers"
 echo
 echo "You can download any missing browsers from here:"
@@ -21,6 +24,31 @@ echo "Electron is built in to Cypress"
 echo
 echo
 
+function platform() {
+
+  case "$(uname -s)" in
+
+  Darwin)
+    echo 'macos'
+    ;;
+
+  Linux)
+    echo 'linux'
+    ;;
+
+  CYGWIN* | MINGW32* | MSYS* | MINGW*)
+    echo 'ms'
+    ;;
+
+  # Add here more strings to compare
+  # See correspondence table at the bottom of this answer
+
+  *)
+    echo 'other'
+    ;;
+  esac
+}
+
 function test() {
   for browser in "$@"; do
     echo "TESTING WITH: $browser"
@@ -28,6 +56,9 @@ function test() {
       echo "PASSED"
     else
       echo "FAILED: $browser"
+      if [ "$(platform)" == "macos" ]; then
+        open cypress/videos
+      fi
       exit 1
     fi
   done

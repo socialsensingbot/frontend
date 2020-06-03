@@ -96,6 +96,21 @@ Cypress.Commands.add("tweetCountTotal", (sum) => {
   })
 });
 
+Cypress.Commands.add("withTweetCounts", (callback) => {
+  cy.get(".mat-tab-label:nth-child(1)").then(header => {
+    const headerParts = header.text().trim().split(" ");
+    const visibleCount = +headerParts[0];
+    cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000})
+      .then(title => {
+              const hiddenCount = +title.text().trimLeft().split(" ")[0];
+              callback(visibleCount, hiddenCount);
+            }
+      );
+
+  })
+});
+
+
 Cypress.Commands.add("tweetCount", (vis, hid) => {
   cy.get(".mat-tab-label:nth-child(1)").then(header => {
     const headerParts = header.text().trim().split(" ");
@@ -115,6 +130,9 @@ Cypress.Commands.add("tweetCount", (vis, hid) => {
 });
 
 
+Cypress.Commands.add("clickTweetTab", (index) => {
+  cy.get(`.mat-tab-label:nth-child(${index})`, {timeout: 30000}).click({force: true});
+});
 Cypress.Commands.add("moveMinDateSliderLeft", (times) => {
   for (let i = 0; i < times; i++) {
     cy.get(".ng5-slider-pointer-min").type('{pagedown}');
