@@ -59,7 +59,7 @@ const testHide = (refresh, count, inc) => {
 
 };
 
-describe('Testing #87 & #107', function () {
+describe('Testing #87 & #105', function () {
 
   beforeEach(() => {
     cy.stubLiveJson("live-old");
