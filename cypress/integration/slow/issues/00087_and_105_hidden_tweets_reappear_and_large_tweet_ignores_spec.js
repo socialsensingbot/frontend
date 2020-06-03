@@ -37,23 +37,21 @@ const testUnhide = (refresh, count, fail) => {
   })
 };
 
-const testHide = (refresh, count, inc) => {
+const testHide = (refresh, count) => {
 
   cy.log("Ignoring");
-  const tweetVisible = `.atr-${count}.atr-visible`;
+  const tweetVisible = `.atr-visible .app-twitter-tweet`;
   cy.get(".tweet-drawer", {timeout: 30000}).should("be.visible");
   cy.clickTweetTab(1);
   cy.get(tweetVisible, {timeout: 60000})
     .then(t => {
-      if (t.find(".app-twitter-tweet").length > 0) {
-        cy.get(tweetVisible + " .app-twitter-tweet", {timeout: 60000});
-        cy.get(tweetVisible + " .app-twitter-tweet", {timeout: 60000}).scrollIntoView().should('be.visible');
-        cy.get(tweetVisible).scrollIntoView();
-        cy.get(tweetVisible + " .mat-icon", {timeout: 60000}).click({force: true}).get(menu2ndOpt).click({force: true});
-      } else {
-        cy.log("Skipping missing tweet " + count);
-        inc();
-      }
+      const index = t.first().parents(".atr-visible").attr("data-index");
+      cy.get(`.atr-visible.atr-${index}`, {timeout: 60000}).scrollIntoView().should('be.visible');
+      cy.get(`.atr-visible.atr-${index} mat-icon`,
+             {timeout: 60000}).click({force: true});
+      cy.wait(1000);
+      cy.get(menu2ndOpt).click({force: true});
+
     });
 
 
@@ -86,7 +84,7 @@ describe('Testing #87 & #105', function () {
     let hideCount = 0;
     cy.clickTweetTab(1);
     for (let i = 0; i < 40; i++) {
-      testHide(false, hideCount, () => hideCount++);
+      testHide(false, i);
     }
     checkTabCounts(2);
 
@@ -103,7 +101,7 @@ describe('Testing #87 & #105', function () {
     let hideCount = 0;
     cy.clickTweetTab(1);
     for (let i = 0; i < 40; i++) {
-      testHide(false, hideCount, () => hideCount++);
+      testHide(false, i);
     }
     cy.withTweetCounts((vis1, hid1) => {
       expect(hid1).toBeGreaterThan(30);
