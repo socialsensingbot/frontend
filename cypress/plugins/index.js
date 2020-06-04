@@ -19,14 +19,4 @@ module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
   require('cypress-plugin-retries/lib/plugin')(on);
-  on('task', {
-    resetShouldSkipFlag() {
-      shouldSkip = false;
-      return null;
-    },
-    shouldSkip(value) {
-      if (value != null) shouldSkip = value;
-      return shouldSkip;
-    }
-  });
 };
