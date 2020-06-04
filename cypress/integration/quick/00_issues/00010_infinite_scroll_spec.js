@@ -80,12 +80,14 @@ describe('Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/1
         const visibleCount = +headerParts[0];
         const totalCount = 215;
         const hiddenCount = totalCount - visibleCount;
+        cy.get(".app-tweet-outer .atr-visible", {timeout: 5000});
         cy.get(".app-tweet-outer").find('.atr-visible').its('length').should('eq', visibleCount);
 
         cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000}).click()
           .then(title => {
                   const hiddenCount = +title.text().trimLeft().split(" ")[0];
-            cy.get(".app-tweet-outer").find('.atr-hidden').its('length').should('eq', hiddenCount);
+                  cy.get(".app-tweet-outer .atr-hidden", {timeout: 5000});
+                  cy.get(".app-tweet-outer").find('.atr-hidden').its('length').should('eq', hiddenCount);
 
                 }
           );
