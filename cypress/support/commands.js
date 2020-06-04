@@ -26,6 +26,7 @@
 import "cypress-graphql-mock";
 
 const LONG_TIMEOUT = 60000;
+const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
 
 Cypress.Commands.add("login", () => {
   //Login
@@ -134,6 +135,26 @@ Cypress.Commands.add("tweetCount", (vis, hid) => {
 Cypress.Commands.add("clickTweetTab", (index) => {
   cy.get(`.mat-tab-label:nth-child(${index})`, {timeout: 30000}).click({force: true});
 });
+
+Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
+  cy.get(tweetSelector + " .mat-icon", {timeout: 4000})
+  cy.get(tweetSelector + " .mat-icon").trigger("click", {force: true});
+  cy.get(menu2ndOpt, {timeout: 30000});
+  cy.get(menu2ndOpt).contains("Ignore Tweet");
+  cy.get(menu2ndOpt).click({force: true});
+
+});
+
+Cypress.Commands.add("unignoreTweet", (tweetSelector) => {
+  cy.get(tweetSelector + " .mat-icon", {timeout: 4000})
+  cy.get(tweetSelector + " .mat-icon").trigger("click", {force: true});
+  cy.get(menu2ndOpt, {timeout: 30000});
+  cy.get(menu2ndOpt).contains("Unignore Tweet");
+  cy.get(menu2ndOpt).click({force: true});
+
+});
+
+
 Cypress.Commands.add("moveMinDateSliderLeft", (times) => {
   for (let i = 0; i < times; i++) {
     cy.get(".ng5-slider-pointer-min").type('{pagedown}');

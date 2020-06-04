@@ -1,5 +1,5 @@
 const url = "http://localhost:4200/map?selected=carmarthenshire&min_offset=-5399&max_offset=0&lat=53.00817326643286&lng=-2.0104980468750004";
-const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
+
 
 const checkTabCounts = (clickTab) => {
   cy.wait(4000);
@@ -21,17 +21,12 @@ const testUnhide = (refresh, count, fail) => {
 
   const tweetHidden = ".atr-0.atr-hidden";
   cy.get(".app-tweet-drawer", {timeout: 30000}).should("be.visible");
-  cy.get(".app-tweet-drawer", {timeout: 30000}).should("be.visible");
   cy.get(".app-tweet-drawer", {timeout: 30000}).then(drawer => {
     if (!fail && drawer.find(tweetHidden).length === 0) {
       cy.log("Skipping non existent tweet");
     } else {
-      cy.get(tweetHidden).scrollIntoView();
-      cy.get(tweetHidden + " .mat-icon", {timeout: 60000}).scrollIntoView();
-      cy.get(tweetHidden + " .mat-icon").click({force: true});
-      cy.get(menu2ndOpt, {timeout: 30000});
-      cy.get(menu2ndOpt).contains("Unignore Tweet");
-      cy.get(menu2ndOpt).click({force: true});
+      cy.get(tweetHidden).scrollIntoView().should('be.visible');
+      cy.unignoreTweet(tweetHidden);
       cy.wait(500);
     }
   })
@@ -47,10 +42,7 @@ const testHide = (refresh, count) => {
     .then(t => {
       const index = t.first().parents(".atr-visible").attr("data-index");
       cy.get(`.atr-visible.atr-${index}`, {timeout: 60000}).scrollIntoView().should('be.visible');
-      cy.get(`.atr-visible.atr-${index} mat-icon`,
-             {timeout: 60000}).click({force: true});
-      cy.wait(1000);
-      cy.get(menu2ndOpt).click({force: true});
+      cy.ignoreTweet(`.atr-visible.atr-${index}`);
 
     });
 
@@ -94,7 +86,7 @@ describe('Testing #87 & #105', function () {
     cy.get(".app-tweet-drawer", {timeout: 30000});
     cy.log("Cleaning up.");
     cy.clickTweetTab(2);
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < 40; i++) {
       testUnhide(false, i, false);
     }
     cy.log("Cleaned up.");
