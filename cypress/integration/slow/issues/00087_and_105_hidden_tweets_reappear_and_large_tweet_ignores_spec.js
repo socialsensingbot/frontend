@@ -40,7 +40,7 @@ const testUnhide = (refresh, count, fail) => {
 const testHide = (refresh, count) => {
 
   cy.log("Ignoring");
-  const tweetVisible = `.atr-visible .app-twitter-tweet`;
+  const tweetVisible = `.atr-visible .app-tweet-item`;
   cy.get(".app-tweet-drawer", {timeout: 30000}).should("be.visible");
   cy.clickTweetTab(1);
   cy.get(tweetVisible, {timeout: 60000})
