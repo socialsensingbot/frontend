@@ -14,7 +14,7 @@ describe('Date headers : https://github.com/socialsensingbot/frontend/issues/85'
       cy.noSpinner();
       cy.url().should("equal", url);
       cy.get(".app-tweet-drawer", {timeout: 60000}).should("be.visible");
-      cy.get(".date-separator").should("not.exist");
+      cy.get(".app-tweet-date-separator").should("not.exist");
     });
   });
 
@@ -27,7 +27,7 @@ describe('Date headers : https://github.com/socialsensingbot/frontend/issues/85'
       cy.noSpinner();
       cy.url().should("equal", url);
       cy.get(".app-tweet-drawer", {timeout: 60000}).should("be.visible");
-      cy.get(".date-separator").should("exist");
+      cy.get(".app-tweet-date-separator").should("exist");
     });
   });
 
