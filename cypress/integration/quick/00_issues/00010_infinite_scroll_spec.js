@@ -27,7 +27,7 @@ describe('Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/1
       cy.log("Now we scroll to the bottom.");
 
       cy.get('.app-tweet-list').scrollTo('bottom');
-      cy.wait(5000);
+      cy.wait(10000);
 
       cy.log(
         "There should be 3 pages of 20 tweets loaded at any time. The first page should not have any visible tweets and the fourth page should contain 20 tweets.");
@@ -40,7 +40,7 @@ describe('Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/1
       cy.log("Now we scroll back to the top.");
 
       cy.get('.app-tweet-list').scrollTo('top');
-      cy.wait(5000);
+      cy.wait(10000);
 
       cy.log(
         "There should be 3 pages of 20 tweets loaded at any time. The first page should again contain 20 tweets and the fourth page should now contain no tweets.");
