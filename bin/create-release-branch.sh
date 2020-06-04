@@ -2,9 +2,8 @@
 cd $(dirname $0) || exit 1
 cd .. || exit 1
 
-if (( $$ < 1 ))
-then
-echo "Usage $0: <version>"
+if (($? < 1)); then
+  echo "Usage $0: <version>"
   exit 1
 fi
 echo "Creating git branch 'release/$1' from master"

@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  version: "",
+  version:    "1.1.1",
   hmr:        false,
   confirm:    {
     email:    '',
