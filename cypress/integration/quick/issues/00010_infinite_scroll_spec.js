@@ -20,7 +20,7 @@ describe('Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/1
       cy.log(
         "There should be 3 pages of 20 tweets loaded at any time. The first page should contain 20 tweets and the fourth page should contain no tweets.");
 
-      cy.get("twitter-panel").find('.app-tweet-paged.app-tweet-row-active').its('length').should('eq', 60);
+      cy.get("twitter-panel").find('.app-tweet-paged .app-tweet-row-active').its('length').should('eq', 60);
       cy.get(".app-tweet-page-0").find('.app-tweet-row-active').its('length').should('eq', 20);
       cy.get(".app-tweet-page-3 .app-tweet-row-active").should("not.exist");
 
@@ -32,7 +32,7 @@ describe('Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/1
       cy.log(
         "There should be 3 pages of 20 tweets loaded at any time. The first page should not have any visible tweets and the fourth page should contain 20 tweets.");
 
-      cy.get("twitter-panel").find('.app-tweet-paged.app-tweet-row-active').its('length').should('be.gt', 60);
+      cy.get("twitter-panel").find('.app-tweet-paged .app-tweet-row-active').its('length').should('be.gt', 60);
       cy.get(".app-tweet-page-0 .app-tweet-row-active").should("not.be.visible");
       cy.get(".app-tweet-page-3").find('.app-tweet-row-active').its('length').should('eq', 20);
       cy.get(".atr-0", {timeout: 20000}).should("not.be.visible");
@@ -44,7 +44,7 @@ describe('Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/1
 
       cy.log(
         "There should be 3 pages of 20 tweets loaded at any time. The first page should again contain 20 tweets and the fourth page should now contain no tweets.");
-      cy.get("twitter-panel").find('.app-tweet-paged.app-tweet-row-active').its('length').should('eq', 60);
+      cy.get("twitter-panel").find('.app-tweet-paged .app-tweet-row-active').its('length').should('eq', 60);
       cy.get(".app-tweet-page-0").find('.app-tweet-row-active').its('length').should('eq', 20);
       cy.get(".app-tweet-page-3 .app-tweet-row-active").should("not.exist");
 

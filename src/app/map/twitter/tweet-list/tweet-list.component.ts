@@ -82,6 +82,9 @@ class TweetPage {
              styleUrls:   ['./tweet-list.component.scss']
            })
 export class TweetListComponent implements OnInit {
+  /**
+   * The TweetListComponent is responsible for managing a invisibly paged infinite scroll collection of tweets. At present all tweets are stored in memory but their rendering is scrolled for browser performance.
+   */
 
   private _tweets: Tweet[] | null = [];
   public loaded: boolean[] = [];
@@ -98,34 +101,27 @@ export class TweetListComponent implements OnInit {
   public direction: string;
   public maxPage = this.INITIAL_PAGES - 1;
   public minPage = 0;
-
-  @Output() public update: EventEmitter<Tweet> = new EventEmitter();
-  @Input() public group: string;
-
-  // Infinite scroll end
+  // Infinite Scroll End
 
   public moreToShow: boolean;
   public pages: TweetPage[] = [];
 
-  constructor(private _zone: NgZone, public pref: PreferenceService) {
-    // Hub.listen("twitter-panel", (e) => {
-    //   if (e.payload.message === "update") {
-    //     this._zone.run(() => this.updateTweets());
-    //   }
-    // });
-    // Hub.listen("twitter-panel", (e) => {
-    //   if (e.payload.message === "render") {
-    //     this._zone.run(() => this.ready = true);
-    //   }
-    // });
-    Hub.listen("twitter-panel", (e) => {
-      if (e.payload.message === "refresh") {
-        this._zone.run(() => this.updateTweets(this._tweets));
-      }
-    });
+  /**
+   * If the set of tweets have been updated (by an ignore/unignore for example) this will emit an event to the parent component.
+   */
+  @Output() public update: EventEmitter<Tweet> = new EventEmitter();
 
-  }
+  /**
+   * A name for this group of tweets presently only "hidden" or "visible" is allowed.
+   */
+  @Input() public group: "hidden" | "visible";
 
+
+  /**
+   * The tweets to render or null if not yet ready.
+   *
+   * @param val the tweets or null
+   */
   @Input()
   public set tweets(val: Tweet[] | null) {
     if (val === null) {
@@ -140,6 +136,17 @@ export class TweetListComponent implements OnInit {
 
   }
 
+  public get tweets(): Tweet[] {
+    return this._tweets;
+  }
+
+
+  constructor(private _zone: NgZone, public pref: PreferenceService) {}
+
+  /**
+   * Update the tweets stored in this list.
+   * @param val an array of {@link Tweet}s
+   */
   private updateTweets(val: Tweet[]) {
     this.tweetCount = val.length;
     log.debug("updateTweets()");
@@ -204,10 +211,6 @@ export class TweetListComponent implements OnInit {
     for (let i = 0; i <= this.maxPage; i++) {
       this.animateTweetAppearance(i);
     }
-  }
-
-  public get tweets(): Tweet[] {
-    return this._tweets;
   }
 
 
