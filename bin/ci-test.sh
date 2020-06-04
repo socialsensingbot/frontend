@@ -26,8 +26,7 @@ fi
 
 function test() {
   for browser in "$@"; do
-    npx cypress run --record --key 47c8c363-b800-478c-b2ce-f48b1079d39a
-    -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser ${browser} --headless --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-${browser},overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" --spec "${tests}"
+    npx cypress run --record --key 47c8c363-b800-478c-b2ce-f48b1079d39a -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser ${browser} --headless --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-${browser},overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" --spec "${tests}"
     #npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser firefox --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-firefox,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"
   done
 }
