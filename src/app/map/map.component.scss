@@ -53,7 +53,7 @@ $drawer-width: 568px;
   right: 0px;
 }
 
-.tweet-drawer {
+.app-tweet-drawer {
   max-width: $drawer-width;
   width: $drawer-width;
   min-width: $drawer-width;
@@ -70,11 +70,6 @@ $drawer-width: 568px;
   @media screen and (max-width: 768px) {
 
   }
-
-  .twitter-panel {
-
-  }
-
 
 }
 

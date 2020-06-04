@@ -1,9 +1,9 @@
-<div class="tweets-outer">
+<div class="app-tweet-outer">
 
-  <div class="tweets-header">
+  <div class="app-tweet-header">
     <ng-container *ngIf="ready">
       <ng-container *ngIf="tweets.length > 0">
-        <span class="tweets-heading" style="color: black">{{region}}:</span>
+        <span class="app-tweet-heading" style="color: black">{{region}}:</span>
         <help page="help-and-support#exceedance"
               tooltip="Exceedance probability is calculated by comparing the current level of tweet activity with historical tweet activity.">
           Exceedance probability
@@ -13,56 +13,45 @@
 
       <ng-container *ngIf="tweets.length === 0">
 
-      <span *ngIf="region" class="tweets-heading"
+      <span *ngIf="region" class="app-tweet-heading"
             style="color: black">No Tweets from {{region}}<br/></span>
 
-        <span *ngIf="!region" class="tweets-heading" style="color: black">Loading ...<br/></span>
+        <span *ngIf="!region" class="app-tweet-heading" style="color: black">Loading ...<br/></span>
       </ng-container>
 
-      <button mat-icon-button class="app-twitter-refresh-btn" (click)="refresh()">
+      <button mat-icon-button class="app-tweet-refresh-btn" (click)="refresh()">
         <mat-icon>refresh</mat-icon>
       </button>
 
     </ng-container>
 
     <div *ngIf="!ready">
-        <mat-spinner diameter="48" class="tinfo-spinner"></mat-spinner>
+      <mat-spinner diameter="48" class="app-tweet-area-loading-spinner"></mat-spinner>
     </div>
   </div>
 
 
-  <div id="tinfo" class="tinfo">
+  <div class="app-tweet-table" *ngIf="showTimeline">
 
 
-    <!--      <button id="tinfo_button" class="tinfo_button">-</button>-->
-    <div id="tinfo_table_wrapper" class="tinfo_table_wrapper">
-
-      <div id="tinfo_table" class="app-twitter-table" *ngIf="showTimeline">
-        <div class="table_info">
-
-
-          <mat-tab-group (selectedTabChange)="update(null)">
-            <mat-tab label="{{ready ? visibleTweets.length: ''}} Tweets">
-              <ng-template matTabContent>
-                <app-tweet-list group="visible" [tweets]="visibleTweets" (update)="update($event)"
-                                [style.visibility]="tweetsReady ? 'visible' : 'hidden'"></app-tweet-list>
-              </ng-template>
-            </mat-tab>
-            <mat-tab label="{{ready ? hiddenTweets.length: ''}} Ignored">
-              <ng-template matTabContent>
-                <app-tweet-list group="hidden" [tweets]="hiddenTweets" (update)="update($event)"
-                                [style.visibility]="tweetsReady ? 'visible' : 'hidden'"></app-tweet-list>
-              </ng-template>
-            </mat-tab>
-          </mat-tab-group>
+    <mat-tab-group (selectedTabChange)="update(null)">
+      <mat-tab label="{{ready ? visibleTweets.length: ''}} Tweets">
+        <ng-template matTabContent>
+          <app-tweet-list group="visible" [tweets]="visibleTweets" (update)="update($event)"
+                          [style.visibility]="tweetsReady ? 'visible' : 'hidden'"></app-tweet-list>
+        </ng-template>
+      </mat-tab>
+      <mat-tab label="{{ready ? hiddenTweets.length: ''}} Ignored">
+        <ng-template matTabContent>
+          <app-tweet-list group="hidden" [tweets]="hiddenTweets" (update)="update($event)"
+                          [style.visibility]="tweetsReady ? 'visible' : 'hidden'"></app-tweet-list>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
 
 
-        </div>
-
-      </div>
-
-    </div>
   </div>
+
 </div>
 
 

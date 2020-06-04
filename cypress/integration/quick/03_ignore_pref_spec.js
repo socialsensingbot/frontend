@@ -13,19 +13,19 @@ describe('Ignore tweets: ', function () {
       cy.visitAndWait(url);
       const tweetHidden = twitterIdClass + ".atr-hidden";
       const tweetVisible = twitterIdClass + ".atr-visible";
-      cy.get(".tweet-drawer", {timeout: 30000}).should("be.visible");
-      cy.get(".table_info", {timeout: 30000}).then(panel => {
+      cy.get(".app-tweet-drawer", {timeout: 30000}).should("be.visible");
+      cy.get(".app-tweet-table", {timeout: 30000}).then(panel => {
         if (panel.find(twitterIdClass).length > 0) {
           cy.get(tweetVisible, {timeout: 60000});
           cy.get(tweetVisible, {timeout: 60000}).should('be.visible');
-          cy.get(tweetVisible + " .app-twitter-tweet", {timeout: 60000});
-          cy.get(tweetVisible + " .app-twitter-tweet", {timeout: 60000}).should('be.visible');
+          cy.get(tweetVisible + " .app-tweet-item", {timeout: 60000});
+          cy.get(tweetVisible + " .app-tweet-item", {timeout: 60000}).should('be.visible');
           cy.get(tweetVisible + " .mat-icon", {timeout: 60000}).click({force: true});
           cy.get(menu2ndOpt).click();
           cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000}).click();
           cy.wait(4000);
           cy.get(tweetHidden, {timeout: 60000});
-          cy.get(tweetHidden + " .app-twitter-tweet", {timeout: 60000});
+          cy.get(tweetHidden + " .app-tweet-item", {timeout: 60000});
           cy.get(tweetHidden + " .mat-icon", {timeout: 30000}).click({force: true});
           cy.get(menu2ndOpt).contains("Unignore Tweet");
         } else {

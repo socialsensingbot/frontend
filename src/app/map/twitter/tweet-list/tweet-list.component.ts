@@ -33,18 +33,18 @@ function twitterInit() {
 
         window.setTimeout(() => {
           const parent = $(event.target).parent();
-          const atr = $(event.target).parents(".app-twitter-row");
+          const atr = $(event.target).parents(".app-tweet-row");
           const blockquote = atr.find("blockquote");
           if (atr.find("blockquote.twitter-tweet-error").length > 0) {
             const error = atr.find("blockquote.twitter-tweet-error");
-            error.find(".app-twitter-item-menu").hide();
+            error.find(".app-tweet-item-menu").hide();
 
 
             error.css("opacity", 1.0)
                  .css("min-width", "516px")
                  .css("display", "block")
                  .css("text-align", "center");
-            error.parent().addClass("twitter-card");
+            error.parent().addClass("app-tweet-item-card");
 
             error.text("Tweet no longer available");
           } else {
@@ -53,8 +53,8 @@ function twitterInit() {
           try {
             if (atr.length > 0) {
               atr.find("mat-spinner").hide();
-              atr.find(".app-twitter-item-menu").css("opacity", 1.0);
-              atr.find(".tweet-loading-placeholder").remove();
+              atr.find(".app-tweet-item-menu").css("opacity", 1.0);
+              // atr.find(".tweet-loading-placeholder").remove();
             }
           } catch (e) {
             log.debug(e);
@@ -217,7 +217,7 @@ export class TweetListComponent implements OnInit {
     }
     log.debug("Loading tweets by page " + page);
     if (!this.loaded[page]) {
-      twitterLoad(".app-tweet-list-" + this.group + " .tweet-page-" + page);
+      twitterLoad(".app-tweet-list-" + this.group + " .app-tweet-page-" + page);
       // this.loaded[page]= true;
     }
   }

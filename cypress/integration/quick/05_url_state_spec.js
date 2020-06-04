@@ -122,8 +122,8 @@ describe('URL State: ', function () {
       cy.get(".slider-date-time", {timeout: 20000});
       cy.url().should("equal", url);
       cy.get(".slider-date-time-min .slider-date",{timeout: 20000}).should("contain.text","11-Oct-18");
-      cy.get(".slider-date-time-min .slider-time").should("contain.text","5 AM");
-      cy.get(".tweet-drawer", {timeout: 20000}).should("be.visible");
+      cy.get(".slider-date-time-min .slider-time").should("contain.text", "5 AM");
+      cy.get(".app-tweet-drawer", {timeout: 20000}).should("be.visible");
       cy.url().should("equal", url);
       cy.twitterPanelHeader("Powys");
 

@@ -12,9 +12,9 @@ describe('Missing tweets : https://github.com/socialsensingbot/frontend/issues/7
       cy.url().should("equal", url);
       cy.noSpinner();
       cy.url().should("equal", url);
-      cy.get(".tweet-drawer", {timeout: 20000}).should("be.visible");
+      cy.get(".app-tweet-drawer", {timeout: 20000}).should("be.visible");
       cy.twitterPanelHeader("Roscommon");
-      cy.get(".tweet-drawer").find(".tweet-no-longer-available").its("length").should("eq", 2);
+      cy.get(".app-tweet-drawer").find(".tweet-no-longer-available").its("length").should("eq", 2);
       cy.noSpinner();
       cy.logout();
     });

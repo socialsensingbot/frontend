@@ -1,5 +1,6 @@
 $tweetWidth: 540px;
 $tweetMargin: 8px;
+$tweetHeaderOffset: 16px;
 
 ::ng-deep {
   .mat-tab-body-wrapper, .mat-tab-group {
@@ -16,61 +17,20 @@ $tweetMargin: 8px;
 
 }
 
-.tweets-outer {
+.app-tweet-outer {
   display: block;
   height: 100%;
   max-height: 100%;
   min-height: 100%;
   font-size: 16px;
   overflow: hidden;
-  width: 568px;
+  width: 564px;
   max-width: 564px;
-  min-width: $tweetWidth + 16px;
+  min-width: 564px;
   margin: 0;
   padding: 0;
 
-  .tinfo {
-    margin: 4px;
-    height: 100%;
-
-    h4 {
-      margin: 12px;
-      color: #777;
-    }
-  }
-
-
-  .tinfo_h4b {
-    margin: 5px 0 5px 0;
-    color: #000;
-  }
-
-  .tinfo_table_wrapper {
-    width: 100%;
-    height: 100%;
-    max-height: 100%;
-    min-height: 100%;
-    //overflow: auto;
-  }
-
-  .tinfo td, .tinfo th {
-    margin: 8px;
-  }
-
-
-  .tinfo tr:hover {
-    background-color: #ddd;
-  }
-
-  .tinfo th {
-    border: 1px solid #ddd;
-    padding: 0;
-    text-align: left;
-    margin: 0;
-    color: #777;
-  }
-
-  .tinfo-spinner {
+  .app-tweet-area-loading-spinner {
     margin: 2em auto;
     margin-top: 24px;
     opacity: 0.3;
@@ -81,71 +41,63 @@ $tweetMargin: 8px;
   }
 
 
-  .app-twitter-table {
+  .app-tweet-table {
     display: block;
-    height: 100%;
+    height: calc(100vh - 174px);
     position: relative;
+    overflow: visible;
 
-    .table_info {
-      display: block;
+
+    .app-tweet-date-separator {
+      opacity: 0.4;
+      margin-top: 1em;
+      margin-bottom: 1em;
+    }
+
+    .app-tweet-scroll-spinner-outer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: $tweetWidth;
+      text-align: center;
+      max-width: $tweetWidth;
+
+      span {
+        opacity: 0.3;
+      }
+
+      .app-tweet-scroll-spinner {
+        height: 24px;
+        width: 24px;
+        margin: 0 auto;
+
+      }
+    }
+
+    .app-tweet-paged {
+      display: flex;
+      align-items: stretch;
+      flex-direction: column;
       height: 100%;
 
-      .date-separator {
-        opacity: 0.4;
-        margin-top: 1em;
-        margin-bottom: 1em;
-      }
-
-      .scroll-spinner-outer {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-width: $tweetWidth;
-        text-align: center;
-        max-width: $tweetWidth;
-
-        span {
-          opacity: 0.3;
-        }
-
-        .scroll-spinner {
-          height: 24px;
-          width: 24px;
-          margin: 0 auto;
-
-        }
-      }
-
-      .tweet-page {
-        display: flex;
-        align-items: stretch;
-        flex-direction: column;
-        height: 100%;
-
-      }
-
-
     }
+
 
   }
 
 
-  .tweets-header {
+  .app-tweet-header {
     //position: rel;
     z-index: 10;
-    top: 84px;
     margin-right: 14px;
     margin-left: 14px;
     margin-bottom: 0;
     margin-top: 16px;
     //background: white;
 
-    .tweets-heading {
+    .app-tweet-heading {
       font-size: 1.2em;
-      margin-top: 1.2em;
-      margin-right: 0em;
-      margin-left: 0;
-      margin-bottom: 0em;
+      margin: 0;
       line-height: 1.5em;
     }
 
@@ -154,6 +106,6 @@ $tweetMargin: 8px;
 
 }
 
-.app-twitter-refresh-btn {
+.app-tweet-refresh-btn {
   opacity: 0.4;
 }

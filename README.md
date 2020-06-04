@@ -51,7 +51,7 @@ Make sure you are in the top level of the project and follow the instructions be
  
          ng serve --open
          
-    If you leave ```ng serve```  running it will serve up the application and reload upon file changes.
+    If you leave ```ng serve```  running it will serve up the application and reload upon file changes. However there is also a script to do this ```./bin/dev.sh```.
 
 3. Install Amplify 
 
@@ -84,9 +84,7 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 
 <https://docs.cypress.io/guides/getting-started/installing-cypress.html#Opening-Cypress>
 
-End to end tests are peformed using [Cypress](https://cypress.io). All end to end (integration) tests will be executed on a build.
-
-To run the tests you need to run the following, substituting username and password.
+End to end tests are peformed using [Cypress](https://cypress.io). The end to end (integration) tests will be executed on a build and can be run manually (substituting username and password):
 
     export TEST_AC_USER=<username>,TEST_AC_PASS=<password> ./bin/cypress.sh
    
@@ -100,10 +98,9 @@ The [src](/src) folder is the main folder for development and contains all the s
 
 Within the src folder you will find the [app](/src/app) folder which contains the application source code which is covered in [The Application Structure] - best make sure you know [The Structure of an Angular Application] first.
 
-The [environments](/src/environments) folder contains application variables that are environment specific.
+The [environments](/src/environments) folder contains application variables that are environment specific. Most importantly [environment.production](/src/environments/environment.prod.ts) which contains amongst other things the version number of the application - this needs to be updated every time a new release/x.y.z branch is created.
 
 The [amplify](/amplify) folder contains all the amplify generated configuration and should not be manually edited.
-
 
 ### The Application Structure
 
@@ -395,7 +392,7 @@ and used like
       cy.get(".slider-date-time", {timeout: 20000});
       cy.get(".slider-date-time-max .slider-date").should("contain.text","15-Oct-18");
       cy.get(".slider-date-time-max .slider-time").should("contain.text", "12 AM");
-      cy.get(".tweet-drawer", {timeout: 60000}).should("be.visible");
+      cy.get(".app-tweet-drawer", {timeout: 60000}).should("be.visible");
       cy.url().should("equal", url);
       
       cy.twitterPanelHeader("No Tweets from Scottish Borders");

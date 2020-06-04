@@ -1,6 +1,6 @@
 $tweetWidth: 540px;
 $tweetMargin: 8px;
-.app-tweets-list {
+.app-tweet-list {
   display: block;
   max-height: 100%;
   height: 100%;
@@ -11,17 +11,17 @@ $tweetMargin: 8px;
   padding: 0;
 
 
-  .tweet-page {
+  .app-tweet-paged {
     display: block;
     height: auto;
 
   }
 
-  .tweet-text {
+  .app-tweet-item-text {
     height: 100%;
   }
 
-  .app-twitter-row {
+  .app-tweet-row {
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: center;
@@ -33,7 +33,7 @@ $tweetMargin: 8px;
 
     //max-height: 0;
 
-    .app-twitter-item-menu {
+    .app-tweet-item-menu {
       position: absolute;
       right: -32px;
       top: 0px;
@@ -43,7 +43,7 @@ $tweetMargin: 8px;
       //border: 1px solid red;
     }
 
-    .app-twitter-tweet {
+    .app-tweet-item {
       //display: flex;
       //flex-direction: column;
       //border: 1px solid green;
@@ -57,7 +57,7 @@ $tweetMargin: 8px;
           transition: opacity 0.8s ease-in-out;
         }
 
-        .tweet-text blockquote {
+        .app-tweet-item-text blockquote {
           display: none;
           opacity: 0.0;
           margin: 12px;
@@ -92,7 +92,7 @@ $tweetMargin: 8px;
   }
 
 
-  .tweet-placeholder {
+  .app-tweet-item-placeholder {
     opacity: 1.0;
     margin: 16px;
     display: block;
@@ -100,7 +100,7 @@ $tweetMargin: 8px;
     width: 100%;
   }
 
-  .twitter-card-surround {
+  .app-tweet-item-card-surround {
     margin: $tweetMargin;
     width: 100%;
 
@@ -111,7 +111,7 @@ $tweetMargin: 8px;
     }
   }
 
-  .twitter-card {
+  .app-tweet-item-card {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     box-sizing: border-box;
     display: block;
@@ -137,3 +137,6 @@ $tweetMargin: 8px;
 
 }
 
+.app-tweet-list-end-tilde {
+  opacity: 0.4;
+}

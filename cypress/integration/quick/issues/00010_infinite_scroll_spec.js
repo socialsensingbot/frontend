@@ -20,33 +20,33 @@ describe('Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/1
       cy.log(
         "There should be 3 pages of 20 tweets loaded at any time. The first page should contain 20 tweets and the fourth page should contain no tweets.");
 
-      cy.get("twitter-panel").find('.tweet-page .app-twitter-row-active').its('length').should('eq', 60);
-      cy.get(".tweet-page-0").find('.app-twitter-row-active').its('length').should('eq', 20);
-      cy.get(".tweet-page-3 .app-twitter-row-active").should("not.exist");
+      cy.get("twitter-panel").find('.app-tweet-paged.app-tweet-row-active').its('length').should('eq', 60);
+      cy.get(".app-tweet-page-0").find('.app-tweet-row-active').its('length').should('eq', 20);
+      cy.get(".app-tweet-page-3 .app-tweet-row-active").should("not.exist");
 
       cy.log("Now we scroll to the bottom.");
 
-      cy.get('.app-tweets-list').scrollTo('bottom');
+      cy.get('.app-tweet-list').scrollTo('bottom');
       cy.wait(1000);
 
       cy.log(
         "There should be 3 pages of 20 tweets loaded at any time. The first page should not have any visible tweets and the fourth page should contain 20 tweets.");
 
-      cy.get("twitter-panel").find('.tweet-page .app-twitter-row-active').its('length').should('be.gt', 60);
-      cy.get(".tweet-page-0 .app-twitter-row-active").should("not.be.visible");
-      cy.get(".tweet-page-3").find('.app-twitter-row-active').its('length').should('eq', 20);
+      cy.get("twitter-panel").find('.app-tweet-paged.app-tweet-row-active').its('length').should('be.gt', 60);
+      cy.get(".app-tweet-page-0 .app-tweet-row-active").should("not.be.visible");
+      cy.get(".app-tweet-page-3").find('.app-tweet-row-active').its('length').should('eq', 20);
       cy.get(".atr-0", {timeout: 20000}).should("not.be.visible");
 
       cy.log("Now we scroll back to the top.");
 
-      cy.get('.app-tweets-list').scrollTo('top');
+      cy.get('.app-tweet-list').scrollTo('top');
       cy.wait(1000);
 
       cy.log(
         "There should be 3 pages of 20 tweets loaded at any time. The first page should again contain 20 tweets and the fourth page should now contain no tweets.");
-      cy.get("twitter-panel").find('.tweet-page .app-twitter-row-active').its('length').should('eq', 60);
-      cy.get(".tweet-page-0").find('.app-twitter-row-active').its('length').should('eq', 20);
-      cy.get(".tweet-page-3 .app-twitter-row-active").should("not.exist");
+      cy.get("twitter-panel").find('.app-tweet-paged.app-tweet-row-active').its('length').should('eq', 60);
+      cy.get(".app-tweet-page-0").find('.app-tweet-row-active').its('length').should('eq', 20);
+      cy.get(".app-tweet-page-3 .app-tweet-row-active").should("not.exist");
 
       cy.log("And the first tweet should be visible and loaded.")
 
@@ -61,7 +61,7 @@ describe('Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/1
       cy.get(".atr-0.atr-visible", {timeout: 90000})
       cy.get(".atr-0.atr-visible").scrollIntoView()
       cy.get(".atr-0.atr-visible", {timeout: 90000}).should("be.visible");
-      cy.get('.app-tweets-list').scrollTo('bottom');
+      cy.get('.app-tweet-list').scrollTo('bottom');
       cy.get(".atr-0", {timeout: 20000}).should("not.be.visible");
       cy.logout();
     });
@@ -80,12 +80,12 @@ describe('Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/1
         const visibleCount = +headerParts[0];
         const totalCount = 215;
         const hiddenCount = totalCount - visibleCount;
-        cy.get(".tweets-outer").find('.atr-visible').its('length').should('eq', visibleCount);
+        cy.get(".app-tweet-outer").find('.atr-visible').its('length').should('eq', visibleCount);
 
         cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000}).click()
           .then(title => {
                   const hiddenCount = +title.text().trimLeft().split(" ")[0];
-                  cy.get(".tweets-outer").find('.atr-hidden').its('length').should('eq', hiddenCount);
+            cy.get(".app-tweet-outer").find('.atr-hidden').its('length').should('eq', hiddenCount);
 
                 }
           );

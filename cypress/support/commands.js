@@ -64,21 +64,22 @@ Cypress.Commands.add("noSpinner", () => {
 
 Cypress.Commands.add("twitterPanelHeader", (text) => {
   cy.get("twitter-panel");
-  cy.get(".tinfo-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  cy.get(".app-tweet-area-loading-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
   cy.wait(1000);
-  cy.get(".tinfo-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
-  cy.get(".tweets-heading", {timeout: LONG_TIMEOUT});
-  cy.get("span.tweets-heading", {timeout: LONG_TIMEOUT}).should("contain.text", text);
+  cy.get(".app-tweet-area-loading-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  cy.get(".app-tweet-heading", {timeout: LONG_TIMEOUT});
+  cy.get("span.app-tweet-heading", {timeout: LONG_TIMEOUT}).should("contain.text", text);
 });
 Cypress.Commands.add("twitterPanelVisible", () => {
-  cy.get(".tweet-drawer", {timeout: LONG_TIMEOUT}).should("be.visible");
+  cy.get(".app-tweet-drawer", {timeout: LONG_TIMEOUT}).should("be.visible");
 });
 
 Cypress.Commands.add("twitterPanelNotVisible", () => {
-  cy.get(".tweet-drawer", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  cy.get(".app-tweet-drawer", {timeout: LONG_TIMEOUT}).should("not.be.visible");
 });
 Cypress.Commands.add("tweetsVisible", (count) => {
-  cy.get("twitter-panel").find('.tweet-page .atr-visible .twitter-tweet', {timeout: LONG_TIMEOUT}).its('length').should(
+  cy.get("twitter-panel").find('.app-tweet-paged .atr-visible .app-tweet-item',
+                               {timeout: LONG_TIMEOUT}).its('length').should(
     'eq',
     count);
 });
@@ -116,12 +117,12 @@ Cypress.Commands.add("tweetCount", (vis, hid) => {
     const headerParts = header.text().trim().split(" ");
     const visibleCount = +headerParts[0];
     const totalCount = vis + hid;
-    cy.get(".tweets-outer").find('.atr-visible').its('length').should('eq', vis);
+    cy.get(".app-tweet-outer").find('.atr-visible').its('length').should('eq', vis);
 
     cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000}).click()
       .then(title => {
               const hiddenCount = +title.text().trimLeft().split(" ")[0];
-              cy.get(".tweets-outer").find('.atr-hidden').its('length').should('eq', hid);
+        cy.get(".app-tweet-outer").find('.atr-hidden').its('length').should('eq', hid);
 
             }
       );
