@@ -82,7 +82,7 @@ describe('Testing #87 & #105', function () {
 
 
   });
-  it.only('More than 30 ignores fails : https://github.com/socialsensingbot/frontend/issues/105 : ', () => {
+  it('More than 30 ignores fails : https://github.com/socialsensingbot/frontend/issues/105 : ', () => {
     cy.get(".app-tweet-drawer", {timeout: 30000});
     cy.log("Cleaning up.");
     cy.clickTweetTab(2);
