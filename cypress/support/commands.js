@@ -137,7 +137,7 @@ Cypress.Commands.add("clickTweetTab", (index) => {
 });
 
 Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
-  cy.get(tweetSelector + " .mat-icon", {timeout: 4000})
+  cy.get(tweetSelector + " .mat-icon", {timeout: 10000})
   cy.get(tweetSelector + " .mat-icon").trigger("click", {force: true});
   cy.get(menu2ndOpt, {timeout: 30000});
   cy.get(menu2ndOpt).contains("Ignore Tweet");
@@ -146,7 +146,7 @@ Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
 });
 
 Cypress.Commands.add("unignoreTweet", (tweetSelector) => {
-  cy.get(tweetSelector + " .mat-icon", {timeout: 4000})
+  cy.get(tweetSelector + " .mat-icon", {timeout: 10000})
   cy.get(tweetSelector + " .mat-icon").trigger("click", {force: true});
   cy.get(menu2ndOpt, {timeout: 30000});
   cy.get(menu2ndOpt).contains("Unignore Tweet");

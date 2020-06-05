@@ -43,7 +43,7 @@ const testHide = (refresh, count) => {
       const index = t.first().parents(".atr-visible").attr("data-index");
       cy.get(`.atr-visible.atr-${index}`, {timeout: 60000}).scrollIntoView().should('be.visible');
       cy.ignoreTweet(`.atr-visible.atr-${index}`);
-
+      cy.wait(500);
     });
 
 
@@ -83,16 +83,17 @@ describe('Testing #87 & #105', function () {
 
   });
   it('More than 30 ignores fails : https://github.com/socialsensingbot/frontend/issues/105 : ', () => {
+    Cypress.currentTest.retries(5);
     cy.get(".app-tweet-drawer", {timeout: 30000});
     cy.log("Cleaning up.");
     cy.clickTweetTab(2);
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 32; i++) {
       testUnhide(false, i, false);
     }
     cy.log("Cleaned up.");
     let hideCount = 0;
     cy.clickTweetTab(1);
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 45; i++) {
       testHide(false, i);
     }
     cy.withTweetCounts((vis1, hid1) => {
