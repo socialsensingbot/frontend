@@ -13,40 +13,44 @@ describe('Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/1
     it('row changes', () => {
       cy.mockGraphQL();
       cy.visitAndWait(url);
-      cy.twitterPanelHeader("from");
+      cy.twitterPanelHeader("Carmarthenshire");
       cy.get(".atr-0.atr-visible", {timeout: 90000})
       cy.get(".atr-0.atr-visible .twitter-tweet", {timeout: 90000}).should("be.visible");
 
       cy.log(
         "There should be 3 pages of 20 tweets loaded at any time. The first page should contain 20 tweets and the fourth page should contain no tweets.");
 
-      cy.get("twitter-panel").find('.tweet-page .app-twitter-row-active').its('length').should('eq', 60);
-      cy.get(".tweet-page-0").find('.app-twitter-row-active').its('length').should('eq', 20);
-      cy.get(".tweet-page-3 .app-twitter-row-active").should("not.exist");
+      cy.get("twitter-panel").find('.app-tweet-paged .app-tweet-row-active').its('length').should('eq', 60);
+      cy.get(".app-tweet-page-0").find('.app-tweet-row-active').its('length').should('eq', 20);
+      cy.get(".app-tweet-page-3 .app-tweet-row-active").should("not.exist");
 
       cy.log("Now we scroll to the bottom.");
 
-      cy.get('.tweets-outer').scrollTo('bottom');
-      cy.wait(1000);
+      cy.get('.app-tweet-list').scrollTo('bottom');
+      cy.wait(5000);
+      cy.get('.app-tweet-list').scrollTo('bottom');
+      cy.wait(5000);
 
       cy.log(
         "There should be 3 pages of 20 tweets loaded at any time. The first page should not have any visible tweets and the fourth page should contain 20 tweets.");
 
-      cy.get("twitter-panel").find('.tweet-page .app-twitter-row-active').its('length').should('be.gt', 60);
-      cy.get(".tweet-page-0 .app-twitter-row-active").should("not.be.visible");
-      cy.get(".tweet-page-3").find('.app-twitter-row-active').its('length').should('eq', 20);
+      cy.get("twitter-panel").find('.app-tweet-paged .app-tweet-row-active').its('length').should('be.gt', 60);
+      cy.get(".app-tweet-page-0 .app-tweet-row-active").should("not.be.visible");
+      cy.get(".app-tweet-page-3").find('.app-tweet-row-active').its('length').should('eq', 20);
       cy.get(".atr-0", {timeout: 20000}).should("not.be.visible");
 
       cy.log("Now we scroll back to the top.");
 
-      cy.get('.tweets-outer').scrollTo('top');
-      cy.wait(1000);
+      cy.get('.app-tweet-list').scrollTo('top');
+      cy.wait(5000);
+      cy.get('.app-tweet-list').scrollTo('top');
+      cy.wait(5000);
 
       cy.log(
         "There should be 3 pages of 20 tweets loaded at any time. The first page should again contain 20 tweets and the fourth page should now contain no tweets.");
-      cy.get("twitter-panel").find('.tweet-page .app-twitter-row-active').its('length').should('eq', 60);
-      cy.get(".tweet-page-0").find('.app-twitter-row-active').its('length').should('eq', 20);
-      cy.get(".tweet-page-3 .app-twitter-row-active").should("not.exist");
+      cy.get("twitter-panel").find('.app-tweet-paged .app-tweet-row-active').its('length').should('eq', 60);
+      cy.get(".app-tweet-page-0").find('.app-tweet-row-active').its('length').should('eq', 20);
+      cy.get(".app-tweet-page-3 .app-tweet-row-active").should("not.exist");
 
       cy.log("And the first tweet should be visible and loaded.")
 
@@ -57,11 +61,11 @@ describe('Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/1
     it('top and bottom', () => {
       cy.mockGraphQL();
       cy.visitAndWait(url);
-      cy.twitterPanelHeader("from");
+      cy.twitterPanelHeader("Carmarthenshire");
       cy.get(".atr-0.atr-visible", {timeout: 90000})
       cy.get(".atr-0.atr-visible").scrollIntoView()
       cy.get(".atr-0.atr-visible", {timeout: 90000}).should("be.visible");
-      cy.get('.tweets-outer').scrollTo('bottom');
+      cy.get('.app-tweet-list').scrollTo('bottom');
       cy.get(".atr-0", {timeout: 20000}).should("not.be.visible");
       cy.logout();
     });
@@ -74,22 +78,24 @@ describe('Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/1
 
     it('correct row count', () => {
       cy.visitAndWait(url);
-      cy.twitterPanelHeader("from");
-      cy.get("twitter-panel .tweets-header  mat-card > span > b").then(header => {
+      cy.twitterPanelHeader("Carmarthenshire");
+      cy.get(".mat-tab-label:nth-child(1)").then(header => {
         const headerParts = header.text().trim().split(" ");
-        assert(headerParts[0] === "Showing");
-        assert(headerParts[2] === "of");
-        const visibleCount = +headerParts[1];
-        const totalCount = +headerParts[3];
-        cy.get(".hidden-tweet-container mat-panel-title", {timeout: 30000}).should('be.visible');
-        cy.get(".hidden-tweet-container mat-panel-title",
-               {timeout: 30000}).scrollIntoView().should('be.visible').click();
-        cy.get(".hidden-tweet-container mat-panel-title")
+        const visibleCount = +headerParts[0];
+        const totalCount = 215;
+        const hiddenCount = totalCount - visibleCount;
+        cy.get(".app-tweet-outer .atr-visible", {timeout: 5000});
+        cy.get(".app-tweet-outer").find('.atr-visible').its('length').should('eq', visibleCount);
+
+        cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000}).click()
           .then(title => {
                   const hiddenCount = +title.text().trimLeft().split(" ")[0];
-                  cy.get(".hidden-tweet-container").find('.atr-hidden').its('length').should('eq', hiddenCount);
+                  if (hiddenCount > 0) {
+                    cy.get(".app-tweet-outer").find('.atr-hidden').its('length').should('eq', hiddenCount);
+                  } else {
+                    cy.get(".app-tweet-outer .atr-hidden").should("not.exist");
+                  }
 
-                  expect(hiddenCount).to.equal(totalCount - visibleCount);
                 }
           );
 

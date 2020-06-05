@@ -26,7 +26,7 @@ describe('URL State: ', function () {
       cy.noSpinner();
 
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
-      cy.twitterPanelHeader("Tweets from 123");
+      cy.twitterPanelHeader("123");
       cy.logout();
     });
 
@@ -41,7 +41,7 @@ describe('URL State: ', function () {
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 60000}).should("have.attr", "fill").should(
         "eq",
         "#2B8CBE");
-      cy.twitterPanelHeader("Tweets from 123");
+      cy.twitterPanelHeader("123");
       cy.logout();
     });
     it('when authorized and load state', () => {
@@ -49,7 +49,7 @@ describe('URL State: ', function () {
       cy.login();
       cy.visitAndWait(url);
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 60000});
-      cy.twitterPanelHeader("Tweets from 123");
+      cy.twitterPanelHeader("123");
       cy.logout();
     });
   });
@@ -107,7 +107,7 @@ describe('URL State: ', function () {
       cy.get(".leaflet-map-pane").click(300, 300);
       cy.pushStateDelay(); // The push state is not immediate
       cy.url().should("equal", newUrl);
-      cy.twitterPanelHeader("Tweets from Cambridgeshire");
+      cy.twitterPanelHeader("Cambridgeshire");
       cy.logout();
     });
   });
@@ -122,10 +122,10 @@ describe('URL State: ', function () {
       cy.get(".slider-date-time", {timeout: 20000});
       cy.url().should("equal", url);
       cy.get(".slider-date-time-min .slider-date",{timeout: 20000}).should("contain.text","11-Oct-18");
-      cy.get(".slider-date-time-min .slider-time").should("contain.text","5 AM");
-      cy.get(".tweet-drawer", {timeout: 20000}).should("be.visible");
+      cy.get(".slider-date-time-min .slider-time").should("contain.text", "5 AM");
+      cy.get(".app-tweet-drawer", {timeout: 20000}).should("be.visible");
       cy.url().should("equal", url);
-      cy.twitterPanelHeader("Tweets from Powys");
+      cy.twitterPanelHeader("Powys");
 
       cy.logout();
     });

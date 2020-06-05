@@ -551,7 +551,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this.ready = true;
       }
     });
-    this._twitterUpdateTimer = timer(0, 2000).subscribe(async () => {
+    this._twitterUpdateTimer = timer(0, 500).subscribe(async () => {
       if (this._twitterIsStale) {
         await this.updateTwitter();
         this._twitterIsStale = false;
@@ -771,7 +771,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.sliderOptions = {...this.sliderOptions, startMin: this._dateMin, startMax: this._dateMax};
     this.updateSearch({min_offset: lower, max_offset: upper});
     this.updateLayers("Slider Change");
-
+    this._twitterIsStale = true;
 
   }
 
@@ -797,7 +797,7 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   public sliderChangeOnEnd($event: any) {
     log.debug("sliderChangeOnEnd()");
-    this._twitterIsStale = true;
+
   }
 
   /**
