@@ -26,6 +26,7 @@
 import "cypress-graphql-mock";
 
 const LONG_TIMEOUT = 60000;
+const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
 
 Cypress.Commands.add("login", () => {
   //Login
@@ -43,7 +44,7 @@ Cypress.Commands.add("logout", () => {
 
 Cypress.Commands.add("visitAndWait", (url) => {
   cy.visit(url);
-  cy.url({timeou: 20000}).should("equal", url);
+  cy.url({timeout: 20000}).should("equal", url);
   cy.noSpinner();
 });
 
@@ -64,19 +65,110 @@ Cypress.Commands.add("noSpinner", () => {
 
 Cypress.Commands.add("twitterPanelHeader", (text) => {
   cy.get("twitter-panel");
-  cy.get(".tinfo-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  cy.get(".app-tweet-area-loading-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
   cy.wait(1000);
-  cy.get(".tinfo-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
-  cy.get("twitter-panel .tweets-header", {timeout: LONG_TIMEOUT});
-  cy.get("twitter-panel .tweets-header  mat-card > span > b", {timeout: LONG_TIMEOUT}).should("contain.text", text);
+  cy.get(".app-tweet-area-loading-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  cy.get(".app-tweet-heading", {timeout: LONG_TIMEOUT});
+  cy.get("span.app-tweet-heading", {timeout: LONG_TIMEOUT}).should("contain.text", text);
 });
 Cypress.Commands.add("twitterPanelVisible", () => {
-  cy.get(".tweet-drawer", {timeout: LONG_TIMEOUT}).should("be.visible");
+  cy.get(".app-tweet-drawer", {timeout: LONG_TIMEOUT}).should("be.visible");
 });
 
 Cypress.Commands.add("twitterPanelNotVisible", () => {
-  cy.get(".tweet-drawer", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  cy.get(".app-tweet-drawer", {timeout: LONG_TIMEOUT}).should("not.be.visible");
 });
+Cypress.Commands.add("tweetsVisible", (count) => {
+  cy.get("twitter-panel").find('.app-tweet-paged .atr-visible .app-tweet-item',
+                               {timeout: LONG_TIMEOUT}).its('length').should(
+    'eq',
+    count);
+});
+Cypress.Commands.add("tweetCountTotal", (sum) => {
+  cy.get(".mat-tab-label:nth-child(1)").then(header => {
+    const headerParts = header.text().trim().split(" ");
+    const visibleCount = +headerParts[0];
+    cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000})
+      .then(title => {
+              const hiddenCount = +title.text().trimLeft().split(" ")[0];
+              expect(hiddenCount + visibleCount).equals(sum);
+            }
+      );
+
+  })
+});
+
+Cypress.Commands.add("withTweetCounts", (callback) => {
+  cy.get(".mat-tab-label:nth-child(1)").then(header => {
+    const headerParts = header.text().trim().split(" ");
+    const visibleCount = +headerParts[0];
+    cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000})
+      .then(title => {
+              const hiddenCount = +title.text().trimLeft().split(" ")[0];
+              callback(visibleCount, hiddenCount);
+            }
+      );
+
+  })
+});
+
+
+Cypress.Commands.add("tweetCount", (vis, hid) => {
+  cy.get(".mat-tab-label:nth-child(1)").then(header => {
+    const headerParts = header.text().trim().split(" ");
+    const visibleCount = +headerParts[0];
+    const totalCount = vis + hid;
+    cy.get(".app-tweet-outer").find('.atr-visible').its('length').should('eq', vis);
+
+    cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000}).click()
+      .then(title => {
+              const hiddenCount = +title.text().trimLeft().split(" ")[0];
+        cy.get(".app-tweet-outer").find('.atr-hidden').its('length').should('eq', hid);
+
+            }
+      );
+
+  })
+});
+
+
+Cypress.Commands.add("clickTweetTab", (index) => {
+  cy.get(`.mat-tab-label:nth-child(${index})`, {timeout: 30000}).click({force: true});
+});
+
+Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
+  cy.get(tweetSelector + " .mat-icon", {timeout: 10000})
+  cy.get(tweetSelector + " .mat-icon").trigger("click", {force: true});
+  cy.get(menu2ndOpt, {timeout: 30000});
+  cy.get(menu2ndOpt).contains("Ignore Tweet");
+  cy.get(menu2ndOpt).click({force: true});
+
+});
+
+Cypress.Commands.add("unignoreTweet", (tweetSelector) => {
+  cy.get(tweetSelector + " .mat-icon", {timeout: 10000})
+  cy.get(tweetSelector + " .mat-icon").trigger("click", {force: true});
+  cy.get(menu2ndOpt, {timeout: 30000});
+  cy.get(menu2ndOpt).contains("Unignore Tweet");
+  cy.get(menu2ndOpt).click({force: true});
+
+});
+
+
+Cypress.Commands.add("moveMinDateSliderLeft", (times) => {
+  for (let i = 0; i < times; i++) {
+    cy.get(".ng5-slider-pointer-min").type('{pagedown}');
+    cy.wait(1000);
+  }
+});
+
+Cypress.Commands.add("moveMinDateSliderRight", (times) => {
+  for (let i = 0; i < times; i++) {
+    cy.get(".ng5-slider-pointer-min").type('{pageup}');
+    cy.wait(1000);
+  }
+});
+
 Cypress.Commands.add("pushStateDelay", () => {
   cy.wait(500);
 });

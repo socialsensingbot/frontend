@@ -36,6 +36,7 @@ import {NgForageConfig, NgForageModule} from "ngforage";
 import {HelpButtonComponent} from './help/help-button.component';
 import {HelpSpanComponent} from "./help/help-span.component";
 import {HelpDialogComponent} from './help/help-dialog.component';
+import {TweetListComponent} from './map/twitter/tweet-list/tweet-list.component';
 
 export class NotificationErrorHandler implements ErrorHandler {
   constructor(private _notify: NotificationService) {}
@@ -62,7 +63,8 @@ export class NotificationErrorHandler implements ErrorHandler {
               LegendComponent,
               HelpButtonComponent,
               HelpDialogComponent,
-              HelpSpanComponent
+              HelpSpanComponent,
+              TweetListComponent
             ],
             imports:         [
               BrowserModule,
