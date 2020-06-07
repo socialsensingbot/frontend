@@ -111,6 +111,7 @@ export class TwitterPanelComponent implements OnChanges, OnDestroy, OnInit {
       log.debug(this.tweets);
       if (this.tweets.length - this.hidden.length > 0) {
         log.debug("Waiting for tweets to load before marking as ready.")
+        this.ready = true;
       } else {
         log.debug("No tweets to load so marking as ready.")
         this.ready = true;
