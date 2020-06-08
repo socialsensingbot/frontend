@@ -120,12 +120,15 @@ export type DeleteGroupPreferencesInput = {
 export type CreateGroupTweetIgnoreInput = {
   id?: string | null;
   url: string;
-  tweetId?: string | null;
+  ignoredBy: string;
+  tweetId: string;
+  ownerGroups?: Array<string | null> | null;
   groupTweetIgnoreGroupId?: string | null;
 };
 
 export type ModelGroupTweetIgnoreConditionInput = {
   url?: ModelStringInput | null;
+  ignoredBy?: ModelStringInput | null;
   tweetId?: ModelStringInput | null;
   and?: Array<ModelGroupTweetIgnoreConditionInput | null> | null;
   or?: Array<ModelGroupTweetIgnoreConditionInput | null> | null;
@@ -135,7 +138,9 @@ export type ModelGroupTweetIgnoreConditionInput = {
 export type UpdateGroupTweetIgnoreInput = {
   id: string;
   url?: string | null;
+  ignoredBy?: string | null;
   tweetId?: string | null;
+  ownerGroups?: Array<string | null> | null;
   groupTweetIgnoreGroupId?: string | null;
 };
 
@@ -146,11 +151,14 @@ export type DeleteGroupTweetIgnoreInput = {
 export type CreateGroupTwitterUserIgnoreInput = {
   id?: string | null;
   twitterScreenName: string;
+  ignoredBy: string;
+  ownerGroups?: Array<string | null> | null;
   groupTwitterUserIgnoreGroupId?: string | null;
 };
 
 export type ModelGroupTwitterUserIgnoreConditionInput = {
   twitterScreenName?: ModelStringInput | null;
+  ignoredBy?: ModelStringInput | null;
   and?: Array<ModelGroupTwitterUserIgnoreConditionInput | null> | null;
   or?: Array<ModelGroupTwitterUserIgnoreConditionInput | null> | null;
   not?: ModelGroupTwitterUserIgnoreConditionInput | null;
@@ -159,6 +167,8 @@ export type ModelGroupTwitterUserIgnoreConditionInput = {
 export type UpdateGroupTwitterUserIgnoreInput = {
   id: string;
   twitterScreenName?: string | null;
+  ignoredBy?: string | null;
+  ownerGroups?: Array<string | null> | null;
   groupTwitterUserIgnoreGroupId?: string | null;
 };
 
@@ -259,7 +269,9 @@ export type ModelGroupPreferencesFilterInput = {
 export type ModelGroupTweetIgnoreFilterInput = {
   id?: ModelIDInput | null;
   url?: ModelStringInput | null;
+  ignoredBy?: ModelStringInput | null;
   tweetId?: ModelStringInput | null;
+  ownerGroups?: ModelStringInput | null;
   and?: Array<ModelGroupTweetIgnoreFilterInput | null> | null;
   or?: Array<ModelGroupTweetIgnoreFilterInput | null> | null;
   not?: ModelGroupTweetIgnoreFilterInput | null;
@@ -268,6 +280,8 @@ export type ModelGroupTweetIgnoreFilterInput = {
 export type ModelGroupTwitterUserIgnoreFilterInput = {
   id?: ModelIDInput | null;
   twitterScreenName?: ModelStringInput | null;
+  ignoredBy?: ModelStringInput | null;
+  ownerGroups?: ModelStringInput | null;
   and?: Array<ModelGroupTwitterUserIgnoreFilterInput | null> | null;
   or?: Array<ModelGroupTwitterUserIgnoreFilterInput | null> | null;
   not?: ModelGroupTwitterUserIgnoreFilterInput | null;
@@ -423,7 +437,8 @@ export type CreateGroupTweetIgnoreMutation = {
   __typename: "GroupTweetIgnore";
   id: string;
   url: string;
-  tweetId: string | null;
+  ignoredBy: string;
+  tweetId: string;
   group: {
     __typename: "GroupPreferences";
     id: string;
@@ -431,6 +446,7 @@ export type CreateGroupTweetIgnoreMutation = {
     createdAt: string;
     updatedAt: string;
   } | null;
+  ownerGroups: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -439,7 +455,8 @@ export type UpdateGroupTweetIgnoreMutation = {
   __typename: "GroupTweetIgnore";
   id: string;
   url: string;
-  tweetId: string | null;
+  ignoredBy: string;
+  tweetId: string;
   group: {
     __typename: "GroupPreferences";
     id: string;
@@ -447,6 +464,7 @@ export type UpdateGroupTweetIgnoreMutation = {
     createdAt: string;
     updatedAt: string;
   } | null;
+  ownerGroups: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -455,7 +473,8 @@ export type DeleteGroupTweetIgnoreMutation = {
   __typename: "GroupTweetIgnore";
   id: string;
   url: string;
-  tweetId: string | null;
+  ignoredBy: string;
+  tweetId: string;
   group: {
     __typename: "GroupPreferences";
     id: string;
@@ -463,6 +482,7 @@ export type DeleteGroupTweetIgnoreMutation = {
     createdAt: string;
     updatedAt: string;
   } | null;
+  ownerGroups: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -471,6 +491,7 @@ export type CreateGroupTwitterUserIgnoreMutation = {
   __typename: "GroupTwitterUserIgnore";
   id: string;
   twitterScreenName: string;
+  ignoredBy: string;
   group: {
     __typename: "GroupPreferences";
     id: string;
@@ -478,6 +499,7 @@ export type CreateGroupTwitterUserIgnoreMutation = {
     createdAt: string;
     updatedAt: string;
   } | null;
+  ownerGroups: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -486,6 +508,7 @@ export type UpdateGroupTwitterUserIgnoreMutation = {
   __typename: "GroupTwitterUserIgnore";
   id: string;
   twitterScreenName: string;
+  ignoredBy: string;
   group: {
     __typename: "GroupPreferences";
     id: string;
@@ -493,6 +516,7 @@ export type UpdateGroupTwitterUserIgnoreMutation = {
     createdAt: string;
     updatedAt: string;
   } | null;
+  ownerGroups: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -501,6 +525,7 @@ export type DeleteGroupTwitterUserIgnoreMutation = {
   __typename: "GroupTwitterUserIgnore";
   id: string;
   twitterScreenName: string;
+  ignoredBy: string;
   group: {
     __typename: "GroupPreferences";
     id: string;
@@ -508,6 +533,7 @@ export type DeleteGroupTwitterUserIgnoreMutation = {
     createdAt: string;
     updatedAt: string;
   } | null;
+  ownerGroups: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -697,7 +723,8 @@ export type GetGroupTweetIgnoreQuery = {
   __typename: "GroupTweetIgnore";
   id: string;
   url: string;
-  tweetId: string | null;
+  ignoredBy: string;
+  tweetId: string;
   group: {
     __typename: "GroupPreferences";
     id: string;
@@ -705,6 +732,7 @@ export type GetGroupTweetIgnoreQuery = {
     createdAt: string;
     updatedAt: string;
   } | null;
+  ownerGroups: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -715,7 +743,9 @@ export type ListGroupTweetIgnoresQuery = {
     __typename: "GroupTweetIgnore";
     id: string;
     url: string;
-    tweetId: string | null;
+    ignoredBy: string;
+    tweetId: string;
+    ownerGroups: Array<string | null> | null;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
@@ -726,6 +756,7 @@ export type GetGroupTwitterUserIgnoreQuery = {
   __typename: "GroupTwitterUserIgnore";
   id: string;
   twitterScreenName: string;
+  ignoredBy: string;
   group: {
     __typename: "GroupPreferences";
     id: string;
@@ -733,6 +764,7 @@ export type GetGroupTwitterUserIgnoreQuery = {
     createdAt: string;
     updatedAt: string;
   } | null;
+  ownerGroups: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -743,6 +775,8 @@ export type ListGroupTwitterUserIgnoresQuery = {
     __typename: "GroupTwitterUserIgnore";
     id: string;
     twitterScreenName: string;
+    ignoredBy: string;
+    ownerGroups: Array<string | null> | null;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
@@ -942,7 +976,8 @@ export type OnCreateGroupTweetIgnoreSubscription = {
   __typename: "GroupTweetIgnore";
   id: string;
   url: string;
-  tweetId: string | null;
+  ignoredBy: string;
+  tweetId: string;
   group: {
     __typename: "GroupPreferences";
     id: string;
@@ -950,6 +985,7 @@ export type OnCreateGroupTweetIgnoreSubscription = {
     createdAt: string;
     updatedAt: string;
   } | null;
+  ownerGroups: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -958,7 +994,8 @@ export type OnUpdateGroupTweetIgnoreSubscription = {
   __typename: "GroupTweetIgnore";
   id: string;
   url: string;
-  tweetId: string | null;
+  ignoredBy: string;
+  tweetId: string;
   group: {
     __typename: "GroupPreferences";
     id: string;
@@ -966,6 +1003,7 @@ export type OnUpdateGroupTweetIgnoreSubscription = {
     createdAt: string;
     updatedAt: string;
   } | null;
+  ownerGroups: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -974,7 +1012,8 @@ export type OnDeleteGroupTweetIgnoreSubscription = {
   __typename: "GroupTweetIgnore";
   id: string;
   url: string;
-  tweetId: string | null;
+  ignoredBy: string;
+  tweetId: string;
   group: {
     __typename: "GroupPreferences";
     id: string;
@@ -982,6 +1021,7 @@ export type OnDeleteGroupTweetIgnoreSubscription = {
     createdAt: string;
     updatedAt: string;
   } | null;
+  ownerGroups: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -990,6 +1030,7 @@ export type OnCreateGroupTwitterUserIgnoreSubscription = {
   __typename: "GroupTwitterUserIgnore";
   id: string;
   twitterScreenName: string;
+  ignoredBy: string;
   group: {
     __typename: "GroupPreferences";
     id: string;
@@ -997,6 +1038,7 @@ export type OnCreateGroupTwitterUserIgnoreSubscription = {
     createdAt: string;
     updatedAt: string;
   } | null;
+  ownerGroups: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -1005,6 +1047,7 @@ export type OnUpdateGroupTwitterUserIgnoreSubscription = {
   __typename: "GroupTwitterUserIgnore";
   id: string;
   twitterScreenName: string;
+  ignoredBy: string;
   group: {
     __typename: "GroupPreferences";
     id: string;
@@ -1012,6 +1055,7 @@ export type OnUpdateGroupTwitterUserIgnoreSubscription = {
     createdAt: string;
     updatedAt: string;
   } | null;
+  ownerGroups: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -1020,6 +1064,7 @@ export type OnDeleteGroupTwitterUserIgnoreSubscription = {
   __typename: "GroupTwitterUserIgnore";
   id: string;
   twitterScreenName: string;
+  ignoredBy: string;
   group: {
     __typename: "GroupPreferences";
     id: string;
@@ -1027,6 +1072,7 @@ export type OnDeleteGroupTwitterUserIgnoreSubscription = {
     createdAt: string;
     updatedAt: string;
   } | null;
+  ownerGroups: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -1416,6 +1462,7 @@ export class APIService {
           __typename
           id
           url
+          ignoredBy
           tweetId
           group {
             __typename
@@ -1424,6 +1471,7 @@ export class APIService {
             createdAt
             updatedAt
           }
+          ownerGroups
           createdAt
           updatedAt
         }
@@ -1448,6 +1496,7 @@ export class APIService {
           __typename
           id
           url
+          ignoredBy
           tweetId
           group {
             __typename
@@ -1456,6 +1505,7 @@ export class APIService {
             createdAt
             updatedAt
           }
+          ownerGroups
           createdAt
           updatedAt
         }
@@ -1480,6 +1530,7 @@ export class APIService {
           __typename
           id
           url
+          ignoredBy
           tweetId
           group {
             __typename
@@ -1488,6 +1539,7 @@ export class APIService {
             createdAt
             updatedAt
           }
+          ownerGroups
           createdAt
           updatedAt
         }
@@ -1512,6 +1564,7 @@ export class APIService {
           __typename
           id
           twitterScreenName
+          ignoredBy
           group {
             __typename
             id
@@ -1519,6 +1572,7 @@ export class APIService {
             createdAt
             updatedAt
           }
+          ownerGroups
           createdAt
           updatedAt
         }
@@ -1545,6 +1599,7 @@ export class APIService {
           __typename
           id
           twitterScreenName
+          ignoredBy
           group {
             __typename
             id
@@ -1552,6 +1607,7 @@ export class APIService {
             createdAt
             updatedAt
           }
+          ownerGroups
           createdAt
           updatedAt
         }
@@ -1578,6 +1634,7 @@ export class APIService {
           __typename
           id
           twitterScreenName
+          ignoredBy
           group {
             __typename
             id
@@ -1585,6 +1642,7 @@ export class APIService {
             createdAt
             updatedAt
           }
+          ownerGroups
           createdAt
           updatedAt
         }
@@ -1984,6 +2042,7 @@ export class APIService {
           __typename
           id
           url
+          ignoredBy
           tweetId
           group {
             __typename
@@ -1992,6 +2051,7 @@ export class APIService {
             createdAt
             updatedAt
           }
+          ownerGroups
           createdAt
           updatedAt
         }
@@ -2016,7 +2076,9 @@ export class APIService {
             __typename
             id
             url
+            ignoredBy
             tweetId
+            ownerGroups
             createdAt
             updatedAt
           }
@@ -2046,6 +2108,7 @@ export class APIService {
           __typename
           id
           twitterScreenName
+          ignoredBy
           group {
             __typename
             id
@@ -2053,6 +2116,7 @@ export class APIService {
             createdAt
             updatedAt
           }
+          ownerGroups
           createdAt
           updatedAt
         }
@@ -2079,6 +2143,8 @@ export class APIService {
             __typename
             id
             twitterScreenName
+            ignoredBy
+            ownerGroups
             createdAt
             updatedAt
           }
@@ -2415,6 +2481,7 @@ export class APIService {
           __typename
           id
           url
+          ignoredBy
           tweetId
           group {
             __typename
@@ -2423,6 +2490,7 @@ export class APIService {
             createdAt
             updatedAt
           }
+          ownerGroups
           createdAt
           updatedAt
         }
@@ -2437,6 +2505,7 @@ export class APIService {
           __typename
           id
           url
+          ignoredBy
           tweetId
           group {
             __typename
@@ -2445,6 +2514,7 @@ export class APIService {
             createdAt
             updatedAt
           }
+          ownerGroups
           createdAt
           updatedAt
         }
@@ -2459,6 +2529,7 @@ export class APIService {
           __typename
           id
           url
+          ignoredBy
           tweetId
           group {
             __typename
@@ -2467,6 +2538,7 @@ export class APIService {
             createdAt
             updatedAt
           }
+          ownerGroups
           createdAt
           updatedAt
         }
@@ -2481,6 +2553,7 @@ export class APIService {
           __typename
           id
           twitterScreenName
+          ignoredBy
           group {
             __typename
             id
@@ -2488,6 +2561,7 @@ export class APIService {
             createdAt
             updatedAt
           }
+          ownerGroups
           createdAt
           updatedAt
         }
@@ -2502,6 +2576,7 @@ export class APIService {
           __typename
           id
           twitterScreenName
+          ignoredBy
           group {
             __typename
             id
@@ -2509,6 +2584,7 @@ export class APIService {
             createdAt
             updatedAt
           }
+          ownerGroups
           createdAt
           updatedAt
         }
@@ -2523,6 +2599,7 @@ export class APIService {
           __typename
           id
           twitterScreenName
+          ignoredBy
           group {
             __typename
             id
@@ -2530,6 +2607,7 @@ export class APIService {
             createdAt
             updatedAt
           }
+          ownerGroups
           createdAt
           updatedAt
         }

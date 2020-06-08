@@ -150,6 +150,7 @@ mutation CreateGroupTweetIgnore(
   createGroupTweetIgnore(input: $input, condition: $condition) {
     id
     url
+    ignoredBy
     tweetId
     group {
       id
@@ -157,6 +158,7 @@ mutation CreateGroupTweetIgnore(
       createdAt
       updatedAt
     }
+    ownerGroups
     createdAt
     updatedAt
   }
@@ -168,6 +170,7 @@ mutation UpdateGroupTweetIgnore(
   updateGroupTweetIgnore(input: $input, condition: $condition) {
     id
     url
+    ignoredBy
     tweetId
     group {
       id
@@ -175,6 +178,7 @@ mutation UpdateGroupTweetIgnore(
       createdAt
       updatedAt
     }
+    ownerGroups
     createdAt
     updatedAt
   }
@@ -186,6 +190,7 @@ mutation DeleteGroupTweetIgnore(
   deleteGroupTweetIgnore(input: $input, condition: $condition) {
     id
     url
+    ignoredBy
     tweetId
     group {
       id
@@ -193,6 +198,7 @@ mutation DeleteGroupTweetIgnore(
       createdAt
       updatedAt
     }
+    ownerGroups
     createdAt
     updatedAt
   }
@@ -204,12 +210,14 @@ mutation CreateGroupTwitterUserIgnore(
   createGroupTwitterUserIgnore(input: $input, condition: $condition) {
     id
     twitterScreenName
+    ignoredBy
     group {
       id
       group
       createdAt
       updatedAt
     }
+    ownerGroups
     createdAt
     updatedAt
   }
@@ -221,12 +229,14 @@ mutation UpdateGroupTwitterUserIgnore(
   updateGroupTwitterUserIgnore(input: $input, condition: $condition) {
     id
     twitterScreenName
+    ignoredBy
     group {
       id
       group
       createdAt
       updatedAt
     }
+    ownerGroups
     createdAt
     updatedAt
   }
@@ -238,12 +248,14 @@ mutation DeleteGroupTwitterUserIgnore(
   deleteGroupTwitterUserIgnore(input: $input, condition: $condition) {
     id
     twitterScreenName
+    ignoredBy
     group {
       id
       group
       createdAt
       updatedAt
     }
+    ownerGroups
     createdAt
     updatedAt
   }

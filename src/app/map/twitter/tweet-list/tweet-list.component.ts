@@ -257,22 +257,22 @@ export class TweetListComponent implements OnInit {
   }
 
   public async ignoreSender(tweet, $event: MouseEvent) {
-    await this.pref.ignoreSender(tweet);
+    await this.pref.groupIgnoreSender(tweet);
     this.update.emit(tweet);
   }
 
   public async unIgnoreSender(tweet, $event: MouseEvent) {
-    await this.pref.unIgnoreSender(tweet);
+    await this.pref.groupUnIgnoreSender(tweet);
     this.update.emit(tweet);
   }
 
   public async ignoreTweet(tweet, $event: MouseEvent) {
-    await this.pref.ignoreTweet(tweet);
+    await this.pref.groupIgnoreTweet(tweet);
     this.update.emit(tweet);
   }
 
   public async unIgnoreTweet(tweet, $event: MouseEvent) {
-    await this.pref.unIgnoreTweet(tweet);
+    await this.pref.groupUnIgnoreTweet(tweet);
     this.update.emit(tweet);
   }
 

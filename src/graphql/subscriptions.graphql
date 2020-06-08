@@ -120,6 +120,7 @@ subscription OnCreateGroupTweetIgnore {
   onCreateGroupTweetIgnore {
     id
     url
+    ignoredBy
     tweetId
     group {
       id
@@ -127,6 +128,7 @@ subscription OnCreateGroupTweetIgnore {
       createdAt
       updatedAt
     }
+    ownerGroups
     createdAt
     updatedAt
   }
@@ -135,6 +137,7 @@ subscription OnUpdateGroupTweetIgnore {
   onUpdateGroupTweetIgnore {
     id
     url
+    ignoredBy
     tweetId
     group {
       id
@@ -142,6 +145,7 @@ subscription OnUpdateGroupTweetIgnore {
       createdAt
       updatedAt
     }
+    ownerGroups
     createdAt
     updatedAt
   }
@@ -150,6 +154,7 @@ subscription OnDeleteGroupTweetIgnore {
   onDeleteGroupTweetIgnore {
     id
     url
+    ignoredBy
     tweetId
     group {
       id
@@ -157,6 +162,7 @@ subscription OnDeleteGroupTweetIgnore {
       createdAt
       updatedAt
     }
+    ownerGroups
     createdAt
     updatedAt
   }
@@ -165,12 +171,14 @@ subscription OnCreateGroupTwitterUserIgnore {
   onCreateGroupTwitterUserIgnore {
     id
     twitterScreenName
+    ignoredBy
     group {
       id
       group
       createdAt
       updatedAt
     }
+    ownerGroups
     createdAt
     updatedAt
   }
@@ -179,12 +187,14 @@ subscription OnUpdateGroupTwitterUserIgnore {
   onUpdateGroupTwitterUserIgnore {
     id
     twitterScreenName
+    ignoredBy
     group {
       id
       group
       createdAt
       updatedAt
     }
+    ownerGroups
     createdAt
     updatedAt
   }
@@ -193,12 +203,14 @@ subscription OnDeleteGroupTwitterUserIgnore {
   onDeleteGroupTwitterUserIgnore {
     id
     twitterScreenName
+    ignoredBy
     group {
       id
       group
       createdAt
       updatedAt
     }
+    ownerGroups
     createdAt
     updatedAt
   }

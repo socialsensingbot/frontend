@@ -90,6 +90,7 @@ query GetGroupTweetIgnore($id: ID!) {
   getGroupTweetIgnore(id: $id) {
     id
     url
+    ignoredBy
     tweetId
     group {
       id
@@ -97,6 +98,7 @@ query GetGroupTweetIgnore($id: ID!) {
       createdAt
       updatedAt
     }
+    ownerGroups
     createdAt
     updatedAt
   }
@@ -110,7 +112,9 @@ query ListGroupTweetIgnores(
     items {
       id
       url
+      ignoredBy
       tweetId
+      ownerGroups
       createdAt
       updatedAt
     }
@@ -121,12 +125,14 @@ query GetGroupTwitterUserIgnore($id: ID!) {
   getGroupTwitterUserIgnore(id: $id) {
     id
     twitterScreenName
+    ignoredBy
     group {
       id
       group
       createdAt
       updatedAt
     }
+    ownerGroups
     createdAt
     updatedAt
   }
@@ -144,6 +150,8 @@ query ListGroupTwitterUserIgnores(
     items {
       id
       twitterScreenName
+      ignoredBy
+      ownerGroups
       createdAt
       updatedAt
     }
