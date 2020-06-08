@@ -9,9 +9,7 @@ describe('Data Update: ', function () {
       cy.stubLiveJson("live-short");
       cy.visit(url);
       cy.login();
-      cy.visit(url);
-      cy.url().should("equal", url);
-      cy.noSpinner();
+      cy.visitAndWait(url);
       cy.get(".slider-date-time", {timeout: 20000});
       cy.get(".slider-date-time-max .slider-date").should("contain.text","26-Apr-20");
       cy.get(".slider-date-time-max .slider-time").should("contain.text","10 PM");

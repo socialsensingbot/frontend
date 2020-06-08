@@ -1,5 +1,6 @@
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.25.
 
+
 - [Getting Started] 
   - [Installation and Quick Start] 
 - [Development Quick Reference] 
@@ -11,8 +12,8 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
   - [Key files and folders for development] 
   - [The Application Structure] 
 - [The Development/Release Cycle]  
-  - [Simple Development] 
-  - [Feature Branch Development] 
+  - [The Branches] 
+  - [The Process]  
 - [Design] 
   - [Material Design] 
   - [Angular Material] 
@@ -26,11 +27,13 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
     - [Setting a Users Password] 
   - [AWS Route 53] 
   - [AWS S3 & CloudFront] 
-- [Branches, Environments and Deployments] 
-  - [Github] 
-    - [GitFlow] 
-  - [Testing] 
-  - [Issue Tracking] 
+- [Testing] 
+  - [End to End with Cypress] 
+      - [Using Fixtures and Stubbing Services] 
+        - [Live.json] 
+        - [GraphQL (DynamoDB access)] 
+      - [Cross-Browser Testing] 
+- [Issue Tracking] 
 
 # Getting Started
 
@@ -48,7 +51,7 @@ Make sure you are in the top level of the project and follow the instructions be
  
          ng serve --open
          
-    If you leave ```ng serve```  running it will serve up the application and reload upon file changes.
+    If you leave ```ng serve```  running it will serve up the application and reload upon file changes. However there is also a script to do this ```./bin/dev.sh```.
 
 3. Install Amplify 
 
@@ -61,7 +64,7 @@ Make sure you are in the top level of the project and follow the instructions be
 
 ### Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run ```./bin/dev.sh``` for a development server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 ### Code scaffolding
 
@@ -69,11 +72,11 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 #### Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build or `--aot` to check that it builds under the AOT compiler.
 
 ### Running unit tests
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io). (TODO: At present I have not written any unit tests, these are all stubs. I've focussed on getting integration tests working.) 
+Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io). (TODO: At present I have not written **any** unit tests, these are all stubs. I've focussed on getting integration tests working.) 
 
 ### Running end-to-end tests
 
@@ -81,13 +84,13 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 
 <https://docs.cypress.io/guides/getting-started/installing-cypress.html#Opening-Cypress>
 
-End to end tests are peformed using [Cypress](https://cypress.io). All end to end (integration) tests will be executed on a build.
+End to end tests are peformed using [Cypress](https://cypress.io). The end to end (integration) tests will be executed on a build and can be run manually (substituting username and password):
 
-To run the tests you need to run the following, substituting username and password.
-
-    npx cypress open -e TEST_AC_USER=<username>,TEST_AC_PASS=<password>
-
+    export TEST_AC_USER=<username>,TEST_AC_PASS=<password> ./bin/cypress.sh
+   
 The test folder is [cypress](/cypress) and the tests themselves are in the [integration](/cypress/integration) folder.
+
+See the [Testing] section for more in depth description of the tests.
        
 ### Key files and folders for development
 
@@ -95,10 +98,9 @@ The [src](/src) folder is the main folder for development and contains all the s
 
 Within the src folder you will find the [app](/src/app) folder which contains the application source code which is covered in [The Application Structure] - best make sure you know [The Structure of an Angular Application] first.
 
-The [environments](/src/environments) folder contains application variables that are environment specific.
+The [environments](/src/environments) folder contains application variables that are environment specific. Most importantly [environment.production](/src/environments/environment.prod.ts) which contains amongst other things the version number of the application - this needs to be updated every time a new release/x.y.z branch is created.
 
 The [amplify](/amplify) folder contains all the amplify generated configuration and should not be manually edited.
-
 
 ### The Application Structure
 
@@ -156,32 +158,23 @@ Details can be found at <https://aws-amplify.github.io/docs/js/angular> and <htt
 
 ## The Development/Release Cycle
 
-### Simple Development
+### The Branches
 
-1. Developer checks out the ```develop``` branch from GitHub.
-2. Developer makes changes to the codebase.
-3. Developer commits and pushes to ```develop```
-4. Amplify automatically builds, tests and deploys to https://dev.socialsensing.com
-5. Developer manually tests their code.
-6. Developer issues a pull request (PR) on GitHub to request merging on to the ```master``` branch.
-7. Lead (or just other) Developer reviews the code (optionally views a live preview of the changes created by Amplify) and decides to accept or reject the PR.
-8. If PR is accepted, GitHub merges the changes into ```master```
-9. Amplify builds a production environment, tests and atomically (i.e. instantly) deploys to production.
+The following are the key branches ```release/x.y.z```, ```feature/xxx```, staging and master.
 
-### Feature Branch Development
+When a developer starts working on a feature it must be associated with a release. For example ```feature/frontend-10``` will be released in ```release/1.1```. 
 
-1. Developer creates a new branch from develop called feature/XXX (where XXX is the name of the feature being developed)
-2. Developer makes changes to the codebase.
-3. Developer commits and pushes to ```feature/XXX```
-4. Amplify automatically builds, tests and deploys to a temporary environment (the console will show the name of the environment).
-5. Developer manually tests their code.
-6. Developer requests merging of the feature branch into ```develop```
-7. If team is happy developer merges into ```develop```
-8. Amplify automatically builds, tests and deploys to https://dev.socialsensing.com
-9. Team issues a pull request (PR) on GitHub to request merging on to the ```master``` branch from ```develop```
-10. Lead (or just other) Developer reviews the code (optionally views a live preview of the changes created by Amplify) and decides to accept or reject the PR.
-11. If PR is accepted, GitHub merges the changes into ```master```
-12. Amplify builds a production environment, tests and atomically (i.e. instantly) deploys to production.
+### The Process
+
+So firstly if there is no release branch create it from the *master* branch, then create a feature branch from the release branch. The developer then makes changes to the codebase in ```feature/XXX```. Amplify automatically builds, tests and deploys to a temporary environment (the console will show the name of the environment). The developer manually tests their code. 
+
+When all tests are passing and there has been some degree of manual testing done it should then be merged into the ```release/x.y.z``` branch. The ```feature/XXX``` can then be deleted and then delete the amplify branch using the supplied script. For feature/XXX this would be:
+    
+    ./bin/delete-branch.sh XXX
+
+Amplify automatically builds, tests and deploys to the release environment. The team tests all the features when ready for the release. If the team are happy and the release is ready for live testing the team issues a pull request (PR) on GitHub to request merging on to the ```staging``` branch from ```release/x.y.z```. Lead (or just other) Developer reviews the code tests the branch environment and then decides to accept or reject the PR.
+
+If PR is accepted, GitHub merges the changes into ```staging```. The team and possibly customer reps. test the release in staging which is a production environment running against the live data and backend. When everyone is happy a PR is issued to merge ```staging``` into ```master```. It is enforced that at least one other person must okay that PR. The merging of the PR triggers amplify to build a new production environment and instantly deploys to production.
 
 
 ## Technology
@@ -331,6 +324,11 @@ The app is 100% stateless and serverless from a deployment perspective - this me
 
 Typically you won't interact with these services directly while working on or maintaining the app. The S3/Cloudfront deployment is managed by amplify.
 
+
+### GraphQL & AWS DynamoDB
+
+TODO:
+
 ### AWS Route 53
 
 Currently the GoDaddy registry for socialsensing.com points to AWS Route 53 for all DNS records. 
@@ -345,25 +343,153 @@ And within this recordset are the entries for the live and development environme
 
     
 
-  
-## Branches, Environments and Deployments
+# Testing
 
-###  Github
+## End to End with Cypress
 
-I have created an additional branch called develop. Amplify then builds two environments - one for development and one production (built from master). Also any branches that start with feature/** will be built and have an environment created for them. Environments can further be created for pull requests but that needs the project to be private. I would of course suggest that the application does become private again on GitHub.
+<https://docs.aws.amazon.com/amplify/latest/userguide/running-tests.html>
 
-#### GitFlow
+<https://docs.cypress.io/guides/getting-started/installing-cypress.html#Opening-Cypress>
 
-This a good standard way of managing changes - in uber summary it goes. Dev codes into develop or creates a branch from develop. Developer checks in code. The dev environment is built by Amplify (and available at <https://dev.socialsensing.com/> ). The developer issues a pull request on GitHub to bring the changes into master. Those changes are potentially reviewed and (tested) then the pull request is accepted (or declined!). The pull request merges the code into master - which triggers Amplify to build production ( <https://new.socialsensing.com/> ).
+End to end tests are peformed using [Cypress](https://cypress.io). All end to end (integration) tests will be executed on a build in a release branch and the quick tests on a feature branch.
 
-### Testing
+To run the tests you need to run the following, substituting username and password.
 
-There is a lot of boiler plate code for testing in the app, as you can imagine that has not been within scope during the work to get this together. However going forward using continuous deployment it will be necessary - as continuous deployment mandates automated testing. For now, you don't need to implement full continuous deployment.
+    export TEST_AC_USER=<username>,TEST_AC_PASS=<password> ./bin/cypress.sh
+   
+The test folder is [cypress](/cypress) and the tests themselves are in the [integration](/cypress/integration) folder.
+
+Within the [cypress](/cypress) folder there are the following that you will need to use:
+
+The quick tests are run during builds of feature and release branches and can be found in [integration/01_quick](/cypress/integration/01_quick), tests that are directly related to issues are in the [integration/01_quick/00_issues](/cypress/integration/01_quick/00_issues) folder and are prefixed with the issue id from GitHub.
+
+The slow tests are run during builds of release branches (or manually) only and can be found in [integration/slow](/cypress/integration/00_slow), tests that are directly related to issues are in the [integration/00_slow/00_issues](/cypress/integration/00_slow/00_issues) folder and are prefixed with the issue id from GitHub. The difference is simply how long a test takes to run.
+
+### Writing custom commands
+
+<https://docs.cypress.io/api/cypress-api/custom-commands.html>
+
+The [commands.js](cypress/support/commands.js) file contains custom commands that can be used in Cypress tests. They are very straightforward to write and basically are defined like:
+
+```javascript
+Cypress.Commands.add("twitterPanelHeader", (text) => {
+  cy.get("twitter-panel");
+  cy.get(".tinfo-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  cy.wait(1000);
+  cy.get(".tinfo-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  cy.get("twitter-panel .tweets-header", {timeout: LONG_TIMEOUT});
+  cy.get("twitter-panel .tweets-header  mat-card > span > b", {timeout: LONG_TIMEOUT}).should("contain.text", text);
+});
+```
+
+and used like
+
+```javascript
+ describe('select county and date range', () => {
+    const url = "http://localhost:4200/map?selected=scottish%20borders&min_offset=-1439&max_offset=0&zoom=5";
+    it('with no tweets', () => {
+      cy.visitAndWait(url);
+      cy.get(".slider-date-time", {timeout: 20000});
+      cy.get(".slider-date-time-max .slider-date").should("contain.text","15-Oct-18");
+      cy.get(".slider-date-time-max .slider-time").should("contain.text", "12 AM");
+      cy.get(".app-tweet-drawer", {timeout: 60000}).should("be.visible");
+      cy.url().should("equal", url);
+      
+      cy.twitterPanelHeader("No Tweets from Scottish Borders");
+
+      cy.logout();
+    });
+  });
+```
+
+### Using Fixtures and Stubbing Services
+
+The [fixtures](/cypress/fixtures) folder contains data used to stub out remote services for testing purposes. In our case this is the live.json data retrieved from S3. In the commands.js file you will see how they are used.
+
+This is a huge topic please, please read the Cypress docs on fixtures and the ```cy.route(...)``` command. But let's quickly focus in on the key parts:
+
+#### Live.json
+
+The live.json file is usually retrieved from S3 securely by the app. However certain bugs only manifest with sepcific data. For example a region where every tweet has been deleted. So to test those issues we need to capture the live.json for the issue then save it to the [fixtures](/cypress/fixtures) folder and then tell the test we're writing to use that data set.
+ 
+You will see something like this in [commands.js](cypress/support/commands.js)
+
+```javascript
+    Cypress.Commands.add("stubLiveJson", (file) => {
+    // prepare network responses
+      cy.server();
+    // this is where we tell cypress to intercept
+    // certain XHR calls,
+    // and to stub in our fixture instead
+      cy.route({
+             // our example is a GET call, but you could also
+             // have a POST, if you're pushing data up
+             method:   "GET",
+             // more on the URL below
+             url:      /.*\/public\/live.json?.*/g,
+             // the fixture: shortcut will know to
+             // look in cypress/fixtures,
+             // unless you configure cypress to
+             // put it somewhere else
+             response: "fixture:" + file + ".json"
+           });
+
+});
+```
+
+This creates a command we can use in Cypress tests called cy.stubLiveJson() that takes a file name (minus the .json extension) of a fixture to use replace the live.json normally loaded by the app. It is usually used like this :
+
+```javascript
+      beforeEach(function () {
+                ...
+          cy.stubLiveJson("live-old");
+                ...
+      });
+```
+
+    
+#### GraphQL (DynamoDB access)
+
+This is a work in progress, the initial hack just turns off all tweet ignores and is called using:
+
+```javascript
+    cy.mockGraphQL();
+```
+
+It is a complex subject that had me wracking my brains for hours. The solution I've done is sub par but works. Expect more work on this at a later date.    
+
+### Retries
+
+The [Cypress Retries Plugin](https://github.com/Bkucera/cypress-plugin-retries) is used to make Cypress retry flakey tests. In the [cypress.json](cypress.json) file we configure the retries.
+
+```json
+{
+  "env": {
+    "RETRIES": 2
+  }
+}
+```
+
+The retry count is overidden by the CYPRESS_RETRIES environment variable in the [Amplify Console](https://eu-west-2.console.aws.amazon.com/amplify/home?region=eu-west-2#/dtmxl3q3i7oix/settings/variables).
 
 
-###  Issue Tracking 
+### Cross-Browser Testing
 
-Please see <https://github.com/socialsensingbot/frontend/issues> for issues and for managing issues and tasks please see the Kanban board <https://github.com/socialsensingbot/frontend/projects/1> 
+At present this is not automated but there is a script that runs through all the main browsers supported by cypress in ```bin/test-browsers.sh``` pass the path to the test or tests as the first argument.
+
+##  Issue Tracking 
+
+The issues are tracked at:
+
+ <https://github.com/socialsensingbot/frontend/issues>
+
+For managing issues and tasks please see the Kanban board:
+ 
+ <https://github.com/socialsensingbot/frontend/projects/1>
+
+To see the latest development milestones: 
+
+ <https://github.com/socialsensingbot/frontend/milestones> 
 
 ## Further help
 
@@ -371,7 +497,7 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 [The Application Structure]: #the-application-structure
 [The Structure of an Angular Application]: #the-structure-of-an-angular-application
-[Branches, Environments and Deployments]: #branches-environments-and-deployments
+
 [AWS Amplify]: #aws-amplify
 [Angular]: #angular
 [Getting Started]: #getting-started
@@ -381,8 +507,6 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 [AWS Cognito]: #aws-cognito
 [AWS Route 53]: #aws-route-53
 [AWS S3 & CloudFront]: #aws-s3--cloudfront
-[Github]: #github
-[GitFlow]: #gitflow
 [Development server]: #development-server
 [Code scaffolding]: #code-scaffolding
 [Build]: #build
@@ -394,14 +518,27 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 [Issue Tracking]: #issue-tracking
 [Authentication Component (auth)]: #authentication-component-auth
 [Sign-in Component (sign-in)]: #sign-in-component-sign-in
-[Simple Development]: #simple-development
-[Feature Branch Development]: #feature-branch-development
 [The Development/Release Cycle]: #the-developmentrelease-cycle
 [Design]: #design
 [Material Design]: #material-design
 [Angular Material]: #angular-material
 [Creating a Live User]: #creating-a-live-user
 [Setting a Users Password]: #setting-a-users-password
+[End to End with Cypress]: #end-to-end-with-cypress
+[Using Fixtures and Stubbing Services]: #using-fixtures-and-stubbing-services
+[GraphQL (DynamoDB access)]: #graphql-dynamodb-access
+[The Branches]: #the-branches
+[The Process]: #the-process
+[Live.json]: #livejson
+[Cross-Browser Testing]: #cross-browser-testing
+
+
+
+
+
+
+
+
 
 
 

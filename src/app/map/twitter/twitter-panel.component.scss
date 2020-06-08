@@ -1,0 +1,111 @@
+$tweetWidth: 540px;
+$tweetMargin: 8px;
+$tweetHeaderOffset: 16px;
+
+::ng-deep {
+  .mat-tab-body-wrapper, .mat-tab-group {
+    height: 100%;
+    max-height: 100%;
+    min-height: 100%;
+    display: block;
+  }
+
+  .mat-tab-body.mat-tab-body-active {
+    overflow: hidden !important;
+  }
+
+
+}
+
+.app-tweet-outer {
+  display: block;
+  height: 100%;
+  max-height: 100%;
+  min-height: 100%;
+  font-size: 16px;
+  overflow: hidden;
+  width: 564px;
+  max-width: 564px;
+  min-width: 564px;
+  margin: 0;
+  padding: 0;
+
+  .app-tweet-area-loading-spinner {
+    margin: 2em auto;
+    margin-top: 24px;
+    opacity: 0.3;
+  }
+
+  .mat-tab-body {
+    overflow-x: visible;
+  }
+
+
+  .app-tweet-table {
+    display: block;
+    height: calc(100vh - 174px);
+    position: relative;
+    overflow: visible;
+
+
+    .app-tweet-date-separator {
+      opacity: 0.4;
+      margin-top: 1em;
+      margin-bottom: 1em;
+    }
+
+    .app-tweet-scroll-spinner-outer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: $tweetWidth;
+      text-align: center;
+      max-width: $tweetWidth;
+
+      span {
+        opacity: 0.3;
+      }
+
+      .app-tweet-scroll-spinner {
+        height: 24px;
+        width: 24px;
+        margin: 0 auto;
+
+      }
+    }
+
+    .app-tweet-paged {
+      display: flex;
+      align-items: stretch;
+      flex-direction: column;
+      height: 100%;
+
+    }
+
+
+  }
+
+
+  .app-tweet-header {
+    //position: rel;
+    z-index: 10;
+    margin-right: 14px;
+    margin-left: 14px;
+    margin-bottom: 0;
+    margin-top: 16px;
+    //background: white;
+
+    .app-tweet-heading {
+      font-size: 1.2em;
+      margin: 0;
+      line-height: 1.5em;
+    }
+
+  }
+
+
+}
+
+.app-tweet-refresh-btn {
+  opacity: 0.4;
+}

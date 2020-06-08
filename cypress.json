@@ -1,1 +1,6 @@
-{}
+{
+  "env": {
+    "RETRIES": 2
+  },
+  "projectId": "zxxo89"
+}

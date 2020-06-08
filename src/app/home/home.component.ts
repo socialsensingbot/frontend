@@ -11,8 +11,7 @@ export class HomeComponent implements OnInit {
   constructor( private _router: Router  ) { }
 
   ngOnInit() {
-
-    this._router.navigate(['/map'],{queryParamsHandling:"merge"});
+    this._router.navigate(['/map'], {queryParamsHandling: "merge"});
   }
 
 }
