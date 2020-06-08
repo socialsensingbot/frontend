@@ -102,15 +102,15 @@ export class UIExecutionService {
       const executionTask = new ExecutionTask(resolve, reject, task, name, waitForStates, dedupKey, this._notify);
       if (dedupKey !== null) {
         if (this.dedupMap.has(dedupKey)) {
-          if (replace) {
-            if (!silent) {
+          if (replaceExisting) {
+            if (!silentFailure) {
               log.warn(`Replacing duplicate ${name} (${dedupKey}) on execution queue`);
             }
             const oldTask = this.dedupMap.get(dedupKey);
             this._queue = this._queue.filter(i => i.dedup !== oldTask.dedup);
             this.dedupMap.set(dedupKey, executionTask);
           } else {
-            if (silent) {
+            if (silentFailure) {
               resolve();
             } else {
               log.warn(
