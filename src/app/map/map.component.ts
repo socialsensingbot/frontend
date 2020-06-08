@@ -205,7 +205,7 @@ export class MapComponent implements OnInit, OnDestroy {
         queryParams:         this._newParams,
         queryParamsHandling: 'merge'
       });
-    })
+    }, "", true, true)
 
   }
 
@@ -755,7 +755,7 @@ export class MapComponent implements OnInit, OnDestroy {
     log.debug("showTweets()");
     this._exec.queue("Tweets Visible", ["ready"], () => {
       this.tweetsVisible = true;
-    });
+    }, "tweets.visible", true);
   }
 
   /**
