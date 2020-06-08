@@ -37,7 +37,7 @@ export class PreferenceService {
     this._userInfo = userInfo;
     const groups = (await Auth.currentAuthenticatedUser()).signInUserSession.accessToken.payload["cognito:groups"];
     this._email = userInfo.attributes.email;
-    if (groups.length === 1) {
+    if (!groups || groups.length === 1) {
       this._groups = groups;
     } else if (groups.length === 0) {
       this._groups = ["testuser"]
