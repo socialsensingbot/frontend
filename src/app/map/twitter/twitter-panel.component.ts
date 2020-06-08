@@ -48,8 +48,8 @@ export class TwitterPanelComponent implements OnChanges {
             this._tweets = [];
             this.hiddenTweets = [];
             this.visibleTweets = [];
-            this.ready = false;
-            log.debug("Tweets reset");
+          this.ready = true;
+          log.debug("Tweets reset");
             return;
         }
 
