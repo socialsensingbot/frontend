@@ -150,8 +150,6 @@ export class MapComponent implements OnInit, OnDestroy {
   };
 
 
-
-
   constructor(private _router: Router,
               private route: ActivatedRoute,
               private _zone: NgZone,
@@ -704,7 +702,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   private async updateLayers(reason: string = "") {
-    return await this._exec.queue("Update Layers: " + reason, ["ready", "data-loaded"], async () => {
+    return await this._exec.queue("Update Layers: " + reason, ["ready", "data-loaded", "data-refresh"], async () => {
                                     // Mark as stale to trigger a refresh
                                     if (!this._updating) {
                                       this.activity = true;
@@ -731,7 +729,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                       log.debug("Update in progress so skipping this update");
                                     }
                                   }
-      , `${this._dateMin} ${this._dateMax}`).catch(e => {
+      , "", true, true).catch(e => {
       if (e !== DUPLICATE_REASON) {
         log.error(e);
       }
