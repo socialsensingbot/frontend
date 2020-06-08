@@ -1,14 +1,14 @@
 <mat-sidenav-container class="map-outer">
-  <mat-sidenav class="tweet-drawer" #sidenav [(opened)]="tweetsVisible" disableClose mode="side">
+  <mat-sidenav class="app-tweet-drawer" #sidenav [(opened)]="tweetsVisible" disableClose mode="side">
     <button mat-icon-button class="draw-close-button" aria-label="Close" (click)="sidenav.toggle()">
       <mat-icon>close</mat-icon>
     </button>
-    <div class="tweets-outer">
-      <twitter-panel [count]="tweetCount" [region]="selectedRegion" [exceedanceProbability]="exceedanceProbability"
-                     [embeds]="embeds" [showHeaderInfo]="twitterPanelHeader"
-                     [showTimeline]="showTwitterTimeline"></twitter-panel>
 
-    </div>
+    <twitter-panel class="twitter-panel" [count]="tweetCount" [region]="selectedRegion"
+                   [exceedanceProbability]="exceedanceProbability"
+                   [tweets]="tweets" [showHeaderInfo]="twitterPanelHeader"
+                   [showTimeline]="showTwitterTimeline"></twitter-panel>
+
   </mat-sidenav>
   <mat-sidenav-content>
     <div class="map-surround">
@@ -18,15 +18,14 @@
            [leafletOptions]="options">
       </div>
     </div>
-    <map-legend *ngIf="ready" class="legend" [activeNumber]="activeNumberLayerShortName" [colorData]="colorData"
-                [colorFunctions]="colorFunctions"></map-legend>
+    <map-legend *ngIf="ready" class="legend" [activeNumber]="activeNumberLayerShortName"></map-legend>
     <div class="date-slider">
-      <date-range-slider [style.visibility]="ready ? 'visible' : 'hidden'" (dateRange)="sliderChange($event)" [timeKeyedData]="timeKeyedData"
+      <date-range-slider [style.opacity]="ready ? '1.0' : '0.0'" (dateRange)="sliderChange($event)"
                          (onEnd)="sliderChangeOnEnd($event)"
                          [options]="sliderOptions"></date-range-slider>
     </div>
 
-    <mat-progress-bar *ngIf="loading" class="map-progress" mode="indeterminate"></mat-progress-bar>
+    <mat-progress-bar *ngIf="activity && ready" class="map-progress" mode="indeterminate"></mat-progress-bar>
     <!--    <div class="map-inset-shadow"></div>-->
   </mat-sidenav-content>
 </mat-sidenav-container>

@@ -68,7 +68,7 @@ export class NewPassComponent implements OnInit {
     return this.auth.completeNewPassword(this.passwordInput.value).then(() => {
       log.debug("completed new password");
       this._router.navigate(['/map'], {queryParamsHandling: "merge"});
-    }).catch(e => console.error(e));
+    }).catch(e => log.error(e));
   }
 
 

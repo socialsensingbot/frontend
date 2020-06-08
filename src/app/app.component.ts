@@ -1,11 +1,14 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AmplifyService} from 'aws-amplify-angular';
 import {AuthService} from "./auth/auth.service";
 import {API, Auth, graphqlOperation, Logger} from "aws-amplify";
-import {NavigationEnd, NavigationExtras, NavigationStart, Router} from "@angular/router";
+import {Router} from "@angular/router";
 import {environment} from "../environments/environment";
 import {PreferenceService} from "./pref/preference.service";
-import {filter, map} from "rxjs/operators";
+import {NotificationService} from "./services/notification.service";
+import {APIService, OnCreateUserSessionSubscription} from "./API.service";
+import {SessionService} from "./auth/session.service";
+
 const log = new Logger('app');
 
 @Component({
@@ -13,22 +16,24 @@ const log = new Logger('app');
              templateUrl: './app.component.html',
              styleUrls:   ['./app.component.scss']
            })
-export class AppComponent  {
-
+export class AppComponent {
 
   title = 'SocialSensing.com';
+  public isDev: boolean = !environment.production;
   user: any;
-  usernameAttributes = "email";
   isAuthenticated: boolean;
   public isSignup: boolean = !environment.production;
 
   constructor(private amplifyService: AmplifyService, public auth: AuthService,
-              private _router: Router, private _pref: PreferenceService) {
+              private _router: Router, private _pref: PreferenceService,
+              private _notify: NotificationService,
+              private _api: APIService,
+              private _session: SessionService) {
     Auth.currentAuthenticatedUser({bypassCache: true})
         .then(user => this.isAuthenticated = (user != null))
         .then(() => this.checkSession())
         .catch(err => log.debug(err));
-    auth.authState.subscribe((event: string) => {
+    auth.state.subscribe((event: string) => {
       if (event === AuthService.SIGN_IN) {
         this.isAuthenticated = true;
         this.isSignup = false;
@@ -41,6 +46,8 @@ export class AppComponent  {
         this._pref.clear();
       }
     });
+
+    this._router.events.subscribe((val) => log.verbose("Router Event: ", val));
 
   }
 
@@ -55,22 +62,25 @@ export class AppComponent  {
       const userInfo = await Auth.currentUserInfo();
       if (userInfo) {
         await this._pref.init(userInfo);
+        await this._session.open(userInfo);
       }
+
       if (userInfo && userInfo.attributes.profile) {
-        const avatar = userInfo.attributes.profile;
+
         this.user = userInfo;
         this.isAuthenticated = true;
         this.isSignup = false;
 
-
       }
+
     } catch (error) {
-      console.error('no session: ', error);
+      this._notify.error(error)
     }
   }
 
   public logout() {
     this.isAuthenticated = false;
+    this._session.close();
     Auth.signOut()
         .then(data => this._router.navigate(['/'], {queryParamsHandling: "merge"}))
         .catch(err => log.debug(err));

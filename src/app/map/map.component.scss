@@ -5,8 +5,8 @@ $drawer-width: 568px;
 
 .draw-close-button {
   position: absolute;
-  right: -12px;
-  top: -8px;
+  right: 0px;
+  top: 0px;
   z-index: 100;
 
 }
@@ -37,7 +37,7 @@ $drawer-width: 568px;
   right: 0px;
   position: absolute;
   z-index: -10;
-  pointer-events:all;
+  pointer-events: all;
 
 }
 
@@ -53,7 +53,7 @@ $drawer-width: 568px;
   right: 0px;
 }
 
-.tweet-drawer {
+.app-tweet-drawer {
   max-width: $drawer-width;
   width: $drawer-width;
   min-width: $drawer-width;
@@ -63,21 +63,13 @@ $drawer-width: 568px;
   //box-shadow: 0px 0px 4px rgba(17, 17, 17, 0.63);;
   //overflow: hidden;
   text-align: center;
-
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
   @media screen and (max-width: 768px) {
 
   }
-
-
-
-
-  .tweets-outer {
-
-    max-height: 100%;
-    overflow-x: hidden;
-    font-size: 16px;
-  }
-
 
 }
 

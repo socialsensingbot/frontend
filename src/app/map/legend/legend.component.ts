@@ -1,4 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {ColorCodeService} from "../services/color-code.service";
 
 @Component({
              selector:    'map-legend',
@@ -6,46 +7,27 @@ import {Component, Input, OnInit} from '@angular/core';
              styleUrls:   ['./legend.component.scss']
            })
 export class LegendComponent implements OnInit {
-  public getColor: (number) => string= null;
-  public values: number[]=[];
+  public getColor: (number) => string = null;
+  public values: number[] = [];
   private colors: any[];
 
   @Input()
   public set activeNumber(value: string) {
     this._activeNumber = value;
-    if(this._colorData) {
-      ({values: this.values, colors: this.colors} = (this._colorData)[(this._activeNumber)]);
-    }
-    if(this._colorFunctions) {
-      this.getColor = (this._colorFunctions)[(this._activeNumber)].getColor;
-    }
+    ({values: this.values, colors: this.colors} = (this._color.colorData)[(this._activeNumber)]);
+    this.getColor = (this._color.colorFunctions)[(this._activeNumber)].getColor;
   }
 
   public get activeNumber() {
     return this._activeNumber;
   }
 
-  @Input()
-  public set colorFunctions(value: { stats:(()=>any)[], count:(()=>any)[]}) {
-    this._colorFunctions = value;
-    if(typeof this._activeNumber !== "undefined" && (this._colorFunctions)[(this._activeNumber)] !=null) {
-      this.getColor = (this._colorFunctions)[(this._activeNumber)].getColor;
-    }
+
+  private _activeNumber: string = "stats";
+
+  constructor(private _color: ColorCodeService) {
+
   }
-
-  @Input()
-  public set colorData(value: any) {
-    this._colorData = value;
-    if(typeof this._activeNumber !== "undefined") {
-      ({values: this.values, colors: this.colors} = (this._colorData)[(this._activeNumber)]);
-    }
-  }
-
-  private _colorData: any;
-  private _activeNumber: string="stats";
-  private _colorFunctions: { stats: (() => any)[]; count: (() => any)[] };
-
-  constructor() { }
 
   ngOnInit() {
   }
