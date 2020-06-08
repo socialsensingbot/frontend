@@ -91,7 +91,8 @@ export class UIExecutionService {
 
   }
 
-  public queue(name: String, waitForStates: UIState[] | null, task: () => any, dedup: any = null) {
+  public queue(name: String, waitForStates: UIState[] | null, task: () => any, dedup: any = null,
+               silentFailure: boolean = false, replaceExisting: boolean = false) {
 
     return new Promise<any>((resolve, reject) => {
       let dedupKey = null;
