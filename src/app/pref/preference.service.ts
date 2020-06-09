@@ -88,14 +88,14 @@ export class PreferenceService {
   private async readBlacklist() {
     //todo: this is a hardcoded limit to fix https://github.com/socialsensingbot/frontend/issues/87
     const tweetIgnores = await this._api.ListTweetIgnores(null, 10000);
-    // if (tweetIgnores) {
-    //   this._tweetBlackList.push(...tweetIgnores.items.map(i => i.tweetId));
-    // }
-    //
-    // const userIgnores = await this._api.ListTwitterUserIgnores(null, 10000);
-    // if (userIgnores) {
-    //   this._twitterUserBlackList.push(...userIgnores.items.map(i => i.twitterScreenName));
-    // }
+    if (tweetIgnores) {
+      this._tweetBlackList.push(...tweetIgnores.items.map(i => i.tweetId));
+    }
+
+    const userIgnores = await this._api.ListTwitterUserIgnores(null, 10000);
+    if (userIgnores) {
+      this._twitterUserBlackList.push(...userIgnores.items.map(i => i.twitterScreenName));
+    }
 
     const groupTweetIgnores = await this._api.ListGroupTweetIgnores(null, 10000);
     if (groupTweetIgnores) {
@@ -109,6 +109,11 @@ export class PreferenceService {
 
     log.debug(this._tweetBlackList);
     log.debug(this._twitterUserBlackList);
+
+
+    //////// TODO: ADD SUBSCRIPTION ////////////////
+    //////// TODO: ADD SUBSCRIPTION ////////////////
+    //////// TODO: ADD SUBSCRIPTION ////////////////
 
   }
 
