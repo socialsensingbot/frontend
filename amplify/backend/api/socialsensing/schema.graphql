@@ -20,28 +20,25 @@ type UserSession @model(timestamps: {createdAt: "createdAt", updatedAt: "updated
 
 type GroupPreferences @model @auth(rules: [{allow: groups, operations: [create, update, delete, read], groupsField: "group"}]){
   id: ID!
-  ignoreTweets: [GroupTweetIgnore] @connection(name: "GroupTweetIgnores")
-  ignorePeople: [GroupTwitterUserIgnore] @connection(name: "GroupTwitterUserIgnores")
   group: String
 }
 
 
-type GroupTweetIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" })  @auth(rules: [{allow: groups, groupsField: "ownerGroups"}]) {
+type GroupTweetIgnore @model( timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" })  @auth(rules: [{allow: groups, groupsField: "ownerGroups"}]) {
   id: ID!
   url: String!
   ignoredBy: String!
   tweetId: String!
-  group: GroupPreferences @connection(name: "GroupTweetIgnores")
   ownerGroups: [String]
+  scope: String
 }
-
 
 type GroupTwitterUserIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" })   @auth(rules: [{allow: groups, groupsField: "ownerGroups"}]) {
   id: ID!
   twitterScreenName: String!
   ignoredBy: String!
-  group: GroupPreferences @connection(name: "GroupTwitterUserIgnores")
   ownerGroups: [String]
+  scope: String
 }
 
 

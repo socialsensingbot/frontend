@@ -77,12 +77,6 @@ subscription OnDeleteUserSession($owner: String!) {
 subscription OnCreateGroupPreferences {
   onCreateGroupPreferences {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
     group
     createdAt
     updatedAt
@@ -91,12 +85,6 @@ subscription OnCreateGroupPreferences {
 subscription OnUpdateGroupPreferences {
   onUpdateGroupPreferences {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
     group
     createdAt
     updatedAt
@@ -105,12 +93,6 @@ subscription OnUpdateGroupPreferences {
 subscription OnDeleteGroupPreferences {
   onDeleteGroupPreferences {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
     group
     createdAt
     updatedAt
@@ -122,13 +104,8 @@ subscription OnCreateGroupTweetIgnore {
     url
     ignoredBy
     tweetId
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
     ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -139,13 +116,8 @@ subscription OnUpdateGroupTweetIgnore {
     url
     ignoredBy
     tweetId
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
     ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -156,13 +128,8 @@ subscription OnDeleteGroupTweetIgnore {
     url
     ignoredBy
     tweetId
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
     ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -172,13 +139,8 @@ subscription OnCreateGroupTwitterUserIgnore {
     id
     twitterScreenName
     ignoredBy
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
     ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -188,13 +150,8 @@ subscription OnUpdateGroupTwitterUserIgnore {
     id
     twitterScreenName
     ignoredBy
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
     ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -204,13 +161,8 @@ subscription OnDeleteGroupTwitterUserIgnore {
     id
     twitterScreenName
     ignoredBy
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
     ownerGroups
+    scope
     createdAt
     updatedAt
   }

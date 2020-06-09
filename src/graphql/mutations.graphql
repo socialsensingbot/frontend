@@ -98,12 +98,6 @@ mutation CreateGroupPreferences(
 ) {
   createGroupPreferences(input: $input, condition: $condition) {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
     group
     createdAt
     updatedAt
@@ -115,12 +109,6 @@ mutation UpdateGroupPreferences(
 ) {
   updateGroupPreferences(input: $input, condition: $condition) {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
     group
     createdAt
     updatedAt
@@ -132,12 +120,6 @@ mutation DeleteGroupPreferences(
 ) {
   deleteGroupPreferences(input: $input, condition: $condition) {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
     group
     createdAt
     updatedAt
@@ -152,13 +134,8 @@ mutation CreateGroupTweetIgnore(
     url
     ignoredBy
     tweetId
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
     ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -172,13 +149,8 @@ mutation UpdateGroupTweetIgnore(
     url
     ignoredBy
     tweetId
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
     ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -192,13 +164,8 @@ mutation DeleteGroupTweetIgnore(
     url
     ignoredBy
     tweetId
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
     ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -211,13 +178,8 @@ mutation CreateGroupTwitterUserIgnore(
     id
     twitterScreenName
     ignoredBy
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
     ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -230,13 +192,8 @@ mutation UpdateGroupTwitterUserIgnore(
     id
     twitterScreenName
     ignoredBy
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
     ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -249,13 +206,8 @@ mutation DeleteGroupTwitterUserIgnore(
     id
     twitterScreenName
     ignoredBy
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
     ownerGroups
+    scope
     createdAt
     updatedAt
   }
