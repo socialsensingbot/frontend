@@ -98,6 +98,7 @@ export class PreferenceService {
 
   private async readBlacklist() {
     //todo: this is a hardcoded limit to fix https://github.com/socialsensingbot/frontend/issues/87
+    //NB: Filtering for scope is done on the server
     const groupTweetIgnores = await this._api.ListGroupTweetIgnores(
       {or: [{scope: {eq: this.groupScope()}}, {scope: {eq: "*"}}]}, 10000);
     if (groupTweetIgnores) {
@@ -105,6 +106,7 @@ export class PreferenceService {
     }
 
     //todo: this is a hardcoded limit to fix https://github.com/socialsensingbot/frontend/issues/87
+    //NB: Filtering for scope is done on the server
     const groupUserIgnores = await this._api.ListGroupTwitterUserIgnores(
       {or: [{scope: {eq: this.groupScope()}}, {scope: {eq: "*"}}]}, 10000);
     if (groupUserIgnores) {
@@ -114,8 +116,7 @@ export class PreferenceService {
     log.debug(this._tweetBlackList);
     log.debug(this._twitterUserBlackList);
 
-    //TODO: Filtering here is done on the client, the filter needs to be in the subscriuption really.
-    //This is run when a new TweetIgnore is created on DynamoDB
+    //TODO: Filtering here is done on the client see https://github.com/socialsensingbot/frontend/issues/114
     const onTweetIgnore = (subObj: any) => {
       const sub: OnCreateGroupTweetIgnoreSubscription = subObj.value.data.onCreateGroupTweetIgnore;
       log.debug("New tweet ignore detected ");
