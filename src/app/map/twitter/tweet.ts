@@ -1,5 +1,12 @@
 import {PolygonLayerShortName} from "../types";
 
+export class CSVExportTweet {
+  constructor(public id: string, public date: Date, public url: string, public text: string) {
+
+  }
+
+}
+
 /**
  * This class encapsulates the data and functionality for the in memory representation of a tweet.
  * The class is lazily initialized on various data accesses as the full construction of this object includes some CPU intensive tasks.
@@ -135,4 +142,11 @@ export class Tweet {
     this._init = tweet._init;
     return this;
   }
+
+  public asCSV(): CSVExportTweet {
+    this.lazyInit();
+    return new CSVExportTweet(this._id, this._date, this._url, this._html);
+  }
 }
+
+

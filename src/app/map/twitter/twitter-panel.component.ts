@@ -14,6 +14,7 @@ import {
   OnDeleteGroupTweetIgnoreSubscription, OnDeleteGroupTwitterUserIgnoreSubscription
 } from "../../API.service";
 import {Subscription} from "rxjs";
+import {ExportToCsv} from "export-to-csv";
 
 const log = new Logger('twitter-panel');
 
@@ -42,6 +43,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
   private tweetUnignoreSub: Subscription;
   private twitterUserIgnoreSub: Subscription;
   private twitterUserUnignoreSub: Subscription;
+  private csvExporter: ExportToCsv;
 
   constructor(private _zone: NgZone, public pref: PreferenceService) {
     Hub.listen("twitter-panel", (e) => {
@@ -49,6 +51,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
         this._zone.run(() => this.updateTweets(this._tweets));
       }
     });
+
 
   }
 
@@ -144,5 +147,23 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
       (sub: OnDeleteGroupTwitterUserIgnoreSubscription) => {
         this.update(null)
       });
+  }
+
+  public download() {
+    const options = {
+      fieldSeparator:   ',',
+      quoteStrings:     '"',
+      decimalSeparator: '.',
+      showLabels:       true,
+      showTitle:        true,
+      title:            `${this.region} Tweets`,
+      useTextFile:      false,
+      useBom:           true,
+      useKeysAsHeaders: true,
+      // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
+    };
+
+    this.csvExporter = new ExportToCsv(options);
+    this.csvExporter.generateCsv(this.visibleTweets.filter(i => i.valid).map(i => i.asCSV()));
   }
 }
