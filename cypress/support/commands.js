@@ -28,10 +28,10 @@ import "cypress-graphql-mock";
 const LONG_TIMEOUT = 60000;
 const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
 
-Cypress.Commands.add("login", () => {
+Cypress.Commands.add("login", (username = Cypress.env("TEST_AC_USER")) => {
   //Login
   cy.url({timeout: LONG_TIMEOUT}).should("contain", "auth/signin")
-  cy.get('input[type=email]').type(Cypress.env("TEST_AC_USER"));
+  cy.get('input[type=email]').type(username);
   cy.get('input[type=password]').type(Cypress.env("TEST_AC_PASS"));
   cy.get('.mat-button-base.mat-raised-button').contains('Sign In');
   cy.get('.mat-button-base.mat-raised-button').contains('Sign In').click();

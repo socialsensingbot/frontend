@@ -50,8 +50,6 @@ export class PreferenceService {
     this._email = userInfo.attributes.email;
     if (!groups || groups.length === 1) {
       this._groups = groups;
-    } else if (groups.length === 0) {
-      this._groups = ["testuser"]
     } else {
       log.error("User is a member of more than one group (not supported)");
     }
@@ -69,18 +67,26 @@ export class PreferenceService {
         this._preferences = pref;
 
       }
-      const groupPref = await this._api.GetGroupPreferences(this._groups[0]);
-      if (!groupPref) {
-        log.debug("No existing preferences.");
-        await this._api.CreateGroupPreferences({id: this._groups[0], group: this._groups[0]});
-        log.debug("Created new group preferences.");
-        this._groupPreferences = await this._api.GetGroupPreferences(this._groups[0]);
+      if (!groups || groups.length === 0) {
+        this._notify.show(
+          "Your account is not a member of a group, please ask an administrator to fix this. The application will not work correctly until you do.",
+          "I Will",
+          180);
+        this._groups = ["__invalid__"];
       } else {
-        log.debug("Existing group preferences.");
-        this._groupPreferences = groupPref;
+        const groupPref = await this._api.GetGroupPreferences(this._groups[0]);
+        if (!groupPref) {
+          log.debug("No existing preferences.");
+          await this._api.CreateGroupPreferences({id: this._groups[0], group: this._groups[0]});
+          log.debug("Created new group preferences.");
+          this._groupPreferences = await this._api.GetGroupPreferences(this._groups[0]);
+        } else {
+          log.debug("Existing group preferences.");
+          this._groupPreferences = groupPref;
 
+        }
+        log.debug(this._preferences);
       }
-      log.debug(this._preferences);
       this.readBlacklist();
       log.debug("** Preference Service Initialized **");
     } catch (e) {
