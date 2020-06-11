@@ -23,8 +23,6 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 - [AWS Services]
   - [AWS Amplify] 
   - [AWS Cognito] 
-    - [Creating a Live User] 
-    - [Setting a Users Password] 
   - [AWS Route 53] 
   - [AWS S3 & CloudFront] 
 - [Testing] 
@@ -294,27 +292,6 @@ Please now read about [Branches, Environments and Deployments] to understand wha
 <https://aws.amazon.com/cognito/>
 
 This is what is used for user management, you will see there are two user pools, one for [production](https://eu-west-2.console.aws.amazon.com/cognito/users/?region=eu-west-2#/pool/eu-west-2_dkJC8ZcOU/details?_k=9e2wps) and one for [development](https://eu-west-2.console.aws.amazon.com/cognito/users/?region=eu-west-2#/pool/eu-west-2_L3RQGANbS/details?_k=kpehkf). 
-
-#### Creating a Live User
-
-<https://docs.aws.amazon.com/cli/latest/reference/cognito-idp/admin-create-user.html>
-
-There is a script in the bin directory called create-user.sh and is used as follows
-
-```
-    ./bin/create-user.sh <email> <passsword>
-```
-
-#### Setting a Users Password
-
-<https://docs.aws.amazon.com/cli/latest/reference/cognito-idp/admin-set-user-password.html>
-
-There is a script in the bin directory called set-live-password.sh and is used as follows
-
-```
-    ./bin/set-live-password.sh <user> <passsword>
-```
-
 
 ### AWS S3 & CloudFront
 

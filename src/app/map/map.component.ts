@@ -150,8 +150,6 @@ export class MapComponent implements OnInit, OnDestroy {
   };
 
 
-
-
   constructor(private _router: Router,
               private route: ActivatedRoute,
               private _zone: NgZone,
@@ -201,13 +199,13 @@ export class MapComponent implements OnInit, OnDestroy {
 
     // Merge the params to change into _newParams which holds the
     // next set of parameters to add to the URL state.
-    return this._exec.queue("Update URL Query Params", ["ready", "data-refresh"], () => {
+    return this._exec.queue("Update URL Query Params", ["ready", "data-refresh"], async () => {
       this._newParams = {...this._newParams, ...params};
-      this._router.navigate([], {
+      await this._router.navigate([], {
         queryParams:         this._newParams,
         queryParamsHandling: 'merge'
       });
-    })
+    }, "", true, true)
 
   }
 
@@ -333,7 +331,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this._searchParams.subscribe(params => {
       if (!this._params) {
         this._exec.queue("Initial Search Params", ["ready", "no-params"],
-                         () => {
+                         async () => {
                            this._params = true;
                            this.updateMapFromQueryParams(params);
                            //Listeners to push map state into URL
@@ -347,20 +345,23 @@ export class MapComponent implements OnInit, OnDestroy {
                              return this._zone.run(() => this.updateSearch({zoom: this._map.getZoom()}));
                            });
 
-                           map.on('baselayerchange', (e: any) => {
-                             log.debug("New baselayer " + e.name);
-                             if (e.name in this._basemapControl.polygon) {
-                               this.activePolyLayerShortName = this._polyLayersNameMap[e.name];
-                               this.updateSearch({active_polygon: this.activePolyLayerShortName, selected: null});
-                               this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
-                                 this.activity = true;
-                                 this.resetLayers(true);
-                                 this.activity = false;
-                               });
-                             } else {
-                               this.activeNumberLayerShortName = this._numberLayersNameMap[e.name];
-                               this.updateSearch({active_number: this.activeNumberLayerShortName});
-                             }
+                           map.on('baselayerchange', async (e: any) => {
+                             this._zone.run(async () => {
+                               log.debug("New baselayer " + e.name);
+                               if (e.name in this._basemapControl.polygon) {
+                                 this.activePolyLayerShortName = this._polyLayersNameMap[e.name];
+                                 this.updateSearch(
+                                   {active_polygon: this.activePolyLayerShortName, selected: null});
+                                 this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
+                                   this.activity = true;
+                                   this.resetLayers(true);
+                                   this.activity = false;
+                                 });
+                               } else {
+                                 this.activeNumberLayerShortName = this._numberLayersNameMap[e.name];
+                                 this.updateSearch({active_number: this.activeNumberLayerShortName});
+                               }
+                             });
                            });
                            this._exec.changeState("ready");
                            map.addControl(zoomControl);
@@ -704,34 +705,34 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   private async updateLayers(reason: string = "") {
-    return await this._exec.queue("Update Layers: " + reason, ["ready", "data-loaded"], async () => {
-                                    // Mark as stale to trigger a refresh
-                                    if (!this._updating) {
-                                      this.activity = true;
-                                      this._updating = true;
-                                      try {
+    return this._exec.queue("Update Layers: " + reason, ["ready", "data-loaded", "data-refresh"], async () => {
+                              // Mark as stale to trigger a refresh
+                              if (!this._updating) {
+                                this.activity = true;
+                                this._updating = true;
+                                try {
 
-                                        this._exec.changeState("data-refresh");
-                                        await this._data.updateData(this._dateMin, this._dateMax);
-                                        this.clearMapFeatures();
-                                        this.updateRegionData();
-                                        this.resetLayers(false);
-                                        if (this._params) {
+                                  this._exec.changeState("data-refresh");
+                                  await this._data.updateData(this._dateMin, this._dateMax);
+                                  this.clearMapFeatures();
+                                  this.updateRegionData();
+                                  this.resetLayers(false);
+                                  if (this._params) {
 
-                                          this._exec.changeState("ready");
-                                        } else {
-                                          this._exec.changeState("no-params");
-                                        }
-
-                                      } finally {
-                                        this.activity = false;
-                                        this._updating = false;
-                                      }
-                                    } else {
-                                      log.debug("Update in progress so skipping this update");
-                                    }
+                                    this._exec.changeState("ready");
+                                  } else {
+                                    this._exec.changeState("no-params");
                                   }
-      , `${this._dateMin} ${this._dateMax}`).catch(e => {
+
+                                } finally {
+                                  this.activity = false;
+                                  this._updating = false;
+                                }
+                              } else {
+                                log.debug("Update in progress so skipping this update");
+                              }
+                            }
+      , "", true, true).catch(e => {
       if (e !== DUPLICATE_REASON) {
         log.error(e);
       }
@@ -754,7 +755,7 @@ export class MapComponent implements OnInit, OnDestroy {
     log.debug("showTweets()");
     this._exec.queue("Tweets Visible", ["ready"], () => {
       this.tweetsVisible = true;
-    });
+    }, "tweets.visible", true);
   }
 
   /**
@@ -769,6 +770,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this._dateMax = upper;
     this._dateMin = lower;
     this.sliderOptions = {...this.sliderOptions, startMin: this._dateMin, startMax: this._dateMax};
+    //NB: The following are executed asynchronously
     this.updateSearch({min_offset: lower, max_offset: upper});
     this.updateLayers("Slider Change");
     this._twitterIsStale = true;

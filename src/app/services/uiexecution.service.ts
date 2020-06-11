@@ -52,20 +52,20 @@ export class UIExecutionService {
   private _state: UIState = "init";
   public state = new EventEmitter<UIState>();
 
-  private dedupSet: Set<any> = new Set<any>();
+  private dedupMap: Map<any, ExecutionTask> = new Map<any, ExecutionTask>();
 
   constructor(private _notify: NotificationService) { }
 
   public async start() {
     await Auth.currentAuthenticatedUser() !== null
     this._executionTimer = timer(0, 100).subscribe(() => {
-      if (this._queue.length > 0 && !this._pause) {
+      while (this._queue.length > 0 && !this._pause) {
         const task = this._queue.shift();
 
         if (task.waitForStates === null || task.waitForStates.indexOf(this._state) >= 0) {
           task.execute()
           if (task.dedup !== null) {
-            this.dedupSet.delete(task.dedup);
+            this.dedupMap.delete(task.dedup);
           }
         } else {
           log.warn(
@@ -91,29 +91,42 @@ export class UIExecutionService {
 
   }
 
-  public queue(name: String, waitForStates: UIState[] | null, task: () => any, dedup: any = null) {
+  public queue(name: String, waitForStates: UIState[] | null, task: () => any, dedup: any = null,
+               silentFailure: boolean = false, replaceExisting: boolean = false) {
 
     return new Promise<any>((resolve, reject) => {
       let dedupKey = null;
-      if (dedup != null) {
+      if (dedup !== null) {
         dedupKey = name + ":" + dedup;
 
       }
-      if (dedupKey != null) {
-        if (this.dedupSet.has(dedupKey)) {
-          log.warn(
-            `Skipped duplicate ${name} (${dedupKey}) on execution queue as this task is already in progress`)
-          reject(DUPLICATE_REASON);
-          return;
+      const executionTask = new ExecutionTask(resolve, reject, task, name, waitForStates, dedupKey, this._notify);
+      if (dedupKey !== null) {
+        if (this.dedupMap.has(dedupKey)) {
+          if (replaceExisting) {
+            if (!silentFailure) {
+              log.warn(`Replacing duplicate ${name} (${dedupKey}) on execution queue`);
+            }
+            const oldTask = this.dedupMap.get(dedupKey);
+            this._queue = this._queue.filter(i => i.dedup !== oldTask.dedup);
+            this.dedupMap.set(dedupKey, executionTask);
+          } else {
+            if (silentFailure) {
+              resolve();
+            } else {
+              log.warn(
+                `Skipped duplicate ${name} (${dedupKey}) on execution queue as this task is already queued.`);
+              reject(DUPLICATE_REASON);
+            }
+            return;
+          }
         } else {
-          this.dedupSet.add(dedupKey);
-
+          this.dedupMap.set(dedupKey, executionTask);
         }
       }
-      const executionTask = new ExecutionTask(resolve, reject, task, name, waitForStates, dedupKey, this._notify);
       this._queue.push(executionTask);
       log.debug(`Added ${name} to queue`);
-    })
+    });
   }
 
   public changeState(newState: UIState) {

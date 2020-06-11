@@ -1,1 +1,13 @@
-{}
+{
+  "groupPermissionMap": {
+    "metoffice": [
+      "read"
+    ],
+    "socialsensing": [
+      "read"
+    ],
+    "testuser": [
+      "read"
+    ]
+  }
+}
