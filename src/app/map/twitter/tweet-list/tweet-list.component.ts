@@ -1,9 +1,10 @@
-import {Component, EventEmitter, Input, NgZone, OnInit, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
 import {Tweet} from "../tweet";
 import {PreferenceService} from "../../../pref/preference.service";
 import {Hub, Logger} from "aws-amplify";
 import * as $ from "jquery";
 import {IInfiniteScrollEvent} from "ngx-infinite-scroll";
+import {Subscription, timer} from "rxjs";
 
 const log = new Logger('tweet-list');
 
@@ -81,7 +82,7 @@ class TweetPage {
              templateUrl: './tweet-list.component.html',
              styleUrls:   ['./tweet-list.component.scss']
            })
-export class TweetListComponent implements OnInit {
+export class TweetListComponent implements OnInit, OnDestroy {
   /**
    * The TweetListComponent is responsible for managing a invisibly paged infinite scroll collection of tweets. At present all tweets are stored in memory but their rendering is scrolled for browser performance.
    */
@@ -116,6 +117,9 @@ export class TweetListComponent implements OnInit {
    */
   @Input() public group: "hidden" | "visible";
   public firstVisibleDate: Date;
+  public showDateHeader: boolean;
+  private lastDateShow: number;
+  private _dateHeaderTimer: Subscription;
 
 
   /**
@@ -278,10 +282,16 @@ export class TweetListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this._dateHeaderTimer = timer(5000, 5000).subscribe(() => {
+      if (Date.now() - this.lastDateShow > 5 * 1000) {
+        this.showDateHeader = false;
+      }
+    });
   }
 
   public ngOnDestroy(): void {
     this._destroyed = true;
+    this._dateHeaderTimer.unsubscribe();
   }
 
   public isNewDate(i: number) {
@@ -367,5 +377,7 @@ export class TweetListComponent implements OnInit {
     }
     let i = +firstEl.attr("data-index");
     this.firstVisibleDate = this.tweets[i].date;
+    this.showDateHeader = true;
+    this.lastDateShow = Date.now();
   }
 }
