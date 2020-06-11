@@ -2,7 +2,7 @@ import * as geojson from "geojson";
   export interface Properties {
     name: string;
     count: number;
-    stats: number;
+    stats?: number;
   }
 
   export interface Geometry {

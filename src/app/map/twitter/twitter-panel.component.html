@@ -19,11 +19,11 @@
         <span *ngIf="!region" class="app-tweet-heading" style="color: black">Loading ...<br/></span>
       </ng-container>
 
-      <button mat-icon-button class="app-tweet-refresh-btn" (click)="refresh()">
-        <mat-icon>refresh</mat-icon>
-      </button>
       <button mat-icon-button class="app-tweet-refresh-btn" (click)="download()">
-        <mat-icon>cloud_download</mat-icon>
+        <mat-icon matTooltip="Download these Tweets as a CSV">cloud_download</mat-icon>
+      </button>
+      <button mat-icon-button class="app-tweet-refresh-btn" (click)="refresh()">
+        <mat-icon matTooltip="Refresh Data from Server">refresh</mat-icon>
       </button>
 
     </ng-container>
