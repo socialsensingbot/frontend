@@ -219,10 +219,10 @@ Cypress.Commands.add("mockGraphQL", () => {
                 if (route.url.indexOf('/graphql') >= 0) {
                   const {body} = proxy.request;
                   if (body && body.query && body.query.indexOf(
-                    "ListTweetIgnores") >= 0) {
+                    "ListGroupTweetIgnores") >= 0) {
                     route.response = {
                       "data": {
-                        "listTweetIgnores": {
+                        "listGroupTweetIgnores": {
                           items: []
                         }
                       }
@@ -232,10 +232,10 @@ Cypress.Commands.add("mockGraphQL", () => {
                   }
 
                   if (body && body.query && body.query.indexOf(
-                    "ListTwitterUserIgnores") >= 0) {
+                    "ListGroupTwitterUserIgnores") >= 0) {
                     route.response = {
                       "data": {
-                        "listTwitterUserIgnores": {
+                        "listGroupTwitterUserIgnores": {
                           items: []
                         }
 
@@ -250,15 +250,6 @@ Cypress.Commands.add("mockGraphQL", () => {
                       "data": {
                         "getUserPreferences": {
                           "id":           "434fd82f-3a65-4c66-85c1-b701f2b7ca81",
-                          "ignoreTweets": {
-                            "nextToken": null
-                          },
-                          "ignorePeople": {
-                            "nextToken": null
-                          },
-                          "irrelevant":   {
-                            "nextToken": null
-                          },
                           "owner":        "434fd82f-3a65-4c66-85c1-b701f2b7ca81"
                         }
                       }
