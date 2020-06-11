@@ -28,7 +28,7 @@ import "cypress-graphql-mock";
 const LONG_TIMEOUT = 60000;
 const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
 
-Cypress.Commands.add("login", (username = Cypress.env("TEST_AC_USER")) => {
+Cypress.Commands.add("login", (username = "cypress1@example.com") => {
   //Login
   cy.url({timeout: LONG_TIMEOUT}).should("contain", "auth/signin")
   cy.get('input[type=email]').type(username);
