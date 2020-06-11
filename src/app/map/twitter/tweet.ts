@@ -97,7 +97,7 @@ export class Tweet {
       if (matched) {
         this._sender = matched[1];
         console.assert(this._id == matched[2]);
-        this._url = "https://twitter.com/" + this._sender + "status/" + this._id
+        this._url = "https://twitter.com/" + this._sender + "/status/" + this._id
       }
       this._date = new Date(Number(this._internalDateString.substring(0, 4)),
                             Number(this._internalDateString.substring(4, 6)) - 1,

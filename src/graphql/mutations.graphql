@@ -98,12 +98,6 @@ mutation CreateGroupPreferences(
 ) {
   createGroupPreferences(input: $input, condition: $condition) {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
     group
     createdAt
     updatedAt
@@ -115,12 +109,6 @@ mutation UpdateGroupPreferences(
 ) {
   updateGroupPreferences(input: $input, condition: $condition) {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
     group
     createdAt
     updatedAt
@@ -132,12 +120,6 @@ mutation DeleteGroupPreferences(
 ) {
   deleteGroupPreferences(input: $input, condition: $condition) {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
     group
     createdAt
     updatedAt
@@ -150,13 +132,10 @@ mutation CreateGroupTweetIgnore(
   createGroupTweetIgnore(input: $input, condition: $condition) {
     id
     url
+    ignoredBy
     tweetId
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
+    ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -168,13 +147,10 @@ mutation UpdateGroupTweetIgnore(
   updateGroupTweetIgnore(input: $input, condition: $condition) {
     id
     url
+    ignoredBy
     tweetId
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
+    ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -186,13 +162,10 @@ mutation DeleteGroupTweetIgnore(
   deleteGroupTweetIgnore(input: $input, condition: $condition) {
     id
     url
+    ignoredBy
     tweetId
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
+    ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -204,12 +177,9 @@ mutation CreateGroupTwitterUserIgnore(
   createGroupTwitterUserIgnore(input: $input, condition: $condition) {
     id
     twitterScreenName
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
+    ignoredBy
+    ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -221,12 +191,9 @@ mutation UpdateGroupTwitterUserIgnore(
   updateGroupTwitterUserIgnore(input: $input, condition: $condition) {
     id
     twitterScreenName
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
+    ignoredBy
+    ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -238,12 +205,9 @@ mutation DeleteGroupTwitterUserIgnore(
   deleteGroupTwitterUserIgnore(input: $input, condition: $condition) {
     id
     twitterScreenName
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
+    ignoredBy
+    ownerGroups
+    scope
     createdAt
     updatedAt
   }

@@ -93,6 +93,226 @@
         }
       }
     },
+    "socialsensingGroup": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "GroupName": "socialsensing",
+        "Precedence": 2,
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "socialsensingGroupRole",
+            "Arn"
+          ]
+        },
+        "UserPoolId": {
+          "Ref": "authsocialsensingf07a871cUserPoolId"
+        }
+      }
+    },
+    "socialsensingGroupRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "authsocialsensingf07a871cUserPoolId"
+              },
+              "-socialsensingGroupRole"
+            ]
+          ]
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud": {
+                    "Ref": "authsocialsensingf07a871cIdentityPoolId"
+                  }
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "testuserGroup": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "GroupName": "testuser",
+        "Precedence": 3,
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "testuserGroupRole",
+            "Arn"
+          ]
+        },
+        "UserPoolId": {
+          "Ref": "authsocialsensingf07a871cUserPoolId"
+        }
+      }
+    },
+    "testuserGroupRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "authsocialsensingf07a871cUserPoolId"
+              },
+              "-testuserGroupRole"
+            ]
+          ]
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud": {
+                    "Ref": "authsocialsensingf07a871cIdentityPoolId"
+                  }
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "cypressAGroup": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "GroupName": "cypressA",
+        "Precedence": 4,
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "cypressAGroupRole",
+            "Arn"
+          ]
+        },
+        "UserPoolId": {
+          "Ref": "authsocialsensingf07a871cUserPoolId"
+        }
+      }
+    },
+    "cypressAGroupRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "authsocialsensingf07a871cUserPoolId"
+              },
+              "-cypressAGroupRole"
+            ]
+          ]
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud": {
+                    "Ref": "authsocialsensingf07a871cIdentityPoolId"
+                  }
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "cypressBGroup": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "GroupName": "cypressB",
+        "Precedence": 5,
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "cypressBGroupRole",
+            "Arn"
+          ]
+        },
+        "UserPoolId": {
+          "Ref": "authsocialsensingf07a871cUserPoolId"
+        }
+      }
+    },
+    "cypressBGroupRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "authsocialsensingf07a871cUserPoolId"
+              },
+              "-cypressBGroupRole"
+            ]
+          ]
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud": {
+                    "Ref": "authsocialsensingf07a871cIdentityPoolId"
+                  }
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
     "LambdaExecutionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -291,6 +511,38 @@
       "Value": {
         "Fn::GetAtt": [
           "metofficeGroupRole",
+          "Arn"
+        ]
+      }
+    },
+    "socialsensingGroupRole": {
+      "Value": {
+        "Fn::GetAtt": [
+          "socialsensingGroupRole",
+          "Arn"
+        ]
+      }
+    },
+    "testuserGroupRole": {
+      "Value": {
+        "Fn::GetAtt": [
+          "testuserGroupRole",
+          "Arn"
+        ]
+      }
+    },
+    "cypressAGroupRole": {
+      "Value": {
+        "Fn::GetAtt": [
+          "cypressAGroupRole",
+          "Arn"
+        ]
+      }
+    },
+    "cypressBGroupRole": {
+      "Value": {
+        "Fn::GetAtt": [
+          "cypressBGroupRole",
           "Arn"
         ]
       }

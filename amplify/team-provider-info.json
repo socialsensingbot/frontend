@@ -13,7 +13,8 @@
         },
         "categories": {
             "auth": {
-                "socialsensingf07a871c": {}
+              "socialsensingf07a871c": {},
+              "userPoolGroups": {}
             },
             "function": {
                 "S3Triggerb3a090e2": {}

@@ -1,6 +1,12 @@
-import {Injectable} from '@angular/core';
-import {Logger} from "aws-amplify";
-import {APIService} from "../API.service";
+import {EventEmitter, Injectable} from '@angular/core';
+import {Auth, Logger} from "aws-amplify";
+import {
+  APIService,
+  OnCreateGroupTweetIgnoreSubscription,
+  OnCreateGroupTwitterUserIgnoreSubscription,
+  OnDeleteGroupTweetIgnoreSubscription,
+  OnDeleteGroupTwitterUserIgnoreSubscription
+} from "../API.service";
 import {NotificationService} from "../services/notification.service";
 import {Tweet} from "../map/twitter/tweet";
 
@@ -11,6 +17,7 @@ const log = new Logger('pref-service');
             })
 export class PreferenceService {
   private _preferences: any;
+  private _groupPreferences: any;
   //todo: There must be a better way to do this!
   private _username: Promise<string> = new Promise<string>((resolve) => {
     const loop = () => {
@@ -27,18 +34,32 @@ export class PreferenceService {
   private _tweetBlackList: string[] = [];
   private _twitterUserBlackList: string[] = [];
   private _userInfo: any = null;
+  private _groups: string[] = [];
+  private _email: string;
+
+  public tweetIgnored = new EventEmitter<OnCreateGroupTweetIgnoreSubscription>();
+  public twitterUserIgnored = new EventEmitter<OnCreateGroupTwitterUserIgnoreSubscription>();
+  public tweetUnignored = new EventEmitter<OnDeleteGroupTweetIgnoreSubscription>();
+  public twitterUserUnignored = new EventEmitter<OnDeleteGroupTwitterUserIgnoreSubscription>();
 
   constructor(private _notify: NotificationService, private _api: APIService) { }
 
   public async init(userInfo: any) {
     this._userInfo = userInfo;
+    const groups = (await Auth.currentAuthenticatedUser()).signInUserSession.accessToken.payload["cognito:groups"];
+    this._email = userInfo.attributes.email;
+    if (!groups || groups.length === 1) {
+      this._groups = groups;
+    } else {
+      log.error("User is a member of more than one group (not supported)");
+    }
     log.debug("** Preference Service Initializing **");
     log.debug(userInfo);
     try {
       const pref = await this._api.GetUserPreferences(userInfo.username);
       if (!pref) {
         log.debug("No existing preferences.");
-        this._api.CreateUserPreferences({id: userInfo.username});
+        await this._api.CreateUserPreferences({id: userInfo.username});
         log.debug("Created new preferences.");
         this._preferences = await this._api.GetUserPreferences(userInfo.username);
       } else {
@@ -46,7 +67,26 @@ export class PreferenceService {
         this._preferences = pref;
 
       }
-      log.debug(this._preferences);
+      if (!groups || groups.length === 0) {
+        this._notify.show(
+          "Your account is not a member of a group, please ask an administrator to fix this. The application will not work correctly until you do.",
+          "I Will",
+          180);
+        this._groups = ["__invalid__"];
+      } else {
+        const groupPref = await this._api.GetGroupPreferences(this._groups[0]);
+        if (!groupPref) {
+          log.debug("No existing preferences.");
+          await this._api.CreateGroupPreferences({id: this._groups[0], group: this._groups[0]});
+          log.debug("Created new group preferences.");
+          this._groupPreferences = await this._api.GetGroupPreferences(this._groups[0]);
+        } else {
+          log.debug("Existing group preferences.");
+          this._groupPreferences = groupPref;
+
+        }
+        log.debug(this._preferences);
+      }
       this.readBlacklist();
       log.debug("** Preference Service Initialized **");
     } catch (e) {
@@ -64,43 +104,133 @@ export class PreferenceService {
 
   private async readBlacklist() {
     //todo: this is a hardcoded limit to fix https://github.com/socialsensingbot/frontend/issues/87
-    const tweetIgnores = await this._api.ListTweetIgnores(null, 10000);
-    if (tweetIgnores) {
-      this._tweetBlackList.push(...tweetIgnores.items.map(i => i.tweetId));
+    //NB: Filtering for scope is done on the server
+    const groupTweetIgnores = await this._api.ListGroupTweetIgnores(
+      {or: [{scope: {eq: this.groupScope()}}, {scope: {eq: "*"}}]}, 10000);
+    if (groupTweetIgnores) {
+      this._tweetBlackList.push(...groupTweetIgnores.items.map(i => i.tweetId));
     }
-    // const result2 = await API.graphql(graphqlOperation(listTweetIrrelevants));
-    // if(result2.data.listTweetIrrelevants) {
-    //   this._tweetBlackList.push(...result2.data.listTweetIrrelevants.items.map(i => i.tweetId));
-    // }
+
     //todo: this is a hardcoded limit to fix https://github.com/socialsensingbot/frontend/issues/87
-    const userIgnores = await this._api.ListTwitterUserIgnores(null, 10000);
-    if (userIgnores) {
-      this._twitterUserBlackList.push(...userIgnores.items.map(i => i.twitterScreenName));
+    //NB: Filtering for scope is done on the server
+    const groupUserIgnores = await this._api.ListGroupTwitterUserIgnores(
+      {or: [{scope: {eq: this.groupScope()}}, {scope: {eq: "*"}}]}, 10000);
+    if (groupUserIgnores) {
+      this._twitterUserBlackList.push(...groupUserIgnores.items.map(i => i.twitterScreenName));
     }
+
     log.debug(this._tweetBlackList);
     log.debug(this._twitterUserBlackList);
 
+    //TODO: Filtering here is done on the client see https://github.com/socialsensingbot/frontend/issues/114
+    const onTweetIgnore = (subObj: any) => {
+      const sub: OnCreateGroupTweetIgnoreSubscription = subObj.value.data.onCreateGroupTweetIgnore;
+      log.debug("New tweet ignore detected ");
+      if (!sub.id) {
+        log.warn('Invalid id for sub', sub);
+      }
+      if (this.isInScope(sub)) {
+        log.debug("New tweet ignore is meant for us.", sub);
+        this._tweetBlackList.push(sub.tweetId);
+        this.tweetIgnored.emit(sub);
+      } else {
+        log.debug(`Ignoring out of scope tweet ignore from scope ${sub.scope}`);
+      }
+    };
+
+    this._api.OnCreateGroupTweetIgnoreListener.subscribe(onTweetIgnore);
+    const onTwitterUser = (subObj: any) => {
+      const sub: OnCreateGroupTwitterUserIgnoreSubscription = subObj.value.data.onCreateGroupTwitterUserIgnore;
+      log.debug("New twitter user ignore detected ");
+      if (!sub.id) {
+        log.warn('Invalid id for sub', sub);
+      }
+      if (this.isInScope(sub)) {
+        log.debug("New twitter user ignore is meant for us.", sub);
+        this._twitterUserBlackList.push(sub.twitterScreenName);
+        this.twitterUserIgnored.emit(sub);
+      } else {
+        log.debug(`Ignoring out of scope twitter user ignore from scope ${sub.scope}`);
+      }
+    };
+
+    this._api.OnCreateGroupTwitterUserIgnoreListener.subscribe(onTwitterUser);
+
+
+    const onTweetUnignore = (subObj: any) => {
+      const sub: OnDeleteGroupTweetIgnoreSubscription = subObj.value.data.onDeleteGroupTweetIgnore;
+      log.debug("New tweet unignore detected ");
+      if (!sub.id) {
+        log.warn('Invalid id for sub', sub);
+      }
+      if (this.isInScope(sub)) {
+        log.debug("New tweet unignore is meant for us.", sub);
+        this._tweetBlackList = this._tweetBlackList.filter(i => i !== sub.tweetId);
+        this.tweetUnignored.emit(sub);
+      } else {
+        log.debug(`Ignoring out of scope tweet unignore from scope ${sub.scope}`);
+      }
+    };
+
+    this._api.OnDeleteGroupTweetIgnoreListener.subscribe(onTweetUnignore);
+
+    const onTwitterUserUnignore = (subObj: any) => {
+      const sub: OnDeleteGroupTwitterUserIgnoreSubscription = subObj.value.data.onDeleteGroupTwitterUserIgnore;
+      log.debug("New twitter user unignore detected ");
+      if (!sub.id) {
+        log.warn('Invalid id for sub', sub);
+      }
+      if (this.isInScope(sub)) {
+        log.debug("New twitter user unignore is meant for us.", sub);
+        this._twitterUserBlackList = this._twitterUserBlackList.filter(i => i !== sub.twitterScreenName);
+        this.twitterUserUnignored.emit(sub);
+      } else {
+        log.debug(`Ignoring out of scope twitter user unignore from scope ${sub.scope}`);
+      }
+    };
+
+    this._api.OnDeleteGroupTwitterUserIgnoreListener.subscribe(onTwitterUserUnignore);
   }
+
+  private isInScope(sub: any) {
+    return sub.scope == "*" || sub.scope === this.groupScope();
+  }
+
+  private groupScope() {
+    if (this._groups && this._groups.length > 0) {
+      return "group:" + this._groups[0];
+    } else {
+      return "group:_unknown_";
+    }
+  }
+
   public clear() {
     this._preferences = null;
   }
 
-  public async ignoreSender(tweet: Tweet) {
+  public async groupIgnoreSender(tweet: Tweet) {
+    return await this.ignoreSenderForScope(tweet, this.groupScope());
+  }
+
+
+  private async ignoreSenderForScope(tweet: Tweet, scope: string) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to ignore sender on an unparseable tweet.");
+      this._notify.error("Shouldn't be trying to group ignore sender on an unparseable tweet.");
       return;
     }
     //#87 the value of the await needs to be in a temp variable
     const username = await this._username;
-    const id = username + ":" + tweet.sender;
-    const result = await this._api.GetTwitterUserIgnore(id);
+    const id = scope + ":" + tweet.sender;
+    const result = await this._api.GetGroupTwitterUserIgnore(id);
     log.debug(result);
     if (!result) {
-      const result = this._api.CreateTwitterUserIgnore(
+      const result = this._api.CreateGroupTwitterUserIgnore(
         {
-          id:                      id,
-          twitterScreenName:       tweet.sender,
-          twitterUserIgnoreUserId: username
+          id:                id,
+          twitterScreenName: tweet.sender,
+          ignoredBy:         this._email,
+          ownerGroups:       this._groups,
+          scope:             scope
         }
       );
     } else {
@@ -109,28 +239,35 @@ export class PreferenceService {
     this._twitterUserBlackList.push(tweet.sender);
   }
 
-
   private async checkInit() {
     await this._username;
   }
 
-  public async ignoreTweet(tweet: Tweet) {
+
+  public async groupIgnoreTweet(tweet: Tweet) {
+    return await this.ignoreTweetForScope(tweet, this.groupScope());
+  }
+
+
+  private async ignoreTweetForScope(tweet: Tweet, scope: string) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to ignore tweet on an unparseable tweet.");
+      this._notify.error("Shouldn't be trying to (group) ignore tweet on an unparseable tweet.");
       return;
     }
 
     const username = await this._username;
-    const id = username + ":" + tweet.id;
-    const result = await this._api.GetTweetIgnore(id);
+    const id = scope + ":" + tweet.id;
+    const result = await this._api.GetGroupTweetIgnore(id);
     log.debug(result);
     if (!result) {
-      const result = this._api.CreateTweetIgnore(
+      const result = this._api.CreateGroupTweetIgnore(
         {
           id,
-          url:               tweet.url,
-          tweetId:           tweet.id,
-          tweetIgnoreUserId: username
+          url:         tweet.url,
+          tweetId:     tweet.id,
+          ignoredBy:   this._email,
+          ownerGroups: this._groups,
+          scope:       scope
         }
       );
 
@@ -139,8 +276,6 @@ export class PreferenceService {
     }
     this._tweetBlackList.push(tweet.id);
   }
-
-
 
   public isSenderIgnored(tweet) {
     if (!tweet.valid) {
@@ -159,36 +294,44 @@ export class PreferenceService {
     return this._tweetBlackList.includes(tweet.id);
   }
 
-  public async unIgnoreSender(tweet) {
+  public async groupUnIgnoreSender(tweet) {
+    return await this.unignoreSenderForScope(tweet, this.groupScope());
+  }
 
+  private async unignoreSenderForScope(tweet, scope: string) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to un-ignore sender on an unparseable tweet.");
+      this._notify.error("Shouldn't be trying to (group) un-ignore sender on an unparseable tweet.");
       return;
     }
 
-    this._twitterUserBlackList = this._twitterUserBlackList.filter(i => i !== tweet.sender);
-    const id = (await this._username) + ":" + tweet.sender;
-    const result = await this._api.GetTwitterUserIgnore(id);
+    // this._twitterUserBlackList = this._twitterUserBlackList.filter(i => i !== tweet.sender);
+    await this._username;
+    const id = scope + ":" + tweet.sender;
+    const result = await this._api.GetGroupTwitterUserIgnore(id);
     log.debug(result);
     if (result) {
-      await this._api.DeleteTwitterUserIgnore({id});
+      await this._api.DeleteGroupTwitterUserIgnore({id});
     } else {
       this._notify.show("Not ignoring @" + tweet.sender)
     }
   }
 
-  public async unIgnoreTweet(tweet) {
+  public async groupUnIgnoreTweet(tweet) {
+    return await this.unignoreTweetForScope(tweet, this.groupScope());
+  }
+
+  private async unignoreTweetForScope(tweet, scope: string) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to un-ignore tweet on an unparseable tweet.");
+      this._notify.error("Shouldn't be trying to (group) un-ignore tweet on an unparseable tweet.");
       return;
     }
-
-    const id = (await this._username) + ":" + tweet.id;
-    this._tweetBlackList = this._tweetBlackList.filter(i => i !== tweet.id);
-    const result = await this._api.GetTweetIgnore(id);
+    await this._username;
+    const id = scope + ":" + tweet.id;
+    // this._tweetBlackList = this._tweetBlackList.filter(i => i !== tweet.id);
+    const result = await this._api.GetGroupTweetIgnore(id);
     log.debug(result);
     if (result) {
-      await this._api.DeleteTweetIgnore({id});
+      await this._api.DeleteGroupTweetIgnore({id});
       log.debug(result);
     } else {
       this._notify.show("Not ignoring " + tweet.id);

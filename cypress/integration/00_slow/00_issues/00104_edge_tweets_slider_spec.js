@@ -19,7 +19,6 @@ describe('Slider and tweet interaction : https://github.com/socialsensingbot/fro
       cy.wait(20000);
       cy.url({timeout: 20000}).should("equal",
                                       "http://localhost:4200/map?selected=greater%20london&min_offset=-5757&max_offset=0");
-      cy.tweetCountTotal(148);
       cy.log("Click out of London in any other county");
       cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path[stroke='white']").first().click();
       cy.wait(4000);
