@@ -2,5 +2,13 @@
   {
     "groupName": "metoffice",
     "precedence": 1
+  },
+  {
+    "groupName": "socialsensing",
+    "precedence": 2
+  },
+  {
+    "groupName": "testuser",
+    "precedence": 3
   }
 ]
