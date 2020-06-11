@@ -98,6 +98,7 @@ export class MapComponent implements OnInit, OnDestroy {
   //The UI state fields
   public tweets: Tweet[] = null;
   public selectedRegion: string;
+  public selectedGeometry: Geometry;
   public exceedanceProbability: number;
   public tweetCount: number;
   public tweetsVisible: boolean = false;
@@ -148,7 +149,6 @@ export class MapComponent implements OnInit, OnDestroy {
     zoom:   6,
     center: latLng([53, -2])
   };
-  private selectedGeometry: Geometry;
 
 
   constructor(private _router: Router,
