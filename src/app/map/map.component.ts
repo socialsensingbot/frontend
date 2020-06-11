@@ -26,7 +26,7 @@ import {
   BasemapControl,
   ByRegionType,
   COUNTY,
-  Feature,
+  Feature, Geometry,
   MapLayers,
   NumberLayerFullName,
   numberLayerFullNames,
@@ -148,6 +148,7 @@ export class MapComponent implements OnInit, OnDestroy {
     zoom:   6,
     center: latLng([53, -2])
   };
+  private selectedGeometry: Geometry;
 
 
   constructor(private _router: Router,
@@ -433,24 +434,25 @@ export class MapComponent implements OnInit, OnDestroy {
 
   /**
    * Update the Twitter panel by updating the properties it reacts to.
-   * @param props
+   * @param feature
    */
-  updateTwitterPanel(props?: any) {
-    log.debug(`updateTwitterPanel(${JSON.stringify(props.properties)})`);
-    this.selectedRegion = this.toTitleCase(props.properties.name);
-    if (props.properties.count > 0) {
+  updateTwitterPanel(feature?: Feature) {
+    log.debug(`updateTwitterPanel(${JSON.stringify(feature.properties)})`);
+    this.selectedRegion = this.toTitleCase(feature.properties.name);
+    this.selectedGeometry = feature.geometry;
+    if (feature.properties.count > 0) {
       log.debug("Count > 0");
-      this.exceedanceProbability = Math.round(props.properties.stats * 100) / 100;
-      this.tweetCount = props.properties.count;
+      this.exceedanceProbability = Math.round(feature.properties.stats * 100) / 100;
+      this.tweetCount = feature.properties.count;
       log.debug(`this.activePolyLayerShortName=${this.activePolyLayerShortName}`);
-      this.tweets = this._data.tweets(this.activePolyLayerShortName, props.properties.name);
+      this.tweets = this._data.tweets(this.activePolyLayerShortName, feature.properties.name);
       log.debug(this.tweets);
       this.twitterPanelHeader = true;
       this.showTwitterTimeline = true;
       // Hub.dispatch("twitter-panel",{message:"update",event:"update"});
       this.showTweets()
     } else {
-      log.debug(`Count == ${props.properties.count}`);
+      log.debug(`Count == ${feature.properties.count}`);
       this.twitterPanelHeader = true;
       this.showTwitterTimeline = false;
       this.tweetCount = 0;
