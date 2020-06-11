@@ -1,4 +1,4 @@
-<div *ngIf="showDateHeader" class="app-tweet-list-date-float">
+<div [style.opacity]="showDateHeader ? '0.9':'0'" class="app-tweet-list-date-float">
   <div class="app-tweet-list-date-float-inner">{{firstVisibleDate| date:"medium"}}</div>
 </div>
 
