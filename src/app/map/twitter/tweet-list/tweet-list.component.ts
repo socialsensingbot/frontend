@@ -115,6 +115,7 @@ export class TweetListComponent implements OnInit {
    * A name for this group of tweets presently only "hidden" or "visible" is allowed.
    */
   @Input() public group: "hidden" | "visible";
+  public firstVisibleDate: Date;
 
 
   /**
@@ -341,4 +342,30 @@ export class TweetListComponent implements OnInit {
   }
 
 
+  public calcFirstVisibleDate() {
+    const checkInView = (elem, partial) => {
+      var container = $(".app-tweet-list");
+      var contHeight = container.height();
+      var contTop = container.scrollTop();
+      var contBottom = contTop + contHeight;
+
+      var elemTop = $(elem).offset().top - container.offset().top;
+      var elemBottom = elemTop + $(elem).height();
+
+      var isTotal = (elemTop >= 0 && elemBottom <= contHeight);
+      var isPart = ((elemTop < 0 && elemBottom > 0) || (elemTop > 0 && elemTop <= container.height())) && partial;
+
+      return isTotal || isPart;
+    }
+
+    let firstEl;
+    for (const el of $(".app-tweet-row")) {
+      if (checkInView(el, true)) {
+        firstEl = $(el);
+        break;
+      }
+    }
+    let i = +firstEl.attr("data-index");
+    this.firstVisibleDate = this.tweets[i].date;
+  }
 }
