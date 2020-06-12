@@ -149,6 +149,8 @@ export class MapComponent implements OnInit, OnDestroy {
     zoom:   6,
     center: latLng([53, -2])
   };
+  private readonly MINIMUM_DATE: number = 24 * 60 * 60 * 7;
+  private _absoluteDateUpdateTimer: Subscription;
 
 
   constructor(private _router: Router,
@@ -206,7 +208,7 @@ export class MapComponent implements OnInit, OnDestroy {
         queryParams:         this._newParams,
         queryParamsHandling: 'merge'
       });
-    }, "", true, true)
+    }, JSON.stringify(params), false, true)
 
   }
 
@@ -218,7 +220,10 @@ export class MapComponent implements OnInit, OnDestroy {
   private updateMapFromQueryParams(params: Params) {
     log.debug("updateMapFromQueryParams()");
     log.debug("Params:", params);
-    const {lng, lat, zoom, active_number, active_polygon, selected, min_offset, max_offset} = params;
+    const {
+      lng, lat, zoom, active_number, active_polygon, selected, min_offset, max_offset,
+      abs_time
+    } = params;
 
     // These handle the date slider min_offset & max_offset values
     if (typeof min_offset !== "undefined") {
@@ -228,6 +233,19 @@ export class MapComponent implements OnInit, OnDestroy {
     if (typeof max_offset !== "undefined") {
       this._dateMax = max_offset;
       this.sliderOptions = {...this.sliderOptions, startMax: max_offset};
+    }
+
+    if (typeof abs_time !== "undefined") {
+      const dateOffset = (this._data.lastEntryDate().getTime() - abs_time) / 60 * 1000;
+      if (dateOffset > -this.sliderOptions.min) {
+        this._notify.show(`The date stored in the URL  (${new Date(
+          +abs_time)} is now out of range, showing date range for current time.`);
+      } else {
+        this._dateMin = Math.max(this.sliderOptions.min, this._dateMin - dateOffset);
+        this._dateMax = Math.max(this.sliderOptions.min, this._dateMax - dateOffset);
+      }
+
+      this.sliderOptions = {...this.sliderOptions, startMin: this._dateMin, startMax: this._dateMax};
     }
 
     // This handles the fact that the zoom and lat/lng can change independently of each other
@@ -300,6 +318,9 @@ export class MapComponent implements OnInit, OnDestroy {
     // if (typeof min_offset !== "undefined" && typeof min_offset !== "undefined") {
     //   ($(".timeslider") as any).slider("option", "values", [min_offset, max_offset]);
     // }
+
+    this.updateSearch({abs_time: this._data.lastEntryDate().getTime()});
+
     return undefined;
   }
 
@@ -689,6 +710,8 @@ export class MapComponent implements OnInit, OnDestroy {
         this._exec.changeState("no-params");
       } else {
         await this.updateLayers("Data Load");
+        await this.updateSearch({abs_time: this._data.lastEntryDate().getTime()});
+
       }
 
       this._twitterIsStale = true;
@@ -782,9 +805,9 @@ export class MapComponent implements OnInit, OnDestroy {
   /**
    * Update the date slider after a data update.
    */
-  updateSliderFromData() {
+  async updateSliderFromData() {
     log.debug("updateSliderFromData()");
-    log.info("Latest data is dated at: " + this._data.lastEntry())
+    log.info(`Latest data is dated at: ${this._data.lastEntryDate()}`)
     this._dateMin = Math.max(this._dateMin, -(this._data.entryCount() - 1));
     this.sliderOptions = {
       max:      0,

@@ -207,9 +207,19 @@ export class MapDataService {
     }
   }
 
-  public lastEntry() {
+  public lastEntry(): string {
     if (this.timeKeyedData) {
       return this.timeKeyedData[this.timeKeyedData.length - 1];
+    } else {
+      return null;
+    }
+  }
+
+  public lastEntryDate(): Date {
+    if (this.timeKeyedData) {
+      const tstring = this.timeKeyedData[this.timeKeyedData.length - 1];
+      return new Date(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
+                      tstring.substring(8, 10), tstring.substring(10, 12), 0, 0);
     } else {
       return null;
     }
