@@ -1,3 +1,7 @@
+<div [style.opacity]="showDateHeader ? '0.9':'0'" class="app-tweet-list-date-float">
+  <div class="app-tweet-list-date-float-inner">{{firstVisibleDate| date:"medium"}}</div>
+</div>
+
 <div class="app-tweet-list app-tweet-list-{{group}}"
      infinite-scroll
      [infiniteScrollDistance]="scrollDistance"
@@ -5,6 +9,7 @@
      [infiniteScrollThrottle]="throttle"
      alwaysCallback="true"
      [scrollWindow]="false"
+     (scroll)="calcFirstVisibleDate()"
      (scrolled)="onScrollDown($event)"
      (scrolledUp)="onUp($event)">
 
@@ -39,6 +44,8 @@
       <mat-spinner diameter="24" class="app-tweet-scroll-spinner"></mat-spinner>
     </div>
     <div [attr.data-index]="i+ page.start"
+         [attr.data-i]="i"
+         [attr.data-page]="page"
          class="app-tweet-row atr-{{group}} atr-{{i+ page.start}} app-twitter-id-{{tweet.id}}"
          *ngFor="let tweet of page.tweets; let i = index">
       <div class="app-tweet-date-separator" *ngIf="isNewDate(i + page.start)">{{tweet.date | date:"mediumDate"}}</div>

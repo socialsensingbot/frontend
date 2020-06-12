@@ -39,7 +39,7 @@ $tweetMargin: 8px;
       top: 0px;
       z-index: 10;
       opacity: 0.0;
-      transition: opacity 1s ease-in-out 1s;
+      transition: opacity 1s ease-in-out 0.3s;
       //border: 1px solid red;
     }
 
@@ -139,4 +139,24 @@ $tweetMargin: 8px;
 
 .app-tweet-list-end-tilde {
   opacity: 0.4;
+}
+
+.app-tweet-list-date-float {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 1.5em;
+  background: none;
+  z-index: 10;
+  transition: opacity 0.8s ease-in-out 0.3s;
+
+  .app-tweet-list-date-float-inner {
+    background: #fefefe;
+    display: block;
+    width: 200px;
+    text-align: center;
+    padding: 4px;
+    border-radius: 2px;
+    margin: 4px auto;
+  }
 }
