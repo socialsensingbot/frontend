@@ -236,16 +236,26 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     if (typeof abs_time !== "undefined") {
-      const dateOffset = (this._data.lastEntryDate().getTime() - abs_time) / 60 * 1000;
+      const dateOffset = (this._data.lastEntryDate().getTime() - abs_time) / (60 * 1000);
       if (dateOffset > -this.sliderOptions.min) {
+        log.debug(abs_time, dateOffset, -this.sliderOptions.min, new Date(
+          +abs_time))
+        this._notify.show(`The data is no longer available for the date (${new Date(
+          +abs_time)}, showing date range for current data instead.`);
+      } else if (dateOffset < 0) {
         this._notify.show(`The date stored in the URL  (${new Date(
-          +abs_time)} is now out of range, showing date range for current time.`);
+          +abs_time)} is in the future, showing date range for current time instead.`);
       } else {
         this._dateMin = Math.max(this.sliderOptions.min, this._dateMin - dateOffset);
         this._dateMax = Math.max(this.sliderOptions.min, this._dateMax - dateOffset);
+        this.sliderOptions = {...this.sliderOptions, startMin: this._dateMin, startMax: this._dateMax};
       }
 
-      this.sliderOptions = {...this.sliderOptions, startMin: this._dateMin, startMax: this._dateMax};
+      this.updateSearch({
+                          abs_time:   this._data.lastEntryDate().getTime(),
+                          min_offset: this._dateMin - dateOffset,
+                          max_offset: this._dateMax - dateOffset
+                        });
     }
 
     // This handles the fact that the zoom and lat/lng can change independently of each other
