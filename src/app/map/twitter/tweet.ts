@@ -145,7 +145,7 @@ export class Tweet {
 
   public asCSV(): CSVExportTweet {
     this.lazyInit();
-    return new CSVExportTweet(this._id, this._date, this._url, this._html.replace(/<[^>]+>/g, ""));
+    return new CSVExportTweet(this._id, this._date, this._url, $("<div>").html(this._html).text());
   }
 }
 
