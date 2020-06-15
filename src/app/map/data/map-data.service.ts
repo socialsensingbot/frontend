@@ -18,6 +18,7 @@ const log = new Logger('map-data');
             })
 export class MapDataService {
 
+
   public timeKeyUpdate = new EventEmitter<any>()
   /**
    * The unprocessed twitter data that's come in from the server
@@ -39,7 +40,7 @@ export class MapDataService {
     fine:   {stats: {}, count: {}, embed: {}}
   };
 
-  public timeKeyedData: any; //The times in the input JSON
+  public reverseTimeKeys: any; //The times in the input JSON
 
 
   private _updating: boolean;
@@ -115,9 +116,9 @@ export class MapDataService {
 
 
   public async load() {
-    return this._exec.queue("Load Data", ["ready", "map-init", "data-loaded", "data-load-failed"], async () => {
+    return await this._exec.queue("Load Data", ["ready", "map-init", "data-loaded", "data-load-failed"], async () => {
       this._rawTwitterData = await this.loadLiveData() as TimeSlice[];
-      this.timeKeyedData = this.getTimes();
+      this.reverseTimeKeys = this.getTimes();
       this._exec.changeState("data-loaded");
       log.debug("Loading live data completed", this._rawTwitterData);
     });
@@ -157,7 +158,7 @@ export class MapDataService {
     this._updating = true;
 
     log.debug("Updating data");
-    this.timeKeyedData = this.getTimes();
+    this.reverseTimeKeys = this.getTimes();
     // For performance reasons we need to do the
     // next part without triggering Angular
     try {
@@ -166,7 +167,7 @@ export class MapDataService {
       log.debug("update() end");
       this._updating = false;
     }
-    this.timeKeyUpdate.emit(this.timeKeyedData);
+    this.timeKeyUpdate.emit(this.reverseTimeKeys);
     // if (this._clicked != "") {
     //   this.updateTwitterHeader(this._clicked.target.feature);
     // }
@@ -188,43 +189,40 @@ export class MapDataService {
       log.debug(this._twitterData)
     } else {
       log.info("Tweet data not in cache.");
-      this._twitterData = new ProcessedData(_dateMin, _dateMax, this.timeKeyedData, this._rawTwitterData, this._stats);
+      this._twitterData = new ProcessedData(_dateMin, _dateMax, this.reverseTimeKeys, this._rawTwitterData,
+                                            this._stats);
       this.cache.setCached(key, this._twitterData, 24 * 60 * 60 * 1000);
     }
   }
 
 
   private createKey(_dateMin, _dateMax) {
-    const key = `${_dateMin}:${_dateMax}:${this.timeKeyedData}`;
+    const key = `${_dateMin}:${_dateMax}:${this.reverseTimeKeys}`;
     return key;
   }
 
   public entryCount(): number {
-    if (this.timeKeyedData) {
-      return this.timeKeyedData.length;
+    if (this.reverseTimeKeys) {
+      return this.reverseTimeKeys.length;
     } else {
       return 0;
     }
   }
 
-  public lastEntry(): string {
-    if (this.timeKeyedData) {
-      return this.timeKeyedData[this.timeKeyedData.length - 1];
-    } else {
-      return null;
-    }
-  }
-
   public lastEntryDate(): Date {
-    if (this.timeKeyedData) {
-      const tstring = this.timeKeyedData[this.timeKeyedData.length - 1];
-      return new Date(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
-                      tstring.substring(8, 10), tstring.substring(10, 12), 0, 0);
+    if (this.reverseTimeKeys) {
+      const tstring = this.reverseTimeKeys[0];
+      return this.parseTimeKey(tstring);
     } else {
       return null;
     }
   }
 
+
+  private parseTimeKey(tstring) {
+    return new Date(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
+                    tstring.substring(8, 10), tstring.substring(10, 12), 0, 0);
+  }
 
   public regionTypes(): PolygonLayerShortName[] {
     //Object.keys(this._twitterData).map(i => i as PolygonLayerShortName)
@@ -238,5 +236,16 @@ export class MapDataService {
 
   public places(regionType: PolygonLayerShortName): Set<string> {
     return this._twitterData.regionData(regionType).places();
+  }
+
+  offset(date: string): number {
+    let count = 0;
+    for (const timeKey of this.reverseTimeKeys) {
+      if (timeKey <= date) {
+        return -count;
+      }
+      count++;
+    }
+    return -this.reverseTimeKeys.length;
   }
 }

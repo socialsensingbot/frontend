@@ -2,7 +2,7 @@ import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {fgsData} from './county_bi';
 import {coarseData} from './coarse_bi';
 import {fineData} from './fine_bi';
-import {Auth, Hub, Logger} from 'aws-amplify';
+import {Auth, Logger} from 'aws-amplify';
 import {
   Browser,
   control,
@@ -26,7 +26,8 @@ import {
   BasemapControl,
   ByRegionType,
   COUNTY,
-  Feature, Geometry,
+  Feature,
+  Geometry,
   MapLayers,
   NumberLayerFullName,
   numberLayerFullNames,
@@ -36,7 +37,6 @@ import {
   PolygonLayerShortName,
   polygonLayerShortNames,
   Properties,
-  RegionData,
   STATS
 } from "./types";
 import {AuthService} from "../auth/auth.service";
@@ -72,8 +72,7 @@ export class MapComponent implements OnInit, OnDestroy {
   public activeNumberLayerShortName: NumberLayerShortName = STATS;
   public activePolyLayerShortName: PolygonLayerShortName = COUNTY;
 
-  private _dateMax = 0;
-  private _dateMin = -24 * 60 + 1;
+
   private _oldClicked: (LeafletMouseEvent | "") = "";
   private _clicked: (LeafletMouseEvent | "") = "";
   private _lcontrols: { numbers: Control.Layers, polygon: Control.Layers } = {numbers: null, polygon: null};
@@ -81,6 +80,13 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   // URL state management //
+
+  // ... URL parameters
+  private _dateMax = 0;
+  private _dateMin = -24 * 60 + 1;
+  private _absoluteTime: number;
+  private _previousDateMin: string;
+  private _previousDateMax: any;
 
   /**
    * The current URL parameters, this is updated by a subscriber to this.route.queryParams.
@@ -151,6 +157,7 @@ export class MapComponent implements OnInit, OnDestroy {
   };
   private readonly MINIMUM_DATE: number = 24 * 60 * 60 * 7;
   private _absoluteDateUpdateTimer: Subscription;
+
 
 
   constructor(private _router: Router,
@@ -235,9 +242,10 @@ export class MapComponent implements OnInit, OnDestroy {
       this.sliderOptions = {...this.sliderOptions, startMax: max_offset};
     }
 
+    // This handles the absolute time parameter used to preserve temporal state
     if (typeof abs_time !== "undefined") {
       const dateOffset = (this._data.lastEntryDate().getTime() - abs_time) / (60 * 1000);
-      if (dateOffset > -this.sliderOptions.min) {
+      if (dateOffset > this._data.entryCount() - 1) {
         log.debug(abs_time, dateOffset, -this.sliderOptions.min, new Date(
           +abs_time))
         this._notify.show(`The data is no longer available for the date (${new Date(
@@ -246,16 +254,22 @@ export class MapComponent implements OnInit, OnDestroy {
         this._notify.show(`The date stored in the URL  (${new Date(
           +abs_time)} is in the future, showing date range for current time instead.`);
       } else {
-        this._dateMin = Math.max(this.sliderOptions.min, this._dateMin - dateOffset);
-        this._dateMax = Math.max(this.sliderOptions.min, this._dateMax - dateOffset);
-        this.sliderOptions = {...this.sliderOptions, startMin: this._dateMin, startMax: this._dateMax};
+        const minLimit = -(this._data.entryCount() - 1);
+        this._dateMin = Math.max(minLimit, this._dateMin - dateOffset);
+        this._dateMax = Math.max(minLimit, this._dateMax - dateOffset);
+        log.debug(`URL Date was  (${new Date(
+          +abs_time)} current Date is ${this._data.lastEntryDate()} delta was ${dateOffset} mins and minLimit is ${minLimit}.`);
+        this.sliderOptions = {
+          ...this.sliderOptions,
+          min:      -(this._data.entryCount() - 1),
+          startMin: this._dateMin,
+          startMax: this._dateMax
+        };
       }
+      this._absoluteTime = this._data.lastEntryDate().getTime();
 
-      this.updateSearch({
-                          abs_time:   this._data.lastEntryDate().getTime(),
-                          min_offset: this._dateMin - dateOffset,
-                          max_offset: this._dateMax - dateOffset
-                        });
+    } else {
+      this._absoluteTime = this._data.lastEntryDate().getTime();
     }
 
     // This handles the fact that the zoom and lat/lng can change independently of each other
@@ -273,10 +287,6 @@ export class MapComponent implements OnInit, OnDestroy {
     if (viewChange) {
       this._map.setView(newCentre, newZoom);
     }
-
-    // if (typeof active_polys != "undefined") {
-    //   this.options.zoom = zoom;
-    // }
 
     // This handles a change to the active_number value
     const numberLayerName: NumberLayerShortName = typeof active_number !== "undefined" ? active_number : STATS;
@@ -323,13 +333,7 @@ export class MapComponent implements OnInit, OnDestroy {
     if (typeof selected !== "undefined") {
       this._selectedFeatureName = selected;
       this._twitterIsStale;
-      // this.showTweets();
     }
-    // if (typeof min_offset !== "undefined" && typeof min_offset !== "undefined") {
-    //   ($(".timeslider") as any).slider("option", "values", [min_offset, max_offset]);
-    // }
-
-    this.updateSearch({abs_time: this._data.lastEntryDate().getTime()});
 
     return undefined;
   }
@@ -362,9 +366,9 @@ export class MapComponent implements OnInit, OnDestroy {
     await this.load(true);
     this._searchParams.subscribe(params => {
       if (!this._params) {
-        this._exec.queue("Initial Search Params", ["ready", "no-params"],
+        this._params = true;
+        this._exec.queue("Initial Search Params", ["no-params"],
                          async () => {
-                           this._params = true;
                            this.updateMapFromQueryParams(params);
                            //Listeners to push map state into URL
                            map.addEventListener("dragend", () => {
@@ -396,6 +400,11 @@ export class MapComponent implements OnInit, OnDestroy {
                              });
                            });
                            this._exec.changeState("ready");
+                           this.updateSearch({
+                                               abs_time:   this._absoluteTime,
+                                               min_offset: Math.round(this._dateMin),
+                                               max_offset: Math.round(this._dateMax)
+                                             });
                            map.addControl(zoomControl);
                            this.addToggleControls();
                            return this.updateLayers("From Parameters").then(() => this._twitterIsStale = true);
@@ -712,16 +721,22 @@ export class MapComponent implements OnInit, OnDestroy {
     log.debug("load()");
     this.activity = true;
     try {
+      if (!first) {
+        //Save the time keys to adjust the slider to the new correct values.
+        this._previousDateMin = this._data.reverseTimeKeys[-this._dateMin];
+        this._previousDateMax = this._data.reverseTimeKeys[-this._dateMax];
+      }
       await this._data.load();
-      await this._exec.queue("Update Slider", ["ready", "data-loaded"],
-                             () => {this.updateSliderFromData();});
 
       if (first) {
+        await this._exec.queue("Update Slider", ["data-loaded"],
+                               () => {this.updateSliderFromData();});
         this._exec.changeState("no-params");
       } else {
         await this.updateLayers("Data Load");
-        await this.updateSearch({abs_time: this._data.lastEntryDate().getTime()});
-
+        await this._exec.queue("Update Slider", ["ready"],
+                               () => {this.updateSliderFromData();});
+        await this.updateSearch({min_offset: this._dateMin, max_offset: this._dateMax, abs_time: this._absoluteTime});
       }
 
       this._twitterIsStale = true;
@@ -790,7 +805,7 @@ export class MapComponent implements OnInit, OnDestroy {
     log.debug("showTweets()");
     this._exec.queue("Tweets Visible", ["ready"], () => {
       this.tweetsVisible = true;
-    }, "tweets.visible", true);
+    }, "tweets.visible", true, true, true);
   }
 
   /**
@@ -817,14 +832,17 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   async updateSliderFromData() {
     log.debug("updateSliderFromData()");
-    log.info(`Latest data is dated at: ${this._data.lastEntryDate()}`)
-    this._dateMin = Math.max(this._dateMin, -(this._data.entryCount() - 1));
+    this._dateMin = Math.max(this._previousDateMin ? this._data.offset(this._previousDateMin) : this._dateMin,
+                             -(this._data.entryCount() - 1));
+    this._dateMax = Math.max(this._previousDateMax ? this._data.offset(this._previousDateMax) : this._dateMax,
+                             -(this._data.entryCount() - 1));
     this.sliderOptions = {
       max:      0,
       min:      -this._data.entryCount() + 1,
       startMin: this._dateMin,
       startMax: this._dateMax
     };
+    this._absoluteTime = this._data.lastEntryDate().getTime();
 
   }
 
@@ -854,8 +872,6 @@ export class MapComponent implements OnInit, OnDestroy {
       } else if (this._feature) {
         this.updateTwitterPanel(this._feature);
       }
-    });
-
-
+    }, "", false, true, true);
   }
 }

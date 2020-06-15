@@ -18,14 +18,15 @@ describe('Slider and tweet interaction : https://github.com/socialsensingbot/fro
       cy.moveMinDateSliderLeft(8);
       cy.wait(20000);
       cy.url({timeout: 20000}).should("equal",
-                                      "http://localhost:4200/map?selected=greater%20london&min_offset=-5757&max_offset=0");
+                                      "http://localhost:4200/map?selected=greater%20london&min_offset=-5757&max_offset=0&abs_time=1590751860000");
       cy.log("Click out of London in any other county");
       cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path[stroke='white']").first().click();
       cy.wait(4000);
       cy.tweetCountTotal(6);
       cy.log("Click back into London");
-      cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path:nth-child(" + londonPath + ")").click({force: true});
+      cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path:nth-child(" + london.index() + ")").click({force: true});
       cy.wait(4000);
+      cy.twitterPanelHeader("Greater London");
       cy.tweetCountTotal(148);
       cy.log("Move time slider back to 1 day back from latest time");
       cy.moveMinDateSliderRight(7);
@@ -33,9 +34,12 @@ describe('Slider and tweet interaction : https://github.com/socialsensingbot/fro
       cy.wait(20000);
       cy.log("Click out of London in any other county");
       cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path[stroke='white']").first().click();
+      cy.wait(4000);
       cy.tweetCountTotal(1);
       cy.log("Click back into London.");
-      cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path:nth-child(" + londonPath + ")").click({force: true});
+      cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path:nth-child(" + london.index() + ")").click({force: true});
+      cy.wait(4000);
+      cy.twitterPanelHeader("Greater London");
       cy.tweetCountTotal(49);
       cy.url({timeout: 20000}).should("equal", url);
 
