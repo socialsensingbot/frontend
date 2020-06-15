@@ -858,14 +858,12 @@ export class MapComponent implements OnInit, OnDestroy {
     log.debug("updateTwitter()");
     await this._exec.queue("Update Twitter", ["ready"], () => {
       // Mark as stale to trigger a refresh
-      if (!this.tweetsVisible) {
-        this._clicked = "";
-        this._feature = null;
-      }
-      if (this._clicked != "") {
-        this.updateTwitterPanel(this._clicked.target.feature);
-      } else if (this._feature) {
-        this.updateTwitterPanel(this._feature);
+      if (this.tweetsVisible) {
+        if (this._clicked != "") {
+          this.updateTwitterPanel(this._clicked.target.feature);
+        } else if (this._feature) {
+          this.updateTwitterPanel(this._feature);
+        }
       }
     }, Date.now(), false, true, true);
   }
