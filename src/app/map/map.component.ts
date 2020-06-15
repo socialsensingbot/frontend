@@ -86,7 +86,7 @@ export class MapComponent implements OnInit, OnDestroy {
   private _dateMin = -24 * 60 + 1;
   private _absoluteTime: number;
   private _previousDateMin: string;
-  private _previousDateMax: any;
+  private _previousDateMax: string;
 
   /**
    * The current URL parameters, this is updated by a subscriber to this.route.queryParams.
@@ -155,10 +155,6 @@ export class MapComponent implements OnInit, OnDestroy {
     zoom:   6,
     center: latLng([53, -2])
   };
-  private readonly MINIMUM_DATE: number = 24 * 60 * 60 * 7;
-  private _absoluteDateUpdateTimer: Subscription;
-
-
 
   constructor(private _router: Router,
               private route: ActivatedRoute,
@@ -767,16 +763,15 @@ export class MapComponent implements OnInit, OnDestroy {
                                   this.clearMapFeatures();
                                   this.updateRegionData();
                                   this.resetLayers(false);
-                                  if (this._params) {
-
-                                    this._exec.changeState("ready");
-                                  } else {
-                                    this._exec.changeState("no-params");
-                                  }
 
                                 } finally {
                                   this.activity = false;
                                   this._updating = false;
+                                  if (this._params) {
+                                    this._exec.changeState("ready");
+                                  } else {
+                                    this._exec.changeState("no-params");
+                                  }
                                 }
                               } else {
                                 log.debug("Update in progress so skipping this update");
@@ -872,6 +867,6 @@ export class MapComponent implements OnInit, OnDestroy {
       } else if (this._feature) {
         this.updateTwitterPanel(this._feature);
       }
-    }, "", false, true, true);
+    }, Date.now(), false, true, true);
   }
 }

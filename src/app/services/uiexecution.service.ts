@@ -9,7 +9,8 @@ class ExecutionTask {
 
   constructor(private _resolve: (value?: any) => void, private _reject: (reason?: any) => void,
               private _task: () => any, public name: String, public waitForStates: UIState[] | null,
-              private _dedup: string, private _notify: NotificationService, public reschedule: boolean) {
+              private _dedup: string, private _notify: NotificationService, public reschedule: boolean,
+              public silentFailure: boolean) {
 
   }
 
@@ -74,8 +75,12 @@ export class UIExecutionService {
               `RESCHEDULED out of sequence task ${task.name} on execution queue, state ${this._state} needs to be one of ${task.waitForStates}.`)
             return;
           } else {
-            this._notify.error(
-              `Skipped out of sequence task ${task.name} on execution queue, state ${this._state} should be one of ${task.waitForStates}`)
+            const message = `Skipped out of sequence task ${task.name} on execution queue, state ${this._state} should be one of ${task.waitForStates}`;
+            if (task.silentFailure) {
+              log.debug(message);
+            } else {
+              this._notify.error(message);
+            }
             // this._queue.push(task)
           }
         }
@@ -108,7 +113,7 @@ export class UIExecutionService {
 
       }
       const executionTask = new ExecutionTask(resolve, reject, task, name, waitForStates, dedupKey, this._notify,
-                                              reschedule);
+                                              reschedule, silentFailure);
       if (dedupKey !== null) {
         if (this.dedupMap.has(dedupKey)) {
           if (replaceExisting) {
