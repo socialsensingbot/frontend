@@ -22,6 +22,4 @@ describe('Date time: ', function () {
     });
   });
 
-
-
 });
