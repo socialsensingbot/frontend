@@ -1,4 +1,4 @@
-describe('Date time: ', function () {
+describe('02 Date time: ', function () {
   // Step 1: setup the application state
   beforeEach(function () {
     cy.visit('http://localhost:4200/map');
@@ -13,7 +13,7 @@ describe('Date time: ', function () {
       cy.visitAndWait(url);
       cy.get(".slider-date-time", {timeout: 20000});
       cy.get(".slider-date-time-max .slider-date").should("contain.text", "15-Oct-18");
-      cy.get(".slider-date-time-max .slider-time").should("contain.text", "1 AM");
+      cy.get(".slider-date-time-max .slider-time").should("contain.text", "12 AM");
       cy.get(".app-tweet-drawer", {timeout: 60000}).should("be.visible");
       cy.url().should("equal", url);
       cy.twitterPanelHeader("No Tweets from Scottish Borders");

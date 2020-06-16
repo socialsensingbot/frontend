@@ -1,4 +1,4 @@
-describe('Slider and tweet interaction : https://github.com/socialsensingbot/frontend/issues/104', function () {
+describe('#104 lider and tweet interaction : https://github.com/socialsensingbot/frontend/issues/104', function () {
   beforeEach(function () {
     cy.visit('http://localhost:4200/map');
     cy.stubLiveJson("live-02-06-2020");

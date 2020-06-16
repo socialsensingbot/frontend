@@ -2,13 +2,13 @@ const zoomDuration = 1000;
 
 function confirmSlider() {
   cy.get(".slider-date-time-min .slider-date", {timeout: 20000}).should("contain.text", "24-Apr-20");
-  cy.get(".slider-date-time-min .slider-time").should("contain.text", "7 PM");
+  cy.get(".slider-date-time-min .slider-time").should("contain.text", "6 PM");
   cy.get(".slider-date-time-max .slider-date", {timeout: 20000}).should("contain.text", "25-Apr-20");
-  cy.get(".slider-date-time-max .slider-time").should("contain.text", "7 PM");
+  cy.get(".slider-date-time-max .slider-time").should("contain.text", "6 PM");
 }
 
 
-describe('App auto adjusts for past date in date range: : https://github.com/socialsensingbot/frontend/issues/95',
+describe('#95 App auto adjusts for past date in date range: : https://github.com/socialsensingbot/frontend/issues/95',
          () => {
            const url = "http://localhost:4200/map?selected=powys&min_offset=-1439&max_offset=0&abs_time=1587840500000";
            it('when authorized and load state', () => {

@@ -33,7 +33,7 @@ const testHide = (refresh, count) => {
 
 };
 
-describe('Testing #94', function () {
+describe('#94 Group Ignore Prefs : https://github.com/socialsensingbot/frontend/issues/94 :', function () {
 
   beforeEach(() => {
     cy.stubLiveJson("live-old");
@@ -46,7 +46,7 @@ describe('Testing #94', function () {
   });
 
 
-  it('Group Ignore Prefs : https://github.com/socialsensingbot/frontend/issues/94 : ', () => {
+  it('Reproduce issue ', () => {
     cy.visit(url);
 
     cy.login("cypress1@example.com");
