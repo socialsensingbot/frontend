@@ -6,7 +6,7 @@ describe('Missing tweets : https://github.com/socialsensingbot/frontend/issues/7
   });
 
   describe('select county with only missing tweets', () => {
-    const url = "http://localhost:4200/map?min_offset=-1460&max_offset=-20&selected=roscommon";
+    const url = "http://localhost:4200/map?abs_time=1588536540000&max_offset=-20&min_offset=-1460&selected=roscommon";
     it('Should be two tweets both removed', () => {
       cy.visit(url);
       cy.url().should("equal", url);

@@ -206,7 +206,11 @@ export class MapComponent implements OnInit, OnDestroy {
     // Merge the params to change into _newParams which holds the
     // next set of parameters to add to the URL state.
     return this._exec.queue("Update URL Query Params", ["ready", "data-refresh"], async () => {
-      this._newParams = {...this._newParams, ...params};
+      const keys = {...this._newParams, ...params};
+      this._newParams = {};
+      Object.keys(keys).sort().forEach((key) => {
+        this._newParams[key] = keys[key];
+      });
       await this._router.navigate([], {
         queryParams:         this._newParams,
         queryParamsHandling: 'merge'
@@ -227,6 +231,7 @@ export class MapComponent implements OnInit, OnDestroy {
       lng, lat, zoom, active_number, active_polygon, selected, min_offset, max_offset,
       abs_time
     } = params;
+    this._newParams = params;
 
     // These handle the date slider min_offset & max_offset values
     if (typeof min_offset !== "undefined") {
@@ -857,13 +862,10 @@ export class MapComponent implements OnInit, OnDestroy {
   private async updateTwitter() {
     log.debug("updateTwitter()");
     await this._exec.queue("Update Twitter", ["ready"], () => {
-      // Mark as stale to trigger a refresh
-      if (this.tweetsVisible) {
-        if (this._clicked != "") {
-          this.updateTwitterPanel(this._clicked.target.feature);
-        } else if (this._feature) {
-          this.updateTwitterPanel(this._feature);
-        }
+      if (this._clicked != "") {
+        this.updateTwitterPanel(this._clicked.target.feature);
+      } else if (this._feature) {
+        this.updateTwitterPanel(this._feature);
       }
     }, Date.now(), false, true, true);
   }

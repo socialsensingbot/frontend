@@ -7,21 +7,19 @@ function confirmSlider() {
   cy.get(".slider-date-time-max .slider-time").should("contain.text", "6 PM");
 }
 
-describe('URL State: ', function () {
-  beforeEach(() => {
-  })
 
-  describe('App auto adjusts for past date in date range', () => {
-    const url = "http://localhost:4200/map?selected=powys&min_offset=-1439&max_offset=0&abs_time=1587836900000";
-    it('when authorized and load state', () => {
-      cy.visit("http://localhost:4200/map");
-      cy.stubLiveJson("live-short");
-      cy.login();
-      cy.visitAndWait(url);
-      cy.get(".slider-date-time", {timeout: 20000});
-      cy.log(
-        "The URL should auto update based on the latest data's latest time, adjusting the min and max offsets accordingly.");
-      cy.url({timeout: 20000}).should("equal",
+  describe('App auto adjusts for past date in date range: : https://github.com/socialsensingbot/frontend/issues/95',
+           () => {
+             const url = "http://localhost:4200/map?selected=powys&min_offset=-1439&max_offset=0&abs_time=1587836900000";
+             it('when authorized and load state', () => {
+               cy.visit("http://localhost:4200/map");
+               cy.stubLiveJson("live-short");
+               cy.login();
+               cy.visitAndWait(url);
+               cy.get(".slider-date-time", {timeout: 20000});
+               cy.log(
+                 "The URL should auto update based on the latest data's latest time, adjusting the min and max offsets accordingly.");
+               cy.url({timeout: 20000}).should("equal",
                                       "http://localhost:4200/map?selected=powys&min_offset=-3109&max_offset=-1669&abs_time=1587936900000");
       confirmSlider();
       cy.get(".app-tweet-drawer", {timeout: 20000}).should("be.visible");
@@ -43,4 +41,4 @@ describe('URL State: ', function () {
   });
 
 
-});
+
