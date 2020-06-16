@@ -9,7 +9,8 @@ class ExecutionTask {
 
   constructor(private _resolve: (value?: any) => void, private _reject: (reason?: any) => void,
               private _task: () => any, public name: String, public waitForStates: UIState[] | null,
-              private _dedup: string, private _notify: NotificationService) {
+              private _dedup: string, private _notify: NotificationService, public reschedule: boolean,
+              public silentFailure: boolean) {
 
   }
 
@@ -68,9 +69,20 @@ export class UIExecutionService {
             this.dedupMap.delete(task.dedup);
           }
         } else {
-          log.warn(
-            `Skipped out of sequence task ${task.name} on execution queue, state ${this._state} should be one of ${task.waitForStates}`)
-          // this._queue.push(task)
+          if (task.reschedule) {
+            this._queue.push(task);
+            log.debug(
+              `RESCHEDULED out of sequence task ${task.name} on execution queue, state ${this._state} needs to be one of ${task.waitForStates}.`)
+            return;
+          } else {
+            const message = `Skipped out of sequence task ${task.name} on execution queue, state ${this._state} should be one of ${task.waitForStates}`;
+            if (task.silentFailure) {
+              log.debug(message);
+            } else {
+              this._notify.error(message);
+            }
+            // this._queue.push(task)
+          }
         }
       }
 
@@ -92,7 +104,7 @@ export class UIExecutionService {
   }
 
   public queue(name: String, waitForStates: UIState[] | null, task: () => any, dedup: any = null,
-               silentFailure: boolean = false, replaceExisting: boolean = false) {
+               silentFailure: boolean = false, replaceExisting: boolean = false, reschedule: boolean = false) {
 
     return new Promise<any>((resolve, reject) => {
       let dedupKey = null;
@@ -100,7 +112,8 @@ export class UIExecutionService {
         dedupKey = name + ":" + dedup;
 
       }
-      const executionTask = new ExecutionTask(resolve, reject, task, name, waitForStates, dedupKey, this._notify);
+      const executionTask = new ExecutionTask(resolve, reject, task, name, waitForStates, dedupKey, this._notify,
+                                              reschedule, silentFailure);
       if (dedupKey !== null) {
         if (this.dedupMap.has(dedupKey)) {
           if (replaceExisting) {

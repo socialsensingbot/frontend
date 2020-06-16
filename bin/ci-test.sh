@@ -2,12 +2,12 @@
 set -euxo pipefail
 cd $(dirname $0)
 cd ..
-tests="cypress/integration/01_quick/**"
+tests="cypress/integration/00_quick/**"
 browsers="electron"
 record="" #Or "--record"
 
 if [[ "${AWS_BRANCH}" == feature* ]]; then
-  tests="cypress/integration/01_quick/**"
+  tests="cypress/integration/00_quick/**"
   browsers="electron"
 fi
 if [[ "${AWS_BRANCH}" == release* ]]; then

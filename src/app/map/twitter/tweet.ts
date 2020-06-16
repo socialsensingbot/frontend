@@ -106,11 +106,11 @@ export class Tweet {
         console.assert(this._id == matched[2]);
         this._url = "https://twitter.com/" + this._sender + "/status/" + this._id
       }
-      this._date = new Date(Number(this._internalDateString.substring(0, 4)),
-                            Number(this._internalDateString.substring(4, 6)) - 1,
-                            Number(this._internalDateString.substring(6, 8)),
-                            Number(this._internalDateString.substring(8, 10)),
-                            +Number(this._internalDateString.substring(10, 12)), 0, 0);
+      this._date = new Date(Date.UTC(Number(this._internalDateString.substring(0, 4)),
+                                     Number(this._internalDateString.substring(4, 6)) - 1,
+                                     Number(this._internalDateString.substring(6, 8)),
+                                     Number(this._internalDateString.substring(8, 10)),
+                                     +Number(this._internalDateString.substring(10, 12)), 0, 0));
       this._year = new Intl.DateTimeFormat('en', {year: '2-digit'}).format(this._date);
       this._month = new Intl.DateTimeFormat('en', {month: 'short'}).format(this._date);
       this._day = new Intl.DateTimeFormat('en', {day: '2-digit'}).format(this._date);

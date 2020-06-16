@@ -161,12 +161,12 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     if (cachedItem != null) {
       return cachedItem;
     } else {
-      const date = new Date(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
-                            tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0);
-      const ye = new Intl.DateTimeFormat('en', {year: '2-digit'}).format(date);
-      const mo = new Intl.DateTimeFormat('en', {month: 'short'}).format(date);
-      const da = new Intl.DateTimeFormat('en', {day: '2-digit'}).format(date);
-      const hr = new Intl.DateTimeFormat('en', {hour: '2-digit', hour12: true}).format(date);
+      const date = new Date(Date.UTC(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
+                                     tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0));
+      const ye = new Intl.DateTimeFormat('en', {year: '2-digit', timeZone: "UTC"}).format(date);
+      const mo = new Intl.DateTimeFormat('en', {month: 'short', timeZone: "UTC"}).format(date);
+      const da = new Intl.DateTimeFormat('en', {day: '2-digit', timeZone: "UTC"}).format(date);
+      const hr = new Intl.DateTimeFormat('en', {hour: '2-digit', hour12: true, timeZone: "UTC"}).format(date);
 
       const text = `<span class="slider-date-time slider-date-time-${label}"><span class='slider-time'>${hr}</span> <span class='slider-date'>${da}-${mo}-${ye}</span></span>`;
       //var date = new Date( tstring.substring(0,4), tstring.substring(4,6)-1, tstring.substring(6,8), +tstring.substring(8,10)+add, 0, 0, 0);

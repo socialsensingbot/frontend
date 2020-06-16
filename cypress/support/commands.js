@@ -85,7 +85,7 @@ Cypress.Commands.add("tweetsVisible", (count) => {
     count);
 });
 Cypress.Commands.add("tweetCountTotal", (sum) => {
-  cy.get(".mat-tab-label:nth-child(1)").then(header => {
+  cy.get(".mat-tab-label:nth-child(1)", {timeout: 30000}).then(header => {
     const headerParts = header.text().trim().split(" ");
     const visibleCount = +headerParts[0];
     cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000})

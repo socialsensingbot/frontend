@@ -369,15 +369,18 @@ export class TweetListComponent implements OnInit, OnDestroy {
     }
 
     let firstEl;
+
     for (const el of $(".app-tweet-row")) {
       if (checkInView(el, true)) {
         firstEl = $(el);
         break;
       }
     }
-    let i = +firstEl.attr("data-index");
-    this.firstVisibleDate = this.tweets[i].date;
-    this.showDateHeader = true;
-    this.lastDateShow = Date.now();
+    if (firstEl) {
+      let i = +firstEl.attr("data-index");
+      this.firstVisibleDate = this.tweets[i].date;
+      this.showDateHeader = true;
+      this.lastDateShow = Date.now();
+    }
   }
 }
