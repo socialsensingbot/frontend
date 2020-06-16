@@ -219,9 +219,9 @@ export class MapDataService {
   }
 
 
-  private parseTimeKey(tstring) {
-    return new Date(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
-                    tstring.substring(8, 10), tstring.substring(10, 12), 0, 0);
+  public parseTimeKey(tstring) {
+    return new Date(Date.UTC(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
+                             tstring.substring(8, 10), tstring.substring(10, 12), 0, 0));
   }
 
   public regionTypes(): PolygonLayerShortName[] {

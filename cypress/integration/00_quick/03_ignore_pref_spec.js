@@ -6,7 +6,7 @@ describe('Ignore tweets: ', function () {
   })
   describe('ignore tweet', () => {
     const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
-    const url = "http://localhost:4200/map?selected=carmarthenshire&abs_time=1539557940000&max_offset=0&min_offset=-1439";
+    const url = "http://localhost:4200/map?selected=carmarthenshire&abs_time=1539561540000&max_offset=0&min_offset=-1439";
     const test = () => {
       cy.visit(url);
       cy.login();

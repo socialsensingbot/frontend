@@ -1,4 +1,4 @@
-describe.only('Slider and tweet interaction : https://github.com/socialsensingbot/frontend/issues/104', function () {
+describe('Slider and tweet interaction : https://github.com/socialsensingbot/frontend/issues/104', function () {
   beforeEach(function () {
     cy.visit('http://localhost:4200/map');
     cy.stubLiveJson("live-02-06-2020");
@@ -13,7 +13,7 @@ describe.only('Slider and tweet interaction : https://github.com/socialsensingbo
     cy.moveMinDateSliderLeft(8);
     cy.wait(1000);
     cy.url({timeout: 20000}).should("equal",
-                                    "http://localhost:4200/map?selected=greater%20london&min_offset=-5757&max_offset=0&abs_time=1591097340000");
+                                    "http://localhost:4200/map?selected=greater%20london&min_offset=-5757&max_offset=0&abs_time=1591100940000");
     cy.log("Click out of London in any other county");
     cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-armagh").click();
     cy.wait(1000);
@@ -39,7 +39,7 @@ describe.only('Slider and tweet interaction : https://github.com/socialsensingbo
     cy.twitterPanelHeader("Greater London");
     cy.tweetCountTotal(49);
     cy.url({timeout: 20000}).should("equal",
-                                    "http://localhost:4200/map?selected=greater%20london&min_offset=-1557&max_offset=0&abs_time=1591097340000");
+                                    "http://localhost:4200/map?selected=greater%20london&min_offset=-1557&max_offset=0&abs_time=1591100940000");
 
   });
 

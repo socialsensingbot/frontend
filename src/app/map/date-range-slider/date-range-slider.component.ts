@@ -161,8 +161,8 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     if (cachedItem != null) {
       return cachedItem;
     } else {
-      const date = new Date(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
-                            tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0);
+      const date = new Date(Date.UTC(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
+                                     tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0));
       const ye = new Intl.DateTimeFormat('en', {year: '2-digit'}).format(date);
       const mo = new Intl.DateTimeFormat('en', {month: 'short'}).format(date);
       const da = new Intl.DateTimeFormat('en', {day: '2-digit'}).format(date);

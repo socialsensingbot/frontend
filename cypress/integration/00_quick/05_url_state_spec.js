@@ -55,7 +55,7 @@ describe('URL State: ', function () {
   });
 
   describe('select zoom', () => {
-    const url = "http://localhost:4200/map?abs_time=1539557940000&max_offset=0&min_offset=-1439";
+    const url = "http://localhost:4200/map?abs_time=1539561540000&max_offset=0&min_offset=-1439";
     const urlZoom6 = url + "&zoom=6"; //default zoom
     const urlZoom7 = url + "&zoom=7";
     const urlZoom8 = url + "&zoom=8";
@@ -97,7 +97,7 @@ describe('URL State: ', function () {
 
   describe('select lat & lng', () => {
     const url = "http://localhost:4200/map?zoom=11&lat=52.3336607715546&lng=0.05321502685546875";
-    const newUrl = "http://localhost:4200/map?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&abs_time=1539557940000&max_offset=0&min_offset=-1439&selected=cambridgeshire";
+    const newUrl = "http://localhost:4200/map?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&abs_time=1539561540000&max_offset=0&min_offset=-1439&selected=cambridgeshire";
     it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
@@ -114,7 +114,7 @@ describe('URL State: ', function () {
 
 
   describe('select county and date range', () => {
-    const url = "http://localhost:4200/map?selected=powys&min_offset=-5459&max_offset=-2819&abs_time=1539557940000";
+    const url = "http://localhost:4200/map?selected=powys&min_offset=-5459&max_offset=-2819&abs_time=1539561540000";
     it('when authorized and load state', () => {
       cy.visit("http://localhost:4200/map");
       cy.login();
