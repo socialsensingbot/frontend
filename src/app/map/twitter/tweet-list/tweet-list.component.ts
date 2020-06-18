@@ -5,6 +5,7 @@ import {Hub, Logger} from "aws-amplify";
 import * as $ from "jquery";
 import {IInfiniteScrollEvent} from "ngx-infinite-scroll";
 import {Subscription, timer} from "rxjs";
+import {environment} from "../../../../environments/environment";
 
 const log = new Logger('tweet-list');
 
@@ -120,6 +121,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
   public showDateHeader: boolean;
   private lastDateShow: number;
   private _dateHeaderTimer: Subscription;
+  public utc: boolean = environment.timezone === "UTC";
 
 
   /**

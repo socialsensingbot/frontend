@@ -1,4 +1,5 @@
 import {PolygonLayerShortName} from "../types";
+import {environment} from "../../../environments/environment";
 
 export class CSVExportTweet {
   constructor(public id: string, public date: Date, public url: string, public text: string) {
@@ -111,11 +112,16 @@ export class Tweet {
                                      Number(this._internalDateString.substring(6, 8)),
                                      Number(this._internalDateString.substring(8, 10)),
                                      +Number(this._internalDateString.substring(10, 12)), 0, 0));
-      this._year = new Intl.DateTimeFormat('en', {year: '2-digit'}).format(this._date);
-      this._month = new Intl.DateTimeFormat('en', {month: 'short'}).format(this._date);
-      this._day = new Intl.DateTimeFormat('en', {day: '2-digit'}).format(this._date);
-      this._hour = new Intl.DateTimeFormat('en', {hour: '2-digit', hour12: true}).format(this._date);
 
+      this._year = new Intl.DateTimeFormat(environment.locale,
+                                           {year: '2-digit', timeZone: environment.timezone}).format(this._date);
+      this._month = new Intl.DateTimeFormat(environment.locale,
+                                            {month: 'short', timeZone: environment.timezone}).format(this._date);
+      this._day = new Intl.DateTimeFormat(environment.locale, {day: '2-digit', timeZone: environment.timezone}).format(
+        this._date);
+      this._hour = new Intl.DateTimeFormat(environment.locale,
+                                           {hour: '2-digit', hour12: true, timeZone: environment.timezone}).format(
+        this._date);
       this._init = true;
     }
   }

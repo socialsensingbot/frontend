@@ -1,5 +1,5 @@
-<div [style.opacity]="showDateHeader ? '0.9':'0'" class="app-tweet-list-date-float">
-  <div class="app-tweet-list-date-float-inner">{{firstVisibleDate| date:"medium"}} UTC</div>
+<div [style.opacity]="showDateHeader ? '0.8':'0'" class="app-tweet-list-date-float">
+  <div class="app-tweet-list-date-float-inner">{{firstVisibleDate| date:"medium"}} {{utc ? "UTC" : ""}}</div>
 </div>
 
 <div class="app-tweet-list app-tweet-list-{{group}}"

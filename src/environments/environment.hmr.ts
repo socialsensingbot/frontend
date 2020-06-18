@@ -1,9 +1,12 @@
 export const environment = {
-  version: "hmr",
+  version:    "hmr",
   production: false,
-  hmr: true,
-  confirm: {
-    email: '',
+  hmr:        true,
+  // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
+  timezone:   "UTC",
+  locale:     'en-GB',
+  confirm:    {
+    email:    '',
     password: ''
   }
 };

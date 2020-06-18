@@ -2,9 +2,9 @@ const zoomDuration = 1000;
 
 function confirmSlider() {
   cy.get(".slider-date-time-min .slider-date", {timeout: 20000}).should("contain.text", "24-Apr-20");
-  cy.get(".slider-date-time-min .slider-time").should("contain.text", "6 PM");
+  cy.get(".slider-date-time-min .slider-time").should("contain.text", "6 pm");
   cy.get(".slider-date-time-max .slider-date", {timeout: 20000}).should("contain.text", "25-Apr-20");
-  cy.get(".slider-date-time-max .slider-time").should("contain.text", "6 PM");
+  cy.get(".slider-date-time-max .slider-time").should("contain.text", "6 pm");
 }
 
 

@@ -5,6 +5,7 @@ import PubSub from '@aws-amplify/pubsub';
 import Amplify, {Auth, Logger, Storage} from 'aws-amplify';
 import API from '@aws-amplify/api';
 import awsconfig from './aws-exports';
+
 const log = new Logger('main');
 
 API.configure(awsconfig);
@@ -15,6 +16,7 @@ Amplify.configure(awsconfig);
 import {AppModule} from './app/app.module';
 import {environment} from './environments/environment';
 import {hmrBootstrap} from "./hmr";
+
 if (environment.production) {
   enableProdMode();
   Amplify.Logger.LOG_LEVEL = 'INFO';
@@ -38,18 +40,31 @@ if (environment.production) {
 }
 
 
-if(window.location.search.indexOf('__debug__') >= 0) {
+if (window.location.search.indexOf('__debug__') >= 0) {
   Amplify.Logger.LOG_LEVEL = 'VERBOSE';
 }
 
-log.info("**********************************")
-log.info("*** Social Sensing Version "+environment.version);
-log.info("**********************************")
+function getLang() {
+  if (navigator.languages != undefined) {
+    return navigator.languages[0];
+  } else {
+    return navigator.language;
+  }
+}
+
+log.info("**********************************");
+log.info("*** Social Sensing Version " + environment.version);
+log.info("**********************************");
+log.info("");
+log.info("Locale detected: " + getLang());
+log.info("Locale in use: " + environment.locale);
+log.info("Timezone detected: " + Intl.DateTimeFormat().resolvedOptions().timeZone);
+log.info("Timezone in use: " + environment.timezone);
 
 const bootstrap = () => platformBrowserDynamic().bootstrapModule(AppModule);
 
 if (environment.hmr) {
-  if (module[ 'hot' ]) {
+  if (module['hot']) {
     hmrBootstrap(module, bootstrap);
   } else {
     console.error('HMR is not enabled for webpack-dev-server!');
