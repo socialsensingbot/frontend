@@ -1,5 +1,5 @@
-<div [style.opacity]="showDateHeader ? '0.8':'0'" class="app-tweet-list-date-float">
-  <div class="app-tweet-list-date-float-inner">{{firstVisibleDate| date:"medium"}} {{utc ? "UTC" : ""}}</div>
+<div *ngIf="firstVisibleDate" [style.opacity]="showDateHeader ? '0.8':'0'" class="app-tweet-list-date-float">
+  <div class="app-tweet-list-date-float-inner">{{firstVisibleDate.toUTCString()}}</div>
 </div>
 
 <div class="app-tweet-list app-tweet-list-{{group}}"

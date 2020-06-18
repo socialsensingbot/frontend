@@ -2,7 +2,7 @@ import {PolygonLayerShortName} from "../types";
 import {environment} from "../../../environments/environment";
 
 export class CSVExportTweet {
-  constructor(public id: string, public date: Date, public url: string, public text: string) {
+  constructor(public id: string, public date: string, public url: string, public text: string) {
 
   }
 
@@ -151,7 +151,7 @@ export class Tweet {
 
   public asCSV(): CSVExportTweet {
     this.lazyInit();
-    return new CSVExportTweet(this._id, this._date, this._url, $("<div>").html(this._html).text());
+    return new CSVExportTweet(this._id, this._date.toUTCString(), this._url, $("<div>").html(this._html).text());
   }
 }
 
