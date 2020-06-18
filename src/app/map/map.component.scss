@@ -1,6 +1,6 @@
-$right-hand-margin: 18px;
-$top-margin: 18px;
-$bottom-margin: 28px;
+$right-hand-margin: 24px;
+$top-margin: 24px;
+$bottom-margin: 36px;
 $drawer-width: 568px;
 
 .draw-close-button {
@@ -24,13 +24,13 @@ $drawer-width: 568px;
   right: 0px;
   position: absolute;
   pointer-events: none;
-  box-shadow: inset 0px 0px 4px 1px rgba(17, 17, 17, 0.5);
+  box-shadow: inset 0px 0px 4px 1px rgba(0, 0, 0, 0.3);
 }
 
 .map {
   height: 100%;
   width: 100%;
-  overflow: auto;
+  overflow: hidden;
   top: 0px;
   left: 0px;
   bottom: 0px;
