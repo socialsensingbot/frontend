@@ -1,3 +1,4 @@
+@import "../../../../styles";
 $tweetWidth: 540px;
 $tweetMargin: 8px;
 .app-tweet-list {
@@ -151,9 +152,10 @@ $tweetMargin: 8px;
   transition: opacity 0.8s ease-in-out 0.3s;
 
   .app-tweet-list-date-float-inner {
-    background: #fefefe;
+    background: mat-color($app-accent);
+    color: white;
     display: block;
-    width: 200px;
+    width: 240px;
     text-align: center;
     padding: 4px;
     border-radius: 2px;

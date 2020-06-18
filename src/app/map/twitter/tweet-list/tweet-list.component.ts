@@ -282,8 +282,8 @@ export class TweetListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this._dateHeaderTimer = timer(5000, 5000).subscribe(() => {
-      if (Date.now() - this.lastDateShow > 5 * 1000) {
+    this._dateHeaderTimer = timer(1000, 1000).subscribe(() => {
+      if (Date.now() - this.lastDateShow > 3 * 1000) {
         this.showDateHeader = false;
       }
     });
