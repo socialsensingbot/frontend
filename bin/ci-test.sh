@@ -27,6 +27,8 @@ if [[ "${AWS_BRANCH}" == master ]]; then
   exit 1
 fi
 
+export TZ=Europe/London
+
 function test() {
   echo "Running ${tests} on branch ${AWS_BRANCH} against ${browsers}"
   for browser in "$@"; do
