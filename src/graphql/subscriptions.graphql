@@ -78,6 +78,8 @@ subscription OnCreateGroupPreferences {
   onCreateGroupPreferences {
     id
     group
+    locale
+    timezone
     createdAt
     updatedAt
   }
@@ -86,6 +88,8 @@ subscription OnUpdateGroupPreferences {
   onUpdateGroupPreferences {
     id
     group
+    locale
+    timezone
     createdAt
     updatedAt
   }
@@ -94,6 +98,8 @@ subscription OnDeleteGroupPreferences {
   onDeleteGroupPreferences {
     id
     group
+    locale
+    timezone
     createdAt
     updatedAt
   }

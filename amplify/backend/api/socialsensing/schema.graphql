@@ -20,7 +20,9 @@ type UserSession @model(timestamps: {createdAt: "createdAt", updatedAt: "updated
 
 type GroupPreferences @model @auth(rules: [{allow: groups, operations: [create, update, delete, read], groupsField: "group"}]){
   id: ID!
-  group: String
+  group: String!
+  locale: String
+  timezone: String
 }
 
 
@@ -30,7 +32,7 @@ type GroupTweetIgnore @model( timestamps: {createdAt: "createdAt", updatedAt: "u
   ignoredBy: String!
   tweetId: String!
   ownerGroups: [String]
-  scope: String
+  scope: String!
 }
 
 type GroupTwitterUserIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" })   @auth(rules: [{allow: groups, groupsField: "ownerGroups"}]) {
@@ -38,7 +40,7 @@ type GroupTwitterUserIgnore @model(timestamps: {createdAt: "createdAt", updatedA
   twitterScreenName: String!
   ignoredBy: String!
   ownerGroups: [String]
-  scope: String
+  scope: String!
 }
 
 

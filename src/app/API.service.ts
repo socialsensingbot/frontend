@@ -4,7 +4,7 @@
 import {Injectable} from "@angular/core";
 import API, {graphqlOperation} from "@aws-amplify/api";
 import {GraphQLResult} from "@aws-amplify/api/lib/types";
-import * as Observable from "zen-observable";
+import {Observable} from "zen-observable-ts";
 
 export type CreateUserPreferencesInput = {
   id?: string | null;
@@ -99,10 +99,14 @@ export type DeleteUserSessionInput = {
 
 export type CreateGroupPreferencesInput = {
   id?: string | null;
-  group?: string | null;
+  group: string;
+  locale?: string | null;
+  timezone?: string | null;
 };
 
 export type ModelGroupPreferencesConditionInput = {
+  locale?: ModelStringInput | null;
+  timezone?: ModelStringInput | null;
   and?: Array<ModelGroupPreferencesConditionInput | null> | null;
   or?: Array<ModelGroupPreferencesConditionInput | null> | null;
   not?: ModelGroupPreferencesConditionInput | null;
@@ -111,6 +115,8 @@ export type ModelGroupPreferencesConditionInput = {
 export type UpdateGroupPreferencesInput = {
   id: string;
   group?: string | null;
+  locale?: string | null;
+  timezone?: string | null;
 };
 
 export type DeleteGroupPreferencesInput = {
@@ -123,7 +129,7 @@ export type CreateGroupTweetIgnoreInput = {
   ignoredBy: string;
   tweetId: string;
   ownerGroups?: Array<string | null> | null;
-  scope?: string | null;
+  scope: string;
 };
 
 export type ModelGroupTweetIgnoreConditionInput = {
@@ -154,7 +160,7 @@ export type CreateGroupTwitterUserIgnoreInput = {
   twitterScreenName: string;
   ignoredBy: string;
   ownerGroups?: Array<string | null> | null;
-  scope?: string | null;
+  scope: string;
 };
 
 export type ModelGroupTwitterUserIgnoreConditionInput = {
@@ -263,6 +269,8 @@ export type ModelUserSessionFilterInput = {
 export type ModelGroupPreferencesFilterInput = {
   id?: ModelIDInput | null;
   group?: ModelStringInput | null;
+  locale?: ModelStringInput | null;
+  timezone?: ModelStringInput | null;
   and?: Array<ModelGroupPreferencesFilterInput | null> | null;
   or?: Array<ModelGroupPreferencesFilterInput | null> | null;
   not?: ModelGroupPreferencesFilterInput | null;
@@ -392,7 +400,9 @@ export type DeleteUserSessionMutation = {
 export type CreateGroupPreferencesMutation = {
   __typename: "GroupPreferences";
   id: string;
-  group: string | null;
+  group: string;
+  locale: string | null;
+  timezone: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -400,7 +410,9 @@ export type CreateGroupPreferencesMutation = {
 export type UpdateGroupPreferencesMutation = {
   __typename: "GroupPreferences";
   id: string;
-  group: string | null;
+  group: string;
+  locale: string | null;
+  timezone: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -408,7 +420,9 @@ export type UpdateGroupPreferencesMutation = {
 export type DeleteGroupPreferencesMutation = {
   __typename: "GroupPreferences";
   id: string;
-  group: string | null;
+  group: string;
+  locale: string | null;
+  timezone: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -420,7 +434,7 @@ export type CreateGroupTweetIgnoreMutation = {
   ignoredBy: string;
   tweetId: string;
   ownerGroups: Array<string | null> | null;
-  scope: string | null;
+  scope: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -432,7 +446,7 @@ export type UpdateGroupTweetIgnoreMutation = {
   ignoredBy: string;
   tweetId: string;
   ownerGroups: Array<string | null> | null;
-  scope: string | null;
+  scope: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -444,7 +458,7 @@ export type DeleteGroupTweetIgnoreMutation = {
   ignoredBy: string;
   tweetId: string;
   ownerGroups: Array<string | null> | null;
-  scope: string | null;
+  scope: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -455,7 +469,7 @@ export type CreateGroupTwitterUserIgnoreMutation = {
   twitterScreenName: string;
   ignoredBy: string;
   ownerGroups: Array<string | null> | null;
-  scope: string | null;
+  scope: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -466,7 +480,7 @@ export type UpdateGroupTwitterUserIgnoreMutation = {
   twitterScreenName: string;
   ignoredBy: string;
   ownerGroups: Array<string | null> | null;
-  scope: string | null;
+  scope: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -477,7 +491,7 @@ export type DeleteGroupTwitterUserIgnoreMutation = {
   twitterScreenName: string;
   ignoredBy: string;
   ownerGroups: Array<string | null> | null;
-  scope: string | null;
+  scope: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -638,7 +652,9 @@ export type ListUserSessionsQuery = {
 export type GetGroupPreferencesQuery = {
   __typename: "GroupPreferences";
   id: string;
-  group: string | null;
+  group: string;
+  locale: string | null;
+  timezone: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -648,7 +664,9 @@ export type ListGroupPreferencessQuery = {
   items: Array<{
     __typename: "GroupPreferences";
     id: string;
-    group: string | null;
+    group: string;
+    locale: string | null;
+    timezone: string | null;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
@@ -662,7 +680,7 @@ export type GetGroupTweetIgnoreQuery = {
   ignoredBy: string;
   tweetId: string;
   ownerGroups: Array<string | null> | null;
-  scope: string | null;
+  scope: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -676,7 +694,7 @@ export type ListGroupTweetIgnoresQuery = {
     ignoredBy: string;
     tweetId: string;
     ownerGroups: Array<string | null> | null;
-    scope: string | null;
+    scope: string;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
@@ -689,7 +707,7 @@ export type GetGroupTwitterUserIgnoreQuery = {
   twitterScreenName: string;
   ignoredBy: string;
   ownerGroups: Array<string | null> | null;
-  scope: string | null;
+  scope: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -702,7 +720,7 @@ export type ListGroupTwitterUserIgnoresQuery = {
     twitterScreenName: string;
     ignoredBy: string;
     ownerGroups: Array<string | null> | null;
-    scope: string | null;
+    scope: string;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
@@ -853,7 +871,9 @@ export type OnDeleteUserSessionSubscription = {
 export type OnCreateGroupPreferencesSubscription = {
   __typename: "GroupPreferences";
   id: string;
-  group: string | null;
+  group: string;
+  locale: string | null;
+  timezone: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -861,7 +881,9 @@ export type OnCreateGroupPreferencesSubscription = {
 export type OnUpdateGroupPreferencesSubscription = {
   __typename: "GroupPreferences";
   id: string;
-  group: string | null;
+  group: string;
+  locale: string | null;
+  timezone: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -869,7 +891,9 @@ export type OnUpdateGroupPreferencesSubscription = {
 export type OnDeleteGroupPreferencesSubscription = {
   __typename: "GroupPreferences";
   id: string;
-  group: string | null;
+  group: string;
+  locale: string | null;
+  timezone: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -881,7 +905,7 @@ export type OnCreateGroupTweetIgnoreSubscription = {
   ignoredBy: string;
   tweetId: string;
   ownerGroups: Array<string | null> | null;
-  scope: string | null;
+  scope: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -893,7 +917,7 @@ export type OnUpdateGroupTweetIgnoreSubscription = {
   ignoredBy: string;
   tweetId: string;
   ownerGroups: Array<string | null> | null;
-  scope: string | null;
+  scope: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -905,7 +929,7 @@ export type OnDeleteGroupTweetIgnoreSubscription = {
   ignoredBy: string;
   tweetId: string;
   ownerGroups: Array<string | null> | null;
-  scope: string | null;
+  scope: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -916,7 +940,7 @@ export type OnCreateGroupTwitterUserIgnoreSubscription = {
   twitterScreenName: string;
   ignoredBy: string;
   ownerGroups: Array<string | null> | null;
-  scope: string | null;
+  scope: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -927,7 +951,7 @@ export type OnUpdateGroupTwitterUserIgnoreSubscription = {
   twitterScreenName: string;
   ignoredBy: string;
   ownerGroups: Array<string | null> | null;
-  scope: string | null;
+  scope: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -938,7 +962,7 @@ export type OnDeleteGroupTwitterUserIgnoreSubscription = {
   twitterScreenName: string;
   ignoredBy: string;
   ownerGroups: Array<string | null> | null;
-  scope: string | null;
+  scope: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -1232,6 +1256,8 @@ export class APIService {
           __typename
           id
           group
+          locale
+          timezone
           createdAt
           updatedAt
         }
@@ -1256,6 +1282,8 @@ export class APIService {
           __typename
           id
           group
+          locale
+          timezone
           createdAt
           updatedAt
         }
@@ -1280,6 +1308,8 @@ export class APIService {
           __typename
           id
           group
+          locale
+          timezone
           createdAt
           updatedAt
         }
@@ -1789,6 +1819,8 @@ export class APIService {
           __typename
           id
           group
+          locale
+          timezone
           createdAt
           updatedAt
         }
@@ -1813,6 +1845,8 @@ export class APIService {
             __typename
             id
             group
+            locale
+            timezone
             createdAt
             updatedAt
           }
@@ -2203,6 +2237,8 @@ export class APIService {
           __typename
           id
           group
+          locale
+          timezone
           createdAt
           updatedAt
         }
@@ -2217,6 +2253,8 @@ export class APIService {
           __typename
           id
           group
+          locale
+          timezone
           createdAt
           updatedAt
         }
@@ -2231,6 +2269,8 @@ export class APIService {
           __typename
           id
           group
+          locale
+          timezone
           createdAt
           updatedAt
         }

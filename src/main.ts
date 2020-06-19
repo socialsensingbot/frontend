@@ -44,22 +44,11 @@ if (window.location.search.indexOf('__debug__') >= 0) {
   Amplify.Logger.LOG_LEVEL = 'VERBOSE';
 }
 
-function getLang() {
-  if (navigator.languages != undefined) {
-    return navigator.languages[0];
-  } else {
-    return navigator.language;
-  }
-}
 
 log.info("**********************************");
 log.info("*** Social Sensing Version " + environment.version);
 log.info("**********************************");
 log.info("");
-log.info("Locale detected: " + getLang());
-log.info("Locale in use: " + environment.locale);
-log.info("Timezone detected: " + Intl.DateTimeFormat().resolvedOptions().timeZone);
-log.info("Timezone in use: " + environment.timezone);
 
 const bootstrap = () => platformBrowserDynamic().bootstrapModule(AppModule);
 

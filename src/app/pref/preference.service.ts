@@ -9,6 +9,7 @@ import {
 } from "../API.service";
 import {NotificationService} from "../services/notification.service";
 import {Tweet} from "../map/twitter/tweet";
+import {environment} from "../../environments/environment";
 
 const log = new Logger('pref-service');
 
@@ -42,7 +43,11 @@ export class PreferenceService {
   public tweetUnignored = new EventEmitter<OnDeleteGroupTweetIgnoreSubscription>();
   public twitterUserUnignored = new EventEmitter<OnDeleteGroupTwitterUserIgnoreSubscription>();
 
-  constructor(private _notify: NotificationService, private _api: APIService) { }
+  public group: any;
+
+  constructor(private _notify: NotificationService, private _api: APIService) {
+    this.group = environment;
+  }
 
   public async init(userInfo: any) {
     this._userInfo = userInfo;
@@ -85,10 +90,16 @@ export class PreferenceService {
           this._groupPreferences = groupPref;
 
         }
+        if (this._groupPreferences.locale) {
+          this.group.locale = this._groupPreferences.locale;
+        }
+        if (this._groupPreferences.timezone) {
+          this.group.timezone = this._groupPreferences.timezone;
+        }
         log.debug(this._preferences);
       }
       this.readBlacklist();
-      log.debug("** Preference Service Initialized **");
+      log.info("Preference Service Initialized");
     } catch (e) {
       log.debug("** Preferences Service Failed to Initialize **");
       this._notify.error(e);

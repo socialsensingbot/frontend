@@ -11,6 +11,14 @@ import {SessionService} from "./auth/session.service";
 
 const log = new Logger('app');
 
+function getLang() {
+  if (navigator.languages != undefined) {
+    return navigator.languages[0];
+  } else {
+    return navigator.language;
+  }
+}
+
 @Component({
              selector:    'app-root',
              templateUrl: './app.component.html',
@@ -63,6 +71,11 @@ export class AppComponent {
       if (userInfo) {
         await this._pref.init(userInfo);
         await this._session.open(userInfo);
+        log.info("Locale detected: " + getLang());
+        log.info("Locale in use: " + this._pref.group.locale);
+        log.info("Timezone detected: " + Intl.DateTimeFormat().resolvedOptions().timeZone);
+        log.info("Timezone in use: " + this._pref.group.timezone);
+
       }
 
       if (userInfo && userInfo.attributes.profile) {
@@ -70,7 +83,6 @@ export class AppComponent {
         this.user = userInfo;
         this.isAuthenticated = true;
         this.isSignup = false;
-
       }
 
     } catch (error) {
