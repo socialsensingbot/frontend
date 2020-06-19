@@ -228,7 +228,7 @@ export class PreferenceService {
 
   private async ignoreSenderForScope(tweet: Tweet, scope: string) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to group ignore sender on an unparseable tweet.");
+      throw new Error("Shouldn't be trying to group ignore sender on an unparseable tweet.");
       return;
     }
     //#87 the value of the await needs to be in a temp variable
@@ -264,7 +264,7 @@ export class PreferenceService {
 
   private async ignoreTweetForScope(tweet: Tweet, scope: string) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to (group) ignore tweet on an unparseable tweet.");
+      throw new Error("Shouldn't be trying to (group) ignore tweet on an unparseable tweet.");
       return;
     }
 
@@ -292,7 +292,7 @@ export class PreferenceService {
 
   public isSenderIgnored(tweet) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to check ignored sender on an unparseable tweet.");
+      throw new Error("Shouldn't be trying to check ignored sender on an unparseable tweet.");
       return;
     }
 
@@ -301,7 +301,7 @@ export class PreferenceService {
 
   public isTweetIgnored(tweet: Tweet) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to check tweet ignored on an unparseable tweet.");
+      throw new Error("Shouldn't be trying to check tweet ignored on an unparseable tweet.");
       return;
     }
     return this._tweetBlackList.includes(tweet.id);
@@ -313,7 +313,7 @@ export class PreferenceService {
 
   private async unignoreSenderForScope(tweet, scope: string) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to (group) un-ignore sender on an unparseable tweet.");
+      throw new Error("Shouldn't be trying to (group) un-ignore sender on an unparseable tweet.");
       return;
     }
 
@@ -335,7 +335,7 @@ export class PreferenceService {
 
   private async unignoreTweetForScope(tweet, scope: string) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to (group) un-ignore tweet on an unparseable tweet.");
+      throw new Error("Shouldn't be trying to (group) un-ignore tweet on an unparseable tweet.");
       return;
     }
     await this._username;

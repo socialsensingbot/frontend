@@ -1,7 +1,9 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {EventEmitter, Inject, Injectable} from '@angular/core';
 import {Observable, Subscription, timer} from "rxjs";
 import {Auth, Logger} from "aws-amplify";
 import {NotificationService} from "./notification.service";
+import {RollbarService} from "../rollbar";
+import * as Rollbar from "rollbar";
 
 const log = new Logger('uiexecution');
 
@@ -10,7 +12,7 @@ class ExecutionTask {
   constructor(private _resolve: (value?: any) => void, private _reject: (reason?: any) => void,
               private _task: () => any, public name: String, public waitForStates: UIState[] | null,
               private _dedup: string, private _notify: NotificationService, public reschedule: boolean,
-              public silentFailure: boolean) {
+              public silentFailure: boolean,) {
 
   }
 
@@ -25,7 +27,6 @@ class ExecutionTask {
       this._resolve(this._task());
     } catch (e) {
       log.error("ERROR Executing " + this.name)
-      this._notify.error(e);
       this._reject(e);
     }
   }
@@ -55,7 +56,7 @@ export class UIExecutionService {
 
   private dedupMap: Map<any, ExecutionTask> = new Map<any, ExecutionTask>();
 
-  constructor(private _notify: NotificationService) { }
+  constructor(private _notify: NotificationService, @Inject(RollbarService) private _rollbar: Rollbar) { }
 
   public async start() {
     await Auth.currentAuthenticatedUser() !== null

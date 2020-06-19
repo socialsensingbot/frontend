@@ -73,9 +73,6 @@ export class MapDataService {
             .then(json => {
               this._stats.coarse = Object.freeze(json);
               return json;
-            }).catch(e => {
-              this._notify.error(e)
-              return e;
             });
         } else {
           return this._stats;
@@ -92,10 +89,7 @@ export class MapDataService {
                 Object.freeze(this._stats);
               }
               return this._stats;
-            }).catch(e => {
-              this._notify.error(e)
-              return e;
-            })
+            });
         } else {
           return this._stats;
         }
