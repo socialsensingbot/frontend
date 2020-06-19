@@ -16,7 +16,7 @@ import {
   tileLayer,
 } from 'leaflet';
 import 'jquery-ui/ui/widgets/slider.js';
-import {ActivatedRoute, Params, Router} from '@angular/router';
+import {ActivatedRoute, NavigationStart, Params, Router} from '@angular/router';
 import {Observable, Subscription, timer} from "rxjs";
 import * as geojson from "geojson";
 import {DateRange, DateRangeSliderOptions} from "./date-range-slider/date-range-slider.component";
@@ -155,6 +155,7 @@ export class MapComponent implements OnInit, OnDestroy {
     zoom:   6,
     center: latLng([53, -2])
   };
+  _routerStateChangeSub: Subscription;
 
   constructor(private _router: Router,
               private route: ActivatedRoute,
@@ -366,6 +367,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     await this.load(true);
     this._searchParams.subscribe(params => {
+      this._newParams = params;
       if (!this._params) {
         this._params = true;
         this._exec.queue("Initial Search Params", ["no-params"],
@@ -611,6 +613,19 @@ export class MapComponent implements OnInit, OnDestroy {
       }
     });
 
+    this._routerStateChangeSub = this._router.events
+                                     .subscribe((event: NavigationStart) => {
+                                       if (event.navigationTrigger === 'popstate') {
+                                         this._exec.queue("Pop State", ["ready"],
+                                                          async () => {
+                                                            this.updateMapFromQueryParams(this._newParams);
+                                                            await this.updateLayers("From Back Button")
+                                                                      .then(() => this._twitterIsStale = true);
+                                                          }, "", true, true, true);
+                                       }
+                                     });
+
+
   }
 
   /**
@@ -626,6 +641,10 @@ export class MapComponent implements OnInit, OnDestroy {
     if (this._stateSub) {
       this._stateSub.unsubscribe();
     }
+    if (this._routerStateChangeSub) {
+      this._routerStateChangeSub.unsubscribe();
+    }
+
   }
 
   /**
