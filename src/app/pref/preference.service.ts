@@ -17,6 +17,10 @@ const log = new Logger('pref-service');
               providedIn: 'root'
             })
 export class PreferenceService {
+  public get groups(): string[] {
+    return this._groups;
+  }
+
   private _preferences: any;
   private _groupPreferences: any;
   //todo: There must be a better way to do this!

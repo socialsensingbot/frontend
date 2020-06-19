@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
 import {AmplifyService} from 'aws-amplify-angular';
 import {AuthService} from "./auth/auth.service";
 import {API, Auth, graphqlOperation, Logger} from "aws-amplify";
@@ -8,6 +8,9 @@ import {PreferenceService} from "./pref/preference.service";
 import {NotificationService} from "./services/notification.service";
 import {APIService, OnCreateUserSessionSubscription} from "./API.service";
 import {SessionService} from "./auth/session.service";
+import * as Rollbar from "rollbar";
+import {RollbarService} from "./rollbar";
+
 
 const log = new Logger('app');
 
@@ -36,7 +39,7 @@ export class AppComponent {
               private _router: Router, private _pref: PreferenceService,
               private _notify: NotificationService,
               private _api: APIService,
-              private _session: SessionService) {
+              private _session: SessionService, @Inject(RollbarService) private _rollbar: Rollbar) {
     Auth.currentAuthenticatedUser({bypassCache: true})
         .then(user => this.isAuthenticated = (user != null))
         .then(() => this.checkSession())
@@ -75,7 +78,18 @@ export class AppComponent {
         log.info("Locale in use: " + this._pref.group.locale);
         log.info("Timezone detected: " + Intl.DateTimeFormat().resolvedOptions().timeZone);
         log.info("Timezone in use: " + this._pref.group.timezone);
-
+        this._rollbar.configure(
+          {
+            enabled:   true,
+            captureIp: 'anonymize',
+            payload:   {
+              person: {
+                id:     userInfo.attributes.username,
+                groups: this._pref.groups
+              }
+            }
+          }
+        );
       }
 
       if (userInfo && userInfo.attributes.profile) {

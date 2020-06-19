@@ -6,6 +6,7 @@ export const environment = {
   version:    "dev",
   production: false,
   hmr:        false,
+  rollbar:    false,
   // timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   timezone:   "UTC",
   locale:     'en-GB',
