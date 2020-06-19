@@ -156,6 +156,7 @@ export class MapComponent implements OnInit, OnDestroy {
     center: latLng([53, -2])
   };
   _routerStateChangeSub: Subscription;
+  _popState: boolean;
 
   constructor(private _router: Router,
               private route: ActivatedRoute,
@@ -367,7 +368,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     await this.load(true);
     this._searchParams.subscribe(params => {
-      this._newParams = params;
+
       if (!this._params) {
         this._params = true;
         this._exec.queue("Initial Search Params", ["no-params"],
@@ -413,6 +414,13 @@ export class MapComponent implements OnInit, OnDestroy {
                            return this.updateLayers("From Parameters").then(() => this._twitterIsStale = true);
 
                          });
+      } else {
+        if (this._popState) {
+          this._popState = false;
+          this.updateMapFromQueryParams(params);
+          return this.updateLayers("From Back Button")
+                     .then(() => this._twitterIsStale = true);
+        }
       }
 
     });
@@ -614,14 +622,9 @@ export class MapComponent implements OnInit, OnDestroy {
     });
 
     this._routerStateChangeSub = this._router.events
-                                     .subscribe((event: NavigationStart) => {
+                                     .subscribe(async (event: NavigationStart) => {
                                        if (event.navigationTrigger === 'popstate') {
-                                         this._exec.queue("Pop State", ["ready"],
-                                                          async () => {
-                                                            this.updateMapFromQueryParams(this._newParams);
-                                                            await this.updateLayers("From Back Button")
-                                                                      .then(() => this._twitterIsStale = true);
-                                                          }, "", true, true, true);
+                                         this._popState = true;
                                        }
                                      });
 
@@ -801,7 +804,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                 log.debug("Update in progress so skipping this update");
                               }
                             }
-      , "", true, true).catch(e => {
+      , reason, true, true).catch(e => {
       if (e !== DUPLICATE_REASON) {
         log.error(e);
       }
