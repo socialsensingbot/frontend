@@ -14,6 +14,8 @@ import {
   OnDeleteGroupTweetIgnoreSubscription, OnDeleteGroupTwitterUserIgnoreSubscription
 } from "../../API.service";
 import {Subscription} from "rxjs";
+import {ExportToCsv} from "export-to-csv";
+import {Geometry} from "../types";
 
 const log = new Logger('twitter-panel');
 
@@ -25,6 +27,7 @@ const log = new Logger('twitter-panel');
 export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
   @Input() count: number;
+  @Input() geometry: Geometry;
   @Input() region: string;
   @Input() exceedanceProbability: string;
   private _tweets: Tweet[] | null = null;
@@ -42,6 +45,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
   private tweetUnignoreSub: Subscription;
   private twitterUserIgnoreSub: Subscription;
   private twitterUserUnignoreSub: Subscription;
+  private csvExporter: ExportToCsv;
 
   constructor(private _zone: NgZone, public pref: PreferenceService) {
     Hub.listen("twitter-panel", (e) => {
@@ -49,6 +53,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
         this._zone.run(() => this.updateTweets(this._tweets));
       }
     });
+
 
   }
 
@@ -144,5 +149,48 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
       (sub: OnDeleteGroupTwitterUserIgnoreSubscription) => {
         this.update(null)
       });
+  }
+
+  public download() {
+    let title = `${this.region}`;
+
+    if (this.region.match(/\d+/)) {
+      let minX = null;
+      let maxX = null;
+      let minY = null;
+      let maxY = null;
+      for (const point of this.geometry.coordinates[0]) {
+        if (minX === null || point[0] < minX) {
+          minX = point[0];
+        }
+        if (minY === null || point[1] < minY) {
+          minY = point[1];
+        }
+        if (maxX === null || point[0] > maxX) {
+          maxX = point[0];
+        }
+        if (maxY === null || point[1] > maxY) {
+          maxY = point[1];
+        }
+      }
+      console.log(
+        `Bounding box of ${JSON.stringify(this.geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`)
+      title = `"Region bounded by ${minX},${minY} to ${maxX},${maxY}"`
+    }
+    const options = {
+      fieldSeparator:   ',',
+      quoteStrings:     '"',
+      decimalSeparator: '.',
+      showLabels:       true,
+      showTitle:        true,
+      title:            title,
+      useTextFile:      false,
+      useBom:           true,
+      useKeysAsHeaders: true,
+      // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
+    };
+
+    this.csvExporter = new ExportToCsv(options);
+    this.csvExporter.generateCsv(this.visibleTweets.filter(i => i.valid).map(i => i.asCSV()));
   }
 }

@@ -4,6 +4,7 @@ import {Subscription, timer} from "rxjs";
 import {Cache, Hub, Logger} from "aws-amplify";
 import {NgEventBus} from "ng-event-bus";
 import {MapDataService} from "../data/map-data.service";
+import {environment} from "../../../environments/environment";
 
 const log = new Logger('date-range');
 
@@ -161,12 +162,16 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     if (cachedItem != null) {
       return cachedItem;
     } else {
-      const date = new Date(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
-                            tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0);
-      const ye = new Intl.DateTimeFormat('en', {year: '2-digit'}).format(date);
-      const mo = new Intl.DateTimeFormat('en', {month: 'short'}).format(date);
-      const da = new Intl.DateTimeFormat('en', {day: '2-digit'}).format(date);
-      const hr = new Intl.DateTimeFormat('en', {hour: '2-digit', hour12: true}).format(date);
+      const date = new Date(Date.UTC(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
+                                     tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0));
+      const ye = new Intl.DateTimeFormat(environment.locale, {year: '2-digit', timeZone: environment.timezone}).format(
+        date);
+      const mo = new Intl.DateTimeFormat(environment.locale, {month: 'short', timeZone: environment.timezone}).format(
+        date);
+      const da = new Intl.DateTimeFormat(environment.locale, {day: '2-digit', timeZone: environment.timezone}).format(
+        date);
+      const hr = new Intl.DateTimeFormat(environment.locale,
+                                         {hour: '2-digit', hour12: true, timeZone: environment.timezone}).format(date);
 
       const text = `<span class="slider-date-time slider-date-time-${label}"><span class='slider-time'>${hr}</span> <span class='slider-date'>${da}-${mo}-${ye}</span></span>`;
       //var date = new Date( tstring.substring(0,4), tstring.substring(4,6)-1, tstring.substring(6,8), +tstring.substring(8,10)+add, 0, 0, 0);

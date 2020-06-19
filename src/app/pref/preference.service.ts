@@ -9,6 +9,7 @@ import {
 } from "../API.service";
 import {NotificationService} from "../services/notification.service";
 import {Tweet} from "../map/twitter/tweet";
+import {environment} from "../../environments/environment";
 
 const log = new Logger('pref-service');
 
@@ -16,6 +17,10 @@ const log = new Logger('pref-service');
               providedIn: 'root'
             })
 export class PreferenceService {
+  public get groups(): string[] {
+    return this._groups;
+  }
+
   private _preferences: any;
   private _groupPreferences: any;
   //todo: There must be a better way to do this!
@@ -42,7 +47,11 @@ export class PreferenceService {
   public tweetUnignored = new EventEmitter<OnDeleteGroupTweetIgnoreSubscription>();
   public twitterUserUnignored = new EventEmitter<OnDeleteGroupTwitterUserIgnoreSubscription>();
 
-  constructor(private _notify: NotificationService, private _api: APIService) { }
+  public group: any;
+
+  constructor(private _notify: NotificationService, private _api: APIService) {
+    this.group = environment;
+  }
 
   public async init(userInfo: any) {
     this._userInfo = userInfo;
@@ -55,44 +64,48 @@ export class PreferenceService {
     }
     log.debug("** Preference Service Initializing **");
     log.debug(userInfo);
-    try {
-      const pref = await this._api.GetUserPreferences(userInfo.username);
-      if (!pref) {
-        log.debug("No existing preferences.");
-        await this._api.CreateUserPreferences({id: userInfo.username});
-        log.debug("Created new preferences.");
-        this._preferences = await this._api.GetUserPreferences(userInfo.username);
-      } else {
-        log.debug("Existing preferences.");
-        this._preferences = pref;
 
-      }
-      if (!groups || groups.length === 0) {
-        this._notify.show(
-          "Your account is not a member of a group, please ask an administrator to fix this. The application will not work correctly until you do.",
-          "I Will",
-          180);
-        this._groups = ["__invalid__"];
-      } else {
-        const groupPref = await this._api.GetGroupPreferences(this._groups[0]);
-        if (!groupPref) {
-          log.debug("No existing preferences.");
-          await this._api.CreateGroupPreferences({id: this._groups[0], group: this._groups[0]});
-          log.debug("Created new group preferences.");
-          this._groupPreferences = await this._api.GetGroupPreferences(this._groups[0]);
-        } else {
-          log.debug("Existing group preferences.");
-          this._groupPreferences = groupPref;
+    const pref = await this._api.GetUserPreferences(userInfo.username);
+    if (!pref) {
+      log.debug("No existing preferences.");
+      await this._api.CreateUserPreferences({id: userInfo.username});
+      log.debug("Created new preferences.");
+      this._preferences = await this._api.GetUserPreferences(userInfo.username);
+    } else {
+      log.debug("Existing preferences.");
+      this._preferences = pref;
 
-        }
-        log.debug(this._preferences);
-      }
-      this.readBlacklist();
-      log.debug("** Preference Service Initialized **");
-    } catch (e) {
-      log.debug("** Preferences Service Failed to Initialize **");
-      this._notify.error(e);
     }
+    if (!groups || groups.length === 0) {
+      this._notify.show(
+        "Your account is not a member of a group, please ask an administrator to fix this. The application will not work correctly until you do.",
+        "I Will",
+        180);
+      this._groups = ["__invalid__"];
+    } else {
+      const groupPref = await this._api.GetGroupPreferences(this._groups[0]);
+      if (!groupPref) {
+        log.debug("No existing preferences.");
+        await this._api.CreateGroupPreferences({id: this._groups[0], group: this._groups[0]});
+        log.debug("Created new group preferences.");
+        this._groupPreferences = await this._api.GetGroupPreferences(this._groups[0]);
+      } else {
+        log.debug("Existing group preferences.");
+        this._groupPreferences = groupPref;
+
+      }
+      if (this._groupPreferences.locale) {
+        this.group.locale = this._groupPreferences.locale;
+      }
+      if (this._groupPreferences.timezone) {
+        this.group.timezone = this._groupPreferences.timezone;
+      }
+      log.debug(this._preferences);
+    }
+    this.readBlacklist();
+    log.info("Preference Service Initialized");
+
+
   }
 
   public isBlacklisted(tweet: Tweet): boolean {
@@ -215,7 +228,7 @@ export class PreferenceService {
 
   private async ignoreSenderForScope(tweet: Tweet, scope: string) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to group ignore sender on an unparseable tweet.");
+      throw new Error("Shouldn't be trying to group ignore sender on an unparseable tweet.");
       return;
     }
     //#87 the value of the await needs to be in a temp variable
@@ -251,7 +264,7 @@ export class PreferenceService {
 
   private async ignoreTweetForScope(tweet: Tweet, scope: string) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to (group) ignore tweet on an unparseable tweet.");
+      throw new Error("Shouldn't be trying to (group) ignore tweet on an unparseable tweet.");
       return;
     }
 
@@ -279,7 +292,7 @@ export class PreferenceService {
 
   public isSenderIgnored(tweet) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to check ignored sender on an unparseable tweet.");
+      throw new Error("Shouldn't be trying to check ignored sender on an unparseable tweet.");
       return;
     }
 
@@ -288,7 +301,7 @@ export class PreferenceService {
 
   public isTweetIgnored(tweet: Tweet) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to check tweet ignored on an unparseable tweet.");
+      throw new Error("Shouldn't be trying to check tweet ignored on an unparseable tweet.");
       return;
     }
     return this._tweetBlackList.includes(tweet.id);
@@ -300,7 +313,7 @@ export class PreferenceService {
 
   private async unignoreSenderForScope(tweet, scope: string) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to (group) un-ignore sender on an unparseable tweet.");
+      throw new Error("Shouldn't be trying to (group) un-ignore sender on an unparseable tweet.");
       return;
     }
 
@@ -322,7 +335,7 @@ export class PreferenceService {
 
   private async unignoreTweetForScope(tweet, scope: string) {
     if (!tweet.valid) {
-      this._notify.error("Shouldn't be trying to (group) un-ignore tweet on an unparseable tweet.");
+      throw new Error("Shouldn't be trying to (group) un-ignore tweet on an unparseable tweet.");
       return;
     }
     await this._username;

@@ -2,7 +2,7 @@ import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {fgsData} from './county_bi';
 import {coarseData} from './coarse_bi';
 import {fineData} from './fine_bi';
-import {Auth, Hub, Logger} from 'aws-amplify';
+import {Auth, Logger} from 'aws-amplify';
 import {
   Browser,
   control,
@@ -27,6 +27,7 @@ import {
   ByRegionType,
   COUNTY,
   Feature,
+  Geometry,
   MapLayers,
   NumberLayerFullName,
   numberLayerFullNames,
@@ -36,7 +37,6 @@ import {
   PolygonLayerShortName,
   polygonLayerShortNames,
   Properties,
-  RegionData,
   STATS
 } from "./types";
 import {AuthService} from "../auth/auth.service";
@@ -72,8 +72,7 @@ export class MapComponent implements OnInit, OnDestroy {
   public activeNumberLayerShortName: NumberLayerShortName = STATS;
   public activePolyLayerShortName: PolygonLayerShortName = COUNTY;
 
-  private _dateMax = 0;
-  private _dateMin = -24 * 60 + 1;
+
   private _oldClicked: (LeafletMouseEvent | "") = "";
   private _clicked: (LeafletMouseEvent | "") = "";
   private _lcontrols: { numbers: Control.Layers, polygon: Control.Layers } = {numbers: null, polygon: null};
@@ -81,6 +80,13 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   // URL state management //
+
+  // ... URL parameters
+  private _dateMax = 0;
+  private _dateMin = -24 * 60 + 1;
+  private _absoluteTime: number;
+  private _previousDateMin: string;
+  private _previousDateMax: string;
 
   /**
    * The current URL parameters, this is updated by a subscriber to this.route.queryParams.
@@ -98,6 +104,7 @@ export class MapComponent implements OnInit, OnDestroy {
   //The UI state fields
   public tweets: Tweet[] = null;
   public selectedRegion: string;
+  public selectedGeometry: Geometry;
   public exceedanceProbability: number;
   public tweetCount: number;
   public tweetsVisible: boolean = false;
@@ -149,7 +156,6 @@ export class MapComponent implements OnInit, OnDestroy {
     center: latLng([53, -2])
   };
 
-
   constructor(private _router: Router,
               private route: ActivatedRoute,
               private _zone: NgZone,
@@ -200,12 +206,16 @@ export class MapComponent implements OnInit, OnDestroy {
     // Merge the params to change into _newParams which holds the
     // next set of parameters to add to the URL state.
     return this._exec.queue("Update URL Query Params", ["ready", "data-refresh"], async () => {
-      this._newParams = {...this._newParams, ...params};
+      const keys = {...this._newParams, ...params};
+      this._newParams = {};
+      Object.keys(keys).sort().forEach((key) => {
+        this._newParams[key] = keys[key];
+      });
       await this._router.navigate([], {
         queryParams:         this._newParams,
         queryParamsHandling: 'merge'
       });
-    }, "", true, true)
+    }, JSON.stringify(params), false, true)
 
   }
 
@@ -217,7 +227,11 @@ export class MapComponent implements OnInit, OnDestroy {
   private updateMapFromQueryParams(params: Params) {
     log.debug("updateMapFromQueryParams()");
     log.debug("Params:", params);
-    const {lng, lat, zoom, active_number, active_polygon, selected, min_offset, max_offset} = params;
+    const {
+      lng, lat, zoom, active_number, active_polygon, selected, min_offset, max_offset,
+      abs_time
+    } = params;
+    this._newParams = params;
 
     // These handle the date slider min_offset & max_offset values
     if (typeof min_offset !== "undefined") {
@@ -227,6 +241,36 @@ export class MapComponent implements OnInit, OnDestroy {
     if (typeof max_offset !== "undefined") {
       this._dateMax = max_offset;
       this.sliderOptions = {...this.sliderOptions, startMax: max_offset};
+    }
+
+    // This handles the absolute time parameter used to preserve temporal state
+    if (typeof abs_time !== "undefined") {
+      const dateOffset = (this._data.lastEntryDate().getTime() - abs_time) / (60 * 1000);
+      if (dateOffset > this._data.entryCount() - 1) {
+        log.debug(abs_time, dateOffset, -this.sliderOptions.min, new Date(
+          +abs_time))
+        this._notify.show(`The data is no longer available for the date (${new Date(
+          +abs_time)}, showing date range for current data instead.`);
+      } else if (dateOffset < 0) {
+        this._notify.show(`The date stored in the URL  (${new Date(
+          +abs_time)} is in the future, showing date range for current time instead.`);
+      } else {
+        const minLimit = -(this._data.entryCount() - 1);
+        this._dateMin = Math.max(minLimit, this._dateMin - dateOffset);
+        this._dateMax = Math.max(minLimit, this._dateMax - dateOffset);
+        log.debug(`URL Date was  (${new Date(
+          +abs_time)} current Date is ${this._data.lastEntryDate()} delta was ${dateOffset} mins and minLimit is ${minLimit}.`);
+        this.sliderOptions = {
+          ...this.sliderOptions,
+          min:      -(this._data.entryCount() - 1),
+          startMin: this._dateMin,
+          startMax: this._dateMax
+        };
+      }
+      this._absoluteTime = this._data.lastEntryDate().getTime();
+
+    } else {
+      this._absoluteTime = this._data.lastEntryDate().getTime();
     }
 
     // This handles the fact that the zoom and lat/lng can change independently of each other
@@ -244,10 +288,6 @@ export class MapComponent implements OnInit, OnDestroy {
     if (viewChange) {
       this._map.setView(newCentre, newZoom);
     }
-
-    // if (typeof active_polys != "undefined") {
-    //   this.options.zoom = zoom;
-    // }
 
     // This handles a change to the active_number value
     const numberLayerName: NumberLayerShortName = typeof active_number !== "undefined" ? active_number : STATS;
@@ -294,11 +334,8 @@ export class MapComponent implements OnInit, OnDestroy {
     if (typeof selected !== "undefined") {
       this._selectedFeatureName = selected;
       this._twitterIsStale;
-      // this.showTweets();
     }
-    // if (typeof min_offset !== "undefined" && typeof min_offset !== "undefined") {
-    //   ($(".timeslider") as any).slider("option", "values", [min_offset, max_offset]);
-    // }
+
     return undefined;
   }
 
@@ -330,9 +367,9 @@ export class MapComponent implements OnInit, OnDestroy {
     await this.load(true);
     this._searchParams.subscribe(params => {
       if (!this._params) {
-        this._exec.queue("Initial Search Params", ["ready", "no-params"],
+        this._params = true;
+        this._exec.queue("Initial Search Params", ["no-params"],
                          async () => {
-                           this._params = true;
                            this.updateMapFromQueryParams(params);
                            //Listeners to push map state into URL
                            map.addEventListener("dragend", () => {
@@ -364,6 +401,11 @@ export class MapComponent implements OnInit, OnDestroy {
                              });
                            });
                            this._exec.changeState("ready");
+                           this.updateSearch({
+                                               abs_time:   this._absoluteTime,
+                                               min_offset: Math.round(this._dateMin),
+                                               max_offset: Math.round(this._dateMax)
+                                             });
                            map.addControl(zoomControl);
                            this.addToggleControls();
                            return this.updateLayers("From Parameters").then(() => this._twitterIsStale = true);
@@ -433,24 +475,25 @@ export class MapComponent implements OnInit, OnDestroy {
 
   /**
    * Update the Twitter panel by updating the properties it reacts to.
-   * @param props
+   * @param feature
    */
-  updateTwitterPanel(props?: any) {
-    log.debug(`updateTwitterPanel(${JSON.stringify(props.properties)})`);
-    this.selectedRegion = this.toTitleCase(props.properties.name);
-    if (props.properties.count > 0) {
+  updateTwitterPanel(feature?: Feature) {
+    log.debug(`updateTwitterPanel(${JSON.stringify(feature.properties)})`);
+    this.selectedRegion = this.toTitleCase(feature.properties.name);
+    this.selectedGeometry = feature.geometry;
+    if (feature.properties.count > 0) {
       log.debug("Count > 0");
-      this.exceedanceProbability = Math.round(props.properties.stats * 100) / 100;
-      this.tweetCount = props.properties.count;
+      this.exceedanceProbability = Math.round(feature.properties.stats * 100) / 100;
+      this.tweetCount = feature.properties.count;
       log.debug(`this.activePolyLayerShortName=${this.activePolyLayerShortName}`);
-      this.tweets = this._data.tweets(this.activePolyLayerShortName, props.properties.name);
+      this.tweets = this._data.tweets(this.activePolyLayerShortName, feature.properties.name);
       log.debug(this.tweets);
       this.twitterPanelHeader = true;
       this.showTwitterTimeline = true;
       // Hub.dispatch("twitter-panel",{message:"update",event:"update"});
       this.showTweets()
     } else {
-      log.debug(`Count == ${props.properties.count}`);
+      log.debug(`Count == ${feature.properties.count}`);
       this.twitterPanelHeader = true;
       this.showTwitterTimeline = false;
       this.tweetCount = 0;
@@ -679,14 +722,22 @@ export class MapComponent implements OnInit, OnDestroy {
     log.debug("load()");
     this.activity = true;
     try {
+      if (!first) {
+        //Save the time keys to adjust the slider to the new correct values.
+        this._previousDateMin = this._data.reverseTimeKeys[-this._dateMin];
+        this._previousDateMax = this._data.reverseTimeKeys[-this._dateMax];
+      }
       await this._data.load();
-      await this._exec.queue("Update Slider", ["ready", "data-loaded"],
-                             () => {this.updateSliderFromData();});
 
       if (first) {
+        await this._exec.queue("Update Slider", ["data-loaded"],
+                               () => {this.updateSliderFromData();});
         this._exec.changeState("no-params");
       } else {
         await this.updateLayers("Data Load");
+        await this._exec.queue("Update Slider", ["ready"],
+                               () => {this.updateSliderFromData();});
+        await this.updateSearch({min_offset: this._dateMin, max_offset: this._dateMax, abs_time: this._absoluteTime});
       }
 
       this._twitterIsStale = true;
@@ -717,16 +768,15 @@ export class MapComponent implements OnInit, OnDestroy {
                                   this.clearMapFeatures();
                                   this.updateRegionData();
                                   this.resetLayers(false);
-                                  if (this._params) {
-
-                                    this._exec.changeState("ready");
-                                  } else {
-                                    this._exec.changeState("no-params");
-                                  }
 
                                 } finally {
                                   this.activity = false;
                                   this._updating = false;
+                                  if (this._params) {
+                                    this._exec.changeState("ready");
+                                  } else {
+                                    this._exec.changeState("no-params");
+                                  }
                                 }
                               } else {
                                 log.debug("Update in progress so skipping this update");
@@ -755,7 +805,7 @@ export class MapComponent implements OnInit, OnDestroy {
     log.debug("showTweets()");
     this._exec.queue("Tweets Visible", ["ready"], () => {
       this.tweetsVisible = true;
-    }, "tweets.visible", true);
+    }, "tweets.visible", true, true, true);
   }
 
   /**
@@ -780,16 +830,19 @@ export class MapComponent implements OnInit, OnDestroy {
   /**
    * Update the date slider after a data update.
    */
-  updateSliderFromData() {
+  async updateSliderFromData() {
     log.debug("updateSliderFromData()");
-    log.info("Latest data is dated at: " + this._data.lastEntry())
-    this._dateMin = Math.max(this._dateMin, -(this._data.entryCount() - 1));
+    this._dateMin = Math.max(this._previousDateMin ? this._data.offset(this._previousDateMin) : this._dateMin,
+                             -(this._data.entryCount() - 1));
+    this._dateMax = Math.max(this._previousDateMax ? this._data.offset(this._previousDateMax) : this._dateMax,
+                             -(this._data.entryCount() - 1));
     this.sliderOptions = {
       max:      0,
       min:      -this._data.entryCount() + 1,
       startMin: this._dateMin,
       startMax: this._dateMax
     };
+    this._absoluteTime = this._data.lastEntryDate().getTime();
 
   }
 
@@ -809,18 +862,11 @@ export class MapComponent implements OnInit, OnDestroy {
   private async updateTwitter() {
     log.debug("updateTwitter()");
     await this._exec.queue("Update Twitter", ["ready"], () => {
-      // Mark as stale to trigger a refresh
-      if (!this.tweetsVisible) {
-        this._clicked = "";
-        this._feature = null;
-      }
       if (this._clicked != "") {
         this.updateTwitterPanel(this._clicked.target.feature);
       } else if (this._feature) {
         this.updateTwitterPanel(this._feature);
       }
-    });
-
-
+    }, Date.now(), false, true, true);
   }
 }

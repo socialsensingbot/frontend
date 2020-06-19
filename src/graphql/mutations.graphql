@@ -99,6 +99,8 @@ mutation CreateGroupPreferences(
   createGroupPreferences(input: $input, condition: $condition) {
     id
     group
+    locale
+    timezone
     createdAt
     updatedAt
   }
@@ -110,6 +112,8 @@ mutation UpdateGroupPreferences(
   updateGroupPreferences(input: $input, condition: $condition) {
     id
     group
+    locale
+    timezone
     createdAt
     updatedAt
   }
@@ -121,6 +125,8 @@ mutation DeleteGroupPreferences(
   deleteGroupPreferences(input: $input, condition: $condition) {
     id
     group
+    locale
+    timezone
     createdAt
     updatedAt
   }

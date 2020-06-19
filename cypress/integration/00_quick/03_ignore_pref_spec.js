@@ -1,16 +1,16 @@
 const twitterIdClass = ".app-twitter-id-1051568984070479874";
 
-describe('Ignore tweets: ', function () {
+describe('03 Ignore tweets: ', function () {
   beforeEach(() => {
     cy.stubLiveJson("live-old");
   })
-  describe('ignore tweet', () => {
-    const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
-    const url = "http://localhost:4200/map?selected=carmarthenshire";
-    const test = () => {
-      cy.visit(url);
-      cy.login();
-      cy.visitAndWait(url);
+
+  const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
+  const url = "http://localhost:4200/map?selected=carmarthenshire&abs_time=1539561540000&max_offset=0&min_offset=-1439";
+  const test = () => {
+    cy.visit(url);
+    cy.login();
+    cy.visitAndWait(url);
       const tweetHidden = twitterIdClass + ".atr-hidden";
       const tweetVisible = twitterIdClass + ".atr-visible";
       cy.get(".app-tweet-drawer", {timeout: 30000}).should("be.visible");
@@ -42,7 +42,6 @@ describe('Ignore tweets: ', function () {
     };
     it('toggle tweet', test);
     it('toggle tweet again', test);
-  });
 
 
 });

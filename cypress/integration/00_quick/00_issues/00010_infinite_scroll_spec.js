@@ -1,4 +1,4 @@
-describe('Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/10): ', function () {
+describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/10): ', function () {
   // Step 1: setup the application state
   beforeEach(function () {
     cy.visit('http://localhost:4200/map');
