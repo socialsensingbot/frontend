@@ -64,50 +64,48 @@ export class PreferenceService {
     }
     log.debug("** Preference Service Initializing **");
     log.debug(userInfo);
-    try {
-      const pref = await this._api.GetUserPreferences(userInfo.username);
-      if (!pref) {
-        log.debug("No existing preferences.");
-        await this._api.CreateUserPreferences({id: userInfo.username});
-        log.debug("Created new preferences.");
-        this._preferences = await this._api.GetUserPreferences(userInfo.username);
-      } else {
-        log.debug("Existing preferences.");
-        this._preferences = pref;
 
-      }
-      if (!groups || groups.length === 0) {
-        this._notify.show(
-          "Your account is not a member of a group, please ask an administrator to fix this. The application will not work correctly until you do.",
-          "I Will",
-          180);
-        this._groups = ["__invalid__"];
-      } else {
-        const groupPref = await this._api.GetGroupPreferences(this._groups[0]);
-        if (!groupPref) {
-          log.debug("No existing preferences.");
-          await this._api.CreateGroupPreferences({id: this._groups[0], group: this._groups[0]});
-          log.debug("Created new group preferences.");
-          this._groupPreferences = await this._api.GetGroupPreferences(this._groups[0]);
-        } else {
-          log.debug("Existing group preferences.");
-          this._groupPreferences = groupPref;
+    const pref = await this._api.GetUserPreferences(userInfo.username);
+    if (!pref) {
+      log.debug("No existing preferences.");
+      await this._api.CreateUserPreferences({id: userInfo.username});
+      log.debug("Created new preferences.");
+      this._preferences = await this._api.GetUserPreferences(userInfo.username);
+    } else {
+      log.debug("Existing preferences.");
+      this._preferences = pref;
 
-        }
-        if (this._groupPreferences.locale) {
-          this.group.locale = this._groupPreferences.locale;
-        }
-        if (this._groupPreferences.timezone) {
-          this.group.timezone = this._groupPreferences.timezone;
-        }
-        log.debug(this._preferences);
-      }
-      this.readBlacklist();
-      log.info("Preference Service Initialized");
-    } catch (e) {
-      log.debug("** Preferences Service Failed to Initialize **");
-      this._notify.error(e);
     }
+    if (!groups || groups.length === 0) {
+      this._notify.show(
+        "Your account is not a member of a group, please ask an administrator to fix this. The application will not work correctly until you do.",
+        "I Will",
+        180);
+      this._groups = ["__invalid__"];
+    } else {
+      const groupPref = await this._api.GetGroupPreferences(this._groups[0]);
+      if (!groupPref) {
+        log.debug("No existing preferences.");
+        await this._api.CreateGroupPreferences({id: this._groups[0], group: this._groups[0]});
+        log.debug("Created new group preferences.");
+        this._groupPreferences = await this._api.GetGroupPreferences(this._groups[0]);
+      } else {
+        log.debug("Existing group preferences.");
+        this._groupPreferences = groupPref;
+
+      }
+      if (this._groupPreferences.locale) {
+        this.group.locale = this._groupPreferences.locale;
+      }
+      if (this._groupPreferences.timezone) {
+        this.group.timezone = this._groupPreferences.timezone;
+      }
+      log.debug(this._preferences);
+    }
+    this.readBlacklist();
+    log.info("Preference Service Initialized");
+
+
   }
 
   public isBlacklisted(tweet: Tweet): boolean {

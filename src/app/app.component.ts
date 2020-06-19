@@ -69,7 +69,7 @@ export class AppComponent {
       return;
     }
     log.debug("Authenticated");
-    try {
+
       const userInfo = await Auth.currentUserInfo();
       if (userInfo) {
         await this._pref.init(userInfo);
@@ -80,12 +80,20 @@ export class AppComponent {
         log.info("Timezone in use: " + this._pref.group.timezone);
         this._rollbar.configure(
           {
-            enabled:   true,
-            captureIp: 'anonymize',
-            payload:   {
-              person: {
-                id:     userInfo.attributes.username,
-                groups: this._pref.groups
+            enabled:      true,
+            // environment: environment.name,
+            captureIp:    'anonymize',
+            code_version: environment.version,
+            payload:      {
+              person:           {
+                id:       userInfo.username,
+                username: userInfo.username,
+                groups:   this._pref.groups
+              },
+              // environment: environment.name,
+              environment_info: environment,
+              prefs:            {
+                group: this._pref.group
               }
             }
           }
@@ -99,9 +107,7 @@ export class AppComponent {
         this.isSignup = false;
       }
 
-    } catch (error) {
-      this._notify.error(error)
-    }
+
   }
 
   public logout() {

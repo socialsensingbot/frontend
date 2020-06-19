@@ -37,17 +37,8 @@ import {HelpButtonComponent} from './help/help-button.component';
 import {HelpSpanComponent} from "./help/help-span.component";
 import {HelpDialogComponent} from './help/help-dialog.component';
 import {TweetListComponent} from './map/twitter/tweet-list/tweet-list.component';
-import {environment} from 'src/environments/environment';
 import {RollbarErrorHandler, rollbarFactory, RollbarService} from "./rollbar";
 
-
-export class NotificationErrorHandler implements ErrorHandler {
-  constructor(private _notify: NotificationService) {}
-
-  handleError(e: Error) {
-    this._notify.error(e);
-  }
-}
 
 @NgModule({
             declarations: [
@@ -95,9 +86,6 @@ export class NotificationErrorHandler implements ErrorHandler {
                                       });
               },
 
-            }, {
-              provide:  ErrorHandler,
-              useClass: NotificationErrorHandler,
             }, {provide: ErrorHandler, useClass: RollbarErrorHandler},
                            {provide: RollbarService, useFactory: rollbarFactory},
                            AuthService, NgEventBus],

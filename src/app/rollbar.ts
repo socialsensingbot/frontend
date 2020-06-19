@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 
 import {environment} from "../environments/environment";
+import {NotificationService} from "./services/notification.service";
 
 const rollbarConfig = {
   accessToken:                'd22c641642f94b619b51f31de651e7b9',
@@ -22,10 +23,14 @@ export const RollbarService = new InjectionToken<Rollbar>('rollbar');
 
 @Injectable()
 export class RollbarErrorHandler implements ErrorHandler {
-  constructor(@Inject(RollbarService) private rollbar: Rollbar) {}
+  constructor(@Inject(RollbarService) private rollbar: Rollbar, private _notify: NotificationService) {}
 
   handleError(err: any): void {
-    this.rollbar.error(err.originalError || err);
+    if (environment.rollbar) {
+      this.rollbar.error(err.originalError || err);
+    } else {
+      this._notify.error(err);
+    }
   }
 }
 

@@ -3,6 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
+  name:       "dev",
   version:    "dev",
   production: false,
   hmr:        false,
