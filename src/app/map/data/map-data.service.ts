@@ -290,7 +290,7 @@ export class MapDataService {
       }
       log.debug(
         `Bounding box of ${JSON.stringify(geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`)
-      regionText = `${minX},${minY} to ${maxX},${maxY}`
+      regionText = `(${minX},${minY}),(${maxX},${maxY})`
     }
     console.log("Region: " + region);
     return this._twitterData.embeds(polyType, region)

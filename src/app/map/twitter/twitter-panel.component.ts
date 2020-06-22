@@ -176,7 +176,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
       }
       console.log(
         `Bounding box of ${JSON.stringify(this.geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`)
-      region = `"Region bounded by ${minX},${minY} to ${maxX},${maxY}"`
+      region = `(${minX},${minY}),(${maxX},${maxY})`
     }
     const options = {
       fieldSeparator:   ',',
