@@ -153,6 +153,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
   public download() {
     let region = `${this.region}`;
+    let filename = `region-${this.region.replace(" ", "-").toLocaleLowerCase()}-tweet-export`
 
     if (this.region.match(/\d+/)) {
       let minX = null;
@@ -187,6 +188,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
       useTextFile:      false,
       useBom:           true,
       useKeysAsHeaders: true,
+      filename: filename
       // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
     };
 

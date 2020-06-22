@@ -309,6 +309,7 @@ export class MapDataService {
       useTextFile:      false,
       useBom:           true,
       useKeysAsHeaders: true,
+      filename: "global-tweet-export"
       // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
     };
     for (const region of this._twitterData.regionNames(polyType).keys()) {
