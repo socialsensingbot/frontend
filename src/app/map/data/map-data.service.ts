@@ -12,6 +12,7 @@ import {environment} from "../../../environments/environment";
 import {ExportToCsv} from "export-to-csv";
 import {GeoJsonObject} from 'geojson';
 import {PreferenceService} from "../../pref/preference.service";
+import {toTitleCase} from "../../common";
 
 
 const log = new Logger('map-data');
@@ -293,7 +294,7 @@ export class MapDataService {
     console.log("Region: " + region);
     return this._twitterData.embeds(polyType, region)
                .filter(i => i.valid && !this._pref.isBlacklisted(i))
-               .map(i => i.asCSV(region));
+               .map(i => i.asCSV(toTitleCase(region)));
 
   }
 

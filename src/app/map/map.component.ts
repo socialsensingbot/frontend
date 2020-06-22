@@ -47,6 +47,7 @@ import {MapDataService} from "./data/map-data.service";
 import {ProcessedPolygonData} from "./data/processed-data";
 import {Tweet} from "./twitter/tweet";
 import {ExportToCsv} from "export-to-csv";
+import {toTitleCase} from '../common';
 
 
 const log = new Logger('map');
@@ -442,7 +443,7 @@ export class MapComponent implements OnInit, OnDestroy {
     log.debug("featureEntered()");
     const feature = e.target.feature;
     const exceedanceProbability: number = Math.round(feature.properties.stats * 100) / 100;
-    const region: string = this.toTitleCase(feature.properties.name);
+    const region: string = toTitleCase(feature.properties.name);
     const count: number = feature.properties.count;
     this.highlight(e, 1);
 
@@ -481,7 +482,7 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   updateTwitterPanel(feature?: Feature) {
     log.debug(`updateTwitterPanel(${JSON.stringify(feature.properties)})`);
-    this.selectedRegion = this.toTitleCase(feature.properties.name);
+    this.selectedRegion = toTitleCase(feature.properties.name);
     this.selectedGeometry = feature.geometry;
     if (feature.properties.count > 0) {
       log.debug("Count > 0");
@@ -536,15 +537,6 @@ export class MapComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Converts a lower case string to a Title Case String.
-   *
-   * @param str the lowercase string
-   * @returns a Title Case String
-   */
-  toTitleCase(str: string): string {
-    return str.replace(/\S+/g, str => str.charAt(0).toUpperCase() + str.substr(1).toLowerCase());
-  }
 
   onEachFeature(feature: geojson.Feature<geojson.GeometryObject, any>, layer: GeoJSON) {
     log.verbose("onEachFeature()");
