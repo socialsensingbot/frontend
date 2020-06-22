@@ -1,14 +1,14 @@
-describe.only('#104 Slider and tweet interaction : https://github.com/socialsensingbot/frontend/issues/104',
-              function () {
-                beforeEach(function () {
-                  cy.visit('http://localhost:4200/map');
-                  cy.stubLiveJson("live-02-06-2020");
-                  cy.login();
-                });
+describe('#104 Slider and tweet interaction : https://github.com/socialsensingbot/frontend/issues/104',
+         function () {
+           beforeEach(function () {
+             cy.visit('http://localhost:4200/map');
+             cy.stubLiveJson("live-02-06-2020");
+             cy.login();
+           });
 
-                it('Reproduce Issue', () => {
-                  const url = "http://localhost:4200/map?selected=greater%20london&max_time=1591100940000&min_time=1591007520000";
-                  cy.visitAndWait(url);
+           it('Reproduce Issue', () => {
+             const url = "http://localhost:4200/map?selected=greater%20london&max_time=1591100940000&min_time=1591007520000";
+             cy.visitAndWait(url);
                   cy.tweetCountTotal(49);
     cy.log("Set slider to whole 5 days (be great if tweets updated as you did this)");
     cy.moveMinDateSliderLeft(8);
