@@ -268,6 +268,7 @@ export class MapDataService {
   }
 
   private downloadRegion(polyType: PolygonLayerShortName, region: string, geometry: Geometry): CSVExportTweet[] {
+    let regionText = region;
     if (region.match(/\d+/)) {
       let minX = null;
       let maxX = null;
@@ -289,12 +290,12 @@ export class MapDataService {
       }
       log.debug(
         `Bounding box of ${JSON.stringify(geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`)
-      region = `"${minX},${minY} to ${maxX},${maxY}"`
+      regionText = `${minX},${minY} to ${maxX},${maxY}`
     }
     console.log("Region: " + region);
     return this._twitterData.embeds(polyType, region)
                .filter(i => i.valid && !this._pref.isBlacklisted(i))
-               .map(i => i.asCSV(toTitleCase(region)));
+               .map(i => i.asCSV(toTitleCase(regionText)));
 
   }
 
