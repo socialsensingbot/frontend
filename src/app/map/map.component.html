@@ -25,6 +25,15 @@
                          [options]="sliderOptions"></date-range-slider>
     </div>
 
+    <div class="map-actions">
+      <mat-card *ngIf="ready">
+        <button mat-icon-button (click)="downloadTweetsAsCSV()">
+          <mat-icon matTooltip="Download these Tweets as a CSV file.">cloud_download</mat-icon>
+        </button>
+      </mat-card>
+
+    </div>
+
     <mat-progress-bar *ngIf="activity && ready" class="map-progress" mode="indeterminate"></mat-progress-bar>
     <!--    <div class="map-inset-shadow"></div>-->
   </mat-sidenav-content>

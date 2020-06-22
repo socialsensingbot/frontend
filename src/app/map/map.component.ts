@@ -46,6 +46,7 @@ import {ColorCodeService} from "./services/color-code.service";
 import {MapDataService} from "./data/map-data.service";
 import {ProcessedPolygonData} from "./data/processed-data";
 import {Tweet} from "./twitter/tweet";
+import {ExportToCsv} from "export-to-csv";
 
 
 const log = new Logger('map');
@@ -891,5 +892,9 @@ export class MapComponent implements OnInit, OnDestroy {
         this.updateTwitterPanel(this._feature);
       }
     }, Date.now(), false, true, true);
+  }
+
+  public downloadTweetsAsCSV() {
+    this._data.download(this.activePolyLayerShortName, this._polygonData[this.activePolyLayerShortName] as PolygonData);
   }
 }

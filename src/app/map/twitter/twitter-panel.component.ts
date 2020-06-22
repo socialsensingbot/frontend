@@ -152,7 +152,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   public download() {
-    let title = `${this.region}`;
+    let region = `${this.region}`;
 
     if (this.region.match(/\d+/)) {
       let minX = null;
@@ -175,15 +175,15 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
       }
       console.log(
         `Bounding box of ${JSON.stringify(this.geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`)
-      title = `"Region bounded by ${minX},${minY} to ${maxX},${maxY}"`
+      region = `"Region bounded by ${minX},${minY} to ${maxX},${maxY}"`
     }
     const options = {
       fieldSeparator:   ',',
       quoteStrings:     '"',
       decimalSeparator: '.',
       showLabels:       true,
-      showTitle:        true,
-      title:            title,
+      showTitle:        false,
+      title:            region,
       useTextFile:      false,
       useBom:           true,
       useKeysAsHeaders: true,
@@ -191,6 +191,6 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
     };
 
     this.csvExporter = new ExportToCsv(options);
-    this.csvExporter.generateCsv(this.visibleTweets.filter(i => i.valid).map(i => i.asCSV()));
+    this.csvExporter.generateCsv(this.visibleTweets.filter(i => i.valid).map(i => i.asCSV(region)));
   }
 }

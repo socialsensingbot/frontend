@@ -1,14 +1,17 @@
 import {EventEmitter, Injectable, NgZone} from '@angular/core';
-import {PolygonLayerShortName, Stats, TimeSlice} from "../types";
+import {PolygonData, PolygonLayerShortName, Stats, TimeSlice, Geometry} from "../types";
 import {Cache, Logger, Storage} from "aws-amplify";
 import {HttpClient} from "@angular/common/http";
 import {UIExecutionService} from "../../services/uiexecution.service";
 import {ProcessedData, ProcessedPolygonData} from "./processed-data";
-import {Tweet} from "../twitter/tweet";
+import {CSVExportTweet, Tweet} from "../twitter/tweet";
 import {NotificationService} from "../../services/notification.service";
 import {NgForage, NgForageCache} from "ngforage";
 import {CachedItem} from "ngforage/lib/cache/cached-item";
 import {environment} from "../../../environments/environment";
+import {ExportToCsv} from "export-to-csv";
+import {GeoJsonObject} from 'geojson';
+import {PreferenceService} from "../../pref/preference.service";
 
 
 const log = new Logger('map-data');
@@ -49,7 +52,8 @@ export class MapDataService {
 
   constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
               private _notify: NotificationService, private readonly cache: NgForageCache,
-              private readonly ngf: NgForage) { }
+              private readonly ngf: NgForage,
+              private _pref: PreferenceService) { }
 
   /**
    * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
@@ -260,5 +264,65 @@ export class MapDataService {
       count++;
     }
     return -this.reverseTimeKeys.length + 1;
+  }
+
+  private downloadRegion(polyType: PolygonLayerShortName, region: string, geometry: Geometry): CSVExportTweet[] {
+    if (region.match(/\d+/)) {
+      let minX = null;
+      let maxX = null;
+      let minY = null;
+      let maxY = null;
+      for (const point of geometry.coordinates[0]) {
+        if (minX === null || point[0] < minX) {
+          minX = point[0];
+        }
+        if (minY === null || point[1] < minY) {
+          minY = point[1];
+        }
+        if (maxX === null || point[0] > maxX) {
+          maxX = point[0];
+        }
+        if (maxY === null || point[1] > maxY) {
+          maxY = point[1];
+        }
+      }
+      log.debug(
+        `Bounding box of ${JSON.stringify(geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`)
+      region = `"${minX},${minY} to ${maxX},${maxY}"`
+    }
+    console.log("Region: " + region);
+    return this._twitterData.embeds(polyType, region)
+               .filter(i => i.valid && !this._pref.isBlacklisted(i))
+               .map(i => i.asCSV(region));
+
+  }
+
+  public download(polyType: PolygonLayerShortName, polygonDatum: PolygonData) {
+    const exportedTweets: CSVExportTweet[] = [];
+    const options = {
+      fieldSeparator:   ',',
+      quoteStrings:     '"',
+      decimalSeparator: '.',
+      showLabels:       true,
+      showTitle:        false,
+      title:            "",
+      useTextFile:      false,
+      useBom:           true,
+      useKeysAsHeaders: true,
+      // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
+    };
+    for (const region of this._twitterData.regionNames(polyType).keys()) {
+      let geometry;
+      for (const feature of polygonDatum.features) {
+        if (feature.id === region) {
+          geometry = feature.geometry;
+        }
+      }
+      exportedTweets.push(...this.downloadRegion(polyType, region, geometry));
+    }
+    const csvExporter = new ExportToCsv(options);
+    csvExporter.generateCsv(exportedTweets);
+
+
   }
 }
