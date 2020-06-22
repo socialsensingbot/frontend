@@ -1,5 +1,4 @@
 # Script to run the for the Amplify Console CI Cypress testing
-set -euxo pipefail
 cd $(dirname $0)
 cd ..
 tests="cypress/integration/00_quick/**"
@@ -16,7 +15,7 @@ if [[ "${AWS_BRANCH}" == release* ]]; then
 fi
 if [[ "${AWS_BRANCH}" == "" ]]; then
   tests="cypress/integration/**"
-  browsers="edge firefox chrome"
+  browsers="electron"
 fi
 if [[ "${AWS_BRANCH}" == staging ]]; then
   echo "Tests must not be run on STAGING"

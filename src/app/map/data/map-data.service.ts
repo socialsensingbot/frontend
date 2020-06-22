@@ -8,6 +8,7 @@ import {Tweet} from "../twitter/tweet";
 import {NotificationService} from "../../services/notification.service";
 import {NgForage, NgForageCache} from "ngforage";
 import {CachedItem} from "ngforage/lib/cache/cached-item";
+import {environment} from "../../../environments/environment";
 
 
 const log = new Logger('map-data');
@@ -143,7 +144,7 @@ export class MapDataService {
    *
    * @param tweetInfo the data from the server.
    */
-  public async updateData(_dateMin, _dateMax) {
+  public async updateData(_dateMin: number, _dateMax: number) {
     log.debug("update()")
     if (this._updating) {
       log.debug("Update already running.")
@@ -156,7 +157,7 @@ export class MapDataService {
     // For performance reasons we need to do the
     // next part without triggering Angular
     try {
-      await this.updateTweetsData(_dateMin, _dateMax);
+      await this.updateTweetsData(this.offset(_dateMin), this.offset(_dateMax));
     } finally {
       log.debug("update() end");
       this._updating = false;
@@ -212,6 +213,14 @@ export class MapDataService {
     }
   }
 
+  public entryDate(offset: number): Date {
+    if (this.reverseTimeKeys) {
+      const tstring = this.reverseTimeKeys[-offset];
+      return this.parseTimeKey(tstring);
+    } else {
+      return null;
+    }
+  }
 
   public parseTimeKey(tstring) {
     return new Date(Date.UTC(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
@@ -232,7 +241,17 @@ export class MapDataService {
     return this._twitterData.regionData(regionType).places();
   }
 
-  offset(date: string): number {
+  offset(dateInMillis: number): number {
+    const dateFull = new Date(dateInMillis);
+    const ye = dateFull.getFullYear();
+    const mo = ((dateFull.getUTCMonth() + 1) + "").padStart(2, "0");
+    const da = (dateFull.getUTCDate() + "").padStart(2, "0");
+    const hr = (dateFull.getUTCHours() + "").padStart(2, "0");
+    const min = (dateFull.getUTCMinutes() + "").padStart(2, "0");
+
+
+    const date = `${ye}${mo}${da}${hr}${min}`
+    log.debug(`DATE: ${dateFull} = ${date}`);
     let count = 0;
     for (const timeKey of this.reverseTimeKeys) {
       if (timeKey <= date) {
@@ -240,6 +259,6 @@ export class MapDataService {
       }
       count++;
     }
-    return -this.reverseTimeKeys.length;
+    return -this.reverseTimeKeys.length + 1;
   }
 }
