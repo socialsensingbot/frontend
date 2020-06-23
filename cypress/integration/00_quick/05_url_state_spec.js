@@ -1,6 +1,6 @@
 const zoomDuration = 1000;
-describe('URL State: ', function () {
-  beforeEach(()=> {
+describe('05 URL State: ', function () {
+  beforeEach(() => {
     cy.stubLiveJson("live-old");
   })
   describe('select county', () => {
@@ -55,10 +55,10 @@ describe('URL State: ', function () {
   });
 
   describe('select zoom', () => {
-    const url = "http://localhost:4200/map";
-    const urlZoom6 = "http://localhost:4200/map?zoom=6"; //default zoom
-    const urlZoom7 = "http://localhost:4200/map?zoom=7";
-    const urlZoom8 = "http://localhost:4200/map?zoom=8";
+    const url = "http://localhost:4200/map?max_time=1539475200000&min_time=1539216000000";
+    const urlZoom6 = url + "&zoom=6"; //default zoom
+    const urlZoom7 = url + "&zoom=7";
+    const urlZoom8 = url + "&zoom=8";
     it('default zoom', () => {
       cy.visit(url);
       cy.login();
@@ -97,7 +97,7 @@ describe('URL State: ', function () {
 
   describe('select lat & lng', () => {
     const url = "http://localhost:4200/map?zoom=11&lat=52.3336607715546&lng=0.05321502685546875";
-    const newUrl = "http://localhost:4200/map?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&selected=cambridgeshire";
+    const newUrl = "http://localhost:4200/map?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&max_time=1539561540000&min_time=1539475200000&selected=cambridgeshire";
     it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
@@ -114,15 +114,15 @@ describe('URL State: ', function () {
 
 
   describe('select county and date range', () => {
-    const url = "http://localhost:4200/map?selected=powys&min_offset=-5459&max_offset=-2819";
+    const url = "http://localhost:4200/map?selected=powys&max_time=1539392400000&min_time=1539234000000";
     it('when authorized and load state', () => {
       cy.visit("http://localhost:4200/map");
       cy.login();
       cy.visitAndWait(url);
       cy.get(".slider-date-time", {timeout: 20000});
       cy.url().should("equal", url);
-      cy.get(".slider-date-time-min .slider-date",{timeout: 20000}).should("contain.text","11-Oct-18");
-      cy.get(".slider-date-time-min .slider-time").should("contain.text", "5 AM");
+      cy.get(".slider-date-time-min .slider-date", {timeout: 20000}).should("contain.text", "11-Oct-18");
+      cy.get(".slider-date-time-min .slider-time").should("contain.text", "5 am");
       cy.get(".app-tweet-drawer", {timeout: 20000}).should("be.visible");
       cy.url().should("equal", url);
       cy.twitterPanelHeader("Powys");

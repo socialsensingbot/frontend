@@ -61,6 +61,8 @@ query GetGroupPreferences($id: ID!) {
   getGroupPreferences(id: $id) {
     id
     group
+    locale
+    timezone
     createdAt
     updatedAt
   }
@@ -74,6 +76,8 @@ query ListGroupPreferencess(
     items {
       id
       group
+      locale
+      timezone
       createdAt
       updatedAt
     }

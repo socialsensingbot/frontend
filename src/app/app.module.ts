@@ -1,5 +1,6 @@
+import * as Rollbar from 'rollbar';
 import {BrowserModule} from '@angular/platform-browser';
-import {ErrorHandler, NgModule} from '@angular/core';
+import {ErrorHandler, Inject, Injectable, InjectionToken, NgModule} from '@angular/core';
 import {AmplifyAngularModule, AmplifyService, AmplifyModules} from 'aws-amplify-angular';
 import Auth from '@aws-amplify/auth';
 import Interactions from '@aws-amplify/interactions';
@@ -18,11 +19,10 @@ import {FilterPipe} from './auth/country-code-select/filter.pipe';
 import {SignInComponent} from './auth/sign-in/sign-in.component';
 import {ConfirmCodeComponent} from './auth/confirm-code/confirm-code.component';
 import {AuthService} from './auth/auth.service';
-import {Router} from "@angular/router";
 import {HomeComponent} from "./home/home.component";
 import {LeafletModule} from '@asymmetrik/ngx-leaflet';
 import {MatSliderModule} from "@angular/material/slider";
-import {MatDrawer, MatSidenavModule} from "@angular/material/sidenav";
+import {MatSidenavModule} from "@angular/material/sidenav";
 import {TwitterPanelComponent} from './map/twitter/twitter-panel.component';
 import {DateRangeSliderComponent} from './map/date-range-slider/date-range-slider.component';
 import {Ng5SliderModule} from "ng5-slider";
@@ -37,17 +37,11 @@ import {HelpButtonComponent} from './help/help-button.component';
 import {HelpSpanComponent} from "./help/help-span.component";
 import {HelpDialogComponent} from './help/help-dialog.component';
 import {TweetListComponent} from './map/twitter/tweet-list/tweet-list.component';
+import {RollbarErrorHandler, rollbarFactory, RollbarService} from "./rollbar";
 
-export class NotificationErrorHandler implements ErrorHandler {
-  constructor(private _notify: NotificationService) {}
-
-  handleError(e: Error) {
-    this._notify.error(e);
-  }
-}
 
 @NgModule({
-            declarations:    [
+            declarations: [
               AppComponent,
               MapComponent,
               SignUpComponent,
@@ -66,7 +60,7 @@ export class NotificationErrorHandler implements ErrorHandler {
               HelpSpanComponent,
               TweetListComponent
             ],
-            imports:         [
+            imports:      [
               BrowserModule,
               HttpClientModule,
               BrowserAnimationsModule,
@@ -81,7 +75,7 @@ export class NotificationErrorHandler implements ErrorHandler {
               InfiniteScrollModule,
               LeafletModule.forRoot()
             ],
-            providers:       [{
+            providers:    [{
               provide: AmplifyService,
 
               useFactory: () => {
@@ -92,11 +86,9 @@ export class NotificationErrorHandler implements ErrorHandler {
                                       });
               },
 
-            }, {
-              provide:  ErrorHandler,
-              useClass: NotificationErrorHandler,
-            },
-                              AuthService, NgEventBus],
+            }, {provide: ErrorHandler, useClass: RollbarErrorHandler},
+                           {provide: RollbarService, useFactory: rollbarFactory},
+                           AuthService, NgEventBus],
             bootstrap:       [AppComponent],
             entryComponents: [CountryCodeSelectComponent, HelpDialogComponent]
           },)

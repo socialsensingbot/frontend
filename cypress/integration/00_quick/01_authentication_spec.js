@@ -1,6 +1,6 @@
-describe('Authentication:', function() {
+describe('01 Authentication:', function () {
   // Step 1: setup the application state
-  beforeEach(function() {
+  beforeEach(function () {
     cy.visit('http://localhost:4200/map');
   });
 

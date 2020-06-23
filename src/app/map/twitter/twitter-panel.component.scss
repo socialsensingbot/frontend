@@ -38,6 +38,7 @@ $tweetHeaderOffset: 16px;
 
   .mat-tab-body {
     overflow-x: visible;
+    position: relative;
   }
 
 
@@ -109,3 +110,9 @@ $tweetHeaderOffset: 16px;
 .app-tweet-refresh-btn {
   opacity: 0.4;
 }
+
+.app-tweet-btn {
+  opacity: 0.4;
+  max-width: 32px;
+}
+

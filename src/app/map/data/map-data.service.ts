@@ -1,13 +1,18 @@
 import {EventEmitter, Injectable, NgZone} from '@angular/core';
-import {PolygonLayerShortName, Stats, TimeSlice} from "../types";
+import {PolygonData, PolygonLayerShortName, Stats, TimeSlice, Geometry} from "../types";
 import {Cache, Logger, Storage} from "aws-amplify";
 import {HttpClient} from "@angular/common/http";
 import {UIExecutionService} from "../../services/uiexecution.service";
 import {ProcessedData, ProcessedPolygonData} from "./processed-data";
-import {Tweet} from "../twitter/tweet";
+import {CSVExportTweet, Tweet} from "../twitter/tweet";
 import {NotificationService} from "../../services/notification.service";
 import {NgForage, NgForageCache} from "ngforage";
 import {CachedItem} from "ngforage/lib/cache/cached-item";
+import {environment} from "../../../environments/environment";
+import {ExportToCsv} from "export-to-csv";
+import {GeoJsonObject} from 'geojson';
+import {PreferenceService} from "../../pref/preference.service";
+import {toTitleCase} from "../../common";
 
 
 const log = new Logger('map-data');
@@ -17,6 +22,7 @@ const log = new Logger('map-data');
               providedIn: 'root'
             })
 export class MapDataService {
+
 
   public timeKeyUpdate = new EventEmitter<any>()
   /**
@@ -39,7 +45,7 @@ export class MapDataService {
     fine:   {stats: {}, count: {}, embed: {}}
   };
 
-  public timeKeyedData: any; //The times in the input JSON
+  public reverseTimeKeys: any; //The times in the input JSON
 
 
   private _updating: boolean;
@@ -47,7 +53,8 @@ export class MapDataService {
 
   constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
               private _notify: NotificationService, private readonly cache: NgForageCache,
-              private readonly ngf: NgForage) { }
+              private readonly ngf: NgForage,
+              private _pref: PreferenceService) { }
 
   /**
    * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
@@ -72,9 +79,6 @@ export class MapDataService {
             .then(json => {
               this._stats.coarse = Object.freeze(json);
               return json;
-            }).catch(e => {
-              this._notify.error(e)
-              return e;
             });
         } else {
           return this._stats;
@@ -91,10 +95,7 @@ export class MapDataService {
                 Object.freeze(this._stats);
               }
               return this._stats;
-            }).catch(e => {
-              this._notify.error(e)
-              return e;
-            })
+            });
         } else {
           return this._stats;
         }
@@ -115,9 +116,9 @@ export class MapDataService {
 
 
   public async load() {
-    return this._exec.queue("Load Data", ["ready", "map-init", "data-loaded", "data-load-failed"], async () => {
+    return await this._exec.queue("Load Data", ["ready", "map-init", "data-loaded", "data-load-failed"], async () => {
       this._rawTwitterData = await this.loadLiveData() as TimeSlice[];
-      this.timeKeyedData = this.getTimes();
+      this.reverseTimeKeys = this.getTimes();
       this._exec.changeState("data-loaded");
       log.debug("Loading live data completed", this._rawTwitterData);
     });
@@ -148,7 +149,7 @@ export class MapDataService {
    *
    * @param tweetInfo the data from the server.
    */
-  public async updateData(_dateMin, _dateMax) {
+  public async updateData(_dateMin: number, _dateMax: number) {
     log.debug("update()")
     if (this._updating) {
       log.debug("Update already running.")
@@ -157,16 +158,16 @@ export class MapDataService {
     this._updating = true;
 
     log.debug("Updating data");
-    this.timeKeyedData = this.getTimes();
+    this.reverseTimeKeys = this.getTimes();
     // For performance reasons we need to do the
     // next part without triggering Angular
     try {
-      await this.updateTweetsData(_dateMin, _dateMax);
+      await this.updateTweetsData(this.offset(_dateMin), this.offset(_dateMax));
     } finally {
       log.debug("update() end");
       this._updating = false;
     }
-    this.timeKeyUpdate.emit(this.timeKeyedData);
+    this.timeKeyUpdate.emit(this.reverseTimeKeys);
     // if (this._clicked != "") {
     //   this.updateTwitterHeader(this._clicked.target.feature);
     // }
@@ -188,33 +189,48 @@ export class MapDataService {
       log.debug(this._twitterData)
     } else {
       log.info("Tweet data not in cache.");
-      this._twitterData = new ProcessedData(_dateMin, _dateMax, this.timeKeyedData, this._rawTwitterData, this._stats);
+      this._twitterData = new ProcessedData(_dateMin, _dateMax, this.reverseTimeKeys, this._rawTwitterData,
+                                            this._stats);
       this.cache.setCached(key, this._twitterData, 24 * 60 * 60 * 1000);
     }
   }
 
 
   private createKey(_dateMin, _dateMax) {
-    const key = `${_dateMin}:${_dateMax}:${this.timeKeyedData}`;
+    const key = `${_dateMin}:${_dateMax}:${this.reverseTimeKeys}`;
     return key;
   }
 
   public entryCount(): number {
-    if (this.timeKeyedData) {
-      return this.timeKeyedData.length;
+    if (this.reverseTimeKeys) {
+      return this.reverseTimeKeys.length;
     } else {
       return 0;
     }
   }
 
-  public lastEntry() {
-    if (this.timeKeyedData) {
-      return this.timeKeyedData[this.timeKeyedData.length - 1];
+  public lastEntryDate(): Date {
+    if (this.reverseTimeKeys) {
+      const tstring = this.reverseTimeKeys[0];
+      return this.parseTimeKey(tstring);
     } else {
       return null;
     }
   }
 
+  public entryDate(offset: number): Date {
+    if (this.reverseTimeKeys) {
+      const tstring = this.reverseTimeKeys[-offset];
+      return this.parseTimeKey(tstring);
+    } else {
+      return null;
+    }
+  }
+
+  public parseTimeKey(tstring) {
+    return new Date(Date.UTC(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
+                             tstring.substring(8, 10), tstring.substring(10, 12), 0, 0));
+  }
 
   public regionTypes(): PolygonLayerShortName[] {
     //Object.keys(this._twitterData).map(i => i as PolygonLayerShortName)
@@ -228,5 +244,92 @@ export class MapDataService {
 
   public places(regionType: PolygonLayerShortName): Set<string> {
     return this._twitterData.regionData(regionType).places();
+  }
+
+  offset(dateInMillis: number): number {
+    const dateFull = new Date(dateInMillis);
+    const ye = dateFull.getFullYear();
+    const mo = ((dateFull.getUTCMonth() + 1) + "").padStart(2, "0");
+    const da = (dateFull.getUTCDate() + "").padStart(2, "0");
+    const hr = (dateFull.getUTCHours() + "").padStart(2, "0");
+    const min = (dateFull.getUTCMinutes() + "").padStart(2, "0");
+
+
+    const date = `${ye}${mo}${da}${hr}${min}`
+    log.debug(`DATE: ${dateFull} = ${date}`);
+    let count = 0;
+    for (const timeKey of this.reverseTimeKeys) {
+      if (timeKey <= date) {
+        return -count;
+      }
+      count++;
+    }
+    return -this.reverseTimeKeys.length + 1;
+  }
+
+  private downloadRegion(polyType: PolygonLayerShortName, region: string, geometry: Geometry): CSVExportTweet[] {
+    let regionText = region;
+    if (region.match(/\d+/)) {
+      let minX = null;
+      let maxX = null;
+      let minY = null;
+      let maxY = null;
+      for (const point of geometry.coordinates[0]) {
+        if (minX === null || point[0] < minX) {
+          minX = point[0];
+        }
+        if (minY === null || point[1] < minY) {
+          minY = point[1];
+        }
+        if (maxX === null || point[0] > maxX) {
+          maxX = point[0];
+        }
+        if (maxY === null || point[1] > maxY) {
+          maxY = point[1];
+        }
+      }
+      log.verbose(
+        `Bounding box of ${JSON.stringify(geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`)
+      regionText = `(${minX},${minY}),(${maxX},${maxY})`
+    }
+    log.verbose("Exporting egion: " + region);
+    return this._twitterData.embeds(polyType, region)
+               .filter(i => i.valid && !this._pref.isBlacklisted(i))
+               .map(i => i.asCSV(toTitleCase(regionText)));
+
+  }
+
+  public download(polyType: PolygonLayerShortName, polygonDatum: PolygonData) {
+    const exportedTweets: CSVExportTweet[] = [];
+    const options = {
+      fieldSeparator:   ',',
+      quoteStrings:     '"',
+      decimalSeparator: '.',
+      showLabels:       true,
+      showTitle:        false,
+      title:            "",
+      useTextFile:      false,
+      useBom:           true,
+      useKeysAsHeaders: true,
+      filename: "global-tweet-export"
+      // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
+    };
+    for (const region of this._twitterData.regionNames(polyType).keys()) {
+      let geometry;
+      for (const feature of polygonDatum.features) {
+        if (feature.id === region) {
+          geometry = feature.geometry;
+        }
+      }
+      if (typeof geometry === "undefined") {
+        log.warn("No geometry for " + region);
+      } else {
+        exportedTweets.push(...this.downloadRegion(polyType, region, geometry));
+      }
+    }
+    const csvExporter = new ExportToCsv(options);
+    csvExporter.generateCsv(exportedTweets);
+
+
   }
 }

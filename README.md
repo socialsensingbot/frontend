@@ -338,9 +338,9 @@ The test folder is [cypress](/cypress) and the tests themselves are in the [inte
 
 Within the [cypress](/cypress) folder there are the following that you will need to use:
 
-The quick tests are run during builds of feature and release branches and can be found in [integration/01_quick](/cypress/integration/01_quick), tests that are directly related to issues are in the [integration/01_quick/00_issues](/cypress/integration/01_quick/00_issues) folder and are prefixed with the issue id from GitHub.
+The quick tests are run during builds of feature and release branches and can be found in [integration/01_quick](/cypress/integration/00_quick), tests that are directly related to issues are in the [integration/00_quick/00_issues](/cypress/integration/00_quick/00_issues) folder and are prefixed with the issue id from GitHub.
 
-The slow tests are run during builds of release branches (or manually) only and can be found in [integration/slow](/cypress/integration/00_slow), tests that are directly related to issues are in the [integration/00_slow/00_issues](/cypress/integration/00_slow/00_issues) folder and are prefixed with the issue id from GitHub. The difference is simply how long a test takes to run.
+The slow tests are run during builds of release branches (or manually) only and can be found in [integration/slow](/cypress/integration/01_slow), tests that are directly related to issues are in the [integration/01_slow/00_issues](/cypress/integration/01_slow/00_issues) folder and are prefixed with the issue id from GitHub. The difference is simply how long a test takes to run.
 
 ### Writing custom commands
 
@@ -363,7 +363,7 @@ and used like
 
 ```javascript
  describe('select county and date range', () => {
-    const url = "http://localhost:4200/map?selected=scottish%20borders&min_offset=-1439&max_offset=0&zoom=5";
+    const url = "http://localhost:4200/map?selected=scottish%20borders&min_time=-1439&max_time=0&zoom=5";
     it('with no tweets', () => {
       cy.visitAndWait(url);
       cy.get(".slider-date-time", {timeout: 20000});

@@ -176,6 +176,10 @@ export class ProcessedData {
     return this.layer(activePolyLayerShortName).tweetsForPlace(name)
   }
 
+  public regionNames(activePolyLayerShortName: PolygonLayerShortName): Set<string> {
+    return this.layer(activePolyLayerShortName).places();
+  }
+
   private layer(activePolyLayerShortName: PolygonLayerShortName): ProcessedPolygonData {
     switch (activePolyLayerShortName) {
       case "coarse":

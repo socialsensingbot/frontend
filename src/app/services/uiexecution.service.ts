@@ -1,7 +1,9 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {EventEmitter, Inject, Injectable} from '@angular/core';
 import {Observable, Subscription, timer} from "rxjs";
 import {Auth, Logger} from "aws-amplify";
 import {NotificationService} from "./notification.service";
+import {RollbarService} from "../rollbar";
+import * as Rollbar from "rollbar";
 
 const log = new Logger('uiexecution');
 
@@ -9,7 +11,8 @@ class ExecutionTask {
 
   constructor(private _resolve: (value?: any) => void, private _reject: (reason?: any) => void,
               private _task: () => any, public name: String, public waitForStates: UIState[] | null,
-              private _dedup: string, private _notify: NotificationService) {
+              private _dedup: string, private _notify: NotificationService, public reschedule: boolean,
+              public silentFailure: boolean,) {
 
   }
 
@@ -24,7 +27,6 @@ class ExecutionTask {
       this._resolve(this._task());
     } catch (e) {
       log.error("ERROR Executing " + this.name)
-      this._notify.error(e);
       this._reject(e);
     }
   }
@@ -54,7 +56,7 @@ export class UIExecutionService {
 
   private dedupMap: Map<any, ExecutionTask> = new Map<any, ExecutionTask>();
 
-  constructor(private _notify: NotificationService) { }
+  constructor(private _notify: NotificationService, @Inject(RollbarService) private _rollbar: Rollbar) { }
 
   public async start() {
     await Auth.currentAuthenticatedUser() !== null
@@ -68,9 +70,20 @@ export class UIExecutionService {
             this.dedupMap.delete(task.dedup);
           }
         } else {
-          log.warn(
-            `Skipped out of sequence task ${task.name} on execution queue, state ${this._state} should be one of ${task.waitForStates}`)
-          // this._queue.push(task)
+          if (task.reschedule) {
+            this._queue.push(task);
+            log.debug(
+              `RESCHEDULED out of sequence task ${task.name} on execution queue, state ${this._state} needs to be one of ${task.waitForStates}.`)
+            return;
+          } else {
+            const message = `Skipped out of sequence task ${task.name} on execution queue, state ${this._state} should be one of ${task.waitForStates}`;
+            if (task.silentFailure) {
+              log.debug(message);
+            } else {
+              this._notify.error(message);
+            }
+            // this._queue.push(task)
+          }
         }
       }
 
@@ -92,7 +105,7 @@ export class UIExecutionService {
   }
 
   public queue(name: String, waitForStates: UIState[] | null, task: () => any, dedup: any = null,
-               silentFailure: boolean = false, replaceExisting: boolean = false) {
+               silentFailure: boolean = false, replaceExisting: boolean = false, reschedule: boolean = false) {
 
     return new Promise<any>((resolve, reject) => {
       let dedupKey = null;
@@ -100,7 +113,8 @@ export class UIExecutionService {
         dedupKey = name + ":" + dedup;
 
       }
-      const executionTask = new ExecutionTask(resolve, reject, task, name, waitForStates, dedupKey, this._notify);
+      const executionTask = new ExecutionTask(resolve, reject, task, name, waitForStates, dedupKey, this._notify,
+                                              reschedule, silentFailure);
       if (dedupKey !== null) {
         if (this.dedupMap.has(dedupKey)) {
           if (replaceExisting) {

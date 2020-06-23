@@ -1,5 +1,21 @@
 const url = "http://localhost:4200/map?selected=carmarthenshire&min_offset=-5399&max_offset=0&lat=53.00817326643286&lng=-2.0104980468750004";
 
+
+const checkTabCounts = (clickTab) => {
+  cy.wait(4000);
+  cy.withTweetCounts((vis1, hid1) => {
+    cy.visit(url);
+    cy.noSpinner();
+    cy.clickTweetTab(clickTab);
+    cy.withTweetCounts((vis2, hid2) => {
+      console.log("Testing for the same hidden and visible counts after refresh.")
+      expect(vis1).equals(vis2);
+      expect(hid1).equals(hid2);
+    });
+
+  });
+};
+
 const testUnhide = (refresh, count, fail) => {
   cy.log("Un-ignoring " + count);
 
@@ -33,11 +49,14 @@ const testHide = (refresh, count) => {
 
 };
 
-describe('Testing #94', function () {
+describe('#87 & #105', function () {
 
   beforeEach(() => {
     cy.stubLiveJson("live-old");
-
+    cy.visit(url);
+    cy.login("cypress1@example.com");
+    cy.visitAndWait(url);
+    cy.log("Starting test.;")
   });
 
   afterEach(() => {
@@ -46,57 +65,42 @@ describe('Testing #94', function () {
   });
 
 
-  it('Group Ignore Prefs : https://github.com/socialsensingbot/frontend/issues/94 : ', () => {
-    cy.visit(url);
-
-    cy.login("cypress1@example.com");
-
+  it('#87 Hidden Tweets Reappear : https://github.com/socialsensingbot/frontend/issues/87 : ', () => {
     cy.get(".app-tweet-drawer", {timeout: 30000});
-
     cy.log("Cleaning up.");
     cy.clickTweetTab(2);
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 40; i++) {
       testUnhide(false, i, false);
     }
     cy.log("Cleaned up.");
-
-
-    cy.visitAndWait(url);
-    cy.log("Starting test.");
-
     let hideCount = 0;
     cy.clickTweetTab(1);
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 40; i++) {
       testHide(false, i);
     }
+    checkTabCounts(2);
 
-    cy.withTweetCounts((vis1, hid1) => {
-      cy.logout();
-      cy.login("cypress2@example.com");
-      cy.visitAndWait(url);
-      cy.get(".app-tweet-drawer", {timeout: 30000});
-      cy.withTweetCounts((vis2, hid2) => {
-        cy.log("Testing for the same hidden and visible counts after account switch to cypress2@example.com.")
-        expect(vis1).equals(vis2);
-        expect(hid1).equals(hid2);
-      });
-
-    });
-
-    cy.withTweetCounts((vis1, hid1) => {
-      cy.logout();
-      cy.login("cypress3@example.com");
-      cy.visitAndWait(url);
-      cy.get(".app-tweet-drawer", {timeout: 30000});
-      cy.withTweetCounts((vis2, hid2) => {
-        cy.log("Testing for the different hidden and visible counts after account switch to cypress3@example.com.")
-        expect(vis1).to.not.equal(vis2);
-        expect(hid1).to.not.equal(hid2);
-      });
-
-    });
 
   });
+  /*
+  it('More than 30 ignores fails : https://github.com/socialsensingbot/frontend/issues/105 : ', () => {
+    Cypress.currentTest.retries(5);
+    cy.get(".app-tweet-drawer", {timeout: 30000});
+    cy.log("Cleaning up.");
+    cy.clickTweetTab(2);
+    for (let i = 0; i < 32; i++) {
+      testUnhide(false, i, false);
+    }
+    cy.log("Cleaned up.");
+    let hideCount = 0;
+    cy.clickTweetTab(1);
+    for (let i = 0; i < 45; i++) {
+      testHide(false, i);
+    }
+    cy.withTweetCounts((vis1, hid1) => {
+      expect(hid1).toBeGreaterThan(30);
+    });
+  });*/
 
 
 });
