@@ -37,11 +37,9 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
   @Input()
   public set options(value: DateRangeSliderOptions) {
     this._options = value;
-    this.sliderOptions.ceil = value.max;
-    this.sliderOptions.floor = value.min;
     this._lowerValue = value.startMin;
     this._upperValue = value.startMax;
-
+    this.sliderOptions = {...this.sliderOptions, ceil: value.max, floor: value.min};
   }
 
 

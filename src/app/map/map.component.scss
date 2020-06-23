@@ -92,10 +92,25 @@ $drawer-width: 568px;
 }
 
 
+.map-actions {
+  top: 2em;
+  max-height: 3em;
+  min-height: 3em;
+  position: absolute;
+  background: none;
+  z-index: 10;
+  max-width: 3em;
+  min-width: 3em;
+  right: $right-hand-margin;
+  .mat-card {
+    padding: 4px !important;
+  }
+}
+
 .legend {
   max-height: 8em;
   min-height: 6em;
-  top: $top-margin;
+  top: 7em;
   position: absolute;
   background: none;
   //border: 3px solid red;
@@ -103,6 +118,7 @@ $drawer-width: 568px;
   max-width: 6em;
   min-width: 3em;
   right: $right-hand-margin;
+
 
 }
 

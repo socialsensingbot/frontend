@@ -3,7 +3,7 @@
  */
 describe('Data Update: ', function () {
   describe('slider change', () => {
-    const url = "http://localhost:4200/map";
+    const url = "http://localhost:4200/map?selected=powys&max_time=1587941160000&min_time=1587854760000";
     it('after scheduled update', ()=> {
       //See commands.js - stubLiveJson stubs out the call to S3 to get live.json
       cy.stubLiveJson("live-short");
@@ -13,12 +13,12 @@ describe('Data Update: ', function () {
       cy.get(".slider-date-time", {timeout: 20000});
       cy.get(".slider-date-time-max .slider-date").should("contain.text", "26-Apr-20");
       cy.get(".slider-date-time-max .slider-time").should("contain.text", "10 pm");
-      cy.url().should("equal", "http://localhost:4200/map?abs_time=1587940500000&max_offset=0&min_offset=-1429")
-      cy.stubLiveJson("live-long");
+      cy.url().should("equal", url)
+      cy.stubLiveJson("live-long"); // and prosper
       cy.wait(65 * 1000);
       cy.get(".slider-date-time-max .slider-date").should("contain.text", "26-Apr-20");
       cy.get(".slider-date-time-max .slider-time").should("contain.text", "10 pm");
-      cy.url().should("equal", "http://localhost:4200/map?abs_time=1588012740000&max_offset=-469&min_offset=-1909");
+      cy.url().should("equal", url);
       cy.logout();
     });
 

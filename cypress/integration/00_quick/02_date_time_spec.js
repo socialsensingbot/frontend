@@ -8,7 +8,7 @@ describe('02 Date time: ', function () {
 
   describe('select county and date range', () => {
     console.debug("Tests https://github.com/socialsensingbot/frontend/issues/67");
-    const url = "http://localhost:4200/map?selected=scottish%20borders&min_offset=-1439&max_offset=0&zoom=5&abs_time=1539561540000";
+    const url = "http://localhost:4200/map?selected=scottish%20borders&zoom=5&max_time=1539561540000&min_time=1539475200000";
     it('with no tweets', () => {
       cy.visitAndWait(url);
       cy.get(".slider-date-time", {timeout: 20000});

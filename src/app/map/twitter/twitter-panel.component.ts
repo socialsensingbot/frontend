@@ -152,7 +152,8 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   public download() {
-    let title = `${this.region}`;
+    let region = `${this.region}`;
+    let filename = `region-${this.region.replace(" ", "-").toLocaleLowerCase()}-tweet-export`
 
     if (this.region.match(/\d+/)) {
       let minX = null;
@@ -175,22 +176,23 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
       }
       console.log(
         `Bounding box of ${JSON.stringify(this.geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`)
-      title = `"Region bounded by ${minX},${minY} to ${maxX},${maxY}"`
+      region = `(${minX},${minY}),(${maxX},${maxY})`
     }
     const options = {
       fieldSeparator:   ',',
       quoteStrings:     '"',
       decimalSeparator: '.',
       showLabels:       true,
-      showTitle:        true,
-      title:            title,
+      showTitle:        false,
+      title:            region,
       useTextFile:      false,
       useBom:           true,
       useKeysAsHeaders: true,
+      filename: filename
       // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
     };
 
     this.csvExporter = new ExportToCsv(options);
-    this.csvExporter.generateCsv(this.visibleTweets.filter(i => i.valid).map(i => i.asCSV()));
+    this.csvExporter.generateCsv(this.visibleTweets.filter(i => i.valid).map(i => i.asCSV(region)));
   }
 }
