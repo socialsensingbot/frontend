@@ -288,11 +288,11 @@ export class MapDataService {
           maxY = point[1];
         }
       }
-      log.debug(
+      log.verbose(
         `Bounding box of ${JSON.stringify(geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`)
       regionText = `(${minX},${minY}),(${maxX},${maxY})`
     }
-    console.log("Region: " + region);
+    log.verbose("Exporting egion: " + region);
     return this._twitterData.embeds(polyType, region)
                .filter(i => i.valid && !this._pref.isBlacklisted(i))
                .map(i => i.asCSV(toTitleCase(regionText)));
@@ -321,7 +321,11 @@ export class MapDataService {
           geometry = feature.geometry;
         }
       }
-      exportedTweets.push(...this.downloadRegion(polyType, region, geometry));
+      if (typeof geometry === "undefined") {
+        log.warn("No geometry for " + region);
+      } else {
+        exportedTweets.push(...this.downloadRegion(polyType, region, geometry));
+      }
     }
     const csvExporter = new ExportToCsv(options);
     csvExporter.generateCsv(exportedTweets);
