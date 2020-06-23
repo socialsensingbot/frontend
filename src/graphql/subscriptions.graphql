@@ -80,6 +80,7 @@ subscription OnCreateGroupPreferences {
     group
     locale
     timezone
+    multipleSessions
     createdAt
     updatedAt
   }
@@ -90,6 +91,7 @@ subscription OnUpdateGroupPreferences {
     group
     locale
     timezone
+    multipleSessions
     createdAt
     updatedAt
   }
@@ -100,6 +102,7 @@ subscription OnDeleteGroupPreferences {
     group
     locale
     timezone
+    multipleSessions
     createdAt
     updatedAt
   }

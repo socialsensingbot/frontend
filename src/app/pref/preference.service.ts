@@ -1,7 +1,7 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {Auth, Logger} from "aws-amplify";
 import {
-  APIService,
+  APIService, GetGroupPreferencesQuery,
   OnCreateGroupTweetIgnoreSubscription,
   OnCreateGroupTwitterUserIgnoreSubscription,
   OnDeleteGroupTweetIgnoreSubscription,
@@ -22,7 +22,7 @@ export class PreferenceService {
   }
 
   private _preferences: any;
-  private _groupPreferences: any;
+  private _groupPreferences: GetGroupPreferencesQuery;
   //todo: There must be a better way to do this!
   private _username: Promise<string> = new Promise<string>((resolve) => {
     const loop = () => {
@@ -50,7 +50,7 @@ export class PreferenceService {
   public group: any;
 
   constructor(private _notify: NotificationService, private _api: APIService) {
-    this.group = environment;
+    this.group = {...environment};
   }
 
   public async init(userInfo: any) {
@@ -99,6 +99,9 @@ export class PreferenceService {
       }
       if (this._groupPreferences.timezone) {
         this.group.timezone = this._groupPreferences.timezone;
+      }
+      if (typeof this._groupPreferences.multipleSessions !== "undefined") {
+        this.group.multipleSessions = this._groupPreferences.multipleSessions;
       }
       log.debug(this._preferences);
     }

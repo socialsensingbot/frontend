@@ -102,11 +102,13 @@ export type CreateGroupPreferencesInput = {
   group: string;
   locale?: string | null;
   timezone?: string | null;
+  multipleSessions?: boolean | null;
 };
 
 export type ModelGroupPreferencesConditionInput = {
   locale?: ModelStringInput | null;
   timezone?: ModelStringInput | null;
+  multipleSessions?: ModelBooleanInput | null;
   and?: Array<ModelGroupPreferencesConditionInput | null> | null;
   or?: Array<ModelGroupPreferencesConditionInput | null> | null;
   not?: ModelGroupPreferencesConditionInput | null;
@@ -117,6 +119,7 @@ export type UpdateGroupPreferencesInput = {
   group?: string | null;
   locale?: string | null;
   timezone?: string | null;
+  multipleSessions?: boolean | null;
 };
 
 export type DeleteGroupPreferencesInput = {
@@ -271,6 +274,7 @@ export type ModelGroupPreferencesFilterInput = {
   group?: ModelStringInput | null;
   locale?: ModelStringInput | null;
   timezone?: ModelStringInput | null;
+  multipleSessions?: ModelBooleanInput | null;
   and?: Array<ModelGroupPreferencesFilterInput | null> | null;
   or?: Array<ModelGroupPreferencesFilterInput | null> | null;
   not?: ModelGroupPreferencesFilterInput | null;
@@ -403,6 +407,7 @@ export type CreateGroupPreferencesMutation = {
   group: string;
   locale: string | null;
   timezone: string | null;
+  multipleSessions: boolean | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -413,6 +418,7 @@ export type UpdateGroupPreferencesMutation = {
   group: string;
   locale: string | null;
   timezone: string | null;
+  multipleSessions: boolean | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -423,6 +429,7 @@ export type DeleteGroupPreferencesMutation = {
   group: string;
   locale: string | null;
   timezone: string | null;
+  multipleSessions: boolean | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -655,6 +662,7 @@ export type GetGroupPreferencesQuery = {
   group: string;
   locale: string | null;
   timezone: string | null;
+  multipleSessions: boolean | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -667,6 +675,7 @@ export type ListGroupPreferencessQuery = {
     group: string;
     locale: string | null;
     timezone: string | null;
+    multipleSessions: boolean | null;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
@@ -874,6 +883,7 @@ export type OnCreateGroupPreferencesSubscription = {
   group: string;
   locale: string | null;
   timezone: string | null;
+  multipleSessions: boolean | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -884,6 +894,7 @@ export type OnUpdateGroupPreferencesSubscription = {
   group: string;
   locale: string | null;
   timezone: string | null;
+  multipleSessions: boolean | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -894,6 +905,7 @@ export type OnDeleteGroupPreferencesSubscription = {
   group: string;
   locale: string | null;
   timezone: string | null;
+  multipleSessions: boolean | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -1258,6 +1270,7 @@ export class APIService {
           group
           locale
           timezone
+          multipleSessions
           createdAt
           updatedAt
         }
@@ -1284,6 +1297,7 @@ export class APIService {
           group
           locale
           timezone
+          multipleSessions
           createdAt
           updatedAt
         }
@@ -1310,6 +1324,7 @@ export class APIService {
           group
           locale
           timezone
+          multipleSessions
           createdAt
           updatedAt
         }
@@ -1821,6 +1836,7 @@ export class APIService {
           group
           locale
           timezone
+          multipleSessions
           createdAt
           updatedAt
         }
@@ -1847,6 +1863,7 @@ export class APIService {
             group
             locale
             timezone
+            multipleSessions
             createdAt
             updatedAt
           }
@@ -2239,6 +2256,7 @@ export class APIService {
           group
           locale
           timezone
+          multipleSessions
           createdAt
           updatedAt
         }
@@ -2255,6 +2273,7 @@ export class APIService {
           group
           locale
           timezone
+          multipleSessions
           createdAt
           updatedAt
         }
@@ -2271,6 +2290,7 @@ export class APIService {
           group
           locale
           timezone
+          multipleSessions
           createdAt
           updatedAt
         }

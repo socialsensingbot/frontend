@@ -23,6 +23,7 @@ type GroupPreferences @model @auth(rules: [{allow: groups, operations: [create, 
   group: String!
   locale: String
   timezone: String
+  multipleSessions: Boolean
 }
 
 
