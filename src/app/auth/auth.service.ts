@@ -32,7 +32,7 @@ export class AuthService {
   public static SIGN_IN = 'signIn';
   public static SIGN_OUT = 'signOut';
 
-  constructor(private _session: SessionService) {
+  constructor() {
     Hub.listen('auth', (data) => {
       const {channel, payload} = data;
       if (channel === 'auth') {
@@ -66,7 +66,6 @@ export class AuthService {
   }
 
   async signOut(): Promise<any> {
-    await this._session.close();
     return Auth.signOut()
                .then(() => this.loggedIn = false);
   }

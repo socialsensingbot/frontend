@@ -63,6 +63,7 @@ query GetGroupPreferences($id: ID!) {
     group
     locale
     timezone
+    multipleSessions
     createdAt
     updatedAt
   }
@@ -78,6 +79,7 @@ query ListGroupPreferencess(
       group
       locale
       timezone
+      multipleSessions
       createdAt
       updatedAt
     }
