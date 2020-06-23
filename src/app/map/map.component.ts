@@ -46,7 +46,6 @@ import {ColorCodeService} from "./services/color-code.service";
 import {MapDataService} from "./data/map-data.service";
 import {ProcessedPolygonData} from "./data/processed-data";
 import {Tweet} from "./twitter/tweet";
-import {ExportToCsv} from "export-to-csv";
 import {toTitleCase} from '../common';
 
 
@@ -60,6 +59,51 @@ const ONE_MINUTE_IN_MILLIS = 60000;
              styleUrls:   ['./map.component.scss']
            })
 export class MapComponent implements OnInit, OnDestroy {
+  public get activePolyLayerShortName(): PolygonLayerShortName {
+    return this._activePolyLayerShortName;
+  }
+
+  public set activePolyLayerShortName(value: PolygonLayerShortName) {
+    this._activePolyLayerShortName = value;
+    log.debug("New baselayer " + value);
+    this.updateSearch({active_polygon: this.activePolyLayerShortName, selected: null});
+    this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
+      this.activity = true;
+      this.resetLayers(true);
+      this.activity = false;
+    });
+
+
+  }
+
+  public get activeNumberLayerShortName(): NumberLayerShortName {
+    return this._activeNumberLayerShortName;
+  }
+
+  public set activeNumberLayerShortName(value: NumberLayerShortName) {
+    this._activeNumberLayerShortName = value;
+    this.updateSearch({active_number: this._activeNumberLayerShortName});
+    if (this._map) {
+      for (let layer in this._numberLayers) {
+        if (this._numberLayersNameMap[layer] !== value) {
+          log.debug("Removing " + layer);
+          this._map.removeLayer(this._numberLayers[layer]);
+        }
+      }
+      for (let layer in this._numberLayers) {
+        if (this._numberLayersNameMap[layer] === value) {
+          log.debug("Adding " + layer);
+          this._map.addLayer(this._numberLayers[layer]);
+
+        }
+      }
+    }
+    this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
+      this.activity = true;
+      this.resetLayers(true);
+      this.activity = false;
+    });
+  }
 
 
   // The Map & Map Layers
@@ -73,8 +117,8 @@ export class MapComponent implements OnInit, OnDestroy {
   private _numberLayersNameMap = {"Exceedance": "stats", "Tweet Count": "count"};
   private _basemapControl: BasemapControl = {"numbers": this._numberLayers, "polygon": this._polyLayers};
 
-  public activeNumberLayerShortName: NumberLayerShortName = STATS;
-  public activePolyLayerShortName: PolygonLayerShortName = COUNTY;
+  private _activeNumberLayerShortName: NumberLayerShortName = STATS;
+  private _activePolyLayerShortName: PolygonLayerShortName = COUNTY;
 
 
   private _oldClicked: (LeafletMouseEvent | "") = "";
@@ -289,22 +333,7 @@ export class MapComponent implements OnInit, OnDestroy {
     const numberLayerName: NumberLayerShortName = typeof active_number !== "undefined" ? active_number : STATS;
     this.activeNumberLayerShortName = numberLayerName;
 
-    if (this._map) {
-      for (let layer in this._numberLayers) {
-        if (this._numberLayersNameMap[layer] !== numberLayerName) {
-          log.debug("Removing " + layer);
-          this._map.removeLayer(this._numberLayers[layer]);
-        }
-        this.activeNumberLayerShortName = numberLayerName;
-      }
-      for (let layer in this._numberLayers) {
-        if (this._numberLayersNameMap[layer] === numberLayerName) {
-          log.debug("Adding " + layer);
-          this._map.addLayer(this._numberLayers[layer]);
 
-        }
-      }
-    }
 
     // This handles a change to the active_polygon value
     const polygonLayerName: PolygonLayerShortName = typeof active_polygon !== "undefined" ? active_polygon : COUNTY;
@@ -379,31 +408,14 @@ export class MapComponent implements OnInit, OnDestroy {
                              return this._zone.run(() => this.updateSearch({zoom: this._map.getZoom()}));
                            });
 
-                           map.on('baselayerchange', async (e: any) => {
-                             this._zone.run(async () => {
-                               log.debug("New baselayer " + e.name);
-                               if (e.name in this._basemapControl.polygon) {
-                                 this.activePolyLayerShortName = this._polyLayersNameMap[e.name];
-                                 this.updateSearch(
-                                   {active_polygon: this.activePolyLayerShortName, selected: null});
-                                 this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
-                                   this.activity = true;
-                                   this.resetLayers(true);
-                                   this.activity = false;
-                                 });
-                               } else {
-                                 this.activeNumberLayerShortName = this._numberLayersNameMap[e.name];
-                                 this.updateSearch({active_number: this.activeNumberLayerShortName});
-                               }
-                             });
-                           });
+
                            this._exec.changeState("ready");
                            this.updateSearch({
                                                min_time: Math.round(this._dateMin),
                                                max_time: Math.round(this._dateMax)
                                              });
-                           map.addControl(zoomControl);
-                           this.addToggleControls();
+                           // map.addControl(zoomControl);
+                           // this.addToggleControls();
                            return this.updateLayers("From Parameters").then(() => this._twitterIsStale = true);
 
                          });
@@ -426,16 +438,16 @@ export class MapComponent implements OnInit, OnDestroy {
     this._loadTimer = timer(ONE_MINUTE_IN_MILLIS, ONE_MINUTE_IN_MILLIS).subscribe(() => this.load());
   }
 
-  private addToggleControls() {
-    log.debug("addToggleControls()");
-    for (let key in this._basemapControl) {
-      // noinspection JSUnfilteredForInLoop
-      this._lcontrols[key] = control.layers(this._basemapControl[key], {}).addTo(this._map);
-      // noinspection JSUnfilteredForInLoop
-      this._lcontrols[key].setPosition('topleft');
-    }
-
-  }
+  // private addToggleControls() {
+  //   log.debug("addToggleControls()");
+  //   for (let key in this._basemapControl) {
+  //     // noinspection JSUnfilteredForInLoop
+  //     this._lcontrols[key] = control.layers(this._basemapControl[key], {}).addTo(this._map);
+  //     // noinspection JSUnfilteredForInLoop
+  //     this._lcontrols[key].setPosition('topleft');
+  //   }
+  //
+  // }
 
 
   /**
@@ -515,7 +527,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param e
    */
   featureLeft(e: LeafletMouseEvent) {
-    log.debug("featureLeft(" + this.activeNumberLayerShortName + ")");
+    log.debug("featureLeft(" + this._activeNumberLayerShortName + ")");
     this._geojson[this.activeNumberLayerShortName].resetStyle(e.propagatedFrom);
     if (this._clicked != "") {
       this.highlight(this._clicked);
@@ -890,6 +902,31 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   public downloadTweetsAsCSV() {
-    this._data.download(this.activePolyLayerShortName, this._polygonData[this.activePolyLayerShortName] as PolygonData);
+    this._data.download(this.activePolyLayerShortName,
+                        this._polygonData[this.activePolyLayerShortName] as PolygonData);
+  }
+
+  public polyLayers() {
+    return [["Local Authority", "county"], ["Coarse Grid", "coarse"], ["Fine Grid", "fine"]];
+  }
+
+  public numberLayers() {
+    return [["Exceedance", "stats"], ["Tweet Count", "count"]];
+  }
+
+  public zoomIn() {
+    if (this._map.getZoom() < 18) {
+      this._map.setZoom(this._map.getZoom() + 1);
+    } else {
+      this._notify.show("Maximum Zoom")
+    }
+  }
+
+  public zoomOut() {
+    if (this._map.getZoom() > 2) {
+      this._map.setZoom(this._map.getZoom() - 1);
+    } else {
+      this._notify.show("Minimum Zoom")
+    }
   }
 }

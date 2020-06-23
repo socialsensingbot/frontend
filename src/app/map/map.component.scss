@@ -53,6 +53,38 @@ $drawer-width: 568px;
   right: 0px;
 }
 
+.map-toolbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  font-size: 14px;
+
+  .map-toolbar-separator {
+    display: flex;
+    min-width: 2em;
+  }
+
+  .map-toolbar-btn {
+    display: flex;
+  }
+
+  .date-slider {
+    display: flex;
+    z-index: 10;
+    //border: 1px solid red;
+    margin-right: 2em;
+    //margin: 2em auto;
+    date-range-slider {
+      max-width: 30vw;
+      min-width: 30vw;
+      display: block;
+      margin: 0em auto;
+      min-height: 1em
+    }
+  }
+
+}
+
 .app-tweet-drawer {
   max-width: $drawer-width;
   width: $drawer-width;
@@ -73,23 +105,6 @@ $drawer-width: 568px;
 
 }
 
-.date-slider {
-  max-height: 6em;
-  min-height: 4em;
-  bottom: $bottom-margin;
-  position: absolute;
-  background: none;
-  z-index: 10;
-  max-width: 30vw;
-  min-width: 30vw;
-  right: $right-hand-margin;
-  //border: 3px solid red;
-  //margin: 2em auto;
-  date-range-slider {
-    margin: 0em auto;
-    min-height: 10em;
-  }
-}
 
 
 .map-actions {
