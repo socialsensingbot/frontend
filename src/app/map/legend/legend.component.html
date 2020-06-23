@@ -10,8 +10,18 @@
     </help>
   </mat-card-title>
   <div class="legend-inner">
+    <span>
+    <i [style.background]="getColor(values[0]+1)"></i>
+      {{values[0]}}&ndash;<br/>
+      </span>
     <span *ngFor="let value of values; let i = index">
-    <i [style.background]="getColor(value)"></i> {{value}}{{(values[i + 1] ? '&ndash;' + values[i + 1] : '&ndash;0')}}
+
+    <i [style.background]="getColor(value)"></i>
+      <ng-container>
+        {{value}}{{(values[i + 1] ? '&ndash;' + values[i + 1] : '&ndash;0')}}<br/>
+      </ng-container>
+
+
       </span>
   </div>
 </mat-card>
