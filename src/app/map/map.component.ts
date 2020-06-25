@@ -60,7 +60,7 @@ const ONE_MINUTE_IN_MILLIS = 60000;
              styleUrls:   ['./map.component.scss']
            })
 export class MapComponent implements OnInit, OnDestroy {
-  private _selectedFeatureNames: string[];
+  private _selectedFeatureNames: string[] = [];
 
   public get activePolyLayerShortName(): PolygonLayerShortName {
     return this._activePolyLayerShortName;
