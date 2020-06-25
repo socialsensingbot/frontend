@@ -64,9 +64,14 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   public set activePolyLayerShortName(value: PolygonLayerShortName) {
-    this._activePolyLayerShortName = value;
     log.debug("New baselayer " + value);
-    this.updateSearch({active_polygon: this.activePolyLayerShortName, selected: null});
+    if (!this.activePolyLayerShortName || this.activePolyLayerShortName === value) {
+      this.updateSearch({active_polygon: value});
+    } else {
+      log.debug("Removing selected region(s) as we have changed region type");
+      this.updateSearch({active_polygon: value, selected: null});
+    }
+    this._activePolyLayerShortName = value;
     this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
       this.activity = true;
       this.resetLayers(true);

@@ -53,20 +53,8 @@ $drawer-width: 568px;
   right: 0px;
 }
 
-.map-toolbar {
-  display: flex;
-  flex-direction: row;
-  justify-content: left;
-  font-size: 14px;
 
-  .map-toolbar-separator {
-    display: flex;
-    min-width: 1em;
-  }
-
-  .map-toolbar-btn {
-    display: flex;
-  }
+.app-toolbar {
 
   .date-slider {
     display: flex;

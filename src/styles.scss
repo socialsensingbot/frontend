@@ -88,4 +88,30 @@ blockquote {
   }
 }
 
+.app-toolbar-separator {
+  display: flex;
+  min-width: 1em;
+}
+
+.app-toolbar-expanding-separator {
+  display: flex;
+  flex-grow: 10;
+  min-width: 1em;
+  max-width: 100%;
+}
+
+.app-toolbar-btn {
+  display: flex;
+}
+
+.app-toolbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  font-size: 14px;
+  overflow: visible;
+  background-color: white;
+  box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.3);
+}
+
 

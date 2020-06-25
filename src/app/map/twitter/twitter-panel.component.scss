@@ -2,6 +2,7 @@ $tweetWidth: 540px;
 $tweetMargin: 8px;
 $tweetHeaderOffset: 16px;
 
+
 ::ng-deep {
   .mat-tab-body-wrapper, .mat-tab-group {
     height: 100%;
@@ -24,9 +25,9 @@ $tweetHeaderOffset: 16px;
   min-height: 100%;
   font-size: 16px;
   overflow: hidden;
-  width: 564px;
-  max-width: 564px;
-  min-width: 564px;
+  width: 568px;
+  max-width: 568px;
+  min-width: 568px;
   margin: 0;
   padding: 0;
 
@@ -44,9 +45,10 @@ $tweetHeaderOffset: 16px;
 
   .app-tweet-table {
     display: block;
-    height: calc(100vh - 174px);
+    height: calc(100vh - 160px);
     position: relative;
     overflow: visible;
+    margin-top: 8px;
 
 
     .app-tweet-date-separator {
@@ -87,32 +89,13 @@ $tweetHeaderOffset: 16px;
   }
 
 
-  .app-tweet-header {
-    //position: rel;
-    z-index: 10;
-    margin-right: 14px;
-    margin-left: 14px;
-    margin-bottom: 0;
-    margin-top: 16px;
-    //background: white;
-
-    .app-tweet-heading {
-      font-size: 1.2em;
-      margin: 0;
-      line-height: 1.5em;
-    }
-
-  }
-
-
 }
 
-.app-tweet-refresh-btn {
-  opacity: 0.4;
+.app-tweet-heading {
+  font-size: 1.2em;
+  margin: 0;
+  line-height: 1.5em;
 }
 
-.app-tweet-btn {
-  opacity: 0.4;
-  max-width: 32px;
-}
+
 

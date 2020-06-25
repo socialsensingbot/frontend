@@ -18,14 +18,14 @@
            [leafletOptions]="options">
       </div>
     </div>
-    <mat-toolbar class="expanded-toolbar map-toolbar">
-      <button class="map-toolbar-btn" mat-icon-button (click)="zoomIn()">
+    <mat-toolbar class="expanded-toolbar app-toolbar" [style.opacity]="ready ? '1.0' : '0.0'">
+      <button class="app-toolbar-btn map-zoom-in" mat-icon-button (click)="zoomIn()">
         <mat-icon matTooltip="Zoom In">zoom_in</mat-icon>
       </button>
-      <button class="map-toolbar-btn" mat-icon-button (click)="zoomOut()">
+      <button class="app-toolbar-btn map-zoom-out" mat-icon-button (click)="zoomOut()">
         <mat-icon matTooltip="Zoom Out">zoom_out</mat-icon>
       </button>
-      <div class="map-toolbar-separator"></div>
+      <div class="app-toolbar-separator"></div>
 
       <!--      <mat-select>-->
       <!--        <mat-option *ngFor="let polyLayer of polyLayers()" [value]="polyLayer[1]">-->
@@ -37,17 +37,13 @@
       <!--          {{numLayer[0]}}-->
       <!--        </mat-option>-->
       <!--      </mat-select>-->
-      <div class="map-toolbar-separator"></div>
+      <div class="app-toolbar-separator"></div>
       <div class="date-slider">
-        <date-range-slider [style.opacity]="ready ? '1.0' : '0.0'" (dateRange)="sliderChange($event)"
+        <date-range-slider (dateRange)="sliderChange($event)"
                            (onEnd)="sliderChangeOnEnd($event)"
                            [options]="sliderOptions"></date-range-slider>
       </div>
-      <div class="map-toolbar-separator"></div>
-      <button class="map-toolbar-btn" mat-icon-button (click)="downloadTweetsAsCSV()">
-        <mat-icon matTooltip="Download all Tweets as a CSV file.">cloud_download</mat-icon>
-      </button>
-      <div class="map-toolbar-separator"></div>
+      <div class="app-toolbar-separator"></div>
       <mat-form-field>
         <mat-select [(value)]="activePolyLayerShortName">
           <mat-option value="county">Local Authority</mat-option>
@@ -55,13 +51,17 @@
           <mat-option value="fine">Fine Grid</mat-option>
         </mat-select>
       </mat-form-field>
-      <div class="map-toolbar-separator"></div>
+      <div class="app-toolbar-separator"></div>
       <mat-form-field>
         <mat-select [(value)]="activeNumberLayerShortName">
           <mat-option value="stats">Exceedance</mat-option>
           <mat-option value="count">Tweet Count</mat-option>
         </mat-select>
       </mat-form-field>
+      <div class="app-toolbar-separator"></div>
+      <button class="app-toolbar-btn" mat-icon-button (click)="downloadTweetsAsCSV()">
+        <mat-icon matTooltip="Download all Tweets as a CSV file.">cloud_download</mat-icon>
+      </button>
 
 
     </mat-toolbar>
