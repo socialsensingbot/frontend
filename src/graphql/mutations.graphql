@@ -101,6 +101,7 @@ mutation CreateGroupPreferences(
     group
     locale
     timezone
+    multipleSessions
     createdAt
     updatedAt
   }
@@ -114,6 +115,7 @@ mutation UpdateGroupPreferences(
     group
     locale
     timezone
+    multipleSessions
     createdAt
     updatedAt
   }
@@ -127,6 +129,7 @@ mutation DeleteGroupPreferences(
     group
     locale
     timezone
+    multipleSessions
     createdAt
     updatedAt
   }

@@ -29,11 +29,11 @@ describe('04: Map: ', function () {
     const url = "http://localhost:4200/map?active_number=count";
     const legendEntry = "mat-sidenav-content > map-legend > mat-card > div > span:nth-child(1)";
     const statsControl = "div.leaflet-control-container > div.leaflet-top.leaflet-left > div:nth-child(2)";
-    const statsFirstLegendColour = "background: rgb(252, 174, 145)";
-    const statsFirstLegendVal = " 5–2.5 ";
+    const statsFirstLegendColour = "background: rgb(254, 229, 217);";
+    const statsFirstLegendVal = " 5–";
 
-    const countFirstLegendColour = "background: rgb(43, 140, 190)";
-    const countFirstLegendVal = " 150–50 ";
+    const countFirstLegendColour = "background: rgb(4, 90, 141);";
+    const countFirstLegendVal = " 150–";
 
     it('has correct default', () => {
       cy.visitAndWait("http://localhost:4200/map");

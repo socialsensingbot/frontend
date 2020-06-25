@@ -8,6 +8,8 @@ import {
 } from "../API.service";
 import {NotificationService} from "../services/notification.service";
 import {Subscription, timer} from "rxjs";
+import {PreferenceService} from "../pref/preference.service";
+import {AuthService} from "./auth.service";
 
 const log = new Logger("session");
 
@@ -44,7 +46,10 @@ export class SessionService implements OnInit, OnDestroy {
    */
   private _session: GetUserSessionQuery;
 
-  constructor(private _notify: NotificationService, private _api: APIService) {
+  constructor(private _notify: NotificationService,
+              private _api: APIService,
+              private _pref: PreferenceService,
+              private _auth: AuthService) {
 
   }
 
@@ -223,8 +228,16 @@ export class SessionService implements OnInit, OnDestroy {
    *
    * @TODO: remove oldest param
    */
-  private moreThanOneSession(oldest: boolean = true) {
-    this._notify.show("You are logged in more than once, in future this session will be logged out.", "OK", 30);
+  private async moreThanOneSession(oldest: boolean = true) {
+    if (this._pref.group.multipleSessions) {
+      log.info("User logged in more than once, which group preferences or the environment allow.");
+    } else {
+      this._notify.show("You are logged in more than once this session will now be logged out.", "OK", 30);
+      window.setTimeout(async () => {
+        await this._auth.signOut();
+        window.location.reload();
+      }, 8000);
+    }
   }
 
   /**

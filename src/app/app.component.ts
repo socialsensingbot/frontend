@@ -54,6 +54,7 @@ export class AppComponent {
         this.user = undefined;
         this.isAuthenticated = false;
         this.isSignup = !environment.production;
+        this._session.close();
         this._pref.clear();
       }
     });

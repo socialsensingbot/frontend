@@ -409,10 +409,13 @@ export class MapComponent implements OnInit, OnDestroy {
                          });
       } else {
         if (this._popState) {
+          log.debug("POP STATE detected during URL query params change.");
           this._popState = false;
+          this.activity = true;
           this.updateMapFromQueryParams(params);
+          this.resetLayers(true);
           return this.updateLayers("From Back Button")
-                     .then(() => this._twitterIsStale = true);
+                     .then(() => this._twitterIsStale = true).then(() => this.activity = false);
         }
       }
 
