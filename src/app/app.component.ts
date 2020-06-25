@@ -35,11 +35,14 @@ export class AppComponent {
   isAuthenticated: boolean;
   public isSignup: boolean = !environment.production;
 
-  constructor(private amplifyService: AmplifyService, public auth: AuthService,
+  constructor(private amplifyService: AmplifyService,
+              public auth: AuthService,
+              public pref: PreferenceService,
               private _router: Router, private _pref: PreferenceService,
               private _notify: NotificationService,
               private _api: APIService,
-              private _session: SessionService, @Inject(RollbarService) private _rollbar: Rollbar) {
+              private _session: SessionService,
+              @Inject(RollbarService) private _rollbar: Rollbar) {
     Auth.currentAuthenticatedUser({bypassCache: true})
         .then(user => this.isAuthenticated = (user != null))
         .then(() => this.checkSession())

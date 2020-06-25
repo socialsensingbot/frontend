@@ -8,7 +8,7 @@ import {
   control,
   Control,
   GeoJSON,
-  latLng,
+  latLng, Layer,
   LayerGroup,
   layerGroup,
   LeafletMouseEvent,
@@ -20,7 +20,7 @@ import {ActivatedRoute, NavigationStart, Params, Router} from '@angular/router';
 import {Observable, Subscription, timer} from "rxjs";
 import * as geojson from "geojson";
 import {DateRange, DateRangeSliderOptions} from "./date-range-slider/date-range-slider.component";
-import {LayerStyleService} from "./services/layer-style.service";
+import {LayerStyleService, selectedColor, unselectedColor} from "./services/layer-style.service";
 import {NotificationService} from "../services/notification.service";
 import {
   BasemapControl,
@@ -48,6 +48,7 @@ import {ProcessedPolygonData} from "./data/processed-data";
 import {Tweet} from "./twitter/tweet";
 import {toTitleCase, getOS} from '../common';
 import {RegionSelection} from './region-selection';
+import {PreferenceService} from '../pref/preference.service';
 
 
 const log = new Logger('map');
@@ -128,7 +129,6 @@ export class MapComponent implements OnInit, OnDestroy {
   private _activePolyLayerShortName: PolygonLayerShortName = COUNTY;
 
 
-  private _oldClicked: (LeafletMouseEvent | "") = "";
   private _geojson: { stats: GeoJSON, count: GeoJSON } = {stats: null, count: null};
 
 
@@ -138,8 +138,6 @@ export class MapComponent implements OnInit, OnDestroy {
   private _dateMax = 0;
   private _dateMin = 0;
   private _absoluteTime: number;
-  private _previousDateMin: string;
-  private _previousDateMax: string;
 
   /**
    * The current URL parameters, this is updated by a subscriber to this.route.queryParams.
@@ -214,7 +212,8 @@ export class MapComponent implements OnInit, OnDestroy {
               private _http: HttpClient,
               private _exec: UIExecutionService,
               private _color: ColorCodeService,
-              private _data: MapDataService
+              private _data: MapDataService,
+              public pref: PreferenceService
   ) {
     //save the query parameter observable
     this._searchParams = this.route.queryParams;
@@ -462,7 +461,7 @@ export class MapComponent implements OnInit, OnDestroy {
     const exceedanceProbability: number = Math.round(feature.properties.stats * 100) / 100;
     const region: string = toTitleCase(feature.properties.name);
     const count: number = feature.properties.count;
-    this.highlight(e, 1);
+    this.highlight(e.target, 1);
 
     let text = "" +
       `<div>Region: ${region}</div>`;
@@ -477,37 +476,39 @@ export class MapComponent implements OnInit, OnDestroy {
     e.target.bindTooltip(text).openTooltip();
   }
 
-  private highlight(e: LeafletMouseEvent, weight: number = 3) {
-    log.debug("Highlighting ", e.target.feature);
-    const feature = e.target.feature;
+  private highlight(target: any, weight: number = 3) {
+    log.debug("Highlighting ", target.feature);
+    const feature = target.feature;
     const count: number = feature.properties.count;
-    e.target.setStyle({
-                        stroke:      true,
-                        weight,
-                        color:       '#000000',
-                        dashArray:   '',
-                        fillOpacity: count > 0 ? 1.0 : 0.5,
-                      });
+    target.setStyle({
+                      stroke:      true,
+                      weight,
+                      color:       selectedColor,
+                      opacity:     1,
+                      dashArray:   '',
+                      fillOpacity: count > 0 ? 1.0 : 0.5,
+                    });
 
     if (!Browser.ie && !Browser.opera && !Browser.edge) {
-      e.target.bringToFront();
+      target.bringToFront();
     }
   }
 
-  private unhighlight(e: LeafletMouseEvent) {
-    log.debug("Un-highlighting ", e.target.feature);
-    const feature = e.target.feature;
+  private unhighlight(target: any) {
+    log.debug("Un-highlighting ", target.feature);
+    const feature = target.feature;
     const count: number = feature.properties.count;
-    e.target.setStyle({
-                        stroke:      true,
-                        weight:      1,
-                        color:       '#FFFFFF',
-                        dashArray:   '',
-                        fillOpacity: count > 0 ? 1.0 : 0.5,
-                      });
+    target.setStyle({
+                      stroke:      true,
+                      weight:      1,
+                      opacity:     0.5,
+                      color:       unselectedColor,
+                      dashArray:   '',
+                      fillOpacity: count > 0 ? 1.0 : 0.5,
+                    });
 
     if (!Browser.ie && !Browser.opera && !Browser.edge) {
-      e.target.bringToFront();
+      target.bringToFront();
     }
   }
 
@@ -555,9 +556,9 @@ export class MapComponent implements OnInit, OnDestroy {
   featureLeft(e: LeafletMouseEvent) {
     log.debug("featureLeft(" + this._activeNumberLayerShortName + ")");
     if (this.selection.isSelected(e.target.feature)) {
-      this.highlight(e);
+      this.highlight(e.target);
     } else {
-      this.unhighlight(e);
+      this.unhighlight(e.target);
     }
   }
 
@@ -579,9 +580,9 @@ export class MapComponent implements OnInit, OnDestroy {
     this._selectedFeatureNames = this.selection.regionNames();
     this.updateTwitterPanel();
     if (this.selection.isSelected(e.target.feature)) {
-      this.highlight(e, 3);
+      this.highlight(e.target, 3);
     } else {
-      this.highlight(e);
+      this.highlight(e.target);
     }
 
   }
@@ -600,18 +601,7 @@ export class MapComponent implements OnInit, OnDestroy {
     if (this._selectedFeatureNames.includes(feature.properties.name)) {
       log.debug("Matched " + feature.properties.name);
 
-      //Put the selection outline around the feature
-      layer.setStyle({
-                       stroke:      true,
-                       weight:      3,
-                       color:       '#000000',
-                       dashArray:   '',
-                       fillOpacity: feature.properties.count > 0 ? 1.0 : 0.01,
-                     });
-
-      if (!Browser.ie && !Browser.opera && !Browser.edge) {
-        layer.bringToFront();
-      }
+      this.highlight(layer, 3);
 
       this.selection.select(feature as Feature);
       this.showTweets();

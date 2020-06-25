@@ -29,11 +29,14 @@ export function getFeatureStyle(values, colors, layer_type, feature){
     return {
       fillColor:   getColor(values, colors, d),
       weight:      1,
-      opacity:     1,
-      color:       'white',
-      dashArray:   '3',
+      opacity:     0.5,
+      color:       unselectedColor,
+      dashArray:   '',
       fillOpacity: getFill(d),
       className:   ("x-feature-name-" + feature.properties.name).replace(/ +/g, "-")
     };
   }
 }
+
+export const selectedColor: string = '#B1205F';
+export const unselectedColor: string = 'white';
