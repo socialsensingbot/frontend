@@ -62,8 +62,12 @@ export class RegionSelection {
 
   public regions: { [key: string]: Region } = {};
 
-  public select(feature: Feature) {
+  public selectOnly(feature: Feature) {
     this.regions = {};
+    this.regions[feature.properties.name] = new Region(feature);
+  }
+
+  public select(feature: Feature) {
     this.regions[feature.properties.name] = new Region(feature);
   }
 

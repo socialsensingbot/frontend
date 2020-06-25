@@ -573,7 +573,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this.selection.toggle(e.target.feature);
     } else {
       this._geojson[this.activeNumberLayerShortName].resetStyle(e.propagatedFrom);
-      this.selection.select(e.target.feature);
+      this.selection.selectOnly(e.target.feature);
     }
     this.updateSearch({selected: this.selection.regionNames()});
     this._selectedFeatureNames = this.selection.regionNames();
@@ -602,14 +602,13 @@ export class MapComponent implements OnInit, OnDestroy {
                        weight:      3,
                        color:       '#000000',
                        dashArray:   '',
-                       fillOpacity: feature.properties.count > 0 ? 1.0 : 0.01
+                       fillOpacity: feature.properties.count > 0 ? 1.0 : 0.01,
                      });
 
       if (!Browser.ie && !Browser.opera && !Browser.edge) {
         layer.bringToFront();
       }
 
-      //Update the Twitter panel with the changes
       this.selection.select(feature as Feature);
       this.showTweets();
     }
