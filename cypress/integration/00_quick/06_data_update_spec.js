@@ -1,7 +1,7 @@
 /**
  * These tests test the change of data from the server.
  */
-describe.only('Data Update: ', function () {
+describe('Data Update: ', function () {
   describe('slider change', () => {
     const url = "http://localhost:4200/map?selected=powys&max_time=1587941160000&min_time=1587854760000&active_number=stats&active_polygon=county";
     it('after scheduled update', () => {
