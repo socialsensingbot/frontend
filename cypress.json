@@ -1,6 +1,6 @@
 {
   "env": {
-    "RETRIES": 2
+    "RETRIES": 0
   },
   "projectId": "zxxo89"
 }

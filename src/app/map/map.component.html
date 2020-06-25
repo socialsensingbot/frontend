@@ -45,7 +45,7 @@
       </div>
       <div class="app-toolbar-separator"></div>
       <mat-form-field>
-        <mat-select [(value)]="activePolyLayerShortName">
+        <mat-select [(value)]="activePolyLayerShortName" class="map-polygon-layer-select">
           <mat-option value="county">Local Authority</mat-option>
           <mat-option value="coarse">Coarse Grid</mat-option>
           <mat-option value="fine">Fine Grid</mat-option>
@@ -53,7 +53,7 @@
       </mat-form-field>
       <div class="app-toolbar-separator"></div>
       <mat-form-field>
-        <mat-select [(value)]="activeNumberLayerShortName">
+        <mat-select [(value)]="activeNumberLayerShortName" class="map-number-layer-select">
           <mat-option value="stats">Exceedance</mat-option>
           <mat-option value="count">Tweet Count</mat-option>
         </mat-select>
