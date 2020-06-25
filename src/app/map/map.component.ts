@@ -46,7 +46,7 @@ import {ColorCodeService} from "./services/color-code.service";
 import {MapDataService} from "./data/map-data.service";
 import {ProcessedPolygonData} from "./data/processed-data";
 import {Tweet} from "./twitter/tweet";
-import {toTitleCase} from '../common';
+import {toTitleCase, getOS} from '../common';
 import {RegionSelection} from './region-selection';
 
 
@@ -569,7 +569,7 @@ export class MapComponent implements OnInit, OnDestroy {
   featureClicked(e: LeafletMouseEvent) {
     log.debug("featureClicked()");
     log.debug(e.target.feature.properties.name);
-    if (e.originalEvent.metaKey) {
+    if (this.isMultiSelect(e)) {
       this.selection.toggle(e.target.feature);
     } else {
       this._geojson[this.activeNumberLayerShortName].resetStyle(e.propagatedFrom);
@@ -587,11 +587,15 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
 
+  private isMultiSelect(e: LeafletMouseEvent) {
+    return (getOS() === "Mac OS" && e.originalEvent.metaKey) || (getOS() !== "Mac OS" && e.originalEvent.altKey);
+  }
+
   onEachFeature(feature: geojson.Feature<geojson.GeometryObject, any>, layer: GeoJSON) {
     log.verbose("onEachFeature()");
 
-    // If this feature is referenced in the URL query paramter selected
-    // e.g. ?...&selected=powys
+    // If this feature is referenced in the URL query parameters selected
+    // e.g. ?...&selected=powys&selected=armagh
     // then highlight it and update Twitter
     if (this._selectedFeatureNames.includes(feature.properties.name)) {
       log.debug("Matched " + feature.properties.name);

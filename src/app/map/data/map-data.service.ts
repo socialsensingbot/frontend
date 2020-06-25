@@ -130,7 +130,10 @@ export class MapDataService {
     log.debug(`embeds(${activePolyLayerShortName},${name})`);
     const tweets: Tweet[] = [];
     for (const name of names) {
-      tweets.push(...this._twitterData.embeds(activePolyLayerShortName, name));
+      const t = this._twitterData.tweets(activePolyLayerShortName, name);
+      if (t) {
+        tweets.push(...t);
+      }
     }
     return tweets;
   }
@@ -297,7 +300,7 @@ export class MapDataService {
       regionText = `(${minX},${minY}),(${maxX},${maxY})`
     }
     log.verbose("Exporting egion: " + region);
-    return this._twitterData.embeds(polyType, region)
+    return this._twitterData.tweets(polyType, region)
                .filter(i => i.valid && !this._pref.isBlacklisted(i))
                .map(i => i.asCSV(toTitleCase(regionText)));
 
