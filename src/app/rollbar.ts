@@ -15,8 +15,8 @@ import {NotificationService} from "./services/notification.service";
 
 const rollbarConfig = {
   accessToken:                'd22c641642f94b619b51f31de651e7b9',
-  captureUncaught:            environment.rollbar,
-  captureUnhandledRejections: environment.rollbar,
+  captureUncaught:            true,
+  captureUnhandledRejections: true,
 };
 
 export const RollbarService = new InjectionToken<Rollbar>('rollbar');
