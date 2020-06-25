@@ -593,7 +593,7 @@ export class MapComponent implements OnInit, OnDestroy {
     // If this feature is referenced in the URL query paramter selected
     // e.g. ?...&selected=powys
     // then highlight it and update Twitter
-    if (feature.properties.name in this._selectedFeatureNames) {
+    if (this._selectedFeatureNames.includes(feature.properties.name)) {
       log.debug("Matched " + feature.properties.name);
 
       //Put the selection outline around the feature
