@@ -13,6 +13,7 @@ $tweetHeaderOffset: 16px;
 
   .mat-tab-body.mat-tab-body-active {
     overflow: hidden !important;
+    background-color: #f4f4f4;
   }
 
 
@@ -25,9 +26,9 @@ $tweetHeaderOffset: 16px;
   min-height: 100%;
   font-size: 16px;
   overflow: hidden;
-  width: 568px;
-  max-width: 568px;
-  min-width: 568px;
+  width: 566px;
+  max-width: 566px;
+  min-width: 566px;
   margin: 0;
   padding: 0;
 
@@ -40,12 +41,13 @@ $tweetHeaderOffset: 16px;
   .mat-tab-body {
     overflow-x: visible;
     position: relative;
+
   }
 
 
   .app-tweet-table {
     display: block;
-    height: calc(100vh - 160px);
+    height: calc(100vh - 188px);
     position: relative;
     overflow: visible;
     margin-top: 8px;
