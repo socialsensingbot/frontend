@@ -126,9 +126,13 @@ export class MapDataService {
 
   }
 
-  public tweets(activePolyLayerShortName: PolygonLayerShortName, name: any): Tweet[] {
+  public tweets(activePolyLayerShortName: PolygonLayerShortName, names: string[]): Tweet[] {
     log.debug(`embeds(${activePolyLayerShortName},${name})`);
-    return this._twitterData.embeds(activePolyLayerShortName, name);
+    const tweets: Tweet[] = [];
+    for (const name of names) {
+      tweets.push(...this._twitterData.embeds(activePolyLayerShortName, name));
+    }
+    return tweets;
   }
 
 

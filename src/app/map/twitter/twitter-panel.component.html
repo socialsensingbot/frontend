@@ -2,26 +2,30 @@
 
   <mat-toolbar class="expanded-toolbar app-toolbar">
     <ng-container *ngIf="ready">
-      <ng-container *ngIf="tweets.length > 0">
-        <span class="app-tweet-heading" style="color: black">{{region}}:</span>
-        <div class="app-toolbar-separator"></div>
-        <help page="help-and-support#exceedance"
-              tooltip="Exceedance probability is calculated by comparing the current level of tweet activity with historical tweet activity.">
-          Exceedance probability&nbsp;
-        </help>
-        {{exceedanceProbability}}%
-        <div class="app-toolbar-separator"></div>
+      <ng-container *ngIf="selection.count === 1">
+        <ng-container *ngIf="tweets.length > 0">
+          <span class="app-tweet-heading" style="color: black">{{selection.firstRegion().title}}:</span>
+          <div class="app-toolbar-separator"></div>
+          <help page="help-and-support#exceedance"
+                tooltip="Exceedance probability is calculated by comparing the current level of tweet activity with historical tweet activity.">
+            Exceedance probability&nbsp;
+          </help>
+          {{selection.firstRegion().exceedanceProbability}}%
+          <div class="app-toolbar-separator"></div>
 
+        </ng-container>
+
+        <ng-container *ngIf="tweets.length === 0">
+
+      <span *ngIf="selection" class="app-tweet-heading"
+            style="color: black">No Tweets from {{selection.firstRegion().title}}<br/></span>
+
+          <span *ngIf="!selection" class="app-tweet-heading" style="color: black">Loading ...<br/></span>
+        </ng-container>
       </ng-container>
-
-      <ng-container *ngIf="tweets.length === 0">
-
-      <span *ngIf="region" class="app-tweet-heading"
-            style="color: black">No Tweets from {{region}}<br/></span>
-
-        <span *ngIf="!region" class="app-tweet-heading" style="color: black">Loading ...<br/></span>
+      <ng-container *ngIf="selection.count > 1">
+        {{selection.count}} regions selected
       </ng-container>
-
       <span>&nbsp;&nbsp;&nbsp;</span>
       <div class="app-toolbar-expanding-separator"></div>
       <button mat-icon-button class="app-toolbar-btn app-tweet-btn app-tweet-export-btn" (click)="download()">

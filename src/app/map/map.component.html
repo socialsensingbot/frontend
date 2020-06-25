@@ -4,8 +4,7 @@
       <mat-icon>close</mat-icon>
     </button>
 
-    <twitter-panel class="twitter-panel" [count]="tweetCount" [geometry]="selectedGeometry" [region]="selectedRegion"
-                   [exceedanceProbability]="exceedanceProbability"
+    <twitter-panel class="twitter-panel" [selection]="selection"
                    [tweets]="tweets" [showHeaderInfo]="twitterPanelHeader"
                    [showTimeline]="showTwitterTimeline"></twitter-panel>
 

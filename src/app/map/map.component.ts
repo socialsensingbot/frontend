@@ -47,6 +47,7 @@ import {MapDataService} from "./data/map-data.service";
 import {ProcessedPolygonData} from "./data/processed-data";
 import {Tweet} from "./twitter/tweet";
 import {toTitleCase} from '../common';
+import {RegionSelection} from './region-selection';
 
 
 const log = new Logger('map');
@@ -59,6 +60,8 @@ const ONE_MINUTE_IN_MILLIS = 60000;
              styleUrls:   ['./map.component.scss']
            })
 export class MapComponent implements OnInit, OnDestroy {
+  private _selectedFeatureNames: string[];
+
   public get activePolyLayerShortName(): PolygonLayerShortName {
     return this._activePolyLayerShortName;
   }
@@ -120,15 +123,12 @@ export class MapComponent implements OnInit, OnDestroy {
   private _polyLayers: MapLayers = {"Local Authority": null, "Coarse Grid": null, "Fine Grid": null};
   private _polyLayersNameMap = {"Local Authority": "county", "Coarse Grid": "coarse", "Fine Grid": "fine"};
   private _numberLayersNameMap = {"Exceedance": "stats", "Tweet Count": "count"};
-  private _basemapControl: BasemapControl = {"numbers": this._numberLayers, "polygon": this._polyLayers};
 
   private _activeNumberLayerShortName: NumberLayerShortName = STATS;
   private _activePolyLayerShortName: PolygonLayerShortName = COUNTY;
 
 
   private _oldClicked: (LeafletMouseEvent | "") = "";
-  private _clicked: (LeafletMouseEvent | "") = "";
-  private _lcontrols: { numbers: Control.Layers, polygon: Control.Layers } = {numbers: null, polygon: null};
   private _geojson: { stats: GeoJSON, count: GeoJSON } = {stats: null, count: null};
 
 
@@ -156,10 +156,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   //The UI state fields
   public tweets: Tweet[] = null;
-  public selectedRegion: string;
-  public selectedGeometry: Geometry;
-  public exceedanceProbability: number;
-  public tweetCount: number;
+  public selection = new RegionSelection();
   public tweetsVisible: boolean = false;
   public twitterPanelHeader: boolean;
   public activity: boolean = false;
@@ -171,8 +168,6 @@ export class MapComponent implements OnInit, OnDestroy {
     startMax: 0
   };
 
-
-  private _feature;
 
   private _loggedIn: boolean;
 
@@ -186,7 +181,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   public showTwitterTimeline: boolean;
-  private _selectedFeatureName: string;
   private _updating: boolean;
   private _stateSub: Subscription;
 
@@ -339,7 +333,6 @@ export class MapComponent implements OnInit, OnDestroy {
     this.activeNumberLayerShortName = numberLayerName;
 
 
-
     // This handles a change to the active_polygon value
     const polygonLayerName: PolygonLayerShortName = typeof active_polygon !== "undefined" ? active_polygon : COUNTY;
     this.activePolyLayerShortName = polygonLayerName;
@@ -362,7 +355,11 @@ export class MapComponent implements OnInit, OnDestroy {
 
     // If a polygon (region) is selected update Twitter panel.
     if (typeof selected !== "undefined") {
-      this._selectedFeatureName = selected;
+      if (Array.isArray(selected)) {
+        this._selectedFeatureNames = selected;
+      } else {
+        this._selectedFeatureNames = [selected];
+      }
       this._twitterIsStale;
     }
 
@@ -481,12 +478,30 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private highlight(e: LeafletMouseEvent, weight: number = 3) {
+    log.debug("Highlighting ", e.target.feature);
     const feature = e.target.feature;
     const count: number = feature.properties.count;
     e.target.setStyle({
                         stroke:      true,
                         weight,
-                        color:       '#EA1E63',
+                        color:       '#000000',
+                        dashArray:   '',
+                        fillOpacity: count > 0 ? 1.0 : 0.5,
+                      });
+
+    if (!Browser.ie && !Browser.opera && !Browser.edge) {
+      e.target.bringToFront();
+    }
+  }
+
+  private unhighlight(e: LeafletMouseEvent) {
+    log.debug("Un-highlighting ", e.target.feature);
+    const feature = e.target.feature;
+    const count: number = feature.properties.count;
+    e.target.setStyle({
+                        stroke:      true,
+                        weight:      1,
+                        color:       '#FFFFFF',
                         dashArray:   '',
                         fillOpacity: count > 0 ? 1.0 : 0.5,
                       });
@@ -500,30 +515,36 @@ export class MapComponent implements OnInit, OnDestroy {
    * Update the Twitter panel by updating the properties it reacts to.
    * @param feature
    */
-  updateTwitterPanel(feature?: Feature) {
-    log.debug(`updateTwitterPanel(${JSON.stringify(feature.properties)})`);
-    this.selectedRegion = toTitleCase(feature.properties.name);
-    this.selectedGeometry = feature.geometry;
-    if (feature.properties.count > 0) {
-      log.debug("Count > 0");
-      this.exceedanceProbability = Math.round(feature.properties.stats * 100) / 100;
-      this.tweetCount = feature.properties.count;
-      log.debug(`this.activePolyLayerShortName=${this.activePolyLayerShortName}`);
-      this.tweets = this._data.tweets(this.activePolyLayerShortName, feature.properties.name);
+  updateTwitterPanel() {
+    const features = this.selection.features();
+    if (features.length === 1) {
+      const feature = features[0];
+      log.debug(`updateTwitterPanel() ${JSON.stringify(feature)}`);
+      if (feature.properties.count > 0) {
+        log.debug("Count > 0");
+        log.debug(`this.activePolyLayerShortName=${this.activePolyLayerShortName}`);
+        this.tweets = this._data.tweets(this.activePolyLayerShortName, this.selection.regionNames());
+        log.debug(this.tweets);
+        this.twitterPanelHeader = true;
+        this.showTwitterTimeline = true;
+        this.showTweets()
+      } else {
+        log.debug(`Count == ${feature.properties.count}`);
+        this.twitterPanelHeader = true;
+        this.showTwitterTimeline = false;
+        this.tweets = [];
+      }
+    } else if (features.length === 0) {
+      this.showTwitterTimeline = false;
+      this.tweets = [];
+      this.hideTweets();
+    } else {
+      this.tweets = this._data.tweets(this.activePolyLayerShortName, this.selection.regionNames());
       log.debug(this.tweets);
       this.twitterPanelHeader = true;
       this.showTwitterTimeline = true;
-      // Hub.dispatch("twitter-panel",{message:"update",event:"update"});
-      this.showTweets()
-    } else {
-      log.debug(`Count == ${feature.properties.count}`);
-      this.twitterPanelHeader = true;
-      this.showTwitterTimeline = false;
-      this.tweetCount = 0;
-      this.exceedanceProbability = 0;
-      this.tweets = [];
-
     }
+
 
   };
 
@@ -533,11 +554,13 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   featureLeft(e: LeafletMouseEvent) {
     log.debug("featureLeft(" + this._activeNumberLayerShortName + ")");
-    this._geojson[this.activeNumberLayerShortName].resetStyle(e.propagatedFrom);
-    if (this._clicked != "") {
-      this.highlight(this._clicked);
+    if (this.selection.isSelected(e.target.feature)) {
+      this.highlight(e);
+    } else {
+      this.unhighlight(e);
     }
   }
+
 
   /**
    * Mouse click event.
@@ -546,15 +569,21 @@ export class MapComponent implements OnInit, OnDestroy {
   featureClicked(e: LeafletMouseEvent) {
     log.debug("featureClicked()");
     log.debug(e.target.feature.properties.name);
-    this._selectedFeatureName = e.target.feature.properties.name;
-    this.updateSearch({selected: e.target.feature.properties.name});
-    this.updateTwitterPanel(e.target.feature);
-    this._oldClicked = this._clicked;
-    this._clicked = e;
-    this.highlight(e, 3);
-    if (this._oldClicked != "") {
-      this.featureLeft(this._oldClicked);
+    if (e.originalEvent.metaKey) {
+      this.selection.toggle(e.target.feature);
+    } else {
+      this._geojson[this.activeNumberLayerShortName].resetStyle(e.propagatedFrom);
+      this.selection.select(e.target.feature);
     }
+    this.updateSearch({selected: this.selection.regionNames()});
+    this._selectedFeatureNames = this.selection.regionNames();
+    this.updateTwitterPanel();
+    if (this.selection.isSelected(e.target.feature)) {
+      this.highlight(e, 3);
+    } else {
+      this.highlight(e);
+    }
+
   }
 
 
@@ -564,14 +593,14 @@ export class MapComponent implements OnInit, OnDestroy {
     // If this feature is referenced in the URL query paramter selected
     // e.g. ?...&selected=powys
     // then highlight it and update Twitter
-    if (feature.properties.name === this._selectedFeatureName) {
+    if (feature.properties.name in this._selectedFeatureNames) {
       log.debug("Matched " + feature.properties.name);
 
       //Put the selection outline around the feature
       layer.setStyle({
                        stroke:      true,
                        weight:      3,
-                       color:       '#EA1E63',
+                       color:       '#000000',
                        dashArray:   '',
                        fillOpacity: feature.properties.count > 0 ? 1.0 : 0.01
                      });
@@ -581,7 +610,7 @@ export class MapComponent implements OnInit, OnDestroy {
       }
 
       //Update the Twitter panel with the changes
-      this._feature = feature;
+      this.selection.select(feature as Feature);
       this.showTweets();
     }
 
@@ -680,12 +709,7 @@ export class MapComponent implements OnInit, OnDestroy {
         log.debug("Null layer " + key);
       }
       if (clear_click) {
-        log.debug("resetLayers() clear_click");
-        if (this._clicked != "") {
-          this._geojson[this.activeNumberLayerShortName].resetStyle(this._clicked.layer);
-        }
-        this._clicked = "";
-        this._feature = null;
+        this.selection.clear();
       }
     }
   }
@@ -898,11 +922,8 @@ export class MapComponent implements OnInit, OnDestroy {
   private async updateTwitter() {
     log.debug("updateTwitter()");
     await this._exec.queue("Update Twitter", ["ready"], () => {
-      if (this._clicked != "") {
-        this.updateTwitterPanel(this._clicked.target.feature);
-      } else if (this._feature) {
-        this.updateTwitterPanel(this._feature);
-      }
+      // this.selectedRegion.toggle(this._clicked.target.feature.properties.name,this._clicked.target.feature.geometry);
+      this.updateTwitterPanel();
     }, Date.now(), false, true, true);
   }
 

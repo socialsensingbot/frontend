@@ -81,7 +81,7 @@ export class AppComponent {
         log.info("Timezone in use: " + this._pref.group.timezone);
         this._rollbar.configure(
           {
-            enabled:      true,
+            enabled:      environment.rollbar,
             // environment: environment.name,
             captureIp:    'anonymize',
             code_version: environment.version,
