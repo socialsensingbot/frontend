@@ -587,7 +587,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   private isMultiSelect(e: LeafletMouseEvent) {
-    return (getOS() === "Mac OS" && e.originalEvent.metaKey) || (getOS() !== "Mac OS" && e.originalEvent.altKey);
+    return (getOS() === "Mac OS" && e.originalEvent.metaKey) || (getOS() !== "Mac OS" && e.originalEvent.ctrlKey);
   }
 
   onEachFeature(feature: geojson.Feature<geojson.GeometryObject, any>, layer: GeoJSON) {
