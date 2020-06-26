@@ -110,6 +110,11 @@ export class MapComponent implements OnInit, OnDestroy {
   private _polyLayers: MapLayers = {"Local Authority": null, "Coarse Grid": null, "Fine Grid": null};
   private _polyLayersNameMap = {"Local Authority": "county", "Coarse Grid": "coarse", "Fine Grid": "fine"};
   private _numberLayersNameMap = {"Exceedance": "stats", "Tweet Count": "count"};
+  private _polygonData: ByRegionType<PolygonData | geojson.GeoJsonObject> = {
+    county: fgsData,
+    coarse: coarseData,
+    fine:   fineData
+  };
 
   private _activeNumberLayerShortName: NumberLayerShortName = STATS;
   private _activePolyLayerShortName: PolygonLayerShortName = COUNTY;
@@ -371,7 +376,7 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   private async init(map: Map) {
     log.debug("init");
-    const zoomControl = map.zoomControl.remove();
+    map.zoomControl.remove();
 
     //define the layers for the different counts
     this._numberLayers["Exceedance"] = layerGroup().addTo(map);
@@ -386,16 +391,15 @@ export class MapComponent implements OnInit, OnDestroy {
     this._loggedIn = await Auth.currentAuthenticatedUser() != null;
 
     this._exec.changeState("map-init");
-
-
     await this.load(true);
-    this._searchParams.subscribe(params => {
+    this._searchParams.subscribe(async params => {
 
       if (!this._params) {
         this._params = true;
         this._exec.queue("Initial Search Params", ["no-params"],
                          async () => {
                            this.updateMapFromQueryParams(params);
+
                            //Listeners to push map state into URL
                            map.addEventListener("dragend", () => {
                              return this._zone.run(
@@ -407,26 +411,21 @@ export class MapComponent implements OnInit, OnDestroy {
                              return this._zone.run(() => this.updateSearch({zoom: this._map.getZoom()}));
                            });
 
-
                            this._exec.changeState("ready");
-                           this.updateSearch({
-                                               min_time: Math.round(this._dateMin),
-                                               max_time: Math.round(this._dateMax)
-                                             });
-                           // map.addControl(zoomControl);
-                           // this.addToggleControls();
-                           return this.updateLayers("From Parameters").then(() => this._twitterIsStale = true);
+                           return this.updateLayers("From Parameters")
+                                      .then(() => this._twitterIsStale = true);
 
                          });
       } else {
         if (this._popState) {
-          log.debug("POP STATE detected during URL query params change.");
+          log.debug("POP STATE detected before URL query params change.");
           this._popState = false;
           this.activity = true;
-          this.updateMapFromQueryParams(params);
-          this.resetLayers(true);
-          return this.updateLayers("From Back Button")
-                     .then(() => this._twitterIsStale = true).then(() => this.activity = false);
+          await this.updateMapFromQueryParams(params);
+          await this.resetLayers(true);
+          return this.updateLayers("Pop State")
+                     .then(() => this._twitterIsStale = true)
+                     .then(() => this.activity = false);
         }
       }
 
@@ -437,23 +436,11 @@ export class MapComponent implements OnInit, OnDestroy {
     this._loadTimer = timer(ONE_MINUTE_IN_MILLIS, ONE_MINUTE_IN_MILLIS).subscribe(() => this.load());
   }
 
-  // private addToggleControls() {
-  //   log.debug("addToggleControls()");
-  //   for (let key in this._basemapControl) {
-  //     // noinspection JSUnfilteredForInLoop
-  //     this._lcontrols[key] = control.layers(this._basemapControl[key], {}).addTo(this._map);
-  //     // noinspection JSUnfilteredForInLoop
-  //     this._lcontrols[key].setPosition('topleft');
-  //   }
-  //
-  // }
-
-
   /**
    * When the user places their mouse over a feature (region) this is called.
    * @param e
    */
-  featureEntered(e: LeafletMouseEvent) {
+  private featureEntered(e: LeafletMouseEvent) {
     log.debug("featureEntered()");
     const feature = e.target.feature;
     const exceedanceProbability: number = Math.round(feature.properties.stats * 100) / 100;
@@ -514,7 +501,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * Update the Twitter panel by updating the properties it reacts to.
    * @param feature
    */
-  updateTwitterPanel() {
+  private updateTwitterPanel() {
     const features = this.selection.features();
     if (features.length === 1) {
       const feature = features[0];
@@ -551,7 +538,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * Mouse out event.
    * @param e
    */
-  featureLeft(e: LeafletMouseEvent) {
+  private featureLeft(e: LeafletMouseEvent) {
     log.debug("featureLeft(" + this._activeNumberLayerShortName + ")");
     if (this.selection.isSelected(e.target.feature)) {
       this.highlight(e.target);
@@ -565,7 +552,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * Mouse click event.
    * @param e
    */
-  featureClicked(e: LeafletMouseEvent) {
+  private featureClicked(e: LeafletMouseEvent) {
     log.debug("featureClicked()");
     log.debug(e.target.feature.properties.name);
     if (this.isMultiSelect(e)) {
@@ -590,7 +577,7 @@ export class MapComponent implements OnInit, OnDestroy {
     return (getOS() === "Mac OS" && e.originalEvent.metaKey) || (getOS() !== "Mac OS" && e.originalEvent.ctrlKey);
   }
 
-  onEachFeature(feature: geojson.Feature<geojson.GeometryObject, any>, layer: GeoJSON) {
+  private onEachFeature(feature: geojson.Feature<geojson.GeometryObject, any>, layer: GeoJSON) {
     log.verbose("onEachFeature()");
 
     // If this feature is referenced in the URL query parameters selected
@@ -689,7 +676,7 @@ export class MapComponent implements OnInit, OnDestroy {
    *
    * @param clear_click clears the selected polygon
    */
-  resetLayers(clear_click) {
+  private resetLayers(clear_click) {
     log.debug("resetLayers(" + clear_click + ")");
     // this.hideTweets();
     for (let key of numberLayerFullNames) {
@@ -756,11 +743,6 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
 
-  private _polygonData: ByRegionType<PolygonData | geojson.GeoJsonObject> = {
-    county: fgsData,
-    coarse: coarseData,
-    fine:   fineData
-  };
 
   private shortNumberLayerName(key: NumberLayerFullName): NumberLayerShortName {
     return <NumberLayerShortName>this._numberLayersNameMap[key];
@@ -770,7 +752,11 @@ export class MapComponent implements OnInit, OnDestroy {
    * Read the live.json data file and process contents.
    */
   async load(first: boolean = false) {
-    log.debug("load()");
+    log.debug(`load(${first})`);
+    if (!this._loggedIn) {
+      log.warn("User logged out, not performing load.");
+      return;
+    }
     this.activity = true;
     try {
       await this._data.load();
@@ -809,7 +795,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                 try {
 
                                   this._exec.changeState("data-refresh");
-                                  await this._data.updateData(this._dateMin, this._dateMax);
+                                  await this._data.update(this._dateMin, this._dateMax);
                                   this.clearMapFeatures();
                                   this.updateRegionData();
                                   this.resetLayers(false);
@@ -862,26 +848,9 @@ export class MapComponent implements OnInit, OnDestroy {
   public sliderChange(range: DateRange) {
     const {lower, upper} = range;
     log.debug("sliderChange(" + lower + "->" + upper + ")");
-    // log.debug(`
-    // sliderChange(range from ${lower} to ${upper})
-    //
-    // Min: ${this.sliderOptions.startMin} => ${lower}
-    // Min (Tics delta): ${this.sliderOptions.startMin - lower}
-    // Min (Mins delta): ${(this._dateMin - this._data.entryDate(lower).getTime()) / ONE_MINUTE_IN_MILLIS}
-    // Min: ${this._dateMin} => ${this._data.entryDate(lower).getTime()}
-    //
-    //
-    // Max: ${this.sliderOptions.startMax} => ${upper}
-    // Max (Tics delta): ${this.sliderOptions.startMax - upper}
-    // Max (Mins delta): ${(this._dateMax - this._data.entryDate(upper).getTime()) / ONE_MINUTE_IN_MILLIS}
-    // Max: ${this._dateMax} => ${this._data.entryDate(upper).getTime()}
-    //
-    //
-    // `);
     this._dateMax = this._data.entryDate(upper).getTime();
     this._dateMin = this._data.entryDate(lower).getTime();
     this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
-    // this.sliderOptions = {...this.sliderOptions, startMin: lower, startMax: upper};
     this._sliderIsStale = true;
 
   }

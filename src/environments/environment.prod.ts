@@ -5,7 +5,7 @@ export const environment = {
   // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
   timezone:         "UTC",
   locale:           'en-GB',
-  toolbarColor:     'accent',
+  toolbarColor:     'primary',
   rollbar:          true,
   multipleSessions: false,
   hmr:              false,

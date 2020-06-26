@@ -8,7 +8,7 @@ export const environment = {
   production:       false,
   hmr:              false,
   rollbar:          false,
-  toolbarColor:     'accent',
+  toolbarColor:     'primary',
   // timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   timezone:         "UTC",
   multipleSessions: false,

@@ -156,7 +156,7 @@ export class MapDataService {
    *
    * @param tweetInfo the data from the server.
    */
-  public async updateData(_dateMin: number, _dateMax: number) {
+  public async update(_dateMin: number, _dateMax: number) {
     log.debug("update()")
     if (this._updating) {
       log.debug("Update already running.")
