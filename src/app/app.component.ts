@@ -9,7 +9,7 @@ import {NotificationService} from "./services/notification.service";
 import {APIService, OnCreateUserSessionSubscription} from "./API.service";
 import {SessionService} from "./auth/session.service";
 import * as Rollbar from "rollbar";
-import {RollbarService} from "./rollbar";
+import {RollbarService} from "./error";
 
 
 const log = new Logger('app');

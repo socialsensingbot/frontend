@@ -15,7 +15,7 @@ function twitterLoad(selector) {
   if ((window as any).twttr && (window as any).twttr.widgets) {
     setTimeout(() => {
       (window as any).twttr.widgets.load($(selector)[0]);
-    }, 50);
+    }, Math.random() * 500 + 100);
   } else {
     setTimeout(() => twitterLoad(selector), 500);
   }
@@ -95,7 +95,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
   private _destroyed: boolean = false;
 
   // Infinite scroll start: https://github.com/socialsensingbot/frontend/issues/10
-  private readonly PAGE_SIZE = 20;
+  private readonly PAGE_SIZE = 5;
   private readonly INITIAL_PAGES = 3;
   public scrollDistance = 4;
   public scrollUpDistance = 4;
@@ -232,31 +232,12 @@ export class TweetListComponent implements OnInit, OnDestroy {
     }
   }
 
-  private appearTweet(i: number) {
-    if (!this.loaded[i]) {
-      if ($(".atr-" + i + " blockquote").has("a")) {
-        log.debug("Loading tweet " + i);
-        twitterLoad(i);
-        this.loaded[i] = true;
-      } else {
-        log.debug("Skipping " + i);
-      }
-    }
-  }
-
   public show($event: any) {
     log.debug($event);
   }
 
-  public ngOnChanges(changes: SimpleChanges): void {
-    log.debug(changes);
-    // (window as any).twttr.widgets.load($("#tinfo")[0]);
-  }
-
   public sender(tweet) {
-
     return tweet.sender;
-
   }
 
   public isPlaceholder(tweet) {

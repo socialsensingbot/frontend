@@ -3,31 +3,18 @@ import {fgsData} from './county_bi';
 import {coarseData} from './coarse_bi';
 import {fineData} from './fine_bi';
 import {Auth, Logger} from 'aws-amplify';
-import {
-  Browser,
-  control,
-  Control,
-  GeoJSON,
-  latLng, Layer,
-  LayerGroup,
-  layerGroup,
-  LeafletMouseEvent,
-  Map,
-  tileLayer,
-} from 'leaflet';
+import {Browser, GeoJSON, latLng, LayerGroup, layerGroup, LeafletMouseEvent, Map, tileLayer,} from 'leaflet';
 import 'jquery-ui/ui/widgets/slider.js';
 import {ActivatedRoute, NavigationStart, Params, Router} from '@angular/router';
 import {Observable, Subscription, timer} from "rxjs";
 import * as geojson from "geojson";
 import {DateRange, DateRangeSliderOptions} from "./date-range-slider/date-range-slider.component";
-import {LayerStyleService, selectedColor, unselectedColor} from "./services/layer-style.service";
+import {LayerStyleService} from "./services/layer-style.service";
 import {NotificationService} from "../services/notification.service";
 import {
-  BasemapControl,
   ByRegionType,
   COUNTY,
   Feature,
-  Geometry,
   MapLayers,
   NumberLayerFullName,
   numberLayerFullNames,
@@ -46,7 +33,7 @@ import {ColorCodeService} from "./services/color-code.service";
 import {MapDataService} from "./data/map-data.service";
 import {ProcessedPolygonData} from "./data/processed-data";
 import {Tweet} from "./twitter/tweet";
-import {toTitleCase, getOS} from '../common';
+import {getOS, toTitleCase} from '../common';
 import {RegionSelection} from './region-selection';
 import {PreferenceService} from '../pref/preference.service';
 
@@ -61,7 +48,6 @@ const ONE_MINUTE_IN_MILLIS = 60000;
              styleUrls:   ['./map.component.scss']
            })
 export class MapComponent implements OnInit, OnDestroy {
-  private _selectedFeatureNames: string[] = [];
 
   public get activePolyLayerShortName(): PolygonLayerShortName {
     return this._activePolyLayerShortName;
@@ -139,10 +125,11 @@ export class MapComponent implements OnInit, OnDestroy {
   private _dateMin = 0;
   private _absoluteTime: number;
 
+
   /**
-   * The current URL parameters, this is updated by a subscriber to this.route.queryParams.
+   * True if the query parameters have been processed.
    */
-  private _params: boolean = null;
+  private _params: boolean = false;
   /**
    * A subscription to the URL search parameters state.
    */
@@ -154,7 +141,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   //The UI state fields
   public tweets: Tweet[] = null;
-  public selection = new RegionSelection();
+  private _selectedFeatureNames: string[] = [];
   public tweetsVisible: boolean = false;
   public twitterPanelHeader: boolean;
   public activity: boolean = false;
@@ -167,19 +154,30 @@ export class MapComponent implements OnInit, OnDestroy {
   };
 
 
+  public selection = new RegionSelection();
+
+
   private _loggedIn: boolean;
 
 
   // Timed action triggers //
-  private _twitterIsStale: boolean;
+  private _twitterIsStale: boolean = false;
+  private _sliderIsStale: boolean = false;
 
   // Timers for timed actions //
   private _twitterUpdateTimer: Subscription;
+  private _sliderUpdateTimer: Subscription;
   private _loadTimer: Subscription;
-
-
   public showTwitterTimeline: boolean;
+
+  /**
+   * True during a layer update
+   */
   private _updating: boolean;
+
+  /**
+   * A subscription to the UI execution state.
+   */
   private _stateSub: Subscription;
 
 
@@ -483,7 +481,7 @@ export class MapComponent implements OnInit, OnDestroy {
     target.setStyle({
                       stroke:      true,
                       weight,
-                      color:       selectedColor,
+                      color:       '#B1205F',
                       opacity:     1,
                       dashArray:   '',
                       fillOpacity: count > 0 ? 1.0 : 0.5,
@@ -502,7 +500,7 @@ export class MapComponent implements OnInit, OnDestroy {
                       stroke:      true,
                       weight:      1,
                       opacity:     0.5,
-                      color:       unselectedColor,
+                      color:       'white',
                       dashArray:   '',
                       fillOpacity: count > 0 ? 1.0 : 0.5,
                     });
@@ -631,10 +629,17 @@ export class MapComponent implements OnInit, OnDestroy {
         this.ready = true;
       }
     });
-    this._twitterUpdateTimer = timer(0, 500).subscribe(async () => {
+
+    this._twitterUpdateTimer = timer(0, 3000).subscribe(async () => {
       if (this._twitterIsStale) {
-        await this.updateTwitter();
         this._twitterIsStale = false;
+        await this.updateTwitter();
+      }
+    });
+    this._sliderUpdateTimer = timer(0, 1000).subscribe(async () => {
+      if (this._sliderIsStale) {
+        this._sliderIsStale = false;
+        await this.updateFromSlider();
       }
     });
 
@@ -666,6 +671,9 @@ export class MapComponent implements OnInit, OnDestroy {
     }
     if (this._twitterUpdateTimer) {
       this._twitterUpdateTimer.unsubscribe();
+    }
+    if (this._sliderUpdateTimer) {
+      this._sliderUpdateTimer.unsubscribe();
     }
     if (this._stateSub) {
       this._stateSub.unsubscribe();
@@ -873,17 +881,23 @@ export class MapComponent implements OnInit, OnDestroy {
     this._dateMax = this._data.entryDate(upper).getTime();
     this._dateMin = this._data.entryDate(lower).getTime();
     this.sliderOptions = {...this.sliderOptions, startMin: lower, startMax: upper};
-    //NB: The following are executed asynchronously
-    this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
-    this.updateLayers("Slider Change");
-    this._twitterIsStale = true;
+
 
   }
 
   /**
-   * Update the date slider after a data update.
+   * This is called if this._sliderIsStale === true;
    */
-  async updateSliderFromData() {
+  private async updateFromSlider() {
+    await this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
+    await this.updateLayers("Slider Change");
+    this._twitterIsStale = true;
+  }
+
+  /**
+   * Update the date slider after a data update from the server.
+   */
+  private async updateSliderFromData() {
     log.debug("updateSliderFromData()");
     this._absoluteTime = this._data.lastEntryDate().getTime();
     this._dateMin = Math.max(this._dateMin,
@@ -905,7 +919,7 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   public sliderChangeOnEnd($event: any) {
     log.debug("sliderChangeOnEnd()");
-
+    this._sliderIsStale = true;
   }
 
   /**
@@ -924,15 +938,6 @@ export class MapComponent implements OnInit, OnDestroy {
     this._data.download(this.activePolyLayerShortName,
                         this._polygonData[this.activePolyLayerShortName] as PolygonData);
   }
-
-  public polyLayers() {
-    return [["Local Authority", "county"], ["Coarse Grid", "coarse"], ["Fine Grid", "fine"]];
-  }
-
-  public numberLayers() {
-    return [["Exceedance", "stats"], ["Tweet Count", "count"]];
-  }
-
   public zoomIn() {
     if (this._map.getZoom() < 18) {
       this._map.setZoom(this._map.getZoom() + 1);
@@ -949,3 +954,4 @@ export class MapComponent implements OnInit, OnDestroy {
     }
   }
 }
+

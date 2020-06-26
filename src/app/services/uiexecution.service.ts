@@ -2,7 +2,7 @@ import {EventEmitter, Inject, Injectable} from '@angular/core';
 import {Observable, Subscription, timer} from "rxjs";
 import {Auth, Logger} from "aws-amplify";
 import {NotificationService} from "./notification.service";
-import {RollbarService} from "../rollbar";
+import {RollbarService} from "../error";
 import * as Rollbar from "rollbar";
 
 const log = new Logger('uiexecution');

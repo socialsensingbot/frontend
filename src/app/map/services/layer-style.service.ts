@@ -1,5 +1,4 @@
-import { Injectable } from '@angular/core';
-import {Browser} from "leaflet";
+import {Injectable} from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +29,7 @@ export function getFeatureStyle(values, colors, layer_type, feature){
       fillColor:   getColor(values, colors, d),
       weight:      1,
       opacity:     0.5,
-      color:       unselectedColor,
+      color:       'white',
       dashArray:   '',
       fillOpacity: getFill(d),
       className:   ("x-feature-name-" + feature.properties.name).replace(/ +/g, "-")
@@ -38,5 +37,5 @@ export function getFeatureStyle(values, colors, layer_type, feature){
   }
 }
 
-export const selectedColor: string = '#B1205F';
-export const unselectedColor: string = 'white';
+
+

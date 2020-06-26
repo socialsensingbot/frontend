@@ -37,7 +37,7 @@ import {HelpButtonComponent} from './help/help-button.component';
 import {HelpSpanComponent} from "./help/help-span.component";
 import {HelpDialogComponent} from './help/help-dialog.component';
 import {TweetListComponent} from './map/twitter/tweet-list/tweet-list.component';
-import {RollbarErrorHandler, rollbarFactory, RollbarService} from "./rollbar";
+import {RollbarErrorHandler, rollbarFactory, RollbarService} from "./error";
 
 
 @NgModule({

@@ -1,5 +1,8 @@
-<div class="slider-surround custom-slider" *ngIf="timeKeyedData">
-  <ng5-slider [manualRefresh]="refresh" [(value)]="lowerValue" [(highValue)]="upperValue" [options]="sliderOptions"
+<div class="date-range-slider-surround" *ngIf="timeKeyedData">
+  <ng5-slider [manualRefresh]="refresh" [(value)]="lowerValue"
+              [(highValue)]="upperValue"
+              [options]="sliderOptions"
+              (userChange)="change($event)"
               (userChangeEnd)="onEnd.emit($event)"></ng5-slider>
 </div>
 
