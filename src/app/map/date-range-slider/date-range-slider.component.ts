@@ -99,17 +99,19 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
    * @see https://angular-slider.github.io/ng5-slider
    */
   public sliderOptions: Options = {
-    floor:               0,
-    ceil:                0,
-    step:                60,
-    showTicks:           false,
+    floor:                0,
+    ceil:                 0,
+    step:                 60,
+    showTicks:            false,
     // handleDimension: 12,
-    inputEventsInterval: 500,
-    mouseEventsInterval: 500,
-    ticksTooltip:        (value: number): string => {
+    inputEventsInterval:  100,
+    mouseEventsInterval:  100,
+    outputEventsInterval: 100,
+    touchEventsInterval:  100,
+    ticksTooltip:         (value: number): string => {
       return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0, "") : ""
     },
-    translate:           (value: number, label: LabelType): string => {
+    translate:            (value: number, label: LabelType): string => {
       if (typeof this.timeKeyedData !== "undefined" && typeof this.timeKeyedData[-value] !== "undefined") {
         switch (label) {
           case LabelType.Low:

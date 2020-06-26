@@ -41,7 +41,11 @@ export class RollbarErrorHandler implements ErrorHandler {
     if (environment.rollbar) {
       this.rollbar.error(err.originalError || err);
     } else {
-      this._notify.error(err.originalError || err);
+      if (environment.showErrors) {
+        this._notify.error(err.originalError || err);
+      } else {
+        console.error(err.originalError || err)
+      }
     }
   }
 }

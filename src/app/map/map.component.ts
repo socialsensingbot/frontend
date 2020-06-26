@@ -630,13 +630,13 @@ export class MapComponent implements OnInit, OnDestroy {
       }
     });
 
-    this._twitterUpdateTimer = timer(0, 3000).subscribe(async () => {
+    this._twitterUpdateTimer = timer(0, 1000).subscribe(async () => {
       if (this._twitterIsStale) {
         this._twitterIsStale = false;
         await this.updateTwitter();
       }
     });
-    this._sliderUpdateTimer = timer(0, 1000).subscribe(async () => {
+    this._sliderUpdateTimer = timer(0, 100).subscribe(async () => {
       if (this._sliderIsStale) {
         this._sliderIsStale = false;
         await this.updateFromSlider();
@@ -862,26 +862,27 @@ export class MapComponent implements OnInit, OnDestroy {
   public sliderChange(range: DateRange) {
     const {lower, upper} = range;
     log.debug("sliderChange(" + lower + "->" + upper + ")");
-    log.debug(`
-    sliderChange(range from ${lower} to ${upper})
-
-    Min: ${this.sliderOptions.startMin} => ${lower}
-    Min (Tics delta): ${this.sliderOptions.startMin - lower}
-    Min (Mins delta): ${(this._dateMin - this._data.entryDate(lower).getTime()) / ONE_MINUTE_IN_MILLIS}
-    Min: ${this._dateMin} => ${this._data.entryDate(lower).getTime()}
-
-
-    Max: ${this.sliderOptions.startMax} => ${upper}
-    Max (Tics delta): ${this.sliderOptions.startMax - upper}
-    Max (Mins delta): ${(this._dateMax - this._data.entryDate(upper).getTime()) / ONE_MINUTE_IN_MILLIS}
-    Max: ${this._dateMax} => ${this._data.entryDate(upper).getTime()}
-
-
-    `);
+    // log.debug(`
+    // sliderChange(range from ${lower} to ${upper})
+    //
+    // Min: ${this.sliderOptions.startMin} => ${lower}
+    // Min (Tics delta): ${this.sliderOptions.startMin - lower}
+    // Min (Mins delta): ${(this._dateMin - this._data.entryDate(lower).getTime()) / ONE_MINUTE_IN_MILLIS}
+    // Min: ${this._dateMin} => ${this._data.entryDate(lower).getTime()}
+    //
+    //
+    // Max: ${this.sliderOptions.startMax} => ${upper}
+    // Max (Tics delta): ${this.sliderOptions.startMax - upper}
+    // Max (Mins delta): ${(this._dateMax - this._data.entryDate(upper).getTime()) / ONE_MINUTE_IN_MILLIS}
+    // Max: ${this._dateMax} => ${this._data.entryDate(upper).getTime()}
+    //
+    //
+    // `);
     this._dateMax = this._data.entryDate(upper).getTime();
     this._dateMin = this._data.entryDate(lower).getTime();
-    this.sliderOptions = {...this.sliderOptions, startMin: lower, startMax: upper};
-
+    this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
+    // this.sliderOptions = {...this.sliderOptions, startMin: lower, startMax: upper};
+    this._sliderIsStale = true;
 
   }
 
@@ -889,7 +890,6 @@ export class MapComponent implements OnInit, OnDestroy {
    * This is called if this._sliderIsStale === true;
    */
   private async updateFromSlider() {
-    await this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
     await this.updateLayers("Slider Change");
     this._twitterIsStale = true;
   }
@@ -919,7 +919,7 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   public sliderChangeOnEnd($event: any) {
     log.debug("sliderChangeOnEnd()");
-    this._sliderIsStale = true;
+
   }
 
   /**

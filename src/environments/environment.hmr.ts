@@ -10,5 +10,7 @@ export const environment = {
   confirm:          {
     email:    '',
     password: ''
-  }
+  },
+  showErrors:       false
+
 };
