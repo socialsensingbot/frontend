@@ -1,4 +1,4 @@
-describe('#104 Slider and tweet interaction : https://github.com/socialsensingbot/frontend/issues/104',
+describe('#126 Pop state : https://github.com/socialsensingbot/frontend/issues/126',
          function () {
            beforeEach(function () {
              cy.visit('http://localhost:4200/map');

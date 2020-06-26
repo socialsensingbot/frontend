@@ -27,6 +27,8 @@ import "cypress-graphql-mock";
 
 const LONG_TIMEOUT = 60000;
 const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
+const multipleKey = Cypress.platform === "darwin" ? "{command}" : "{ctrl}";
+
 
 Cypress.Commands.add("login", (username = "cypress1@example.com") => {
   //Login
@@ -169,6 +171,15 @@ Cypress.Commands.add("moveMinDateSliderRight", (times) => {
   }
 });
 
+Cypress.Commands.add("multiSelectRegions", (regions) => {
+  for (let region of regions) {
+    const path = `div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-${region}`;
+    cy.get("body").type(multipleKey, {release: false, force: true})
+    cy.get(path).click({force: true});
+    cy.wait(1000);
+    cy.get("body").type(multipleKey, {release: true, force: true})
+  }
+});
 Cypress.Commands.add("pushStateDelay", () => {
   cy.wait(500);
 });
