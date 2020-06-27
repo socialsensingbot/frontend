@@ -158,7 +158,7 @@ Cypress.Commands.add("unignoreTweet", (tweetSelector) => {
 Cypress.Commands.add("moveMinDateSliderLeft", (times) => {
   for (let i = 0; i < times; i++) {
     cy.get(".ng5-slider-pointer-min").type('{pagedown}');
-    cy.wait(1000);
+    cy.wait(2000);
   }
 });
 
