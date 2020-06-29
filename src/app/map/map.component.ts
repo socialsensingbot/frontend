@@ -24,7 +24,7 @@ import {
   PolygonLayerShortName,
   polygonLayerShortNames,
   Properties,
-  STATS
+  STATS, numberLayerShortNames
 } from "./types";
 import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
@@ -188,6 +188,7 @@ export class MapComponent implements OnInit, OnDestroy {
   public options: any = {
     layers: [
       tileLayer(
+        // tslint:disable-next-line:max-line-length
         "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
         {
           maxZoom:     18,
@@ -228,7 +229,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
   /**
    * Called when the map element has finished initialising.
-   * @param map
    */
   onMapReady(map: Map) {
     log.debug("onMapReady");
@@ -322,7 +322,7 @@ export class MapComponent implements OnInit, OnDestroy {
       newCentre = latLng(lat, lng);
     }
     if (typeof zoom !== "undefined") {
-      viewChange = newZoom != zoom || viewChange;
+      viewChange = newZoom !== zoom || viewChange;
       newZoom = zoom;
     }
     if (viewChange) {
@@ -436,7 +436,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
   /**
    * When the user places their mouse over a feature (region) this is called.
-   * @param e
    */
   private featureEntered(e: LeafletMouseEvent) {
     log.debug("featureEntered()");
@@ -451,7 +450,7 @@ export class MapComponent implements OnInit, OnDestroy {
     if (count > 0) {
       text = text +
         `<div>Count: ${count}</div>`;
-      if ("" + exceedanceProbability != "NaN") {
+      if ("" + exceedanceProbability !== "NaN") {
         text = text + `<div>Exceedance: ${exceedanceProbability}</div>`;
       }
     }
@@ -497,7 +496,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
   /**
    * Update the Twitter panel by updating the properties it reacts to.
-   * @param feature
    */
   private updateTwitterPanel() {
     const features = this.selection.features();
@@ -534,7 +532,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
   /**
    * Mouse out event.
-   * @param e
    */
   private featureLeft(e: LeafletMouseEvent) {
     log.debug("featureLeft(" + this._activeNumberLayerShortName + ")");
@@ -548,7 +545,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
   /**
    * Mouse click event.
-   * @param e
    */
   private featureClicked(e: LeafletMouseEvent) {
     log.debug("featureClicked()");
@@ -672,29 +668,29 @@ export class MapComponent implements OnInit, OnDestroy {
   /**
    * Reset the polygon layers.
    *
-   * @param clear_click clears the selected polygon
+   * @param clearClick clears the selected polygon
    */
-  private resetLayers(clear_click) {
-    log.debug("resetLayers(" + clear_click + ")");
+  private resetLayers(clearClick) {
+    log.debug("resetLayers(" + clearClick + ")");
     // this.hideTweets();
-    for (const key of numberLayerFullNames) {
+    for (const key of numberLayerShortNames) {
       log.debug(key);
-      const layerGroup = this._numberLayers[key];
-      if (layerGroup != null) {
+      const curLayerGroup = this._numberLayers[key];
+      if (curLayerGroup != null) {
         // noinspection JSUnfilteredForInLoop
-        layerGroup.clearLayers();
+        curLayerGroup.clearLayers();
 
         // noinspection JSUnfilteredForInLoop
-        const shortNumberLayerName = this.shortNumberLayerName(key);
+        const shortNumberLayerName = key;
         this._geojson[shortNumberLayerName] = new GeoJSON(
           this._polygonData[this.activePolyLayerShortName] as geojson.GeoJsonObject, {
             style:         (feature) => this._color.colorFunctions[shortNumberLayerName].getFeatureStyle(feature),
             onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
-          }).addTo(layerGroup);
+          }).addTo(curLayerGroup);
       } else {
         log.debug("Null layer " + key);
       }
-      if (clear_click) {
+      if (clearClick) {
         this.selection.clear();
       }
     }
@@ -706,8 +702,8 @@ export class MapComponent implements OnInit, OnDestroy {
   private clearMapFeatures() {
     for (const regionType of this._data.regionTypes()) { // counties, coarse, fine
       const features = (this._polygonData[regionType as PolygonLayerShortName] as PolygonData).features;
-      for (let i = 0; i < features.length; i++) {
-        const properties = features[i].properties;
+      for (const feature of features) {
+        const properties = feature.properties;
         const place = properties.name;
         if (place in this._data.places(regionType as PolygonLayerShortName)) {
           properties.count = 0;
@@ -725,8 +721,8 @@ export class MapComponent implements OnInit, OnDestroy {
       console.assert(polygonLayerShortNames.includes(regionType as PolygonLayerShortName));
       const regionData: PolygonData = (this._polygonData)[regionType] as PolygonData;
       const features: Feature[] = regionData.features;
-      for (let i = 0; i < features.length; i++) {
-        const featureProperties: Properties = features[i].properties;
+      for (const feature of features) {
+        const featureProperties: Properties = feature.properties;
         const place = featureProperties.name;
         const tweetRegionInfo: ProcessedPolygonData = this._data.regionData(regionType);
         if (tweetRegionInfo.hasPlace(place)) {
@@ -739,13 +735,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
   }
-
-
-
-  private shortNumberLayerName(key: NumberLayerFullName): NumberLayerShortName {
-    return this._numberLayersNameMap[key] as NumberLayerShortName;
-  }
-
   /**
    * Read the live.json data file and process contents.
    */
