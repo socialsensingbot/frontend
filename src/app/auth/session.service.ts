@@ -138,7 +138,8 @@ export class SessionService implements OnInit, OnDestroy {
     };
 
 
-    return await API.graphql(
+    // @ts-ignore
+    return (await API.graphql(
       graphqlOperation(
         `subscription OnCreateUserSession($owner: String!) {
         onCreateUserSession(owner: $owner) {
@@ -148,7 +149,7 @@ export class SessionService implements OnInit, OnDestroy {
           owner
         }
       }`
-        , {owner: userInfo.username})).subscribe(onSession);
+        , {owner: userInfo.username})) as any).subscribe(onSession);
   }
 
   /**

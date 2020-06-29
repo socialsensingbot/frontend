@@ -1,10 +1,7 @@
-declare module 'graphql/language/ast' {
-  export type DocumentNode = any;
-}
 import {enableProdMode} from '@angular/core';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import PubSub from '@aws-amplify/pubsub';
-import Amplify, {Auth, Logger, Storage} from 'aws-amplify';
+import Amplify, {Logger} from 'aws-amplify';
 import API from '@aws-amplify/api';
 import awsconfig from './aws-exports';
 

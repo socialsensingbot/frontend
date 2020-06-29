@@ -17,6 +17,16 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "lodash",
+              "crypto-js",
+              "aws-sdk",
+              "@aws-sdk/protocol-http",
+              "@aws-sdk/url-parser-node",
+              "@aws-sdk/util-format-url",
+              "@aws-sdk/fetch-http-handler",
+              "@aws-sdk/util-create-request"
+            ],
             "outputPath": "dist/frontend",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -41,7 +51,9 @@
               "./node_modules/leaflet/dist/leaflet.css",
               "./node_modules/jquery-ui/themes/base/selectable.css"
             ],
-            "scripts": [ "node_modules/jquery/dist/jquery.min.js"]
+            "scripts": [
+              "node_modules/jquery/dist/jquery.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -154,5 +166,8 @@
       }
     }
   },
-  "defaultProject": "frontend"
+  "defaultProject": "frontend",
+  "cli": {
+    "analytics": false
+  }
 }
