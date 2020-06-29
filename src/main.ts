@@ -1,8 +1,6 @@
 declare module 'graphql/language/ast' {
   export type DocumentNode = any;
 }
-
-import 'hammerjs';
 import {enableProdMode} from '@angular/core';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import PubSub from '@aws-amplify/pubsub';

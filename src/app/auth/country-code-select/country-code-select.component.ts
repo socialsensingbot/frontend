@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {CountryCode, CountryCodes} from './country-codes';
-import {MatBottomSheetRef} from '@angular/material';
+import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 
 @Component({
              selector:    'app-country-code-select',
