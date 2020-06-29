@@ -1,5 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+//@ts-nocheck
 //  This file was automatically generated and should not be edited.
 import {Injectable} from "@angular/core";
 import API, {graphqlOperation} from "@aws-amplify/api";
@@ -2130,6 +2131,7 @@ export class APIService {
     return <ListTwitterUserIgnoresQuery>response.data.listTwitterUserIgnores;
   }
 
+  // @ts-ignore
   OnCreateUserPreferencesListener: Observable<OnCreateUserPreferencesSubscription> = API.graphql(
     graphqlOperation(
       `subscription OnCreateUserPreferences($owner: String!) {
@@ -2538,3 +2540,5 @@ export class APIService {
     )
   ) as Observable<OnDeleteTwitterUserIgnoreSubscription>;
 }
+
+// @ts-ignore-end
