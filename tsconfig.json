@@ -12,7 +12,7 @@
     "importHelpers": true,
     "skipLibCheck": true,
     "strict": false,
-    "target": "es5",
+    "target": "es2015",
     "typeRoots": [
       "node_modules/@types"
     ],

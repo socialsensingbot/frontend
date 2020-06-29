@@ -15,7 +15,7 @@ import {
   ByRegionType,
   COUNTY,
   Feature,
-  MapLayers,
+  PolyLayers,
   NumberLayerFullName,
   numberLayerFullNames,
   NumberLayers,
@@ -81,13 +81,13 @@ export class MapComponent implements OnInit, OnDestroy {
     this.updateSearch({active_number: this._activeNumberLayerShortName});
     if (this._map) {
       for (const layer in this._numberLayers) {
-        if (this._numberLayersNameMap[layer] !== value) {
+        if (layer !== value) {
           log.debug("Removing " + layer);
           this._map.removeLayer(this._numberLayers[layer]);
         }
       }
       for (const layer in this._numberLayers) {
-        if (this._numberLayersNameMap[layer] === value) {
+        if (layer === value) {
           log.debug("Adding " + layer);
           this._map.addLayer(this._numberLayers[layer]);
 
@@ -107,10 +107,8 @@ export class MapComponent implements OnInit, OnDestroy {
   private _countyLayer: LayerGroup = layerGroup(); // dummy layers to fool layer control
   private _map: Map;
 
-  private _numberLayers: NumberLayers = {Exceedance: null, "Tweet Count": null};
-  private _polyLayers: MapLayers = {"Local Authority": null, "Coarse Grid": null, "Fine Grid": null};
-  private _polyLayersNameMap = {"Local Authority": "county", "Coarse Grid": "coarse", "Fine Grid": "fine"};
-  private _numberLayersNameMap = {Exceedance: "stats", "Tweet Count": "count"};
+  private _numberLayers: NumberLayers = {stats: null, count: null};
+  private _polyLayers: PolyLayers = {county: null, coarse: null, fine: null};
   private _polygonData: ByRegionType<PolygonData | geojson.GeoJsonObject> = {
     county: fgsData,
     coarse: coarseData,
@@ -342,13 +340,13 @@ export class MapComponent implements OnInit, OnDestroy {
 
     if (this._map) {
       for (const layer in this._polyLayers) {
-        if (this._polyLayersNameMap[layer] !== polygonLayerName) {
+        if (layer !== polygonLayerName) {
           log.debug("Removing " + layer);
           this._map.removeLayer(this._polyLayers[layer]);
         }
       }
       for (const layer in this._polyLayers) {
-        if (this._polyLayersNameMap[layer] === polygonLayerName) {
+        if (layer === polygonLayerName) {
           log.debug("Adding " + layer);
           this._map.addLayer(this._polyLayers[layer]);
 
@@ -363,7 +361,6 @@ export class MapComponent implements OnInit, OnDestroy {
       } else {
         this._selectedFeatureNames = [selected];
       }
-      this._twitterIsStale;
     }
 
     return undefined;
@@ -380,13 +377,13 @@ export class MapComponent implements OnInit, OnDestroy {
     map.zoomControl.remove();
 
     // define the layers for the different counts
-    this._numberLayers.Exceedance = layerGroup().addTo(map);
-    this._numberLayers["Tweet Count"] = layerGroup();
+    this._numberLayers.stats = layerGroup().addTo(map);
+    this._numberLayers.count = layerGroup();
 
     // layers for the different polygons
-    this._polyLayers["Local Authority"] = layerGroup().addTo(map);
-    this._polyLayers["Coarse Grid"] = layerGroup();
-    this._polyLayers["Fine Grid"] = layerGroup();
+    this._polyLayers.county = layerGroup().addTo(map);
+    this._polyLayers.coarse = layerGroup();
+    this._polyLayers.fine = layerGroup();
 
 
     this._loggedIn = await Auth.currentAuthenticatedUser() != null;
