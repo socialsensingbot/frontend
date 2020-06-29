@@ -14,7 +14,7 @@ describe('#126 Pop state : https://github.com/socialsensingbot/frontend/issues/1
              cy.log("Click out of London in any other county");
              cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-tipperary").click();
              cy.wait(1000);
-             cy.twitterPanelHeader("Armagh");
+             cy.twitterPanelHeader("Tipperary");
              cy.tweetCountTotal(1);
              cy.log("Go back into London.");
              cy.go('back');

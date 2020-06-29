@@ -18,7 +18,7 @@ describe('#104 Slider and tweet interaction : https://github.com/socialsensingbo
              cy.log("Click out of London in any other county");
              cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-tipperary").click();
              cy.wait(1000);
-             cy.tweetCountTotal(6);
+             cy.tweetCountTotal(1);
              cy.log("Click back into London");
              cy.get("mat-sidenav button.draw-close-button", {timeout: 30000}).click();
              cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-greater-london").click({force: true});

@@ -9,15 +9,8 @@
                    [showTimeline]="showTwitterTimeline"></twitter-panel>
 
   </mat-sidenav>
-  <mat-sidenav-content>
-    <div class="map-surround">
-      <div class="map" aria-label="Map"
-           leaflet
-           (leafletMapReady)="onMapReady($event)"
-           [leafletOptions]="options">
-      </div>
-    </div>
-    <mat-toolbar class="expanded-toolbar app-toolbar">
+  <mat-sidenav-content style="overflow:hidden">
+    <mat-toolbar class="app-toolbar">
       <ng-container *ngIf="ready">
         <button class="app-toolbar-btn map-zoom-in" mat-icon-button (click)="zoomIn()">
           <mat-icon matTooltip="Zoom In">zoom_in</mat-icon>
@@ -29,29 +22,29 @@
 
         <!--      <mat-select>-->
         <!--        <mat-option *ngFor="let polyLayer of polyLayers()" [value]="polyLayer[1]">-->
-      <!--          {{polyLayer[0]}}-->
-      <!--        </mat-option>-->
-      <!--      </mat-select>-->
-      <!--      <mat-select>-->
-      <!--        <mat-option *ngFor="let numLayer of numberLayers()" [value]="numLayer[1]">-->
-      <!--          {{numLayer[0]}}-->
-      <!--        </mat-option>-->
-      <!--      </mat-select>-->
-      <div class="app-toolbar-separator"></div>
-      <div class="date-slider">
-        <date-range-slider (dateRange)="sliderChange($event)"
-                           (onEnd)="sliderChangeOnEnd($event)"
-                           [options]="sliderOptions"></date-range-slider>
-      </div>
-      <div class="app-toolbar-separator"></div>
-      <mat-form-field>
-        <mat-select [(value)]="activePolyLayerShortName" class="map-polygon-layer-select">
-          <mat-option value="county">Local Authority</mat-option>
-          <mat-option value="coarse">Coarse Grid</mat-option>
-          <mat-option value="fine">Fine Grid</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <div class="app-toolbar-separator"></div>
+        <!--          {{polyLayer[0]}}-->
+        <!--        </mat-option>-->
+        <!--      </mat-select>-->
+        <!--      <mat-select>-->
+        <!--        <mat-option *ngFor="let numLayer of numberLayers()" [value]="numLayer[1]">-->
+        <!--          {{numLayer[0]}}-->
+        <!--        </mat-option>-->
+        <!--      </mat-select>-->
+        <div class="app-toolbar-separator"></div>
+        <div class="date-slider">
+          <date-range-slider (dateRange)="sliderChange($event)"
+                             (onEnd)="sliderChangeOnEnd($event)"
+                             [options]="sliderOptions"></date-range-slider>
+        </div>
+        <div class="app-toolbar-separator"></div>
+        <mat-form-field>
+          <mat-select [(value)]="activePolyLayerShortName" class="map-polygon-layer-select">
+            <mat-option value="county">Local Authority</mat-option>
+            <mat-option value="coarse">Coarse Grid</mat-option>
+            <mat-option value="fine">Fine Grid</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="app-toolbar-separator"></div>
         <mat-form-field>
           <mat-select [(value)]="activeNumberLayerShortName" class="map-number-layer-select">
             <mat-option value="stats">Exceedance</mat-option>
@@ -64,6 +57,14 @@
         </button>
       </ng-container>
     </mat-toolbar>
+    <div class="map-surround">
+      <div class="map" aria-label="Map"
+           leaflet
+           (leafletMapReady)="onMapReady($event)"
+           [leafletOptions]="options">
+      </div>
+    </div>
+
     <map-legend *ngIf="ready" class="legend" [activeNumber]="activeNumberLayerShortName"></map-legend>
 
 

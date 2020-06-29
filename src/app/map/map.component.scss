@@ -24,23 +24,15 @@ $drawer-width: 568px;
 
 //The Map
 .map-surround {
-  height: 100%;
+  overflow: hidden;
   width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  top: 0px;
-  left: 0px;
-  bottom: 0px;
-  right: 0px;
-  position: absolute;
+  height: calc(100% - 64px);
+  position: relative;
   pointer-events: none;
   box-shadow: inset 0px 0px 4px 1px rgba(0, 0, 0, 0.3);
 }
 
 .map {
-  height: 100%;
-  width: 100%;
   overflow: hidden;
   top: 0px;
   left: 0px;
@@ -54,7 +46,7 @@ $drawer-width: 568px;
 
 
 .map-outer {
-
+  overflow: hidden;
   display: block;
   position: absolute;
 
