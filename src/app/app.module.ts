@@ -30,7 +30,7 @@ import {NewPassComponent} from "./auth/new-pass/new-pass.component";
 import {HttpClientModule} from "@angular/common/http";
 import {NgEventBus} from "ng-event-bus";
 import {InfiniteScrollModule} from "ngx-infinite-scroll";
-import {DEFAULT_CONFIG, Driver, NgForageConfig, NgForageModule, NgForageOptions} from "ngforage";
+import {NgForageConfig} from "ngforage";
 import {HelpButtonComponent} from './help/help-button.component';
 import {HelpSpanComponent} from "./help/help-span.component";
 import {HelpDialogComponent} from './help/help-dialog.component';
@@ -84,15 +84,6 @@ import {RollbarErrorHandler, rollbarFactory, RollbarService} from "./error";
                                       });
               },
 
-            }, {
-              provide:  DEFAULT_CONFIG,
-              useValue: {
-                          name:   'MyApp',
-                          driver: [ // defaults to indexedDB -> webSQL -> localStorage
-                            Driver.INDEXED_DB,
-                            Driver.LOCAL_STORAGE
-                          ]
-                        } as NgForageOptions
             },
                               {
                                 provide:  ErrorHandler,
