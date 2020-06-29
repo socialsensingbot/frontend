@@ -15,7 +15,6 @@ import {
 } from "../../API.service";
 import {Subscription} from "rxjs";
 import {ExportToCsv} from "export-to-csv";
-import {Geometry} from "../types";
 import {RegionSelection} from "../region-selection";
 
 const log = new Logger('twitter-panel');
@@ -153,6 +152,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
   public download() {
     let filename;
     if (this.selection.count == 1) {
+      filename = this.selection.firstRegion().name + "-tweet-export";
     } else {
       filename = `multiple-regions-tweet-export`;
     }

@@ -1,14 +1,14 @@
-describe.only('#124 Region multi select : https://github.com/socialsensingbot/frontend/issues/124',
-              function () {
-                beforeEach(function () {
-                  cy.visit('http://localhost:4200/map');
-                  cy.stubLiveJson("live-old");
-                  cy.login();
-                });
+describe('#124 Region multi select : https://github.com/socialsensingbot/frontend/issues/124',
+         function () {
+           beforeEach(function () {
+             cy.visit('http://localhost:4200/map');
+             cy.stubLiveJson("live-old");
+             cy.login();
+           });
 
 
-                it('Select manually', () => {
-                  const url = "http://localhost:4200/map?active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000&zoom=5&selected=powys";
+           it('Select manually', () => {
+             const url = "http://localhost:4200/map?active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000&zoom=5&selected=powys";
                   cy.visitAndWait(url);
                   cy.get(`div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-powys[stroke-width=3]`);
                   cy.twitterPanelHeader("Powys");
