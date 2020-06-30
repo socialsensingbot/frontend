@@ -501,7 +501,7 @@ export class MapComponent implements OnInit, OnDestroy {
     const features = this.selection.features();
     if (features.length === 1) {
       const feature = features[0];
-      log.debug(`updateTwitterPanel() ${JSON.stringify(feature)}`);
+      log.debug("updateTwitterPanel()", feature);
       if (feature.properties.count > 0) {
         log.debug("Count > 0");
         log.debug(`this.activePolyLayerShortName=${this.activePolyLayerShortName}`);
