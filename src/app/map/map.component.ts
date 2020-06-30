@@ -750,6 +750,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
   }
+
   /**
    * Read the live.json data file and process contents.
    */
@@ -913,6 +914,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this._data.download(this.activePolyLayerShortName,
                         this._polygonData[this.activePolyLayerShortName] as PolygonData);
   }
+
   public zoomIn() {
     if (this._map.getZoom() < 18) {
       this._map.setZoom(this._map.getZoom() + 1);
