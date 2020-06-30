@@ -1,7 +1,5 @@
-@import "../../../../styles";
+@import "../../map.component";
 
-$tweetWidth: 540px;
-$tweetMargin: 8px;
 .app-tweet-list {
   display: block;
   max-height: 100%;
@@ -29,8 +27,8 @@ $tweetMargin: 8px;
     align-items: center;
     //border: 1px solid blue;
     position: relative;
-    max-width: 500px + $tweetMargin * 2;
-    min-width: 500px + $tweetMargin * 2;
+    max-width: $tweetWidth + $tweetMargin * 2;
+    min-width: $tweetWidth + $tweetMargin * 2;
 
 
     //max-height: 0;

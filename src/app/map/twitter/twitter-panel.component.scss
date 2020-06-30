@@ -1,5 +1,5 @@
-$tweetWidth: 540px;
-$tweetMargin: 8px;
+@import "../map.component";
+
 $tweetHeaderOffset: 16px;
 
 
@@ -26,9 +26,9 @@ $tweetHeaderOffset: 16px;
   min-height: 100%;
   font-size: 16px;
   overflow: hidden;
-  width: 566px;
-  max-width: 566px;
-  min-width: 566px;
+  width: $drawer-width - 2px;
+  max-width: $drawer-width - 2px;
+  min-width: $drawer-width - 2px;
   margin: 0;
   padding: 0;
 

@@ -1,7 +1,9 @@
+@import "../../styles";
+
 $right-hand-margin: 24px;
 $top-margin: 24px;
 $bottom-margin: 36px;
-$drawer-width: 568px;
+$drawer-width: $tweetAndMargin + 48px;
 
 .draw-close-button {
   position: absolute;
@@ -149,6 +151,3 @@ $drawer-width: 568px;
   position: absolute;
   z-index: 1000;
 }
-
-
-
