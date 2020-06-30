@@ -1,5 +1,5 @@
 import {EventEmitter, Inject, Injectable} from '@angular/core';
-import {Observable, Subscription, timer} from "rxjs";
+import {Subscription, timer} from "rxjs";
 import {Auth, Logger} from "aws-amplify";
 import {NotificationService} from "./notification.service";
 import {RollbarService} from "../error";

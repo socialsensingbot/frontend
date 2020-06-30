@@ -17,12 +17,22 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "lodash",
+              "crypto-js",
+              "aws-sdk",
+              "@aws-sdk/protocol-http",
+              "@aws-sdk/url-parser-node",
+              "@aws-sdk/util-format-url",
+              "@aws-sdk/fetch-http-handler",
+              "@aws-sdk/util-create-request"
+            ],
             "outputPath": "dist/frontend",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
-            "aot": false,
+            "aot": true,
             "assets": [
               "src/android-chrome-192x192.png",
               "src/android-chrome-512x512.png",
@@ -41,7 +51,9 @@
               "./node_modules/leaflet/dist/leaflet.css",
               "./node_modules/jquery-ui/themes/base/selectable.css"
             ],
-            "scripts": [ "node_modules/jquery/dist/jquery.min.js"]
+            "scripts": [
+              "node_modules/jquery/dist/jquery.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -56,7 +68,6 @@
               "sourceMap": false,
               "extractCss": true,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
@@ -65,10 +76,20 @@
                   "type": "initial",
                   "maximumWarning": "10mb",
                   "maximumError": "20mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
                 }
               ]
             },
             "hmr": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -145,5 +166,8 @@
       }
     }
   },
-  "defaultProject": "frontend"
+  "defaultProject": "frontend",
+  "cli": {
+    "analytics": false
+  }
 }

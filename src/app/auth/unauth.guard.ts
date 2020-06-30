@@ -4,9 +4,8 @@ import {
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
   Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import Auth from '@aws-amplify/auth';
-
+import {Observable} from 'rxjs';
 /**
  * Prevents the user from accessing signup/signin pages when they are already authenticated.
  * This is used as a guard around those routes.
