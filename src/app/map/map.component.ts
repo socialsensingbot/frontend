@@ -615,7 +615,7 @@ export class MapComponent implements OnInit, OnDestroy {
     });
 
     let twitterUpdateInProgress = false;
-    this._twitterUpdateTimer = timer(0, 2000).subscribe(async () => {
+    this._twitterUpdateTimer = timer(0, 1000).subscribe(async () => {
       if (!twitterUpdateInProgress) {
         if (this._twitterIsStale) {
           twitterUpdateInProgress = true;
@@ -706,6 +706,7 @@ export class MapComponent implements OnInit, OnDestroy {
       }
       if (clearClick) {
         this.selection.clear();
+        this.hideTweets();
       }
     }
   }

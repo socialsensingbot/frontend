@@ -15,6 +15,7 @@ function twitterLoad(selector) {
   if ((window as any).twttr && (window as any).twttr.widgets) {
     setTimeout(() => {
       (window as any).twttr.widgets.load($(selector)[0]);
+      $(selector).find(".app-tweet-row").addClass("app-tweet-row-animate-out");
     }, Math.random() * 500 + 100);
   } else {
     setTimeout(() => twitterLoad(selector), 500);
@@ -33,11 +34,16 @@ function twitterInit() {
         twitterBound = true;
         $(event.target).parents(".app-tweet-page").addClass("app-tweet-page-loaded");
         Hub.dispatch("twitter-panel", {message: "render", event: "render", data: event.target});
+        const parent = $(event.target).parent();
+        const atr = $(event.target).parents(".app-tweet-row");
 
+        const blockquote = atr.find("blockquote");
+        blockquote.addClass("tweet-rendered");
         window.setTimeout(() => {
-          const parent = $(event.target).parent();
-          const atr = $(event.target).parents(".app-tweet-row");
-          const blockquote = atr.find("blockquote");
+          atr.addClass("app-tweet-row-rendered");
+          atr.addClass("app-tweet-row-animate-in");
+          atr.removeClass("app-tweet-row-animate-out");
+          setTimeout(() => atr.removeClass("app-tweet-row-animate-in"), 600);
           if (atr.find("blockquote.twitter-tweet-error").length > 0) {
             const error = atr.find("blockquote.twitter-tweet-error");
             error.find(".app-tweet-item-menu").hide();
@@ -50,19 +56,18 @@ function twitterInit() {
             error.parent().addClass("app-tweet-item-card");
 
             error.text("Tweet no longer available");
-          } else {
-            blockquote.addClass("tweet-rendered");
+            blockquote.removeClass("tweet-rendered");
           }
           try {
             if (atr.length > 0) {
-              atr.find("mat-spinner").hide();
+              atr.find("mat-spinner").css("opacity", 0);
               atr.find(".app-tweet-item-menu").css("opacity", 1.0);
               // atr.find(".tweet-loading-placeholder").remove();
             }
           } catch (e) {
             log.debug(e);
           }
-        }, 100);
+        }, 10);
 
       }
     );

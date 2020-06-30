@@ -16,17 +16,18 @@
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
+          "allowedCommonJsDependencies": [
+            "lodash",
+            "crypto-js",
+            "export-to-csv",
+            "aws-sdk",
+            "@aws-sdk/protocol-http",
+            "@aws-sdk/url-parser-node",
+            "@aws-sdk/util-format-url",
+            "@aws-sdk/fetch-http-handler",
+            "@aws-sdk/util-create-request"
+          ],
           "options": {
-            "allowedCommonJsDependencies": [
-              "lodash",
-              "crypto-js",
-              "aws-sdk",
-              "@aws-sdk/protocol-http",
-              "@aws-sdk/url-parser-node",
-              "@aws-sdk/util-format-url",
-              "@aws-sdk/fetch-http-handler",
-              "@aws-sdk/util-create-request"
-            ],
             "outputPath": "dist/frontend",
             "index": "src/index.html",
             "main": "src/main.ts",
