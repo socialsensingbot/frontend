@@ -94,10 +94,17 @@ $tweetHeaderOffset: 16px;
 }
 
 .app-tweet-heading {
-  font-size: 1.2em;
-  margin: 0;
-  line-height: 1.5em;
+  font-size: 16px;
+  margin-top: -8px;
+}
+
+.app-tweet-sub-heading {
+  font-size: 12px;
+  margin-top: -8px;
 }
 
 
-
+.app-tweet-heading-text {
+  margin-top: 0px;
+  max-height: 40px;
+}
