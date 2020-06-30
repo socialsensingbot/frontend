@@ -65,13 +65,17 @@ Cypress.Commands.add("noSpinner", () => {
   });
 });
 
-Cypress.Commands.add("twitterPanelHeader", (text) => {
+Cypress.Commands.add("twitterPanelHeader", (text, subheadingText) => {
   cy.get("twitter-panel");
   cy.get(".app-tweet-area-loading-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
   cy.wait(1000);
   cy.get(".app-tweet-area-loading-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
   cy.get(".app-tweet-heading", {timeout: LONG_TIMEOUT});
   cy.get(".app-tweet-heading", {timeout: LONG_TIMEOUT}).should("contain.text", text);
+  if (subheadingText) {
+    cy.get(".app-tweet-sub-heading", {timeout: LONG_TIMEOUT});
+    cy.get(".app-tweet-sub-heading", {timeout: LONG_TIMEOUT}).should("contain.text", subheadingText);
+  }
 });
 Cypress.Commands.add("twitterPanelVisible", () => {
   cy.get(".app-tweet-drawer", {timeout: LONG_TIMEOUT}).should("be.visible");

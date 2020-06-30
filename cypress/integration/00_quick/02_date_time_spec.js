@@ -16,8 +16,7 @@ describe('02 Date time: ', function () {
       cy.get(".slider-date-time-max .slider-time").should("contain.text", "0 am");
       cy.get(".app-tweet-drawer", {timeout: 60000}).should("be.visible");
       cy.url().should("equal", url);
-      cy.twitterPanelHeader("No Tweets from Scottish Borders");
-
+      cy.twitterPanelHeader("Scottish Borders", "No Tweets");
       cy.logout();
     });
   });
