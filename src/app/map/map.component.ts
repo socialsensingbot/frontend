@@ -134,8 +134,8 @@ export class MapComponent implements OnInit, OnDestroy {
     fine:   fineData
   };
 
-  private _activeNumberLayerShortName: NumberLayerShortName = STATS;
-  private _activePolyLayerShortName: PolygonLayerShortName = COUNTY;
+  private _activeNumberLayerShortName: NumberLayerShortName;
+  private _activePolyLayerShortName: PolygonLayerShortName;
 
 
   private _geojson: { stats: GeoJSON, count: GeoJSON } = {stats: null, count: null};
@@ -284,7 +284,7 @@ export class MapComponent implements OnInit, OnDestroy {
         queryParams:         this._newParams,
         queryParamsHandling: "merge"
       });
-    }, JSON.stringify(params), false, true, false);
+    }, JSON.stringify(params), false, true);
 
   }
 
@@ -356,7 +356,6 @@ export class MapComponent implements OnInit, OnDestroy {
     this.activePolyLayerShortName = typeof active_polygon !== "undefined" ? active_polygon : COUNTY;
 
 
-
     // If a polygon (region) is selected update Twitter panel.
     if (typeof selected !== "undefined") {
       if (Array.isArray(selected)) {
@@ -413,6 +412,7 @@ export class MapComponent implements OnInit, OnDestroy {
                            });
 
                            this._exec.changeState("ready");
+                           this.resetLayers(false);
                            return this.updateLayers("From Parameters")
                                       .then(() => this._twitterIsStale = true);
 
@@ -614,16 +614,27 @@ export class MapComponent implements OnInit, OnDestroy {
       }
     });
 
-    this._twitterUpdateTimer = timer(0, 1000).subscribe(async () => {
-      if (this._twitterIsStale) {
-        this._twitterIsStale = false;
-        await this.updateTwitter();
+    let twitterUpdateInProgress = false;
+    this._twitterUpdateTimer = timer(0, 2000).subscribe(async () => {
+      if (!twitterUpdateInProgress) {
+        if (this._twitterIsStale) {
+          twitterUpdateInProgress = true;
+          this._twitterIsStale = false;
+          await this.updateTwitter();
+          twitterUpdateInProgress = false;
+        }
       }
     });
+
+    let sliderUpdateInProgress = false;
     this._sliderUpdateTimer = timer(0, 100).subscribe(async () => {
-      if (this._sliderIsStale) {
-        this._sliderIsStale = false;
-        await this.updateFromSlider();
+      if (!sliderUpdateInProgress) {
+        if (this._sliderIsStale) {
+          sliderUpdateInProgress = true;
+          this._sliderIsStale = false;
+          await this.updateFromSlider();
+          sliderUpdateInProgress = false;
+        }
       }
     });
 
@@ -742,6 +753,13 @@ export class MapComponent implements OnInit, OnDestroy {
    * Read the live.json data file and process contents.
    */
   async load(first: boolean = false) {
+    if (this.activity || this._updating) {
+      log.info("UI is busy so skipping load");
+      setTimeout(() => {
+        this._zone.run(() => this.load());
+      }, 2000);
+      return;
+    }
     log.debug(`load(${first})`);
     if (!this._loggedIn) {
       log.warn("User logged out, not performing load.");
@@ -757,19 +775,17 @@ export class MapComponent implements OnInit, OnDestroy {
         this._exec.changeState("no-params");
       } else {
         await this.updateLayers("Data Load");
-        await this._exec.queue("Update Slider", ["ready"],
+        await this._exec.queue("Update Slider", ["ready", "data-refresh"],
                                () => {this.updateSliderFromData(); });
       }
 
       this._twitterIsStale = true;
 
-
     } catch (e) {
       this._exec.changeState("data-load-failed");
-      setTimeout(() => {
-        this._zone.run(() => this.load());
-      }, 5000);
+
       this._notify.error(e);
+    } finally {
       this.activity = false;
     }
 

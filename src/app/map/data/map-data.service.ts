@@ -127,7 +127,7 @@ export class MapDataService {
   }
 
   public tweets(activePolyLayerShortName: PolygonLayerShortName, names: string[]): Tweet[] {
-    log.debug(`embeds(${activePolyLayerShortName},${name})`);
+    log.debug(`tweets(${activePolyLayerShortName},${name})`);
     const tweets: Tweet[] = [];
     for (const name of names) {
       const t = this._twitterData.tweets(activePolyLayerShortName, name);
