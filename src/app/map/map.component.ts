@@ -3,9 +3,10 @@ import {fgsData} from "./county_bi";
 import {coarseData} from "./coarse_bi";
 import {fineData} from "./fine_bi";
 import {Auth, Logger} from "aws-amplify";
-import {Browser, GeoJSON, latLng, LayerGroup, layerGroup, LeafletMouseEvent, Map, tileLayer,} from "leaflet";
+import {Browser, GeoJSON, latLng, LayerGroup, layerGroup, LeafletMouseEvent, Map, tileLayer} from "leaflet";
 import "jquery-ui/ui/widgets/slider.js";
 import {ActivatedRoute, NavigationStart, Params, Router} from "@angular/router";
+import * as rxjs from "rxjs";
 import {Subscription, timer} from "rxjs";
 import * as geojson from "geojson";
 import {DateRange, DateRangeSliderOptions} from "./date-range-slider/date-range-slider.component";
@@ -15,16 +16,15 @@ import {
   ByRegionType,
   COUNTY,
   Feature,
-  PolyLayers,
-  NumberLayerFullName,
-  numberLayerFullNames,
   NumberLayers,
   NumberLayerShortName,
+  numberLayerShortNames,
   PolygonData,
   PolygonLayerShortName,
   polygonLayerShortNames,
+  PolyLayers,
   Properties,
-  STATS, numberLayerShortNames
+  STATS
 } from "./types";
 import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
@@ -36,7 +36,6 @@ import {Tweet} from "./twitter/tweet";
 import {getOS, toTitleCase} from "../common";
 import {RegionSelection} from "./region-selection";
 import {PreferenceService} from "../pref/preference.service";
-import * as rxjs from "rxjs";
 
 
 const log = new Logger("map");
@@ -56,18 +55,36 @@ export class MapComponent implements OnInit, OnDestroy {
 
   public set activePolyLayerShortName(value: PolygonLayerShortName) {
     log.debug("New baselayer " + value);
-    if (!this.activePolyLayerShortName || this.activePolyLayerShortName === value) {
-      this.updateSearch({active_polygon: value});
-    } else {
-      log.debug("Removing selected region(s) as we have changed region type");
-      this.updateSearch({active_polygon: value, selected: null});
+
+    if (this.activePolyLayerShortName !== value) {
+      if (!this.activePolyLayerShortName) {
+        this.updateSearch({active_polygon: value});
+      } else {
+        log.debug("Removing selected region(s) as we have changed region type");
+        this.updateSearch({active_polygon: value, selected: null});
+      }
+      if (this._map) {
+        for (const layer in this._polyLayers) {
+          if (layer !== value) {
+            log.debug("Removing " + layer);
+            this._map.removeLayer(this._polyLayers[layer]);
+          }
+        }
+        for (const layer in this._polyLayers) {
+          if (layer === value) {
+            log.debug("Adding " + layer);
+            this._map.addLayer(this._polyLayers[layer]);
+
+          }
+        }
+      }
+      this._activePolyLayerShortName = value;
+      this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
+        this.activity = true;
+        this.resetLayers(true);
+        this.activity = false;
+      });
     }
-    this._activePolyLayerShortName = value;
-    this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
-      this.activity = true;
-      this.resetLayers(true);
-      this.activity = false;
-    });
 
 
   }
@@ -77,28 +94,30 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   public set activeNumberLayerShortName(value: NumberLayerShortName) {
-    this._activeNumberLayerShortName = value;
-    this.updateSearch({active_number: this._activeNumberLayerShortName});
-    if (this._map) {
-      for (const layer in this._numberLayers) {
-        if (layer !== value) {
-          log.debug("Removing " + layer);
-          this._map.removeLayer(this._numberLayers[layer]);
+    if (this._activeNumberLayerShortName !== value) {
+      this._activeNumberLayerShortName = value;
+      this.updateSearch({active_number: this._activeNumberLayerShortName});
+      if (this._map) {
+        for (const layer in this._numberLayers) {
+          if (layer !== value) {
+            log.debug("Removing " + layer);
+            this._map.removeLayer(this._numberLayers[layer]);
+          }
         }
-      }
-      for (const layer in this._numberLayers) {
-        if (layer === value) {
-          log.debug("Adding " + layer);
-          this._map.addLayer(this._numberLayers[layer]);
+        for (const layer in this._numberLayers) {
+          if (layer === value) {
+            log.debug("Adding " + layer);
+            this._map.addLayer(this._numberLayers[layer]);
 
+          }
         }
       }
+      this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
+        this.activity = true;
+        this.resetLayers(false);
+        this.activity = false;
+      });
     }
-    this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
-      this.activity = true;
-      this.resetLayers(true);
-      this.activity = false;
-    });
   }
 
 
@@ -265,7 +284,7 @@ export class MapComponent implements OnInit, OnDestroy {
         queryParams:         this._newParams,
         queryParamsHandling: "merge"
       });
-    }, JSON.stringify(params), false, true);
+    }, JSON.stringify(params), false, true, false);
 
   }
 
@@ -330,29 +349,13 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     // This handles a change to the active_number value
-    const numberLayerName: NumberLayerShortName = typeof active_number !== "undefined" ? active_number : STATS;
-    this.activeNumberLayerShortName = numberLayerName;
+    this.activeNumberLayerShortName = typeof active_number !== "undefined" ? active_number : STATS;
 
 
     // This handles a change to the active_polygon value
-    const polygonLayerName: PolygonLayerShortName = typeof active_polygon !== "undefined" ? active_polygon : COUNTY;
-    this.activePolyLayerShortName = polygonLayerName;
+    this.activePolyLayerShortName = typeof active_polygon !== "undefined" ? active_polygon : COUNTY;
 
-    if (this._map) {
-      for (const layer in this._polyLayers) {
-        if (layer !== polygonLayerName) {
-          log.debug("Removing " + layer);
-          this._map.removeLayer(this._polyLayers[layer]);
-        }
-      }
-      for (const layer in this._polyLayers) {
-        if (layer === polygonLayerName) {
-          log.debug("Adding " + layer);
-          this._map.addLayer(this._polyLayers[layer]);
 
-        }
-      }
-    }
 
     // If a polygon (region) is selected update Twitter panel.
     if (typeof selected !== "undefined") {
