@@ -1,5 +1,5 @@
 import {Injectable, NgZone, OnDestroy, OnInit} from '@angular/core';
-import {MatSnackBar, MatSnackBarRef} from '@angular/material';
+import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 import {Subscription} from 'rxjs';
 import {environment} from "../../environments/environment";
 import {Logger} from "aws-amplify";
@@ -35,20 +35,7 @@ export class NotificationService implements OnDestroy, OnInit {
   }
 
   ngOnInit(): void {
-    window.onerror = (message, file, line, col, e) => {
-      log.error(e)
-      this._zone.run(() => this.error(message));
-      return false;
-    };
-    window.addEventListener("error", (e) => {
-      log.error(e);
-      this._zone.run(() => this.error(e.message));
-      return false;
-    });
-    window.addEventListener('unhandledrejection', (e) => {
-      log.error(e);
-      this._zone.run(() => this.error(e.reason));
-    })
+
   }
 
   /**

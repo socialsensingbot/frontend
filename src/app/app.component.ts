@@ -9,7 +9,7 @@ import {NotificationService} from "./services/notification.service";
 import {APIService, OnCreateUserSessionSubscription} from "./API.service";
 import {SessionService} from "./auth/session.service";
 import * as Rollbar from "rollbar";
-import {RollbarService} from "./rollbar";
+import {RollbarService} from "./error";
 
 
 const log = new Logger('app');
@@ -35,11 +35,14 @@ export class AppComponent {
   isAuthenticated: boolean;
   public isSignup: boolean = !environment.production;
 
-  constructor(private amplifyService: AmplifyService, public auth: AuthService,
+  constructor(private amplifyService: AmplifyService,
+              public auth: AuthService,
+              public pref: PreferenceService,
               private _router: Router, private _pref: PreferenceService,
               private _notify: NotificationService,
               private _api: APIService,
-              private _session: SessionService, @Inject(RollbarService) private _rollbar: Rollbar) {
+              private _session: SessionService,
+              @Inject(RollbarService) private _rollbar: Rollbar) {
     Auth.currentAuthenticatedUser({bypassCache: true})
         .then(user => this.isAuthenticated = (user != null))
         .then(() => this.checkSession())
@@ -81,7 +84,7 @@ export class AppComponent {
         log.info("Timezone in use: " + this._pref.group.timezone);
         this._rollbar.configure(
           {
-            enabled:      true,
+            enabled:      environment.rollbar,
             // environment: environment.name,
             captureIp:    'anonymize',
             code_version: environment.version,

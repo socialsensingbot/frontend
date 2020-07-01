@@ -94,15 +94,7 @@ export class PreferenceService {
         this._groupPreferences = groupPref;
 
       }
-      if (this._groupPreferences.locale) {
-        this.group.locale = this._groupPreferences.locale;
-      }
-      if (this._groupPreferences.timezone) {
-        this.group.timezone = this._groupPreferences.timezone;
-      }
-      if (typeof this._groupPreferences.multipleSessions !== "undefined") {
-        this.group.multipleSessions = this._groupPreferences.multipleSessions;
-      }
+      this.group = {...this.group, ...this._groupPreferences}
       log.debug(this._preferences);
     }
     this.readBlacklist();

@@ -1,8 +1,8 @@
 import {EventEmitter, Inject, Injectable} from '@angular/core';
-import {Observable, Subscription, timer} from "rxjs";
+import {Subscription, timer} from "rxjs";
 import {Auth, Logger} from "aws-amplify";
 import {NotificationService} from "./notification.service";
-import {RollbarService} from "../rollbar";
+import {RollbarService} from "../error";
 import * as Rollbar from "rollbar";
 
 const log = new Logger('uiexecution');
@@ -59,24 +59,26 @@ export class UIExecutionService {
   constructor(private _notify: NotificationService, @Inject(RollbarService) private _rollbar: Rollbar) { }
 
   public async start() {
-    await Auth.currentAuthenticatedUser() !== null
+    await Auth.currentAuthenticatedUser();
     this._executionTimer = timer(0, 100).subscribe(() => {
       while (this._queue.length > 0 && !this._pause) {
         const task = this._queue.shift();
 
         if (task.waitForStates === null || task.waitForStates.indexOf(this._state) >= 0) {
-          task.execute()
+          task.execute();
           if (task.dedup !== null) {
             this.dedupMap.delete(task.dedup);
           }
         } else {
           if (task.reschedule) {
             this._queue.push(task);
-            log.debug(
-              `RESCHEDULED out of sequence task ${task.name} on execution queue, state ${this._state} needs to be one of ${task.waitForStates}.`)
+            log.verbose(
+              `RESCHEDULED out of sequence task ${task.name} on execution queue,
+              state ${this._state} needs to be one of ${task.waitForStates}.`);
             return;
           } else {
-            const message = `Skipped out of sequence task ${task.name} on execution queue, state ${this._state} should be one of ${task.waitForStates}`;
+            const message = `Skipped out of sequence task ${task.name} on execution queue,
+             state ${this._state} should be one of ${task.waitForStates}`;
             if (task.silentFailure) {
               log.debug(message);
             } else {

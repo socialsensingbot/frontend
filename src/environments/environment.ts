@@ -8,6 +8,7 @@ export const environment = {
   production:       false,
   hmr:              false,
   rollbar:          false,
+  toolbarColor:     'primary',
   // timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   timezone:         "UTC",
   multipleSessions: false,
@@ -15,7 +16,8 @@ export const environment = {
   confirm:          {
     email:    '',
     password: ''
-  }
+  },
+  showErrors:       false
 };
 
 /*

@@ -1,6 +1,5 @@
-import * as Rollbar from 'rollbar';
 import {BrowserModule} from '@angular/platform-browser';
-import {ErrorHandler, Inject, Injectable, InjectionToken, NgModule} from '@angular/core';
+import {ErrorHandler, NgModule} from '@angular/core';
 import {AmplifyAngularModule, AmplifyService, AmplifyModules} from 'aws-amplify-angular';
 import Auth from '@aws-amplify/auth';
 import Interactions from '@aws-amplify/interactions';
@@ -30,18 +29,17 @@ import {LegendComponent} from './map/legend/legend.component';
 import {NewPassComponent} from "./auth/new-pass/new-pass.component";
 import {HttpClientModule} from "@angular/common/http";
 import {NgEventBus} from "ng-event-bus";
-import {NotificationService} from "./services/notification.service";
 import {InfiniteScrollModule} from "ngx-infinite-scroll";
-import {NgForageConfig, NgForageModule} from "ngforage";
+import {NgForageConfig} from "ngforage";
 import {HelpButtonComponent} from './help/help-button.component';
 import {HelpSpanComponent} from "./help/help-span.component";
 import {HelpDialogComponent} from './help/help-dialog.component';
 import {TweetListComponent} from './map/twitter/tweet-list/tweet-list.component';
-import {RollbarErrorHandler, rollbarFactory, RollbarService} from "./rollbar";
+import {RollbarErrorHandler, rollbarFactory, RollbarService} from "./error";
 
 
 @NgModule({
-            declarations: [
+            declarations:    [
               AppComponent,
               MapComponent,
               SignUpComponent,
@@ -60,7 +58,7 @@ import {RollbarErrorHandler, rollbarFactory, RollbarService} from "./rollbar";
               HelpSpanComponent,
               TweetListComponent
             ],
-            imports:      [
+            imports:         [
               BrowserModule,
               HttpClientModule,
               BrowserAnimationsModule,
@@ -75,7 +73,7 @@ import {RollbarErrorHandler, rollbarFactory, RollbarService} from "./rollbar";
               InfiniteScrollModule,
               LeafletModule.forRoot()
             ],
-            providers:    [{
+            providers:       [{
               provide: AmplifyService,
 
               useFactory: () => {
@@ -86,9 +84,19 @@ import {RollbarErrorHandler, rollbarFactory, RollbarService} from "./rollbar";
                                       });
               },
 
-            }, {provide: ErrorHandler, useClass: RollbarErrorHandler},
-                           {provide: RollbarService, useFactory: rollbarFactory},
-                           AuthService, NgEventBus],
+            },
+                              {
+                                provide:  ErrorHandler,
+                                useClass: RollbarErrorHandler
+                              },
+
+                              {
+                                provide:    RollbarService,
+                                useFactory: rollbarFactory
+                              },
+                              AuthService,
+                              NgEventBus
+            ],
             bootstrap:       [AppComponent],
             entryComponents: [CountryCodeSelectComponent, HelpDialogComponent]
           },)

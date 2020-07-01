@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, SimpleChanges} from "@angular/core";
 import {Tweet} from "../tweet";
 import {PreferenceService} from "../../../pref/preference.service";
 import {Hub, Logger} from "aws-amplify";
@@ -7,15 +7,16 @@ import {IInfiniteScrollEvent} from "ngx-infinite-scroll";
 import {Subscription, timer} from "rxjs";
 import {environment} from "../../../../environments/environment";
 
-const log = new Logger('tweet-list');
+const log = new Logger("tweet-list");
 
 
 function twitterLoad(selector) {
-  //todo: the use of setTimeout is very brittle, revisit.
+  // todo: the use of setTimeout is very brittle, revisit.
   if ((window as any).twttr && (window as any).twttr.widgets) {
     setTimeout(() => {
       (window as any).twttr.widgets.load($(selector)[0]);
-    }, 50);
+      $(selector).find(".app-tweet-row").addClass("app-tweet-row-animate-out");
+    }, Math.random() * 500 + 100);
   } else {
     setTimeout(() => twitterLoad(selector), 500);
   }
@@ -27,16 +28,22 @@ let twitterBound = false;
 function twitterInit() {
   if ((window as any).twttr && (window as any).twttr.events) {
     (window as any).twttr.events.bind(
-      'rendered',
+      "rendered",
       (event) => {
         log.debug(event);
         twitterBound = true;
+        $(event.target).parents(".app-tweet-page").addClass("app-tweet-page-loaded");
         Hub.dispatch("twitter-panel", {message: "render", event: "render", data: event.target});
+        const parent = $(event.target).parent();
+        const atr = $(event.target).parents(".app-tweet-row");
 
+        const blockquote = atr.find("blockquote");
+        blockquote.addClass("tweet-rendered");
         window.setTimeout(() => {
-          const parent = $(event.target).parent();
-          const atr = $(event.target).parents(".app-tweet-row");
-          const blockquote = atr.find("blockquote");
+          atr.addClass("app-tweet-row-rendered");
+          atr.addClass("app-tweet-row-animate-in");
+          atr.removeClass("app-tweet-row-animate-out");
+          setTimeout(() => atr.removeClass("app-tweet-row-animate-in"), 600);
           if (atr.find("blockquote.twitter-tweet-error").length > 0) {
             const error = atr.find("blockquote.twitter-tweet-error");
             error.find(".app-tweet-item-menu").hide();
@@ -49,19 +56,18 @@ function twitterInit() {
             error.parent().addClass("app-tweet-item-card");
 
             error.text("Tweet no longer available");
-          } else {
-            blockquote.addClass("tweet-rendered");
+            blockquote.removeClass("tweet-rendered");
           }
           try {
             if (atr.length > 0) {
-              atr.find("mat-spinner").hide();
+              atr.find("mat-spinner").css("opacity", 0);
               atr.find(".app-tweet-item-menu").css("opacity", 1.0);
               // atr.find(".tweet-loading-placeholder").remove();
             }
           } catch (e) {
             log.debug(e);
           }
-        }, 100);
+        }, 10);
 
       }
     );
@@ -74,28 +80,39 @@ twitterInit();
 
 
 class TweetPage {
+  public loaded = false;
 
   constructor(public page: number, public start: number, public tweets: Tweet[]) {}
+
+  public is(other: TweetPage) {
+    return other.page === this.page
+      && other.start === this.start
+      && this.tweets.length === other.tweets.length
+      && this.tweets.every((tweet, i) => this.tweets[i].id === other.tweets[i].id);
+  }
 }
 
+/**
+ * The TweetListComponent is responsible for managing an invisibly
+ * paged infinite scroll collection of tweets. At present all
+ * tweets are stored in memory but their rendering is scrolled for browser performance.
+ */
 @Component({
-             selector:    'app-tweet-list',
-             templateUrl: './tweet-list.component.html',
-             styleUrls:   ['./tweet-list.component.scss']
+             selector:    "app-tweet-list",
+             templateUrl: "./tweet-list.component.html",
+             styleUrls:   ["./tweet-list.component.scss"]
            })
 export class TweetListComponent implements OnInit, OnDestroy {
-  /**
-   * The TweetListComponent is responsible for managing a invisibly paged infinite scroll collection of tweets. At present all tweets are stored in memory but their rendering is scrolled for browser performance.
-   */
+
 
   private _tweets: Tweet[] | null = [];
   public loaded: boolean[] = [];
   public tweetCount = 0;
   public ready: boolean;
-  private _destroyed: boolean = false;
+  private _destroyed = false;
 
   // Infinite scroll start: https://github.com/socialsensingbot/frontend/issues/10
-  private readonly PAGE_SIZE = 20;
+  private readonly PAGE_SIZE = 5;
   private readonly INITIAL_PAGES = 3;
   public scrollDistance = 4;
   public scrollUpDistance = 4;
@@ -161,7 +178,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
       return;
     }
     let changed = false;
-    if (val.length != this._tweets.length) {
+    if (val.length !== this._tweets.length) {
       changed = true;
     } else {
       for (let i = 0; i < val.length; i++) {
@@ -177,7 +194,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
     }
 
     if (this.pages.length !== Math.ceil(val.length / this.PAGE_SIZE)) {
-      this.pages.length = Math.ceil(val.length / this.PAGE_SIZE)
+      this.pages.length = Math.ceil(val.length / this.PAGE_SIZE);
     }
     if (val.length !== this._tweets.length) {
       this._tweets.length = val.length;
@@ -185,20 +202,29 @@ export class TweetListComponent implements OnInit, OnDestroy {
     if (this.loaded.length !== val.length) {
       this.loaded.length = val.length;
     }
+    let currPage = new TweetPage(0, 0, []);
+    this.pages.length = Math.ceil(val.length / this.PAGE_SIZE);
     for (let i = 0; i < val.length; i++) {
       const page = Math.floor(i / this.PAGE_SIZE);
       const tweetOnPage = i % this.PAGE_SIZE;
       if (tweetOnPage === 0) {
-        this.pages[page] = new TweetPage(page, i, []);
+        currPage = new TweetPage(page, i, []);
       }
       const tweet = val[i];
-      if (tweetOnPage >= this.pages[page].tweets.length) {
-        this.pages[page].tweets.push(tweet)
+      if (tweetOnPage >= currPage.tweets.length) {
+        currPage.tweets.push(tweet);
       } else {
-        this.pages[page].tweets[i] = tweet;
-
+        currPage.tweets[tweetOnPage] = tweet;
       }
 
+      const lastEntryOnPage = i === (val.length - 1) || ((i + 1) % this.PAGE_SIZE) === 0;
+      if (lastEntryOnPage) {
+        // Do not change/reload unchanged pages.
+        if (typeof this.pages[page] === "undefined" || !this.pages[page].is(currPage)) {
+          log.debug(`Pages are different for page ${page}: `, this.pages[page], currPage);
+          this.pages[page] = currPage;
+        }
+      }
 
       this._tweets[i] = tweet;
       if (this._tweets[i] && this._tweets[i].id !== tweet.id) {
@@ -221,26 +247,11 @@ export class TweetListComponent implements OnInit, OnDestroy {
   }
 
 
-  private animateTweetAppearance(page: number) {
-    if (typeof this.loaded[page] === undefined) {
-      this.loaded[page] = false;
-    }
-    log.debug("Loading tweets by page " + page);
-    if (!this.loaded[page]) {
-      twitterLoad(".app-tweet-list-" + this.group + " .app-tweet-page-" + page);
-      // this.loaded[page]= true;
-    }
-  }
-
-  private appearTweet(i: number) {
-    if (!this.loaded[i]) {
-      if ($(".atr-" + i + " blockquote").has("a")) {
-        log.debug("Loading tweet " + i);
-        twitterLoad(i);
-        this.loaded[i] = true;
-      } else {
-        log.debug("Skipping " + i);
-      }
+  private async animateTweetAppearance(page: number) {
+    if (this.pages[page] && !this.pages[page].loaded) {
+      log.debug("Loading tweets by page " + page);
+      await twitterLoad(".app-tweet-list-" + this.group + " .app-tweet-page-" + page);
+      this.pages[page].loaded = true;
     }
   }
 
@@ -248,15 +259,8 @@ export class TweetListComponent implements OnInit, OnDestroy {
     log.debug($event);
   }
 
-  public ngOnChanges(changes: SimpleChanges): void {
-    log.debug(changes);
-    // (window as any).twttr.widgets.load($("#tinfo")[0]);
-  }
-
   public sender(tweet) {
-
     return tweet.sender;
-
   }
 
   public isPlaceholder(tweet) {
@@ -297,21 +301,21 @@ export class TweetListComponent implements OnInit, OnDestroy {
   }
 
   public isNewDate(i: number) {
-    return i > 0 && this.tweets[i - 1].day !== this.tweets[i].day;
+    return i > 0 && this.tweets.length > i && this.tweets[i - 1].day !== this.tweets[i].day;
   }
 
 
   onScrollDown(ev) {
-    log.debug('scrolled down!!', ev);
-    //add items
-    this.direction = 'down'
+    log.debug("scrolled down!!", ev);
+    // add items
+    this.direction = "down";
     const oldMax = this.maxPage;
     if (this.maxPage < this.pages.length - 1) {
       this.moreToShow = true;
       this.maxPage += 1;
     } else {
       this.moreToShow = false;
-      this.maxPage = this.pages.length - 1
+      this.maxPage = this.pages.length - 1;
     }
     if (this.minPage <= this.pages.length - this.INITIAL_PAGES) {
       this.minPage += 1;
@@ -319,19 +323,19 @@ export class TweetListComponent implements OnInit, OnDestroy {
       this.minPage = Math.max(this.pages.length - this.INITIAL_PAGES, 0);
     }
     log.debug(this.maxPage);
-    if (oldMax != this.maxPage) {
+    if (oldMax !== this.maxPage) {
       this.loadPagesOfTweets();
     }
-    log.debug("New max page " + this.maxPage)
-    log.debug("New min page " + this.minPage)
+    log.debug("New max page " + this.maxPage);
+    log.debug("New min page " + this.minPage);
   }
 
   onUp($event: IInfiniteScrollEvent) {
-    log.debug('scrolled up!', $event);
+    log.debug("scrolled up!", $event);
 
-    this.direction = 'up';
+    this.direction = "up";
     const oldMin = this.minPage;
-    if ($event.currentScrollPosition == 0) {
+    if ($event.currentScrollPosition === 0) {
       this.maxPage = this.INITIAL_PAGES - 1;
       this.minPage = 0;
     }
@@ -342,11 +346,11 @@ export class TweetListComponent implements OnInit, OnDestroy {
     if (this.minPage > 0) {
       this.minPage -= 1;
     }
-    if (oldMin != this.minPage) {
+    if (oldMin !== this.minPage) {
       this.loadPagesOfTweets();
     }
-    log.debug("New max page " + this.maxPage)
-    log.debug("New min page " + this.minPage)
+    log.debug("New max page " + this.maxPage);
+    log.debug("New min page " + this.minPage);
 
     // if (this.maxTweets > 100) {
     //   this.maxTweets -= this.PAGE_SIZE;
@@ -356,19 +360,19 @@ export class TweetListComponent implements OnInit, OnDestroy {
 
   public calcFirstVisibleDate() {
     const checkInView = (elem, partial) => {
-      var container = $(".app-tweet-list");
-      var contHeight = container.height();
-      var contTop = container.scrollTop();
-      var contBottom = contTop + contHeight;
+      const container = $(".app-tweet-list");
+      const contHeight = container.height();
+      const contTop = container.scrollTop();
+      const contBottom = contTop + contHeight;
 
-      var elemTop = $(elem).offset().top - container.offset().top;
-      var elemBottom = elemTop + $(elem).height();
+      const elemTop = $(elem).offset().top - container.offset().top;
+      const elemBottom = elemTop + $(elem).height();
 
-      var isTotal = (elemTop >= 0 && elemBottom <= contHeight);
-      var isPart = ((elemTop < 0 && elemBottom > 0) || (elemTop > 0 && elemTop <= container.height())) && partial;
+      const isTotal = (elemTop >= 0 && elemBottom <= contHeight);
+      const isPart = ((elemTop < 0 && elemBottom > 0) || (elemTop > 0 && elemTop <= container.height())) && partial;
 
       return isTotal || isPart;
-    }
+    };
 
     let firstEl;
 
@@ -379,7 +383,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
       }
     }
     if (firstEl) {
-      let i = +firstEl.attr("data-index");
+      const i = +firstEl.attr("data-index");
       this.firstVisibleDate = this.tweets[i].date;
       this.showDateHeader = true;
       this.lastDateShow = Date.now();

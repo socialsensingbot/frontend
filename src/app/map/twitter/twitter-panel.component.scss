@@ -1,6 +1,7 @@
-$tweetWidth: 540px;
-$tweetMargin: 8px;
+@import "../map.component";
+
 $tweetHeaderOffset: 16px;
+
 
 ::ng-deep {
   .mat-tab-body-wrapper, .mat-tab-group {
@@ -12,6 +13,7 @@ $tweetHeaderOffset: 16px;
 
   .mat-tab-body.mat-tab-body-active {
     overflow: hidden !important;
+    background-color: #f4f4f4;
   }
 
 
@@ -24,9 +26,9 @@ $tweetHeaderOffset: 16px;
   min-height: 100%;
   font-size: 16px;
   overflow: hidden;
-  width: 564px;
-  max-width: 564px;
-  min-width: 564px;
+  width: $drawer-width - 2px;
+  max-width: $drawer-width - 2px;
+  min-width: $drawer-width - 2px;
   margin: 0;
   padding: 0;
 
@@ -39,14 +41,16 @@ $tweetHeaderOffset: 16px;
   .mat-tab-body {
     overflow-x: visible;
     position: relative;
+
   }
 
 
   .app-tweet-table {
     display: block;
-    height: calc(100vh - 174px);
+    height: calc(100vh - 188px);
     position: relative;
     overflow: visible;
+    margin-top: 8px;
 
 
     .app-tweet-date-separator {
@@ -87,32 +91,21 @@ $tweetHeaderOffset: 16px;
   }
 
 
-  .app-tweet-header {
-    //position: rel;
-    z-index: 10;
-    margin-right: 14px;
-    margin-left: 14px;
-    margin-bottom: 0;
-    margin-top: 16px;
-    //background: white;
-
-    .app-tweet-heading {
-      font-size: 1.2em;
-      margin: 0;
-      line-height: 1.5em;
-    }
-
-  }
-
-
 }
 
-.app-tweet-refresh-btn {
-  opacity: 0.4;
+.app-tweet-heading {
+  font-size: 16px;
+  margin-top: -8px;
+  text-align: left;
 }
 
-.app-tweet-btn {
-  opacity: 0.4;
-  max-width: 32px;
+.app-tweet-sub-heading {
+  font-size: 12px;
+  margin-top: -8px;
 }
 
+
+.app-tweet-heading-text {
+  margin-top: 0px;
+  max-height: 40px;
+}

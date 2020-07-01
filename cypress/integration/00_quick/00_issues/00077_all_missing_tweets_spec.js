@@ -6,7 +6,7 @@ describe('#77 Missing tweets : https://github.com/socialsensingbot/frontend/issu
   });
 
 
-  const url = "http://localhost:4200/map?selected=roscommon&max_time=1588538940000&min_time=1588452540000";
+  const url = "http://localhost:4200/map?selected=roscommon&max_time=1588538940000&min_time=1588452540000&active_number=stats&active_polygon=county";
 
   it('Should be two tweets both removed', () => {
     cy.visit(url);
