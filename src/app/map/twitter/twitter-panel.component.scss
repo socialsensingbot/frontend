@@ -105,10 +105,12 @@ $tweetHeaderOffset: 16px;
     opacity: 0.3;
   }
 
-  .app-tweet-scroll-spinner {
-    height: 24px;
-    width: 24px;
-    margin: 0 auto;
 
-  }
+}
+
+.app-tweet-scroll-spinner {
+  height: 24px;
+  width: 24px;
+  margin: 0 auto;
+  display: none !important;
 }
