@@ -416,8 +416,6 @@ export class MapComponent implements OnInit, OnDestroy {
                            // Schedule periodic data loads from the server
                            this._loadTimer = timer(ONE_MINUTE_IN_MILLIS, ONE_MINUTE_IN_MILLIS)
                              .subscribe(() => this.load());
-                           this.updateTwitterPanel();
-
                          });
       } else {
         if (this._popState) {
@@ -812,7 +810,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                   this.clearMapFeatures();
                                   this.updateRegionData();
                                   this.resetLayers(false);
-
+                                  this.updateTwitterPanel();
                                 } finally {
                                   this.activity = false;
                                   this._updating = false;
