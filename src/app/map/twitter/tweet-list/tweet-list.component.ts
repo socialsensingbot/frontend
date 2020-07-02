@@ -16,7 +16,14 @@ function twitterLoad(selector) {
     setTimeout(() => {
       (window as any).twttr.widgets.load($(selector)[0]);
       $(selector).find(".app-tweet-row").addClass("app-tweet-row-animate-out");
-    }, Math.random() * 500 + 100);
+    }, Math.random() * 50 + 10);
+    setTimeout(() => {
+      const nonRenderedRows = $(selector).find(".app-tweet-row:not(.app-tweet-row-rendered)");
+      nonRenderedRows.removeClass("app-tweet-row-animate-out");
+      nonRenderedRows.find("mat-spinner").css("opacity", 0);
+      nonRenderedRows.find(".app-tweet-item-menu").css("opacity", 1.0);
+    }, 10000);
+
   } else {
     setTimeout(() => twitterLoad(selector), 500);
   }
@@ -40,10 +47,17 @@ function twitterInit() {
         const blockquote = atr.find("blockquote");
         blockquote.addClass("tweet-rendered");
         window.setTimeout(() => {
-          atr.addClass("app-tweet-row-rendered");
           atr.addClass("app-tweet-row-animate-in");
           atr.removeClass("app-tweet-row-animate-out");
-          setTimeout(() => atr.removeClass("app-tweet-row-animate-in"), 600);
+          setTimeout(() => {
+            atr.addClass("app-tweet-row-rendered");
+            atr.removeClass("app-tweet-row-animate-in");
+            if (atr[0]) {
+              localStorage.setItem("tweet:" + atr.attr("data-tweet-id"),
+                                   JSON.stringify(
+                                     {timestamp: Date.now(), html: atr.find(".app-tweet-item-text").html()}));
+            }
+          }, 800);
           if (atr.find("blockquote.twitter-tweet-error").length > 0) {
             const error = atr.find("blockquote.twitter-tweet-error");
             error.find(".app-tweet-item-menu").hide();
@@ -139,6 +153,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
   private lastDateShow: number;
   private _dateHeaderTimer: Subscription;
   public utc: boolean = environment.timezone === "UTC";
+  public cache: any = {};
 
 
   /**
@@ -185,6 +200,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
         if (this._tweets[i].id !== val[i].id) {
           changed = true;
         }
+
       }
     }
     if (!changed) {
@@ -207,6 +223,9 @@ export class TweetListComponent implements OnInit, OnDestroy {
     for (let i = 0; i < val.length; i++) {
       const page = Math.floor(i / this.PAGE_SIZE);
       const tweetOnPage = i % this.PAGE_SIZE;
+      if (this.isCached(val[i].id)) {
+        this.cache[val[i].id] = this.cached(val[i].id);
+      }
       if (tweetOnPage === 0) {
         currPage = new TweetPage(page, i, []);
       }
@@ -388,5 +407,24 @@ export class TweetListComponent implements OnInit, OnDestroy {
       this.showDateHeader = true;
       this.lastDateShow = Date.now();
     }
+  }
+
+  public isCached(id: string) {
+    if (!localStorage.getItem("tweet:" + id)) {
+      return false;
+
+    }
+    const item = JSON.parse(localStorage.getItem("tweet:" + id));
+
+    if (item && item.timestamp > Date.now() - 60 * 50 * 1000) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public cached(id: string) {
+    log.debug("From cache " + id);
+    return JSON.parse(localStorage.getItem("tweet:" + id)).html;
   }
 }

@@ -376,7 +376,7 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   private async init(map: Map) {
     log.debug("init");
-    map.zoomControl.remove();
+    // map.zoomControl.remove();
 
     // define the layers for the different counts
     this._numberLayers.stats = layerGroup().addTo(map);
@@ -712,7 +712,7 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Clears and initialises feature data on the map.
+   * Clears and iialises feature data on the map.
    */
   private clearMapFeatures() {
     for (const regionType of this._data.regionTypes()) { // counties, coarse, fine
