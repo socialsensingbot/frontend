@@ -40,7 +40,8 @@
 
   <div class="app-tweet-paged app-tweet-page-{{p}}" *ngFor="let page of pages; let p= index">
     <ng-container *ngIf="page">
-      <div class="app-tweet-scroll-spinner-outer" *ngIf="p == 0 && p < minPage">
+      <div class="app-tweet-scroll-
+      -outer" *ngIf="p == 0 && p < minPage">
         <mat-spinner diameter="24" class="app-tweet-scroll-spinner"></mat-spinner>
       </div>
       <ng-container *ngFor="let tweet of page.tweets; let i = index">

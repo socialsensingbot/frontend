@@ -79,14 +79,18 @@ export class MapComponent implements OnInit, OnDestroy {
         }
       }
       this._activePolyLayerShortName = value;
-      this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
-        this.activity = true;
-        this.resetLayers(true);
-        this.activity = false;
-      });
+      this.scheduleResetLayers();
     }
 
 
+  }
+
+  private scheduleResetLayers() {
+    return this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
+      this.activity = true;
+      this.resetLayers(true);
+      this.activity = false;
+    }, "", false, true, true);
   }
 
   public get activeNumberLayerShortName(): NumberLayerShortName {
@@ -112,11 +116,7 @@ export class MapComponent implements OnInit, OnDestroy {
           }
         }
       }
-      this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
-        this.activity = true;
-        this.resetLayers(false);
-        this.activity = false;
-      });
+      this.scheduleResetLayers();
     }
   }
 
@@ -412,9 +412,11 @@ export class MapComponent implements OnInit, OnDestroy {
                            });
 
                            this._exec.changeState("ready");
-                           this.resetLayers(false);
-                           return this.updateLayers("From Parameters")
-                                      .then(() => this._twitterIsStale = true);
+                           await this.updateLayers("From Parameters");
+                           // Schedule periodic data loads from the server
+                           this._loadTimer = timer(ONE_MINUTE_IN_MILLIS, ONE_MINUTE_IN_MILLIS)
+                             .subscribe(() => this.load());
+                           this.updateTwitterPanel();
 
                          });
       } else {
@@ -433,8 +435,6 @@ export class MapComponent implements OnInit, OnDestroy {
     });
 
 
-    // Schedule periodic data loads from the server
-    this._loadTimer = timer(ONE_MINUTE_IN_MILLIS, ONE_MINUTE_IN_MILLIS).subscribe(() => this.load());
   }
 
   /**
@@ -501,8 +501,10 @@ export class MapComponent implements OnInit, OnDestroy {
    * Update the Twitter panel by updating the properties it reacts to.
    */
   private updateTwitterPanel() {
+    log.debug("updateTwitterPanel()");
     const features = this.selection.features();
     if (features.length === 1) {
+      log.debug("1 feature");
       const feature = features[0];
       log.debug("updateTwitterPanel()", feature);
       if (feature.properties.count > 0) {
@@ -520,10 +522,12 @@ export class MapComponent implements OnInit, OnDestroy {
         this.tweets = [];
       }
     } else if (features.length === 0) {
+      log.debug("0 features");
       this.showTwitterTimeline = false;
       this.tweets = [];
       this.hideTweets();
     } else {
+      log.debug(features.length + " features");
       this.tweets = this._data.tweets(this.activePolyLayerShortName, this.selection.regionNames());
       log.debug(this.tweets);
       this.twitterPanelHeader = true;
@@ -586,6 +590,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this.highlight(layer, 3);
 
       this.selection.select(feature as Feature);
+      this._twitterIsStale = true;
       this.showTweets();
     }
 
@@ -755,7 +760,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * Read the live.json data file and process contents.
    */
   async load(first: boolean = false) {
-    if (this.activity || this._updating) {
+    if (!first && (this.activity || this._updating)) {
       log.info("UI is busy so skipping load");
       setTimeout(() => {
         this._zone.run(() => this.load());
@@ -907,7 +912,7 @@ export class MapComponent implements OnInit, OnDestroy {
     await this._exec.queue("Update Twitter", ["ready"], () => {
       // this.selectedRegion.toggle(this._clicked.target.feature.properties.name,this._clicked.target.feature.geometry);
       this.updateTwitterPanel();
-    }, Date.now(), false, true, true);
+    }, "", false, true, true);
   }
 
   public downloadTweetsAsCSV() {

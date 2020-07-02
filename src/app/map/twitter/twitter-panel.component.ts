@@ -4,7 +4,7 @@ import {
   NgZone,
   OnChanges, OnDestroy, OnInit,
   SimpleChanges
-} from '@angular/core';
+} from "@angular/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {Hub, Logger} from "aws-amplify";
 import {Tweet} from "./tweet";
@@ -17,12 +17,12 @@ import {Subscription} from "rxjs";
 import {ExportToCsv} from "export-to-csv";
 import {RegionSelection} from "../region-selection";
 
-const log = new Logger('twitter-panel');
+const log = new Logger("twitter-panel");
 
 @Component({
-             selector:    'twitter-panel',
-             templateUrl: './twitter-panel.component.html',
-             styleUrls:   ['./twitter-panel.component.scss']
+             selector:    "twitter-panel",
+             templateUrl: "./twitter-panel.component.html",
+             styleUrls:   ["./twitter-panel.component.scss"]
            })
 export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
@@ -34,10 +34,10 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
   public ready: boolean;
   public tweetsReady: boolean;
-  private _destroyed: boolean = false;
+  private _destroyed = false;
 
 
-  @Input() showHeaderInfo: boolean = true;
+  @Input() showHeaderInfo = true;
   @Input() showTimeline: boolean;
   private tweetIgnoreSub: Subscription;
   private tweetUnignoreSub: Subscription;
@@ -107,13 +107,13 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
 
   public refresh() {
-    const tweets = this.tweets
+    const tweets = this.tweets;
     this.tweets = [];
     this.ready = false;
     this.tweetsReady = false;
     setTimeout(() => this._zone.run(() => {
       this.tweets = tweets;
-      this.tweetsReady = true
+      this.tweetsReady = true;
     }), 50);
   }
 
@@ -134,40 +134,40 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.tweetIgnoreSub = this.pref.tweetIgnored.subscribe((sub: OnCreateGroupTweetIgnoreSubscription) => {
-      this.update(null)
+      this.update(null);
     });
     this.tweetUnignoreSub = this.pref.tweetUnignored.subscribe((sub: OnDeleteGroupTweetIgnoreSubscription) => {
-      this.update(null)
+      this.update(null);
     });
     this.twitterUserIgnoreSub = this.pref.twitterUserIgnored.subscribe(
       (sub: OnCreateGroupTwitterUserIgnoreSubscription) => {
-        this.update(null)
+        this.update(null);
       });
     this.twitterUserUnignoreSub = this.pref.twitterUserUnignored.subscribe(
       (sub: OnDeleteGroupTwitterUserIgnoreSubscription) => {
-        this.update(null)
+        this.update(null);
       });
   }
 
   public download() {
     let filename;
-    if (this.selection.count == 1) {
+    if (this.selection.count === 1) {
       filename = this.selection.firstRegion().name + "-tweet-export";
     } else {
       filename = `multiple-regions-tweet-export`;
     }
 
     const options = {
-      fieldSeparator:   ',',
-      quoteStrings:     '"',
-      decimalSeparator: '.',
+      fieldSeparator:   ",",
+      quoteStrings:     "\"",
+      decimalSeparator: ".",
       showLabels:       true,
       showTitle:        false,
-      title:            '',
+      title:            "",
       useTextFile:      false,
       useBom:           true,
       useKeysAsHeaders: true,
-      filename:         filename
+      filename
       // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
     };
 
@@ -196,8 +196,8 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
           }
         }
         console.log(
-          `Bounding box of ${JSON.stringify(r.geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`)
-        regionName = `(${minX},${minY}),(${maxX},${maxY})`
+          `Bounding box of ${JSON.stringify(r.geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`);
+        regionName = `(${minX},${minY}),(${maxX},${maxY})`;
       }
       regionData.push(...this.visibleTweets.filter(i => i.valid).map(i => i.asCSV(regionName)));
 

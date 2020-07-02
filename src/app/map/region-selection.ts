@@ -2,12 +2,16 @@ import {Feature} from "./types";
 import {toTitleCase} from "../common";
 
 export class Region {
-  asSelector(): JQuery {
-    return $(".x-feature-name-" + this.name.replace(" ", "-"));
-  }
 
   public get title(): any {
     return toTitleCase(this.name);
+  }
+
+  constructor(public feature: Feature) {
+    this.name = feature.properties.name;
+    this.geometry = feature.geometry;
+    this.exceedanceProbability = Math.round(feature.properties.stats * 100) / 100;
+    this.tweetCount = feature.properties.count;
   }
 
   public name: any;
@@ -15,11 +19,8 @@ export class Region {
   public exceedanceProbability: number;
   public tweetCount: number;
 
-  constructor(public feature: Feature) {
-    this.name = feature.properties.name;
-    this.geometry = feature.geometry
-    this.exceedanceProbability = Math.round(feature.properties.stats * 100) / 100;
-    this.tweetCount = feature.properties.count;
+  asSelector(): JQuery {
+    return $(".x-feature-name-" + this.name.replace(" ", "-"));
   }
 
 
@@ -33,9 +34,7 @@ export class RegionSelection {
     return this.all().length;
   }
 
-  l
-
-
+  public regions: { [key: string]: Region } = {};
   all(): Region[] {
     return Object.values(this.regions);
   }
@@ -59,8 +58,6 @@ export class RegionSelection {
       this.regions[feature.properties.name] = new Region(feature);
     }
   }
-
-  public regions: { [key: string]: Region } = {};
 
   public selectOnly(feature: Feature) {
     this.regions = {};
