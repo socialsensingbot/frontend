@@ -28,8 +28,7 @@
 
     </mat-menu>
     <div class="app-tweet-item app-tweet-row-active">
-
-      <div class="app-tweet-item-text" [innerHtml]="(!!cache[tweet.id] ? cache[tweet.id]: tweet.html)|safeHtml"></div>
+      <div class="app-tweet-item-text" [innerHtml]="tweet.html|safeHtml"></div>
     </div>
     <div class="app-tweet-item-menu">
       <button mat-icon-button [matMenuTriggerData]="{tweet:tweet,si:si,ti:ti}" [matMenuTriggerFor]="appMenu">

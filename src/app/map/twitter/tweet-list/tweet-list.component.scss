@@ -30,23 +30,19 @@
     max-width: $tweetWidth + $tweetMargin * 2;
     min-width: $tweetWidth + $tweetMargin * 2;
     background-color: #eee;
-    //transform: scaleY(1);
-    //transform-origin: top;
-    //opacity: 1.0;
-    //
-    //&.app-tweet-row-animate-out {
-    //  opacity: 0.0;
-    //}
-    //
-    //&.app-tweet-row-animate-in {
-    //  opacity: 0.0;
-    //}
-    //
-    //&.app-tweet-row-rendered {
-    //  //transform: scaleY(1);
-    //  opacity: 1.0;
-    //  transition: opacity 1s ease-in-out;
-    //}
+    transform: scaleY(1);
+    transform-origin: top;
+    opacity: 1.0;
+
+    &.app-tweet-row-animate-in {
+      opacity: 0.0;
+    }
+
+    &.app-tweet-row-rendered {
+      //transform: scaleY(1);
+      opacity: 1.0;
+      transition: opacity 1s ease-in-out;
+    }
 
     //max-height: 0;
 
