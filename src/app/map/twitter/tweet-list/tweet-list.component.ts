@@ -8,27 +8,15 @@ import {Subscription, timer} from "rxjs";
 import {environment} from "../../../../environments/environment";
 
 const log = new Logger("tweet-list");
+let loadTweets = false;
 
-
-function twitterLoad(selector) {
+setInterval(() => {
   // todo: the use of setTimeout is very brittle, revisit.
   if ((window as any).twttr && (window as any).twttr.widgets) {
-    setTimeout(() => {
-      (window as any).twttr.widgets.load($("app-tweet-list")[0]);
-      // $(selector).find(".app-tweet-row").addClass("app-tweet-row-animate-out");
-    }, Math.random() * 50 + 10);
-    setTimeout(() => {
-      const nonRenderedRows = $(selector).find(".app-tweet-row:not(.app-tweet-row-rendered)");
-      // nonRenderedRows.removeClass("app-tweet-row-animate-out");
-      nonRenderedRows.find("mat-spinner").css("opacity", 0);
-      nonRenderedRows.find(".app-tweet-item-menu").css("opacity", 1.0);
-    }, 10000);
-
-  } else {
-    setTimeout(() => twitterLoad(selector), 500);
+    (window as any).twttr.widgets.load($("app-tweet-list")[0]);
   }
 
-}
+}, 1000);
 
 let twitterBound = false;
 
@@ -39,6 +27,7 @@ function twitterInit() {
       (event) => {
         log.debug(event);
         twitterBound = true;
+        loadTweets = false;
         $(event.target).parents(".app-tweet-page").addClass("app-tweet-page-loaded");
         Hub.dispatch("twitter-panel", {message: "render", event: "render", data: event.target});
         const parent = $(event.target).parent();
@@ -269,7 +258,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
   private async animateTweetAppearance(page: number) {
     if (this.pages[page] && !this.pages[page].loaded) {
       log.debug("Loading tweets by page " + page);
-      await twitterLoad(".app-tweet-list-" + this.group + " .app-tweet-page-" + page);
+      loadTweets = true;
       this.pages[page].loaded = true;
     }
   }
