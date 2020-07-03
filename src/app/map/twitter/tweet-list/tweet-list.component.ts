@@ -14,8 +14,8 @@ function twitterLoad(selector) {
   // todo: the use of setTimeout is very brittle, revisit.
   if ((window as any).twttr && (window as any).twttr.widgets) {
     setTimeout(() => {
-      (window as any).twttr.widgets.load($(selector)[0]);
-      $(selector).find(".app-tweet-row").addClass("app-tweet-row-animate-out");
+      (window as any).twttr.widgets.load($("app-tweet-list")[0]);
+      // $(selector).find(".app-tweet-row").addClass("app-tweet-row-animate-out");
     }, Math.random() * 50 + 10);
     setTimeout(() => {
       const nonRenderedRows = $(selector).find(".app-tweet-row:not(.app-tweet-row-rendered)");
