@@ -19,7 +19,7 @@ function twitterLoad(selector) {
     }, Math.random() * 50 + 10);
     setTimeout(() => {
       const nonRenderedRows = $(selector).find(".app-tweet-row:not(.app-tweet-row-rendered)");
-      nonRenderedRows.removeClass("app-tweet-row-animate-out");
+      // nonRenderedRows.removeClass("app-tweet-row-animate-out");
       nonRenderedRows.find("mat-spinner").css("opacity", 0);
       nonRenderedRows.find(".app-tweet-item-menu").css("opacity", 1.0);
     }, 10000);
