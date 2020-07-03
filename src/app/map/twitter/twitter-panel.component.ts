@@ -4,7 +4,7 @@ import {
   NgZone,
   OnChanges, OnDestroy, OnInit,
   SimpleChanges
-} from '@angular/core';
+} from "@angular/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {Hub, Logger} from "aws-amplify";
 import {Tweet} from "./tweet";
@@ -15,31 +15,29 @@ import {
 } from "../../API.service";
 import {Subscription} from "rxjs";
 import {ExportToCsv} from "export-to-csv";
-import {Geometry} from "../types";
+import {RegionSelection} from "../region-selection";
 
-const log = new Logger('twitter-panel');
+const log = new Logger("twitter-panel");
 
 @Component({
-             selector:    'twitter-panel',
-             templateUrl: './twitter-panel.component.html',
-             styleUrls:   ['./twitter-panel.component.scss']
+             selector:    "twitter-panel",
+             templateUrl: "./twitter-panel.component.html",
+             styleUrls:   ["./twitter-panel.component.scss"]
            })
 export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
-  @Input() count: number;
-  @Input() geometry: Geometry;
-  @Input() region: string;
-  @Input() exceedanceProbability: string;
+
+  @Input() selection: RegionSelection;
   private _tweets: Tweet[] | null = null;
   public hiddenTweets: Tweet[] = [];
   public visibleTweets: Tweet[] = [];
 
   public ready: boolean;
   public tweetsReady: boolean;
-  private _destroyed: boolean = false;
+  private _destroyed = false;
 
 
-  @Input() showHeaderInfo: boolean = true;
+  @Input() showHeaderInfo = true;
   @Input() showTimeline: boolean;
   private tweetIgnoreSub: Subscription;
   private tweetUnignoreSub: Subscription;
@@ -109,13 +107,13 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
 
   public refresh() {
-    const tweets = this.tweets
+    const tweets = this.tweets;
     this.tweets = [];
     this.ready = false;
     this.tweetsReady = false;
     setTimeout(() => this._zone.run(() => {
       this.tweets = tweets;
-      this.tweetsReady = true
+      this.tweetsReady = true;
     }), 50);
   }
 
@@ -136,63 +134,74 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.tweetIgnoreSub = this.pref.tweetIgnored.subscribe((sub: OnCreateGroupTweetIgnoreSubscription) => {
-      this.update(null)
+      this.update(null);
     });
     this.tweetUnignoreSub = this.pref.tweetUnignored.subscribe((sub: OnDeleteGroupTweetIgnoreSubscription) => {
-      this.update(null)
+      this.update(null);
     });
     this.twitterUserIgnoreSub = this.pref.twitterUserIgnored.subscribe(
       (sub: OnCreateGroupTwitterUserIgnoreSubscription) => {
-        this.update(null)
+        this.update(null);
       });
     this.twitterUserUnignoreSub = this.pref.twitterUserUnignored.subscribe(
       (sub: OnDeleteGroupTwitterUserIgnoreSubscription) => {
-        this.update(null)
+        this.update(null);
       });
   }
 
   public download() {
-    let region = `${this.region}`;
-    let filename = `region-${this.region.replace(" ", "-").toLocaleLowerCase()}-tweet-export`
-
-    if (this.region.match(/\d+/)) {
-      let minX = null;
-      let maxX = null;
-      let minY = null;
-      let maxY = null;
-      for (const point of this.geometry.coordinates[0]) {
-        if (minX === null || point[0] < minX) {
-          minX = point[0];
-        }
-        if (minY === null || point[1] < minY) {
-          minY = point[1];
-        }
-        if (maxX === null || point[0] > maxX) {
-          maxX = point[0];
-        }
-        if (maxY === null || point[1] > maxY) {
-          maxY = point[1];
-        }
-      }
-      console.log(
-        `Bounding box of ${JSON.stringify(this.geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`)
-      region = `(${minX},${minY}),(${maxX},${maxY})`
+    let filename;
+    if (this.selection.count === 1) {
+      filename = this.selection.firstRegion().name + "-tweet-export";
+    } else {
+      filename = `multiple-regions-tweet-export`;
     }
+
     const options = {
-      fieldSeparator:   ',',
-      quoteStrings:     '"',
-      decimalSeparator: '.',
+      fieldSeparator:   ",",
+      quoteStrings:     "\"",
+      decimalSeparator: ".",
       showLabels:       true,
       showTitle:        false,
-      title:            region,
+      title:            "",
       useTextFile:      false,
       useBom:           true,
       useKeysAsHeaders: true,
-      filename: filename
+      filename
       // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
     };
 
     this.csvExporter = new ExportToCsv(options);
-    this.csvExporter.generateCsv(this.visibleTweets.filter(i => i.valid).map(i => i.asCSV(region)));
+    const regionData = [];
+    for (const r of this.selection.all()) {
+      let regionName = `${r.title}`;
+
+      if (r.isNumericRegion()) {
+        let minX = null;
+        let maxX = null;
+        let minY = null;
+        let maxY = null;
+        for (const point of r.geometry.coordinates[0]) {
+          if (minX === null || point[0] < minX) {
+            minX = point[0];
+          }
+          if (minY === null || point[1] < minY) {
+            minY = point[1];
+          }
+          if (maxX === null || point[0] > maxX) {
+            maxX = point[0];
+          }
+          if (maxY === null || point[1] > maxY) {
+            maxY = point[1];
+          }
+        }
+        console.log(
+          `Bounding box of ${JSON.stringify(r.geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`);
+        regionName = `(${minX},${minY}),(${maxX},${maxY})`;
+      }
+      regionData.push(...this.visibleTweets.filter(i => i.valid).map(i => i.asCSV(regionName)));
+
+    }
+    this.csvExporter.generateCsv(regionData);
   }
 }

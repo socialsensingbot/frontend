@@ -172,7 +172,7 @@ export class ProcessedData {
     return ["county", "coarse", "fine"];
   }
 
-  public embeds(activePolyLayerShortName: PolygonLayerShortName, name: string): Tweet[] {
+  public tweets(activePolyLayerShortName: PolygonLayerShortName, name: string): Tweet[] {
     return this.layer(activePolyLayerShortName).tweetsForPlace(name)
   }
 

@@ -15,6 +15,8 @@ const log = new Logger('sign-in');
            })
 export class SignInComponent {
 
+  buttonColor = environment.toolbarColor;
+
   signinForm: FormGroup = new FormGroup({
                                           email:    new FormControl('', [Validators.email, Validators.required]),
                                           password: new FormControl('', [Validators.required, Validators.min(6)])

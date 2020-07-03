@@ -28,7 +28,7 @@
 
     </mat-menu>
     <div class="app-tweet-item app-tweet-row-active">
-      <div class="app-tweet-item-text" [innerHtml]="tweet.html"></div>
+      <div class="app-tweet-item-text" [innerHtml]="tweet.html|safeHtml"></div>
     </div>
     <div class="app-tweet-item-menu">
       <button mat-icon-button [matMenuTriggerData]="{tweet:tweet,si:si,ti:ti}" [matMenuTriggerFor]="appMenu">
@@ -39,40 +39,46 @@
 
 
   <div class="app-tweet-paged app-tweet-page-{{p}}" *ngFor="let page of pages; let p= index">
-    <span style="display:none">This Page {{p}} ({{page.start}}) has {{page.tweets.length}} tweets.</span>
-    <div class="app-tweet-scroll-spinner-outer" *ngIf="p == 0 && p < minPage">
-      <mat-spinner diameter="24" class="app-tweet-scroll-spinner"></mat-spinner>
-    </div>
-    <div [attr.data-index]="i+ page.start"
-         [attr.data-i]="i"
-         [attr.data-page]="page"
-         class="app-tweet-row atr-{{group}} atr-{{i+ page.start}} app-twitter-id-{{tweet.id}}"
-         *ngFor="let tweet of page.tweets; let i = index">
-      <div class="app-tweet-date-separator" *ngIf="isNewDate(i + page.start)">{{tweet.date | date:"mediumDate"}}</div>
-      <ng-container *ngIf="page.page <= maxPage">
-        <div class="app-tweet-item-card-surround" *ngIf="!isPlaceholder(tweet)">
-          <mat-spinner diameter="24" class="app-tweet-load-spinner"></mat-spinner>
-          <ng-container>
-            <ng-container
-              *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i + page.start,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
-          </ng-container>
-        </div>
-        <div class="app-tweet-item-card-surround" *ngIf="isPlaceholder(tweet)">
-          <div class="app-tweet-item-card">
-            <div class="app-tweet-item-placeholder app-tweet-row-active">
-              <span class="app-tweet-item-no-longer-available">Tweet no longer available</span>
-            </div>
-          </div>
-        </div>
-      </ng-container>
-    </div>
-    <ng-container *ngIf="p == pages.length -1">
-      <div class="app-tweet-scroll-spinner-outer" *ngIf="p > maxPage">
+    <ng-container *ngIf="page">
+      <div class="app-tweet-scroll-
+      -outer" *ngIf="p == 0 && p < minPage">
         <mat-spinner diameter="24" class="app-tweet-scroll-spinner"></mat-spinner>
       </div>
-      <div class="app-tweet-scroll-spinner-outer" *ngIf="p == maxPage">
-        <span class="app-tweet-list-end-tilde"> ~ </span>
-      </div>
+      <ng-container *ngFor="let tweet of page.tweets; let i = index">
+        <div [attr.data-index]="i+ page.start"
+             [attr.data-i]="i"
+             [attr.data-page]="p"
+             [attr.data-tweet-id]="tweet.id"
+             class="app-tweet-row atr-{{group}} atr-{{i+ page.start}} app-twitter-id-{{tweet.id}}"
+        >
+          <!--          <div class="app-tweet-date-separator"-->
+          <!--               *ngIf="isNewDate(i + page.start)">{{tweet.date | date:"mediumDate"}}</div>-->
+          <ng-container *ngIf="page.page <= maxPage">
+            <div class="app-tweet-item-card-surround" *ngIf="!isPlaceholder(tweet)">
+              <mat-spinner diameter="24" class="app-tweet-load-spinner"></mat-spinner>
+              <ng-container>
+                <ng-container
+                  *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i + page.start,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
+              </ng-container>
+            </div>
+            <div class="app-tweet-item-card-surround" *ngIf="isPlaceholder(tweet)">
+              <div class="app-tweet-item-card">
+                <div class="app-tweet-item-placeholder app-tweet-row-active">
+                  <span class="app-tweet-item-no-longer-available">Tweet no longer available</span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="p == pages.length -1">
+        <div class="app-tweet-scroll-spinner-outer" *ngIf="p > maxPage">
+          <mat-spinner diameter="24" class="app-tweet-scroll-spinner"></mat-spinner>
+        </div>
+        <div class="app-tweet-scroll-spinner-outer" *ngIf="p == maxPage">
+          <span class="app-tweet-list-end-tilde"> ~ </span>
+        </div>
+      </ng-container>
     </ng-container>
   </div>
 </div>

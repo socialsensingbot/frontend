@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router} from '@angular/router';
-import {Observable} from 'rxjs';
 import Auth from '@aws-amplify/auth';
 import {Logger} from "aws-amplify";
+import {Observable} from 'rxjs';
 const log = new Logger('auth-guard');
 
 /**

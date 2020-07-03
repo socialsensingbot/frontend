@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
-import {LabelType, Options} from "ng5-slider";
+import {ChangeContext, LabelType, Options} from "ng5-slider";
 import {Subscription, timer} from "rxjs";
 import {Cache, Hub, Logger} from "aws-amplify";
 import {NgEventBus} from "ng-event-bus";
@@ -59,10 +59,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
       log.debug("Undefined upper value");
     }
     this._upperValue = value;
-    if (typeof this.timeKeyedData !== "undefined") {
-      log.debug(value);
-      this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
-    }
+
   }
 
   public get lowerValue(): number {
@@ -81,10 +78,6 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
       log.debug("Undefined lower value");
     }
     this._lowerValue = value;
-    if (typeof this.timeKeyedData !== "undefined") {
-      log.debug(value);
-      this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
-    }
   }
 
   /**
@@ -106,14 +99,19 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
    * @see https://angular-slider.github.io/ng5-slider
    */
   public sliderOptions: Options = {
-    floor:        0,
-    ceil:         0,
-    step:         60,
-    showTicks:    false,
-    ticksTooltip: (value: number): string => {
+    floor:                0,
+    ceil:                 0,
+    step:                 60,
+    showTicks:            false,
+    // handleDimension: 12,
+    inputEventsInterval:  100,
+    mouseEventsInterval:  100,
+    outputEventsInterval: 100,
+    touchEventsInterval:  100,
+    ticksTooltip:         (value: number): string => {
       return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0, "") : ""
     },
-    translate:    (value: number, label: LabelType): string => {
+    translate:            (value: number, label: LabelType): string => {
       if (typeof this.timeKeyedData !== "undefined" && typeof this.timeKeyedData[-value] !== "undefined") {
         switch (label) {
           case LabelType.Low:
@@ -179,6 +177,12 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
 
   }
 
+  public change($event: ChangeContext) {
+    if (typeof this.timeKeyedData !== "undefined") {
+      log.debug($event);
+      this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
+    }
+  }
 }
 
 export class DateRangeSliderOptions {
