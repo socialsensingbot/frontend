@@ -5,6 +5,12 @@ $top-margin: 24px;
 $bottom-margin: 36px;
 $drawer-width: $tweetAndMargin + 48px;
 
+::ng-deep {
+  .leaflet-control-container {
+    display: none;
+  }
+}
+
 .draw-close-button {
   position: absolute;
   right: -4px;

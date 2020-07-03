@@ -17,9 +17,6 @@
 
   }
 
-  .app-tweet-item-text {
-    height: 100%;
-  }
 
   .app-tweet-row {
     flex-direction: row;
@@ -29,33 +26,30 @@
     position: relative;
     max-width: $tweetWidth + $tweetMargin * 2;
     min-width: $tweetWidth + $tweetMargin * 2;
-    background-color: #eee;
-    transform: rotateY(0deg);
+    //background-color: #eee;
+    transform: scaleY(1);
     transform-origin: top;
-    transition: transform 0.6s ease-in-out, opacity 0.6s ease-in-out;
-    opacity: 0.0;
-
-    &.app-tweet-row-animate-out {
-      opacity: 1.0;
-    }
+    opacity: 1.0;
 
     &.app-tweet-row-animate-in {
       opacity: 0.0;
     }
 
     &.app-tweet-row-rendered {
+      //transform: scaleY(1);
       opacity: 1.0;
+      transition: opacity 1s ease-in-out;
     }
 
     //max-height: 0;
 
     .app-tweet-item-menu {
       position: absolute;
-      right: -40px;
+      right: -42px;
       top: 0px;
       z-index: 10;
       opacity: 0.0;
-      transition: opacity 1s ease-in-out 0.8s;
+      transition: opacity 1s ease-in-out 1s;
       //border: 1px solid red;
     }
 
@@ -97,7 +91,7 @@
           //opacity: 0.0;
           margin: 12px;
           font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
-          background-color: rgba(0, 0, 0, 0);
+          //background-color: rgba(0, 0, 0, 0);
           list-style: none;
           line-height: 1.3125;
           min-width: 0px;
@@ -118,11 +112,9 @@
           font-size: 12px;
           font-weight: bold;
           line-height: 16px;
-          border-color: #eee #ddd #bbb;
           border-radius: 5px;
-          border-style: solid;
-          border-width: 1px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+          border: 1px solid rgb(225, 232, 237);
+          //box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
           margin-top: 10px;
           margin-left: 0px;
           margin-right: 0px;

@@ -61,8 +61,10 @@ export class UIExecutionService {
   public async start() {
     await Auth.currentAuthenticatedUser();
     this._executionTimer = timer(0, 100).subscribe(() => {
-      while (this._queue.length > 0 && !this._pause) {
-        const task = this._queue.shift();
+      const snapshot = [...this._queue];
+      this._queue = [];
+      while (snapshot.length > 0 && !this._pause) {
+        const task = snapshot.shift();
 
         if (task.waitForStates === null || task.waitForStates.indexOf(this._state) >= 0) {
           task.execute();
@@ -72,7 +74,7 @@ export class UIExecutionService {
         } else {
           if (task.reschedule) {
             this._queue.push(task);
-            log.verbose(
+            log.debug(
               `RESCHEDULED out of sequence task ${task.name} on execution queue,
               state ${this._state} needs to be one of ${task.waitForStates}.`);
             return;

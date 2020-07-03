@@ -53,31 +53,8 @@ $tweetHeaderOffset: 16px;
     margin-top: 8px;
 
 
-    .app-tweet-date-separator {
-      opacity: 0.4;
-      margin-top: 1em;
-      margin-bottom: 1em;
-    }
 
-    .app-tweet-scroll-spinner-outer {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-width: $tweetWidth;
-      text-align: center;
-      max-width: $tweetWidth;
 
-      span {
-        opacity: 0.3;
-      }
-
-      .app-tweet-scroll-spinner {
-        height: 24px;
-        width: 24px;
-        margin: 0 auto;
-
-      }
-    }
 
     .app-tweet-paged {
       display: flex;
@@ -104,8 +81,36 @@ $tweetHeaderOffset: 16px;
   margin-top: -8px;
 }
 
+.app-tweet-date-separator {
+  opacity: 0.4;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
 
 .app-tweet-heading-text {
   margin-top: 0px;
   max-height: 40px;
+}
+
+.app-tweet-scroll-spinner-outer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: $tweetWidth;
+  text-align: center;
+  max-width: $tweetWidth;
+
+  span {
+    opacity: 0.3;
+  }
+
+
+}
+
+.app-tweet-scroll-spinner {
+  height: 24px;
+  width: 24px;
+  margin: 0 auto;
+  display: none !important;
 }
