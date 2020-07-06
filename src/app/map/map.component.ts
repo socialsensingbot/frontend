@@ -250,7 +250,7 @@ export class MapComponent implements OnInit, OnDestroy {
   };
   _routerStateChangeSub: Subscription;
   _popState: boolean;
-  public datasets: any[];
+  public datasets: any[] = [];
 
   private scheduleResetLayers() {
     return this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
@@ -391,11 +391,20 @@ export class MapComponent implements OnInit, OnDestroy {
   private async init(map: Map) {
     log.debug("init");
     // map.zoomControl.remove();
+    await this.pref.waitUntilReady();
+
     if (this.route.snapshot.paramMap.has("dataset")) {
       this._dataset = this.route.snapshot.paramMap.get("dataset");
     } else {
-      this._dataset = this.pref.group.defaultDataSet;
+      this.changeDataSet(this.pref.group.defaultDataSet);
+      return;
     }
+
+    const storedDataSetList = await this._api.ListDataSets();
+    console.warn(storedDataSetList);
+    this.datasets = storedDataSetList.items.filter(
+      i => this.pref.group.availableDataSets.includes(i.id));
+
     // define the layers for the different counts
     this._numberLayers.stats = layerGroup().addTo(map);
     this._numberLayers.count = layerGroup();
@@ -628,10 +637,6 @@ export class MapComponent implements OnInit, OnDestroy {
     // schedulers execution.
 
     this._exec.start();
-    const storedDataSetList = await this._api.ListDataSets();
-    console.warn(storedDataSetList);
-    this.datasets = storedDataSetList.items.filter(
-      i => this.pref.group.availableDataSets.includes(i.id));
 
     this._stateSub = this._exec.state.subscribe((state: UIState) => {
       if (state === "ready") {
@@ -958,9 +963,8 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   public changeDataSet(value: any) {
-    if (this.ready && value !== this.dataset) {
+    if (value !== this.dataset) {
       this.dataset = value;
-      this.load(false);
       this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
     }
   }

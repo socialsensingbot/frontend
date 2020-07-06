@@ -29,7 +29,7 @@ type GroupPreferences @model @auth(rules: [{allow: groups, operations: [create, 
   availableDataSets:[String]
 }
 
-type DataSet @model( timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" }) {
+type DataSet @model( timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" }) @auth(rules: []) {
   id: ID!
   title: String!
 }
