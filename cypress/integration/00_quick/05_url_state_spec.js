@@ -122,11 +122,11 @@ describe('05 URL State: ', function () {
       cy.login();
       cy.visitAndWait(url);
       cy.get(".slider-date-time", {timeout: 20000});
-      cy.url().should("equal", url);
+      cy.url({timeout: 30000}).should("equal", url);
       cy.get(".slider-date-time-min .slider-date", {timeout: 20000}).should("contain.text", "11-Oct-18");
       cy.get(".slider-date-time-min .slider-time").should("contain.text", "5 am");
       cy.get(".app-tweet-drawer", {timeout: 20000}).should("be.visible");
-      cy.url().should("equal", url);
+      cy.url({timeout: 30000}).should("equal", url);
       cy.twitterPanelHeader("Powys");
 
       cy.logout();
