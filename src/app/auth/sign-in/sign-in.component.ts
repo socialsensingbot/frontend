@@ -70,7 +70,8 @@ export class SignInComponent {
             return;
           } else {
             log.debug(user.challengeName);// other situations
-            window.location.href = this._route.snapshot.queryParams["_return"];
+            window.location.replace(this._route.snapshot.queryParams["_return"]);
+
           }
         })
         .catch((error: any) => {

@@ -26,7 +26,7 @@ export class UnauthGuard implements CanActivate {
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     return Auth.currentAuthenticatedUser()
                .then(() => {
-                 window.location.href = this._route.snapshot.queryParams["_return"];
+                 window.location.replace(this._route.snapshot.queryParams["_return"]);
                  return false;
                })
                .catch(() => {

@@ -17,7 +17,8 @@ export class AuthComponent implements OnInit {
       switch (event) {
         case "signIn":
           this._zone.run(() => {
-            window.location.href = this._route.snapshot.queryParams["_return"];
+            window.location.replace(this._route.snapshot.queryParams["_return"]);
+
           });
           break;
         case "signOut":
@@ -29,7 +30,8 @@ export class AuthComponent implements OnInit {
     });
     Auth.currentAuthenticatedUser()
       .then(() => {
-        window.location.href = this._route.snapshot.queryParams["_return"];
+        window.location.replace(this._route.snapshot.queryParams["_return"]);
+
       })
       .catch(() => {});
   }
