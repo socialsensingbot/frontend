@@ -4,7 +4,9 @@
 
 
     <form [formGroup]="signinForm">
-      <h2>Sign in to your account</h2>
+      <h2 *ngIf="!isDemo">Sign in to your account</h2>
+      <h2 *ngIf="isDemo">DEMO</h2>
+      <h3 *ngIf="isDemo">Please sign in in as <code>demo@example.com</code> and password <code>demodemo</code></h3>
       <mat-form-field>
         <input matInput placeholder="Email" type="email" formControlName="email" autocomplete="email" required>
         <mat-hint *ngIf="!emailInput.value">Enter your email address</mat-hint>

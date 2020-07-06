@@ -38,11 +38,66 @@
     }
   },
   "Resources": {
+    "demoGroup": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "GroupName": "demo",
+        "Precedence": 1,
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "demoGroupRole",
+            "Arn"
+          ]
+        },
+        "UserPoolId": {
+          "Ref": "authsocialsensingf07a871cUserPoolId"
+        }
+      }
+    },
+    "demoGroupRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "authsocialsensingf07a871cUserPoolId"
+              },
+              "-demoGroupRole"
+            ]
+          ]
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud": {
+                    "Ref": "authsocialsensingf07a871cIdentityPoolId"
+                  }
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
     "metofficeGroup": {
       "Type": "AWS::Cognito::UserPoolGroup",
       "Properties": {
         "GroupName": "metoffice",
-        "Precedence": 1,
+        "Precedence": 2,
         "RoleArn": {
           "Fn::GetAtt": [
             "metofficeGroupRole",
@@ -97,7 +152,7 @@
       "Type": "AWS::Cognito::UserPoolGroup",
       "Properties": {
         "GroupName": "socialsensing",
-        "Precedence": 2,
+        "Precedence": 3,
         "RoleArn": {
           "Fn::GetAtt": [
             "socialsensingGroupRole",
@@ -152,7 +207,7 @@
       "Type": "AWS::Cognito::UserPoolGroup",
       "Properties": {
         "GroupName": "testuser",
-        "Precedence": 3,
+        "Precedence": 4,
         "RoleArn": {
           "Fn::GetAtt": [
             "testuserGroupRole",
@@ -207,7 +262,7 @@
       "Type": "AWS::Cognito::UserPoolGroup",
       "Properties": {
         "GroupName": "cypressA",
-        "Precedence": 4,
+        "Precedence": 5,
         "RoleArn": {
           "Fn::GetAtt": [
             "cypressAGroupRole",
@@ -262,7 +317,7 @@
       "Type": "AWS::Cognito::UserPoolGroup",
       "Properties": {
         "GroupName": "cypressB",
-        "Precedence": 5,
+        "Precedence": 6,
         "RoleArn": {
           "Fn::GetAtt": [
             "cypressBGroupRole",
@@ -507,6 +562,14 @@
     }
   },
   "Outputs": {
+    "demoGroupRole": {
+      "Value": {
+        "Fn::GetAtt": [
+          "demoGroupRole",
+          "Arn"
+        ]
+      }
+    },
     "metofficeGroupRole": {
       "Value": {
         "Fn::GetAtt": [
