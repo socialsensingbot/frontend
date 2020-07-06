@@ -19,7 +19,7 @@ export const environment = {
     password: ""
   },
   showErrors:       false,
-  sanitizeForGDPR:  false
+  sanitizeForGDPR: true
 };
 
 /*
