@@ -5,7 +5,7 @@ import {fineData} from "./fine_bi";
 import {Auth, Logger} from "aws-amplify";
 import {Browser, GeoJSON, latLng, LayerGroup, layerGroup, LeafletMouseEvent, Map, tileLayer} from "leaflet";
 import "jquery-ui/ui/widgets/slider.js";
-import {ActivatedRoute, NavigationStart, Params, Router} from "@angular/router";
+import {ActivatedRoute, NavigationStart, ParamMap, Params, Router} from "@angular/router";
 import * as rxjs from "rxjs";
 import {Subscription, timer} from "rxjs";
 import * as geojson from "geojson";
@@ -36,6 +36,7 @@ import {Tweet} from "./twitter/tweet";
 import {getOS, toTitleCase} from "../common";
 import {RegionSelection} from "./region-selection";
 import {PreferenceService} from "../pref/preference.service";
+import {switchMap} from "rxjs/operators";
 
 
 const log = new Logger("map");
@@ -48,6 +49,7 @@ const ONE_MINUTE_IN_MILLIS = 60000;
              styleUrls:   ["./map.component.scss"]
            })
 export class MapComponent implements OnInit, OnDestroy {
+  private dataset: string;
 
   public get activePolyLayerShortName(): PolygonLayerShortName {
     return this._activePolyLayerShortName;
@@ -85,14 +87,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
   }
 
-  private scheduleResetLayers() {
-    return this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
-      this.activity = true;
-      this.resetLayers(true);
-      this.activity = false;
-    }, "", false, true, true);
-  }
-
   public get activeNumberLayerShortName(): NumberLayerShortName {
     return this._activeNumberLayerShortName;
   }
@@ -118,6 +112,27 @@ export class MapComponent implements OnInit, OnDestroy {
       }
       this.scheduleResetLayers();
     }
+  }
+
+  constructor(private _router: Router,
+              private route: ActivatedRoute,
+              private _zone: NgZone,
+              private _layerStyles: LayerStyleService,
+              private _notify: NotificationService,
+              private _auth: AuthService,
+              private _http: HttpClient,
+              private _exec: UIExecutionService,
+              private _color: ColorCodeService,
+              private _data: MapDataService,
+              public pref: PreferenceService
+  ) {
+    // save the query parameter observable
+    this._searchParams = this.route.queryParams;
+
+    // Preload the cacheable stats files asynchronously
+    // this gets called again in onMapReady()
+    // But the values should be in the browser cache by then
+    this._data.loadStats().then(() => {log.debug("Prefetched the stats files."); });
   }
 
 
@@ -225,25 +240,12 @@ export class MapComponent implements OnInit, OnDestroy {
   _routerStateChangeSub: Subscription;
   _popState: boolean;
 
-  constructor(private _router: Router,
-              private route: ActivatedRoute,
-              private _zone: NgZone,
-              private _layerStyles: LayerStyleService,
-              private _notify: NotificationService,
-              private _auth: AuthService,
-              private _http: HttpClient,
-              private _exec: UIExecutionService,
-              private _color: ColorCodeService,
-              private _data: MapDataService,
-              public pref: PreferenceService
-  ) {
-    // save the query parameter observable
-    this._searchParams = this.route.queryParams;
-
-    // Preload the cacheable stats files asynchronously
-    // this gets called again in onMapReady()
-    // But the values should be in the browser cache by then
-    this._data.loadStats().then(() => {log.debug("Prefetched the stats files."); });
+  private scheduleResetLayers() {
+    return this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
+      this.activity = true;
+      this.resetLayers(true);
+      this.activity = false;
+    }, "", false, true, true);
   }
 
   /**
@@ -377,7 +379,11 @@ export class MapComponent implements OnInit, OnDestroy {
   private async init(map: Map) {
     log.debug("init");
     // map.zoomControl.remove();
-
+    if (this.route.snapshot.paramMap.has("dataset")) {
+      this.dataset = this.route.snapshot.paramMap.get("dataset");
+    } else {
+      this.dataset = this.pref.group.defaultDataSet;
+    }
     // define the layers for the different counts
     this._numberLayers.stats = layerGroup().addTo(map);
     this._numberLayers.count = layerGroup();
@@ -772,7 +778,7 @@ export class MapComponent implements OnInit, OnDestroy {
     }
     this.activity = true;
     try {
-      await this._data.load();
+      await this._data.load(this.dataset);
 
       if (first) {
         await this._exec.queue("Update Slider", ["data-loaded"],

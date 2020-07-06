@@ -105,19 +105,24 @@ export class MapDataService {
   /**
    * Loads the live data from S3 storage securely.
    */
-  public async loadLiveData(): Promise<TimeSlice[]> {
+  public async loadLiveData(dataset: string): Promise<TimeSlice[]> {
     log.debug("loadLiveData()");
-    return Storage.get("live.json")
-                  .then((url: any) =>
-                          this._http.get(url.toString(), {observe: "body", responseType: "json"})
-                              .toPromise()
-                  ) as Promise<TimeSlice[]>;
+    if (this._pref.group.availableDataSets.includes(dataset)) {
+      return Storage.get(dataset + ".json")
+                    .then((url: any) =>
+                            this._http.get(url.toString(), {observe: "body", responseType: "json"})
+                                .toPromise()
+                    ) as Promise<TimeSlice[]>;
+    } else {
+      this._notify.show("Your group does not have access to dataset " + dataset);
+      throw Error("Your group does not have access to dataset " + dataset);
+    }
   }
 
 
-  public async load() {
+  public async load(dataset: string) {
     return await this._exec.queue("Load Data", ["ready", "map-init", "data-loaded", "data-load-failed"], async () => {
-      this._rawTwitterData = await this.loadLiveData() as TimeSlice[];
+      this._rawTwitterData = await this.loadLiveData(dataset) as TimeSlice[];
       this.reverseTimeKeys = this.getTimes();
       this._exec.changeState("data-loaded");
       log.debug("Loading live data completed", this._rawTwitterData);
