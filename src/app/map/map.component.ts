@@ -37,6 +37,7 @@ import {getOS, toTitleCase} from "../common";
 import {RegionSelection} from "./region-selection";
 import {PreferenceService} from "../pref/preference.service";
 import {switchMap} from "rxjs/operators";
+import {APIService} from "../API.service";
 
 
 const log = new Logger("map");
@@ -49,7 +50,17 @@ const ONE_MINUTE_IN_MILLIS = 60000;
              styleUrls:   ["./map.component.scss"]
            })
 export class MapComponent implements OnInit, OnDestroy {
-  private dataset: string;
+  public get dataset(): string {
+    return this._dataset;
+  }
+
+  public set dataset(value: string) {
+    this._dataset = value;
+    this.load(false);
+    this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
+  }
+
+  private _dataset: string;
 
   public get activePolyLayerShortName(): PolygonLayerShortName {
     return this._activePolyLayerShortName;
@@ -124,7 +135,8 @@ export class MapComponent implements OnInit, OnDestroy {
               private _exec: UIExecutionService,
               private _color: ColorCodeService,
               private _data: MapDataService,
-              public pref: PreferenceService
+              public pref: PreferenceService,
+              private _api: APIService
   ) {
     // save the query parameter observable
     this._searchParams = this.route.queryParams;
@@ -239,6 +251,7 @@ export class MapComponent implements OnInit, OnDestroy {
   };
   _routerStateChangeSub: Subscription;
   _popState: boolean;
+  public datasets: any[];
 
   private scheduleResetLayers() {
     return this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
@@ -380,9 +393,9 @@ export class MapComponent implements OnInit, OnDestroy {
     log.debug("init");
     // map.zoomControl.remove();
     if (this.route.snapshot.paramMap.has("dataset")) {
-      this.dataset = this.route.snapshot.paramMap.get("dataset");
+      this._dataset = this.route.snapshot.paramMap.get("dataset");
     } else {
-      this.dataset = this.pref.group.defaultDataSet;
+      this._dataset = this.pref.group.defaultDataSet;
     }
     // define the layers for the different counts
     this._numberLayers.stats = layerGroup().addTo(map);
@@ -609,14 +622,16 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
 
-  ngOnInit() {
+  async ngOnInit() {
     // Because of the impact on the user experience we prevent overlapping events from occurring
     // and throttle those events also. The prevention of overlapping events is done by the use
     // of a flag and queued events. The throttling is acheived by the the periodicity of the
     // schedulers execution.
 
     this._exec.start();
-
+    this.datasets = (await this._api.ListDataSets()).items.filter(
+      i => this.pref.group.availableDataSets.includes(i.id));
+    console.warn(this.datasets);
     this._stateSub = this._exec.state.subscribe((state: UIState) => {
       if (state === "ready") {
         this.ready = true;
@@ -778,7 +793,7 @@ export class MapComponent implements OnInit, OnDestroy {
     }
     this.activity = true;
     try {
-      await this._data.load(this.dataset);
+      await this._data.load(this._dataset);
 
       if (first) {
         await this._exec.queue("Update Slider", ["data-loaded"],
@@ -939,5 +954,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this._notify.show("Minimum Zoom");
     }
   }
+
+
 }
 

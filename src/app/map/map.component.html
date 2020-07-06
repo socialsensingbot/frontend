@@ -36,6 +36,16 @@
                              (onEnd)="sliderChangeOnEnd($event)"
                              [options]="sliderOptions"></date-range-slider>
         </div>
+        <ng-container *ngIf="datasets.length > 1">
+          <div class="app-toolbar-separator"></div>
+          <mat-form-field>
+            <mat-select [(value)]="dataset">
+              <mat-option *ngFor="let ds of datasets" [value]="ds.id">
+                {{ds.title}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </ng-container>
         <div class="app-toolbar-separator"></div>
         <mat-form-field>
           <mat-select [(value)]="activePolyLayerShortName" class="map-polygon-layer-select">
@@ -51,6 +61,7 @@
             <mat-option value="count">Tweet Count</mat-option>
           </mat-select>
         </mat-form-field>
+
         <div class="app-toolbar-separator"></div>
         <button class="app-toolbar-btn" mat-icon-button (click)="downloadTweetsAsCSV()">
           <mat-icon matTooltip="Download all Tweets as a CSV file.">cloud_download</mat-icon>

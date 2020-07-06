@@ -64,6 +64,9 @@ query GetGroupPreferences($id: ID!) {
     locale
     timezone
     multipleSessions
+    sanitizeForGDPR
+    defaultDataSet
+    availableDataSets
     createdAt
     updatedAt
   }
@@ -80,6 +83,32 @@ query ListGroupPreferencess(
       locale
       timezone
       multipleSessions
+      sanitizeForGDPR
+      defaultDataSet
+      availableDataSets
+      createdAt
+      updatedAt
+    }
+    nextToken
+  }
+}
+query GetDataSet($id: ID!) {
+  getDataSet(id: $id) {
+    id
+    title
+    createdAt
+    updatedAt
+  }
+}
+query ListDataSets(
+  $filter: ModelDataSetFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listDataSets(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      title
       createdAt
       updatedAt
     }

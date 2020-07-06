@@ -31,6 +31,7 @@ type GroupPreferences @model @auth(rules: [{allow: groups, operations: [create, 
 
 type DataSet @model {
   id: ID!
+  title: String
 }
 
 

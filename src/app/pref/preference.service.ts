@@ -78,6 +78,7 @@ export class PreferenceService {
     }
     if (!groups || groups.length === 0) {
       this._notify.show(
+        // tslint:disable-next-line:max-line-length
         "Your account is not a member of a group, please ask an administrator to fix this. The application will not work correctly until you do.",
         "I Will",
         180);
@@ -94,7 +95,13 @@ export class PreferenceService {
         this._groupPreferences = groupPref;
 
       }
-      this.group = {...this.group, ...this._groupPreferences}
+      this.group = {...this.group, ...this._groupPreferences};
+      if (!this.group.availableDataSets) {
+        this.group.availableDataSets = environment.availableDataSets;
+      }
+      if (!this.group.defaultDataSet) {
+        this.group.defaultDataSet = environment.defaultDataSet;
+      }
       log.debug(this._preferences);
     }
     this.readBlacklist();
