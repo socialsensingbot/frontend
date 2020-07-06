@@ -7,7 +7,7 @@ export const environment = {
   timezone:         "UTC",
   locale:           'en-GB',
   rollbar:          true,
-  multipleSessions: false,
+  multipleSessions: true,
   hmr:              false,
   confirm:          {
     email:    '',
