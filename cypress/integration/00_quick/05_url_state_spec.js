@@ -10,7 +10,7 @@ describe('05 URL State: ', function () {
     it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
-      cy.url().should("equal", url);
+      cy.url({timeout: 30000}).should("equal", url);
       cy.noSpinner();
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
 
@@ -24,7 +24,7 @@ describe('05 URL State: ', function () {
     it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
-      cy.url().should("equal", url);
+      cy.url({timeout: 30000}).should("equal", url);
       cy.noSpinner();
 
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 20000});
@@ -38,7 +38,7 @@ describe('05 URL State: ', function () {
     it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
-      cy.url().should("equal", url);
+      cy.url({timeout: 30000}).should("equal", url);
       cy.noSpinner();
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 60000}).should("have.attr", "fill").should(
         "eq",
@@ -64,7 +64,7 @@ describe('05 URL State: ', function () {
     it('default zoom', () => {
       cy.visit(url);
       cy.login();
-      cy.url().should("equal", url);
+      cy.url({timeout: 30000}).should("equal", url);
       cy.noSpinner();
       cy.wait(zoomDuration)
       cy.get(".map-zoom-in").should("be.visible");
@@ -97,19 +97,18 @@ describe('05 URL State: ', function () {
   });
 
 
-  describe('select lat & lng', () => {
+  describe.only('select lat & lng', () => {
     const url = MAP_URL + "?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000";
     const newUrl = MAP_URL + "?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000&selected=cambridgeshire";
     it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
-      cy.url().should("equal", url);
+      cy.url({timeout: 30000}).should("equal", url);
       cy.noSpinner();
       cy.get(".leaflet-map-pane").should("be.visible");
-      cy.get(".leaflet-map-pane").click(300, 300);
-      cy.pushStateDelay(); // The push state is not immediate
-      cy.url({timeout: 30000}).should("equal", newUrl);
+      cy.get(".leaflet-map-pane").click(100, 100);
       cy.twitterPanelHeader("Cambridgeshire");
+      cy.url({timeout: 30000}).should("equal", newUrl);
       cy.logout();
     });
   });
