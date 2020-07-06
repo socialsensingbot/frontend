@@ -1,3 +1,5 @@
+import {MAP_URL} from "../../../support";
+
 describe('#77 Missing tweets : https://github.com/socialsensingbot/frontend/issues/77', function () {
   beforeEach(function () {
     cy.visit('http://localhost:4200/map');
@@ -6,7 +8,7 @@ describe('#77 Missing tweets : https://github.com/socialsensingbot/frontend/issu
   });
 
 
-  const url = "http://localhost:4200/map/live?selected=roscommon&max_time=1588538940000&min_time=1588452540000&active_number=stats&active_polygon=county";
+  const url = MAP_URL + "?selected=roscommon&max_time=1588538940000&min_time=1588452540000&active_number=stats&active_polygon=county";
 
   it('Should be two tweets both removed', () => {
     cy.visit(url);

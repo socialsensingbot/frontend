@@ -430,6 +430,11 @@ export class MapComponent implements OnInit, OnDestroy {
                              return this._zone.run(() => this.updateSearch({zoom: this._map.getZoom()}));
                            });
 
+                           const storedDataSetList = await this._api.ListDataSets();
+                           this.datasets = storedDataSetList.items.filter(
+                             i => this.pref.group.availableDataSets.includes(i.id));
+                           console.warn(this.datasets);
+
                            this._exec.changeState("ready");
                            await this.updateLayers("From Parameters");
                            // Schedule periodic data loads from the server
@@ -629,9 +634,7 @@ export class MapComponent implements OnInit, OnDestroy {
     // schedulers execution.
 
     this._exec.start();
-    this.datasets = (await this._api.ListDataSets()).items.filter(
-      i => this.pref.group.availableDataSets.includes(i.id));
-    console.warn(this.datasets);
+
     this._stateSub = this._exec.state.subscribe((state: UIState) => {
       if (state === "ready") {
         this.ready = true;

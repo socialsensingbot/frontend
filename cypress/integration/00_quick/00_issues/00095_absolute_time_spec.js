@@ -1,3 +1,5 @@
+import {MAP_URL} from "../../../support";
+
 const zoomDuration = 1000;
 
 function confirmSlider() {
@@ -10,7 +12,7 @@ function confirmSlider() {
 
 describe('#95 App auto adjusts for past date in date range: : https://github.com/socialsensingbot/frontend/issues/95',
          () => {
-           const url = "http://localhost:4200/map/live?selected=powys&max_time=1587941160000&min_time=1587854760000&active_number=stats&active_polygon=county";
+           const url = MAP_URL + "?selected=powys&max_time=1587941160000&min_time=1587854760000&active_number=stats&active_polygon=county";
            it('when authorized and load state', () => {
              cy.visit("http://localhost:4200/map");
              cy.stubLiveJson("live-short");

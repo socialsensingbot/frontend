@@ -1,10 +1,12 @@
+import {MAP_URL} from "../../support";
+
 const zoomDuration = 1000;
 describe('05 URL State: ', function () {
   beforeEach(() => {
     cy.stubLiveJson("live-old");
   })
   describe('select county', () => {
-    const url = "http://localhost:4200/map/live?selected=powys";
+    const url = MAP_URL + "?selected=powys";
     it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
@@ -18,7 +20,7 @@ describe('05 URL State: ', function () {
   });
 
   describe('select polygon type', () => {
-    const url = "http://localhost:4200/map/live?active_polygon=coarse&selected=123";
+    const url = MAP_URL + "?active_polygon=coarse&selected=123";
     it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
@@ -32,7 +34,7 @@ describe('05 URL State: ', function () {
 
   });
   describe('select polygon type and count stats', () => {
-    const url = "http://localhost:4200/map/live?active_polygon=coarse&selected=123&active_number=count";
+    const url = MAP_URL + "?active_polygon=coarse&selected=123&active_number=count";
     it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
@@ -55,7 +57,7 @@ describe('05 URL State: ', function () {
   });
 
   describe('select zoom', () => {
-    const url = "http://localhost:4200/map/live?max_time=1539475200000&min_time=1539216000000&active_number=stats&active_polygon=county";
+    const url = MAP_URL + "?max_time=1539475200000&min_time=1539216000000&active_number=stats&active_polygon=county";
     const urlZoom6 = url + "&zoom=6"; //default zoom
     const urlZoom7 = url + "&zoom=7";
     const urlZoom8 = url + "&zoom=8";
@@ -96,8 +98,8 @@ describe('05 URL State: ', function () {
 
 
   describe('select lat & lng', () => {
-    const url = "http://localhost:4200/map/live?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000";
-    const newUrl = "http://localhost:4200/map/live?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000&selected=cambridgeshire";
+    const url = MAP_URL + "?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000";
+    const newUrl = MAP_URL + "?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000&selected=cambridgeshire";
     it('when unauthorized and load state', () => {
       cy.visit(url);
       cy.login();
@@ -114,7 +116,7 @@ describe('05 URL State: ', function () {
 
 
   describe('select county and date range', () => {
-    const url = "http://localhost:4200/map/live?max_time=1539392400000&min_time=1539234000000&active_number=stats&active_polygon=county&selected=powys";
+    const url = MAP_URL + "?max_time=1539392400000&min_time=1539234000000&active_number=stats&active_polygon=county&selected=powys";
     it('when authorized and load state', () => {
       cy.visit("http://localhost:4200/map");
       cy.login();
