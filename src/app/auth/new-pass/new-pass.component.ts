@@ -42,9 +42,9 @@ export class NewPassComponent implements OnInit {
     public auth: AuthService,
     private _notification: NotificationService,
     private _router: Router,
-    private route: ActivatedRoute) {
+    private _route: ActivatedRoute) {
 
-    this.message=_router.getCurrentNavigation().extras.state.message;
+    this.message = _router.getCurrentNavigation().extras.state.message;
   }
 
 
@@ -67,7 +67,7 @@ export class NewPassComponent implements OnInit {
     log.debug("changePass()");
     return this.auth.completeNewPassword(this.passwordInput.value).then(() => {
       log.debug("completed new password");
-      this._router.navigate(['/map'], {queryParamsHandling: "merge"});
+      window.location.href = this._route.snapshot.queryParams["_return"];
     }).catch(e => log.error(e));
   }
 

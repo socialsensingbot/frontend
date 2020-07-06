@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
+import {Injectable, NgZone} from '@angular/core';
 import {
   CanActivate,
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
-  Router } from '@angular/router';
+  Router, ActivatedRoute
+} from '@angular/router';
 import Auth from '@aws-amplify/auth';
 import {Observable} from 'rxjs';
 /**
@@ -18,17 +19,18 @@ import {Observable} from 'rxjs';
   providedIn: 'root'
 })
 export class UnauthGuard implements CanActivate {
-  constructor( private _router: Router ) { }
+  constructor(private _router: Router, private _route: ActivatedRoute) { }
+
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     return Auth.currentAuthenticatedUser()
-            .then(() => {
-              this._router.navigate(['/map'],{queryParamsHandling:"merge"});
-              return false;
-            })
-            .catch(() => {
-              return true;
+               .then(() => {
+                 window.location.href = this._route.snapshot.queryParams["_return"];
+                 return false;
+               })
+               .catch(() => {
+                 return true;
             });
   }
 }

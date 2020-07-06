@@ -1,7 +1,7 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import Auth from '@aws-amplify/auth';
-import { Router } from '@angular/router';
-import { Hub } from '@aws-amplify/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {Hub} from '@aws-amplify/core';
 
 @Component({
   selector: 'app-auth',
@@ -10,14 +10,14 @@ import { Hub } from '@aws-amplify/core';
 })
 export class AuthComponent implements OnInit {
 
-  constructor( private _router: Router, private _zone: NgZone ) { }
+  constructor(private _router: Router, private _zone: NgZone, private _route: ActivatedRoute) { }
 
   ngOnInit() {
     Hub.listen("auth", ({ payload: { event, data } }) => {
       switch (event) {
         case "signIn":
           this._zone.run(() => {
-            this._router.navigate(['/map'],{queryParamsHandling:"merge"});
+            window.location.href = this._route.snapshot.queryParams["_return"];
           });
           break;
         case "signOut":
@@ -29,7 +29,7 @@ export class AuthComponent implements OnInit {
     });
     Auth.currentAuthenticatedUser()
       .then(() => {
-        this._router.navigate(['/map'],{queryParamsHandling:"merge"});
+        window.location.href = this._route.snapshot.queryParams["_return"];
       })
       .catch(() => {});
   }

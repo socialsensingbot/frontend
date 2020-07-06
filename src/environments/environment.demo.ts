@@ -13,6 +13,7 @@ export const environment = {
     email:    "",
     password: ""
   },
-  sanitizeForGDPR:  true
-
+  sanitizeForGDPR:  true,
+  defaultDataSet:   "live",
+  availableDataSets: ["live"]
 };
