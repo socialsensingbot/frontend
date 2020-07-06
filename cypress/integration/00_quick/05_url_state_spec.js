@@ -106,7 +106,7 @@ describe('05 URL State: ', function () {
       cy.get(".leaflet-map-pane").should("be.visible");
       cy.get(".leaflet-map-pane").click(300, 300);
       cy.pushStateDelay(); // The push state is not immediate
-      cy.url().should("equal", newUrl);
+      cy.url({timeout: 30000}).should("equal", newUrl);
       cy.twitterPanelHeader("Cambridgeshire");
       cy.logout();
     });
