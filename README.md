@@ -363,7 +363,7 @@ and used like
 
 ```javascript
  describe('select county and date range', () => {
-    const url = "http://localhost:4200/map?selected=scottish%20borders&min_time=-1439&max_time=0&zoom=5";
+    const url = "http://localhost:4200/map/live?selected=scottish%20borders&min_time=-1439&max_time=0&zoom=5";
     it('with no tweets', () => {
       cy.visitAndWait(url);
       cy.get(".slider-date-time", {timeout: 20000});

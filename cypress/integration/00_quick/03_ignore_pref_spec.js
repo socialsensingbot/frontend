@@ -6,7 +6,7 @@ describe('03 Ignore tweets: ', function () {
   })
 
   const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
-  const url = "http://localhost:4200/map?selected=carmarthenshire&max_offset=0&min_offset=-1439";
+  const url = "http://localhost:4200/map/live?selected=carmarthenshire&max_offset=0&min_offset=-1439";
   const test = () => {
     cy.visit(url);
     cy.login();

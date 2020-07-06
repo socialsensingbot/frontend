@@ -8,7 +8,7 @@ describe('#124 Region multi select : https://github.com/socialsensingbot/fronten
 
 
            it('Select manually', () => {
-             const url = "http://localhost:4200/map?active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000&zoom=5&selected=powys";
+             const url = "http://localhost:4200/map/live?active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000&zoom=5&selected=powys";
                   cy.visitAndWait(url);
                   cy.get(`div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-powys[stroke-width=3]`);
                   cy.twitterPanelHeader("Powys");
@@ -16,12 +16,12 @@ describe('#124 Region multi select : https://github.com/socialsensingbot/fronten
                   cy.twitterPanelHeader("3 regions selected");
                   cy.tweetCountTotal(108);
                   cy.url().should("equal",
-                                  "http://localhost:4200/map?active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000&zoom=5&selected=powys&selected=ceredigion&selected=carmarthenshire")
+                                  "http://localhost:4200/map/live?active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000&zoom=5&selected=powys&selected=ceredigion&selected=carmarthenshire")
                   cy.multiSelectRegions(["ceredigion"]);
                   cy.twitterPanelHeader("2 regions selected");
                   cy.tweetCountTotal(90);
                   cy.url().should("equal",
-                                  "http://localhost:4200/map?active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000&zoom=5&selected=powys&selected=carmarthenshire")
+                                  "http://localhost:4200/map/live?active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000&zoom=5&selected=powys&selected=carmarthenshire")
                   cy.get(`div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-powys[stroke-width=3]`).click(
                     {force: true});
                   cy.url().should("equal", url);
@@ -30,7 +30,7 @@ describe('#124 Region multi select : https://github.com/socialsensingbot/fronten
 
 
                 it('Select from URL', () => {
-                  const url = "http://localhost:4200/map?active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000&selected=powys&selected=ceredigion&selected=carmarthenshire";
+                  const url = "http://localhost:4200/map/live?active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000&selected=powys&selected=ceredigion&selected=carmarthenshire";
                   cy.visitAndWait(url);
                   cy.tweetCountTotal(108);
                   for (let county of ["powys", "ceredigion", "carmarthenshire"]) {

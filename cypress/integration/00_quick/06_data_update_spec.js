@@ -3,7 +3,7 @@
  */
 describe('Data Update: ', function () {
   describe('slider change', () => {
-    const url = "http://localhost:4200/map?selected=powys&max_time=1587941160000&min_time=1587854760000&active_number=stats&active_polygon=county";
+    const url = "http://localhost:4200/map/live?selected=powys&max_time=1587941160000&min_time=1587854760000&active_number=stats&active_polygon=county";
     it('after scheduled update', () => {
       //See commands.js - stubLiveJson stubs out the call to S3 to get live.json
       cy.stubLiveJson("live-short");

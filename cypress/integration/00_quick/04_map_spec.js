@@ -26,7 +26,7 @@ describe('04: Map: ', function () {
   });
 
   describe('Legend', () => {
-    const url = "http://localhost:4200/map?active_number=count";
+    const url = "http://localhost:4200/map/live?active_number=count";
     const legendEntry = "mat-sidenav-content > map-legend > mat-card > div > span:nth-child(1)";
     const statsFirstLegendColour = "background: rgb(254, 229, 217);";
     const statsFirstLegendVal = " 5–";
@@ -61,7 +61,7 @@ describe('04: Map: ', function () {
 
 
   describe('Twitter drawer', () => {
-    const url = "http://localhost:4200/map?selected=powys&min_offset=-5459&max_offset=-2819";
+    const url = "http://localhost:4200/map/live?selected=powys&min_offset=-5459&max_offset=-2819";
     it('can be closed', () => {
       cy.visitAndWait(url);
       cy.twitterPanelVisible();

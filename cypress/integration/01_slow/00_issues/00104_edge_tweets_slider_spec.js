@@ -7,14 +7,14 @@ describe('#104 Slider and tweet interaction : https://github.com/socialsensingbo
            });
 
            it('Reproduce Issue', () => {
-             const url = "http://localhost:4200/map?selected=greater%20london&max_time=1591100940000&min_time=1591007520000&active_number=stats&active_polygon=county";
+             const url = "http://localhost:4200/map/live?selected=greater%20london&max_time=1591100940000&min_time=1591007520000&active_number=stats&active_polygon=county";
              cy.visitAndWait(url);
              cy.tweetCountTotal(49);
              cy.log("Set slider to whole 5 days (be great if tweets updated as you did this)");
              cy.moveMinDateSliderLeft(8);
              cy.wait(1000);
              cy.url({timeout: 20000}).should("equal",
-                                             "http://localhost:4200/map?selected=greater%20london&max_time=1591100940000&min_time=1590755460000&active_number=stats&active_polygon=county");
+                                             "http://localhost:4200/map/live?selected=greater%20london&max_time=1591100940000&min_time=1590755460000&active_number=stats&active_polygon=county");
              cy.log("Click out of London in any other county");
              cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-tipperary").click();
              cy.wait(1000);
@@ -40,7 +40,7 @@ describe('#104 Slider and tweet interaction : https://github.com/socialsensingbo
              cy.twitterPanelHeader("Greater London");
              cy.tweetCountTotal(49);
              cy.url({timeout: 20000}).should("equal",
-                                             "http://localhost:4200/map?selected=greater%20london&max_time=1591100940000&min_time=1591007520000&active_number=stats&active_polygon=county");
+                                             "http://localhost:4200/map/live?selected=greater%20london&max_time=1591100940000&min_time=1591007520000&active_number=stats&active_polygon=county");
 
            });
 
