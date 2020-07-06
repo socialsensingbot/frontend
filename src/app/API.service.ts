@@ -137,7 +137,7 @@ export type DeleteGroupPreferencesInput = {
 
 export type CreateDataSetInput = {
   id?: string | null;
-  title?: string | null;
+  title: string;
 };
 
 export type ModelDataSetConditionInput = {
@@ -487,7 +487,7 @@ export type DeleteGroupPreferencesMutation = {
 export type CreateDataSetMutation = {
   __typename: "DataSet";
   id: string;
-  title: string | null;
+  title: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -495,7 +495,7 @@ export type CreateDataSetMutation = {
 export type UpdateDataSetMutation = {
   __typename: "DataSet";
   id: string;
-  title: string | null;
+  title: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -503,7 +503,7 @@ export type UpdateDataSetMutation = {
 export type DeleteDataSetMutation = {
   __typename: "DataSet";
   id: string;
-  title: string | null;
+  title: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -765,7 +765,7 @@ export type ListGroupPreferencessQuery = {
 export type GetDataSetQuery = {
   __typename: "DataSet";
   id: string;
-  title: string | null;
+  title: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -775,7 +775,7 @@ export type ListDataSetsQuery = {
   items: Array<{
     __typename: "DataSet";
     id: string;
-    title: string | null;
+    title: string;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
@@ -1022,7 +1022,7 @@ export type OnDeleteGroupPreferencesSubscription = {
 export type OnCreateDataSetSubscription = {
   __typename: "DataSet";
   id: string;
-  title: string | null;
+  title: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -1030,7 +1030,7 @@ export type OnCreateDataSetSubscription = {
 export type OnUpdateDataSetSubscription = {
   __typename: "DataSet";
   id: string;
-  title: string | null;
+  title: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -1038,7 +1038,7 @@ export type OnUpdateDataSetSubscription = {
 export type OnDeleteDataSetSubscription = {
   __typename: "DataSet";
   id: string;
-  title: string | null;
+  title: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -1482,7 +1482,6 @@ export class APIService {
     )) as any;
     return <DeleteGroupPreferencesMutation>response.data.deleteGroupPreferences;
   }
-
   async CreateDataSet(
     input: CreateDataSetInput,
     condition?: ModelDataSetConditionInput
@@ -1507,7 +1506,6 @@ export class APIService {
     )) as any;
     return <CreateDataSetMutation>response.data.createDataSet;
   }
-
   async UpdateDataSet(
     input: UpdateDataSetInput,
     condition?: ModelDataSetConditionInput
@@ -1532,7 +1530,6 @@ export class APIService {
     )) as any;
     return <UpdateDataSetMutation>response.data.updateDataSet;
   }
-
   async DeleteDataSet(
     input: DeleteDataSetInput,
     condition?: ModelDataSetConditionInput
@@ -1557,7 +1554,6 @@ export class APIService {
     )) as any;
     return <DeleteDataSetMutation>response.data.deleteDataSet;
   }
-
   async CreateGroupTweetIgnore(
     input: CreateGroupTweetIgnoreInput,
     condition?: ModelGroupTweetIgnoreConditionInput
@@ -2109,7 +2105,6 @@ export class APIService {
     )) as any;
     return <ListGroupPreferencessQuery>response.data.listGroupPreferencess;
   }
-
   async GetDataSet(id: string): Promise<GetDataSetQuery> {
     const statement = `query GetDataSet($id: ID!) {
         getDataSet(id: $id) {
@@ -2128,7 +2123,6 @@ export class APIService {
     )) as any;
     return <GetDataSetQuery>response.data.getDataSet;
   }
-
   async ListDataSets(
     filter?: ModelDataSetFilterInput,
     limit?: number,
@@ -2162,7 +2156,6 @@ export class APIService {
     )) as any;
     return <ListDataSetsQuery>response.data.listDataSets;
   }
-
   async GetGroupTweetIgnore(id: string): Promise<GetGroupTweetIgnoreQuery> {
     const statement = `query GetGroupTweetIgnore($id: ID!) {
         getGroupTweetIgnore(id: $id) {

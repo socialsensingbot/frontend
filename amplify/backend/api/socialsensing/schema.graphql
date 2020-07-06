@@ -29,9 +29,9 @@ type GroupPreferences @model @auth(rules: [{allow: groups, operations: [create, 
   availableDataSets:[String]
 }
 
-type DataSet @model {
+type DataSet @model( timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" }) {
   id: ID!
-  title: String
+  title: String!
 }
 
 

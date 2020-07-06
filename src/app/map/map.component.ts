@@ -56,8 +56,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   public set dataset(value: string) {
     this._dataset = value;
-    this.load(false);
-    this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
+
   }
 
   private _dataset: string;
@@ -430,11 +429,6 @@ export class MapComponent implements OnInit, OnDestroy {
                              return this._zone.run(() => this.updateSearch({zoom: this._map.getZoom()}));
                            });
 
-                           const storedDataSetList = await this._api.ListDataSets();
-                           this.datasets = storedDataSetList.items.filter(
-                             i => this.pref.group.availableDataSets.includes(i.id));
-                           console.warn(this.datasets);
-
                            this._exec.changeState("ready");
                            await this.updateLayers("From Parameters");
                            // Schedule periodic data loads from the server
@@ -634,6 +628,10 @@ export class MapComponent implements OnInit, OnDestroy {
     // schedulers execution.
 
     this._exec.start();
+    const storedDataSetList = await this._api.ListDataSets();
+    console.warn(storedDataSetList);
+    this.datasets = storedDataSetList.items.filter(
+      i => this.pref.group.availableDataSets.includes(i.id));
 
     this._stateSub = this._exec.state.subscribe((state: UIState) => {
       if (state === "ready") {
@@ -959,5 +957,12 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
 
+  public changeDataSet(value: any) {
+    if (this.ready && value !== this.dataset) {
+      this.dataset = value;
+      this.load(false);
+      this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
+    }
+  }
 }
 

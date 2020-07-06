@@ -39,7 +39,7 @@
         <ng-container *ngIf="datasets.length > 1">
           <div class="app-toolbar-separator"></div>
           <mat-form-field>
-            <mat-select [(value)]="dataset">
+            <mat-select [(value)]="dataset" (valueChange)="changeDataSet($event)">
               <mat-option *ngFor="let ds of datasets" [value]="ds.id">
                 {{ds.title}}
               </mat-option>
