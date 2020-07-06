@@ -966,6 +966,7 @@ export class MapComponent implements OnInit, OnDestroy {
     if (value !== this.dataset) {
       this.dataset = value;
       this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
+      this.load(false);
     }
   }
 }
