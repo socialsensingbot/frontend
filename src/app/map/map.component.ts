@@ -5,7 +5,7 @@ import {fineData} from "./fine_bi";
 import {Auth, Logger} from "aws-amplify";
 import {Browser, GeoJSON, latLng, LayerGroup, layerGroup, LeafletMouseEvent, Map, tileLayer} from "leaflet";
 import "jquery-ui/ui/widgets/slider.js";
-import {ActivatedRoute, NavigationStart, ParamMap, Params, Router} from "@angular/router";
+import {ActivatedRoute, NavigationStart, Params, Router} from "@angular/router";
 import * as rxjs from "rxjs";
 import {Subscription, timer} from "rxjs";
 import * as geojson from "geojson";
@@ -36,7 +36,6 @@ import {Tweet} from "./twitter/tweet";
 import {getOS, toTitleCase} from "../common";
 import {RegionSelection} from "./region-selection";
 import {PreferenceService} from "../pref/preference.service";
-import {switchMap} from "rxjs/operators";
 import {APIService} from "../API.service";
 
 
@@ -55,8 +54,11 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   public set dataset(value: string) {
-    this._dataset = value;
-
+    if (value !== this._dataset) {
+      this._dataset = value;
+      this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
+      this.load(false);
+    }
   }
 
   private _dataset: string;
@@ -396,14 +398,14 @@ export class MapComponent implements OnInit, OnDestroy {
     if (this.route.snapshot.paramMap.has("dataset")) {
       this._dataset = this.route.snapshot.paramMap.get("dataset");
     } else {
-      this.changeDataSet(this.pref.group.defaultDataSet);
-      return;
+      this._dataset = this.pref.group.defaultDataSet;
     }
 
     const storedDataSetList = await this._api.ListDataSets();
     console.warn(storedDataSetList);
     this.datasets = storedDataSetList.items.filter(
-      i => this.pref.group.availableDataSets.includes(i.id));
+      i => this.pref.group.availableDataSets.includes(i.id)
+    );
 
     // define the layers for the different counts
     this._numberLayers.stats = layerGroup().addTo(map);
@@ -958,15 +960,6 @@ export class MapComponent implements OnInit, OnDestroy {
       this._map.setZoom(this._map.getZoom() - 1);
     } else {
       this._notify.show("Minimum Zoom");
-    }
-  }
-
-
-  public changeDataSet(value: any) {
-    if (value !== this.dataset) {
-      this.dataset = value;
-      this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
-      this.load(false);
     }
   }
 }
