@@ -5,6 +5,7 @@
 export const environment = {
   name:             "dev",
   version:          "dev",
+  demo:             false,
   production:       false,
   hmr:              false,
   rollbar:          false,

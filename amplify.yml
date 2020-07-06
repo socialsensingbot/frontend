@@ -16,7 +16,7 @@ frontend:
         - mkdir -p dist/frontend
     build:
       commands:
-        - if [ "${AWS_BRANCH}" = "master" ] || [ "${AWS_BRANCH}" = "staging" ]; then  npm run-script build-prod; else npm run-script build ; fi
+        - ./bin/build.sh
   artifacts:
     baseDirectory: dist/frontend
     files:
