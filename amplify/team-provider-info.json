@@ -40,10 +40,10 @@
             "AmplifyAppId": "dtmxl3q3i7oix"
         },
         "categories": {
-            "auth": {
-                "socialsensingf07a871c": {},
-                "userPoolGroups": {}
-            },
+          "auth": {
+            "socialsensingf07a871c": {},
+            "userPoolGroups": {}
+          },
           "function": {
             "S3Triggerb3a090e2": {}
           },

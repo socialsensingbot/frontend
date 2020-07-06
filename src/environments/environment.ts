@@ -9,16 +9,17 @@ export const environment = {
   production:       false,
   hmr:              false,
   rollbar:          false,
-  toolbarColor:     'primary',
+  toolbarColor:     "primary",
   // timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   timezone:         "UTC",
   multipleSessions: false,
-  locale:           'en-GB',
+  locale:           "en-GB",
   confirm:          {
-    email:    '',
-    password: ''
+    email:    "",
+    password: ""
   },
-  showErrors:       false
+  showErrors:       false,
+  sanitizeForGDPR:  false
 };
 
 /*
@@ -28,4 +29,4 @@ export const environment = {
  * This import should be commented out in production mode because it will have a negative impact
  * on performance if an error is thrown.
  */
-import 'zone.js/dist/zone-error';  // Included with Angular CLI.
+import "zone.js/dist/zone-error";  // Included with Angular CLI.

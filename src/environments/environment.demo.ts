@@ -5,12 +5,14 @@ export const environment = {
   demo:             true,
   // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
   timezone:         "UTC",
-  locale:           'en-GB',
+  locale:           "en-GB",
   rollbar:          true,
   multipleSessions: true,
   hmr:              false,
   confirm:          {
-    email:    '',
-    password: ''
-  }
+    email:    "",
+    password: ""
+  },
+  sanitizeForGDPR:  true
+
 };

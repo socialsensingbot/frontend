@@ -4,15 +4,16 @@ export const environment = {
   hmr:              true,
   demo:             false,
   rollbar:          false,
-  toolbarColor:     'primary',
+  toolbarColor:     "primary",
   // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
   timezone:         "UTC",
   multipleSessions: true,
-  locale:           'en-GB',
+  locale:           "en-GB",
   confirm:          {
-    email:    '',
-    password: ''
+    email:    "",
+    password: ""
   },
-  showErrors:       false
+  showErrors:       false,
+  sanitizeForGDPR:  true
 
 };
