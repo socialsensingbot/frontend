@@ -8,6 +8,7 @@
     "hmr": "ng serve --configuration hmr",
     "build": "ng build --verbose --aot",
     "build-prod": "ng build --prod",
+    "build-demo": "ng build --prod --configuration demo",
     "test": "ng test",
     "lint": "ng lint"
   },

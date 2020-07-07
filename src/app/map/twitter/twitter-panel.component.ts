@@ -199,7 +199,8 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
           `Bounding box of ${JSON.stringify(r.geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`);
         regionName = `(${minX},${minY}),(${maxX},${maxY})`;
       }
-      regionData.push(...this.visibleTweets.filter(i => i.valid).map(i => i.asCSV(regionName)));
+      regionData.push(
+        ...this.visibleTweets.filter(i => i.valid).map(i => i.asCSV(regionName, this.pref.group.sanitizeForGDPR)));
 
     }
     this.csvExporter.generateCsv(regionData);

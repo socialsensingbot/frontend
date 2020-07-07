@@ -1,5 +1,8 @@
 {
   "groupPermissionMap": {
+    "demo": [
+      "read"
+    ],
     "metoffice": [
       "read"
     ],
@@ -7,6 +10,12 @@
       "read"
     ],
     "testuser": [
+      "read"
+    ],
+    "cypressA": [
+      "read"
+    ],
+    "cypressB": [
       "read"
     ]
   }

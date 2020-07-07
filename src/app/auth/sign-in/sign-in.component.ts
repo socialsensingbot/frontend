@@ -23,6 +23,7 @@ export class SignInComponent {
                                         });
 
   hide = true;
+  isDemo = environment.demo;
 
   get emailInput() { return this.signinForm.get('email'); }
 

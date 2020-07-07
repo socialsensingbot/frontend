@@ -302,7 +302,7 @@ export class MapDataService {
     log.verbose("Exporting egion: " + region);
     return this._twitterData.tweets(polyType, region)
                .filter(i => i.valid && !this._pref.isBlacklisted(i))
-               .map(i => i.asCSV(toTitleCase(regionText)));
+               .map(i => i.asCSV(toTitleCase(regionText), this._pref.group.sanitizeForGDPR));
 
   }
 
