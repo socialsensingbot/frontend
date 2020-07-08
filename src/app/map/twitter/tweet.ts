@@ -149,10 +149,24 @@ export class Tweet {
     return this;
   }
 
-  public asCSV(region: string): CSVExportTweet {
+  public asCSV(region: string, sanitize: boolean): CSVExportTweet {
     this.lazyInit();
-    return new CSVExportTweet(region, this._id, this._date.toUTCString(), this._url,
-                              $("<div>").html(this._html).text());
+    if (sanitize) {
+      return new CSVExportTweet(region, this._id, this._date.toUTCString(),
+                                "https://twitter.com/username_removed/status/" + this._id,
+                                this.sanitizeForGDPR($("<div>").html(this._html).text()));
+
+    } else {
+      return new CSVExportTweet(region, this._id, this._date.toUTCString(), this._url,
+                                $("<div>").html(this._html).text());
+    }
+  }
+
+  sanitizeForGDPR(tweetText: string): string {
+    // — Tim Hopkins (@thop1988)
+    return tweetText
+      .replace(/@[a-zA-Z0-9_-]+/g, "@USERNAME_REMOVED")
+      .replace(/— .+ \(@USERNAME_REMOVED\).*$/g, "");
   }
 }
 

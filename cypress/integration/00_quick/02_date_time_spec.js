@@ -8,7 +8,7 @@ describe('02 Date time: ', function () {
 
   describe('select county and date range', () => {
     console.debug("Tests https://github.com/socialsensingbot/frontend/issues/67");
-    const url = "http://localhost:4200/map?selected=scottish%20borders&zoom=5&max_time=1539561540000&min_time=1539475200000";
+    const url = "http://localhost:4200/map?selected=scottish%20borders&zoom=5&max_time=1539561540000&min_time=1539475200000&active_number=stats&active_polygon=county";
     it('with no tweets', () => {
       cy.visitAndWait(url);
       cy.get(".slider-date-time", {timeout: 20000});
@@ -16,8 +16,7 @@ describe('02 Date time: ', function () {
       cy.get(".slider-date-time-max .slider-time").should("contain.text", "0 am");
       cy.get(".app-tweet-drawer", {timeout: 60000}).should("be.visible");
       cy.url().should("equal", url);
-      cy.twitterPanelHeader("No Tweets from Scottish Borders");
-
+      cy.twitterPanelHeader("Scottish Borders", "No Tweets");
       cy.logout();
     });
   });

@@ -98,6 +98,18 @@
     "authuserPoolGroupstestuserGroupRole": {
       "Type": "String",
       "Default": "authuserPoolGroupstestuserGroupRole"
+    },
+    "authuserPoolGroupsdemoGroupRole": {
+      "Type": "String",
+      "Default": "authuserPoolGroupsdemoGroupRole"
+    },
+    "authuserPoolGroupscypressAGroupRole": {
+      "Type": "String",
+      "Default": "authuserPoolGroupscypressAGroupRole"
+    },
+    "authuserPoolGroupscypressBGroupRole": {
+      "Type": "String",
+      "Default": "authuserPoolGroupscypressBGroupRole"
     }
   },
   "Conditions": {
@@ -222,8 +234,8 @@
                 "",
                 [
                   {
-                                        "Ref": "bucketName"
-                                    },
+                    "Ref": "bucketName"
+                  },
                   {
                     "Fn::Select": [
                       3,
@@ -838,6 +850,192 @@
                   "Ref": "authsocialsensingf07a871cUserPoolId"
                 },
                 "-testuserGroupRole"
+              ]
+            ]
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:GetObject",
+                "s3:ListBucket"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "S3Bucket"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": "s3:ListBucket",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "S3Bucket"
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "demoGroupPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "demo-group-s3-policy",
+        "Roles": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Ref": "authsocialsensingf07a871cUserPoolId"
+                },
+                "-demoGroupRole"
+              ]
+            ]
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:GetObject",
+                "s3:ListBucket"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "S3Bucket"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": "s3:ListBucket",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "S3Bucket"
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "cypressAGroupPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "cypressA-group-s3-policy",
+        "Roles": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Ref": "authsocialsensingf07a871cUserPoolId"
+                },
+                "-cypressAGroupRole"
+              ]
+            ]
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:GetObject",
+                "s3:ListBucket"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "S3Bucket"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": "s3:ListBucket",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "S3Bucket"
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "cypressBGroupPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "cypressB-group-s3-policy",
+        "Roles": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Ref": "authsocialsensingf07a871cUserPoolId"
+                },
+                "-cypressBGroupRole"
               ]
             ]
           }

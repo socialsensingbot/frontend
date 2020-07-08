@@ -21,7 +21,9 @@
           {{getConfirmPasswordError()}}
         </mat-error>
       </mat-form-field>
-      <button mat-raised-button color="primary" (click)="changePass()" [disabled]="!changePassForm.valid">Sign In</button>
+      <button mat-raised-button color="{{buttonColor}}" (click)="changePass()" [disabled]="!changePassForm.valid">Sign
+        In
+      </button>
       <!--  <p style="text-align:center;">or</p>-->
       <!--  <button mat-raised-button color="primary" (click)="signInWithFacebook()">Sign In with Facebook</button><br/><br/>-->
       <!--  <button mat-raised-button color="primary" (click)="signInWithGoogle()">Sign In with Google</button>-->

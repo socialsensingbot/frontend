@@ -18,7 +18,7 @@ const log = new Logger("new-pass");
              styleUrls:   ['./new-pass.component.scss']
            })
 export class NewPassComponent implements OnInit {
-
+  buttonColor = environment.toolbarColor;
   changePassForm: FormGroup = new FormGroup({
                                               password: new FormControl('', [Validators.required, Validators.min(8)]),
                                               confirm:  new FormControl('', [Validators.required, Validators.min(8),
