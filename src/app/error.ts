@@ -15,21 +15,37 @@ import {NotificationService} from "./services/notification.service";
 
 const rollbarConfig = {
   accessToken:                'd22c641642f94b619b51f31de651e7b9',
-  captureUncaught:            environment.rollbar,
-  captureUnhandledRejections: environment.rollbar,
+  captureUncaught:            true,
+  captureUnhandledRejections: true,
 };
 
 export const RollbarService = new InjectionToken<Rollbar>('rollbar');
 
 @Injectable()
 export class RollbarErrorHandler implements ErrorHandler {
-  constructor(@Inject(RollbarService) private rollbar: Rollbar, private _notify: NotificationService) {}
+  constructor(@Inject(RollbarService) private rollbar: Rollbar, private _notify: NotificationService) {
+    window.onerror = (message, file, line, col, e) => {
+      this.handleError(message)
+      return false;
+    };
+    window.addEventListener("error", (e) => {
+      this.handleError(e)
+      return false;
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+      this.handleError(e)
+    })
+  }
 
   handleError(err: any): void {
     if (environment.rollbar) {
       this.rollbar.error(err.originalError || err);
     } else {
-      this._notify.error(err);
+      if (environment.showErrors) {
+        this._notify.error(err.originalError || err);
+      } else {
+        console.error(err.originalError || err)
+      }
     }
   }
 }

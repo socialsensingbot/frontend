@@ -24,6 +24,14 @@ type GroupPreferences @model @auth(rules: [{allow: groups, operations: [create, 
   locale: String
   timezone: String
   multipleSessions: Boolean
+  sanitizeForGDPR: Boolean
+  defaultDataSet: String
+  availableDataSets:[String]
+}
+
+type DataSet @model( timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" }) @auth(rules: []) {
+  id: ID!
+  title: String!
 }
 
 

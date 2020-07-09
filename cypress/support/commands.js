@@ -27,6 +27,8 @@ import "cypress-graphql-mock";
 
 const LONG_TIMEOUT = 60000;
 const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
+const multipleKey = Cypress.platform === "darwin" ? "{command}" : "{ctrl}";
+
 
 Cypress.Commands.add("login", (username = "cypress1@example.com") => {
   //Login
@@ -63,13 +65,17 @@ Cypress.Commands.add("noSpinner", () => {
   });
 });
 
-Cypress.Commands.add("twitterPanelHeader", (text) => {
+Cypress.Commands.add("twitterPanelHeader", (text, subheadingText) => {
   cy.get("twitter-panel");
   cy.get(".app-tweet-area-loading-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
   cy.wait(1000);
   cy.get(".app-tweet-area-loading-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
   cy.get(".app-tweet-heading", {timeout: LONG_TIMEOUT});
-  cy.get("span.app-tweet-heading", {timeout: LONG_TIMEOUT}).should("contain.text", text);
+  cy.get(".app-tweet-heading", {timeout: LONG_TIMEOUT}).should("contain.text", text);
+  if (subheadingText) {
+    cy.get(".app-tweet-sub-heading", {timeout: LONG_TIMEOUT});
+    cy.get(".app-tweet-sub-heading", {timeout: LONG_TIMEOUT}).should("contain.text", subheadingText);
+  }
 });
 Cypress.Commands.add("twitterPanelVisible", () => {
   cy.get(".app-tweet-drawer", {timeout: LONG_TIMEOUT}).should("be.visible");
@@ -123,7 +129,7 @@ Cypress.Commands.add("tweetCount", (vis, hid) => {
     cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000}).click()
       .then(title => {
               const hiddenCount = +title.text().trimLeft().split(" ")[0];
-        cy.get(".app-tweet-outer").find('.atr-hidden').its('length').should('eq', hid);
+              cy.get(".app-tweet-outer").find('.atr-hidden').its('length').should('eq', hid);
 
             }
       );
@@ -169,6 +175,15 @@ Cypress.Commands.add("moveMinDateSliderRight", (times) => {
   }
 });
 
+Cypress.Commands.add("multiSelectRegions", (regions) => {
+  for (let region of regions) {
+    const path = `div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-${region}`;
+    cy.get("body").type(multipleKey, {release: false, force: true})
+    cy.get(path).click({force: true});
+    cy.wait(1000);
+    cy.get("body").type(multipleKey, {release: true, force: true})
+  }
+});
 Cypress.Commands.add("pushStateDelay", () => {
   cy.wait(500);
 });
@@ -208,8 +223,8 @@ function patchXhrUsing(makeResponse) {
 }
 
 Cypress.Commands.add("mockGraphQL", () => {
+  throw new Error("DO NOT USE, THIS IS BROKEN");
   cy.server({
-
               onAnyRequest: (route, proxy) => {
 
                 if (!route || !route.url || typeof route.url["indexOf"] === "undefined") {
@@ -229,9 +244,7 @@ Cypress.Commands.add("mockGraphQL", () => {
                     };
 
 
-                  }
-
-                  if (body && body.query && body.query.indexOf(
+                  } else if (body && body.query && body.query.indexOf(
                     "ListGroupTwitterUserIgnores") >= 0) {
                     route.response = {
                       "data": {
@@ -242,15 +255,14 @@ Cypress.Commands.add("mockGraphQL", () => {
                       }
                     };
 
-                  }
-                  if (body && body.query && body.query.indexOf(
+                  } else if (body && body.query && body.query.indexOf(
                     "GetUserPreferences") >= 0) {
                     console.log("GetUserPreferences");
                     route.response = {
                       "data": {
                         "getUserPreferences": {
-                          "id":           "434fd82f-3a65-4c66-85c1-b701f2b7ca81",
-                          "owner":        "434fd82f-3a65-4c66-85c1-b701f2b7ca81"
+                          "id":    "434fd82f-3a65-4c66-85c1-b701f2b7ca81",
+                          "owner": "434fd82f-3a65-4c66-85c1-b701f2b7ca81"
                         }
                       }
                     };
@@ -258,11 +270,22 @@ Cypress.Commands.add("mockGraphQL", () => {
 
                   }
 
+                } else if (body && body.query && body.query.indexOf(
+                  "ListDataSets") >= 0) {
+                  route.response = {
+                    "data": {
+                      "listDataSets": {
+                        items: [{id: "live", title: "Live"}]
+                      }
+
+                    }
+                  };
+
                 }
                 console.log("RESPONSE: ", route, proxy);
               }
 
             });
-  cy.route("POST", "/graphql", {});
+  cy.route("POST", "/graphql");
 });
 

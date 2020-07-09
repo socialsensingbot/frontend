@@ -102,6 +102,9 @@ mutation CreateGroupPreferences(
     locale
     timezone
     multipleSessions
+    sanitizeForGDPR
+    defaultDataSet
+    availableDataSets
     createdAt
     updatedAt
   }
@@ -116,6 +119,9 @@ mutation UpdateGroupPreferences(
     locale
     timezone
     multipleSessions
+    sanitizeForGDPR
+    defaultDataSet
+    availableDataSets
     createdAt
     updatedAt
   }
@@ -130,6 +136,42 @@ mutation DeleteGroupPreferences(
     locale
     timezone
     multipleSessions
+    sanitizeForGDPR
+    defaultDataSet
+    availableDataSets
+    createdAt
+    updatedAt
+  }
+}
+mutation CreateDataSet(
+  $input: CreateDataSetInput!
+  $condition: ModelDataSetConditionInput
+) {
+  createDataSet(input: $input, condition: $condition) {
+    id
+    title
+    createdAt
+    updatedAt
+  }
+}
+mutation UpdateDataSet(
+  $input: UpdateDataSetInput!
+  $condition: ModelDataSetConditionInput
+) {
+  updateDataSet(input: $input, condition: $condition) {
+    id
+    title
+    createdAt
+    updatedAt
+  }
+}
+mutation DeleteDataSet(
+  $input: DeleteDataSetInput!
+  $condition: ModelDataSetConditionInput
+) {
+  deleteDataSet(input: $input, condition: $condition) {
+    id
+    title
     createdAt
     updatedAt
   }

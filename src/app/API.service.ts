@@ -103,12 +103,18 @@ export type CreateGroupPreferencesInput = {
   locale?: string | null;
   timezone?: string | null;
   multipleSessions?: boolean | null;
+  sanitizeForGDPR?: boolean | null;
+  defaultDataSet?: string | null;
+  availableDataSets?: Array<string | null> | null;
 };
 
 export type ModelGroupPreferencesConditionInput = {
   locale?: ModelStringInput | null;
   timezone?: ModelStringInput | null;
   multipleSessions?: ModelBooleanInput | null;
+  sanitizeForGDPR?: ModelBooleanInput | null;
+  defaultDataSet?: ModelStringInput | null;
+  availableDataSets?: ModelStringInput | null;
   and?: Array<ModelGroupPreferencesConditionInput | null> | null;
   or?: Array<ModelGroupPreferencesConditionInput | null> | null;
   not?: ModelGroupPreferencesConditionInput | null;
@@ -120,9 +126,33 @@ export type UpdateGroupPreferencesInput = {
   locale?: string | null;
   timezone?: string | null;
   multipleSessions?: boolean | null;
+  sanitizeForGDPR?: boolean | null;
+  defaultDataSet?: string | null;
+  availableDataSets?: Array<string | null> | null;
 };
 
 export type DeleteGroupPreferencesInput = {
+  id?: string | null;
+};
+
+export type CreateDataSetInput = {
+  id?: string | null;
+  title: string;
+};
+
+export type ModelDataSetConditionInput = {
+  title?: ModelStringInput | null;
+  and?: Array<ModelDataSetConditionInput | null> | null;
+  or?: Array<ModelDataSetConditionInput | null> | null;
+  not?: ModelDataSetConditionInput | null;
+};
+
+export type UpdateDataSetInput = {
+  id: string;
+  title?: string | null;
+};
+
+export type DeleteDataSetInput = {
   id?: string | null;
 };
 
@@ -275,9 +305,20 @@ export type ModelGroupPreferencesFilterInput = {
   locale?: ModelStringInput | null;
   timezone?: ModelStringInput | null;
   multipleSessions?: ModelBooleanInput | null;
+  sanitizeForGDPR?: ModelBooleanInput | null;
+  defaultDataSet?: ModelStringInput | null;
+  availableDataSets?: ModelStringInput | null;
   and?: Array<ModelGroupPreferencesFilterInput | null> | null;
   or?: Array<ModelGroupPreferencesFilterInput | null> | null;
   not?: ModelGroupPreferencesFilterInput | null;
+};
+
+export type ModelDataSetFilterInput = {
+  id?: ModelIDInput | null;
+  title?: ModelStringInput | null;
+  and?: Array<ModelDataSetFilterInput | null> | null;
+  or?: Array<ModelDataSetFilterInput | null> | null;
+  not?: ModelDataSetFilterInput | null;
 };
 
 export type ModelGroupTweetIgnoreFilterInput = {
@@ -408,6 +449,9 @@ export type CreateGroupPreferencesMutation = {
   locale: string | null;
   timezone: string | null;
   multipleSessions: boolean | null;
+  sanitizeForGDPR: boolean | null;
+  defaultDataSet: string | null;
+  availableDataSets: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -419,6 +463,9 @@ export type UpdateGroupPreferencesMutation = {
   locale: string | null;
   timezone: string | null;
   multipleSessions: boolean | null;
+  sanitizeForGDPR: boolean | null;
+  defaultDataSet: string | null;
+  availableDataSets: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -430,6 +477,33 @@ export type DeleteGroupPreferencesMutation = {
   locale: string | null;
   timezone: string | null;
   multipleSessions: boolean | null;
+  sanitizeForGDPR: boolean | null;
+  defaultDataSet: string | null;
+  availableDataSets: Array<string | null> | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateDataSetMutation = {
+  __typename: "DataSet";
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type UpdateDataSetMutation = {
+  __typename: "DataSet";
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type DeleteDataSetMutation = {
+  __typename: "DataSet";
+  id: string;
+  title: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -663,6 +737,9 @@ export type GetGroupPreferencesQuery = {
   locale: string | null;
   timezone: string | null;
   multipleSessions: boolean | null;
+  sanitizeForGDPR: boolean | null;
+  defaultDataSet: string | null;
+  availableDataSets: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -676,6 +753,29 @@ export type ListGroupPreferencessQuery = {
     locale: string | null;
     timezone: string | null;
     multipleSessions: boolean | null;
+    sanitizeForGDPR: boolean | null;
+    defaultDataSet: string | null;
+    availableDataSets: Array<string | null> | null;
+    createdAt: string;
+    updatedAt: string;
+  } | null> | null;
+  nextToken: string | null;
+};
+
+export type GetDataSetQuery = {
+  __typename: "DataSet";
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ListDataSetsQuery = {
+  __typename: "ModelDataSetConnection";
+  items: Array<{
+    __typename: "DataSet";
+    id: string;
+    title: string;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
@@ -884,6 +984,9 @@ export type OnCreateGroupPreferencesSubscription = {
   locale: string | null;
   timezone: string | null;
   multipleSessions: boolean | null;
+  sanitizeForGDPR: boolean | null;
+  defaultDataSet: string | null;
+  availableDataSets: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -895,6 +998,9 @@ export type OnUpdateGroupPreferencesSubscription = {
   locale: string | null;
   timezone: string | null;
   multipleSessions: boolean | null;
+  sanitizeForGDPR: boolean | null;
+  defaultDataSet: string | null;
+  availableDataSets: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -906,6 +1012,33 @@ export type OnDeleteGroupPreferencesSubscription = {
   locale: string | null;
   timezone: string | null;
   multipleSessions: boolean | null;
+  sanitizeForGDPR: boolean | null;
+  defaultDataSet: string | null;
+  availableDataSets: Array<string | null> | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OnCreateDataSetSubscription = {
+  __typename: "DataSet";
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OnUpdateDataSetSubscription = {
+  __typename: "DataSet";
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OnDeleteDataSetSubscription = {
+  __typename: "DataSet";
+  id: string;
+  title: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -1271,6 +1404,9 @@ export class APIService {
           locale
           timezone
           multipleSessions
+          sanitizeForGDPR
+          defaultDataSet
+          availableDataSets
           createdAt
           updatedAt
         }
@@ -1298,6 +1434,9 @@ export class APIService {
           locale
           timezone
           multipleSessions
+          sanitizeForGDPR
+          defaultDataSet
+          availableDataSets
           createdAt
           updatedAt
         }
@@ -1325,6 +1464,9 @@ export class APIService {
           locale
           timezone
           multipleSessions
+          sanitizeForGDPR
+          defaultDataSet
+          availableDataSets
           createdAt
           updatedAt
         }
@@ -1339,6 +1481,78 @@ export class APIService {
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
     return <DeleteGroupPreferencesMutation>response.data.deleteGroupPreferences;
+  }
+  async CreateDataSet(
+    input: CreateDataSetInput,
+    condition?: ModelDataSetConditionInput
+  ): Promise<CreateDataSetMutation> {
+    const statement = `mutation CreateDataSet($input: CreateDataSetInput!, $condition: ModelDataSetConditionInput) {
+        createDataSet(input: $input, condition: $condition) {
+          __typename
+          id
+          title
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <CreateDataSetMutation>response.data.createDataSet;
+  }
+  async UpdateDataSet(
+    input: UpdateDataSetInput,
+    condition?: ModelDataSetConditionInput
+  ): Promise<UpdateDataSetMutation> {
+    const statement = `mutation UpdateDataSet($input: UpdateDataSetInput!, $condition: ModelDataSetConditionInput) {
+        updateDataSet(input: $input, condition: $condition) {
+          __typename
+          id
+          title
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <UpdateDataSetMutation>response.data.updateDataSet;
+  }
+  async DeleteDataSet(
+    input: DeleteDataSetInput,
+    condition?: ModelDataSetConditionInput
+  ): Promise<DeleteDataSetMutation> {
+    const statement = `mutation DeleteDataSet($input: DeleteDataSetInput!, $condition: ModelDataSetConditionInput) {
+        deleteDataSet(input: $input, condition: $condition) {
+          __typename
+          id
+          title
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <DeleteDataSetMutation>response.data.deleteDataSet;
   }
   async CreateGroupTweetIgnore(
     input: CreateGroupTweetIgnoreInput,
@@ -1837,6 +2051,9 @@ export class APIService {
           locale
           timezone
           multipleSessions
+          sanitizeForGDPR
+          defaultDataSet
+          availableDataSets
           createdAt
           updatedAt
         }
@@ -1864,6 +2081,9 @@ export class APIService {
             locale
             timezone
             multipleSessions
+            sanitizeForGDPR
+            defaultDataSet
+            availableDataSets
             createdAt
             updatedAt
           }
@@ -1884,6 +2104,57 @@ export class APIService {
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
     return <ListGroupPreferencessQuery>response.data.listGroupPreferencess;
+  }
+  async GetDataSet(id: string): Promise<GetDataSetQuery> {
+    const statement = `query GetDataSet($id: ID!) {
+        getDataSet(id: $id) {
+          __typename
+          id
+          title
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      id
+    };
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <GetDataSetQuery>response.data.getDataSet;
+  }
+  async ListDataSets(
+    filter?: ModelDataSetFilterInput,
+    limit?: number,
+    nextToken?: string
+  ): Promise<ListDataSetsQuery> {
+    const statement = `query ListDataSets($filter: ModelDataSetFilterInput, $limit: Int, $nextToken: String) {
+        listDataSets(filter: $filter, limit: $limit, nextToken: $nextToken) {
+          __typename
+          items {
+            __typename
+            id
+            title
+            createdAt
+            updatedAt
+          }
+          nextToken
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {};
+    if (filter) {
+      gqlAPIServiceArguments.filter = filter;
+    }
+    if (limit) {
+      gqlAPIServiceArguments.limit = limit;
+    }
+    if (nextToken) {
+      gqlAPIServiceArguments.nextToken = nextToken;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <ListDataSetsQuery>response.data.listDataSets;
   }
   async GetGroupTweetIgnore(id: string): Promise<GetGroupTweetIgnoreQuery> {
     const statement = `query GetGroupTweetIgnore($id: ID!) {
@@ -2257,6 +2528,9 @@ export class APIService {
           locale
           timezone
           multipleSessions
+          sanitizeForGDPR
+          defaultDataSet
+          availableDataSets
           createdAt
           updatedAt
         }
@@ -2274,6 +2548,9 @@ export class APIService {
           locale
           timezone
           multipleSessions
+          sanitizeForGDPR
+          defaultDataSet
+          availableDataSets
           createdAt
           updatedAt
         }
@@ -2291,12 +2568,57 @@ export class APIService {
           locale
           timezone
           multipleSessions
+          sanitizeForGDPR
+          defaultDataSet
+          availableDataSets
           createdAt
           updatedAt
         }
       }`
     )
   ) as Observable<OnDeleteGroupPreferencesSubscription>;
+
+  OnCreateDataSetListener: Observable<OnCreateDataSetSubscription> = API.graphql(
+    graphqlOperation(
+      `subscription OnCreateDataSet {
+        onCreateDataSet {
+          __typename
+          id
+          title
+          createdAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<OnCreateDataSetSubscription>;
+
+  OnUpdateDataSetListener: Observable<OnUpdateDataSetSubscription> = API.graphql(
+    graphqlOperation(
+      `subscription OnUpdateDataSet {
+        onUpdateDataSet {
+          __typename
+          id
+          title
+          createdAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<OnUpdateDataSetSubscription>;
+
+  OnDeleteDataSetListener: Observable<OnDeleteDataSetSubscription> = API.graphql(
+    graphqlOperation(
+      `subscription OnDeleteDataSet {
+        onDeleteDataSet {
+          __typename
+          id
+          title
+          createdAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<OnDeleteDataSetSubscription>;
 
   OnCreateGroupTweetIgnoreListener: Observable<OnCreateGroupTweetIgnoreSubscription> = API.graphql(
     graphqlOperation(

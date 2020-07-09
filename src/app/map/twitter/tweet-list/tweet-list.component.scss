@@ -1,7 +1,5 @@
-@import "../../../../styles";
+@import "../../map.component";
 
-$tweetWidth: 540px;
-$tweetMargin: 8px;
 .app-tweet-list {
   display: block;
   max-height: 100%;
@@ -19,9 +17,6 @@ $tweetMargin: 8px;
 
   }
 
-  .app-tweet-item-text {
-    height: 100%;
-  }
 
   .app-tweet-row {
     flex-direction: row;
@@ -29,19 +24,32 @@ $tweetMargin: 8px;
     align-items: center;
     //border: 1px solid blue;
     position: relative;
-    max-width: 500px + $tweetMargin * 2;
-    min-width: 500px + $tweetMargin * 2;
+    max-width: $tweetWidth + $tweetMargin * 2;
+    min-width: $tweetWidth + $tweetMargin * 2;
+    //background-color: #eee;
+    transform: scaleY(1);
+    transform-origin: top;
+    opacity: 1.0;
 
+    &.app-tweet-row-animate-in {
+      opacity: 0.0;
+    }
+
+    &.app-tweet-row-rendered {
+      //transform: scaleY(1);
+      opacity: 1.0;
+      transition: opacity 1s ease-in-out;
+    }
 
     //max-height: 0;
 
     .app-tweet-item-menu {
       position: absolute;
-      right: -40px;
+      right: -42px;
       top: 0px;
       z-index: 10;
       opacity: 0.0;
-      transition: opacity 1s ease-in-out 0.3s;
+      transition: opacity 1s ease-in-out 1s;
       //border: 1px solid red;
     }
 
@@ -52,19 +60,38 @@ $tweetMargin: 8px;
       width: 100%;
       min-height: 32px;
 
+
       ::ng-deep {
 
+
+        blockquote.twitter-tweet p {
+          font-size: 16px;
+          font-weight: normal;
+          line-height: 20px;
+        }
+
+        blockquote.twitter-tweet a {
+          color: inherit;
+          font-weight: normal;
+          text-decoration: none;
+          outline: 0 none;
+        }
+
+        blockquote.twitter-tweet a:hover,
+        blockquote.twitter-tweet a:focus {
+          text-decoration: underline;
+        }
+
         blockquote {
-          opacity: 0.0;
-          transition: opacity 0.8s ease-in-out;
+          opacity: 0.9;
         }
 
         .app-tweet-item-text blockquote {
-          display: none;
-          opacity: 0.0;
+          //display: none;
+          //opacity: 0.0;
           margin: 12px;
           font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
-          background-color: rgba(0, 0, 0, 0);
+          //background-color: rgba(0, 0, 0, 0);
           list-style: none;
           line-height: 1.3125;
           min-width: 0px;
@@ -79,6 +106,29 @@ $tweetMargin: 8px;
           }
         }
 
+        blockquote.twitter-tweet {
+          opacity: 0.0;
+          display: inline-block;
+          font-family: "Helvetica Neue", Roboto, "Segoe UI", Calibri, sans-serif;
+          font-size: 12px;
+          font-weight: bold;
+          line-height: 16px;
+          border-radius: 5px;
+          border: 1px solid rgb(225, 232, 237);
+          //box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+          margin-top: 10px;
+          margin-left: 0px;
+          margin-right: 0px;
+          margin-bottom: 10px;
+          padding-top: 0;
+          padding-right: 16px;
+          padding-left: 16px;
+          padding-bottom: 16px;
+          max-width: $tweetWidth - 16px;
+          min-width: $tweetWidth - 16px;
+          width: $tweetWidth - 16px;
+          background: white !important;
+        }
 
         blockquote.tweet-rendered {
           opacity: 1.0;
@@ -98,7 +148,7 @@ $tweetMargin: 8px;
     opacity: 1.0;
     margin: 16px;
     display: block;
-    max-width: 540px;
+    max-width: $tweetWidth;
     width: 100%;
   }
 
@@ -165,4 +215,13 @@ $tweetMargin: 8px;
     margin: 4px auto;
     margin-top: 12px;
   }
+}
+
+.app-tweet-load-spinner {
+  position: absolute;
+  left: $tweetAndMargin/2;
+  top: 32px;
+  opacity: 0.2;
+  z-index: 10;
+  transition: opacity 0.4s ease-in-out;
 }

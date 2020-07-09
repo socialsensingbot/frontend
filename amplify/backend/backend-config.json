@@ -46,6 +46,13 @@
           "category": "auth",
           "resourceName": "userPoolGroups",
           "attributes": [
+            "demoGroupRole"
+          ]
+        },
+        {
+          "category": "auth",
+          "resourceName": "userPoolGroups",
+          "attributes": [
             "metofficeGroupRole"
           ]
         },
@@ -61,6 +68,20 @@
           "resourceName": "userPoolGroups",
           "attributes": [
             "testuserGroupRole"
+          ]
+        },
+        {
+          "category": "auth",
+          "resourceName": "userPoolGroups",
+          "attributes": [
+            "cypressAGroupRole"
+          ]
+        },
+        {
+          "category": "auth",
+          "resourceName": "userPoolGroups",
+          "attributes": [
+            "cypressBGroupRole"
           ]
         }
       ]

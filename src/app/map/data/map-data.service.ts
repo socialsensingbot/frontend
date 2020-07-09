@@ -1,4 +1,4 @@
-import {EventEmitter, Injectable, NgZone} from '@angular/core';
+import {EventEmitter, Injectable, NgZone} from "@angular/core";
 import {PolygonData, PolygonLayerShortName, Stats, TimeSlice, Geometry} from "../types";
 import {Cache, Logger, Storage} from "aws-amplify";
 import {HttpClient} from "@angular/common/http";
@@ -10,21 +10,21 @@ import {NgForage, NgForageCache} from "ngforage";
 import {CachedItem} from "ngforage/lib/cache/cached-item";
 import {environment} from "../../../environments/environment";
 import {ExportToCsv} from "export-to-csv";
-import {GeoJsonObject} from 'geojson';
+import {GeoJsonObject} from "geojson";
 import {PreferenceService} from "../../pref/preference.service";
 import {toTitleCase} from "../../common";
 
 
-const log = new Logger('map-data');
+const log = new Logger("map-data");
 
 
 @Injectable({
-              providedIn: 'root'
+              providedIn: "root"
             })
 export class MapDataService {
 
 
-  public timeKeyUpdate = new EventEmitter<any>()
+  public timeKeyUpdate = new EventEmitter<any>();
   /**
    * The unprocessed twitter data that's come in from the server
    * or null if the data has been processed.
@@ -45,7 +45,7 @@ export class MapDataService {
     fine:   {stats: {}, count: {}, embed: {}}
   };
 
-  public reverseTimeKeys: any; //The times in the input JSON
+  public reverseTimeKeys: any; // The times in the input JSON
 
 
   private _updating: boolean;
@@ -62,7 +62,7 @@ export class MapDataService {
   public loadStats(): Promise<Stats> {
     log.debug("loadStats()");
     if (this._statsLoaded) {
-      log.debug("Stats already loaded;")
+      log.debug("Stats already loaded;");
       return new Promise(r => r(this._stats));
     }
     return fetch("assets/data/county_stats.json")
@@ -105,30 +105,42 @@ export class MapDataService {
   /**
    * Loads the live data from S3 storage securely.
    */
-  public async loadLiveData(): Promise<TimeSlice[]> {
+  public async loadLiveData(dataset: string): Promise<TimeSlice[]> {
     log.debug("loadLiveData()");
-    return <Promise<TimeSlice[]>>Storage.get("live.json")
-                                        .then((url: any) =>
-                                                this._http.get(url.toString(), {observe: "body", responseType: "json"})
-                                                    .toPromise()
-                                        );
+    if (this._pref.group.availableDataSets.includes(dataset)) {
+      return Storage.get(dataset + ".json")
+                    .then((url: any) =>
+                            this._http.get(url.toString(), {observe: "body", responseType: "json"})
+                                .toPromise()
+                    ) as Promise<TimeSlice[]>;
+    } else {
+      this._notify.show("Your group does not have access to dataset " + dataset);
+      throw Error("Your group does not have access to dataset " + dataset);
+    }
   }
 
 
-  public async load() {
+  public async load(dataset: string) {
     return await this._exec.queue("Load Data", ["ready", "map-init", "data-loaded", "data-load-failed"], async () => {
-      this._rawTwitterData = await this.loadLiveData() as TimeSlice[];
+      this._rawTwitterData = await this.loadLiveData(dataset) as TimeSlice[];
       this.reverseTimeKeys = this.getTimes();
       this._exec.changeState("data-loaded");
       log.debug("Loading live data completed", this._rawTwitterData);
-    });
+    }, Date.now(), true, true, true);
 
 
   }
 
-  public tweets(activePolyLayerShortName: PolygonLayerShortName, name: any): Tweet[] {
-    log.debug(`embeds(${activePolyLayerShortName},${name})`);
-    return this._twitterData.embeds(activePolyLayerShortName, name);
+  public tweets(activePolyLayerShortName: PolygonLayerShortName, names: string[]): Tweet[] {
+    log.debug(`tweets(${activePolyLayerShortName},${name})`);
+    const tweets: Tweet[] = [];
+    for (const name of names) {
+      const t = this._twitterData.tweets(activePolyLayerShortName, name);
+      if (t) {
+        tweets.push(...t);
+      }
+    }
+    return tweets;
   }
 
 
@@ -136,10 +148,10 @@ export class MapDataService {
    * @returns reverse sorted time keys from the data
    */
   public getTimes() {
-    const time_keys = Object.keys(this._rawTwitterData);
-    time_keys.sort();
-    time_keys.reverse();
-    return time_keys;
+    const timeKeys = Object.keys(this._rawTwitterData);
+    timeKeys.sort();
+    timeKeys.reverse();
+    return timeKeys;
   }
 
 
@@ -149,10 +161,10 @@ export class MapDataService {
    *
    * @param tweetInfo the data from the server.
    */
-  public async updateData(_dateMin: number, _dateMax: number) {
-    log.debug("update()")
+  public async update(_dateMin: number, _dateMax: number) {
+    log.debug("update()");
     if (this._updating) {
-      log.debug("Update already running.")
+      log.debug("Update already running.");
       return;
     }
     this._updating = true;
@@ -186,7 +198,7 @@ export class MapDataService {
       log.info("Retrieved tweet data from cache.");
       log.debug(cacheValue);
       this._twitterData = new ProcessedData().populate(cacheValue.data);
-      log.debug(this._twitterData)
+      log.debug(this._twitterData);
     } else {
       log.info("Tweet data not in cache.");
       this._twitterData = new ProcessedData(_dateMin, _dateMax, this.reverseTimeKeys, this._rawTwitterData,
@@ -233,7 +245,7 @@ export class MapDataService {
   }
 
   public regionTypes(): PolygonLayerShortName[] {
-    //Object.keys(this._twitterData).map(i => i as PolygonLayerShortName)
+    // Object.keys(this._twitterData).map(i => i as PolygonLayerShortName)
     return this._twitterData.regionTypes();
   }
 
@@ -255,7 +267,7 @@ export class MapDataService {
     const min = (dateFull.getUTCMinutes() + "").padStart(2, "0");
 
 
-    const date = `${ye}${mo}${da}${hr}${min}`
+    const date = `${ye}${mo}${da}${hr}${min}`;
     log.debug(`DATE: ${dateFull} = ${date}`);
     let count = 0;
     for (const timeKey of this.reverseTimeKeys) {
@@ -289,29 +301,29 @@ export class MapDataService {
         }
       }
       log.verbose(
-        `Bounding box of ${JSON.stringify(geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`)
-      regionText = `(${minX},${minY}),(${maxX},${maxY})`
+        `Bounding box of ${JSON.stringify(geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`);
+      regionText = `(${minX},${minY}),(${maxX},${maxY})`;
     }
     log.verbose("Exporting egion: " + region);
-    return this._twitterData.embeds(polyType, region)
+    return this._twitterData.tweets(polyType, region)
                .filter(i => i.valid && !this._pref.isBlacklisted(i))
-               .map(i => i.asCSV(toTitleCase(regionText)));
+               .map(i => i.asCSV(toTitleCase(regionText), this._pref.group.sanitizeForGDPR));
 
   }
 
   public download(polyType: PolygonLayerShortName, polygonDatum: PolygonData) {
     const exportedTweets: CSVExportTweet[] = [];
     const options = {
-      fieldSeparator:   ',',
-      quoteStrings:     '"',
-      decimalSeparator: '.',
+      fieldSeparator:   ",",
+      quoteStrings:     "\"",
+      decimalSeparator: ".",
       showLabels:       true,
       showTitle:        false,
       title:            "",
       useTextFile:      false,
       useBom:           true,
       useKeysAsHeaders: true,
-      filename: "global-tweet-export"
+      filename:         "global-tweet-export"
       // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
     };
     for (const region of this._twitterData.regionNames(polyType).keys()) {

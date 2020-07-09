@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
+import {Injectable, NgZone} from '@angular/core';
 import {
   CanActivate,
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
-  Router } from '@angular/router';
-import { Observable } from 'rxjs';
+  Router, ActivatedRoute
+} from '@angular/router';
 import Auth from '@aws-amplify/auth';
-
+import {Observable} from 'rxjs';
 /**
  * Prevents the user from accessing signup/signin pages when they are already authenticated.
  * This is used as a guard around those routes.
@@ -19,17 +19,18 @@ import Auth from '@aws-amplify/auth';
   providedIn: 'root'
 })
 export class UnauthGuard implements CanActivate {
-  constructor( private _router: Router ) { }
+  constructor(private _router: Router, private _route: ActivatedRoute) { }
+
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     return Auth.currentAuthenticatedUser()
-            .then(() => {
-              this._router.navigate(['/map'],{queryParamsHandling:"merge"});
-              return false;
-            })
-            .catch(() => {
-              return true;
+               .then(() => {
+                 window.location.replace(this._route.snapshot.queryParams["_return"]);
+                 return false;
+               })
+               .catch(() => {
+                 return true;
             });
   }
 }

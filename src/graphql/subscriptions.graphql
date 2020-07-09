@@ -81,6 +81,9 @@ subscription OnCreateGroupPreferences {
     locale
     timezone
     multipleSessions
+    sanitizeForGDPR
+    defaultDataSet
+    availableDataSets
     createdAt
     updatedAt
   }
@@ -92,6 +95,9 @@ subscription OnUpdateGroupPreferences {
     locale
     timezone
     multipleSessions
+    sanitizeForGDPR
+    defaultDataSet
+    availableDataSets
     createdAt
     updatedAt
   }
@@ -103,6 +109,33 @@ subscription OnDeleteGroupPreferences {
     locale
     timezone
     multipleSessions
+    sanitizeForGDPR
+    defaultDataSet
+    availableDataSets
+    createdAt
+    updatedAt
+  }
+}
+subscription OnCreateDataSet {
+  onCreateDataSet {
+    id
+    title
+    createdAt
+    updatedAt
+  }
+}
+subscription OnUpdateDataSet {
+  onUpdateDataSet {
+    id
+    title
+    createdAt
+    updatedAt
+  }
+}
+subscription OnDeleteDataSet {
+  onDeleteDataSet {
+    id
+    title
     createdAt
     updatedAt
   }

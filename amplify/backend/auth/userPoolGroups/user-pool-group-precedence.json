@@ -1,22 +1,26 @@
 [
   {
-    "groupName": "metoffice",
+    "groupName": "demo",
     "precedence": 1
   },
   {
-    "groupName": "socialsensing",
+    "groupName": "metoffice",
     "precedence": 2
   },
   {
-    "groupName": "testuser",
+    "groupName": "socialsensing",
     "precedence": 3
   },
   {
-    "groupName": "cypressA",
+    "groupName": "testuser",
     "precedence": 4
   },
   {
-    "groupName": "cypressB",
+    "groupName": "cypressA",
     "precedence": 5
+  },
+  {
+    "groupName": "cypressB",
+    "precedence": 6
   }
 ]
