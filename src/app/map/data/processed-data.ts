@@ -170,9 +170,10 @@ export class ProcessedData {
     return this.layer(regionType);
   }
 
-  public populate(cacheValue: ProcessedData, layers: string[]) {
+  public populate(processedData: ProcessedData, layers: string[]) {
+    this.data = {};
     for (const layer of layers) {
-      this.data[layer] = new ProcessedPolygonData().populate(cacheValue[layer]);
+      this.data[layer] = new ProcessedPolygonData().populate(processedData[layer]);
     }
     return this;
   }

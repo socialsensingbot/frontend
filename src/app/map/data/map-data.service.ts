@@ -180,7 +180,7 @@ export class MapDataService {
   private async updateTweetsData(_dateMin, _dateMax) {
     const key = this.createKey(_dateMin, _dateMax);
     const cacheValue: CachedItem<ProcessedData> = await this.cache.getCached(key);
-    if (cacheValue != null && !cacheValue.expired && cacheValue.hasData) {
+    if (cacheValue != null && !cacheValue.expired && cacheValue.hasData && cacheValue.data) {
       log.info("Retrieved tweet data from cache.");
       log.debug(cacheValue);
       this._twitterData = new ProcessedData().populate(cacheValue.data, this.regionTypes);
