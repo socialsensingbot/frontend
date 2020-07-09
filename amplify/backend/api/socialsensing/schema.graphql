@@ -33,6 +33,8 @@ type DataSet @model( timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"
   id: ID!
   title: String!
   regionGroupings:[String]
+  centre: [Float]
+  zoom: [Int]
 }
 
 

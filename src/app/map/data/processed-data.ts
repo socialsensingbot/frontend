@@ -171,9 +171,9 @@ export class ProcessedData {
   }
 
   public populate(processedData: ProcessedData, layers: string[]) {
-    this.data = {};
+    console.warn(processedData);
     for (const layer of layers) {
-      this.data[layer] = new ProcessedPolygonData().populate(processedData[layer]);
+      this.data[layer] = new ProcessedPolygonData().populate(processedData.data[layer]);
     }
     return this;
   }
