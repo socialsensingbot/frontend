@@ -21,7 +21,7 @@ export const environment = {
   showErrors:        false,
   sanitizeForGDPR:   true,
   defaultDataSet:    "live",
-  availableDataSets: ["live", "dataset-a"]
+  availableDataSets: ["live", "dataset-a", "india"]
 };
 
 /*

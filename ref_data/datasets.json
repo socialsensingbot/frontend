@@ -8,6 +8,36 @@
         "S": "__TIMESTAMP__"
       },
       "title": {
+        "S": "India"
+      },
+      "id": {
+        "S": "india"
+      },
+      "updatedAt": {
+        "S": "__TIMESTAMP__"
+      },
+      "regionGroupings": {
+        "L": [
+          {
+            "S": "coarse"
+          },
+          {
+            "S": "county"
+          },
+          {
+            "S": "fine"
+          }
+        ]
+      }
+    },
+    {
+      "__typename": {
+        "S": "DataSet"
+      },
+      "createdAt": {
+        "S": "__TIMESTAMP__"
+      },
+      "title": {
         "S": "Data Set A"
       },
       "id": {
