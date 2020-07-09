@@ -15,6 +15,19 @@
       },
       "updatedAt": {
         "S": "__TIMESTAMP__"
+      },
+      "regionGroupings": {
+        "L": [
+          {
+            "S": "coarse"
+          },
+          {
+            "S": "county"
+          },
+          {
+            "S": "fine"
+          }
+        ]
       }
     },
     {
@@ -32,6 +45,19 @@
       },
       "updatedAt": {
         "S": "__TIMESTAMP__"
+      },
+      "regionGroupings": {
+        "L": [
+          {
+            "S": "coarse"
+          },
+          {
+            "S": "county"
+          },
+          {
+            "S": "fine"
+          }
+        ]
       }
     }
   ],

@@ -120,6 +120,7 @@ subscription OnCreateDataSet {
   onCreateDataSet {
     id
     title
+    regionGroupings
     createdAt
     updatedAt
   }
@@ -128,6 +129,7 @@ subscription OnUpdateDataSet {
   onUpdateDataSet {
     id
     title
+    regionGroupings
     createdAt
     updatedAt
   }
@@ -136,6 +138,7 @@ subscription OnDeleteDataSet {
   onDeleteDataSet {
     id
     title
+    regionGroupings
     createdAt
     updatedAt
   }

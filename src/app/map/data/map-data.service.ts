@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable, NgZone} from "@angular/core";
-import {Geometry, PolygonData, PolygonLayerShortName, RegionData, Stats, TimeSlice} from "../types";
+import {Geometry, PolygonData, RegionData, TimeSlice} from "../types";
 import {Logger, Storage} from "aws-amplify";
 import {HttpClient} from "@angular/common/http";
 import {UIExecutionService} from "../../services/uiexecution.service";
@@ -11,15 +11,29 @@ import {CachedItem} from "ngforage/lib/cache/cached-item";
 import {ExportToCsv} from "export-to-csv";
 import {PreferenceService} from "../../pref/preference.service";
 import {toTitleCase} from "../../common";
+import * as geojson from "geojson";
+import {APIService, ListDataSetsQuery} from "../../API.service";
 
 
 const log = new Logger("map-data");
 
 
+export interface DataSet {
+  __typename: "DataSet";
+  id: string;
+  title: string;
+  regionGroupings: Array<string | null> | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 @Injectable({
               providedIn: "root"
             })
 export class MapDataService {
+  public polygonData: {
+    [regionName: string]: geojson.GeoJsonObject
+  } = {};
 
 
   public timeKeyUpdate = new EventEmitter<any>();
@@ -37,65 +51,51 @@ export class MapDataService {
   /**
    * This is the semi static stats data which is loaded from assets/data.
    */
-  private _stats: Stats = {
-    county: {stats: {}, count: {}, embed: {}},
-    coarse: {stats: {}, count: {}, embed: {}},
-    fine:   {stats: {}, count: {}, embed: {}}
-  };
+  public stats: { [regionName: string]: any } = {};
+
 
   public reverseTimeKeys: any; // The times in the input JSON
 
 
   private _updating: boolean;
-  private _statsLoaded: any;
-  public polygonData: PolygonData;
+  public storedDataSetList: ListDataSetsQuery;
+  private dataSet: DataSet;
+  public regionTypes: Array<string>;
+  public dataset: string;
 
   constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
               private _notify: NotificationService, private readonly cache: NgForageCache,
               private readonly ngf: NgForage,
-              private _pref: PreferenceService) { }
+              private _pref: PreferenceService,
+              private _api: APIService) {
+    this._api.ListDataSets().then(i => this.storedDataSetList = i);
+  }
 
   /**
    * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
    */
-  public async loadStats(dataset: string, force: boolean = true): Promise<Stats> {
+  public async loadStats() {
     log.debug("loadStats()");
-
-    if (force) {
-      this._statsLoaded = false;
+    for (const region of this.regionTypes) {
+      this.stats[region] = (await this.loadFromS3(
+        this.dataset + "/regions/" + region + "/stats.json")) as RegionData<any, any, any>;
+      this.polygonData[region] = (await this.loadFromS3(
+        this.dataset + "/regions/" + region + "/features.json")) as geojson.GeoJsonObject;
     }
-    if (this._statsLoaded) {
-      log.debug("Stats already loaded;");
-      return new Promise(r => r(this._stats));
-    }
-    if (!this._statsLoaded) {
-      this._stats.county = (await this.loadFromS3(dataset + "/county_stats.json")) as RegionData<any, any, any>;
-    }
-    if (!this._statsLoaded) {
-      this._stats.coarse = (await this.loadFromS3(dataset + "/coarse_stats.json")) as RegionData<any, any, any>;
-    } else {
-      return this._stats;
-    }
-    if (!this._statsLoaded) {
-      this._stats.fine = (await this.loadFromS3(dataset + "/fine_stats.json")) as RegionData<any, any, any>;
-      this._statsLoaded = true;
-    } else {
-      return this._stats;
-    }
-
   }
+
 
   /**
    * Loads the live data from S3 storage securely.
    */
-  public async loadLiveData(dataset: string): Promise<TimeSlice[]> {
+  public async loadLiveData(): Promise<TimeSlice[]> {
     log.debug("loadLiveData()");
-    if (this._pref.group.availableDataSets.includes(dataset)) {
-      const result = this.loadFromS3(dataset + "/twitter.json");
+    if (this._pref.group.availableDataSets.includes(this.dataset)) {
+      const result = this.loadFromS3(this.dataset + "/twitter.json");
       return result as Promise<TimeSlice[]>;
     } else {
-      this._notify.show("Your group does not have access to dataset " + dataset);
-      throw Error("Your group does not have access to dataset " + dataset);
+      this._notify.show("Your group does not have access to dataset " + this.dataset);
+      throw Error("Your group does not have access to dataset " + this.dataset);
     }
   }
 
@@ -106,9 +106,9 @@ export class MapDataService {
                .toPromise();
   }
 
-  public async load(dataset: string) {
+  public async load() {
     return await this._exec.queue("Load Data", ["ready", "map-init", "data-loaded", "data-load-failed"], async () => {
-      this._rawTwitterData = await this.loadLiveData(dataset) as TimeSlice[];
+      this._rawTwitterData = await this.loadLiveData() as TimeSlice[];
       this.reverseTimeKeys = this.getTimes();
       this._exec.changeState("data-loaded");
       log.debug("Loading live data completed", this._rawTwitterData);
@@ -117,7 +117,7 @@ export class MapDataService {
 
   }
 
-  public tweets(activePolyLayerShortName: PolygonLayerShortName, names: string[]): Tweet[] {
+  public tweets(activePolyLayerShortName: string, names: string[]): Tweet[] {
     log.debug(`tweets(${activePolyLayerShortName},${name})`);
     const tweets: Tweet[] = [];
     for (const name of names) {
@@ -183,12 +183,12 @@ export class MapDataService {
     if (cacheValue != null && !cacheValue.expired && cacheValue.hasData) {
       log.info("Retrieved tweet data from cache.");
       log.debug(cacheValue);
-      this._twitterData = new ProcessedData().populate(cacheValue.data);
+      this._twitterData = new ProcessedData().populate(cacheValue.data, this.regionTypes);
       log.debug(this._twitterData);
     } else {
       log.info("Tweet data not in cache.");
       this._twitterData = new ProcessedData(_dateMin, _dateMax, this.reverseTimeKeys, this._rawTwitterData,
-                                            this._stats);
+                                            this.stats, this.regionTypes);
       this.cache.setCached(key, this._twitterData, 24 * 60 * 60 * 1000);
     }
   }
@@ -230,17 +230,12 @@ export class MapDataService {
                              tstring.substring(8, 10), tstring.substring(10, 12), 0, 0));
   }
 
-  public regionTypes(): PolygonLayerShortName[] {
-    // Object.keys(this._twitterData).map(i => i as PolygonLayerShortName)
-    return this._twitterData.regionTypes();
-  }
 
-
-  public regionData(regionType: PolygonLayerShortName): ProcessedPolygonData {
+  public regionData(regionType: string): ProcessedPolygonData {
     return this._twitterData.regionData(regionType);
   }
 
-  public places(regionType: PolygonLayerShortName): Set<string> {
+  public places(regionType: string): Set<string> {
     return this._twitterData.regionData(regionType).places();
   }
 
@@ -265,7 +260,7 @@ export class MapDataService {
     return -this.reverseTimeKeys.length + 1;
   }
 
-  private downloadRegion(polyType: PolygonLayerShortName, region: string, geometry: Geometry): CSVExportTweet[] {
+  private downloadRegion(regionGrouping: string, region: string, geometry: Geometry): CSVExportTweet[] {
     let regionText = region;
     if (region.match(/\d+/)) {
       let minX = null;
@@ -291,13 +286,13 @@ export class MapDataService {
       regionText = `(${minX},${minY}),(${maxX},${maxY})`;
     }
     log.verbose("Exporting egion: " + region);
-    return this._twitterData.tweets(polyType, region)
+    return this._twitterData.tweets(regionGrouping, region)
                .filter(i => i.valid && !this._pref.isBlacklisted(i))
                .map(i => i.asCSV(toTitleCase(regionText), this._pref.group.sanitizeForGDPR));
 
   }
 
-  public download(polyType: PolygonLayerShortName, polygonDatum: PolygonData) {
+  public download(regionGrouping: string, polygonDatum: PolygonData) {
     const exportedTweets: CSVExportTweet[] = [];
     const options = {
       fieldSeparator:   ",",
@@ -312,7 +307,7 @@ export class MapDataService {
       filename:         "global-tweet-export"
       // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
     };
-    for (const region of this._twitterData.regionNames(polyType).keys()) {
+    for (const region of this._twitterData.regionNames(regionGrouping).keys()) {
       let geometry;
       for (const feature of polygonDatum.features) {
         if (feature.id === region) {
@@ -322,12 +317,19 @@ export class MapDataService {
       if (typeof geometry === "undefined") {
         log.warn("No geometry for " + region);
       } else {
-        exportedTweets.push(...this.downloadRegion(polyType, region, geometry));
+        exportedTweets.push(...this.downloadRegion(regionGrouping, region, geometry));
       }
     }
     const csvExporter = new ExportToCsv(options);
     csvExporter.generateCsv(exportedTweets);
 
 
+  }
+
+
+  public switchDataSet(dataset: string) {
+    this.dataset = dataset;
+    this.dataSet = this.storedDataSetList.items.find(i => i.id === this.dataset);
+    this.regionTypes = this.dataSet.regionGroupings;
   }
 }

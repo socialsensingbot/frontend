@@ -13,15 +13,12 @@ import {DateRange, DateRangeSliderOptions} from "./date-range-slider/date-range-
 import {LayerStyleService} from "./services/layer-style.service";
 import {NotificationService} from "../services/notification.service";
 import {
-  ByRegionType,
   COUNTY,
   Feature,
   NumberLayers,
   NumberLayerShortName,
   numberLayerShortNames,
   PolygonData,
-  PolygonLayerShortName,
-  polygonLayerShortNames,
   PolyLayers,
   Properties,
   STATS
@@ -57,17 +54,18 @@ export class MapComponent implements OnInit, OnDestroy {
     if (value && value !== this._dataset) {
       this._dataset = value;
       this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
-      this._data.loadStats(value, true).then(() => this.load(false));
+      this._data.switchDataSet(value);
+      this._data.loadStats().then(() => this.load(false));
     }
   }
 
   private _dataset: string;
 
-  public get activePolyLayerShortName(): PolygonLayerShortName {
+  public get activePolyLayerShortName(): string {
     return this._activePolyLayerShortName;
   }
 
-  public set activePolyLayerShortName(value: PolygonLayerShortName) {
+  public set activePolyLayerShortName(value: string) {
     log.debug("New baselayer " + value);
 
     if (this.activePolyLayerShortName !== value) {
@@ -151,14 +149,9 @@ export class MapComponent implements OnInit, OnDestroy {
 
   private _numberLayers: NumberLayers = {stats: null, count: null};
   private _polyLayers: PolyLayers = {county: null, coarse: null, fine: null};
-  private _polygonData: ByRegionType<PolygonData | geojson.GeoJsonObject> = {
-    county: fgsData,
-    coarse: coarseData,
-    fine:   fineData
-  };
 
   private _activeNumberLayerShortName: NumberLayerShortName;
-  private _activePolyLayerShortName: PolygonLayerShortName;
+  private _activePolyLayerShortName: string;
 
 
   private _geojson: { stats: GeoJSON, count: GeoJSON } = {stats: null, count: null};
@@ -390,10 +383,9 @@ export class MapComponent implements OnInit, OnDestroy {
     } else {
       this._dataset = this.pref.group.defaultDataSet;
     }
-    await this._data.loadStats(this.dataset);
-    const storedDataSetList = await this._api.ListDataSets();
-    console.warn(storedDataSetList);
-    this.datasets = storedDataSetList.items.filter(
+    this._data.switchDataSet(this.dataset);
+    await this._data.loadStats();
+    this.datasets = this._data.storedDataSetList.items.filter(
       i => this.pref.group.availableDataSets.includes(i.id)
     );
 
@@ -719,7 +711,7 @@ export class MapComponent implements OnInit, OnDestroy {
         // noinspection JSUnfilteredForInLoop
         const shortNumberLayerName = key;
         this._geojson[shortNumberLayerName] = new GeoJSON(
-          this._polygonData[this.activePolyLayerShortName] as geojson.GeoJsonObject, {
+          this._data.polygonData[this.activePolyLayerShortName] as geojson.GeoJsonObject, {
             style:         (feature) => this._color.colorFunctions[shortNumberLayerName].getFeatureStyle(feature),
             onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
           }).addTo(curLayerGroup);
@@ -737,12 +729,12 @@ export class MapComponent implements OnInit, OnDestroy {
    * Clears and iialises feature data on the map.
    */
   private clearMapFeatures() {
-    for (const regionType of this._data.regionTypes()) { // counties, coarse, fine
-      const features = (this._polygonData[regionType as PolygonLayerShortName] as PolygonData).features;
+    for (const regionType of this._data.regionTypes) { // counties, coarse, fine
+      const features = (this._data.polygonData[regionType] as PolygonData).features;
       for (const feature of features) {
         const properties = feature.properties;
         const place = properties.name;
-        if (place in this._data.places(regionType as PolygonLayerShortName)) {
+        if (place in this._data.places(regionType)) {
           properties.count = 0;
           properties.stats = 0;
         }
@@ -754,9 +746,8 @@ export class MapComponent implements OnInit, OnDestroy {
    * Updates the data stored in the polygon data of the leaflet layers.
    */
   private updateRegionData() {
-    for (const regionType of this._data.regionTypes()) { // counties, coarse, fine
-      console.assert(polygonLayerShortNames.includes(regionType as PolygonLayerShortName));
-      const regionData: PolygonData = (this._polygonData)[regionType] as PolygonData;
+    for (const regionType of this._data.regionTypes) { // counties, coarse, fine
+      const regionData: PolygonData = (this._data.polygonData)[regionType] as PolygonData;
       const features: Feature[] = regionData.features;
       for (const feature of features) {
         const featureProperties: Properties = feature.properties;
@@ -791,7 +782,7 @@ export class MapComponent implements OnInit, OnDestroy {
     }
     this.activity = true;
     try {
-      await this._data.load(this._dataset);
+      await this._data.load();
 
       if (first) {
         await this._exec.queue("Update Slider", ["data-loaded"],
@@ -934,7 +925,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   public downloadTweetsAsCSV() {
     this._data.download(this.activePolyLayerShortName,
-                        this._polygonData[this.activePolyLayerShortName] as PolygonData);
+                        this._data.polygonData[this.activePolyLayerShortName] as PolygonData);
   }
 
   public zoomIn() {

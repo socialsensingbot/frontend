@@ -96,6 +96,7 @@ query GetDataSet($id: ID!) {
   getDataSet(id: $id) {
     id
     title
+    regionGroupings
     createdAt
     updatedAt
   }
@@ -109,6 +110,7 @@ query ListDataSets(
     items {
       id
       title
+      regionGroupings
       createdAt
       updatedAt
     }

@@ -138,10 +138,12 @@ export type DeleteGroupPreferencesInput = {
 export type CreateDataSetInput = {
   id?: string | null;
   title: string;
+  regionGroupings?: Array<string | null> | null;
 };
 
 export type ModelDataSetConditionInput = {
   title?: ModelStringInput | null;
+  regionGroupings?: ModelStringInput | null;
   and?: Array<ModelDataSetConditionInput | null> | null;
   or?: Array<ModelDataSetConditionInput | null> | null;
   not?: ModelDataSetConditionInput | null;
@@ -150,6 +152,7 @@ export type ModelDataSetConditionInput = {
 export type UpdateDataSetInput = {
   id: string;
   title?: string | null;
+  regionGroupings?: Array<string | null> | null;
 };
 
 export type DeleteDataSetInput = {
@@ -316,6 +319,7 @@ export type ModelGroupPreferencesFilterInput = {
 export type ModelDataSetFilterInput = {
   id?: ModelIDInput | null;
   title?: ModelStringInput | null;
+  regionGroupings?: ModelStringInput | null;
   and?: Array<ModelDataSetFilterInput | null> | null;
   or?: Array<ModelDataSetFilterInput | null> | null;
   not?: ModelDataSetFilterInput | null;
@@ -488,6 +492,7 @@ export type CreateDataSetMutation = {
   __typename: "DataSet";
   id: string;
   title: string;
+  regionGroupings: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -496,6 +501,7 @@ export type UpdateDataSetMutation = {
   __typename: "DataSet";
   id: string;
   title: string;
+  regionGroupings: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -504,6 +510,7 @@ export type DeleteDataSetMutation = {
   __typename: "DataSet";
   id: string;
   title: string;
+  regionGroupings: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -766,6 +773,7 @@ export type GetDataSetQuery = {
   __typename: "DataSet";
   id: string;
   title: string;
+  regionGroupings: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -776,6 +784,7 @@ export type ListDataSetsQuery = {
     __typename: "DataSet";
     id: string;
     title: string;
+    regionGroupings: Array<string | null> | null;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
@@ -1023,6 +1032,7 @@ export type OnCreateDataSetSubscription = {
   __typename: "DataSet";
   id: string;
   title: string;
+  regionGroupings: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -1031,6 +1041,7 @@ export type OnUpdateDataSetSubscription = {
   __typename: "DataSet";
   id: string;
   title: string;
+  regionGroupings: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -1039,6 +1050,7 @@ export type OnDeleteDataSetSubscription = {
   __typename: "DataSet";
   id: string;
   title: string;
+  regionGroupings: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -1491,6 +1503,7 @@ export class APIService {
           __typename
           id
           title
+          regionGroupings
           createdAt
           updatedAt
         }
@@ -1515,6 +1528,7 @@ export class APIService {
           __typename
           id
           title
+          regionGroupings
           createdAt
           updatedAt
         }
@@ -1539,6 +1553,7 @@ export class APIService {
           __typename
           id
           title
+          regionGroupings
           createdAt
           updatedAt
         }
@@ -2111,6 +2126,7 @@ export class APIService {
           __typename
           id
           title
+          regionGroupings
           createdAt
           updatedAt
         }
@@ -2135,6 +2151,7 @@ export class APIService {
             __typename
             id
             title
+            regionGroupings
             createdAt
             updatedAt
           }
@@ -2585,6 +2602,7 @@ export class APIService {
           __typename
           id
           title
+          regionGroupings
           createdAt
           updatedAt
         }
@@ -2599,6 +2617,7 @@ export class APIService {
           __typename
           id
           title
+          regionGroupings
           createdAt
           updatedAt
         }
@@ -2613,6 +2632,7 @@ export class APIService {
           __typename
           id
           title
+          regionGroupings
           createdAt
           updatedAt
         }
