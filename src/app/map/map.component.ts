@@ -54,10 +54,10 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   public set dataset(value: string) {
-    if (value !== this._dataset) {
+    if (value && value !== this._dataset) {
       this._dataset = value;
       this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
-      this.load(false);
+      this._data.loadStats(value, true).then(() => this.load(false));
     }
   }
 
@@ -141,11 +141,6 @@ export class MapComponent implements OnInit, OnDestroy {
   ) {
     // save the query parameter observable
     this._searchParams = this.route.queryParams;
-
-    // Preload the cacheable stats files asynchronously
-    // this gets called again in onMapReady()
-    // But the values should be in the browser cache by then
-    this._data.loadStats().then(() => {log.debug("Prefetched the stats files."); });
   }
 
 
@@ -269,12 +264,7 @@ export class MapComponent implements OnInit, OnDestroy {
     log.debug("onMapReady");
 
     this._map = map;
-    this._data.loadStats()
-        .then(() => this.init(map))
-        .catch(err => {
-          // this._notify.show("Error while loading map data");
-          log.warn(err);
-        });
+    this.init(map);
   }
 
 
@@ -400,7 +390,7 @@ export class MapComponent implements OnInit, OnDestroy {
     } else {
       this._dataset = this.pref.group.defaultDataSet;
     }
-
+    await this._data.loadStats(this.dataset);
     const storedDataSetList = await this._api.ListDataSets();
     console.warn(storedDataSetList);
     this.datasets = storedDataSetList.items.filter(

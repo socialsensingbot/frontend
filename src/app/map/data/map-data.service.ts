@@ -1,6 +1,6 @@
 import {EventEmitter, Injectable, NgZone} from "@angular/core";
-import {PolygonData, PolygonLayerShortName, Stats, TimeSlice, Geometry} from "../types";
-import {Cache, Logger, Storage} from "aws-amplify";
+import {Geometry, PolygonData, PolygonLayerShortName, RegionData, Stats, TimeSlice} from "../types";
+import {Logger, Storage} from "aws-amplify";
 import {HttpClient} from "@angular/common/http";
 import {UIExecutionService} from "../../services/uiexecution.service";
 import {ProcessedData, ProcessedPolygonData} from "./processed-data";
@@ -8,9 +8,7 @@ import {CSVExportTweet, Tweet} from "../twitter/tweet";
 import {NotificationService} from "../../services/notification.service";
 import {NgForage, NgForageCache} from "ngforage";
 import {CachedItem} from "ngforage/lib/cache/cached-item";
-import {environment} from "../../../environments/environment";
 import {ExportToCsv} from "export-to-csv";
-import {GeoJsonObject} from "geojson";
 import {PreferenceService} from "../../pref/preference.service";
 import {toTitleCase} from "../../common";
 
@@ -50,6 +48,7 @@ export class MapDataService {
 
   private _updating: boolean;
   private _statsLoaded: any;
+  public polygonData: PolygonData;
 
   constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
               private _notify: NotificationService, private readonly cache: NgForageCache,
@@ -59,47 +58,31 @@ export class MapDataService {
   /**
    * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
    */
-  public loadStats(): Promise<Stats> {
+  public async loadStats(dataset: string, force: boolean = true): Promise<Stats> {
     log.debug("loadStats()");
+
+    if (force) {
+      this._statsLoaded = false;
+    }
     if (this._statsLoaded) {
       log.debug("Stats already loaded;");
       return new Promise(r => r(this._stats));
     }
-    return fetch("assets/data/county_stats.json")
-      .then(response => response.json())
-      .then(json => {
-        if (!this._statsLoaded) {
-          this._stats.county = Object.freeze(json);
-        }
-      })
-      .then(() => {
-        if (!this._statsLoaded) {
-          return fetch("assets/data/coarse_stats.json")
-            .then(response => response.json())
-            .then(json => {
-              this._stats.coarse = Object.freeze(json);
-              return json;
-            });
-        } else {
-          return this._stats;
-        }
-      })
-      .then(() => {
-        if (!this._statsLoaded) {
-          return fetch("assets/data/fine_stats.json")
-            .then(response => response.json())
-            .then(json => {
-              if (!this._statsLoaded) {
-                this._stats.fine = Object.freeze(json);
-                this._statsLoaded = true;
-                Object.freeze(this._stats);
-              }
-              return this._stats;
-            });
-        } else {
-          return this._stats;
-        }
-      });
+    if (!this._statsLoaded) {
+      this._stats.county = (await this.loadFromS3(dataset + "/county_stats.json")) as RegionData<any, any, any>;
+    }
+    if (!this._statsLoaded) {
+      this._stats.coarse = (await this.loadFromS3(dataset + "/coarse_stats.json")) as RegionData<any, any, any>;
+    } else {
+      return this._stats;
+    }
+    if (!this._statsLoaded) {
+      this._stats.fine = (await this.loadFromS3(dataset + "/fine_stats.json")) as RegionData<any, any, any>;
+      this._statsLoaded = true;
+    } else {
+      return this._stats;
+    }
+
   }
 
   /**
@@ -108,17 +91,20 @@ export class MapDataService {
   public async loadLiveData(dataset: string): Promise<TimeSlice[]> {
     log.debug("loadLiveData()");
     if (this._pref.group.availableDataSets.includes(dataset)) {
-      return Storage.get(dataset + ".json")
-                    .then((url: any) =>
-                            this._http.get(url.toString(), {observe: "body", responseType: "json"})
-                                .toPromise()
-                    ) as Promise<TimeSlice[]>;
+      const result = this.loadFromS3(dataset + "/twitter.json");
+      return result as Promise<TimeSlice[]>;
     } else {
       this._notify.show("Your group does not have access to dataset " + dataset);
       throw Error("Your group does not have access to dataset " + dataset);
     }
   }
 
+
+  private async loadFromS3(name: string) {
+    const url = await Storage.get(name);
+    return this._http.get(url.toString(), {observe: "body", responseType: "json"})
+               .toPromise();
+  }
 
   public async load(dataset: string) {
     return await this._exec.queue("Load Data", ["ready", "map-init", "data-loaded", "data-load-failed"], async () => {
