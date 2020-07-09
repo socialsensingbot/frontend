@@ -62,6 +62,13 @@ export class MapDataService {
   private dataSet: DataSet;
   public regionTypes: Array<string>;
   public dataset: string;
+  public regionGroups: { id: string, title: string }[] = [];
+  public regionGroupsMetadata: { id: string, title: string }[] = [
+    {id: "coarse", title: "Coarse Grid"},
+    {id: "fine", title: "Fine Grid"},
+    {id: "state", title: "State"},
+    {id: "county", title: "Local Authority"}
+  ];
 
   constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
               private _notify: NotificationService, private readonly cache: NgForageCache,
@@ -331,5 +338,6 @@ export class MapDataService {
     this.dataset = dataset;
     this.dataSet = this.storedDataSetList.items.find(i => i.id === this.dataset);
     this.regionTypes = this.dataSet.regionGroupings;
+    this.regionGroups = this.regionGroupsMetadata.filter(i => this.regionTypes.includes(i.id));
   }
 }

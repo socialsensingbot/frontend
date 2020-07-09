@@ -49,9 +49,8 @@
         <div class="app-toolbar-separator"></div>
         <mat-form-field>
           <mat-select [(value)]="activePolyLayerShortName" class="map-polygon-layer-select">
-            <mat-option value="county">Local Authority</mat-option>
-            <mat-option value="coarse">Coarse Grid</mat-option>
-            <mat-option value="fine">Fine Grid</mat-option>
+            <mat-option *ngFor="let regionGrouping of data.regionGroups"
+                        [value]="regionGrouping.id">{{regionGrouping.title}}</mat-option>
           </mat-select>
         </mat-form-field>
         <div class="app-toolbar-separator"></div>

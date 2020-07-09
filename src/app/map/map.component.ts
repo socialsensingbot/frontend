@@ -54,8 +54,8 @@ export class MapComponent implements OnInit, OnDestroy {
     if (value && value !== this._dataset) {
       this._dataset = value;
       this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
-      this._data.switchDataSet(value);
-      this._data.loadStats().then(() => this.load(false));
+      this.data.switchDataSet(value);
+      this.data.loadStats().then(() => this.load(false));
     }
   }
 
@@ -133,7 +133,7 @@ export class MapComponent implements OnInit, OnDestroy {
               private _http: HttpClient,
               private _exec: UIExecutionService,
               private _color: ColorCodeService,
-              private _data: MapDataService,
+              public data: MapDataService,
               public pref: PreferenceService,
               private _api: APIService
   ) {
@@ -299,14 +299,14 @@ export class MapComponent implements OnInit, OnDestroy {
       lng, lat, zoom, active_number, active_polygon, selected, min_time, max_time, min_offset, max_offset
     } = params;
     this._newParams = params;
-    this._absoluteTime = this._data.lastEntryDate().getTime();
-    this.sliderOptions.min = -this._data.entryCount() + 1;
+    this._absoluteTime = this.data.lastEntryDate().getTime();
+    this.sliderOptions.min = -this.data.entryCount() + 1;
     // These handle the date slider min_time & max_time values
     if (typeof min_time !== "undefined") {
       this._dateMin = +min_time;
       this.sliderOptions = {
         ...this.sliderOptions,
-        startMin: this._data.offset(this._dateMin)
+        startMin: this.data.offset(this._dateMin)
       };
     } else if (typeof min_offset !== "undefined") {
       this._dateMin = min_offset * ONE_MINUTE_IN_MILLIS + this._absoluteTime;
@@ -319,7 +319,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this._dateMax = +max_time;
       this.sliderOptions = {
         ...this.sliderOptions,
-        startMax: this._data.offset(this._dateMax)
+        startMax: this.data.offset(this._dateMax)
       };
     } else if (typeof max_offset !== "undefined") {
       this._dateMax = max_offset * ONE_MINUTE_IN_MILLIS + this._absoluteTime;
@@ -383,9 +383,9 @@ export class MapComponent implements OnInit, OnDestroy {
     } else {
       this._dataset = this.pref.group.defaultDataSet;
     }
-    this._data.switchDataSet(this.dataset);
-    await this._data.loadStats();
-    this.datasets = this._data.storedDataSetList.items.filter(
+    this.data.switchDataSet(this.dataset);
+    await this.data.loadStats();
+    this.datasets = this.data.storedDataSetList.items.filter(
       i => this.pref.group.availableDataSets.includes(i.id)
     );
 
@@ -519,7 +519,7 @@ export class MapComponent implements OnInit, OnDestroy {
       if (feature.properties.count > 0) {
         log.debug("Count > 0");
         log.debug(`this.activePolyLayerShortName=${this.activePolyLayerShortName}`);
-        this.tweets = this._data.tweets(this.activePolyLayerShortName, this.selection.regionNames());
+        this.tweets = this.data.tweets(this.activePolyLayerShortName, this.selection.regionNames());
         log.debug(this.tweets);
         this.twitterPanelHeader = true;
         this.showTwitterTimeline = true;
@@ -537,7 +537,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this.hideTweets();
     } else {
       log.debug(features.length + " features");
-      this.tweets = this._data.tweets(this.activePolyLayerShortName, this.selection.regionNames());
+      this.tweets = this.data.tweets(this.activePolyLayerShortName, this.selection.regionNames());
       log.debug(this.tweets);
       this.twitterPanelHeader = true;
       this.showTwitterTimeline = true;
@@ -711,7 +711,7 @@ export class MapComponent implements OnInit, OnDestroy {
         // noinspection JSUnfilteredForInLoop
         const shortNumberLayerName = key;
         this._geojson[shortNumberLayerName] = new GeoJSON(
-          this._data.polygonData[this.activePolyLayerShortName] as geojson.GeoJsonObject, {
+          this.data.polygonData[this.activePolyLayerShortName] as geojson.GeoJsonObject, {
             style:         (feature) => this._color.colorFunctions[shortNumberLayerName].getFeatureStyle(feature),
             onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
           }).addTo(curLayerGroup);
@@ -729,12 +729,12 @@ export class MapComponent implements OnInit, OnDestroy {
    * Clears and iialises feature data on the map.
    */
   private clearMapFeatures() {
-    for (const regionType of this._data.regionTypes) { // counties, coarse, fine
-      const features = (this._data.polygonData[regionType] as PolygonData).features;
+    for (const regionType of this.data.regionTypes) { // counties, coarse, fine
+      const features = (this.data.polygonData[regionType] as PolygonData).features;
       for (const feature of features) {
         const properties = feature.properties;
         const place = properties.name;
-        if (place in this._data.places(regionType)) {
+        if (place in this.data.places(regionType)) {
           properties.count = 0;
           properties.stats = 0;
         }
@@ -746,13 +746,13 @@ export class MapComponent implements OnInit, OnDestroy {
    * Updates the data stored in the polygon data of the leaflet layers.
    */
   private updateRegionData() {
-    for (const regionType of this._data.regionTypes) { // counties, coarse, fine
-      const regionData: PolygonData = (this._data.polygonData)[regionType] as PolygonData;
+    for (const regionType of this.data.regionTypes) { // counties, coarse, fine
+      const regionData: PolygonData = (this.data.polygonData)[regionType] as PolygonData;
       const features: Feature[] = regionData.features;
       for (const feature of features) {
         const featureProperties: Properties = feature.properties;
         const place = featureProperties.name;
-        const tweetRegionInfo: ProcessedPolygonData = this._data.regionData(regionType);
+        const tweetRegionInfo: ProcessedPolygonData = this.data.regionData(regionType);
         if (tweetRegionInfo.hasPlace(place)) {
           featureProperties.count = tweetRegionInfo.countForPlace(place);
           featureProperties.stats = tweetRegionInfo.exceedanceForPlace(place);
@@ -782,7 +782,7 @@ export class MapComponent implements OnInit, OnDestroy {
     }
     this.activity = true;
     try {
-      await this._data.load();
+      await this.data.load();
 
       if (first) {
         await this._exec.queue("Update Slider", ["data-loaded"],
@@ -816,7 +816,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                 try {
 
                                   this._exec.changeState("data-refresh");
-                                  await this._data.update(this._dateMin, this._dateMax);
+                                  await this.data.update(this._dateMin, this._dateMax);
                                   this.clearMapFeatures();
                                   this.updateRegionData();
                                   this.resetLayers(false);
@@ -869,8 +869,8 @@ export class MapComponent implements OnInit, OnDestroy {
   public sliderChange(range: DateRange) {
     const {lower, upper} = range;
     log.debug("sliderChange(" + lower + "->" + upper + ")");
-    this._dateMax = this._data.entryDate(upper).getTime();
-    this._dateMin = this._data.entryDate(lower).getTime();
+    this._dateMax = this.data.entryDate(upper).getTime();
+    this._dateMin = this.data.entryDate(lower).getTime();
     this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
     this._sliderIsStale = true;
 
@@ -889,16 +889,16 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   private async updateSliderFromData() {
     log.debug("updateSliderFromData()");
-    this._absoluteTime = this._data.lastEntryDate().getTime();
+    this._absoluteTime = this.data.lastEntryDate().getTime();
     this._dateMin = Math.max(this._dateMin,
-                             this._absoluteTime - ((this._data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
+                             this._absoluteTime - ((this.data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
     this._dateMax = Math.max(this._dateMax,
-                             this._absoluteTime - ((this._data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
+                             this._absoluteTime - ((this.data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
     this.sliderOptions = {
       max:      0,
-      min:      -this._data.entryCount() + 1,
-      startMin: this._data.offset(this._dateMin),
-      startMax: this._data.offset(this._dateMax)
+      min:      -this.data.entryCount() + 1,
+      startMin: this.data.offset(this._dateMin),
+      startMax: this.data.offset(this._dateMax)
     };
 
   }
@@ -924,8 +924,8 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   public downloadTweetsAsCSV() {
-    this._data.download(this.activePolyLayerShortName,
-                        this._data.polygonData[this.activePolyLayerShortName] as PolygonData);
+    this.data.download(this.activePolyLayerShortName,
+                       this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
   }
 
   public zoomIn() {
