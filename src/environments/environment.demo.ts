@@ -1,19 +1,18 @@
 export const environment = {
-  version:          "hmr",
-  production:       false,
-  hmr:              true,
-  demo:             false,
-  rollbar:          false,
-  toolbarColor:     "primary",
+  production:       true,
+  name:             "demo",
+  version:          "demo",
+  demo:             true,
   // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
   timezone:         "UTC",
-  multipleSessions: true,
   locale:           "en-GB",
+  rollbar:          true,
+  multipleSessions: true,
+  hmr:              false,
   confirm:          {
     email:    "",
     password: ""
   },
-  showErrors:       false,
   sanitizeForGDPR:  true
 
 };

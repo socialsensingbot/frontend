@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { MatBottomSheet } from '@angular/material';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { CountryCodeSelectComponent } from '../country-code-select/country-code-select.component';
 import { CountryCode } from '../country-code-select/country-codes';
 import { AuthService } from '../auth.service';

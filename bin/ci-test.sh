@@ -21,6 +21,10 @@ if [[ "${AWS_BRANCH}" == staging ]]; then
   echo "Tests must not be run on STAGING"
   exit 1
 fi
+if [[ "${AWS_BRANCH}" == demo ]]; then
+  echo "Tests must not be run on DEMO"
+  exit 1
+fi
 if [[ "${AWS_BRANCH}" == master ]]; then
   echo "Tests must not be run on MASTER"
   exit 1

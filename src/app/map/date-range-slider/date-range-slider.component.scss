@@ -1,74 +1,136 @@
 @import '~@angular/material/theming';
 
-.slider-surround {
-  font-size: 60%;
-  min-height: 4em;
-}
 
+//
+//// We need to use ::ng-deep to overcome view encapsulation
+//::ng-deep {
+//  .custom-slider {
+//    .ng5-slider {
+//      .ng5-slider-bar {
+//        background: #333333;
+//        height: 1px;
+//      }
+//
+//      .ng5-slider-selection {
+//        background-color: #888888;
+//      }
+//
+//      .ng5-slider-pointer {
+//        background-color: #444444;
+//      }
+//
+//      //.custom-slider .ng5-slider .ng5-slider-pointer:after {
+//      //  display: none;
+//      //}
+//
+//      .ng5-slider-bubble {
+//        bottom: 0.5em;
+//      }
+//
+//      .ng5-slider-limit {
+//        font-weight: bold;
+//        color: mat-color(mat-palette($mat-light-blue, 400));
+//      }
+//
+//      .ng5-slider-tick {
+//        //width: 1px;
+//        //height: 10px;
+//        //margin-left: 4px;
+//        //border-radius: 0;
+//        background: mat-color(mat-palette($mat-light-blue, 400), default, 0.5);
+//        //top: -1px;
+//      }
+//
+//      .ng5-slider-tick.ng5-slider-selected {
+//        background: mat-color(mat-palette($mat-light-blue, 400));
+//      }
+//
+//      .slider-date-time {
+//        .slider-date {
+//          font-size: 0.8em;
+//          font-weight: bolder;
+//        }
+//
+//        .slider-time {
+//          font-size: 0.6em;
+//          font-weight: lighter;
+//        }
+//      }
+//
+//      .ng5-slider-floor {
+//        display: none;
+//      }
+//
+//      .ng5-slider-ceil {
+//        display: none;
+//      }
+//    }
+//
+//  }
+//}
 
-// We need to use ::ng-deep to overcome view encapsulation
 ::ng-deep {
-  .custom-slider {
-    .ng5-slider {
-      .ng5-slider-bar {
-        background: mat-color(mat-palette($mat-light-blue, 400), default, 0.5);
-        height: 2px;
-      }
 
-      .ng5-slider-selection {
-        background: mat-color(mat-palette($mat-light-blue, 400), default, 0.5);
-      }
+  .date-range-slider-surround {
+    margin-top: 5px;
+    font-size: 60%;
+    min-height: 1em;
+    //border:1px solid red;
 
-      .ng5-slider-pointer {
-        background-color: mat-color(mat-palette($mat-light-blue, 600));
-      }
 
-      //.custom-slider .ng5-slider .ng5-slider-pointer:after {
-      //  display: none;
-      //}
-
-      .ng5-slider-bubble {
-        bottom: 1.5em;
-      }
-
-      .ng5-slider-limit {
-        font-weight: bold;
-        color: mat-color(mat-palette($mat-light-blue, 400));
-      }
-
-      .ng5-slider-tick {
-        //width: 1px;
-        //height: 10px;
-        //margin-left: 4px;
-        //border-radius: 0;
-        background: mat-color(mat-palette($mat-light-blue, 400), default, 0.5);
-        //top: -1px;
-      }
-
-      .ng5-slider-tick.ng5-slider-selected {
-        background: mat-color(mat-palette($mat-light-blue, 400));
-      }
-
-      .slider-date-time {
-        .slider-date {
-          font-size: 0.9em;
-          font-weight: bolder;
-        }
-
-        .slider-time {
-          font-size: 0.8em;
-          font-weight: lighter;
-        }
-      }
-
-      .ng5-slider-floor {
-        display: none;
-      }
-
-      .ng5-slider-ceil {
-        display: none;
-      }
+    .ng5-slider .ng5-slider-bar {
+      background: #999999;
+      height: 1px;
     }
 
+    .ng5-slider .ng5-slider-selection {
+      background: #222222;
+      height: 2px;
+    }
+
+    .ng5-slider-span:focus {
+      outline: none !important;
+    }
+
+    .ng5-slider-floor {
+      display: none;
+    }
+
+    .ng5-slider-ceil {
+      display: none;
+    }
+
+    .ng5-slider .ng5-slider-bubble {
+      bottom: 14px;
+    }
+
+    .ng5-slider .ng5-slider-pointer {
+      width: 16px;
+      height: 16px;
+      top: -8px;
+      bottom: 0;
+      background-color: #333;
+      border-radius: 8px;
+    }
+
+    .ng5-slider .ng5-slider-pointer:after {
+      display: none;
+    }
+
+
+    .slider-date-time {
+      .slider-date {
+        font-size: 0.7em;
+        font-weight: bold;
+      }
+
+      .slider-time {
+        font-size: 0.6em;
+        font-weight: lighter;
+      }
+    }
   }
 }
+
+
+
