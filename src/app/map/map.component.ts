@@ -52,12 +52,18 @@ export class MapComponent implements OnInit, OnDestroy {
       this._dataset = value;
       this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
       this.data.switchDataSet(value).then(async () => {
-        this.applyStartParams();
+        const {zoom, lng, lat} = {
+          ...this.data.serviceMetadata.start,
+          ...this.data.dataSetMetdata.start,
+        };
+        this.updateSearch({zoom, lng, lat});
+        this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 6000});
         await this.data.loadStats();
         this.ready = true;
         this._updating = false;
         await this.load(false);
-        this.resetLayers(true);
+        this._sliderIsStale = true;
+        // this.resetLayers(true);
       }).finally(() => {
         this.activity = false;
 
@@ -389,7 +395,13 @@ export class MapComponent implements OnInit, OnDestroy {
       this._dataset = this.pref.group.defaultDataSet;
     }
     await this.data.switchDataSet(this.dataset);
-    this.applyStartParams();
+    const {zoom, lng, lat} = {
+      ...this.data.serviceMetadata.start,
+      ...this.data.dataSetMetdata.start,
+      ...this.route.snapshot.queryParams,
+      ...this._newParams
+    };
+    this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 4000});
     await this.data.loadStats();
 
     // define the layers for the different counts
@@ -448,17 +460,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   }
-
-  private applyStartParams(animate = true) {
-    const {zoom, lng, lat} = {
-      ...this.data.serviceMetadata.start,
-      ...this.data.dataSetMetdata.start,
-      ...this.route.snapshot.queryParams,
-      ...this._newParams
-    };
-    this._map.setView(latLng([lat, lng]), zoom, {animate, duration: 4000});
-  }
-
   /**
    * When the user places their mouse over a feature (region) this is called.
    */
