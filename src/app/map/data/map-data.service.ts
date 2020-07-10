@@ -118,11 +118,13 @@ export class MapDataService {
   public async loadStats() {
     log.debug("loadStats()");
     for (const region of this.dataSetMetdata.regionGroups) {
+      // Note the use of a random time to make sure that we don't refresh all datasets at once!!
+      const cacheDuration = ONE_DAY * (7.0 + 7.0 * Math.random());
       this.stats[region.id] = (await this.loadFromS3(
-        this.dataset + "/regions/" + region.id + "/stats.json", ONE_DAY,
+        this.dataset + "/regions/" + region.id + "/stats.json", cacheDuration,
         "Loading " + region.title + " statistical data")) as RegionData<any, any, any>;
       this.polygonData[region.id] = (await this.loadFromS3(
-        this.dataset + "/regions/" + region.id + "/features.json", ONE_DAY,
+        this.dataset + "/regions/" + region.id + "/features.json", cacheDuration,
         "Loading " + region.title + " geographical data")) as geojson.GeoJsonObject;
     }
   }
