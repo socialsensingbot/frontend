@@ -34,7 +34,7 @@ export interface RegionMetadata {
 
 export interface StartMetadata {
   "lat": number;
-  "lon": number;
+  "lng": number;
   "zoom": number;
 }
 

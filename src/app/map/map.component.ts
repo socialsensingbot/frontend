@@ -450,8 +450,13 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private applyStartParams(animate = true) {
-    const {zoom, lon, lat} = {...this.data.serviceMetadata.start, ...this.data.dataSetMetdata.start};
-    this._map.setView(latLng([lat, lon]), zoom, {animate, duration: 4000});
+    const {zoom, lng, lat} = {
+      ...this.data.serviceMetadata.start,
+      ...this.data.dataSetMetdata.start,
+      ...this.route.snapshot.queryParams,
+      ...this._newParams
+    };
+    this._map.setView(latLng([lat, lng]), zoom, {animate, duration: 4000});
   }
 
   /**
