@@ -12,7 +12,7 @@ import {ExportToCsv} from "export-to-csv";
 import {PreferenceService} from "../../pref/preference.service";
 import {toTitleCase} from "../../common";
 import * as geojson from "geojson";
-import {APIService, ListDataSetsQuery} from "../../API.service";
+import {APIService} from "../../API.service";
 
 
 const log = new Logger("map-data");
@@ -101,7 +101,8 @@ export class MapDataService {
               private _pref: PreferenceService,
               private _api: APIService) {
     this.loadFromS3("metadata.json", 30 * 1000)
-        .then(i => {
+        .then(async i => {
+          await this._pref.waitUntilReady();
           this.serviceMetadata = i;
           if (this._pref.group.availableDataSets && this._pref.group.availableDataSets !== ["*"]) {
             this.availableDataSets = this.serviceMetadata.datasets.filter(
@@ -117,15 +118,15 @@ export class MapDataService {
    */
   public async loadStats() {
     log.debug("loadStats()");
-    for (const region of this.dataSetMetdata.regionGroups) {
+    for (const regionGroup of this.dataSetMetdata.regionGroups) {
       // Note the use of a random time to make sure that we don't refresh all datasets at once!!
       const cacheDuration = ONE_DAY * (7.0 + 7.0 * Math.random());
-      this.stats[region.id] = (await this.loadFromS3(
-        this.dataset + "/regions/" + region.id + "/stats.json", cacheDuration,
-        "Loading " + region.title + " statistical data")) as RegionData<any, any, any>;
-      this.polygonData[region.id] = (await this.loadFromS3(
-        this.dataset + "/regions/" + region.id + "/features.json", cacheDuration,
-        "Loading " + region.title + " geographical data")) as geojson.GeoJsonObject;
+      this.stats[regionGroup.id] = (await this.loadFromS3(
+        this.dataset + "/regions/" + regionGroup.id + "/stats.json", cacheDuration,
+        "Loading " + regionGroup.title + " statistical data")) as RegionData<any, any, any>;
+      this.polygonData[regionGroup.id] = (await this.loadFromS3(
+        this.dataset + "/regions/" + regionGroup.id + "/features.json", cacheDuration,
+        "Loading " + regionGroup.title + " geographical data")) as geojson.GeoJsonObject;
     }
   }
 

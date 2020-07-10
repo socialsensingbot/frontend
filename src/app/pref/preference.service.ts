@@ -18,6 +18,7 @@ const log = new Logger("pref-service");
             })
 export class PreferenceService {
   private _ready: boolean;
+
   public get groups(): string[] {
     return this._groups;
   }
@@ -107,14 +108,8 @@ export class PreferenceService {
         this._groupPreferences = groupPref;
 
       }
-      this.group = {...this.group, ...this._groupPreferences};
-      if (!this.group.availableDataSets) {
-        this.group.availableDataSets = environment.availableDataSets;
-      }
-      if (!this.group.defaultDataSet) {
-        this.group.defaultDataSet = environment.defaultDataSet;
-      }
-      log.debug(this._preferences);
+      this.group = this.combine(this.group, this._preferences, this._groupPreferences);
+      log.info("Combined preferences are: ", this.group);
       this._ready = true;
     }
     this.readBlacklist();
@@ -368,5 +363,17 @@ export class PreferenceService {
     } else {
       this._notify.show("Not ignoring " + tweet.id);
     }
+  }
+
+  private combine(...prefs: any) {
+    const result = {};
+    for (const pref of prefs) {
+      for (const field in pref) {
+        if (typeof pref[field] !== "undefined" && pref[field] !== null) {
+          result[field] = pref[field];
+        }
+      }
+    }
+    return result;
   }
 }
