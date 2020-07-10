@@ -3,6 +3,8 @@ type UserPreferences @model @auth(
     {allow: owner, operations: [create, update, delete, read]},
   ]){
   id: ID!
+  ignoreTweets: [TweetIgnore] @connection(name: "UserTweetIgnores")
+  ignorePeople: [TwitterUserIgnore] @connection(name: "UserTwitterUserIgnores")
   locale: String
   timezone: String
   multipleSessions: Boolean
@@ -57,10 +59,12 @@ type TweetIgnore @model @auth(rules: [ {allow: owner}]) {
   id: ID!
   url: String!
   tweetId: String
+  user: UserPreferences @connection(name: "UserTweetIgnores")
 }
 
 
 type TwitterUserIgnore @model  @auth(rules: [ {allow: owner}]) {
   id: ID!
   twitterScreenName: String!
+  user: UserPreferences @connection(name: "UserTwitterUserIgnores")
 }
