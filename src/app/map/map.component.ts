@@ -31,6 +31,7 @@ import {getOS, toTitleCase} from "../common";
 import {RegionSelection} from "./region-selection";
 import {PreferenceService} from "../pref/preference.service";
 import {APIService} from "../API.service";
+import {NgForageCache} from "ngforage";
 
 
 const log = new Logger("map");
@@ -62,7 +63,7 @@ export class MapComponent implements OnInit, OnDestroy {
           ...this.data.serviceMetadata.start,
           ...this.data.dataSetMetdata.start,
         };
-        this.updateSearch({zoom, lng, lat});
+        this.updateSearch({zoom, lng, lat, selected: null});
         this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 6000});
         this.ready = true;
         this._updating = false;
@@ -150,10 +151,13 @@ export class MapComponent implements OnInit, OnDestroy {
               private _color: ColorCodeService,
               public data: MapDataService,
               public pref: PreferenceService,
-              private _api: APIService
+              private _api: APIService,
+              private readonly cache: NgForageCache,
   ) {
     // save the query parameter observable
     this._searchParams = this.route.queryParams;
+
+
   }
 
 
@@ -388,6 +392,9 @@ export class MapComponent implements OnInit, OnDestroy {
    * @param map the leaflet.js Map
    */
   private async init(map: Map) {
+    if (this.route.snapshot.queryParamMap.has("__clear_cache__")) {
+      this.cache.clear();
+    }
     log.debug("init");
     // map.zoomControl.remove();
     await this.pref.waitUntilReady();
