@@ -38,11 +38,16 @@ export interface StartMetadata {
   "zoom": number;
 }
 
-export interface Metadata {
+export interface DataSetMetadata {
   id: string;
   title: string;
   regionGroups: RegionMetadata[];
   start: StartMetadata;
+}
+
+interface ServiceMetadata {
+  datasets: { id: string, title: string }[];
+  start?: StartMetadata;
 }
 
 @Injectable({
@@ -76,19 +81,18 @@ export class MapDataService {
 
 
   private _updating: boolean;
-  public storedDataSetList: ListDataSetsQuery;
-  private dataSet: DataSet;
   public dataset: string;
 
 
-  public metadata: Metadata;
+  public dataSetMetdata: DataSetMetadata;
+  public serviceMetadata: ServiceMetadata;
 
   constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
               private _notify: NotificationService, private readonly cache: NgForageCache,
               private readonly ngf: NgForage,
               private _pref: PreferenceService,
               private _api: APIService) {
-    this._api.ListDataSets().then(i => this.storedDataSetList = i);
+    this.loadFromS3("metadata.json", 30 * 1000).then(i => this.serviceMetadata = i);
   }
 
   /**
@@ -361,11 +365,11 @@ export class MapDataService {
 
   public async switchDataSet(dataset: string) {
     this.dataset = dataset;
-    this.metadata = await this.loadFromS3(this.dataset + "/metadata.json", 10 * 1000) as Metadata;
+    this.dataSetMetdata = await this.loadFromS3(this.dataset + "/metadata.json", 10 * 1000) as DataSetMetadata;
 
   }
 
   public regionTypes() {
-    return this.metadata.regionGroups.map(i => i.id);
+    return this.dataSetMetdata.regionGroups.map(i => i.id);
   }
 }

@@ -52,8 +52,8 @@ export class MapComponent implements OnInit, OnDestroy {
       this._dataset = value;
       this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
       this.data.switchDataSet(value).then(async () => {
-        this._map.setView(latLng([this.data.metadata.start.lat, this.data.metadata.start.lon]),
-                          this.data.metadata.start.zoom);
+        this._map.setView(latLng([this.data.dataSetMetdata.start.lat, this.data.dataSetMetdata.start.lon]),
+                          this.data.dataSetMetdata.start.zoom);
         await this.data.loadStats();
         this.load(false);
       });
@@ -241,7 +241,6 @@ export class MapComponent implements OnInit, OnDestroy {
   };
   _routerStateChangeSub: Subscription;
   _popState: boolean;
-  public datasets: any[] = [];
 
   private scheduleResetLayers() {
     return this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
@@ -385,11 +384,9 @@ export class MapComponent implements OnInit, OnDestroy {
       this._dataset = this.pref.group.defaultDataSet;
     }
     await this.data.switchDataSet(this.dataset);
-    map.setView(latLng([this.data.metadata.start.lat, this.data.metadata.start.lon]), this.data.metadata.start.zoom);
+    map.setView(latLng([this.data.dataSetMetdata.start.lat, this.data.dataSetMetdata.start.lon]),
+                this.data.dataSetMetdata.start.zoom);
     await this.data.loadStats();
-    this.datasets = this.data.storedDataSetList.items.filter(
-      i => this.pref.group.availableDataSets.includes(i.id)
-    );
 
     // define the layers for the different counts
     this._numberLayers.stats = layerGroup().addTo(map);

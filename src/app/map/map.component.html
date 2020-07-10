@@ -36,11 +36,11 @@
                              (onEnd)="sliderChangeOnEnd($event)"
                              [options]="sliderOptions"></date-range-slider>
         </div>
-        <ng-container *ngIf="datasets.length > 1">
+        <ng-container *ngIf="data.serviceMetadata.datasets && data.serviceMetadata.datasets.length > 1">
           <div class="app-toolbar-separator"></div>
           <mat-form-field>
             <mat-select [(value)]="dataset">
-              <mat-option *ngFor="let ds of datasets" [value]="ds.id">
+              <mat-option *ngFor="let ds of data.serviceMetadata.datasets" [value]="ds.id">
                 {{ds.title}}
               </mat-option>
             </mat-select>
@@ -49,7 +49,7 @@
         <div class="app-toolbar-separator"></div>
         <mat-form-field>
           <mat-select [(value)]="activePolyLayerShortName" class="map-polygon-layer-select">
-            <mat-option *ngFor="let regionGrouping of data.metadata.regionGroups"
+            <mat-option *ngFor="let regionGrouping of data.dataSetMetdata.regionGroups"
                         [value]="regionGrouping.id">{{regionGrouping.title}}</mat-option>
           </mat-select>
         </mat-form-field>
