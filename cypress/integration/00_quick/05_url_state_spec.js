@@ -97,7 +97,7 @@ describe('05 URL State: ', function () {
   });
 
 
-  describe.only('select lat & lng', () => {
+  describe('select lat & lng', () => {
     const url = MAP_URL + "?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000";
     const newUrl = MAP_URL + "?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&active_number=stats&active_polygon=county&max_time=1539561540000&min_time=1539475200000&selected=cambridgeshire";
     it('when unauthorized and load state', () => {
