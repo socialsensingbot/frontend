@@ -52,18 +52,18 @@ export class MapComponent implements OnInit, OnDestroy {
       this._dataset = value;
       this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
       this.data.switchDataSet(value).then(async () => {
+        this.selection.clear();
+        this.hideTweets();
+        await this.data.loadStats();
         const {zoom, lng, lat} = {
           ...this.data.serviceMetadata.start,
           ...this.data.dataSetMetdata.start,
         };
         this.updateSearch({zoom, lng, lat});
         this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 6000});
-        await this.data.loadStats();
         this.ready = true;
         this._updating = false;
-        await this.load(false);
-        this._sliderIsStale = true;
-        // this.resetLayers(true);
+        await this.load(false, true);
       }).finally(() => {
         this.activity = false;
 
@@ -395,6 +395,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this._dataset = this.pref.group.defaultDataSet;
     }
     await this.data.switchDataSet(this.dataset);
+    await this.data.loadStats();
     const {zoom, lng, lat} = {
       ...this.data.serviceMetadata.start,
       ...this.data.dataSetMetdata.start,
@@ -402,7 +403,6 @@ export class MapComponent implements OnInit, OnDestroy {
       ...this._newParams
     };
     this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 4000});
-    await this.data.loadStats();
 
     // define the layers for the different counts
     this._numberLayers.stats = layerGroup().addTo(map);
@@ -460,6 +460,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   }
+
   /**
    * When the user places their mouse over a feature (region) this is called.
    */
@@ -710,10 +711,10 @@ export class MapComponent implements OnInit, OnDestroy {
   /**
    * Reset the polygon layers.
    *
-   * @param clearClick clears the selected polygon
+   * @param clearSelected clears the selected polygon
    */
-  private resetLayers(clearClick) {
-    log.debug("resetLayers(" + clearClick + ")");
+  private resetLayers(clearSelected) {
+    log.debug("resetLayers(" + clearSelected + ")");
     // this.hideTweets();
     for (const key of numberLayerShortNames) {
       log.debug(key);
@@ -732,7 +733,7 @@ export class MapComponent implements OnInit, OnDestroy {
       } else {
         log.debug("Null layer " + key);
       }
-      if (clearClick) {
+      if (clearSelected) {
         this.selection.clear();
         this.hideTweets();
       }
@@ -803,7 +804,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                () => {this.updateSliderFromData(); });
         this._exec.changeState("no-params");
       } else {
-        await this.updateLayers("Data Load");
+        await this.updateLayers("Data Load", clearSelected);
         await this._exec.queue("Update Slider", ["ready", "data-refresh"],
                                () => {this.updateSliderFromData(); }, null, true, true, true);
       }
@@ -821,7 +822,7 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
 
-  private async updateLayers(reason: string = "") {
+  private async updateLayers(reason: string = "", clearSelected = false) {
     return this._exec.queue("Update Layers: " + reason, ["ready", "data-loaded", "data-refresh"], async () => {
                               // Mark as stale to trigger a refresh
                               if (!this._updating) {
@@ -833,7 +834,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                   await this.data.update(this._dateMin, this._dateMax);
                                   this.clearMapFeatures();
                                   this.updateRegionData();
-                                  this.resetLayers(false);
+                                  this.resetLayers(clearSelected);
                                   this.updateTwitterPanel();
                                 } finally {
                                   this.activity = false;
