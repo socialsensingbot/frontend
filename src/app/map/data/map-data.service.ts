@@ -43,6 +43,8 @@ export interface DataSetMetadata {
   title: string;
   regionGroups: RegionMetadata[];
   start: StartMetadata;
+  location: string;
+  hazards: string[];
 }
 
 export interface DataSetCoreMetadata {

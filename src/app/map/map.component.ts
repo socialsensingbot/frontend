@@ -55,16 +55,20 @@ export class MapComponent implements OnInit, OnDestroy {
       this.ready = false;
       this._dataset = value;
       this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
+      const oldLocation = this.data.dataSetMetdata.location;
       this.data.switchDataSet(value).then(async () => {
-        this.selection.clear();
         this.hideTweets();
         await this.data.loadStats();
-        const {zoom, lng, lat} = {
-          ...this.data.serviceMetadata.start,
-          ...this.data.dataSetMetdata.start,
-        };
-        this.updateSearch({zoom, lng, lat, selected: null});
-        this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 6000});
+        log.debug(`Old location ${oldLocation} new location ${this.data.dataSetMetdata.location}`);
+        if (this.data.dataSetMetdata.location !== oldLocation) {
+          this.selection.clear();
+          const {zoom, lng, lat} = {
+            ...this.data.serviceMetadata.start,
+            ...this.data.dataSetMetdata.start,
+          };
+          this.updateSearch({zoom, lng, lat, selected: null});
+          this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 6000});
+        }
         this.ready = true;
         this._updating = false;
         await this.load(false, true);
