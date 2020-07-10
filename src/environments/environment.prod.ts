@@ -17,6 +17,6 @@ export const environment = {
     password: ""
   },
   defaultDataSet:    "live",
-  availableDataSets: ["live"]
+  availableDataSets: ["*"]
 
 };

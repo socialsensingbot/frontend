@@ -15,5 +15,5 @@ export const environment = {
   },
   sanitizeForGDPR:  true,
   defaultDataSet:   "live",
-  availableDataSets: ["live"]
+  availableDataSets: ["*"]
 };

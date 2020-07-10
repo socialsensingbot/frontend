@@ -45,10 +45,17 @@ export interface DataSetMetadata {
   start: StartMetadata;
 }
 
+export interface DataSetCoreMetadata {
+  id: string;
+  title: string;
+}
+
 interface ServiceMetadata {
-  datasets: { id: string, title: string }[];
+  datasets: DataSetCoreMetadata[];
   start?: StartMetadata;
 }
+
+const ONE_DAY = 24 * 60 * 60 * 1000;
 
 @Injectable({
               providedIn: "root"
@@ -86,13 +93,23 @@ export class MapDataService {
 
   public dataSetMetdata: DataSetMetadata;
   public serviceMetadata: ServiceMetadata;
+  public availableDataSets: DataSetCoreMetadata[];
 
   constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
               private _notify: NotificationService, private readonly cache: NgForageCache,
               private readonly ngf: NgForage,
               private _pref: PreferenceService,
               private _api: APIService) {
-    this.loadFromS3("metadata.json", 30 * 1000).then(i => this.serviceMetadata = i);
+    this.loadFromS3("metadata.json", 30 * 1000)
+        .then(i => {
+          this.serviceMetadata = i;
+          if (this._pref.group.availableDataSets && this._pref.group.availableDataSets !== ["*"]) {
+            this.availableDataSets = this.serviceMetadata.datasets.filter(
+              ds => this._pref.group.availableDataSets.includes(ds.id));
+          } else {
+            this.availableDataSets = this.serviceMetadata.datasets;
+          }
+        });
   }
 
   /**
@@ -100,11 +117,13 @@ export class MapDataService {
    */
   public async loadStats() {
     log.debug("loadStats()");
-    for (const region of this.regionTypes()) {
-      this.stats[region] = (await this.loadFromS3(
-        this.dataset + "/regions/" + region + "/stats.json")) as RegionData<any, any, any>;
-      this.polygonData[region] = (await this.loadFromS3(
-        this.dataset + "/regions/" + region + "/features.json")) as geojson.GeoJsonObject;
+    for (const region of this.dataSetMetdata.regionGroups) {
+      this.stats[region.id] = (await this.loadFromS3(
+        this.dataset + "/regions/" + region.id + "/stats.json", ONE_DAY,
+        "Loading " + region.title + " statistical data")) as RegionData<any, any, any>;
+      this.polygonData[region.id] = (await this.loadFromS3(
+        this.dataset + "/regions/" + region.id + "/features.json", ONE_DAY,
+        "Loading " + region.title + " geographical data")) as geojson.GeoJsonObject;
     }
   }
 
@@ -114,17 +133,12 @@ export class MapDataService {
    */
   public async loadLiveData(): Promise<TimeSlice[]> {
     log.debug("loadLiveData()");
-    if (this._pref.group.availableDataSets.includes(this.dataset)) {
-      const result = this.loadFromS3(this.dataset + "/twitter.json", 2 * 1000);
-      return result as Promise<TimeSlice[]>;
-    } else {
-      this._notify.show("Your group does not have access to dataset " + this.dataset);
-      throw Error("Your group does not have access to dataset " + this.dataset);
-    }
+    const result = this.loadFromS3(this.dataset + "/twitter.json", 2 * 1000);
+    return result as Promise<TimeSlice[]>;
   }
 
 
-  private async loadFromS3(name: string, cacheDuration = 24 * 60 * 60 * 1000) {
+  private async loadFromS3(name: string, cacheDuration = ONE_DAY, loadingMessage: string = null) {
     const cacheValue: CachedItem<any> = await this.cache.getCached(name);
     if (cacheValue != null && !cacheValue.expired && cacheValue.hasData && cacheValue.data) {
       log.info(`Retrieved ${name} from cache.`);
@@ -132,10 +146,14 @@ export class MapDataService {
       return cacheValue.data;
     } else {
       log.info(`${name} not in cache.`);
+      if (loadingMessage !== null) {
+        this._notify.show(loadingMessage, "OK", 60);
+      }
       const url = await Storage.get(name);
       const jsonData = await this._http.get(url.toString(), {observe: "body", responseType: "json"})
                                  .toPromise();
       this.cache.setCached(name, jsonData, cacheDuration);
+      this._notify.dismiss();
       return jsonData;
     }
   }
@@ -224,7 +242,7 @@ export class MapDataService {
       log.info("Tweet data not in cache.");
       this._twitterData = new ProcessedData(_dateMin, _dateMax, this.reverseTimeKeys, this._rawTwitterData,
                                             this.stats, this.regionTypes());
-      this.cache.setCached(key, this._twitterData, 24 * 60 * 60 * 1000);
+      this.cache.setCached(key, this._twitterData, ONE_DAY);
     }
   }
 
