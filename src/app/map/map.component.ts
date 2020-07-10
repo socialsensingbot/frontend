@@ -52,10 +52,15 @@ export class MapComponent implements OnInit, OnDestroy {
       this._dataset = value;
       this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
       this.data.switchDataSet(value).then(async () => {
-        this._map.setView(latLng([this.data.dataSetMetdata.start.lat, this.data.dataSetMetdata.start.lon]),
-                          this.data.dataSetMetdata.start.zoom);
+        this.applyStartParams();
         await this.data.loadStats();
-        this.load(false);
+        this.ready = true;
+        this._updating = false;
+        await this.load(false);
+        this.resetLayers(true);
+      }).finally(() => {
+        this.activity = false;
+
       });
     }
   }
@@ -236,7 +241,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this._statsLayer,
       this._countyLayer
     ],
-    zoom:   6,
+    zoom:   2,
     center: latLng([53, -2])
   };
   _routerStateChangeSub: Subscription;
@@ -344,7 +349,7 @@ export class MapComponent implements OnInit, OnDestroy {
       newZoom = zoom;
     }
     if (viewChange) {
-      this._map.setView(newCentre, newZoom);
+      this._map.setView(newCentre, newZoom, {animate: true, duration: 3000});
     }
 
     // This handles a change to the active_number value
@@ -384,8 +389,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this._dataset = this.pref.group.defaultDataSet;
     }
     await this.data.switchDataSet(this.dataset);
-    map.setView(latLng([this.data.dataSetMetdata.start.lat, this.data.dataSetMetdata.start.lon]),
-                this.data.dataSetMetdata.start.zoom);
+    this.applyStartParams();
     await this.data.loadStats();
 
     // define the layers for the different counts
@@ -443,6 +447,11 @@ export class MapComponent implements OnInit, OnDestroy {
     });
 
 
+  }
+
+  private applyStartParams(animate = true) {
+    const {zoom, lon, lat} = {...this.data.serviceMetadata.start, ...this.data.dataSetMetdata.start};
+    this._map.setView(latLng([lat, lon]), zoom, {animate, duration: 4000});
   }
 
   /**
@@ -790,7 +799,7 @@ export class MapComponent implements OnInit, OnDestroy {
       } else {
         await this.updateLayers("Data Load");
         await this._exec.queue("Update Slider", ["ready", "data-refresh"],
-                               () => {this.updateSliderFromData(); });
+                               () => {this.updateSliderFromData(); }, null, true, true, true);
       }
 
       this._twitterIsStale = true;
