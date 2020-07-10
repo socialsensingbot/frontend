@@ -49,6 +49,9 @@ export class MapComponent implements OnInit, OnDestroy {
 
   public set dataset(value: string) {
     if (value && value !== this._dataset) {
+      this.activity = true;
+      this._updating = true;
+      this.ready = false;
       this._dataset = value;
       this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
       this.data.switchDataSet(value).then(async () => {
@@ -388,7 +391,7 @@ export class MapComponent implements OnInit, OnDestroy {
     log.debug("init");
     // map.zoomControl.remove();
     await this.pref.waitUntilReady();
-
+    this.activity = true;
     if (this.route.snapshot.paramMap.has("dataset")) {
       this._dataset = this.route.snapshot.paramMap.get("dataset");
     } else {
@@ -441,7 +444,13 @@ export class MapComponent implements OnInit, OnDestroy {
                            await this.updateLayers("From Parameters");
                            // Schedule periodic data loads from the server
                            this._loadTimer = timer(ONE_MINUTE_IN_MILLIS, ONE_MINUTE_IN_MILLIS)
-                             .subscribe(() => this.load());
+                             .subscribe(async () => {
+                               this.activity = true;
+                               await this.load();
+                               this.activity = false;
+
+                             });
+                           this.activity = false;
                          });
       } else {
         if (this._popState) {
@@ -452,7 +461,7 @@ export class MapComponent implements OnInit, OnDestroy {
           await this.resetLayers(true);
           return this.updateLayers("Pop State")
                      .then(() => this._twitterIsStale = true)
-                     .then(() => this.activity = false);
+                     .finally(() => this.activity = false);
         }
       }
 
@@ -782,8 +791,8 @@ export class MapComponent implements OnInit, OnDestroy {
   /**
    * Read the live.json data file and process contents.
    */
-  async load(first: boolean = false) {
-    if (!first && (this.activity || this._updating)) {
+  async load(first: boolean = false, clearSelected = false) {
+    if (!first && this._updating) {
       log.info("UI is busy so skipping load");
       setTimeout(() => {
         this._zone.run(() => this.load());
@@ -795,7 +804,7 @@ export class MapComponent implements OnInit, OnDestroy {
       log.warn("User logged out, not performing load.");
       return;
     }
-    this.activity = true;
+
     try {
       await this.data.load();
 
@@ -816,7 +825,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
       this._notify.error(e);
     } finally {
-      this.activity = false;
     }
 
   }
