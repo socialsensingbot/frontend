@@ -1,7 +1,4 @@
 import {Component, NgZone, OnDestroy, OnInit} from "@angular/core";
-import {fgsData} from "./county_bi";
-import {coarseData} from "./coarse_bi";
-import {fineData} from "./fine_bi";
 import {Auth, Logger} from "aws-amplify";
 import {Browser, GeoJSON, latLng, LayerGroup, layerGroup, LeafletMouseEvent, Map, tileLayer} from "leaflet";
 import "jquery-ui/ui/widgets/slider.js";
@@ -388,7 +385,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this._dataset = this.pref.group.defaultDataSet;
     }
     await this.data.switchDataSet(this.dataset);
-    map.setView(latLng([this.data.metadata.start.lat, this.data.metadata.start.lon]), this.data.metadata.start.zoom)
+    map.setView(latLng([this.data.metadata.start.lat, this.data.metadata.start.lon]), this.data.metadata.start.zoom);
     await this.data.loadStats();
     this.datasets = this.data.storedDataSetList.items.filter(
       i => this.pref.group.availableDataSets.includes(i.id)
