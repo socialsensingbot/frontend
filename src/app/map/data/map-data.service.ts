@@ -111,7 +111,7 @@ export class MapDataService {
   public async loadLiveData(): Promise<TimeSlice[]> {
     log.debug("loadLiveData()");
     if (this._pref.group.availableDataSets.includes(this.dataset)) {
-      const result = this.loadFromS3(this.dataset + "/twitter.json", 60 * 1000);
+      const result = this.loadFromS3(this.dataset + "/twitter.json", 2 * 1000);
       return result as Promise<TimeSlice[]>;
     } else {
       this._notify.show("Your group does not have access to dataset " + this.dataset);
