@@ -104,7 +104,9 @@ export class MapDataService {
         .then(async i => {
           await this._pref.waitUntilReady();
           this.serviceMetadata = i;
-          if (this._pref.group.availableDataSets && this._pref.group.availableDataSets !== ["*"]) {
+          if (this._pref.group.availableDataSets
+            && this._pref.group.availableDataSets.length > 0
+            && this._pref.group.availableDataSets[0] !== "*") {
             this.availableDataSets = this.serviceMetadata.datasets.filter(
               ds => this._pref.group.availableDataSets.includes(ds.id));
           } else {

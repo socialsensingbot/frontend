@@ -369,7 +369,7 @@ export class PreferenceService {
     const result = {};
     for (const pref of prefs) {
       for (const field in pref) {
-        if (typeof pref[field] !== "undefined" && pref[field] !== null) {
+        if (!field.startsWith("__") && typeof pref[field] !== "undefined" && pref[field] !== null) {
           result[field] = pref[field];
         }
       }
