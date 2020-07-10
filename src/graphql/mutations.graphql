@@ -150,7 +150,6 @@ mutation CreateDataSet(
   createDataSet(input: $input, condition: $condition) {
     id
     title
-    regionGroupings
     createdAt
     updatedAt
   }
@@ -162,7 +161,6 @@ mutation UpdateDataSet(
   updateDataSet(input: $input, condition: $condition) {
     id
     title
-    regionGroupings
     createdAt
     updatedAt
   }
@@ -174,7 +172,6 @@ mutation DeleteDataSet(
   deleteDataSet(input: $input, condition: $condition) {
     id
     title
-    regionGroupings
     createdAt
     updatedAt
   }

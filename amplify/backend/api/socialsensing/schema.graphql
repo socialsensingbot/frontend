@@ -32,9 +32,6 @@ type GroupPreferences @model @auth(rules: [{allow: groups, operations: [create, 
 type DataSet @model( timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" }) @auth(rules: []) {
   id: ID!
   title: String!
-  regionGroupings:[String]
-  centre: [Float]
-  zoom: [Int]
 }
 
 

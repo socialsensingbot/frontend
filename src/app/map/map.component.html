@@ -49,7 +49,7 @@
         <div class="app-toolbar-separator"></div>
         <mat-form-field>
           <mat-select [(value)]="activePolyLayerShortName" class="map-polygon-layer-select">
-            <mat-option *ngFor="let regionGrouping of data.regionGroups"
+            <mat-option *ngFor="let regionGrouping of data.metadata.regionGroups"
                         [value]="regionGrouping.id">{{regionGrouping.title}}</mat-option>
           </mat-select>
         </mat-form-field>

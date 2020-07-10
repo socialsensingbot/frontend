@@ -54,8 +54,12 @@ export class MapComponent implements OnInit, OnDestroy {
     if (value && value !== this._dataset) {
       this._dataset = value;
       this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
-      this.data.switchDataSet(value);
-      this.data.loadStats().then(() => this.load(false));
+      this.data.switchDataSet(value).then(async () => {
+        this._map.setView(latLng([this.data.metadata.start.lat, this.data.metadata.start.lon]),
+                          this.data.metadata.start.zoom);
+        await this.data.loadStats();
+        this.load(false);
+      });
     }
   }
 
@@ -383,7 +387,8 @@ export class MapComponent implements OnInit, OnDestroy {
     } else {
       this._dataset = this.pref.group.defaultDataSet;
     }
-    this.data.switchDataSet(this.dataset);
+    await this.data.switchDataSet(this.dataset);
+    map.setView(latLng([this.data.metadata.start.lat, this.data.metadata.start.lon]), this.data.metadata.start.zoom)
     await this.data.loadStats();
     this.datasets = this.data.storedDataSetList.items.filter(
       i => this.pref.group.availableDataSets.includes(i.id)
@@ -729,7 +734,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * Clears and iialises feature data on the map.
    */
   private clearMapFeatures() {
-    for (const regionType of this.data.regionTypes) { // counties, coarse, fine
+    for (const regionType of this.data.regionTypes()) { // counties, coarse, fine
       const features = (this.data.polygonData[regionType] as PolygonData).features;
       for (const feature of features) {
         const properties = feature.properties;
@@ -746,7 +751,7 @@ export class MapComponent implements OnInit, OnDestroy {
    * Updates the data stored in the polygon data of the leaflet layers.
    */
   private updateRegionData() {
-    for (const regionType of this.data.regionTypes) { // counties, coarse, fine
+    for (const regionType of this.data.regionTypes()) { // counties, coarse, fine
       const regionData: PolygonData = (this.data.polygonData)[regionType] as PolygonData;
       const features: Feature[] = regionData.features;
       for (const feature of features) {

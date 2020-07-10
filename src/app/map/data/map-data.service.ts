@@ -22,9 +22,27 @@ export interface DataSet {
   __typename: "DataSet";
   id: string;
   title: string;
-  regionGroupings: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
+}
+
+
+export interface RegionMetadata {
+  id: string;
+  title: string;
+}
+
+export interface StartMetadata {
+  "lat": number;
+  "lon": number;
+  "zoom": number;
+}
+
+export interface Metadata {
+  id: string;
+  title: string;
+  regionGroups: RegionMetadata[];
+  start: StartMetadata;
 }
 
 @Injectable({
@@ -60,15 +78,10 @@ export class MapDataService {
   private _updating: boolean;
   public storedDataSetList: ListDataSetsQuery;
   private dataSet: DataSet;
-  public regionTypes: Array<string>;
   public dataset: string;
-  public regionGroups: { id: string, title: string }[] = [];
-  public regionGroupsMetadata: { id: string, title: string }[] = [
-    {id: "coarse", title: "Coarse Grid"},
-    {id: "fine", title: "Fine Grid"},
-    {id: "state", title: "State"},
-    {id: "county", title: "Local Authority"}
-  ];
+
+
+  public metadata: Metadata;
 
   constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
               private _notify: NotificationService, private readonly cache: NgForageCache,
@@ -83,7 +96,7 @@ export class MapDataService {
    */
   public async loadStats() {
     log.debug("loadStats()");
-    for (const region of this.regionTypes) {
+    for (const region of this.regionTypes()) {
       this.stats[region] = (await this.loadFromS3(
         this.dataset + "/regions/" + region + "/stats.json")) as RegionData<any, any, any>;
       this.polygonData[region] = (await this.loadFromS3(
@@ -98,7 +111,7 @@ export class MapDataService {
   public async loadLiveData(): Promise<TimeSlice[]> {
     log.debug("loadLiveData()");
     if (this._pref.group.availableDataSets.includes(this.dataset)) {
-      const result = this.loadFromS3(this.dataset + "/twitter.json");
+      const result = this.loadFromS3(this.dataset + "/twitter.json", 60 * 1000);
       return result as Promise<TimeSlice[]>;
     } else {
       this._notify.show("Your group does not have access to dataset " + this.dataset);
@@ -107,10 +120,20 @@ export class MapDataService {
   }
 
 
-  private async loadFromS3(name: string) {
-    const url = await Storage.get(name);
-    return this._http.get(url.toString(), {observe: "body", responseType: "json"})
-               .toPromise();
+  private async loadFromS3(name: string, cacheDuration = 24 * 60 * 60 * 1000) {
+    const cacheValue: CachedItem<any> = await this.cache.getCached(name);
+    if (cacheValue != null && !cacheValue.expired && cacheValue.hasData && cacheValue.data) {
+      log.info(`Retrieved ${name} from cache.`);
+      log.debug(cacheValue);
+      return cacheValue.data;
+    } else {
+      log.info(`${name} not in cache.`);
+      const url = await Storage.get(name);
+      const jsonData = await this._http.get(url.toString(), {observe: "body", responseType: "json"})
+                                 .toPromise();
+      this.cache.setCached(name, jsonData, cacheDuration);
+      return jsonData;
+    }
   }
 
   public async load() {
@@ -124,7 +147,8 @@ export class MapDataService {
 
   }
 
-  public tweets(activePolyLayerShortName: string, names: string[]): Tweet[] {
+  public tweets(activePolyLayerShortName: string, names: string[]):
+    Tweet[] {
     log.debug(`tweets(${activePolyLayerShortName},${name})`);
     const tweets: Tweet[] = [];
     for (const name of names) {
@@ -190,12 +214,12 @@ export class MapDataService {
     if (cacheValue != null && !cacheValue.expired && cacheValue.hasData && cacheValue.data) {
       log.info("Retrieved tweet data from cache.");
       log.debug(cacheValue);
-      this._twitterData = new ProcessedData().populate(cacheValue.data, this.regionTypes);
+      this._twitterData = new ProcessedData().populate(cacheValue.data, this.regionTypes());
       log.debug(this._twitterData);
     } else {
       log.info("Tweet data not in cache.");
       this._twitterData = new ProcessedData(_dateMin, _dateMax, this.reverseTimeKeys, this._rawTwitterData,
-                                            this.stats, this.regionTypes);
+                                            this.stats, this.regionTypes());
       this.cache.setCached(key, this._twitterData, 24 * 60 * 60 * 1000);
     }
   }
@@ -246,7 +270,8 @@ export class MapDataService {
     return this._twitterData.regionData(regionType).places();
   }
 
-  offset(dateInMillis: number): number {
+  offset(dateInMillis: number):
+    number {
     const dateFull = new Date(dateInMillis);
     const ye = dateFull.getFullYear();
     const mo = ((dateFull.getUTCMonth() + 1) + "").padStart(2, "0");
@@ -334,10 +359,13 @@ export class MapDataService {
   }
 
 
-  public switchDataSet(dataset: string) {
+  public async switchDataSet(dataset: string) {
     this.dataset = dataset;
-    this.dataSet = this.storedDataSetList.items.find(i => i.id === this.dataset);
-    this.regionTypes = this.dataSet.regionGroupings;
-    this.regionGroups = this.regionGroupsMetadata.filter(i => this.regionTypes.includes(i.id));
+    this.metadata = await this.loadFromS3(this.dataset + "/metadata.json", 10 * 1000) as Metadata;
+
+  }
+
+  public regionTypes() {
+    return this.metadata.regionGroups.map(i => i.id);
   }
 }
