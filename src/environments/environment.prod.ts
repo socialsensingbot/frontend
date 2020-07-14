@@ -8,6 +8,7 @@ export const environment = {
   timezone:         "UTC",
   locale:           'en-GB',
   rollbar:          true,
+  showErrors: false,
   multipleSessions: false,
   hmr:              false,
   confirm:          {
