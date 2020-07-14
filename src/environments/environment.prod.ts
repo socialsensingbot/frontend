@@ -1,6 +1,8 @@
 export const environment = {
   production:       true,
   name:             "production",
+  toolbarColor: "primary",
+  demo: false,
   version: "1.3.1",
   // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
   timezone:         "UTC",
