@@ -1,3 +1,5 @@
+import {MAP_URL} from "../../../support";
+
 describe('#126 Pop state : https://github.com/socialsensingbot/frontend/issues/126',
          function () {
            beforeEach(function () {
@@ -7,8 +9,8 @@ describe('#126 Pop state : https://github.com/socialsensingbot/frontend/issues/1
            });
 
            it('Reproduce Issue', () => {
-             const url = "http://localhost:4200/map?selected=greater%20london&max_time=1591100940000&min_time=1591007520000&active_number=stats&active_polygon=county";
-             const slideLeftUrl = "http://localhost:4200/map?selected=greater%20london&max_time=1591100940000&min_time=1590899520000&active_number=stats&active_polygon=county";
+             const url = MAP_URL + "?selected=greater%20london&max_time=1591100940000&min_time=1591007520000&active_number=stats&active_polygon=county";
+             const slideLeftUrl = MAP_URL + "?selected=greater%20london&max_time=1591100940000&min_time=1590899520000&active_number=stats&active_polygon=county";
              cy.visitAndWait(url);
              cy.tweetCountTotal(49);
              cy.log("Click out of London in any other county");
@@ -31,7 +33,7 @@ describe('#126 Pop state : https://github.com/socialsensingbot/frontend/issues/1
              cy.go('back');
              cy.wait(4000);
              cy.url({timeout: 20000}).should("equal",
-                                             "http://localhost:4200/map?selected=greater%20london&max_time=1591100940000&min_time=1590935520000&active_number=stats&active_polygon=county");
+                                             MAP_URL + "?selected=greater%20london&max_time=1591100940000&min_time=1590935520000&active_number=stats&active_polygon=county");
              cy.tweetCountTotal(90);
              cy.go('forward');
              cy.wait(4000);

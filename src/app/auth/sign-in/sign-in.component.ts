@@ -3,7 +3,7 @@ import {FormGroup, FormControl, Validators} from '@angular/forms';
 import {AuthService} from '../auth.service';
 import {CognitoUser} from '@aws-amplify/auth';
 import {NotificationService} from 'src/app/services/notification.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from 'src/environments/environment';
 import {Logger} from "aws-amplify";
 
@@ -33,7 +33,8 @@ export class SignInComponent implements OnInit {
   constructor(
     public auth: AuthService,
     private _notification: NotificationService,
-    private _router: Router) { }
+    private _router: Router,
+    private _route: ActivatedRoute) {}
 
   ngOnInit(): void {
     $("#loading-div").remove();
@@ -67,13 +68,14 @@ export class SignInComponent implements OnInit {
           if (user.challengeName === 'NEW_PASSWORD_REQUIRED') {
             this._router.navigate(['auth/newpass'], {
               queryParamsHandling: "merge", state: {
-                message: "Please Change your Temporary Password"
+                message: "Please change your Temporary Password"
               }
             });
             return;
           } else {
             log.debug(user.challengeName);// other situations
-            this._router.navigate(['/map'], {queryParamsHandling: "merge"});
+            window.location.replace(this._route.snapshot.queryParams["_return"]);
+
           }
         })
         .catch((error: any) => {

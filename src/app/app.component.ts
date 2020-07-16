@@ -1,7 +1,7 @@
-import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
-import {AmplifyService} from 'aws-amplify-angular';
+import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
+import {AmplifyService} from "aws-amplify-angular";
 import {AuthService} from "./auth/auth.service";
-import {API, Auth, graphqlOperation, Logger} from "aws-amplify";
+import {Auth, Logger} from "aws-amplify";
 import {Router} from "@angular/router";
 import {environment} from "../environments/environment";
 import {PreferenceService} from "./pref/preference.service";
@@ -12,10 +12,10 @@ import * as Rollbar from "rollbar";
 import {RollbarService} from "./error";
 
 
-const log = new Logger('app');
+const log = new Logger("app");
 
 function getLang() {
-  if (navigator.languages != undefined) {
+  if (navigator.languages !== undefined) {
     return navigator.languages[0];
   } else {
     return navigator.language;
@@ -23,13 +23,13 @@ function getLang() {
 }
 
 @Component({
-             selector:    'app-root',
-             templateUrl: './app.component.html',
-             styleUrls:   ['./app.component.scss']
+             selector:    "app-root",
+             templateUrl: "./app.component.html",
+             styleUrls:   ["./app.component.scss"]
            })
 export class AppComponent {
 
-  title = 'SocialSensing.com';
+  title = "SocialSensing.com";
   public isDev: boolean = !environment.production;
   user: any;
   isAuthenticated: boolean;
@@ -74,29 +74,29 @@ export class AppComponent {
     }
     log.debug("Authenticated");
 
-      const userInfo = await Auth.currentUserInfo();
-      if (userInfo) {
-        await this._pref.init(userInfo);
-        await this._session.open(userInfo);
-        log.info("Locale detected: " + getLang());
-        log.info("Locale in use: " + this._pref.group.locale);
-        log.info("Timezone detected: " + Intl.DateTimeFormat().resolvedOptions().timeZone);
-        log.info("Timezone in use: " + this._pref.group.timezone);
-        this._rollbar.configure(
-          {
-            enabled:      environment.rollbar,
+    const userInfo = await Auth.currentUserInfo();
+    if (userInfo) {
+      await this._pref.init(userInfo);
+      await this._session.open(userInfo);
+      log.info("Locale detected: " + getLang());
+      log.info("Locale in use: " + this._pref.group.locale);
+      log.info("Timezone detected: " + Intl.DateTimeFormat().resolvedOptions().timeZone);
+      log.info("Timezone in use: " + this._pref.group.timezone);
+      this._rollbar.configure(
+        {
+          enabled:      environment.rollbar,
+          // environment: environment.name,
+          captureIp:    "anonymize",
+          code_version: environment.version,
+          payload:      {
+            person:           {
+              id:       userInfo.username,
+              username: userInfo.username,
+              groups:   this._pref.groups
+            },
             // environment: environment.name,
-            captureIp:    'anonymize',
-            code_version: environment.version,
-            payload:      {
-              person:           {
-                id:       userInfo.username,
-                username: userInfo.username,
-                groups:   this._pref.groups
-              },
-              // environment: environment.name,
-              environment_info: environment,
-              prefs:            {
+            environment_info: environment,
+            prefs:            {
                 group: this._pref.group
               }
             }
@@ -104,12 +104,12 @@ export class AppComponent {
         );
       }
 
-      if (userInfo && userInfo.attributes.profile) {
+    if (userInfo && userInfo.attributes.profile) {
 
-        this.user = userInfo;
-        this.isAuthenticated = true;
-        this.isSignup = false;
-      }
+      this.user = userInfo;
+      this.isAuthenticated = true;
+      this.isSignup = false;
+    }
 
 
   }
@@ -118,7 +118,7 @@ export class AppComponent {
     this.isAuthenticated = false;
     this._session.close();
     Auth.signOut()
-        .then(data => this._router.navigate(['/'], {queryParamsHandling: "merge"}))
+        .then(data => this._router.navigate(["/"], {queryParamsHandling: "merge"}))
         .catch(err => log.debug(err));
 
 

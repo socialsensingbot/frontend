@@ -1,4 +1,3 @@
-import {PolygonLayerShortName} from "../types";
 import {environment} from "../../../environments/environment";
 import {toTitleCase} from "../../common";
 
@@ -74,7 +73,7 @@ export class Tweet {
     return this._html;
   }
 
-  get poly(): PolygonLayerShortName {
+  get poly(): string {
     return this._poly;
   }
 
@@ -91,11 +90,13 @@ export class Tweet {
    * @param _place the region that this tweet is associated with
    */
   constructor(private _id: string = null, private _html: string = null, private _internalDateString: string = null,
-              private _poly: PolygonLayerShortName = null, private _place: string = null) {
+              private _poly: string = null, private _place: string = null) {
   }
 
   /**
-   * Perform lazy initializing of the class. This is called when various accessors need to access fields that are computationally expensive to populate.
+   * Perform lazy initializing of the class.
+   * This is called when various accessors need to access
+   * fields that are computationally expensive to populate.
    */
   private lazyInit() {
     if (!this._init) {
@@ -105,8 +106,8 @@ export class Tweet {
       this._valid = (matched != null);
       if (matched) {
         this._sender = matched[1];
-        console.assert(this._id == matched[2]);
-        this._url = "https://twitter.com/" + this._sender + "/status/" + this._id
+        console.assert(this._id === matched[2]);
+        this._url = "https://twitter.com/" + this._sender + "/status/" + this._id;
       }
       this._date = new Date(Date.UTC(Number(this._internalDateString.substring(0, 4)),
                                      Number(this._internalDateString.substring(4, 6)) - 1,
@@ -115,20 +116,22 @@ export class Tweet {
                                      +Number(this._internalDateString.substring(10, 12)), 0, 0));
 
       this._year = new Intl.DateTimeFormat(environment.locale,
-                                           {year: '2-digit', timeZone: environment.timezone}).format(this._date);
+                                           {year: "2-digit", timeZone: environment.timezone}).format(this._date);
       this._month = new Intl.DateTimeFormat(environment.locale,
-                                            {month: 'short', timeZone: environment.timezone}).format(this._date);
-      this._day = new Intl.DateTimeFormat(environment.locale, {day: '2-digit', timeZone: environment.timezone}).format(
+                                            {month: "short", timeZone: environment.timezone}).format(this._date);
+      this._day = new Intl.DateTimeFormat(environment.locale, {day: "2-digit", timeZone: environment.timezone}).format(
         this._date);
       this._hour = new Intl.DateTimeFormat(environment.locale,
-                                           {hour: '2-digit', hour12: true, timeZone: environment.timezone}).format(
+                                           {hour: "2-digit", hour12: true, timeZone: environment.timezone}).format(
         this._date);
       this._init = true;
     }
   }
 
   /**
-   * Populate this tweet from data from a Tweet like structure. Primarily used to copy a deserialized Tweet which is not a class but a Tweet like class.
+   * Populate this tweet from data from a Tweet like structure.
+   * Primarily used to copy a deserialized Tweet which is not a
+   * class but a Tweet like class.
    *
    * @param tweet the {@link Tweet} to copy data from.
    */

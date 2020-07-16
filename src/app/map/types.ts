@@ -49,23 +49,15 @@ export interface ColorFunctionObject {
 
 export type ColorFunctions = RegionData<ColorFunctionObject, ColorFunctionObject, ColorFunctionObject>;
 export type ColorData = RegionData<{ colors: string[], values: number[] }, { colors: string[], values: number[] }, any>;
-export type ByRegionType<T> = {
-  [index in PolygonLayerShortName]: T;
-};
+export interface ByRegionType<T> {
+  [index: string]: T;
+}
 export type Stats = ByRegionType<RegionData<any, any, any>>;
 
-export type PolygonLayerFullName = "Local Authority" | "Coarse Grid" | "Fine Grid";
-export type PolygonLayerShortName = "county" | "coarse" | "fine";
 export type NumberLayerShortName = "stats" | "count" ;
-export type NumberLayerFullName = "Exceedance" | "Tweet Count" ;
 
-export const polygonLayerFullNames: PolygonLayerFullName[] = ["Local Authority", "Coarse Grid", "Fine Grid"];
-export const polygonLayerShortNames: PolygonLayerShortName[] = ["county", "coarse", "fine"];
-export const numberLayerFullNames: NumberLayerFullName[] = ["Exceedance", "Tweet Count"];
 export const numberLayerShortNames: NumberLayerShortName[] = ["stats", "count"];
 
-export const regionDataKeys: string[] = ["stats", "count", "embed"];
-// These are provided as constants to reduce the chance of typos changing functionality
 
 export const STATS = "stats";
 export const COUNTY = "county";

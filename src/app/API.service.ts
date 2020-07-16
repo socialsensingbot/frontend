@@ -1,6 +1,5 @@
 /* tslint:disable */
 /* eslint-disable */
-// @ts-ignore
 //  This file was automatically generated and should not be edited.
 import {Injectable} from "@angular/core";
 import API, {graphqlOperation} from "@aws-amplify/api";
@@ -104,12 +103,18 @@ export type CreateGroupPreferencesInput = {
   locale?: string | null;
   timezone?: string | null;
   multipleSessions?: boolean | null;
+  sanitizeForGDPR?: boolean | null;
+  defaultDataSet?: string | null;
+  availableDataSets?: Array<string | null> | null;
 };
 
 export type ModelGroupPreferencesConditionInput = {
   locale?: ModelStringInput | null;
   timezone?: ModelStringInput | null;
   multipleSessions?: ModelBooleanInput | null;
+  sanitizeForGDPR?: ModelBooleanInput | null;
+  defaultDataSet?: ModelStringInput | null;
+  availableDataSets?: ModelStringInput | null;
   and?: Array<ModelGroupPreferencesConditionInput | null> | null;
   or?: Array<ModelGroupPreferencesConditionInput | null> | null;
   not?: ModelGroupPreferencesConditionInput | null;
@@ -121,6 +126,9 @@ export type UpdateGroupPreferencesInput = {
   locale?: string | null;
   timezone?: string | null;
   multipleSessions?: boolean | null;
+  sanitizeForGDPR?: boolean | null;
+  defaultDataSet?: string | null;
+  availableDataSets?: Array<string | null> | null;
 };
 
 export type DeleteGroupPreferencesInput = {
@@ -276,6 +284,9 @@ export type ModelGroupPreferencesFilterInput = {
   locale?: ModelStringInput | null;
   timezone?: ModelStringInput | null;
   multipleSessions?: ModelBooleanInput | null;
+  sanitizeForGDPR?: ModelBooleanInput | null;
+  defaultDataSet?: ModelStringInput | null;
+  availableDataSets?: ModelStringInput | null;
   and?: Array<ModelGroupPreferencesFilterInput | null> | null;
   or?: Array<ModelGroupPreferencesFilterInput | null> | null;
   not?: ModelGroupPreferencesFilterInput | null;
@@ -409,6 +420,9 @@ export type CreateGroupPreferencesMutation = {
   locale: string | null;
   timezone: string | null;
   multipleSessions: boolean | null;
+  sanitizeForGDPR: boolean | null;
+  defaultDataSet: string | null;
+  availableDataSets: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -420,6 +434,9 @@ export type UpdateGroupPreferencesMutation = {
   locale: string | null;
   timezone: string | null;
   multipleSessions: boolean | null;
+  sanitizeForGDPR: boolean | null;
+  defaultDataSet: string | null;
+  availableDataSets: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -431,6 +448,9 @@ export type DeleteGroupPreferencesMutation = {
   locale: string | null;
   timezone: string | null;
   multipleSessions: boolean | null;
+  sanitizeForGDPR: boolean | null;
+  defaultDataSet: string | null;
+  availableDataSets: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -664,6 +684,9 @@ export type GetGroupPreferencesQuery = {
   locale: string | null;
   timezone: string | null;
   multipleSessions: boolean | null;
+  sanitizeForGDPR: boolean | null;
+  defaultDataSet: string | null;
+  availableDataSets: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -677,6 +700,9 @@ export type ListGroupPreferencessQuery = {
     locale: string | null;
     timezone: string | null;
     multipleSessions: boolean | null;
+    sanitizeForGDPR: boolean | null;
+    defaultDataSet: string | null;
+    availableDataSets: Array<string | null> | null;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
@@ -885,6 +911,9 @@ export type OnCreateGroupPreferencesSubscription = {
   locale: string | null;
   timezone: string | null;
   multipleSessions: boolean | null;
+  sanitizeForGDPR: boolean | null;
+  defaultDataSet: string | null;
+  availableDataSets: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -896,6 +925,9 @@ export type OnUpdateGroupPreferencesSubscription = {
   locale: string | null;
   timezone: string | null;
   multipleSessions: boolean | null;
+  sanitizeForGDPR: boolean | null;
+  defaultDataSet: string | null;
+  availableDataSets: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -907,6 +939,9 @@ export type OnDeleteGroupPreferencesSubscription = {
   locale: string | null;
   timezone: string | null;
   multipleSessions: boolean | null;
+  sanitizeForGDPR: boolean | null;
+  defaultDataSet: string | null;
+  availableDataSets: Array<string | null> | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -1272,6 +1307,9 @@ export class APIService {
           locale
           timezone
           multipleSessions
+          sanitizeForGDPR
+          defaultDataSet
+          availableDataSets
           createdAt
           updatedAt
         }
@@ -1299,6 +1337,9 @@ export class APIService {
           locale
           timezone
           multipleSessions
+          sanitizeForGDPR
+          defaultDataSet
+          availableDataSets
           createdAt
           updatedAt
         }
@@ -1326,6 +1367,9 @@ export class APIService {
           locale
           timezone
           multipleSessions
+          sanitizeForGDPR
+          defaultDataSet
+          availableDataSets
           createdAt
           updatedAt
         }
@@ -1838,6 +1882,9 @@ export class APIService {
           locale
           timezone
           multipleSessions
+          sanitizeForGDPR
+          defaultDataSet
+          availableDataSets
           createdAt
           updatedAt
         }
@@ -1865,6 +1912,9 @@ export class APIService {
             locale
             timezone
             multipleSessions
+            sanitizeForGDPR
+            defaultDataSet
+            availableDataSets
             createdAt
             updatedAt
           }
@@ -2258,6 +2308,9 @@ export class APIService {
           locale
           timezone
           multipleSessions
+          sanitizeForGDPR
+          defaultDataSet
+          availableDataSets
           createdAt
           updatedAt
         }
@@ -2275,6 +2328,9 @@ export class APIService {
           locale
           timezone
           multipleSessions
+          sanitizeForGDPR
+          defaultDataSet
+          availableDataSets
           createdAt
           updatedAt
         }
@@ -2292,6 +2348,9 @@ export class APIService {
           locale
           timezone
           multipleSessions
+          sanitizeForGDPR
+          defaultDataSet
+          availableDataSets
           createdAt
           updatedAt
         }

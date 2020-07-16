@@ -17,4 +17,4 @@
 import './commands'
 
 require('cypress-plugin-retries');
-
+export const MAP_URL = "http://localhost:4200/map/live"
