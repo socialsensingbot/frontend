@@ -173,7 +173,7 @@ export class ProcessedData {
   }
 
   public tweets(activePolyLayerShortName: PolygonLayerShortName, name: string): Tweet[] {
-    return this.layer(activePolyLayerShortName).tweetsForPlace(name)
+    return this.layer(activePolyLayerShortName).tweetsForPlace(name);
   }
 
   public regionNames(activePolyLayerShortName: PolygonLayerShortName): Set<string> {

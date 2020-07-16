@@ -280,6 +280,8 @@ export class MapDataService {
   }
 
   private downloadRegion(polyType: PolygonLayerShortName, region: string, geometry: Geometry): CSVExportTweet[] {
+
+    const regionMap = {};
     let regionText = region;
     if (region.match(/\d+/)) {
       let minX = null;
@@ -302,12 +304,14 @@ export class MapDataService {
       }
       log.verbose(
         `Bounding box of ${JSON.stringify(geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`);
-      regionText = `(${minX},${minY}),(${maxX},${maxY})`;
+      regionMap[region] = `(${minX},${minY}),(${maxX},${maxY})`;
+    } else {
+      regionMap[region] = toTitleCase(region);
     }
     log.verbose("Exporting egion: " + region);
     return this._twitterData.tweets(polyType, region)
                .filter(i => i.valid && !this._pref.isBlacklisted(i))
-               .map(i => i.asCSV(toTitleCase(regionText), this._pref.group.sanitizeForGDPR));
+               .map(i => i.asCSV(regionMap, this._pref.group.sanitizeForGDPR));
 
   }
 

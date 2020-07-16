@@ -6,6 +6,7 @@ import {NotificationService} from 'src/app/services/notification.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from 'src/environments/environment';
 import {Auth, Logger} from "aws-amplify";
+
 const log = new Logger("new-pass");
 
 /**
@@ -32,7 +33,7 @@ export class NewPassComponent implements OnInit {
                                             });
 
   hide = true;
-  message: string= "Change Password";
+  message: string = "Change Password";
 
   get passwordInput() { return this.changePassForm.get('password'); }
 
@@ -44,7 +45,11 @@ export class NewPassComponent implements OnInit {
     private _router: Router,
     private route: ActivatedRoute) {
 
-    this.message=_router.getCurrentNavigation().extras.state.message;
+    this.message = _router.getCurrentNavigation().extras.state.message;
+  }
+
+  ngOnInit(): void {
+    $("#loading-div").remove();
   }
 
 
@@ -72,7 +77,4 @@ export class NewPassComponent implements OnInit {
   }
 
 
-  public ngOnInit(): void {
-
-  }
 }

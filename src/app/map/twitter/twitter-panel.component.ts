@@ -1,17 +1,12 @@
-import {
-  Component,
-  Input,
-  NgZone,
-  OnChanges, OnDestroy, OnInit,
-  SimpleChanges
-} from "@angular/core";
+import {Component, Input, NgZone, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {Hub, Logger} from "aws-amplify";
 import {Tweet} from "./tweet";
 import {
   OnCreateGroupTweetIgnoreSubscription,
   OnCreateGroupTwitterUserIgnoreSubscription,
-  OnDeleteGroupTweetIgnoreSubscription, OnDeleteGroupTwitterUserIgnoreSubscription
+  OnDeleteGroupTweetIgnoreSubscription,
+  OnDeleteGroupTwitterUserIgnoreSubscription
 } from "../../API.service";
 import {Subscription} from "rxjs";
 import {ExportToCsv} from "export-to-csv";
@@ -173,36 +168,11 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
     this.csvExporter = new ExportToCsv(options);
     const regionData = [];
-    for (const r of this.selection.all()) {
-      let regionName = `${r.title}`;
+    regionData.push(
+      ...this.visibleTweets.filter(i => i.valid)
+             .map(i => i.asCSV(this.selection.regionMap(), this.pref.group.sanitizeForGDPR)));
 
-      if (r.isNumericRegion()) {
-        let minX = null;
-        let maxX = null;
-        let minY = null;
-        let maxY = null;
-        for (const point of r.geometry.coordinates[0]) {
-          if (minX === null || point[0] < minX) {
-            minX = point[0];
-          }
-          if (minY === null || point[1] < minY) {
-            minY = point[1];
-          }
-          if (maxX === null || point[0] > maxX) {
-            maxX = point[0];
-          }
-          if (maxY === null || point[1] > maxY) {
-            maxY = point[1];
-          }
-        }
-        console.log(
-          `Bounding box of ${JSON.stringify(r.geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`);
-        regionName = `(${minX},${minY}),(${maxX},${maxY})`;
-      }
-      regionData.push(
-        ...this.visibleTweets.filter(i => i.valid).map(i => i.asCSV(regionName, this.pref.group.sanitizeForGDPR)));
 
-    }
     this.csvExporter.generateCsv(regionData);
   }
 }
