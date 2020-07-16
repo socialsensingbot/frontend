@@ -11,6 +11,7 @@ type UserPreferences @model @auth(
   #  sanitizeForGDPR: Boolean
   #  defaultDataSet: String
   #  availableDataSets:[String]
+  #  showLoadingMessages: Boolean
 }
 
 type UserSession @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" }) @auth(
@@ -33,6 +34,7 @@ type GroupPreferences @model @auth(rules: [{allow: groups, operations: [create, 
   sanitizeForGDPR: Boolean
   defaultDataSet: String
   availableDataSets:[String]
+  showLoadingMessages: Boolean
 }
 
 

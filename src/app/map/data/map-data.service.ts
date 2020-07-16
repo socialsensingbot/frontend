@@ -166,7 +166,7 @@ export class MapDataService {
       return cacheValue.data;
     } else {
       log.info(`${name} not in cache.`);
-      if (loadingMessage !== null) {
+      if (loadingMessage !== null && this._pref.group.showLoadingMessages) {
         this._notify.show(loadingMessage, "OK", 60);
       }
       const url = await Storage.get(name);

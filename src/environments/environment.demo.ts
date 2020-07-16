@@ -13,7 +13,9 @@ export const environment = {
     email:    "",
     password: ""
   },
-  sanitizeForGDPR:  true,
-  defaultDataSet:   "live",
+  showErrors:       false,
+  showLoadingMessages: true,
+  sanitizeForGDPR: true,
+  defaultDataSet: "live",
   availableDataSets: ["*"]
 };
