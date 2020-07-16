@@ -65,6 +65,7 @@ export class MapDataService {
       log.debug("Stats already loaded;");
       return new Promise(r => r(this._stats));
     }
+    this._notify.show("Loading reference data", "OK", 60);
     return fetch("assets/data/county_stats.json")
       .then(response => response.json())
       .then(json => {
@@ -99,6 +100,8 @@ export class MapDataService {
         } else {
           return this._stats;
         }
+      }).finally(() => {
+        this._notify.dismiss();
       });
   }
 
@@ -107,11 +110,13 @@ export class MapDataService {
    */
   public async loadLiveData(): Promise<TimeSlice[]> {
     log.debug("loadLiveData()");
+    this._notify.show("Loading application data", "OK", 60);
+
     return Storage.get("live.json")
                   .then((url: any) =>
                           this._http.get(url.toString(), {observe: "body", responseType: "json"})
                               .toPromise()
-                  ) as Promise<TimeSlice[]>;
+                  ).finally(() => this._notify.dismiss()) as Promise<TimeSlice[]>;
   }
 
 

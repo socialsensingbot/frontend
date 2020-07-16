@@ -76,4 +76,8 @@ export class NotificationService implements OnDestroy, OnInit {
 
     }
   }
+
+  public dismiss() {
+    this.toast.dismiss();
+  }
 }

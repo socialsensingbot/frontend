@@ -251,7 +251,7 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   onMapReady(map: Map) {
     log.debug("onMapReady");
-
+    $("#loading-div").remove();
     this._map = map;
     this._data.loadStats()
         .then(() => this.init(map))
