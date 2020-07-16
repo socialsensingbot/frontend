@@ -258,7 +258,7 @@ export class MapComponent implements OnInit, OnDestroy {
       this._statsLayer,
       this._countyLayer
     ],
-    zoom:   2,
+    zoom:   4,
     center: latLng([53, -2])
   };
   _routerStateChangeSub: Subscription;
@@ -279,6 +279,7 @@ export class MapComponent implements OnInit, OnDestroy {
     log.debug("onMapReady");
     $("#loading-div").remove();
     this._map = map;
+    // this.ready= true;
     this.init(map);
   }
 
