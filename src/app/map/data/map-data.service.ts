@@ -399,8 +399,14 @@ export class MapDataService {
 
   public async switchDataSet(dataset: string) {
     this.dataset = dataset;
+    let version: string;
+    if (this.serviceMetadata?.version) {
+      version = environment.version + ":" + this.serviceMetadata.version;
+    } else {
+      version = environment.version;
+    }
     this.dataSetMetdata = await this.loadFromS3(this.dataset + "/metadata.json",
-                                                this.serviceMetadata.version ? environment.version + ":" + this.serviceMetadata.version : environment.version,
+                                                version,
                                                 10 * 1000) as DataSetMetadata;
 
   }
