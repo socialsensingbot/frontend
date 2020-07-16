@@ -123,7 +123,10 @@ export class MapDataService {
                  } else {
                    this.availableDataSets = this.serviceMetadata.datasets;
                  }
-               }).finally(() => this.initialized = true);
+               }).finally(() => {
+        this.initialized = true;
+        this._notify.dismiss();
+      });
   }
 
   /**
@@ -132,16 +135,30 @@ export class MapDataService {
   public async loadStats() {
     log.debug("loadStats()");
     const version = environment.version + ":" + this.dataSetMetdata.version;
+    const promises = {};
+    if (this._pref.group.showLoadingMessages) {
+      this._notify.show("Loading reference data", "OK", 60);
+    }
     for (const regionGroup of this.dataSetMetdata.regionGroups) {
       // Note the use of a random time to make sure that we don't refresh all datasets at once!!
       const cacheDuration = ONE_DAY * (7.0 + 7.0 * Math.random());
-      this.stats[regionGroup.id] = (await this.loadFromS3(
-        this.dataset + "/regions/" + regionGroup.id + "/stats.json", version, cacheDuration,
-        "Loading " + regionGroup.title + " statistical data")) as RegionData<any, any, any>;
-      this.polygonData[regionGroup.id] = (await this.loadFromS3(
+      promises["stats:" + regionGroup.id] = (this.loadFromS3(
+        this.dataset + "/regions/" + regionGroup.id + "/stats.json", version, cacheDuration));
+      promises["features:" + regionGroup.id] = (this.loadFromS3(
         this.dataset + "/regions/" + regionGroup.id + "/features.json", version, cacheDuration,
-        "Loading " + regionGroup.title + " geographical data")) as geojson.GeoJsonObject;
+      ));
     }
+    for (const regionGroup of this.dataSetMetdata.regionGroups) {
+      if (this._pref.group.showLoadingMessages) {
+        this._notify.show("Loading '" + regionGroup.title + "' statistical data", "OK", 60);
+      }
+      this.stats[regionGroup.id] = (await promises["stats:" + regionGroup.id]) as RegionData<any, any, any>;
+      if (this._pref.group.showLoadingMessages) {
+        this._notify.show("Loading '" + regionGroup.title + "' geographical data", "OK", 60);
+      }
+      this.polygonData[regionGroup.id] = (await promises["features:" + regionGroup.id]) as geojson.GeoJsonObject;
+    }
+    this._notify.dismiss();
   }
 
 
@@ -151,7 +168,7 @@ export class MapDataService {
   public async loadLiveData(): Promise<TimeSlice[]> {
     log.debug("loadLiveData()");
     const result = this.loadFromS3(this.dataset + "/twitter.json", environment.version, 2 * 1000,
-                                   "Loading application data");
+                                   "Loading application data").finally(() => this._notify.dismiss());
     return result as Promise<TimeSlice[]>;
   }
 
@@ -173,7 +190,6 @@ export class MapDataService {
       const jsonData = await this._http.get(url.toString(), {observe: "body", responseType: "json"})
                                  .toPromise();
       this.cache.setCached(key, jsonData, cacheDuration);
-      this._notify.dismiss();
       return jsonData;
     }
   }
@@ -411,7 +427,7 @@ export class MapDataService {
     this.dataSetMetdata = await this.loadFromS3(this.dataset + "/metadata.json",
                                                 environment.version + ":" + this.serviceMetadata.version,
                                                 10 * 1000) as DataSetMetadata;
-
+    this._notify.dismiss();
   }
 
   public regionTypes() {
