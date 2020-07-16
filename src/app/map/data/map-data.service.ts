@@ -42,6 +42,7 @@ export interface StartMetadata {
 export interface DataSetMetadata {
   id: string;
   title: string;
+  version?: string;
   regionGroups: RegionMetadata[];
   start: StartMetadata;
   location: string;
@@ -54,6 +55,7 @@ export interface DataSetCoreMetadata {
 }
 
 interface ServiceMetadata {
+  version?: string;
   datasets: DataSetCoreMetadata[];
   start?: StartMetadata;
 }
@@ -103,7 +105,7 @@ export class MapDataService {
               private readonly ngf: NgForage,
               private _pref: PreferenceService,
               private _api: APIService) {
-    this.loadFromS3("metadata.json", 30 * 1000)
+    this.loadFromS3("metadata.json", environment.version, 30 * 1000)
         .then(async i => {
           await this._pref.waitUntilReady();
           this.serviceMetadata = i;
@@ -123,14 +125,15 @@ export class MapDataService {
    */
   public async loadStats() {
     log.debug("loadStats()");
+    const version = environment.version + ":" + this.dataSetMetdata.version;
     for (const regionGroup of this.dataSetMetdata.regionGroups) {
       // Note the use of a random time to make sure that we don't refresh all datasets at once!!
       const cacheDuration = ONE_DAY * (7.0 + 7.0 * Math.random());
       this.stats[regionGroup.id] = (await this.loadFromS3(
-        this.dataset + "/regions/" + regionGroup.id + "/stats.json", cacheDuration,
+        this.dataset + "/regions/" + regionGroup.id + "/stats.json", version, cacheDuration,
         "Loading " + regionGroup.title + " statistical data")) as RegionData<any, any, any>;
       this.polygonData[regionGroup.id] = (await this.loadFromS3(
-        this.dataset + "/regions/" + regionGroup.id + "/features.json", cacheDuration,
+        this.dataset + "/regions/" + regionGroup.id + "/features.json", version, cacheDuration,
         "Loading " + regionGroup.title + " geographical data")) as geojson.GeoJsonObject;
     }
   }
@@ -141,16 +144,18 @@ export class MapDataService {
    */
   public async loadLiveData(): Promise<TimeSlice[]> {
     log.debug("loadLiveData()");
-    const result = this.loadFromS3(this.dataset + "/twitter.json", 2 * 1000, "Loading application data");
+    const result = this.loadFromS3(this.dataset + "/twitter.json", environment.version, 2 * 1000,
+                                   "Loading application data");
     return result as Promise<TimeSlice[]>;
   }
 
 
-  private async loadFromS3(name: string, cacheDuration = ONE_DAY, loadingMessage: string = null) {
-    const key = `${environment.name}:${environment.version}:${name}`;
+  private async loadFromS3(name: string, version: string = environment.version, cacheDuration = ONE_DAY,
+                           loadingMessage: string = null) {
+    const key = `${environment.name}:${version}:${name}`;
     const cacheValue: CachedItem<any> = await this.cache.getCached(key);
     if (cacheValue != null && !cacheValue.expired && cacheValue.hasData && cacheValue.data) {
-      log.info(`Retrieved ${name} from cache.`);
+      log.info(`Retrieved ${name} from cache (${key}) .`);
       log.debug(cacheValue);
       return cacheValue.data;
     } else {
@@ -325,7 +330,6 @@ export class MapDataService {
 
   private downloadRegion(regionGrouping: string, region: string, geometry: Geometry): CSVExportTweet[] {
     const regionMap = {};
-    let regionText = region;
     if (region.match(/\d+/)) {
       let minX = null;
       let maxX = null;
@@ -395,7 +399,9 @@ export class MapDataService {
 
   public async switchDataSet(dataset: string) {
     this.dataset = dataset;
-    this.dataSetMetdata = await this.loadFromS3(this.dataset + "/metadata.json", 10 * 1000) as DataSetMetadata;
+    this.dataSetMetdata = await this.loadFromS3(this.dataset + "/metadata.json",
+                                                this.serviceMetadata.version ? environment.version + ":" + this.serviceMetadata.version : environment.version,
+                                                10 * 1000) as DataSetMetadata;
 
   }
 
