@@ -65,6 +65,7 @@ export class MapDataService {
       log.debug("Stats already loaded;");
       return new Promise(r => r(this._stats));
     }
+    this._notify.show("Loading reference data", "OK", 60);
     return fetch("assets/data/county_stats.json")
       .then(response => response.json())
       .then(json => {
@@ -99,6 +100,8 @@ export class MapDataService {
         } else {
           return this._stats;
         }
+      }).finally(() => {
+        this._notify.dismiss();
       });
   }
 
@@ -107,11 +110,13 @@ export class MapDataService {
    */
   public async loadLiveData(): Promise<TimeSlice[]> {
     log.debug("loadLiveData()");
+    this._notify.show("Loading application data", "OK", 60);
+
     return Storage.get("live.json")
                   .then((url: any) =>
                           this._http.get(url.toString(), {observe: "body", responseType: "json"})
                               .toPromise()
-                  ) as Promise<TimeSlice[]>;
+                  ).finally(() => this._notify.dismiss()) as Promise<TimeSlice[]>;
   }
 
 
@@ -275,6 +280,8 @@ export class MapDataService {
   }
 
   private downloadRegion(polyType: PolygonLayerShortName, region: string, geometry: Geometry): CSVExportTweet[] {
+
+    const regionMap = {};
     let regionText = region;
     if (region.match(/\d+/)) {
       let minX = null;
@@ -297,12 +304,14 @@ export class MapDataService {
       }
       log.verbose(
         `Bounding box of ${JSON.stringify(geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`);
-      regionText = `(${minX},${minY}),(${maxX},${maxY})`;
+      regionMap[region] = `(${minX},${minY}),(${maxX},${maxY})`;
+    } else {
+      regionMap[region] = toTitleCase(region);
     }
     log.verbose("Exporting egion: " + region);
     return this._twitterData.tweets(polyType, region)
                .filter(i => i.valid && !this._pref.isBlacklisted(i))
-               .map(i => i.asCSV(toTitleCase(regionText), this._pref.group.sanitizeForGDPR));
+               .map(i => i.asCSV(regionMap, this._pref.group.sanitizeForGDPR));
 
   }
 

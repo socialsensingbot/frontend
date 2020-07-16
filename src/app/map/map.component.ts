@@ -251,7 +251,7 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   onMapReady(map: Map) {
     log.debug("onMapReady");
-
+    $("#loading-div").remove();
     this._map = map;
     this._data.loadStats()
         .then(() => this.init(map))
@@ -748,6 +748,8 @@ export class MapComponent implements OnInit, OnDestroy {
           featureProperties.stats = tweetRegionInfo.exceedanceForPlace(place);
         } else {
           log.verbose("No data for " + place);
+          featureProperties.count = 0;
+          featureProperties.stats = 0;
         }
       }
 
@@ -824,11 +826,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                 log.debug("Update in progress so skipping this update");
                               }
                             }
-      , reason, true, true).catch(e => {
-      if (e !== DUPLICATE_REASON) {
-        log.error(e);
-      }
-    });
+      , reason, true, true);
   }
 
 

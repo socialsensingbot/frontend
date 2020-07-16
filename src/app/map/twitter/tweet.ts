@@ -1,5 +1,6 @@
 import {PolygonLayerShortName} from "../types";
 import {environment} from "../../../environments/environment";
+import {toTitleCase} from "../../common";
 
 export class CSVExportTweet {
   constructor(public region: string, public id: string, public date: string, public url: string, public text: string) {
@@ -149,15 +150,15 @@ export class Tweet {
     return this;
   }
 
-  public asCSV(region: string, sanitize: boolean): CSVExportTweet {
+  public asCSV(regionMap: any, sanitize: boolean): CSVExportTweet {
     this.lazyInit();
     if (sanitize) {
-      return new CSVExportTweet(region, this._id, this._date.toUTCString(),
+      return new CSVExportTweet(regionMap[this._place], this._id, this._date.toUTCString(),
                                 "https://twitter.com/username_removed/status/" + this._id,
                                 this.sanitizeForGDPR($("<div>").html(this._html).text()));
 
     } else {
-      return new CSVExportTweet(region, this._id, this._date.toUTCString(), this._url,
+      return new CSVExportTweet(regionMap[this._place], this._id, this._date.toUTCString(), this._url,
                                 $("<div>").html(this._html).text());
     }
   }

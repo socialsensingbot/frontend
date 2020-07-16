@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --source-map=true --poll 2000",
-    "start-fast": "ng serve --source-map=false --poll 10000",
+    "start-fast": "ng serve --source-map=false --poll 2000",
     "hmr": "ng serve --configuration hmr",
     "build": "ng build --verbose --aot",
     "build-prod": "ng build --prod",
