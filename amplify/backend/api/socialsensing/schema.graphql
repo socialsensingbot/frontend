@@ -5,6 +5,12 @@ type UserPreferences @model @auth(
   id: ID!
   ignoreTweets: [TweetIgnore] @connection(name: "UserTweetIgnores")
   ignorePeople: [TwitterUserIgnore] @connection(name: "UserTwitterUserIgnores")
+  locale: String
+  timezone: String
+  multipleSessions: Boolean
+  sanitizeForGDPR: Boolean
+  defaultDataSet: String
+  availableDataSets:[String]
 }
 
 type UserSession @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" }) @auth(
@@ -27,12 +33,6 @@ type GroupPreferences @model @auth(rules: [{allow: groups, operations: [create, 
   sanitizeForGDPR: Boolean
   defaultDataSet: String
   availableDataSets:[String]
-}
-
-type DataSet @model( timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" }) @auth(rules: []) {
-  id: ID!
-  title: String!
-  regionGroupings:[String]
 }
 
 

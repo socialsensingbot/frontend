@@ -129,7 +129,7 @@ Cypress.Commands.add("tweetCount", (vis, hid) => {
     cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000}).click()
       .then(title => {
               const hiddenCount = +title.text().trimLeft().split(" ")[0];
-        cy.get(".app-tweet-outer").find('.atr-hidden').its('length').should('eq', hid);
+              cy.get(".app-tweet-outer").find('.atr-hidden').its('length').should('eq', hid);
 
             }
       );
@@ -201,7 +201,7 @@ Cypress.Commands.add("stubLiveJson", (file) => {
              // have a POST, if you're pushing data up
              method:   "GET",
              // more on the URL below
-             url:      /.*\/public\/live.json?.*/g,
+             url:      /.*\/public\/live\/twitter.json?.*/g,
              // the fixture: shortcut will know to
              // look in cypress/fixtures,
              // unless you configure cypress to
@@ -223,8 +223,8 @@ function patchXhrUsing(makeResponse) {
 }
 
 Cypress.Commands.add("mockGraphQL", () => {
+  throw new Error("DO NOT USE, THIS IS BROKEN");
   cy.server({
-
               onAnyRequest: (route, proxy) => {
 
                 if (!route || !route.url || typeof route.url["indexOf"] === "undefined") {
@@ -244,9 +244,7 @@ Cypress.Commands.add("mockGraphQL", () => {
                     };
 
 
-                  }
-
-                  if (body && body.query && body.query.indexOf(
+                  } else if (body && body.query && body.query.indexOf(
                     "ListGroupTwitterUserIgnores") >= 0) {
                     route.response = {
                       "data": {
@@ -257,15 +255,14 @@ Cypress.Commands.add("mockGraphQL", () => {
                       }
                     };
 
-                  }
-                  if (body && body.query && body.query.indexOf(
+                  } else if (body && body.query && body.query.indexOf(
                     "GetUserPreferences") >= 0) {
                     console.log("GetUserPreferences");
                     route.response = {
                       "data": {
                         "getUserPreferences": {
-                          "id":           "434fd82f-3a65-4c66-85c1-b701f2b7ca81",
-                          "owner":        "434fd82f-3a65-4c66-85c1-b701f2b7ca81"
+                          "id":    "434fd82f-3a65-4c66-85c1-b701f2b7ca81",
+                          "owner": "434fd82f-3a65-4c66-85c1-b701f2b7ca81"
                         }
                       }
                     };
@@ -273,11 +270,22 @@ Cypress.Commands.add("mockGraphQL", () => {
 
                   }
 
+                } else if (body && body.query && body.query.indexOf(
+                  "ListDataSets") >= 0) {
+                  route.response = {
+                    "data": {
+                      "listDataSets": {
+                        items: [{id: "live", title: "Live"}]
+                      }
+
+                    }
+                  };
+
                 }
                 console.log("RESPONSE: ", route, proxy);
               }
 
             });
-  cy.route("POST", "/graphql", {});
+  cy.route("POST", "/graphql");
 });
 

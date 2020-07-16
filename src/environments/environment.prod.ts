@@ -1,18 +1,22 @@
 export const environment = {
-  production:       true,
-  name:             "production",
-  toolbarColor: "primary",
-  demo: false,
-  version: "1.3.1",
+  production:        true,
+  name:              "production",
+  demo:              false,
+  version:           "1.4",
   // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
-  timezone:         "UTC",
-  locale:           'en-GB',
-  rollbar:          true,
-  showErrors: false,
-  multipleSessions: false,
-  hmr:              false,
-  confirm:          {
-    email:    '',
-    password: ''
-  }
+  timezone:          "UTC",
+  locale:            "en-GB",
+  toolbarColor:      "primary",
+  rollbar:           true,
+  multipleSessions:  false,
+  hmr:               false,
+  showErrors:        false,
+  sanitizeForGDPR:   true,
+  confirm:           {
+    email:    "",
+    password: ""
+  },
+  defaultDataSet:    "live",
+  availableDataSets: ["*"]
+
 };

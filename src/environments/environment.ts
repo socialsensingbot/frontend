@@ -3,23 +3,25 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  name:             "dev",
-  version:          "dev",
-  demo:             false,
-  production:       false,
-  hmr:              false,
-  rollbar:          false,
-  toolbarColor:     "primary",
+  name:              "dev",
+  version:           "dev",
+  demo:              false,
+  production:        false,
+  hmr:               false,
+  rollbar:           false,
+  toolbarColor:      "primary",
   // timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  timezone:         "UTC",
-  multipleSessions: false,
-  locale:           "en-GB",
-  confirm:          {
+  timezone:          "UTC",
+  multipleSessions:  false,
+  locale:            "en-GB",
+  confirm:           {
     email:    "",
     password: ""
   },
-  showErrors:       false,
-  sanitizeForGDPR: true
+  showErrors:        false,
+  sanitizeForGDPR:   true,
+  defaultDataSet:    "live",
+  availableDataSets: ["live", "dataset-a", "india"]
 };
 
 /*

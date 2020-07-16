@@ -1,3 +1,5 @@
+import {MAP_URL} from "../../../support";
+
 describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/10): ', function () {
 
   const pageSize = 5;
@@ -13,10 +15,9 @@ describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issu
 
 
   describe('scroll', () => {
-    const url = "http://localhost:4200/map?selected=carmarthenshire&min_offset=-5399&max_offset=0&lat=53.00817326643286&lng=-2.0104980468750004";
+    const url = MAP_URL + "?selected=carmarthenshire&min_offset=-5399&max_offset=0&lat=53.00817326643286&lng=-2.0104980468750004";
 
     it('row changes', () => {
-      cy.mockGraphQL();
       cy.visitAndWait(url);
       cy.twitterPanelHeader("Carmarthenshire");
       cy.get(".atr-0.atr-visible", {timeout: 90000})
@@ -67,7 +68,6 @@ describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issu
     });
 
     it('top and bottom', () => {
-      cy.mockGraphQL();
       cy.visitAndWait(url);
       cy.twitterPanelHeader("Carmarthenshire");
       cy.get(".atr-0.atr-visible", {timeout: 90000})
@@ -82,7 +82,7 @@ describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issu
   });
 
   describe('various side effects', () => {
-    const url = "http://localhost:4200/map?selected=carmarthenshire&min_offset=-5399&max_offset=0&lat=53.00817326643286&lng=-2.0104980468750004";
+    const url = MAP_URL + "?selected=carmarthenshire&min_offset=-5399&max_offset=0&lat=53.00817326643286&lng=-2.0104980468750004";
 
     it('correct row count', () => {
       cy.visitAndWait(url);
