@@ -99,25 +99,31 @@ export class MapDataService {
   public dataSetMetdata: DataSetMetadata;
   public serviceMetadata: ServiceMetadata;
   public availableDataSets: DataSetCoreMetadata[];
+  private initialized: boolean;
 
   constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
               private _notify: NotificationService, private readonly cache: NgForageCache,
               private readonly ngf: NgForage,
               private _pref: PreferenceService,
               private _api: APIService) {
-    this.loadFromS3("metadata.json", environment.version, 30 * 1000)
-        .then(async i => {
-          await this._pref.waitUntilReady();
-          this.serviceMetadata = i;
-          if (this._pref.group.availableDataSets
-            && this._pref.group.availableDataSets.length > 0
-            && this._pref.group.availableDataSets[0] !== "*") {
-            this.availableDataSets = this.serviceMetadata.datasets.filter(
-              ds => this._pref.group.availableDataSets.includes(ds.id));
-          } else {
-            this.availableDataSets = this.serviceMetadata.datasets;
-          }
-        });
+
+  }
+
+  public async init() {
+
+    return this.loadFromS3("metadata.json", environment.version, 30 * 1000)
+               .then(async i => {
+                 await this._pref.waitUntilReady();
+                 this.serviceMetadata = i;
+                 if (this._pref.group.availableDataSets
+                   && this._pref.group.availableDataSets.length > 0
+                   && this._pref.group.availableDataSets[0] !== "*") {
+                   this.availableDataSets = this.serviceMetadata.datasets.filter(
+                     ds => this._pref.group.availableDataSets.includes(ds.id));
+                 } else {
+                   this.availableDataSets = this.serviceMetadata.datasets;
+                 }
+               }).finally(() => this.initialized = true);
   }
 
   /**
@@ -398,15 +404,12 @@ export class MapDataService {
 
 
   public async switchDataSet(dataset: string) {
-    this.dataset = dataset;
-    let version: string;
-    if (this.serviceMetadata?.version) {
-      version = environment.version + ":" + this.serviceMetadata.version;
-    } else {
-      version = environment.version;
+    if (!this.initialized) {
+      this._notify.error("Map Data Service not Initialized");
     }
+    this.dataset = dataset;
     this.dataSetMetdata = await this.loadFromS3(this.dataset + "/metadata.json",
-                                                version,
+                                                environment.version + ":" + this.serviceMetadata.version,
                                                 10 * 1000) as DataSetMetadata;
 
   }

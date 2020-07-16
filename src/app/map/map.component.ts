@@ -409,6 +409,7 @@ export class MapComponent implements OnInit, OnDestroy {
     } else {
       this._dataset = this.pref.group.defaultDataSet;
     }
+    await this.data.init();
     await this.data.switchDataSet(this.dataset);
     await this.data.loadStats();
     const {zoom, lng, lat} = {
