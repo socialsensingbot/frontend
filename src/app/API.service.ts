@@ -8,24 +8,36 @@ import {Observable} from "zen-observable-ts";
 
 export type CreateUserPreferencesInput = {
   id?: string | null;
-  locale?: string | null;
-  timezone?: string | null;
-  multipleSessions?: boolean | null;
-  sanitizeForGDPR?: boolean | null;
-  defaultDataSet?: string | null;
-  availableDataSets?: Array<string | null> | null;
 };
 
 export type ModelUserPreferencesConditionInput = {
-  locale?: ModelStringInput | null;
-  timezone?: ModelStringInput | null;
-  multipleSessions?: ModelBooleanInput | null;
-  sanitizeForGDPR?: ModelBooleanInput | null;
-  defaultDataSet?: ModelStringInput | null;
-  availableDataSets?: ModelStringInput | null;
   and?: Array<ModelUserPreferencesConditionInput | null> | null;
   or?: Array<ModelUserPreferencesConditionInput | null> | null;
   not?: ModelUserPreferencesConditionInput | null;
+};
+
+export type UpdateUserPreferencesInput = {
+  id: string;
+};
+
+export type DeleteUserPreferencesInput = {
+  id?: string | null;
+};
+
+export type CreateUserSessionInput = {
+  id?: string | null;
+  fingerprint?: string | null;
+  client?: string | null;
+  open: boolean;
+};
+
+export type ModelUserSessionConditionInput = {
+  fingerprint?: ModelStringInput | null;
+  client?: ModelStringInput | null;
+  open?: ModelBooleanInput | null;
+  and?: Array<ModelUserSessionConditionInput | null> | null;
+  or?: Array<ModelUserSessionConditionInput | null> | null;
+  not?: ModelUserSessionConditionInput | null;
 };
 
 export type ModelStringInput = {
@@ -72,36 +84,6 @@ export type ModelBooleanInput = {
   eq?: boolean | null;
   attributeExists?: boolean | null;
   attributeType?: ModelAttributeTypes | null;
-};
-
-export type UpdateUserPreferencesInput = {
-  id: string;
-  locale?: string | null;
-  timezone?: string | null;
-  multipleSessions?: boolean | null;
-  sanitizeForGDPR?: boolean | null;
-  defaultDataSet?: string | null;
-  availableDataSets?: Array<string | null> | null;
-};
-
-export type DeleteUserPreferencesInput = {
-  id?: string | null;
-};
-
-export type CreateUserSessionInput = {
-  id?: string | null;
-  fingerprint?: string | null;
-  client?: string | null;
-  open: boolean;
-};
-
-export type ModelUserSessionConditionInput = {
-  fingerprint?: ModelStringInput | null;
-  client?: ModelStringInput | null;
-  open?: ModelBooleanInput | null;
-  and?: Array<ModelUserSessionConditionInput | null> | null;
-  or?: Array<ModelUserSessionConditionInput | null> | null;
-  not?: ModelUserSessionConditionInput | null;
 };
 
 export type UpdateUserSessionInput = {
@@ -218,6 +200,7 @@ export type CreateTweetIgnoreInput = {
   id?: string | null;
   url: string;
   tweetId?: string | null;
+  tweetIgnoreUserId?: string | null;
 };
 
 export type ModelTweetIgnoreConditionInput = {
@@ -232,6 +215,7 @@ export type UpdateTweetIgnoreInput = {
   id: string;
   url?: string | null;
   tweetId?: string | null;
+  tweetIgnoreUserId?: string | null;
 };
 
 export type DeleteTweetIgnoreInput = {
@@ -241,6 +225,7 @@ export type DeleteTweetIgnoreInput = {
 export type CreateTwitterUserIgnoreInput = {
   id?: string | null;
   twitterScreenName: string;
+  twitterUserIgnoreUserId?: string | null;
 };
 
 export type ModelTwitterUserIgnoreConditionInput = {
@@ -253,6 +238,7 @@ export type ModelTwitterUserIgnoreConditionInput = {
 export type UpdateTwitterUserIgnoreInput = {
   id: string;
   twitterScreenName?: string | null;
+  twitterUserIgnoreUserId?: string | null;
 };
 
 export type DeleteTwitterUserIgnoreInput = {
@@ -261,12 +247,6 @@ export type DeleteTwitterUserIgnoreInput = {
 
 export type ModelUserPreferencesFilterInput = {
   id?: ModelIDInput | null;
-  locale?: ModelStringInput | null;
-  timezone?: ModelStringInput | null;
-  multipleSessions?: ModelBooleanInput | null;
-  sanitizeForGDPR?: ModelBooleanInput | null;
-  defaultDataSet?: ModelStringInput | null;
-  availableDataSets?: ModelStringInput | null;
   and?: Array<ModelUserPreferencesFilterInput | null> | null;
   or?: Array<ModelUserPreferencesFilterInput | null> | null;
   not?: ModelUserPreferencesFilterInput | null;
@@ -355,12 +335,14 @@ export type ModelTwitterUserIgnoreFilterInput = {
 export type CreateUserPreferencesMutation = {
   __typename: "UserPreferences";
   id: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
+  ignoreTweets: {
+    __typename: "ModelTweetIgnoreConnection";
+    nextToken: string | null;
+  } | null;
+  ignorePeople: {
+    __typename: "ModelTwitterUserIgnoreConnection";
+    nextToken: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -369,12 +351,14 @@ export type CreateUserPreferencesMutation = {
 export type UpdateUserPreferencesMutation = {
   __typename: "UserPreferences";
   id: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
+  ignoreTweets: {
+    __typename: "ModelTweetIgnoreConnection";
+    nextToken: string | null;
+  } | null;
+  ignorePeople: {
+    __typename: "ModelTwitterUserIgnoreConnection";
+    nextToken: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -383,12 +367,14 @@ export type UpdateUserPreferencesMutation = {
 export type DeleteUserPreferencesMutation = {
   __typename: "UserPreferences";
   id: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
+  ignoreTweets: {
+    __typename: "ModelTweetIgnoreConnection";
+    nextToken: string | null;
+  } | null;
+  ignorePeople: {
+    __typename: "ModelTwitterUserIgnoreConnection";
+    nextToken: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -543,6 +529,13 @@ export type CreateTweetIgnoreMutation = {
   id: string;
   url: string;
   tweetId: string | null;
+  user: {
+    __typename: "UserPreferences";
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    owner: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -553,6 +546,13 @@ export type UpdateTweetIgnoreMutation = {
   id: string;
   url: string;
   tweetId: string | null;
+  user: {
+    __typename: "UserPreferences";
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    owner: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -563,6 +563,13 @@ export type DeleteTweetIgnoreMutation = {
   id: string;
   url: string;
   tweetId: string | null;
+  user: {
+    __typename: "UserPreferences";
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    owner: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -572,6 +579,13 @@ export type CreateTwitterUserIgnoreMutation = {
   __typename: "TwitterUserIgnore";
   id: string;
   twitterScreenName: string;
+  user: {
+    __typename: "UserPreferences";
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    owner: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -581,6 +595,13 @@ export type UpdateTwitterUserIgnoreMutation = {
   __typename: "TwitterUserIgnore";
   id: string;
   twitterScreenName: string;
+  user: {
+    __typename: "UserPreferences";
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    owner: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -590,6 +611,13 @@ export type DeleteTwitterUserIgnoreMutation = {
   __typename: "TwitterUserIgnore";
   id: string;
   twitterScreenName: string;
+  user: {
+    __typename: "UserPreferences";
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    owner: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -598,12 +626,14 @@ export type DeleteTwitterUserIgnoreMutation = {
 export type GetUserPreferencesQuery = {
   __typename: "UserPreferences";
   id: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
+  ignoreTweets: {
+    __typename: "ModelTweetIgnoreConnection";
+    nextToken: string | null;
+  } | null;
+  ignorePeople: {
+    __typename: "ModelTwitterUserIgnoreConnection";
+    nextToken: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -614,12 +644,6 @@ export type ListUserPreferencessQuery = {
   items: Array<{
     __typename: "UserPreferences";
     id: string;
-    locale: string | null;
-    timezone: string | null;
-    multipleSessions: boolean | null;
-    sanitizeForGDPR: boolean | null;
-    defaultDataSet: string | null;
-    availableDataSets: Array<string | null> | null;
     createdAt: string;
     updatedAt: string;
     owner: string | null;
@@ -744,6 +768,13 @@ export type GetTweetIgnoreQuery = {
   id: string;
   url: string;
   tweetId: string | null;
+  user: {
+    __typename: "UserPreferences";
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    owner: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -767,6 +798,13 @@ export type GetTwitterUserIgnoreQuery = {
   __typename: "TwitterUserIgnore";
   id: string;
   twitterScreenName: string;
+  user: {
+    __typename: "UserPreferences";
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    owner: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -788,12 +826,14 @@ export type ListTwitterUserIgnoresQuery = {
 export type OnCreateUserPreferencesSubscription = {
   __typename: "UserPreferences";
   id: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
+  ignoreTweets: {
+    __typename: "ModelTweetIgnoreConnection";
+    nextToken: string | null;
+  } | null;
+  ignorePeople: {
+    __typename: "ModelTwitterUserIgnoreConnection";
+    nextToken: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -802,12 +842,14 @@ export type OnCreateUserPreferencesSubscription = {
 export type OnUpdateUserPreferencesSubscription = {
   __typename: "UserPreferences";
   id: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
+  ignoreTweets: {
+    __typename: "ModelTweetIgnoreConnection";
+    nextToken: string | null;
+  } | null;
+  ignorePeople: {
+    __typename: "ModelTwitterUserIgnoreConnection";
+    nextToken: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -816,12 +858,14 @@ export type OnUpdateUserPreferencesSubscription = {
 export type OnDeleteUserPreferencesSubscription = {
   __typename: "UserPreferences";
   id: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
+  ignoreTweets: {
+    __typename: "ModelTweetIgnoreConnection";
+    nextToken: string | null;
+  } | null;
+  ignorePeople: {
+    __typename: "ModelTwitterUserIgnoreConnection";
+    nextToken: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -976,6 +1020,13 @@ export type OnCreateTweetIgnoreSubscription = {
   id: string;
   url: string;
   tweetId: string | null;
+  user: {
+    __typename: "UserPreferences";
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    owner: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -986,6 +1037,13 @@ export type OnUpdateTweetIgnoreSubscription = {
   id: string;
   url: string;
   tweetId: string | null;
+  user: {
+    __typename: "UserPreferences";
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    owner: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -996,6 +1054,13 @@ export type OnDeleteTweetIgnoreSubscription = {
   id: string;
   url: string;
   tweetId: string | null;
+  user: {
+    __typename: "UserPreferences";
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    owner: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -1005,6 +1070,13 @@ export type OnCreateTwitterUserIgnoreSubscription = {
   __typename: "TwitterUserIgnore";
   id: string;
   twitterScreenName: string;
+  user: {
+    __typename: "UserPreferences";
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    owner: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -1014,6 +1086,13 @@ export type OnUpdateTwitterUserIgnoreSubscription = {
   __typename: "TwitterUserIgnore";
   id: string;
   twitterScreenName: string;
+  user: {
+    __typename: "UserPreferences";
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    owner: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -1023,6 +1102,13 @@ export type OnDeleteTwitterUserIgnoreSubscription = {
   __typename: "TwitterUserIgnore";
   id: string;
   twitterScreenName: string;
+  user: {
+    __typename: "UserPreferences";
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    owner: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -1040,12 +1126,14 @@ export class APIService {
         createUserPreferences(input: $input, condition: $condition) {
           __typename
           id
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
+          ignoreTweets {
+            __typename
+            nextToken
+          }
+          ignorePeople {
+            __typename
+            nextToken
+          }
           createdAt
           updatedAt
           owner
@@ -1070,12 +1158,14 @@ export class APIService {
         updateUserPreferences(input: $input, condition: $condition) {
           __typename
           id
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
+          ignoreTweets {
+            __typename
+            nextToken
+          }
+          ignorePeople {
+            __typename
+            nextToken
+          }
           createdAt
           updatedAt
           owner
@@ -1100,12 +1190,14 @@ export class APIService {
         deleteUserPreferences(input: $input, condition: $condition) {
           __typename
           id
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
+          ignoreTweets {
+            __typename
+            nextToken
+          }
+          ignorePeople {
+            __typename
+            nextToken
+          }
           createdAt
           updatedAt
           owner
@@ -1474,6 +1566,13 @@ export class APIService {
           id
           url
           tweetId
+          user {
+            __typename
+            id
+            createdAt
+            updatedAt
+            owner
+          }
           createdAt
           updatedAt
           owner
@@ -1500,6 +1599,13 @@ export class APIService {
           id
           url
           tweetId
+          user {
+            __typename
+            id
+            createdAt
+            updatedAt
+            owner
+          }
           createdAt
           updatedAt
           owner
@@ -1526,6 +1632,13 @@ export class APIService {
           id
           url
           tweetId
+          user {
+            __typename
+            id
+            createdAt
+            updatedAt
+            owner
+          }
           createdAt
           updatedAt
           owner
@@ -1551,6 +1664,13 @@ export class APIService {
           __typename
           id
           twitterScreenName
+          user {
+            __typename
+            id
+            createdAt
+            updatedAt
+            owner
+          }
           createdAt
           updatedAt
           owner
@@ -1578,6 +1698,13 @@ export class APIService {
           __typename
           id
           twitterScreenName
+          user {
+            __typename
+            id
+            createdAt
+            updatedAt
+            owner
+          }
           createdAt
           updatedAt
           owner
@@ -1605,6 +1732,13 @@ export class APIService {
           __typename
           id
           twitterScreenName
+          user {
+            __typename
+            id
+            createdAt
+            updatedAt
+            owner
+          }
           createdAt
           updatedAt
           owner
@@ -1628,12 +1762,14 @@ export class APIService {
         getUserPreferences(id: $id) {
           __typename
           id
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
+          ignoreTweets {
+            __typename
+            nextToken
+          }
+          ignorePeople {
+            __typename
+            nextToken
+          }
           createdAt
           updatedAt
           owner
@@ -1658,12 +1794,6 @@ export class APIService {
           items {
             __typename
             id
-            locale
-            timezone
-            multipleSessions
-            sanitizeForGDPR
-            defaultDataSet
-            availableDataSets
             createdAt
             updatedAt
             owner
@@ -1935,6 +2065,13 @@ export class APIService {
           id
           url
           tweetId
+          user {
+            __typename
+            id
+            createdAt
+            updatedAt
+            owner
+          }
           createdAt
           updatedAt
           owner
@@ -1989,6 +2126,13 @@ export class APIService {
           __typename
           id
           twitterScreenName
+          user {
+            __typename
+            id
+            createdAt
+            updatedAt
+            owner
+          }
           createdAt
           updatedAt
           owner
@@ -2043,12 +2187,14 @@ export class APIService {
         onCreateUserPreferences(owner: $owner) {
           __typename
           id
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
+          ignoreTweets {
+            __typename
+            nextToken
+          }
+          ignorePeople {
+            __typename
+            nextToken
+          }
           createdAt
           updatedAt
           owner
@@ -2063,12 +2209,14 @@ export class APIService {
         onUpdateUserPreferences(owner: $owner) {
           __typename
           id
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
+          ignoreTweets {
+            __typename
+            nextToken
+          }
+          ignorePeople {
+            __typename
+            nextToken
+          }
           createdAt
           updatedAt
           owner
@@ -2083,12 +2231,14 @@ export class APIService {
         onDeleteUserPreferences(owner: $owner) {
           __typename
           id
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
+          ignoreTweets {
+            __typename
+            nextToken
+          }
+          ignorePeople {
+            __typename
+            nextToken
+          }
           createdAt
           updatedAt
           owner
@@ -2321,6 +2471,13 @@ export class APIService {
           id
           url
           tweetId
+          user {
+            __typename
+            id
+            createdAt
+            updatedAt
+            owner
+          }
           createdAt
           updatedAt
           owner
@@ -2337,6 +2494,13 @@ export class APIService {
           id
           url
           tweetId
+          user {
+            __typename
+            id
+            createdAt
+            updatedAt
+            owner
+          }
           createdAt
           updatedAt
           owner
@@ -2353,6 +2517,13 @@ export class APIService {
           id
           url
           tweetId
+          user {
+            __typename
+            id
+            createdAt
+            updatedAt
+            owner
+          }
           createdAt
           updatedAt
           owner
@@ -2368,6 +2539,13 @@ export class APIService {
           __typename
           id
           twitterScreenName
+          user {
+            __typename
+            id
+            createdAt
+            updatedAt
+            owner
+          }
           createdAt
           updatedAt
           owner
@@ -2383,6 +2561,13 @@ export class APIService {
           __typename
           id
           twitterScreenName
+          user {
+            __typename
+            id
+            createdAt
+            updatedAt
+            owner
+          }
           createdAt
           updatedAt
           owner
@@ -2398,6 +2583,13 @@ export class APIService {
           __typename
           id
           twitterScreenName
+          user {
+            __typename
+            id
+            createdAt
+            updatedAt
+            owner
+          }
           createdAt
           updatedAt
           owner

@@ -2,12 +2,12 @@
 subscription OnCreateUserPreferences($owner: String!) {
   onCreateUserPreferences(owner: $owner) {
     id
-    locale
-    timezone
-    multipleSessions
-    sanitizeForGDPR
-    defaultDataSet
-    availableDataSets
+    ignoreTweets {
+      nextToken
+    }
+    ignorePeople {
+      nextToken
+    }
     createdAt
     updatedAt
     owner
@@ -16,12 +16,12 @@ subscription OnCreateUserPreferences($owner: String!) {
 subscription OnUpdateUserPreferences($owner: String!) {
   onUpdateUserPreferences(owner: $owner) {
     id
-    locale
-    timezone
-    multipleSessions
-    sanitizeForGDPR
-    defaultDataSet
-    availableDataSets
+    ignoreTweets {
+      nextToken
+    }
+    ignorePeople {
+      nextToken
+    }
     createdAt
     updatedAt
     owner
@@ -30,12 +30,12 @@ subscription OnUpdateUserPreferences($owner: String!) {
 subscription OnDeleteUserPreferences($owner: String!) {
   onDeleteUserPreferences(owner: $owner) {
     id
-    locale
-    timezone
-    multipleSessions
-    sanitizeForGDPR
-    defaultDataSet
-    availableDataSets
+    ignoreTweets {
+      nextToken
+    }
+    ignorePeople {
+      nextToken
+    }
     createdAt
     updatedAt
     owner
@@ -190,6 +190,12 @@ subscription OnCreateTweetIgnore($owner: String!) {
     id
     url
     tweetId
+    user {
+      id
+      createdAt
+      updatedAt
+      owner
+    }
     createdAt
     updatedAt
     owner
@@ -200,6 +206,12 @@ subscription OnUpdateTweetIgnore($owner: String!) {
     id
     url
     tweetId
+    user {
+      id
+      createdAt
+      updatedAt
+      owner
+    }
     createdAt
     updatedAt
     owner
@@ -210,6 +222,12 @@ subscription OnDeleteTweetIgnore($owner: String!) {
     id
     url
     tweetId
+    user {
+      id
+      createdAt
+      updatedAt
+      owner
+    }
     createdAt
     updatedAt
     owner
@@ -219,6 +237,12 @@ subscription OnCreateTwitterUserIgnore($owner: String!) {
   onCreateTwitterUserIgnore(owner: $owner) {
     id
     twitterScreenName
+    user {
+      id
+      createdAt
+      updatedAt
+      owner
+    }
     createdAt
     updatedAt
     owner
@@ -228,6 +252,12 @@ subscription OnUpdateTwitterUserIgnore($owner: String!) {
   onUpdateTwitterUserIgnore(owner: $owner) {
     id
     twitterScreenName
+    user {
+      id
+      createdAt
+      updatedAt
+      owner
+    }
     createdAt
     updatedAt
     owner
@@ -237,6 +267,12 @@ subscription OnDeleteTwitterUserIgnore($owner: String!) {
   onDeleteTwitterUserIgnore(owner: $owner) {
     id
     twitterScreenName
+    user {
+      id
+      createdAt
+      updatedAt
+      owner
+    }
     createdAt
     updatedAt
     owner

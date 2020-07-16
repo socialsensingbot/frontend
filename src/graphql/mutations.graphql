@@ -5,12 +5,12 @@ mutation CreateUserPreferences(
 ) {
   createUserPreferences(input: $input, condition: $condition) {
     id
-    locale
-    timezone
-    multipleSessions
-    sanitizeForGDPR
-    defaultDataSet
-    availableDataSets
+    ignoreTweets {
+      nextToken
+    }
+    ignorePeople {
+      nextToken
+    }
     createdAt
     updatedAt
     owner
@@ -22,12 +22,12 @@ mutation UpdateUserPreferences(
 ) {
   updateUserPreferences(input: $input, condition: $condition) {
     id
-    locale
-    timezone
-    multipleSessions
-    sanitizeForGDPR
-    defaultDataSet
-    availableDataSets
+    ignoreTweets {
+      nextToken
+    }
+    ignorePeople {
+      nextToken
+    }
     createdAt
     updatedAt
     owner
@@ -39,12 +39,12 @@ mutation DeleteUserPreferences(
 ) {
   deleteUserPreferences(input: $input, condition: $condition) {
     id
-    locale
-    timezone
-    multipleSessions
-    sanitizeForGDPR
-    defaultDataSet
-    availableDataSets
+    ignoreTweets {
+      nextToken
+    }
+    ignorePeople {
+      nextToken
+    }
     createdAt
     updatedAt
     owner
@@ -238,6 +238,12 @@ mutation CreateTweetIgnore(
     id
     url
     tweetId
+    user {
+      id
+      createdAt
+      updatedAt
+      owner
+    }
     createdAt
     updatedAt
     owner
@@ -251,6 +257,12 @@ mutation UpdateTweetIgnore(
     id
     url
     tweetId
+    user {
+      id
+      createdAt
+      updatedAt
+      owner
+    }
     createdAt
     updatedAt
     owner
@@ -264,6 +276,12 @@ mutation DeleteTweetIgnore(
     id
     url
     tweetId
+    user {
+      id
+      createdAt
+      updatedAt
+      owner
+    }
     createdAt
     updatedAt
     owner
@@ -276,6 +294,12 @@ mutation CreateTwitterUserIgnore(
   createTwitterUserIgnore(input: $input, condition: $condition) {
     id
     twitterScreenName
+    user {
+      id
+      createdAt
+      updatedAt
+      owner
+    }
     createdAt
     updatedAt
     owner
@@ -288,6 +312,12 @@ mutation UpdateTwitterUserIgnore(
   updateTwitterUserIgnore(input: $input, condition: $condition) {
     id
     twitterScreenName
+    user {
+      id
+      createdAt
+      updatedAt
+      owner
+    }
     createdAt
     updatedAt
     owner
@@ -300,6 +330,12 @@ mutation DeleteTwitterUserIgnore(
   deleteTwitterUserIgnore(input: $input, condition: $condition) {
     id
     twitterScreenName
+    user {
+      id
+      createdAt
+      updatedAt
+      owner
+    }
     createdAt
     updatedAt
     owner

@@ -2,12 +2,12 @@
 query GetUserPreferences($id: ID!) {
   getUserPreferences(id: $id) {
     id
-    locale
-    timezone
-    multipleSessions
-    sanitizeForGDPR
-    defaultDataSet
-    availableDataSets
+    ignoreTweets {
+      nextToken
+    }
+    ignorePeople {
+      nextToken
+    }
     createdAt
     updatedAt
     owner
@@ -21,12 +21,6 @@ query ListUserPreferencess(
   listUserPreferencess(filter: $filter, limit: $limit, nextToken: $nextToken) {
     items {
       id
-      locale
-      timezone
-      multipleSessions
-      sanitizeForGDPR
-      defaultDataSet
-      availableDataSets
       createdAt
       updatedAt
       owner
@@ -167,6 +161,12 @@ query GetTweetIgnore($id: ID!) {
     id
     url
     tweetId
+    user {
+      id
+      createdAt
+      updatedAt
+      owner
+    }
     createdAt
     updatedAt
     owner
@@ -193,6 +193,12 @@ query GetTwitterUserIgnore($id: ID!) {
   getTwitterUserIgnore(id: $id) {
     id
     twitterScreenName
+    user {
+      id
+      createdAt
+      updatedAt
+      owner
+    }
     createdAt
     updatedAt
     owner

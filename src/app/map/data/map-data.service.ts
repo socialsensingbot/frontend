@@ -13,6 +13,7 @@ import {PreferenceService} from "../../pref/preference.service";
 import {toTitleCase} from "../../common";
 import * as geojson from "geojson";
 import {APIService} from "../../API.service";
+import {environment} from "../../../environments/environment";
 
 
 const log = new Logger("map-data");
@@ -146,7 +147,8 @@ export class MapDataService {
 
 
   private async loadFromS3(name: string, cacheDuration = ONE_DAY, loadingMessage: string = null) {
-    const cacheValue: CachedItem<any> = await this.cache.getCached(name);
+    const key = `${environment.name}:${environment.version}:${name}`;
+    const cacheValue: CachedItem<any> = await this.cache.getCached(key);
     if (cacheValue != null && !cacheValue.expired && cacheValue.hasData && cacheValue.data) {
       log.info(`Retrieved ${name} from cache.`);
       log.debug(cacheValue);
@@ -159,7 +161,7 @@ export class MapDataService {
       const url = await Storage.get(name);
       const jsonData = await this._http.get(url.toString(), {observe: "body", responseType: "json"})
                                  .toPromise();
-      this.cache.setCached(name, jsonData, cacheDuration);
+      this.cache.setCached(key, jsonData, cacheDuration);
       this._notify.dismiss();
       return jsonData;
     }
@@ -241,7 +243,7 @@ export class MapDataService {
     const key = this.createKey(_dateMin, _dateMax);
     const cacheValue: CachedItem<ProcessedData> = await this.cache.getCached(key);
     if (cacheValue != null && !cacheValue.expired && cacheValue.hasData && cacheValue.data) {
-      log.info("Retrieved tweet data from cache.");
+      log.info("Retrieved tweet data from cache.", cacheValue.data);
       log.debug(cacheValue);
       this._twitterData = new ProcessedData().populate(cacheValue.data, this.regionTypes());
       log.debug(this._twitterData);
@@ -255,7 +257,7 @@ export class MapDataService {
 
 
   private createKey(_dateMin, _dateMax) {
-    const key = `${_dateMin}:${_dateMax}:${this.reverseTimeKeys}`;
+    const key = `${environment.version}:${_dateMin}:${_dateMax}:${this.reverseTimeKeys}`;
     return key;
   }
 

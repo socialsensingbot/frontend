@@ -19,7 +19,7 @@ const log = new Logger('map');
 @Injectable({
               providedIn: 'root'
             })
-export class NotificationService implements OnDestroy, OnInit {
+export class NotificationService implements OnDestroy {
 
 
   // Configuration api subscription
@@ -34,9 +34,6 @@ export class NotificationService implements OnDestroy, OnInit {
 
   }
 
-  ngOnInit(): void {
-
-  }
 
   /**
    * Unsubscribe from the config state
@@ -54,7 +51,7 @@ export class NotificationService implements OnDestroy, OnInit {
    * @param buttonLabel {string}
    * @returns {MatSnackBarRef}
    */
-  show(message: string, buttonLabel: string = 'OK', toastTimeout = 8): MatSnackBarRef<any> {
+  show(message: string, buttonLabel: string = "OK", toastTimeout = 8): MatSnackBarRef<any> {
     if (toastTimeout > 0) {
       return this.toast.open(message, buttonLabel, {
         duration: toastTimeout * 1000
@@ -64,9 +61,6 @@ export class NotificationService implements OnDestroy, OnInit {
     }
   }
 
-  dismiss() {
-    this.toast.dismiss();
-  }
 
   public error(e: any) {
     if (environment.production) {
