@@ -74,7 +74,7 @@ export class ProcessedPolygonData {
         const tweetCount = this._counts[place];
         let statsWt = 0;
         if (tweetCount) {
-          const asDay = tweetCount / tdiff; // average # tweets per day arraiving at a constant rate
+          const asDay = Math.round(tweetCount / tdiff); // average # tweets per day arraiving at a constant rate
           statsWt = this.getStatsIdx(place, asDay, _statsRefData); // number of days with fewer tweets
           // exceedance probability = rank / (#days + 1) = p
           // rank(t) = #days - #days_with_less_than(t)
@@ -93,14 +93,14 @@ export class ProcessedPolygonData {
   }
 
 
-  getStatsIdx(place, val, stats) {
+  getStatsIdx(place: string, val: number, stats: Stats): number {
 
-    for (let i = 0; i < this._B; i++) {
-      if (val <= stats[this._region.id][place][i]) {
+    for (let i = 0; i < stats[this._region.id][place].length; i++) {
+      if (val <= Math.round(stats[this._region.id][place][i])) {
         return i;
       }
     }
-    return this._B;
+    return stats[this._region.id][place].length;
   }
 
 
