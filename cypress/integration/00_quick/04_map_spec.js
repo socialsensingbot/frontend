@@ -10,6 +10,7 @@ describe('04: Map: ', function () {
 
   describe('Interact', () => {
     it('with the map', () => {
+      cy.visitAndWait('http://localhost:4200/map');
       cy.get('.content-inner').click();
       cy.get('.map').click();
       cy.get('#logout').click();
@@ -18,6 +19,7 @@ describe('04: Map: ', function () {
     });
 
     it('with a tooltip', () => {
+      cy.visitAndWait('http://localhost:4200/map');
       cy.get(
         'body > app-root > div > div > app-map > mat-sidenav-container > mat-sidenav-content > div.map-surround > div > div.leaflet-pane.leaflet-map-pane > div.leaflet-pane.leaflet-overlay-pane > svg > g > path:nth-child(174)',
         {timeout: 60000}).trigger("mouseover", {force: true});

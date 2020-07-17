@@ -277,7 +277,6 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   onMapReady(map: Map) {
     log.debug("onMapReady");
-    $("#loading-div").remove();
     this._map = map;
     // this.ready= true;
     this.init(map);
@@ -434,6 +433,9 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this._exec.changeState("map-init");
     await this.load(true);
+    if (this.pref.group.showLoadingMessages) {
+      this._notify.show("Loading application ...", "OK", 60);
+    }
     this._searchParams.subscribe(async params => {
 
       if (!this._params) {
@@ -463,6 +465,9 @@ export class MapComponent implements OnInit, OnDestroy {
                                this.activity = false;
 
                              });
+                           this._notify.dismiss();
+                           $("#loading-div").css("opacity", 0.0);
+                           setTimeout(() => $("#loading-div").remove(), 1000);
                            this.activity = false;
                          });
       } else {

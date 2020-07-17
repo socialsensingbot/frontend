@@ -138,7 +138,7 @@ export class MapDataService {
     const version = environment.version + ":" + this.dataSetMetdata.version;
     const promises = {};
     if (this._pref.group.showLoadingMessages) {
-      this._notify.show("Loading reference data", "OK", 60);
+      this._notify.show("Loading reference data ...", "OK", 60);
     }
     for (const regionGroup of this.dataSetMetdata.regionGroups) {
       // Note the use of a random time to make sure that we don't refresh all datasets at once!!
@@ -151,11 +151,11 @@ export class MapDataService {
     }
     for (const regionGroup of this.dataSetMetdata.regionGroups) {
       if (this._pref.group.showLoadingMessages) {
-        this._notify.show("Loading '" + regionGroup.title + "' statistical data", "OK", 60);
+        this._notify.show("Loading '" + regionGroup.title + "' statistics...", "OK", 60);
       }
       this.stats[regionGroup.id] = (await promises["stats:" + regionGroup.id]) as RegionData<any, any, any>;
       if (this._pref.group.showLoadingMessages) {
-        this._notify.show("Loading '" + regionGroup.title + "' geographical data", "OK", 60);
+        this._notify.show("Loading '" + regionGroup.title + "' geography ...", "OK", 60);
       }
       this.polygonData[regionGroup.id] = (await promises["features:" + regionGroup.id]) as geojson.GeoJsonObject;
     }
@@ -169,7 +169,7 @@ export class MapDataService {
   public async loadLiveData(): Promise<TimeSlice[]> {
     log.debug("loadLiveData()");
     const result = this.loadFromS3(this.dataset + "/twitter.json", environment.version, 2 * 1000,
-                                   "Loading application data").finally(() => this._notify.dismiss());
+                                   "Loading Twitter data ...").finally(() => this._notify.dismiss());
     return result as Promise<TimeSlice[]>;
   }
 
@@ -270,7 +270,7 @@ export class MapDataService {
   private async updateTweetsData(_dateMin, _dateMax) {
     const key = this.createKey(_dateMin, _dateMax);
     const cacheValue: CachedItem<ProcessedData> = await this.cache.getCached(key);
-    if (cacheValue != null && !cacheValue.expired && cacheValue.hasData && cacheValue.data) {
+    if (environment.cacheProcessedTweets && cacheValue != null && !cacheValue.expired && cacheValue.hasData && cacheValue.data) {
       log.info("Retrieved tweet data from cache.", cacheValue.data);
       log.debug(cacheValue);
       this._twitterData = new ProcessedData().populate(cacheValue.data, this.regionTypes());
@@ -285,7 +285,7 @@ export class MapDataService {
 
 
   private createKey(_dateMin, _dateMax) {
-    const key = `${environment.version}:${_dateMin}:${_dateMax}:${this.reverseTimeKeys}`;
+    const key = `${environment.version}:${this.serviceMetadata.version}:${this.dataSetMetdata.version};${this.dataset}${_dateMin}:${_dateMax}:${this.reverseTimeKeys}`;
     return key;
   }
 
