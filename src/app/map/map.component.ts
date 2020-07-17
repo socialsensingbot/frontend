@@ -277,7 +277,6 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   onMapReady(map: Map) {
     log.debug("onMapReady");
-    $("#loading-div").remove();
     this._map = map;
     // this.ready= true;
     this.init(map);
@@ -433,6 +432,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this._loggedIn = await Auth.currentAuthenticatedUser() != null;
 
     this._exec.changeState("map-init");
+    $("#loading-div").remove();
     await this.load(true);
     this._searchParams.subscribe(async params => {
 
