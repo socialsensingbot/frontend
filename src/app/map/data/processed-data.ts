@@ -26,7 +26,7 @@ export class ExceedanceMap {
 export class ProcessedPolygonData {
   private readonly _gridSizes: ByRegionType<string> = Object.freeze({county: COUNTY, coarse: "15", fine: "60"});
 
-  private readonly _B: number = 1407; // countyStats["cambridgeshire"].length; //number of stats days
+  private readonly _B: number = 1613; // countyStats["cambridgeshire"].length; //number of stats days
   private _places: Set<string> = new Set<string>();
   private _stats: ExceedanceMap = new ExceedanceMap();
   private _counts: CountMap = new CountMap();
