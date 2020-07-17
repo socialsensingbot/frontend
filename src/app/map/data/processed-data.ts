@@ -98,7 +98,7 @@ export class ProcessedPolygonData {
   getStatsIdx(place, val, stats) {
 
     for (let i = 0; i < this._B; i++) {
-      if (val <= stats[this._name][place][i]) {
+      if ( Math.round(val) <= Math.round(stats[this._name][place][i]) ) {
         return i;
       }
     }
