@@ -6,6 +6,7 @@ import {
   TimeSlice
 } from "../types";
 import {Logger} from "aws-amplify";
+import {RegionMetadata} from "./map-data.service";
 
 const log = new Logger("processed-data");
 
@@ -24,15 +25,13 @@ export class ExceedanceMap {
 
 
 export class ProcessedPolygonData {
-  private readonly _gridSizes: ByRegionType<string> = Object.freeze({county: COUNTY, coarse: "15", fine: "60"});
-
-  private readonly _B: number = 1613; // countyStats["cambridgeshire"].length; //number of stats days
+  // countyStats["cambridgeshire"].length; //number of stats days
   private _places: Set<string> = new Set<string>();
   private _stats: ExceedanceMap = new ExceedanceMap();
   private _counts: CountMap = new CountMap();
   private _tweets: TweetMap = new TweetMap();
 
-  constructor(private _name: string = null, dateMin: number = 0, dateMax: number = 0,
+  constructor(private _region: RegionMetadata = null, dateMin: number = 0, dateMax: number = 0,
               _statsRefData: Stats = null,
               timeKeyedData: any = null, _rawTwitterData: any = null) {
 
@@ -45,10 +44,10 @@ export class ProcessedPolygonData {
       for (const i in timeSlice) { // all times
         const timeKey = timeSlice[i];
         const timeslicedData: TimeSlice = (_rawTwitterData)[timeKey];
-        for (const place in timeslicedData[(this._gridSizes)[_name]]) { // all counties/boxes
-          if (timeslicedData[(this._gridSizes)[_name]].hasOwnProperty(place)) {
+        for (const place in timeslicedData[this._region.key]) { // all counties/boxes
+          if (timeslicedData[this._region.key].hasOwnProperty(place)) {
             // add the counts
-            const wt = timeslicedData[(this._gridSizes)[_name]][place].w;
+            const wt = timeslicedData[this._region.key][place].w;
 
 
             if (this.hasPlace(place)) {
@@ -58,10 +57,10 @@ export class ProcessedPolygonData {
               this._tweets[place] = [];
               this._places.add(place);
             }
-            for (const j in timeslicedData[this._gridSizes[_name]][place].i) {
-              const tweetcodeId = timeslicedData[(this._gridSizes)[_name]][place].i[j];
+            for (const j in timeslicedData[this._region.key][place].i) {
+              const tweetcodeId = timeslicedData[this._region.key][place].i[j];
               const tweetHtml: string = timeslicedData.tweets[tweetcodeId]; // html of the tweet
-              this._tweets[place].push(new Tweet(tweetcodeId, tweetHtml, timeKey, _name, place));
+              this._tweets[place].push(new Tweet(tweetcodeId, tweetHtml, timeKey, _region.id, place));
             }
           } else {
             log.debug("Skipping " + place);
@@ -74,18 +73,19 @@ export class ProcessedPolygonData {
       for (const place of this._places) {
         const tweetCount = this._counts[place];
         let statsWt = 0;
-        if (tweetCount) {
-          const asDay = tweetCount / tdiff; // average # tweets per day arraiving at a constant rate
+        if (tweetCount && typeof _statsRefData[this._region.id][place] !== "undefined") {
+          const B = _statsRefData[this._region.id][place].length;
+          const asDay = Math.round(tweetCount / tdiff); // average # tweets per day arraiving at a constant rate
           statsWt = this.getStatsIdx(place, asDay, _statsRefData); // number of days with fewer tweets
           // exceedance probability = rank / (#days + 1) = p
           // rank(t) = #days - #days_with_less_than(t)
           // prob no events in N days = (1-p)^N
           // prob event in N days = 1 - (1-p)^N
-          statsWt = 100 * (1 - Math.pow(1 - ((this._B + 1 - statsWt) / (this._B + 1)), tdiff));
+          statsWt = 100 * (1 - Math.pow(1 - ((B + 1 - statsWt) / (B + 1)), tdiff));
         }
         this._stats[place] = statsWt;
       }
-      log.info(`Processed data for ${this._name} in ${(new Date().getTime() - start.getTime()) / 1000.0}s`);
+      log.info(`Processed data for ${this._region.title} in ${(new Date().getTime() - start.getTime()) / 1000.0}s`);
     }
   }
 
@@ -94,14 +94,14 @@ export class ProcessedPolygonData {
   }
 
 
-  getStatsIdx(place, val, stats) {
+  getStatsIdx(place: string, val: number, stats: Stats): number {
 
-    for (let i = 0; i < this._B; i++) {
-      if ( Math.round(val) <= Math.round(stats[this._name][place][i]) ) {
+    for (let i = 0; i < stats[this._region.id][place].length; i++) {
+      if (val <= Math.round(stats[this._region.id][place][i])) {
         return i;
       }
     }
-    return this._B;
+    return stats[this._region.id][place].length;
   }
 
 
@@ -129,7 +129,7 @@ export class ProcessedPolygonData {
   public populate(data: ProcessedPolygonData): ProcessedPolygonData {
     this._counts = data._counts;
     this._stats = data._stats;
-    this._name = data._name;
+    this._region = data._region;
     this._tweets = data._tweets;
     for (const i in this._tweets) {
       this._tweets[i] = this._tweets[i].map(i => new Tweet().populate(i));
@@ -146,11 +146,11 @@ export class ProcessedData {
 
 
   constructor(dateMin: number = 0, dateMax: number = 0, timeKeyedData = null, _rawTwitterData = null,
-              _statsRefData: Stats = null, layers: string[] = []) {
+              _statsRefData: Stats = null, layers: RegionMetadata[] = []) {
 
     for (const layer of layers) {
-      this.data[layer] = new ProcessedPolygonData(layer, dateMin, dateMax, _statsRefData, timeKeyedData,
-                                                  _rawTwitterData);
+      this.data[layer.id] = new ProcessedPolygonData(layer, dateMin, dateMax, _statsRefData, timeKeyedData,
+                                                     _rawTwitterData);
     }
   }
 

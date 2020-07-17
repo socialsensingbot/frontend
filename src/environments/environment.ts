@@ -22,7 +22,7 @@ export const environment = {
   showLoadingMessages: true,
   sanitizeForGDPR:     true,
   defaultDataSet:      "live",
-  availableDataSets:   ["live"]
+  availableDataSets: ["live", "july-17"]
 };
 
 /*

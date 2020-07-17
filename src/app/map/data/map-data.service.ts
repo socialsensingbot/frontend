@@ -31,6 +31,7 @@ export interface DataSet {
 export interface RegionMetadata {
   id: string;
   title: string;
+  key: string;
 }
 
 export interface StartMetadata {
@@ -277,7 +278,7 @@ export class MapDataService {
     } else {
       log.info("Tweet data not in cache.");
       this._twitterData = new ProcessedData(_dateMin, _dateMax, this.reverseTimeKeys, this._rawTwitterData,
-                                            this.stats, this.regionTypes());
+                                            this.stats, this.dataSetMetdata.regionGroups);
       this.cache.setCached(key, this._twitterData, ONE_DAY);
     }
   }
