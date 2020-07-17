@@ -34,6 +34,7 @@ const multipleKey = Cypress.platform === "darwin" ? "{command}" : "{ctrl}";
 Cypress.Commands.add("login", (username = "cypress1@example.com") => {
   //Login
   cy.url({timeout: LONG_TIMEOUT}).should("contain", "auth/signin")
+  cy.get("#loading-div", {timeout: VERY_LONG_TIMEOUT}).should("not.be.visible");
   cy.get('input[type=email]').type(username);
   cy.get('input[type=password]').type(Cypress.env("TEST_AC_PASS"));
   cy.get('.mat-button-base.mat-raised-button').contains('Sign In');
@@ -42,6 +43,7 @@ Cypress.Commands.add("login", (username = "cypress1@example.com") => {
 });
 
 Cypress.Commands.add("logout", () => {
+  cy.get("#loading-div", {timeout: VERY_LONG_TIMEOUT}).should("not.be.visible");
   cy.get('#logout').click();
 });
 

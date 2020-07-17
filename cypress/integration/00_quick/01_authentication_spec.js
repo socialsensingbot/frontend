@@ -6,7 +6,6 @@ describe('01 Authentication:', function () {
 
   describe('Sign In:', () => {
     it('allows a user to signin', () => {
-
       //Login
       cy.login();
       cy.url().should("equal", 'http://localhost:4200/map');
