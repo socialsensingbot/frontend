@@ -1,7 +1,7 @@
 import {MAP_URL} from "../../support";
 
 const zoomDuration = 1000;
-describe('05 URL State: ', function () {
+describe.only('05 URL State: ', function () {
   beforeEach(() => {
     cy.stubLiveJson("live-old");
   })
@@ -40,6 +40,7 @@ describe('05 URL State: ', function () {
       cy.login();
       cy.url({timeout: 30000}).should("equal", url);
       cy.noSpinner();
+      cy.wait(4000);
       cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 60000}).should("have.attr", "fill").should(
         "eq",
         "#2B8CBE");
