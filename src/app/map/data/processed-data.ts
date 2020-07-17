@@ -81,6 +81,7 @@ export class ProcessedPolygonData {
           // rank(t) = #days - #days_with_less_than(t)
           // prob no events in N days = (1-p)^N
           // prob event in N days = 1 - (1-p)^N
+          console.log(place, asDay, statsWt, tdiff)
           statsWt = 100 * (1 - Math.pow(1 - ((this._B + 1 - statsWt) / (this._B + 1)), tdiff));
         }
         this._stats[place] = statsWt;
