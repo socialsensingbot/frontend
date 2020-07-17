@@ -285,7 +285,7 @@ export class MapDataService {
 
 
   private createKey(_dateMin, _dateMax) {
-    const key = `${environment.version}:${this.dataset}${_dateMin}:${_dateMax}:${this.reverseTimeKeys}`;
+    const key = `${environment.version}:${this.serviceMetadata.version}:${this.dataSetMetdata.version};${this.dataset}${_dateMin}:${_dateMax}:${this.reverseTimeKeys}`;
     return key;
   }
 
