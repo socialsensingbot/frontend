@@ -25,7 +25,7 @@ export class ExceedanceMap {
 
 
 export class ProcessedPolygonData {
-  private readonly _B: number = 1407; // countyStats["cambridgeshire"].length; //number of stats days
+  // countyStats["cambridgeshire"].length; //number of stats days
   private _places: Set<string> = new Set<string>();
   private _stats: ExceedanceMap = new ExceedanceMap();
   private _counts: CountMap = new CountMap();
@@ -72,6 +72,7 @@ export class ProcessedPolygonData {
       log.debug("Places: ", this._places);
       for (const place of this._places) {
         const tweetCount = this._counts[place];
+        const B = _statsRefData[this._region.id][place].length;
         let statsWt = 0;
         if (tweetCount) {
           const asDay = Math.round(tweetCount / tdiff); // average # tweets per day arraiving at a constant rate
@@ -80,7 +81,7 @@ export class ProcessedPolygonData {
           // rank(t) = #days - #days_with_less_than(t)
           // prob no events in N days = (1-p)^N
           // prob event in N days = 1 - (1-p)^N
-          statsWt = 100 * (1 - Math.pow(1 - ((this._B + 1 - statsWt) / (this._B + 1)), tdiff));
+          statsWt = 100 * (1 - Math.pow(1 - ((B + 1 - statsWt) / (B + 1)), tdiff));
         }
         this._stats[place] = statsWt;
       }
