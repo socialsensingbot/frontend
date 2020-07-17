@@ -20,6 +20,7 @@ describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issu
     it('row changes', () => {
       cy.visitAndWait(url);
       cy.twitterPanelHeader("Carmarthenshire");
+      cy.unhideTweets(2);
       cy.get(".atr-0.atr-visible", {timeout: 90000})
       cy.get(".atr-0.atr-visible .twitter-tweet", {timeout: 90000}).should("be.visible");
 

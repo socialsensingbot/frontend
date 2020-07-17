@@ -1,7 +1,7 @@
 import {MAP_URL} from "../../support";
 
 const zoomDuration = 1000;
-describe.only('05 URL State: ', function () {
+describe('05 URL State: ', function () {
   beforeEach(() => {
     cy.stubLiveJson("live-old");
   })

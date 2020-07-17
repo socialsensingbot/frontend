@@ -26,6 +26,7 @@
 import "cypress-graphql-mock";
 
 const LONG_TIMEOUT = 60000;
+const VERY_LONG_TIMEOUT = 120000;
 const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
 const multipleKey = Cypress.platform === "darwin" ? "{command}" : "{ctrl}";
 
@@ -54,6 +55,7 @@ Cypress.Commands.add("visitAndWait", (url) => {
 Cypress.Commands.add("noSpinner", () => {
   cy.get('.map');
   cy.get("mat-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  cy.get("#loading-div", {timeout: VERY_LONG_TIMEOUT}).should("not.be.visible");
   cy.get('body').should(el => {
     if (el) {
       if (el.find("mat-spinner").length > 0) {
@@ -158,6 +160,25 @@ Cypress.Commands.add("unignoreTweet", (tweetSelector) => {
   cy.get(menu2ndOpt).contains("Unignore Tweet");
   cy.get(menu2ndOpt).click({force: true});
 
+});
+
+Cypress.Commands.add("unhideTweets", (num) => {
+  cy.clickTweetTab(2);
+  for (let i = 0; i < num; i++) {
+    const tweetHidden = ".atr-0.atr-hidden";
+    cy.get(".app-tweet-drawer", {timeout: 30000}).should("be.visible");
+    cy.get(".app-tweet-drawer", {timeout: 30000}).then(drawer => {
+      if (drawer.find(tweetHidden).length === 0) {
+        cy.log("Skipping non existent tweet");
+      } else {
+        cy.get(tweetHidden).scrollIntoView().should('be.visible');
+        cy.unignoreTweet(tweetHidden);
+        cy.wait(500);
+      }
+    })
+  }
+  cy.clickTweetTab(1);
+  cy.wait(2000);
 });
 
 

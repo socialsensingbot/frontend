@@ -151,11 +151,11 @@ export class MapDataService {
     }
     for (const regionGroup of this.dataSetMetdata.regionGroups) {
       if (this._pref.group.showLoadingMessages) {
-        this._notify.show("Loading '" + regionGroup.title + "' statistical data ...", "OK", 60);
+        this._notify.show("Loading '" + regionGroup.title + "' statistics...", "OK", 60);
       }
       this.stats[regionGroup.id] = (await promises["stats:" + regionGroup.id]) as RegionData<any, any, any>;
       if (this._pref.group.showLoadingMessages) {
-        this._notify.show("Loading '" + regionGroup.title + "' geographical data ...", "OK", 60);
+        this._notify.show("Loading '" + regionGroup.title + "' geography ...", "OK", 60);
       }
       this.polygonData[regionGroup.id] = (await promises["features:" + regionGroup.id]) as geojson.GeoJsonObject;
     }
@@ -169,7 +169,7 @@ export class MapDataService {
   public async loadLiveData(): Promise<TimeSlice[]> {
     log.debug("loadLiveData()");
     const result = this.loadFromS3(this.dataset + "/twitter.json", environment.version, 2 * 1000,
-                                   "Loading application data ...").finally(() => this._notify.dismiss());
+                                   "Loading Twitter data ...").finally(() => this._notify.dismiss());
     return result as Promise<TimeSlice[]>;
   }
 
