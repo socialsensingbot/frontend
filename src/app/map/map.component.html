@@ -11,7 +11,6 @@
   </mat-sidenav>
   <mat-sidenav-content style="overflow:hidden">
     <mat-toolbar class="app-toolbar">
-      <ng-container *ngIf="ready">
         <button class="app-toolbar-btn map-zoom-in" mat-icon-button (click)="zoomIn()">
           <mat-icon matTooltip="Zoom In">zoom_in</mat-icon>
         </button>
@@ -19,6 +18,7 @@
           <mat-icon matTooltip="Zoom Out">zoom_out</mat-icon>
         </button>
         <div class="app-toolbar-separator"></div>
+      <ng-container *ngIf="ready">
 
         <!--      <mat-select>-->
         <!--        <mat-option *ngFor="let polyLayer of polyLayers()" [value]="polyLayer[1]">-->
