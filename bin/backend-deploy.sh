@@ -26,7 +26,7 @@ PROVIDERS="{\
 }"
 
 CODEGEN="{\
-\"generateCode\":false,\
+\"generateCode\":true,\
 \"generateDocs\":false\
 }"
 
