@@ -5,10 +5,34 @@ export PATH=$PATH:$(pwd)
 cd ..
 #cd amplify && git clean -fdx && cd ..
 
+
+
 amplify_push() {
+  ENV=$1
+AMPLIFY="{\
+\"envName\":\"${ENV}\",\
+\"appId\":\"${AWS_APP_ID}\"\
+}"
+
+AWSCONFIG="{\
+\"configLevel\":\"project\",\
+\"useProfile\":true,\
+\"profileName\":\"default\",\
+\"AmplifyAppId\":\"${AWS_APP_ID}\"\
+}"
+
+PROVIDERS="{\
+\"awscloudformation\":${AWSCONFIG}\
+}"
+
+CODEGEN="{\
+\"generateCode\":false,\
+\"generateDocs\":false\
+}"
+
   pwd
-  amplify init --yes
-  amplify env checkout $1 --yes
+  amplify init --amplify ${AMPLIFY} --providers ${PROVIDERS} --codegen ${CODEGEN} --yes;
+  amplify env get --name ${ENV}
   amplify push --yes
 }
 
