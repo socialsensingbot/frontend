@@ -7,7 +7,7 @@ backend:
     build:
       commands:
         - '# Execute Amplify CLI with the helper script'
-        - sudo apt-get install jq.
+        - apt-get install jq.
         - ./bin/backend-deploy.sh
 frontend:
   phases:
