@@ -3,9 +3,10 @@ set -euxo pipefail
 cd $(dirname $0)
 export PATH=$PATH:$(pwd)
 cd ..
+git clean -fdx
 
 if [[ "${AWS_BRANCH}" == staging ]]; then
-  .backup.sh
+  backup.sh
   amplifyPush --simple
 elif [[ "${AWS_BRANCH}" == demo ]]; then
   backup.sh
