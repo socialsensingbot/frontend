@@ -84,6 +84,7 @@ subscription OnCreateGroupPreferences {
     sanitizeForGDPR
     defaultDataSet
     availableDataSets
+    showLoadingMessages
     createdAt
     updatedAt
   }
@@ -98,6 +99,7 @@ subscription OnUpdateGroupPreferences {
     sanitizeForGDPR
     defaultDataSet
     availableDataSets
+    showLoadingMessages
     createdAt
     updatedAt
   }
@@ -112,6 +114,7 @@ subscription OnDeleteGroupPreferences {
     sanitizeForGDPR
     defaultDataSet
     availableDataSets
+    showLoadingMessages
     createdAt
     updatedAt
   }

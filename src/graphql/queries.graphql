@@ -67,6 +67,7 @@ query GetGroupPreferences($id: ID!) {
     sanitizeForGDPR
     defaultDataSet
     availableDataSets
+    showLoadingMessages
     createdAt
     updatedAt
   }
@@ -86,6 +87,7 @@ query ListGroupPreferencess(
       sanitizeForGDPR
       defaultDataSet
       availableDataSets
+      showLoadingMessages
       createdAt
       updatedAt
     }

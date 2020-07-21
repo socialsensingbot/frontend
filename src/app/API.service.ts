@@ -1,10 +1,10 @@
 /* tslint:disable */
 /* eslint-disable */
 //  This file was automatically generated and should not be edited.
-import {Injectable} from "@angular/core";
-import API, {graphqlOperation} from "@aws-amplify/api";
-import {GraphQLResult} from "@aws-amplify/api/lib/types";
-import {Observable} from "zen-observable-ts";
+import { Injectable } from "@angular/core";
+import API, { graphqlOperation } from "@aws-amplify/api";
+import { GraphQLResult } from "@aws-amplify/api/lib/types";
+import { Observable } from "zen-observable-ts";
 
 export type CreateUserPreferencesInput = {
   id?: string | null;
@@ -106,6 +106,7 @@ export type CreateGroupPreferencesInput = {
   sanitizeForGDPR?: boolean | null;
   defaultDataSet?: string | null;
   availableDataSets?: Array<string | null> | null;
+  showLoadingMessages?: boolean | null;
 };
 
 export type ModelGroupPreferencesConditionInput = {
@@ -115,6 +116,7 @@ export type ModelGroupPreferencesConditionInput = {
   sanitizeForGDPR?: ModelBooleanInput | null;
   defaultDataSet?: ModelStringInput | null;
   availableDataSets?: ModelStringInput | null;
+  showLoadingMessages?: ModelBooleanInput | null;
   and?: Array<ModelGroupPreferencesConditionInput | null> | null;
   or?: Array<ModelGroupPreferencesConditionInput | null> | null;
   not?: ModelGroupPreferencesConditionInput | null;
@@ -129,6 +131,7 @@ export type UpdateGroupPreferencesInput = {
   sanitizeForGDPR?: boolean | null;
   defaultDataSet?: string | null;
   availableDataSets?: Array<string | null> | null;
+  showLoadingMessages?: boolean | null;
 };
 
 export type DeleteGroupPreferencesInput = {
@@ -287,6 +290,7 @@ export type ModelGroupPreferencesFilterInput = {
   sanitizeForGDPR?: ModelBooleanInput | null;
   defaultDataSet?: ModelStringInput | null;
   availableDataSets?: ModelStringInput | null;
+  showLoadingMessages?: ModelBooleanInput | null;
   and?: Array<ModelGroupPreferencesFilterInput | null> | null;
   or?: Array<ModelGroupPreferencesFilterInput | null> | null;
   not?: ModelGroupPreferencesFilterInput | null;
@@ -423,6 +427,7 @@ export type CreateGroupPreferencesMutation = {
   sanitizeForGDPR: boolean | null;
   defaultDataSet: string | null;
   availableDataSets: Array<string | null> | null;
+  showLoadingMessages: boolean | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -437,6 +442,7 @@ export type UpdateGroupPreferencesMutation = {
   sanitizeForGDPR: boolean | null;
   defaultDataSet: string | null;
   availableDataSets: Array<string | null> | null;
+  showLoadingMessages: boolean | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -451,6 +457,7 @@ export type DeleteGroupPreferencesMutation = {
   sanitizeForGDPR: boolean | null;
   defaultDataSet: string | null;
   availableDataSets: Array<string | null> | null;
+  showLoadingMessages: boolean | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -687,6 +694,7 @@ export type GetGroupPreferencesQuery = {
   sanitizeForGDPR: boolean | null;
   defaultDataSet: string | null;
   availableDataSets: Array<string | null> | null;
+  showLoadingMessages: boolean | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -703,6 +711,7 @@ export type ListGroupPreferencessQuery = {
     sanitizeForGDPR: boolean | null;
     defaultDataSet: string | null;
     availableDataSets: Array<string | null> | null;
+    showLoadingMessages: boolean | null;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
@@ -914,6 +923,7 @@ export type OnCreateGroupPreferencesSubscription = {
   sanitizeForGDPR: boolean | null;
   defaultDataSet: string | null;
   availableDataSets: Array<string | null> | null;
+  showLoadingMessages: boolean | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -928,6 +938,7 @@ export type OnUpdateGroupPreferencesSubscription = {
   sanitizeForGDPR: boolean | null;
   defaultDataSet: string | null;
   availableDataSets: Array<string | null> | null;
+  showLoadingMessages: boolean | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -942,6 +953,7 @@ export type OnDeleteGroupPreferencesSubscription = {
   sanitizeForGDPR: boolean | null;
   defaultDataSet: string | null;
   availableDataSets: Array<string | null> | null;
+  showLoadingMessages: boolean | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -1115,8 +1127,8 @@ export type OnDeleteTwitterUserIgnoreSubscription = {
 };
 
 @Injectable({
-              providedIn: "root"
-            })
+  providedIn: "root"
+})
 export class APIService {
   async CreateUserPreferences(
     input: CreateUserPreferencesInput,
@@ -1310,6 +1322,7 @@ export class APIService {
           sanitizeForGDPR
           defaultDataSet
           availableDataSets
+          showLoadingMessages
           createdAt
           updatedAt
         }
@@ -1340,6 +1353,7 @@ export class APIService {
           sanitizeForGDPR
           defaultDataSet
           availableDataSets
+          showLoadingMessages
           createdAt
           updatedAt
         }
@@ -1370,6 +1384,7 @@ export class APIService {
           sanitizeForGDPR
           defaultDataSet
           availableDataSets
+          showLoadingMessages
           createdAt
           updatedAt
         }
@@ -1885,6 +1900,7 @@ export class APIService {
           sanitizeForGDPR
           defaultDataSet
           availableDataSets
+          showLoadingMessages
           createdAt
           updatedAt
         }
@@ -1915,6 +1931,7 @@ export class APIService {
             sanitizeForGDPR
             defaultDataSet
             availableDataSets
+            showLoadingMessages
             createdAt
             updatedAt
           }
@@ -2180,8 +2197,9 @@ export class APIService {
     )) as any;
     return <ListTwitterUserIgnoresQuery>response.data.listTwitterUserIgnores;
   }
-
-  OnCreateUserPreferencesListener: Observable<OnCreateUserPreferencesSubscription> = API.graphql(
+  OnCreateUserPreferencesListener: Observable<
+    OnCreateUserPreferencesSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnCreateUserPreferences($owner: String!) {
         onCreateUserPreferences(owner: $owner) {
@@ -2203,7 +2221,9 @@ export class APIService {
     )
   ) as Observable<OnCreateUserPreferencesSubscription>;
 
-  OnUpdateUserPreferencesListener: Observable<OnUpdateUserPreferencesSubscription> = API.graphql(
+  OnUpdateUserPreferencesListener: Observable<
+    OnUpdateUserPreferencesSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnUpdateUserPreferences($owner: String!) {
         onUpdateUserPreferences(owner: $owner) {
@@ -2225,7 +2245,9 @@ export class APIService {
     )
   ) as Observable<OnUpdateUserPreferencesSubscription>;
 
-  OnDeleteUserPreferencesListener: Observable<OnDeleteUserPreferencesSubscription> = API.graphql(
+  OnDeleteUserPreferencesListener: Observable<
+    OnDeleteUserPreferencesSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnDeleteUserPreferences($owner: String!) {
         onDeleteUserPreferences(owner: $owner) {
@@ -2247,7 +2269,9 @@ export class APIService {
     )
   ) as Observable<OnDeleteUserPreferencesSubscription>;
 
-  OnCreateUserSessionListener: Observable<OnCreateUserSessionSubscription> = API.graphql(
+  OnCreateUserSessionListener: Observable<
+    OnCreateUserSessionSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnCreateUserSession($owner: String!) {
         onCreateUserSession(owner: $owner) {
@@ -2264,7 +2288,9 @@ export class APIService {
     )
   ) as Observable<OnCreateUserSessionSubscription>;
 
-  OnUpdateUserSessionListener: Observable<OnUpdateUserSessionSubscription> = API.graphql(
+  OnUpdateUserSessionListener: Observable<
+    OnUpdateUserSessionSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnUpdateUserSession($owner: String!) {
         onUpdateUserSession(owner: $owner) {
@@ -2281,7 +2307,9 @@ export class APIService {
     )
   ) as Observable<OnUpdateUserSessionSubscription>;
 
-  OnDeleteUserSessionListener: Observable<OnDeleteUserSessionSubscription> = API.graphql(
+  OnDeleteUserSessionListener: Observable<
+    OnDeleteUserSessionSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnDeleteUserSession($owner: String!) {
         onDeleteUserSession(owner: $owner) {
@@ -2298,7 +2326,9 @@ export class APIService {
     )
   ) as Observable<OnDeleteUserSessionSubscription>;
 
-  OnCreateGroupPreferencesListener: Observable<OnCreateGroupPreferencesSubscription> = API.graphql(
+  OnCreateGroupPreferencesListener: Observable<
+    OnCreateGroupPreferencesSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnCreateGroupPreferences {
         onCreateGroupPreferences {
@@ -2311,6 +2341,7 @@ export class APIService {
           sanitizeForGDPR
           defaultDataSet
           availableDataSets
+          showLoadingMessages
           createdAt
           updatedAt
         }
@@ -2318,7 +2349,9 @@ export class APIService {
     )
   ) as Observable<OnCreateGroupPreferencesSubscription>;
 
-  OnUpdateGroupPreferencesListener: Observable<OnUpdateGroupPreferencesSubscription> = API.graphql(
+  OnUpdateGroupPreferencesListener: Observable<
+    OnUpdateGroupPreferencesSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnUpdateGroupPreferences {
         onUpdateGroupPreferences {
@@ -2331,6 +2364,7 @@ export class APIService {
           sanitizeForGDPR
           defaultDataSet
           availableDataSets
+          showLoadingMessages
           createdAt
           updatedAt
         }
@@ -2338,7 +2372,9 @@ export class APIService {
     )
   ) as Observable<OnUpdateGroupPreferencesSubscription>;
 
-  OnDeleteGroupPreferencesListener: Observable<OnDeleteGroupPreferencesSubscription> = API.graphql(
+  OnDeleteGroupPreferencesListener: Observable<
+    OnDeleteGroupPreferencesSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnDeleteGroupPreferences {
         onDeleteGroupPreferences {
@@ -2351,6 +2387,7 @@ export class APIService {
           sanitizeForGDPR
           defaultDataSet
           availableDataSets
+          showLoadingMessages
           createdAt
           updatedAt
         }
@@ -2358,7 +2395,9 @@ export class APIService {
     )
   ) as Observable<OnDeleteGroupPreferencesSubscription>;
 
-  OnCreateGroupTweetIgnoreListener: Observable<OnCreateGroupTweetIgnoreSubscription> = API.graphql(
+  OnCreateGroupTweetIgnoreListener: Observable<
+    OnCreateGroupTweetIgnoreSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnCreateGroupTweetIgnore {
         onCreateGroupTweetIgnore {
@@ -2376,7 +2415,9 @@ export class APIService {
     )
   ) as Observable<OnCreateGroupTweetIgnoreSubscription>;
 
-  OnUpdateGroupTweetIgnoreListener: Observable<OnUpdateGroupTweetIgnoreSubscription> = API.graphql(
+  OnUpdateGroupTweetIgnoreListener: Observable<
+    OnUpdateGroupTweetIgnoreSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnUpdateGroupTweetIgnore {
         onUpdateGroupTweetIgnore {
@@ -2394,7 +2435,9 @@ export class APIService {
     )
   ) as Observable<OnUpdateGroupTweetIgnoreSubscription>;
 
-  OnDeleteGroupTweetIgnoreListener: Observable<OnDeleteGroupTweetIgnoreSubscription> = API.graphql(
+  OnDeleteGroupTweetIgnoreListener: Observable<
+    OnDeleteGroupTweetIgnoreSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnDeleteGroupTweetIgnore {
         onDeleteGroupTweetIgnore {
@@ -2412,7 +2455,9 @@ export class APIService {
     )
   ) as Observable<OnDeleteGroupTweetIgnoreSubscription>;
 
-  OnCreateGroupTwitterUserIgnoreListener: Observable<OnCreateGroupTwitterUserIgnoreSubscription> = API.graphql(
+  OnCreateGroupTwitterUserIgnoreListener: Observable<
+    OnCreateGroupTwitterUserIgnoreSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnCreateGroupTwitterUserIgnore {
         onCreateGroupTwitterUserIgnore {
@@ -2429,7 +2474,9 @@ export class APIService {
     )
   ) as Observable<OnCreateGroupTwitterUserIgnoreSubscription>;
 
-  OnUpdateGroupTwitterUserIgnoreListener: Observable<OnUpdateGroupTwitterUserIgnoreSubscription> = API.graphql(
+  OnUpdateGroupTwitterUserIgnoreListener: Observable<
+    OnUpdateGroupTwitterUserIgnoreSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnUpdateGroupTwitterUserIgnore {
         onUpdateGroupTwitterUserIgnore {
@@ -2446,7 +2493,9 @@ export class APIService {
     )
   ) as Observable<OnUpdateGroupTwitterUserIgnoreSubscription>;
 
-  OnDeleteGroupTwitterUserIgnoreListener: Observable<OnDeleteGroupTwitterUserIgnoreSubscription> = API.graphql(
+  OnDeleteGroupTwitterUserIgnoreListener: Observable<
+    OnDeleteGroupTwitterUserIgnoreSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnDeleteGroupTwitterUserIgnore {
         onDeleteGroupTwitterUserIgnore {
@@ -2463,7 +2512,9 @@ export class APIService {
     )
   ) as Observable<OnDeleteGroupTwitterUserIgnoreSubscription>;
 
-  OnCreateTweetIgnoreListener: Observable<OnCreateTweetIgnoreSubscription> = API.graphql(
+  OnCreateTweetIgnoreListener: Observable<
+    OnCreateTweetIgnoreSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnCreateTweetIgnore($owner: String!) {
         onCreateTweetIgnore(owner: $owner) {
@@ -2486,7 +2537,9 @@ export class APIService {
     )
   ) as Observable<OnCreateTweetIgnoreSubscription>;
 
-  OnUpdateTweetIgnoreListener: Observable<OnUpdateTweetIgnoreSubscription> = API.graphql(
+  OnUpdateTweetIgnoreListener: Observable<
+    OnUpdateTweetIgnoreSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnUpdateTweetIgnore($owner: String!) {
         onUpdateTweetIgnore(owner: $owner) {
@@ -2509,7 +2562,9 @@ export class APIService {
     )
   ) as Observable<OnUpdateTweetIgnoreSubscription>;
 
-  OnDeleteTweetIgnoreListener: Observable<OnDeleteTweetIgnoreSubscription> = API.graphql(
+  OnDeleteTweetIgnoreListener: Observable<
+    OnDeleteTweetIgnoreSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnDeleteTweetIgnore($owner: String!) {
         onDeleteTweetIgnore(owner: $owner) {
@@ -2532,7 +2587,9 @@ export class APIService {
     )
   ) as Observable<OnDeleteTweetIgnoreSubscription>;
 
-  OnCreateTwitterUserIgnoreListener: Observable<OnCreateTwitterUserIgnoreSubscription> = API.graphql(
+  OnCreateTwitterUserIgnoreListener: Observable<
+    OnCreateTwitterUserIgnoreSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnCreateTwitterUserIgnore($owner: String!) {
         onCreateTwitterUserIgnore(owner: $owner) {
@@ -2554,7 +2611,9 @@ export class APIService {
     )
   ) as Observable<OnCreateTwitterUserIgnoreSubscription>;
 
-  OnUpdateTwitterUserIgnoreListener: Observable<OnUpdateTwitterUserIgnoreSubscription> = API.graphql(
+  OnUpdateTwitterUserIgnoreListener: Observable<
+    OnUpdateTwitterUserIgnoreSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnUpdateTwitterUserIgnore($owner: String!) {
         onUpdateTwitterUserIgnore(owner: $owner) {
@@ -2576,7 +2635,9 @@ export class APIService {
     )
   ) as Observable<OnUpdateTwitterUserIgnoreSubscription>;
 
-  OnDeleteTwitterUserIgnoreListener: Observable<OnDeleteTwitterUserIgnoreSubscription> = API.graphql(
+  OnDeleteTwitterUserIgnoreListener: Observable<
+    OnDeleteTwitterUserIgnoreSubscription
+  > = API.graphql(
     graphqlOperation(
       `subscription OnDeleteTwitterUserIgnore($owner: String!) {
         onDeleteTwitterUserIgnore(owner: $owner) {

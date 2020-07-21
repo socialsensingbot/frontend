@@ -32,6 +32,7 @@ import {RegionSelection} from "./region-selection";
 import {PreferenceService} from "../pref/preference.service";
 import {APIService} from "../API.service";
 import {NgForageCache} from "ngforage";
+import {environment} from "../../environments/environment";
 
 
 const log = new Logger("map");
@@ -246,7 +247,7 @@ export class MapComponent implements OnInit, OnDestroy {
   public options: any = {
     layers: [
       tileLayer(
-        'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg',
+        environment.mapTileUrlTemplate,
         {
           maxZoom:     18,
           attribution: "Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, " +

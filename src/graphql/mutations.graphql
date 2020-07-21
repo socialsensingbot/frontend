@@ -105,6 +105,7 @@ mutation CreateGroupPreferences(
     sanitizeForGDPR
     defaultDataSet
     availableDataSets
+    showLoadingMessages
     createdAt
     updatedAt
   }
@@ -122,6 +123,7 @@ mutation UpdateGroupPreferences(
     sanitizeForGDPR
     defaultDataSet
     availableDataSets
+    showLoadingMessages
     createdAt
     updatedAt
   }
@@ -139,6 +141,7 @@ mutation DeleteGroupPreferences(
     sanitizeForGDPR
     defaultDataSet
     availableDataSets
+    showLoadingMessages
     createdAt
     updatedAt
   }
