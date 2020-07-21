@@ -14,7 +14,7 @@ elif [[ "${AWS_BRANCH}" == master ]]; then
   echo "NOTE: No backend changes should me made on master, all must pass through staging. So not pushing backend."
 elif [[ "${AWS_BRANCH}" == release* ]]; then
 #  backup.sh
-  cd amplify && git clean -fdx
+  cd amplify && git clean -fdx && cd ..
   amplify env checkout dev
   yes | amplify push
 else
