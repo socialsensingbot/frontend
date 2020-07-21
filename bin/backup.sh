@@ -13,6 +13,6 @@ done
 
 for table in $(aws dynamodb list-tables  | jq -r .TableNames[])
 do
-  aws dynamodb scan --profile socialsensing --table-name $table --output json > /tmp/table-dump.json
+  aws dynamodb scan --table-name $table --output json > /tmp/table-dump.json
   aws s3 cp  /tmp/table-dump.json s3://socialsensing-backups/dynamodb/$table.json
 done
