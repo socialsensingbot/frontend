@@ -7,7 +7,6 @@ backend:
     build:
       commands:
         - '# Execute Amplify CLI with the helper script'
-        - git clean -fdx
         - wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && chmod +x ./jq && mv jq ./bin
         - ./bin/backend-deploy.sh
 frontend:
