@@ -69,6 +69,7 @@
     </mat-toolbar>
     <div class="map-surround">
       <div class="map" aria-label="Map"
+           style="height:100%"
            leaflet
            (leafletMapReady)="onMapReady($event)"
            [leafletOptions]="options">

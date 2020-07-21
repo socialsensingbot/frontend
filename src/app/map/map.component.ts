@@ -465,6 +465,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
                              });
                            this._notify.dismiss();
+                           this._map.invalidateSize();
                            $("#loading-div").css("opacity", 0.0);
                            setTimeout(() => $("#loading-div").remove(), 1000);
                            this.activity = false;
