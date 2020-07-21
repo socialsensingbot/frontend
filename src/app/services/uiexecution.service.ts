@@ -1,15 +1,18 @@
-import {EventEmitter, Injectable} from '@angular/core';
-import {Observable, Subscription, timer} from "rxjs";
+import {EventEmitter, Inject, Injectable} from "@angular/core";
+import {Subscription, timer} from "rxjs";
 import {Auth, Logger} from "aws-amplify";
 import {NotificationService} from "./notification.service";
+import {RollbarService} from "../error";
+import * as Rollbar from "rollbar";
 
-const log = new Logger('uiexecution');
+const log = new Logger("uiexecution");
 
 class ExecutionTask {
 
   constructor(private _resolve: (value?: any) => void, private _reject: (reason?: any) => void,
-              private _task: () => any, public name: String, public waitForStates: UIState[] | null,
-              private _dedup: string, private _notify: NotificationService) {
+              private _task: () => any, public name: string, public waitForStates: UIState[] | null,
+              private _dedup: string, private _notify: NotificationService, public reschedule: boolean,
+              public silentFailure: boolean,) {
 
   }
 
@@ -20,11 +23,10 @@ class ExecutionTask {
 
   public execute() {
     try {
-      log.info("Executing " + this.name)
+      log.info("Executing " + this.name);
       this._resolve(this._task());
     } catch (e) {
-      log.error("ERROR Executing " + this.name)
-      this._notify.error(e);
+      log.error("ERROR Executing " + this.name);
       this._reject(e);
     }
   }
@@ -42,7 +44,7 @@ export const DUPLICATE_REASON = "duplicate";
  * The effect of this is to give a deterministic start up process.
  */
 @Injectable({
-              providedIn: 'root'
+              providedIn: "root"
             })
 export class UIExecutionService {
 
@@ -52,25 +54,40 @@ export class UIExecutionService {
   private _state: UIState = "init";
   public state = new EventEmitter<UIState>();
 
-  private dedupSet: Set<any> = new Set<any>();
+  private dedupMap: Map<any, ExecutionTask> = new Map<any, ExecutionTask>();
 
-  constructor(private _notify: NotificationService) { }
+  constructor(private _notify: NotificationService, @Inject(RollbarService) private _rollbar: Rollbar) { }
 
   public async start() {
-    await Auth.currentAuthenticatedUser() !== null
+    await Auth.currentAuthenticatedUser();
     this._executionTimer = timer(0, 100).subscribe(() => {
-      if (this._queue.length > 0 && !this._pause) {
-        const task = this._queue.shift();
+      const snapshot = [...this._queue];
+      this._queue = [];
+      while (snapshot.length > 0 && !this._pause) {
+        const task = snapshot.shift();
 
         if (task.waitForStates === null || task.waitForStates.indexOf(this._state) >= 0) {
-          task.execute()
+          task.execute();
           if (task.dedup !== null) {
-            this.dedupSet.delete(task.dedup);
+            this.dedupMap.delete(task.dedup);
           }
         } else {
-          log.warn(
-            `Skipped out of sequence task ${task.name} on execution queue, state ${this._state} should be one of ${task.waitForStates}`)
-          // this._queue.push(task)
+          if (task.reschedule) {
+            this._queue.push(task);
+            log.debug(
+              `RESCHEDULED out of sequence task ${task.name} on execution queue,
+              state ${this._state} needs to be one of ${task.waitForStates}.`);
+            return;
+          } else {
+            const message = `Skipped out of sequence task ${task.name} on execution queue,
+             state ${this._state} should be one of ${task.waitForStates}`;
+            if (task.silentFailure) {
+              log.debug(message);
+            } else {
+              this._notify.error(message);
+            }
+            // this._queue.push(task)
+          }
         }
       }
 
@@ -91,29 +108,43 @@ export class UIExecutionService {
 
   }
 
-  public queue(name: String, waitForStates: UIState[] | null, task: () => any, dedup: any = null) {
+  public queue(name: string, waitForStates: UIState[] | null, task: () => any, dedup: any = null,
+               silentFailure: boolean = false, replaceExisting: boolean = false, reschedule: boolean = false) {
 
     return new Promise<any>((resolve, reject) => {
       let dedupKey = null;
-      if (dedup != null) {
+      if (dedup !== null) {
         dedupKey = name + ":" + dedup;
 
       }
-      if (dedupKey != null) {
-        if (this.dedupSet.has(dedupKey)) {
-          log.warn(
-            `Skipped duplicate ${name} (${dedupKey}) on execution queue as this task is already in progress`)
-          reject(DUPLICATE_REASON);
-          return;
+      const executionTask = new ExecutionTask(resolve, reject, task, name, waitForStates, dedupKey, this._notify,
+                                              reschedule, silentFailure);
+      if (dedupKey !== null) {
+        if (this.dedupMap.has(dedupKey)) {
+          if (replaceExisting) {
+            if (!silentFailure) {
+              log.warn(`Replacing duplicate ${name} (${dedupKey}) on execution queue`);
+            }
+            const oldTask = this.dedupMap.get(dedupKey);
+            this._queue = this._queue.filter(i => i.dedup !== oldTask.dedup);
+            this.dedupMap.set(dedupKey, executionTask);
+          } else {
+            if (silentFailure) {
+              resolve();
+            } else {
+              log.warn(
+                `Skipped duplicate ${name} (${dedupKey}) on execution queue as this task is already queued.`);
+              reject(DUPLICATE_REASON);
+            }
+            return;
+          }
         } else {
-          this.dedupSet.add(dedupKey);
-
+          this.dedupMap.set(dedupKey, executionTask);
         }
       }
-      const executionTask = new ExecutionTask(resolve, reject, task, name, waitForStates, dedupKey, this._notify);
       this._queue.push(executionTask);
       log.debug(`Added ${name} to queue`);
-    })
+    });
   }
 
   public changeState(newState: UIState) {

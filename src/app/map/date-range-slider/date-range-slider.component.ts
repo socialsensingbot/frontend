@@ -1,9 +1,10 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
-import {LabelType, Options} from "ng5-slider";
+import {ChangeContext, LabelType, Options} from "ng5-slider";
 import {Subscription, timer} from "rxjs";
 import {Cache, Hub, Logger} from "aws-amplify";
 import {NgEventBus} from "ng-event-bus";
 import {MapDataService} from "../data/map-data.service";
+import {environment} from "../../../environments/environment";
 
 const log = new Logger('date-range');
 
@@ -36,11 +37,9 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
   @Input()
   public set options(value: DateRangeSliderOptions) {
     this._options = value;
-    this.sliderOptions.ceil = value.max;
-    this.sliderOptions.floor = value.min;
     this._lowerValue = value.startMin;
     this._upperValue = value.startMax;
-
+    this.sliderOptions = {...this.sliderOptions, ceil: value.max, floor: value.min};
   }
 
 
@@ -60,10 +59,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
       log.debug("Undefined upper value");
     }
     this._upperValue = value;
-    if (typeof this.timeKeyedData !== "undefined") {
-      log.debug(value);
-      this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
-    }
+
   }
 
   public get lowerValue(): number {
@@ -82,10 +78,6 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
       log.debug("Undefined lower value");
     }
     this._lowerValue = value;
-    if (typeof this.timeKeyedData !== "undefined") {
-      log.debug(value);
-      this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
-    }
   }
 
   /**
@@ -107,14 +99,19 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
    * @see https://angular-slider.github.io/ng5-slider
    */
   public sliderOptions: Options = {
-    floor:        0,
-    ceil:         0,
-    step:         60,
-    showTicks:    false,
-    ticksTooltip: (value: number): string => {
+    floor:                0,
+    ceil:                 0,
+    step:                 60,
+    showTicks:            false,
+    // handleDimension: 12,
+    inputEventsInterval:  100,
+    mouseEventsInterval:  100,
+    outputEventsInterval: 100,
+    touchEventsInterval:  100,
+    ticksTooltip:         (value: number): string => {
       return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0, "") : ""
     },
-    translate:    (value: number, label: LabelType): string => {
+    translate:            (value: number, label: LabelType): string => {
       if (typeof this.timeKeyedData !== "undefined" && typeof this.timeKeyedData[-value] !== "undefined") {
         switch (label) {
           case LabelType.Low:
@@ -161,12 +158,16 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     if (cachedItem != null) {
       return cachedItem;
     } else {
-      const date = new Date(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
-                            tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0);
-      const ye = new Intl.DateTimeFormat('en', {year: '2-digit'}).format(date);
-      const mo = new Intl.DateTimeFormat('en', {month: 'short'}).format(date);
-      const da = new Intl.DateTimeFormat('en', {day: '2-digit'}).format(date);
-      const hr = new Intl.DateTimeFormat('en', {hour: '2-digit', hour12: true}).format(date);
+      const date = new Date(Date.UTC(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
+                                     tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0));
+      const ye = new Intl.DateTimeFormat(environment.locale, {year: '2-digit', timeZone: environment.timezone}).format(
+        date);
+      const mo = new Intl.DateTimeFormat(environment.locale, {month: 'short', timeZone: environment.timezone}).format(
+        date);
+      const da = new Intl.DateTimeFormat(environment.locale, {day: '2-digit', timeZone: environment.timezone}).format(
+        date);
+      const hr = new Intl.DateTimeFormat(environment.locale,
+                                         {hour: '2-digit', hour12: true, timeZone: environment.timezone}).format(date);
 
       const text = `<span class="slider-date-time slider-date-time-${label}"><span class='slider-time'>${hr}</span> <span class='slider-date'>${da}-${mo}-${ye}</span></span>`;
       //var date = new Date( tstring.substring(0,4), tstring.substring(4,6)-1, tstring.substring(6,8), +tstring.substring(8,10)+add, 0, 0, 0);
@@ -176,6 +177,12 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
 
   }
 
+  public change($event: ChangeContext) {
+    if (typeof this.timeKeyedData !== "undefined") {
+      log.debug($event);
+      this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
+    }
+  }
 }
 
 export class DateRangeSliderOptions {

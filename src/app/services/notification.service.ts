@@ -1,5 +1,5 @@
 import {Injectable, NgZone, OnDestroy, OnInit} from '@angular/core';
-import {MatSnackBar, MatSnackBarRef} from '@angular/material';
+import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 import {Subscription} from 'rxjs';
 import {environment} from "../../environments/environment";
 import {Logger} from "aws-amplify";
@@ -19,7 +19,7 @@ const log = new Logger('map');
 @Injectable({
               providedIn: 'root'
             })
-export class NotificationService implements OnDestroy, OnInit {
+export class NotificationService implements OnDestroy {
 
 
   // Configuration api subscription
@@ -34,22 +34,6 @@ export class NotificationService implements OnDestroy, OnInit {
 
   }
 
-  ngOnInit(): void {
-    window.onerror = (message, file, line, col, e) => {
-      log.error(e)
-      this._zone.run(() => this.error(message));
-      return false;
-    };
-    window.addEventListener("error", (e) => {
-      log.error(e);
-      this._zone.run(() => this.error(e.message));
-      return false;
-    });
-    window.addEventListener('unhandledrejection', (e) => {
-      log.error(e);
-      this._zone.run(() => this.error(e.reason));
-    })
-  }
 
   /**
    * Unsubscribe from the config state
@@ -67,7 +51,7 @@ export class NotificationService implements OnDestroy, OnInit {
    * @param buttonLabel {string}
    * @returns {MatSnackBarRef}
    */
-  show(message: string, buttonLabel: string = 'OK', toastTimeout = 8): MatSnackBarRef<any> {
+  show(message: string, buttonLabel: string = "OK", toastTimeout = 8): MatSnackBarRef<any> {
     if (toastTimeout > 0) {
       return this.toast.open(message, buttonLabel, {
         duration: toastTimeout * 1000
@@ -76,6 +60,7 @@ export class NotificationService implements OnDestroy, OnInit {
       return this.toast.open(message, buttonLabel, {});
     }
   }
+
 
   public error(e: any) {
     if (environment.production) {
@@ -88,5 +73,9 @@ export class NotificationService implements OnDestroy, OnInit {
       });
 
     }
+  }
+
+  public dismiss() {
+    this.toast.dismiss();
   }
 }

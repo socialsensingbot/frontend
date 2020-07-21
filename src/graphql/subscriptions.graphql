@@ -77,13 +77,13 @@ subscription OnDeleteUserSession($owner: String!) {
 subscription OnCreateGroupPreferences {
   onCreateGroupPreferences {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
     group
+    locale
+    timezone
+    multipleSessions
+    sanitizeForGDPR
+    defaultDataSet
+    availableDataSets
     createdAt
     updatedAt
   }
@@ -91,13 +91,13 @@ subscription OnCreateGroupPreferences {
 subscription OnUpdateGroupPreferences {
   onUpdateGroupPreferences {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
     group
+    locale
+    timezone
+    multipleSessions
+    sanitizeForGDPR
+    defaultDataSet
+    availableDataSets
     createdAt
     updatedAt
   }
@@ -105,13 +105,13 @@ subscription OnUpdateGroupPreferences {
 subscription OnDeleteGroupPreferences {
   onDeleteGroupPreferences {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
     group
+    locale
+    timezone
+    multipleSessions
+    sanitizeForGDPR
+    defaultDataSet
+    availableDataSets
     createdAt
     updatedAt
   }
@@ -120,13 +120,10 @@ subscription OnCreateGroupTweetIgnore {
   onCreateGroupTweetIgnore {
     id
     url
+    ignoredBy
     tweetId
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
+    ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -135,13 +132,10 @@ subscription OnUpdateGroupTweetIgnore {
   onUpdateGroupTweetIgnore {
     id
     url
+    ignoredBy
     tweetId
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
+    ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -150,13 +144,10 @@ subscription OnDeleteGroupTweetIgnore {
   onDeleteGroupTweetIgnore {
     id
     url
+    ignoredBy
     tweetId
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
+    ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -165,12 +156,9 @@ subscription OnCreateGroupTwitterUserIgnore {
   onCreateGroupTwitterUserIgnore {
     id
     twitterScreenName
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
+    ignoredBy
+    ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -179,12 +167,9 @@ subscription OnUpdateGroupTwitterUserIgnore {
   onUpdateGroupTwitterUserIgnore {
     id
     twitterScreenName
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
+    ignoredBy
+    ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -193,12 +178,9 @@ subscription OnDeleteGroupTwitterUserIgnore {
   onDeleteGroupTwitterUserIgnore {
     id
     twitterScreenName
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
+    ignoredBy
+    ownerGroups
+    scope
     createdAt
     updatedAt
   }

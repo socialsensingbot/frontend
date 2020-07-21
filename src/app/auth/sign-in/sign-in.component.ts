@@ -1,11 +1,12 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormGroup, FormControl, Validators} from '@angular/forms';
 import {AuthService} from '../auth.service';
 import {CognitoUser} from '@aws-amplify/auth';
 import {NotificationService} from 'src/app/services/notification.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from 'src/environments/environment';
 import {Logger} from "aws-amplify";
+
 const log = new Logger('sign-in');
 
 @Component({
@@ -13,7 +14,9 @@ const log = new Logger('sign-in');
              templateUrl: './sign-in.component.html',
              styleUrls:   ['./sign-in.component.scss']
            })
-export class SignInComponent {
+export class SignInComponent implements OnInit {
+
+  buttonColor = environment.toolbarColor;
 
   signinForm: FormGroup = new FormGroup({
                                           email:    new FormControl('', [Validators.email, Validators.required]),
@@ -21,6 +24,7 @@ export class SignInComponent {
                                         });
 
   hide = true;
+  isDemo = environment.demo;
 
   get emailInput() { return this.signinForm.get('email'); }
 
@@ -29,7 +33,12 @@ export class SignInComponent {
   constructor(
     public auth: AuthService,
     private _notification: NotificationService,
-    private _router: Router) { }
+    private _router: Router,
+    private _route: ActivatedRoute) {}
+
+  ngOnInit(): void {
+    $("#loading-div").remove();
+  }
 
   getEmailInputError() {
     if (this.emailInput.hasError('email')) {
@@ -57,13 +66,16 @@ export class SignInComponent {
            */
           log.debug(user.challengeName);
           if (user.challengeName === 'NEW_PASSWORD_REQUIRED') {
-            this._router.navigate(['auth/newpass'],{queryParamsHandling:"merge",state:{
-              message:"Please Change your Temporary Password"
-              }});
+            this._router.navigate(['auth/newpass'], {
+              queryParamsHandling: "merge", state: {
+                message: "Please change your Temporary Password"
+              }
+            });
             return;
           } else {
             log.debug(user.challengeName);// other situations
-            this._router.navigate(['/map'],{queryParamsHandling:"merge"});
+            window.location.replace(this._route.snapshot.queryParams["_return"]);
+
           }
         })
         .catch((error: any) => {
@@ -72,10 +84,10 @@ export class SignInComponent {
             case "UserNotConfirmedException":
               environment.confirm.email = this.emailInput.value;
               environment.confirm.password = this.passwordInput.value;
-              this._router.navigate(['auth/confirm'],{queryParamsHandling:"merge"});
+              this._router.navigate(['auth/confirm'], {queryParamsHandling: "merge"});
               break;
             case "UsernameExistsException":
-              this._router.navigate(['auth/signin'],{queryParamsHandling:"merge"});
+              this._router.navigate(['auth/signin'], {queryParamsHandling: "merge"});
               break;
           }
         })

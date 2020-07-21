@@ -60,13 +60,13 @@ query ListUserSessions(
 query GetGroupPreferences($id: ID!) {
   getGroupPreferences(id: $id) {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
     group
+    locale
+    timezone
+    multipleSessions
+    sanitizeForGDPR
+    defaultDataSet
+    availableDataSets
     createdAt
     updatedAt
   }
@@ -80,6 +80,12 @@ query ListGroupPreferencess(
     items {
       id
       group
+      locale
+      timezone
+      multipleSessions
+      sanitizeForGDPR
+      defaultDataSet
+      availableDataSets
       createdAt
       updatedAt
     }
@@ -90,13 +96,10 @@ query GetGroupTweetIgnore($id: ID!) {
   getGroupTweetIgnore(id: $id) {
     id
     url
+    ignoredBy
     tweetId
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
+    ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -110,7 +113,10 @@ query ListGroupTweetIgnores(
     items {
       id
       url
+      ignoredBy
       tweetId
+      ownerGroups
+      scope
       createdAt
       updatedAt
     }
@@ -121,12 +127,9 @@ query GetGroupTwitterUserIgnore($id: ID!) {
   getGroupTwitterUserIgnore(id: $id) {
     id
     twitterScreenName
-    group {
-      id
-      group
-      createdAt
-      updatedAt
-    }
+    ignoredBy
+    ownerGroups
+    scope
     createdAt
     updatedAt
   }
@@ -144,6 +147,9 @@ query ListGroupTwitterUserIgnores(
     items {
       id
       twitterScreenName
+      ignoredBy
+      ownerGroups
+      scope
       createdAt
       updatedAt
     }

@@ -1,1 +1,22 @@
-{}
+{
+  "groupPermissionMap": {
+    "demo": [
+      "read"
+    ],
+    "metoffice": [
+      "read"
+    ],
+    "socialsensing": [
+      "read"
+    ],
+    "testuser": [
+      "read"
+    ],
+    "cypressA": [
+      "read"
+    ],
+    "cypressB": [
+      "read"
+    ]
+  }
+}

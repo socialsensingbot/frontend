@@ -26,11 +26,16 @@
 import "cypress-graphql-mock";
 
 const LONG_TIMEOUT = 60000;
+const VERY_LONG_TIMEOUT = 120000;
+const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
+const multipleKey = Cypress.platform === "darwin" ? "{command}" : "{ctrl}";
 
-Cypress.Commands.add("login", () => {
+
+Cypress.Commands.add("login", (username = "cypress1@example.com") => {
   //Login
   cy.url({timeout: LONG_TIMEOUT}).should("contain", "auth/signin")
-  cy.get('input[type=email]').type(Cypress.env("TEST_AC_USER"));
+  cy.get("#loading-div", {timeout: VERY_LONG_TIMEOUT}).should("not.be.visible");
+  cy.get('input[type=email]').type(username);
   cy.get('input[type=password]').type(Cypress.env("TEST_AC_PASS"));
   cy.get('.mat-button-base.mat-raised-button').contains('Sign In');
   cy.get('.mat-button-base.mat-raised-button').contains('Sign In').click();
@@ -38,12 +43,13 @@ Cypress.Commands.add("login", () => {
 });
 
 Cypress.Commands.add("logout", () => {
+  cy.get("#loading-div", {timeout: VERY_LONG_TIMEOUT}).should("not.be.visible");
   cy.get('#logout').click();
 });
 
 Cypress.Commands.add("visitAndWait", (url) => {
   cy.visit(url);
-  cy.url({timeou: 20000}).should("equal", url);
+  cy.url({timeout: 20000}).should("equal", url);
   cy.noSpinner();
 });
 
@@ -51,6 +57,7 @@ Cypress.Commands.add("visitAndWait", (url) => {
 Cypress.Commands.add("noSpinner", () => {
   cy.get('.map');
   cy.get("mat-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  cy.get("#loading-div", {timeout: VERY_LONG_TIMEOUT}).should("not.be.visible");
   cy.get('body').should(el => {
     if (el) {
       if (el.find("mat-spinner").length > 0) {
@@ -62,20 +69,143 @@ Cypress.Commands.add("noSpinner", () => {
   });
 });
 
-Cypress.Commands.add("twitterPanelHeader", (text) => {
+Cypress.Commands.add("twitterPanelHeader", (text, subheadingText) => {
   cy.get("twitter-panel");
-  cy.get(".tinfo-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  cy.get(".app-tweet-area-loading-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
   cy.wait(1000);
-  cy.get(".tinfo-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
-  cy.get("twitter-panel .tweets-header", {timeout: LONG_TIMEOUT});
-  cy.get("twitter-panel .tweets-header  mat-card > span > b", {timeout: LONG_TIMEOUT}).should("contain.text", text);
+  cy.get(".app-tweet-area-loading-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  cy.get(".app-tweet-heading", {timeout: LONG_TIMEOUT});
+  cy.get(".app-tweet-heading", {timeout: LONG_TIMEOUT}).should("contain.text", text);
+  if (subheadingText) {
+    cy.get(".app-tweet-sub-heading", {timeout: LONG_TIMEOUT});
+    cy.get(".app-tweet-sub-heading", {timeout: LONG_TIMEOUT}).should("contain.text", subheadingText);
+  }
 });
 Cypress.Commands.add("twitterPanelVisible", () => {
-  cy.get(".tweet-drawer", {timeout: LONG_TIMEOUT}).should("be.visible");
+  cy.get(".app-tweet-drawer", {timeout: LONG_TIMEOUT}).should("be.visible");
 });
 
 Cypress.Commands.add("twitterPanelNotVisible", () => {
-  cy.get(".tweet-drawer", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  cy.get(".app-tweet-drawer", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+});
+Cypress.Commands.add("tweetsVisible", (count) => {
+  cy.get("twitter-panel").find('.app-tweet-paged .atr-visible .app-tweet-item',
+                               {timeout: LONG_TIMEOUT}).its('length').should(
+    'eq',
+    count);
+});
+Cypress.Commands.add("tweetCountTotal", (sum) => {
+  cy.get(".mat-tab-label:nth-child(1)", {timeout: 30000}).then(header => {
+    const headerParts = header.text().trim().split(" ");
+    const visibleCount = +headerParts[0];
+    cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000})
+      .then(title => {
+              const hiddenCount = +title.text().trimLeft().split(" ")[0];
+              expect(hiddenCount + visibleCount).equals(sum);
+            }
+      );
+
+  })
+});
+
+Cypress.Commands.add("withTweetCounts", (callback) => {
+  cy.get(".mat-tab-label:nth-child(1)").then(header => {
+    const headerParts = header.text().trim().split(" ");
+    const visibleCount = +headerParts[0];
+    cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000})
+      .then(title => {
+              const hiddenCount = +title.text().trimLeft().split(" ")[0];
+              callback(visibleCount, hiddenCount);
+            }
+      );
+
+  })
+});
+
+
+Cypress.Commands.add("tweetCount", (vis, hid) => {
+  cy.get(".mat-tab-label:nth-child(1)").then(header => {
+    const headerParts = header.text().trim().split(" ");
+    const visibleCount = +headerParts[0];
+    const totalCount = vis + hid;
+    cy.get(".app-tweet-outer").find('.atr-visible').its('length').should('eq', vis);
+
+    cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000}).click()
+      .then(title => {
+              const hiddenCount = +title.text().trimLeft().split(" ")[0];
+              cy.get(".app-tweet-outer").find('.atr-hidden').its('length').should('eq', hid);
+
+            }
+      );
+
+  })
+});
+
+
+Cypress.Commands.add("clickTweetTab", (index) => {
+  cy.get(`.mat-tab-label:nth-child(${index})`, {timeout: 30000}).click({force: true});
+});
+
+Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
+  cy.get(tweetSelector + " .mat-icon", {timeout: 10000})
+  cy.get(tweetSelector + " .mat-icon").trigger("click", {force: true});
+  cy.get(menu2ndOpt, {timeout: 30000});
+  cy.get(menu2ndOpt).contains("Ignore Tweet");
+  cy.get(menu2ndOpt).click({force: true});
+
+});
+
+Cypress.Commands.add("unignoreTweet", (tweetSelector) => {
+  cy.get(tweetSelector + " .mat-icon", {timeout: 10000})
+  cy.get(tweetSelector + " .mat-icon").trigger("click", {force: true});
+  cy.get(menu2ndOpt, {timeout: 30000});
+  cy.get(menu2ndOpt).contains("Unignore Tweet");
+  cy.get(menu2ndOpt).click({force: true});
+
+});
+
+Cypress.Commands.add("unhideTweets", (num) => {
+  cy.clickTweetTab(2);
+  for (let i = 0; i < num; i++) {
+    const tweetHidden = ".atr-0.atr-hidden";
+    cy.get(".app-tweet-drawer", {timeout: 30000}).should("be.visible");
+    cy.get(".app-tweet-drawer", {timeout: 30000}).then(drawer => {
+      if (drawer.find(tweetHidden).length === 0) {
+        cy.log("Skipping non existent tweet");
+      } else {
+        cy.get(tweetHidden).scrollIntoView().should('be.visible');
+        cy.unignoreTweet(tweetHidden);
+        cy.wait(500);
+      }
+    })
+  }
+  cy.clickTweetTab(1);
+  cy.wait(2000);
+});
+
+
+Cypress.Commands.add("moveMinDateSliderLeft", (times) => {
+  for (let i = 0; i < times; i++) {
+    cy.get(".ng5-slider-pointer-min").type('{pagedown}');
+    cy.wait(2000);
+  }
+});
+
+Cypress.Commands.add("moveMinDateSliderRight", (times) => {
+  for (let i = 0; i < times; i++) {
+    cy.get(".ng5-slider-pointer-min").type('{pageup}');
+    cy.wait(1000);
+  }
+});
+
+Cypress.Commands.add("multiSelectRegions", (regions) => {
+  for (let region of regions) {
+    const path = `div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-${region}`;
+    cy.get("body").type(multipleKey, {release: false, force: true})
+    cy.get(path).click({force: true});
+    cy.wait(1000);
+    cy.get("body").type(multipleKey, {release: true, force: true})
+  }
 });
 Cypress.Commands.add("pushStateDelay", () => {
   cy.wait(500);
@@ -94,7 +224,7 @@ Cypress.Commands.add("stubLiveJson", (file) => {
              // have a POST, if you're pushing data up
              method:   "GET",
              // more on the URL below
-             url:      /.*\/public\/live.json?.*/g,
+             url:      /.*\/public\/live\/twitter.json?.*/g,
              // the fixture: shortcut will know to
              // look in cypress/fixtures,
              // unless you configure cypress to
@@ -116,8 +246,8 @@ function patchXhrUsing(makeResponse) {
 }
 
 Cypress.Commands.add("mockGraphQL", () => {
+  throw new Error("DO NOT USE, THIS IS BROKEN");
   cy.server({
-
               onAnyRequest: (route, proxy) => {
 
                 if (!route || !route.url || typeof route.url["indexOf"] === "undefined") {
@@ -127,59 +257,58 @@ Cypress.Commands.add("mockGraphQL", () => {
                 if (route.url.indexOf('/graphql') >= 0) {
                   const {body} = proxy.request;
                   if (body && body.query && body.query.indexOf(
-                    "ListTweetIgnores") >= 0) {
+                    "ListGroupTweetIgnores") >= 0) {
                     route.response = {
                       "data": {
-                        "listTweetIgnores": {
+                        "listGroupTweetIgnores": {
                           items: []
                         }
                       }
                     };
 
 
-                  }
-
-                  if (body && body.query && body.query.indexOf(
-                    "ListTwitterUserIgnores") >= 0) {
+                  } else if (body && body.query && body.query.indexOf(
+                    "ListGroupTwitterUserIgnores") >= 0) {
                     route.response = {
                       "data": {
-                        "listTwitterUserIgnores": {
+                        "listGroupTwitterUserIgnores": {
                           items: []
                         }
 
                       }
                     };
 
-                  }
-                  if (body && body.query && body.query.indexOf(
+                  } else if (body && body.query && body.query.indexOf(
                     "GetUserPreferences") >= 0) {
                     console.log("GetUserPreferences");
                     route.response = {
                       "data": {
                         "getUserPreferences": {
-                          "id":           "434fd82f-3a65-4c66-85c1-b701f2b7ca81",
-                          "ignoreTweets": {
-                            "nextToken": null
-                          },
-                          "ignorePeople": {
-                            "nextToken": null
-                          },
-                          "irrelevant":   {
-                            "nextToken": null
-                          },
-                          "owner":        "434fd82f-3a65-4c66-85c1-b701f2b7ca81"
+                          "id":    "434fd82f-3a65-4c66-85c1-b701f2b7ca81",
+                          "owner": "434fd82f-3a65-4c66-85c1-b701f2b7ca81"
                         }
                       }
                     };
 
 
                   }
+
+                } else if (body && body.query && body.query.indexOf(
+                  "ListDataSets") >= 0) {
+                  route.response = {
+                    "data": {
+                      "listDataSets": {
+                        items: [{id: "live", title: "Live"}]
+                      }
+
+                    }
+                  };
 
                 }
                 console.log("RESPONSE: ", route, proxy);
               }
 
             });
-  cy.route("POST", "/graphql", {});
+  cy.route("POST", "/graphql");
 });
 

@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
-import Auth, {CognitoHostedUIIdentityProvider} from '@aws-amplify/auth';
-import {Hub, ICredentials} from '@aws-amplify/core';
-import {Subject, Observable} from 'rxjs';
+import Auth from '@aws-amplify/auth';
+import {Hub} from '@aws-amplify/core';
+import {Subject} from 'rxjs';
 import {CognitoUser} from 'amazon-cognito-identity-js';
 import {Logger} from "aws-amplify";
-import {SessionService} from "./session.service";
+import {Observable} from 'rxjs';
 
 export interface NewUser {
   email: string,
@@ -32,7 +32,7 @@ export class AuthService {
   public static SIGN_IN = 'signIn';
   public static SIGN_OUT = 'signOut';
 
-  constructor(private _session: SessionService) {
+  constructor() {
     Hub.listen('auth', (data) => {
       const {channel, payload} = data;
       if (channel === 'auth') {
@@ -66,7 +66,6 @@ export class AuthService {
   }
 
   async signOut(): Promise<any> {
-    await this._session.close();
     return Auth.signOut()
                .then(() => this.loggedIn = false);
   }

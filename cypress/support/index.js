@@ -17,3 +17,8 @@
 import './commands'
 
 require('cypress-plugin-retries');
+
+// Cypress.on("window:before:load", win => {
+//     win.indexedDB.deleteDatabase("ngForage");
+// });
+export const MAP_URL = "http://localhost:4200/map/live"

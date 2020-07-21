@@ -3,13 +3,27 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  version: "dev",
-  production: false,
-  hmr: false,
-  confirm: {
-    email: '',
-    password: ''
-  }
+  name:                 "dev",
+  version:              "dev",
+  demo:                 false,
+  production:           false,
+  hmr:                  false,
+  rollbar:              false,
+  toolbarColor:         "primary",
+  // timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  timezone:             "UTC",
+  multipleSessions:     false,
+  locale:               "en-GB",
+  confirm:              {
+    email:    "",
+    password: ""
+  },
+  showErrors:           false,
+  showLoadingMessages:  true,
+  sanitizeForGDPR:      true,
+  defaultDataSet:       "live",
+  availableDataSets:    ["live", "july-17"],
+  cacheProcessedTweets: false
 };
 
 /*
@@ -19,4 +33,4 @@ export const environment = {
  * This import should be commented out in production mode because it will have a negative impact
  * on performance if an error is thrown.
  */
-import 'zone.js/dist/zone-error';  // Included with Angular CLI.
+import "zone.js/dist/zone-error";  // Included with Angular CLI.

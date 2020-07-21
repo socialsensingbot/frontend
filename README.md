@@ -23,8 +23,6 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 - [AWS Services]
   - [AWS Amplify] 
   - [AWS Cognito] 
-    - [Creating a Live User] 
-    - [Setting a Users Password] 
   - [AWS Route 53] 
   - [AWS S3 & CloudFront] 
 - [Testing] 
@@ -32,6 +30,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
       - [Using Fixtures and Stubbing Services] 
         - [Live.json] 
         - [GraphQL (DynamoDB access)] 
+      - [Cross-Browser Testing] 
 - [Issue Tracking] 
 
 # Getting Started
@@ -50,7 +49,7 @@ Make sure you are in the top level of the project and follow the instructions be
  
          ng serve --open
          
-    If you leave ```ng serve```  running it will serve up the application and reload upon file changes.
+    If you leave ```ng serve```  running it will serve up the application and reload upon file changes. However there is also a script to do this ```./bin/dev.sh```.
 
 3. Install Amplify 
 
@@ -83,9 +82,7 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 
 <https://docs.cypress.io/guides/getting-started/installing-cypress.html#Opening-Cypress>
 
-End to end tests are peformed using [Cypress](https://cypress.io). All end to end (integration) tests will be executed on a build.
-
-To run the tests you need to run the following, substituting username and password.
+End to end tests are peformed using [Cypress](https://cypress.io). The end to end (integration) tests will be executed on a build and can be run manually (substituting username and password):
 
     export TEST_AC_USER=<username>,TEST_AC_PASS=<password> ./bin/cypress.sh
    
@@ -99,10 +96,9 @@ The [src](/src) folder is the main folder for development and contains all the s
 
 Within the src folder you will find the [app](/src/app) folder which contains the application source code which is covered in [The Application Structure] - best make sure you know [The Structure of an Angular Application] first.
 
-The [environments](/src/environments) folder contains application variables that are environment specific.
+The [environments](/src/environments) folder contains application variables that are environment specific. Most importantly [environment.production](/src/environments/environment.prod.ts) which contains amongst other things the version number of the application - this needs to be updated every time a new release/x.y.z branch is created.
 
 The [amplify](/amplify) folder contains all the amplify generated configuration and should not be manually edited.
-
 
 ### The Application Structure
 
@@ -297,27 +293,6 @@ Please now read about [Branches, Environments and Deployments] to understand wha
 
 This is what is used for user management, you will see there are two user pools, one for [production](https://eu-west-2.console.aws.amazon.com/cognito/users/?region=eu-west-2#/pool/eu-west-2_dkJC8ZcOU/details?_k=9e2wps) and one for [development](https://eu-west-2.console.aws.amazon.com/cognito/users/?region=eu-west-2#/pool/eu-west-2_L3RQGANbS/details?_k=kpehkf). 
 
-#### Creating a Live User
-
-<https://docs.aws.amazon.com/cli/latest/reference/cognito-idp/admin-create-user.html>
-
-There is a script in the bin directory called create-user.sh and is used as follows
-
-```
-    ./bin/create-user.sh <email> <passsword>
-```
-
-#### Setting a Users Password
-
-<https://docs.aws.amazon.com/cli/latest/reference/cognito-idp/admin-set-user-password.html>
-
-There is a script in the bin directory called set-live-password.sh and is used as follows
-
-```
-    ./bin/set-live-password.sh <user> <passsword>
-```
-
-
 ### AWS S3 & CloudFront
 
 These are used for deployment of the [SPA](https://en.wikipedia.org/wiki/Single-page_application) 
@@ -363,9 +338,9 @@ The test folder is [cypress](/cypress) and the tests themselves are in the [inte
 
 Within the [cypress](/cypress) folder there are the following that you will need to use:
 
-The quick tests are run during builds of feature and release branches and can be found in [integration/quick](/cypress/integration/quick), tests that are directly related to issues are in the [integration/quick/issues](/cypress/integration/quick/issues) folder and are prefixed with the issue id from GitHub.
+The quick tests are run during builds of feature and release branches and can be found in [integration/01_quick](/cypress/integration/00_quick), tests that are directly related to issues are in the [integration/00_quick/00_issues](/cypress/integration/00_quick/00_issues) folder and are prefixed with the issue id from GitHub.
 
-The slow tests are run during builds of release branches (or manually) only and can be found in [integration/slow](/cypress/integration/slow), tests that are directly related to issues are in the [integration/slow/issues](/cypress/integration/slow/issues) folder and are prefixed with the issue id from GitHub. The difference is simply how long a test takes to run.
+The slow tests are run during builds of release branches (or manually) only and can be found in [integration/slow](/cypress/integration/01_slow), tests that are directly related to issues are in the [integration/01_slow/00_issues](/cypress/integration/01_slow/00_issues) folder and are prefixed with the issue id from GitHub. The difference is simply how long a test takes to run.
 
 ### Writing custom commands
 
@@ -388,13 +363,13 @@ and used like
 
 ```javascript
  describe('select county and date range', () => {
-    const url = "http://localhost:4200/map?selected=scottish%20borders&min_offset=-1439&max_offset=0&zoom=5";
+    const url = MAP_URL+"?selected=scottish%20borders&min_time=-1439&max_time=0&zoom=5";
     it('with no tweets', () => {
       cy.visitAndWait(url);
       cy.get(".slider-date-time", {timeout: 20000});
       cy.get(".slider-date-time-max .slider-date").should("contain.text","15-Oct-18");
       cy.get(".slider-date-time-max .slider-time").should("contain.text", "12 AM");
-      cy.get(".tweet-drawer", {timeout: 60000}).should("be.visible");
+      cy.get(".app-tweet-drawer", {timeout: 60000}).should("be.visible");
       cy.url().should("equal", url);
       
       cy.twitterPanelHeader("No Tweets from Scottish Borders");
@@ -474,6 +449,11 @@ The [Cypress Retries Plugin](https://github.com/Bkucera/cypress-plugin-retries) 
 
 The retry count is overidden by the CYPRESS_RETRIES environment variable in the [Amplify Console](https://eu-west-2.console.aws.amazon.com/amplify/home?region=eu-west-2#/dtmxl3q3i7oix/settings/variables).
 
+
+### Cross-Browser Testing
+
+At present this is not automated but there is a script that runs through all the main browsers supported by cypress in ```bin/test-browsers.sh``` pass the path to the test or tests as the first argument.
+
 ##  Issue Tracking 
 
 The issues are tracked at:
@@ -527,6 +507,8 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 [The Branches]: #the-branches
 [The Process]: #the-process
 [Live.json]: #livejson
+[Cross-Browser Testing]: #cross-browser-testing
+
 
 
 

@@ -2,15 +2,13 @@ import {Tweet} from "../twitter/tweet";
 import {
   ByRegionType,
   COUNTY,
-  PolygonLayerShortName,
-  polygonLayerShortNames,
-  RegionData,
   Stats,
   TimeSlice
 } from "../types";
 import {Logger} from "aws-amplify";
+import {RegionMetadata} from "./map-data.service";
 
-const log = new Logger('processed-data');
+const log = new Logger("processed-data");
 
 
 export class TweetMap {
@@ -27,32 +25,29 @@ export class ExceedanceMap {
 
 
 export class ProcessedPolygonData {
-  private readonly _gridSizes: ByRegionType<string> = Object.freeze({county: COUNTY, coarse: "15", fine: "60"});
-
-  private readonly _B: number = 1407;//countyStats["cambridgeshire"].length; //number of stats days
+  // countyStats["cambridgeshire"].length; //number of stats days
   private _places: Set<string> = new Set<string>();
   private _stats: ExceedanceMap = new ExceedanceMap();
   private _counts: CountMap = new CountMap();
   private _tweets: TweetMap = new TweetMap();
 
-  constructor(private _name: PolygonLayerShortName = null, dateMin: number = 0, dateMax: number = 0,
+  constructor(private _region: RegionMetadata = null, dateMin: number = 0, dateMax: number = 0,
               _statsRefData: Stats = null,
               timeKeyedData: any = null, _rawTwitterData: any = null) {
 
     if (_rawTwitterData === null) {
-      //creating empty class for deserializing
+      // creating empty class for deserializing
     } else {
       const start = new Date();
       const timeSlice = timeKeyedData.slice(-dateMax, -dateMin);
       const tdiff = timeSlice.length / 1440;
-      for (const i in timeSlice) { //all times
-        var timeKey = timeSlice[i];
-        console.assert(polygonLayerShortNames.includes(this._name));
+      for (const i in timeSlice) { // all times
+        const timeKey = timeSlice[i];
         const timeslicedData: TimeSlice = (_rawTwitterData)[timeKey];
-        for (const place in timeslicedData[(this._gridSizes)[_name]]) { //all counties/boxes
-          if (timeslicedData[(this._gridSizes)[_name]].hasOwnProperty(place)) {
-            //add the counts
-            const wt = timeslicedData[(this._gridSizes)[_name]][place]["w"];
+        for (const place in timeslicedData[this._region.key]) { // all counties/boxes
+          if (timeslicedData[this._region.key].hasOwnProperty(place)) {
+            // add the counts
+            const wt = timeslicedData[this._region.key][place].w;
 
 
             if (this.hasPlace(place)) {
@@ -62,10 +57,10 @@ export class ProcessedPolygonData {
               this._tweets[place] = [];
               this._places.add(place);
             }
-            for (const i in timeslicedData[this._gridSizes[_name]][place]["i"]) {
-              const tweetcode_id = timeslicedData[(this._gridSizes)[_name]][place]["i"][i];
-              const tweetHtml: string = timeslicedData.tweets[tweetcode_id]; //html of the tweet
-              this._tweets[place].push(new Tweet(tweetcode_id, tweetHtml, timeKey, _name, place));
+            for (const j in timeslicedData[this._region.key][place].i) {
+              const tweetcodeId = timeslicedData[this._region.key][place].i[j];
+              const tweetHtml: string = timeslicedData.tweets[tweetcodeId]; // html of the tweet
+              this._tweets[place].push(new Tweet(tweetcodeId, tweetHtml, timeKey, _region.id, place));
             }
           } else {
             log.debug("Skipping " + place);
@@ -76,20 +71,21 @@ export class ProcessedPolygonData {
       }
       log.debug("Places: ", this._places);
       for (const place of this._places) {
-        const tweetCount = this._counts[place]
-        let stats_wt = 0;
-        if (tweetCount) {
-          var as_day = tweetCount / tdiff; //average # tweets per day arraiving at a constant rate
-          stats_wt = this.getStatsIdx(place, as_day, _statsRefData); //number of days with fewer tweets
-          //exceedance probability = rank / (#days + 1) = p
-          //rank(t) = #days - #days_with_less_than(t)
-          //prob no events in N days = (1-p)^N
-          //prob event in N days = 1 - (1-p)^N
-          stats_wt = 100 * (1 - Math.pow(1 - ((this._B + 1 - stats_wt) / (this._B + 1)), tdiff));
+        const tweetCount = this._counts[place];
+        let statsWt = 0;
+        if (tweetCount && typeof _statsRefData[this._region.id][place] !== "undefined") {
+          const B = _statsRefData[this._region.id][place].length;
+          const asDay = Math.round(tweetCount / tdiff); // average # tweets per day arraiving at a constant rate
+          statsWt = this.getStatsIdx(place, asDay, _statsRefData); // number of days with fewer tweets
+          // exceedance probability = rank / (#days + 1) = p
+          // rank(t) = #days - #days_with_less_than(t)
+          // prob no events in N days = (1-p)^N
+          // prob event in N days = 1 - (1-p)^N
+          statsWt = 100 * (1 - Math.pow(1 - ((B + 1 - statsWt) / (B + 1)), tdiff));
         }
-        this._stats[place] = stats_wt;
+        this._stats[place] = statsWt;
       }
-      log.info(`Processed data for ${this._name} in ${(new Date().getTime() - start.getTime()) / 1000.0}s`);
+      log.info(`Processed data for ${this._region.title} in ${(new Date().getTime() - start.getTime()) / 1000.0}s`);
     }
   }
 
@@ -98,22 +94,14 @@ export class ProcessedPolygonData {
   }
 
 
-  /**
-   *
-   * @param place
-   * @param val
-   * @param poly
-   * @param B
-   * @param statsData
-   */
-  getStatsIdx(place, val, stats) {
+  getStatsIdx(place: string, val: number, stats: Stats): number {
 
-    for (let i = 0; i < this._B; i++) {
-      if (val <= stats[this._name][place][i]) {
+    for (let i = 0; i < stats[this._region.id][place].length; i++) {
+      if (val <= Math.round(stats[this._region.id][place][i])) {
         return i;
       }
     }
-    return this._B;
+    return stats[this._region.id][place].length;
   }
 
 
@@ -141,60 +129,53 @@ export class ProcessedPolygonData {
   public populate(data: ProcessedPolygonData): ProcessedPolygonData {
     this._counts = data._counts;
     this._stats = data._stats;
-    this._name = data._name;
+    this._region = data._region;
     this._tweets = data._tweets;
     for (const i in this._tweets) {
-      this._tweets[i] = this._tweets[i].map(i => new Tweet().populate(i))
+      this._tweets[i] = this._tweets[i].map(i => new Tweet().populate(i));
     }
     this._places = new Set(data._places);
     return this;
   }
 }
+
 export class ProcessedData {
 
 
-  public county: ProcessedPolygonData;
-  public coarse: ProcessedPolygonData;
-  public fine: ProcessedPolygonData;
+  data: { [regionType: string]: ProcessedPolygonData } = {};
 
 
   constructor(dateMin: number = 0, dateMax: number = 0, timeKeyedData = null, _rawTwitterData = null,
-              _statsRefData: Stats = null) {
+              _statsRefData: Stats = null, layers: RegionMetadata[] = []) {
 
-    this.county = new ProcessedPolygonData("county", dateMin, dateMax, _statsRefData, timeKeyedData, _rawTwitterData);
-    this.coarse = new ProcessedPolygonData("coarse", dateMin, dateMax, _statsRefData, timeKeyedData, _rawTwitterData);
-    this.fine = new ProcessedPolygonData("fine", dateMin, dateMax, _statsRefData, timeKeyedData, _rawTwitterData);
-
-
-  }
-
-  public regionTypes(): PolygonLayerShortName[] {
-    return ["county", "coarse", "fine"];
-  }
-
-  public embeds(activePolyLayerShortName: PolygonLayerShortName, name: string): Tweet[] {
-    return this.layer(activePolyLayerShortName).tweetsForPlace(name)
-  }
-
-  private layer(activePolyLayerShortName: PolygonLayerShortName): ProcessedPolygonData {
-    switch (activePolyLayerShortName) {
-      case "coarse":
-        return this.coarse;
-      case "fine":
-        return this.fine;
-      case "county":
-        return this.county;
+    for (const layer of layers) {
+      this.data[layer.id] = new ProcessedPolygonData(layer, dateMin, dateMax, _statsRefData, timeKeyedData,
+                                                     _rawTwitterData);
     }
   }
 
-  public regionData(regionType: PolygonLayerShortName): ProcessedPolygonData {
-    return this.layer(regionType)
+  public tweets(activePolyLayerShortName: string, name: string): Tweet[] {
+    return this.layer(activePolyLayerShortName).tweetsForPlace(name);
   }
 
-  public populate(cacheValue: ProcessedData) {
-    this.county = new ProcessedPolygonData().populate(cacheValue.county);
-    this.coarse = new ProcessedPolygonData().populate(cacheValue.coarse);
-    this.fine = new ProcessedPolygonData().populate(cacheValue.fine);
+  public regionNames(activePolyLayerShortName: string): Set<string> {
+    return this.layer(activePolyLayerShortName).places();
+  }
+
+  private layer(activePolyLayerShortName: string): ProcessedPolygonData {
+    return this.data[activePolyLayerShortName];
+  }
+
+  public regionData(regionType: string): ProcessedPolygonData {
+    return this.layer(regionType);
+  }
+
+  public populate(processedData: ProcessedData, layers: string[]) {
+    log.debug(processedData);
+    log.debug(this.data);
+    for (const layer of layers) {
+      this.data[layer] = new ProcessedPolygonData().populate(processedData.data[layer]);
+    }
     return this;
   }
 }

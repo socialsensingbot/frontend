@@ -5,6 +5,13 @@ type UserPreferences @model @auth(
   id: ID!
   ignoreTweets: [TweetIgnore] @connection(name: "UserTweetIgnores")
   ignorePeople: [TwitterUserIgnore] @connection(name: "UserTwitterUserIgnores")
+  #  locale: String
+  #  timezone: String
+  #  multipleSessions: Boolean
+  #  sanitizeForGDPR: Boolean
+  #  defaultDataSet: String
+  #  availableDataSets:[String]
+  #  showLoadingMessages: Boolean
 }
 
 type UserSession @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" }) @auth(
@@ -18,26 +25,34 @@ type UserSession @model(timestamps: {createdAt: "createdAt", updatedAt: "updated
 }
 
 
-type GroupPreferences @model @auth(rules: [{allow: groups, groupsField: "group"}]){
+type GroupPreferences @model @auth(rules: [{allow: groups, operations: [create, update, delete, read], groupsField: "group"}]){
   id: ID!
-  ignoreTweets: [GroupTweetIgnore] @connection(name: "GroupTweetIgnores")
-  ignorePeople: [GroupTwitterUserIgnore] @connection(name: "GroupTwitterUserIgnores")
-  group: String
+  group: String!
+  locale: String
+  timezone: String
+  multipleSessions: Boolean
+  sanitizeForGDPR: Boolean
+  defaultDataSet: String
+  availableDataSets:[String]
+  showLoadingMessages: Boolean
 }
 
 
-type GroupTweetIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" })  @auth(rules: [{allow: groups}]) {
+type GroupTweetIgnore @model( timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" })  @auth(rules: [{allow: groups, groupsField: "ownerGroups"}]) {
   id: ID!
   url: String!
-  tweetId: String
-  group: GroupPreferences @connection(name: "GroupTweetIgnores")
+  ignoredBy: String!
+  tweetId: String!
+  ownerGroups: [String]
+  scope: String!
 }
 
-
-type GroupTwitterUserIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" })   @auth(rules: [{allow: groups}]) {
+type GroupTwitterUserIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" })   @auth(rules: [{allow: groups, groupsField: "ownerGroups"}]) {
   id: ID!
   twitterScreenName: String!
-  group: GroupPreferences @connection(name: "GroupTwitterUserIgnores")
+  ignoredBy: String!
+  ownerGroups: [String]
+  scope: String!
 }
 
 
