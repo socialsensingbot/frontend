@@ -1,6 +1,7 @@
 # Script to run the for the Amplify Console CI Cypress testing
 cd $(dirname $0)
 cd ..
+export PATH=PATH:$(dirname $0)
 
 if [[ "${AWS_BRANCH}" == staging ]]; then
   ./backup.sh
