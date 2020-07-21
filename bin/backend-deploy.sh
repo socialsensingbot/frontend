@@ -1,4 +1,5 @@
-# Script to run the for the Amplify Console CI Cypress testing
+# Script to run the for the Amplify Console Backend Deployment
+set -euxo pipefail
 cd $(dirname $0)
 export PATH=$PATH:$(pwd)
 cd ..
