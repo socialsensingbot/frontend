@@ -1,7 +1,8 @@
 import {EventEmitter, Injectable} from "@angular/core";
 import {Auth, Logger} from "aws-amplify";
 import {
-  APIService, GetGroupPreferencesQuery,
+  APIService,
+  GetGroupPreferencesQuery,
   OnCreateGroupTweetIgnoreSubscription,
   OnCreateGroupTwitterUserIgnoreSubscription,
   OnDeleteGroupTweetIgnoreSubscription,
@@ -259,7 +260,7 @@ export class PreferenceService {
     const result = await this._api.GetGroupTwitterUserIgnore(id);
     log.debug(result);
     if (!result) {
-      const result = this._api.CreateGroupTwitterUserIgnore(
+      this._api.CreateGroupTwitterUserIgnore(
         {
           id,
           twitterScreenName: tweet.sender,
@@ -299,7 +300,7 @@ export class PreferenceService {
     const result = await this._api.GetGroupTweetIgnore(id);
     log.debug(result);
     if (!result) {
-      const result = this._api.CreateGroupTweetIgnore(
+      this._api.CreateGroupTweetIgnore(
         {
           id,
           url:         tweet.url,
