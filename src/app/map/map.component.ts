@@ -406,7 +406,7 @@ export class MapComponent implements OnInit, OnDestroy {
     if (this.route.snapshot.paramMap.has("dataset")) {
       this._dataset = this.route.snapshot.paramMap.get("dataset");
     } else {
-      this._dataset = this.pref.group.defaultDataSet;
+      this._dataset = this.pref.combined.defaultDataSet;
     }
     await this.data.init();
     await this.data.switchDataSet(this.dataset);
@@ -433,7 +433,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this._exec.changeState("map-init");
     await this.load(true);
-    if (this.pref.group.showLoadingMessages) {
+    if (this.pref.combined.showLoadingMessages) {
       this._notify.show("Loading application ...", "OK", 60);
     }
     this._searchParams.subscribe(async params => {

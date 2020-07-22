@@ -230,7 +230,7 @@ export class SessionService implements OnInit, OnDestroy {
    * @TODO: remove oldest param
    */
   private async moreThanOneSession(oldest: boolean = true) {
-    if (this._pref.group.multipleSessions) {
+    if (this._pref.combined.multipleSessions) {
       log.info("User logged in more than once, which group preferences or the environment allow.");
     } else {
       this._notify.show("You are logged in more than once this session will now be logged out.", "OK", 30);

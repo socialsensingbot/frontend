@@ -60,10 +60,10 @@ export class PreferenceService {
   public tweetUnignored = new EventEmitter<OnDeleteGroupTweetIgnoreSubscription>();
   public twitterUserUnignored = new EventEmitter<OnDeleteGroupTwitterUserIgnoreSubscription>();
 
-  public group: any;
+  public combined: any;
 
   constructor(private _notify: NotificationService, private _api: APIService) {
-    this.group = {...environment};
+    this.combined = {...environment};
   }
 
   public async init(userInfo: any) {
@@ -110,10 +110,10 @@ export class PreferenceService {
       }
       try {
         log.debug("GROUP PREFS", JSON.parse(this._groupPreferences.prefs));
-        this.group = this.combine(this.group,
-                                  (typeof this._preferences.prefs !== "undefined" ?
+        this.combined = this.combine(this.combined,
+                                     (typeof this._preferences.prefs !== "undefined" ?
                                     JSON.parse(this._preferences.prefs) : this._preferences),
-                                  (typeof this._groupPreferences.prefs !== "undefined" ?
+                                     (typeof this._groupPreferences.prefs !== "undefined" ?
                                     JSON.parse(this._groupPreferences.prefs) : this._groupPreferences));
       } catch (e) {
         log.error(
@@ -121,7 +121,7 @@ export class PreferenceService {
         log.error(e);
       }
 
-      log.info("Combined preferences are: ", this.group);
+      log.info("Combined preferences are: ", this.combined);
       this._ready = true;
     }
     this.readBlacklist();

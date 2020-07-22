@@ -99,9 +99,9 @@ export class AppComponent {
           30);
       }
       log.info("Locale detected: " + getLang());
-      log.info("Locale in use: " + this._pref.group.locale);
+      log.info("Locale in use: " + this._pref.combined.locale);
       log.info("Timezone detected: " + Intl.DateTimeFormat().resolvedOptions().timeZone);
-      log.info("Timezone in use: " + this._pref.group.timezone);
+      log.info("Timezone in use: " + this._pref.combined.timezone);
       this._rollbar.configure(
         {
           enabled:      environment.rollbar,
@@ -117,7 +117,7 @@ export class AppComponent {
             // environment: environment.name,
             environment_info: environment,
             prefs:            {
-                group: this._pref.group
+                group: this._pref.combined
               }
             }
           }
