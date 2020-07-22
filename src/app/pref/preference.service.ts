@@ -109,13 +109,15 @@ export class PreferenceService {
 
       }
       try {
+        log.debug("GROUP PREFS", JSON.parse(this._groupPreferences.prefs));
         this.group = this.combine(this.group,
-                                  (typeof this._preferences.prefs !== "undefined" ? JSON.parse(
-                                    JSON.parse(this._preferences.prefs)) : this._preferences),
-                                  (typeof this._groupPreferences.prefs !== "undefined" ? JSON.parse(
-                                    JSON.parse(this._groupPreferences.prefs)) : this._groupPreferences));
+                                  (typeof this._preferences.prefs !== "undefined" ?
+                                    JSON.parse(this._preferences.prefs) : this._preferences),
+                                  (typeof this._groupPreferences.prefs !== "undefined" ?
+                                    JSON.parse(this._groupPreferences.prefs) : this._groupPreferences));
       } catch (e) {
-        log.error("Defaulting to environment preferences most probably we couldn't parse the preferences, check the stack trace below.");
+        log.error(
+          "Defaulting to environment preferences most probably we couldn't parse the preferences, check the stack trace below.");
         log.error(e);
       }
 
