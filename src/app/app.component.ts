@@ -76,8 +76,28 @@ export class AppComponent {
 
     const userInfo = await Auth.currentUserInfo();
     if (userInfo) {
-      await this._pref.init(userInfo);
+      try {
+        await this._pref.init(userInfo);
+      } catch (e) {
+        this._rollbar.error(e);
+        log.error(e);
+        this._notify.show(
+          // tslint:disable-next-line:max-line-length
+          "There was a problem with your application preferences, please ask an administrator to fix this. The application may not work correctly until you do.",
+          "I Will",
+          30);
+      }
+      try {
       await this._session.open(userInfo);
+      } catch (e) {
+        this._rollbar.error(e);
+        log.error(e);
+        this._notify.show(
+          // tslint:disable-next-line:max-line-length
+          "There was a problem with creating your session, please ask an administrator to look into this.",
+          "Sure",
+          30);
+      }
       log.info("Locale detected: " + getLang());
       log.info("Locale in use: " + this._pref.group.locale);
       log.info("Timezone detected: " + Intl.DateTimeFormat().resolvedOptions().timeZone);
