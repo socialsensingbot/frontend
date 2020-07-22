@@ -8,36 +8,14 @@ import { Observable } from "zen-observable-ts";
 
 export type CreateUserPreferencesInput = {
   id?: string | null;
+  prefs?: string | null;
 };
 
 export type ModelUserPreferencesConditionInput = {
+  prefs?: ModelStringInput | null;
   and?: Array<ModelUserPreferencesConditionInput | null> | null;
   or?: Array<ModelUserPreferencesConditionInput | null> | null;
   not?: ModelUserPreferencesConditionInput | null;
-};
-
-export type UpdateUserPreferencesInput = {
-  id: string;
-};
-
-export type DeleteUserPreferencesInput = {
-  id?: string | null;
-};
-
-export type CreateUserSessionInput = {
-  id?: string | null;
-  fingerprint?: string | null;
-  client?: string | null;
-  open: boolean;
-};
-
-export type ModelUserSessionConditionInput = {
-  fingerprint?: ModelStringInput | null;
-  client?: ModelStringInput | null;
-  open?: ModelBooleanInput | null;
-  and?: Array<ModelUserSessionConditionInput | null> | null;
-  or?: Array<ModelUserSessionConditionInput | null> | null;
-  not?: ModelUserSessionConditionInput | null;
 };
 
 export type ModelStringInput = {
@@ -79,6 +57,31 @@ export type ModelSizeInput = {
   between?: Array<number | null> | null;
 };
 
+export type UpdateUserPreferencesInput = {
+  id: string;
+  prefs?: string | null;
+};
+
+export type DeleteUserPreferencesInput = {
+  id?: string | null;
+};
+
+export type CreateUserSessionInput = {
+  id?: string | null;
+  fingerprint?: string | null;
+  client?: string | null;
+  open: boolean;
+};
+
+export type ModelUserSessionConditionInput = {
+  fingerprint?: ModelStringInput | null;
+  client?: ModelStringInput | null;
+  open?: ModelBooleanInput | null;
+  and?: Array<ModelUserSessionConditionInput | null> | null;
+  or?: Array<ModelUserSessionConditionInput | null> | null;
+  not?: ModelUserSessionConditionInput | null;
+};
+
 export type ModelBooleanInput = {
   ne?: boolean | null;
   eq?: boolean | null;
@@ -100,23 +103,11 @@ export type DeleteUserSessionInput = {
 export type CreateGroupPreferencesInput = {
   id?: string | null;
   group: string;
-  locale?: string | null;
-  timezone?: string | null;
-  multipleSessions?: boolean | null;
-  sanitizeForGDPR?: boolean | null;
-  defaultDataSet?: string | null;
-  availableDataSets?: Array<string | null> | null;
-  showLoadingMessages?: boolean | null;
+  prefs?: string | null;
 };
 
 export type ModelGroupPreferencesConditionInput = {
-  locale?: ModelStringInput | null;
-  timezone?: ModelStringInput | null;
-  multipleSessions?: ModelBooleanInput | null;
-  sanitizeForGDPR?: ModelBooleanInput | null;
-  defaultDataSet?: ModelStringInput | null;
-  availableDataSets?: ModelStringInput | null;
-  showLoadingMessages?: ModelBooleanInput | null;
+  prefs?: ModelStringInput | null;
   and?: Array<ModelGroupPreferencesConditionInput | null> | null;
   or?: Array<ModelGroupPreferencesConditionInput | null> | null;
   not?: ModelGroupPreferencesConditionInput | null;
@@ -125,13 +116,7 @@ export type ModelGroupPreferencesConditionInput = {
 export type UpdateGroupPreferencesInput = {
   id: string;
   group?: string | null;
-  locale?: string | null;
-  timezone?: string | null;
-  multipleSessions?: boolean | null;
-  sanitizeForGDPR?: boolean | null;
-  defaultDataSet?: string | null;
-  availableDataSets?: Array<string | null> | null;
-  showLoadingMessages?: boolean | null;
+  prefs?: string | null;
 };
 
 export type DeleteGroupPreferencesInput = {
@@ -151,6 +136,7 @@ export type ModelGroupTweetIgnoreConditionInput = {
   url?: ModelStringInput | null;
   ignoredBy?: ModelStringInput | null;
   tweetId?: ModelStringInput | null;
+  ownerGroups?: ModelStringInput | null;
   scope?: ModelStringInput | null;
   and?: Array<ModelGroupTweetIgnoreConditionInput | null> | null;
   or?: Array<ModelGroupTweetIgnoreConditionInput | null> | null;
@@ -181,6 +167,7 @@ export type CreateGroupTwitterUserIgnoreInput = {
 export type ModelGroupTwitterUserIgnoreConditionInput = {
   twitterScreenName?: ModelStringInput | null;
   ignoredBy?: ModelStringInput | null;
+  ownerGroups?: ModelStringInput | null;
   scope?: ModelStringInput | null;
   and?: Array<ModelGroupTwitterUserIgnoreConditionInput | null> | null;
   or?: Array<ModelGroupTwitterUserIgnoreConditionInput | null> | null;
@@ -250,6 +237,7 @@ export type DeleteTwitterUserIgnoreInput = {
 
 export type ModelUserPreferencesFilterInput = {
   id?: ModelIDInput | null;
+  prefs?: ModelStringInput | null;
   and?: Array<ModelUserPreferencesFilterInput | null> | null;
   or?: Array<ModelUserPreferencesFilterInput | null> | null;
   not?: ModelUserPreferencesFilterInput | null;
@@ -284,13 +272,7 @@ export type ModelUserSessionFilterInput = {
 export type ModelGroupPreferencesFilterInput = {
   id?: ModelIDInput | null;
   group?: ModelStringInput | null;
-  locale?: ModelStringInput | null;
-  timezone?: ModelStringInput | null;
-  multipleSessions?: ModelBooleanInput | null;
-  sanitizeForGDPR?: ModelBooleanInput | null;
-  defaultDataSet?: ModelStringInput | null;
-  availableDataSets?: ModelStringInput | null;
-  showLoadingMessages?: ModelBooleanInput | null;
+  prefs?: ModelStringInput | null;
   and?: Array<ModelGroupPreferencesFilterInput | null> | null;
   or?: Array<ModelGroupPreferencesFilterInput | null> | null;
   not?: ModelGroupPreferencesFilterInput | null;
@@ -347,6 +329,7 @@ export type CreateUserPreferencesMutation = {
     __typename: "ModelTwitterUserIgnoreConnection";
     nextToken: string | null;
   } | null;
+  prefs: string | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -363,6 +346,7 @@ export type UpdateUserPreferencesMutation = {
     __typename: "ModelTwitterUserIgnoreConnection";
     nextToken: string | null;
   } | null;
+  prefs: string | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -379,6 +363,7 @@ export type DeleteUserPreferencesMutation = {
     __typename: "ModelTwitterUserIgnoreConnection";
     nextToken: string | null;
   } | null;
+  prefs: string | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -421,13 +406,7 @@ export type CreateGroupPreferencesMutation = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
-  showLoadingMessages: boolean | null;
+  prefs: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -436,13 +415,7 @@ export type UpdateGroupPreferencesMutation = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
-  showLoadingMessages: boolean | null;
+  prefs: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -451,13 +424,7 @@ export type DeleteGroupPreferencesMutation = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
-  showLoadingMessages: boolean | null;
+  prefs: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -539,6 +506,7 @@ export type CreateTweetIgnoreMutation = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    prefs: string | null;
     createdAt: string;
     updatedAt: string;
     owner: string | null;
@@ -556,6 +524,7 @@ export type UpdateTweetIgnoreMutation = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    prefs: string | null;
     createdAt: string;
     updatedAt: string;
     owner: string | null;
@@ -573,6 +542,7 @@ export type DeleteTweetIgnoreMutation = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    prefs: string | null;
     createdAt: string;
     updatedAt: string;
     owner: string | null;
@@ -589,6 +559,7 @@ export type CreateTwitterUserIgnoreMutation = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    prefs: string | null;
     createdAt: string;
     updatedAt: string;
     owner: string | null;
@@ -605,6 +576,7 @@ export type UpdateTwitterUserIgnoreMutation = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    prefs: string | null;
     createdAt: string;
     updatedAt: string;
     owner: string | null;
@@ -621,6 +593,7 @@ export type DeleteTwitterUserIgnoreMutation = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    prefs: string | null;
     createdAt: string;
     updatedAt: string;
     owner: string | null;
@@ -641,6 +614,7 @@ export type GetUserPreferencesQuery = {
     __typename: "ModelTwitterUserIgnoreConnection";
     nextToken: string | null;
   } | null;
+  prefs: string | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -651,6 +625,7 @@ export type ListUserPreferencessQuery = {
   items: Array<{
     __typename: "UserPreferences";
     id: string;
+    prefs: string | null;
     createdAt: string;
     updatedAt: string;
     owner: string | null;
@@ -688,13 +663,7 @@ export type GetGroupPreferencesQuery = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
-  showLoadingMessages: boolean | null;
+  prefs: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -705,13 +674,7 @@ export type ListGroupPreferencessQuery = {
     __typename: "GroupPreferences";
     id: string;
     group: string;
-    locale: string | null;
-    timezone: string | null;
-    multipleSessions: boolean | null;
-    sanitizeForGDPR: boolean | null;
-    defaultDataSet: string | null;
-    availableDataSets: Array<string | null> | null;
-    showLoadingMessages: boolean | null;
+    prefs: string | null;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
@@ -780,6 +743,7 @@ export type GetTweetIgnoreQuery = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    prefs: string | null;
     createdAt: string;
     updatedAt: string;
     owner: string | null;
@@ -810,6 +774,7 @@ export type GetTwitterUserIgnoreQuery = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    prefs: string | null;
     createdAt: string;
     updatedAt: string;
     owner: string | null;
@@ -843,6 +808,7 @@ export type OnCreateUserPreferencesSubscription = {
     __typename: "ModelTwitterUserIgnoreConnection";
     nextToken: string | null;
   } | null;
+  prefs: string | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -859,6 +825,7 @@ export type OnUpdateUserPreferencesSubscription = {
     __typename: "ModelTwitterUserIgnoreConnection";
     nextToken: string | null;
   } | null;
+  prefs: string | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -875,6 +842,7 @@ export type OnDeleteUserPreferencesSubscription = {
     __typename: "ModelTwitterUserIgnoreConnection";
     nextToken: string | null;
   } | null;
+  prefs: string | null;
   createdAt: string;
   updatedAt: string;
   owner: string | null;
@@ -917,13 +885,7 @@ export type OnCreateGroupPreferencesSubscription = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
-  showLoadingMessages: boolean | null;
+  prefs: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -932,13 +894,7 @@ export type OnUpdateGroupPreferencesSubscription = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
-  showLoadingMessages: boolean | null;
+  prefs: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -947,13 +903,7 @@ export type OnDeleteGroupPreferencesSubscription = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
-  showLoadingMessages: boolean | null;
+  prefs: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -1035,6 +985,7 @@ export type OnCreateTweetIgnoreSubscription = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    prefs: string | null;
     createdAt: string;
     updatedAt: string;
     owner: string | null;
@@ -1052,6 +1003,7 @@ export type OnUpdateTweetIgnoreSubscription = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    prefs: string | null;
     createdAt: string;
     updatedAt: string;
     owner: string | null;
@@ -1069,6 +1021,7 @@ export type OnDeleteTweetIgnoreSubscription = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    prefs: string | null;
     createdAt: string;
     updatedAt: string;
     owner: string | null;
@@ -1085,6 +1038,7 @@ export type OnCreateTwitterUserIgnoreSubscription = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    prefs: string | null;
     createdAt: string;
     updatedAt: string;
     owner: string | null;
@@ -1101,6 +1055,7 @@ export type OnUpdateTwitterUserIgnoreSubscription = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    prefs: string | null;
     createdAt: string;
     updatedAt: string;
     owner: string | null;
@@ -1117,6 +1072,7 @@ export type OnDeleteTwitterUserIgnoreSubscription = {
   user: {
     __typename: "UserPreferences";
     id: string;
+    prefs: string | null;
     createdAt: string;
     updatedAt: string;
     owner: string | null;
@@ -1146,6 +1102,7 @@ export class APIService {
             __typename
             nextToken
           }
+          prefs
           createdAt
           updatedAt
           owner
@@ -1178,6 +1135,7 @@ export class APIService {
             __typename
             nextToken
           }
+          prefs
           createdAt
           updatedAt
           owner
@@ -1210,6 +1168,7 @@ export class APIService {
             __typename
             nextToken
           }
+          prefs
           createdAt
           updatedAt
           owner
@@ -1316,13 +1275,7 @@ export class APIService {
           __typename
           id
           group
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
-          showLoadingMessages
+          prefs
           createdAt
           updatedAt
         }
@@ -1347,13 +1300,7 @@ export class APIService {
           __typename
           id
           group
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
-          showLoadingMessages
+          prefs
           createdAt
           updatedAt
         }
@@ -1378,13 +1325,7 @@ export class APIService {
           __typename
           id
           group
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
-          showLoadingMessages
+          prefs
           createdAt
           updatedAt
         }
@@ -1584,6 +1525,7 @@ export class APIService {
           user {
             __typename
             id
+            prefs
             createdAt
             updatedAt
             owner
@@ -1617,6 +1559,7 @@ export class APIService {
           user {
             __typename
             id
+            prefs
             createdAt
             updatedAt
             owner
@@ -1650,6 +1593,7 @@ export class APIService {
           user {
             __typename
             id
+            prefs
             createdAt
             updatedAt
             owner
@@ -1682,6 +1626,7 @@ export class APIService {
           user {
             __typename
             id
+            prefs
             createdAt
             updatedAt
             owner
@@ -1716,6 +1661,7 @@ export class APIService {
           user {
             __typename
             id
+            prefs
             createdAt
             updatedAt
             owner
@@ -1750,6 +1696,7 @@ export class APIService {
           user {
             __typename
             id
+            prefs
             createdAt
             updatedAt
             owner
@@ -1785,6 +1732,7 @@ export class APIService {
             __typename
             nextToken
           }
+          prefs
           createdAt
           updatedAt
           owner
@@ -1809,6 +1757,7 @@ export class APIService {
           items {
             __typename
             id
+            prefs
             createdAt
             updatedAt
             owner
@@ -1894,13 +1843,7 @@ export class APIService {
           __typename
           id
           group
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
-          showLoadingMessages
+          prefs
           createdAt
           updatedAt
         }
@@ -1925,13 +1868,7 @@ export class APIService {
             __typename
             id
             group
-            locale
-            timezone
-            multipleSessions
-            sanitizeForGDPR
-            defaultDataSet
-            availableDataSets
-            showLoadingMessages
+            prefs
             createdAt
             updatedAt
           }
@@ -2085,6 +2022,7 @@ export class APIService {
           user {
             __typename
             id
+            prefs
             createdAt
             updatedAt
             owner
@@ -2146,6 +2084,7 @@ export class APIService {
           user {
             __typename
             id
+            prefs
             createdAt
             updatedAt
             owner
@@ -2213,6 +2152,7 @@ export class APIService {
             __typename
             nextToken
           }
+          prefs
           createdAt
           updatedAt
           owner
@@ -2237,6 +2177,7 @@ export class APIService {
             __typename
             nextToken
           }
+          prefs
           createdAt
           updatedAt
           owner
@@ -2261,6 +2202,7 @@ export class APIService {
             __typename
             nextToken
           }
+          prefs
           createdAt
           updatedAt
           owner
@@ -2335,13 +2277,7 @@ export class APIService {
           __typename
           id
           group
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
-          showLoadingMessages
+          prefs
           createdAt
           updatedAt
         }
@@ -2358,13 +2294,7 @@ export class APIService {
           __typename
           id
           group
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
-          showLoadingMessages
+          prefs
           createdAt
           updatedAt
         }
@@ -2381,13 +2311,7 @@ export class APIService {
           __typename
           id
           group
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
-          showLoadingMessages
+          prefs
           createdAt
           updatedAt
         }
@@ -2525,6 +2449,7 @@ export class APIService {
           user {
             __typename
             id
+            prefs
             createdAt
             updatedAt
             owner
@@ -2550,6 +2475,7 @@ export class APIService {
           user {
             __typename
             id
+            prefs
             createdAt
             updatedAt
             owner
@@ -2575,6 +2501,7 @@ export class APIService {
           user {
             __typename
             id
+            prefs
             createdAt
             updatedAt
             owner
@@ -2599,6 +2526,7 @@ export class APIService {
           user {
             __typename
             id
+            prefs
             createdAt
             updatedAt
             owner
@@ -2623,6 +2551,7 @@ export class APIService {
           user {
             __typename
             id
+            prefs
             createdAt
             updatedAt
             owner
@@ -2647,6 +2576,7 @@ export class APIService {
           user {
             __typename
             id
+            prefs
             createdAt
             updatedAt
             owner

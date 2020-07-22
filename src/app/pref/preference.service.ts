@@ -108,7 +108,17 @@ export class PreferenceService {
         this._groupPreferences = groupPref;
 
       }
-      this.group = this.combine(this.group, this._preferences, this._groupPreferences);
+      try {
+        this.group = this.combine(this.group,
+                                  (typeof this._preferences.prefs !== "undefined" ? JSON.parse(
+                                    JSON.parse(this._preferences.prefs)) : this._preferences),
+                                  (typeof this._groupPreferences.prefs !== "undefined" ? JSON.parse(
+                                    JSON.parse(this._groupPreferences.prefs)) : this._groupPreferences));
+      } catch (e) {
+        log.error("Defaulting to environment preferences most probably we couldn't parse the preferences, check the stack trace below.");
+        log.error(e);
+      }
+
       log.info("Combined preferences are: ", this.group);
       this._ready = true;
     }

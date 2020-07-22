@@ -8,6 +8,7 @@ query GetUserPreferences($id: ID!) {
     ignorePeople {
       nextToken
     }
+    prefs
     createdAt
     updatedAt
     owner
@@ -21,6 +22,7 @@ query ListUserPreferencess(
   listUserPreferencess(filter: $filter, limit: $limit, nextToken: $nextToken) {
     items {
       id
+      prefs
       createdAt
       updatedAt
       owner
@@ -61,13 +63,7 @@ query GetGroupPreferences($id: ID!) {
   getGroupPreferences(id: $id) {
     id
     group
-    locale
-    timezone
-    multipleSessions
-    sanitizeForGDPR
-    defaultDataSet
-    availableDataSets
-    showLoadingMessages
+    prefs
     createdAt
     updatedAt
   }
@@ -81,13 +77,7 @@ query ListGroupPreferencess(
     items {
       id
       group
-      locale
-      timezone
-      multipleSessions
-      sanitizeForGDPR
-      defaultDataSet
-      availableDataSets
-      showLoadingMessages
+      prefs
       createdAt
       updatedAt
     }
@@ -165,6 +155,7 @@ query GetTweetIgnore($id: ID!) {
     tweetId
     user {
       id
+      prefs
       createdAt
       updatedAt
       owner
@@ -197,6 +188,7 @@ query GetTwitterUserIgnore($id: ID!) {
     twitterScreenName
     user {
       id
+      prefs
       createdAt
       updatedAt
       owner

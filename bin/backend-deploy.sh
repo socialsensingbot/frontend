@@ -33,6 +33,7 @@ CODEGEN="{\
   pwd
   amplify init --amplify ${AMPLIFY} --providers ${PROVIDERS} --codegen ${CODEGEN} --yes;
   amplify env checkout ${ENV}
+  amplify codegen
   amplify push --yes
 }
 
