@@ -85,7 +85,7 @@ export class PreferenceService {
       log.debug("Created new preferences.");
       this._preferences = await this._api.GetUserPreferences(userInfo.username);
     } else {
-      log.debug("Existing preferences.");
+      log.debug("Existing preferences", pref);
       this._preferences = pref;
 
     }

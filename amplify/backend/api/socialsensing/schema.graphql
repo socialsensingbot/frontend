@@ -26,7 +26,7 @@ type UserSession @model(timestamps: {createdAt: "createdAt", updatedAt: "updated
 }
 
 
-type GroupPreferences @model @auth(rules: [{allow: groups, operations: [create, update, delete, read], groupsField: "group"}]){
+type GroupPreferences @model @auth(rules: [{allow:private, operations:[create]}, {allow: groups, operations: [create, update, delete, read], groupsField: "group"}]){
   id: ID!
   group: String!
 #  locale: String
