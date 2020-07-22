@@ -1,3 +1,5 @@
+import {MAP_URL} from "../../support";
+
 describe('04: Map: ', function () {
   // Step 1: setup the application state
   beforeEach(function () {
@@ -8,6 +10,7 @@ describe('04: Map: ', function () {
 
   describe('Interact', () => {
     it('with the map', () => {
+      cy.visitAndWait('http://localhost:4200/map');
       cy.get('.content-inner').click();
       cy.get('.map').click();
       cy.get('#logout').click();
@@ -16,6 +19,7 @@ describe('04: Map: ', function () {
     });
 
     it('with a tooltip', () => {
+      cy.visitAndWait('http://localhost:4200/map');
       cy.get(
         'body > app-root > div > div > app-map > mat-sidenav-container > mat-sidenav-content > div.map-surround > div > div.leaflet-pane.leaflet-map-pane > div.leaflet-pane.leaflet-overlay-pane > svg > g > path:nth-child(174)',
         {timeout: 60000}).trigger("mouseover", {force: true});
@@ -26,7 +30,7 @@ describe('04: Map: ', function () {
   });
 
   describe('Legend', () => {
-    const url = "http://localhost:4200/map?active_number=count";
+    const url = MAP_URL + "?active_number=count";
     const legendEntry = "mat-sidenav-content > map-legend > mat-card > div > span:nth-child(1)";
     const statsFirstLegendColour = "background: rgb(254, 229, 217);";
     const statsFirstLegendVal = " 5–";
@@ -61,7 +65,7 @@ describe('04: Map: ', function () {
 
 
   describe('Twitter drawer', () => {
-    const url = "http://localhost:4200/map?selected=powys&min_offset=-5459&max_offset=-2819";
+    const url = MAP_URL + "?selected=powys&min_offset=-5459&max_offset=-2819";
     it('can be closed', () => {
       cy.visitAndWait(url);
       cy.twitterPanelVisible();

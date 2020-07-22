@@ -1,16 +1,16 @@
-import {EventEmitter, Inject, Injectable} from '@angular/core';
+import {EventEmitter, Inject, Injectable} from "@angular/core";
 import {Subscription, timer} from "rxjs";
 import {Auth, Logger} from "aws-amplify";
 import {NotificationService} from "./notification.service";
 import {RollbarService} from "../error";
 import * as Rollbar from "rollbar";
 
-const log = new Logger('uiexecution');
+const log = new Logger("uiexecution");
 
 class ExecutionTask {
 
   constructor(private _resolve: (value?: any) => void, private _reject: (reason?: any) => void,
-              private _task: () => any, public name: String, public waitForStates: UIState[] | null,
+              private _task: () => any, public name: string, public waitForStates: UIState[] | null,
               private _dedup: string, private _notify: NotificationService, public reschedule: boolean,
               public silentFailure: boolean,) {
 
@@ -23,10 +23,10 @@ class ExecutionTask {
 
   public execute() {
     try {
-      log.info("Executing " + this.name)
+      log.info("Executing " + this.name);
       this._resolve(this._task());
     } catch (e) {
-      log.error("ERROR Executing " + this.name)
+      log.error("ERROR Executing " + this.name);
       this._reject(e);
     }
   }
@@ -44,7 +44,7 @@ export const DUPLICATE_REASON = "duplicate";
  * The effect of this is to give a deterministic start up process.
  */
 @Injectable({
-              providedIn: 'root'
+              providedIn: "root"
             })
 export class UIExecutionService {
 
@@ -108,7 +108,7 @@ export class UIExecutionService {
 
   }
 
-  public queue(name: String, waitForStates: UIState[] | null, task: () => any, dedup: any = null,
+  public queue(name: string, waitForStates: UIState[] | null, task: () => any, dedup: any = null,
                silentFailure: boolean = false, replaceExisting: boolean = false, reschedule: boolean = false) {
 
     return new Promise<any>((resolve, reject) => {

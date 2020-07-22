@@ -64,6 +64,9 @@ query GetGroupPreferences($id: ID!) {
     locale
     timezone
     multipleSessions
+    sanitizeForGDPR
+    defaultDataSet
+    availableDataSets
     createdAt
     updatedAt
   }
@@ -80,6 +83,9 @@ query ListGroupPreferencess(
       locale
       timezone
       multipleSessions
+      sanitizeForGDPR
+      defaultDataSet
+      availableDataSets
       createdAt
       updatedAt
     }
