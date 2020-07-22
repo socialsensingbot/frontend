@@ -18,10 +18,15 @@ const log = new Logger("pref-service");
               providedIn: "root"
             })
 export class PreferenceService {
-  private _ready: boolean;
 
   public get groups(): string[] {
     return this._groups;
+  }
+
+  private _ready: boolean;
+
+  constructor(private _notify: NotificationService, private _api: APIService) {
+    this.combined = {...environment};
   }
 
   private _preferences: any;
@@ -63,8 +68,19 @@ export class PreferenceService {
 
   public combined: any;
 
-  constructor(private _notify: NotificationService, private _api: APIService) {
-    this.combined = {...environment};
+  private static combine(...prefs: any) {
+    const result = {};
+    for (const pref of prefs) {
+      for (const field in pref) {
+        if (pref.hasOwnProperty(field)
+          && !field.startsWith("__")
+          && typeof pref[field] !== "undefined"
+          && pref[field] !== null) {
+          result[field] = pref[field];
+        }
+      }
+    }
+    return result;
   }
 
   public async init(userInfo: any) {
@@ -111,11 +127,11 @@ export class PreferenceService {
       }
       try {
         log.debug("GROUP PREFS", JSON.parse(this._groupPreferences.prefs));
-        this.combined = this.combine(this.combined,
-                                     (typeof this._preferences.prefs !== "undefined" ?
-                                    JSON.parse(this._preferences.prefs) : this._preferences),
-                                     (typeof this._groupPreferences.prefs !== "undefined" ?
-                                    JSON.parse(this._groupPreferences.prefs) : this._groupPreferences));
+        this.combined = PreferenceService.combine(this.combined,
+                                                  (typeof this._preferences.prefs !== "undefined" ?
+                                                    JSON.parse(this._preferences.prefs) : this._preferences),
+                                                  (typeof this._groupPreferences.prefs !== "undefined" ?
+                                                    JSON.parse(this._groupPreferences.prefs) : this._groupPreferences));
       } catch (e) {
         log.error(
           "Defaulting to environment preferences most probably we couldn't parse the preferences, check the stack trace below.");
@@ -376,17 +392,5 @@ export class PreferenceService {
     } else {
       this._notify.show("Not ignoring " + tweet.id);
     }
-  }
-
-  private combine(...prefs: any) {
-    const result = {};
-    for (const pref of prefs) {
-      for (const field in pref) {
-        if (!field.startsWith("__") && typeof pref[field] !== "undefined" && pref[field] !== null) {
-          result[field] = pref[field];
-        }
-      }
-    }
-    return result;
   }
 }

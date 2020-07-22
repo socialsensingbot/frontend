@@ -1,5 +1,6 @@
 type UserPreferences @model @auth(
   rules: [
+    {allow:private, operations:[create]},
     {allow: owner, operations: [create, update, delete, read]},
   ]){
   id: ID!
@@ -16,8 +17,9 @@ type UserPreferences @model @auth(
 }
 
 type UserSession @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" }) @auth(
-  rules: [
-    {allow: owner},
+  rules: [{
+    allow: private, operations:[create, read]},
+    {allow: owner, operations:[create, update, delete, read]},
   ]){
   id: ID!
   fingerprint: String
@@ -29,13 +31,13 @@ type UserSession @model(timestamps: {createdAt: "createdAt", updatedAt: "updated
 type GroupPreferences @model @auth(rules: [{allow:private, operations:[create]}, {allow: groups, operations: [create, update, delete, read], groupsField: "group"}]){
   id: ID!
   group: String!
-#  locale: String
-#  timezone: String
-#  multipleSessions: Boolean
-#  sanitizeForGDPR: Boolean
-#  defaultDataSet: String
-#  availableDataSets:[String]
-#  showLoadingMessages: Boolean
+  #  locale: String
+  #  timezone: String
+  #  multipleSessions: Boolean
+  #  sanitizeForGDPR: Boolean
+  #  defaultDataSet: String
+  #  availableDataSets:[String]
+  #  showLoadingMessages: Boolean
   prefs: AWSJSON
 }
 
