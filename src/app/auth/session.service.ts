@@ -117,10 +117,10 @@ export class SessionService implements OnInit, OnDestroy {
 
   public async heartbeat() {
     await this._pref.waitUntilReady();
-    window.localStorage.setItem(SESSION_END, "" + this.ttl());
+    window.localStorage.setItem(SESSION_END, "" + this.localTTL());
     if (this._auth.loggedIn) {
       try {
-        await this._api.UpdateUserSession({id: this._sessionId, open: true});
+        await this._api.UpdateUserSession({id: this._sessionId, open: true, ttl: this.serverTTL()});
       } catch (e) {
         log.error("Heartbeat failed", e);
       }
@@ -239,7 +239,7 @@ export class SessionService implements OnInit, OnDestroy {
                                          fingerprint: this.calculateFingerPrint(),
                                          client,
                                          open:        true,
-                                         ttl:         this.ttl()
+                                         ttl: this.serverTTL()
                                        });
   }
 
@@ -269,8 +269,13 @@ export class SessionService implements OnInit, OnDestroy {
     log.info("User logged into more than one window but one log in session, this message is informational only.");
   }
 
-  private ttl(): number {
+  private localTTL(): number {
     return Date.now() + 1000 * this.sessionDurationInSeconds;
+  }
+
+
+  private serverTTL(): number {
+    return (Math.floor(Date.now() / 1000) + 24 * 60 * 60);
   }
 
   /**
