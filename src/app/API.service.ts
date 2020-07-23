@@ -1,9 +1,10 @@
 /* tslint:disable */
 /* eslint-disable */
 //  This file was automatically generated and should not be edited.
-import {Injectable} from "@angular/core";
-import API, {graphqlOperation} from "@aws-amplify/api";
-import {Observable} from "zen-observable-ts";
+import { Injectable } from "@angular/core";
+import API, { graphqlOperation } from "@aws-amplify/api";
+import { GraphQLResult } from "@aws-amplify/api/lib/types";
+import { Observable } from "zen-observable-ts";
 
 export type CreateUserPreferencesInput = {
   id?: string | null;
@@ -152,7 +153,6 @@ export type ModelGroupTweetIgnoreConditionInput = {
   url?: ModelStringInput | null;
   ignoredBy?: ModelStringInput | null;
   tweetId?: ModelStringInput | null;
-  ownerGroups?: ModelStringInput | null;
   scope?: ModelStringInput | null;
   and?: Array<ModelGroupTweetIgnoreConditionInput | null> | null;
   or?: Array<ModelGroupTweetIgnoreConditionInput | null> | null;
@@ -183,7 +183,6 @@ export type CreateGroupTwitterUserIgnoreInput = {
 export type ModelGroupTwitterUserIgnoreConditionInput = {
   twitterScreenName?: ModelStringInput | null;
   ignoredBy?: ModelStringInput | null;
-  ownerGroups?: ModelStringInput | null;
   scope?: ModelStringInput | null;
   and?: Array<ModelGroupTwitterUserIgnoreConditionInput | null> | null;
   or?: Array<ModelGroupTwitterUserIgnoreConditionInput | null> | null;
@@ -1211,11 +1210,12 @@ export class APIService {
     )) as any;
     return <DeleteUserPreferencesMutation>response.data.deleteUserPreferences;
   }
-
-  OnCreateUserSessionListener: Observable<OnCreateUserSessionSubscription> = API.graphql(
-    graphqlOperation(
-      `subscription OnCreateUserSession($owner: String!) {
-        onCreateUserSession(owner: $owner) {
+  async CreateUserSession(
+    input: CreateUserSessionInput,
+    condition?: ModelUserSessionConditionInput
+  ): Promise<CreateUserSessionMutation> {
+    const statement = `mutation CreateUserSession($input: CreateUserSessionInput!, $condition: ModelUserSessionConditionInput) {
+        createUserSession(input: $input, condition: $condition) {
           __typename
           id
           fingerprint
@@ -1226,13 +1226,24 @@ export class APIService {
           createdAt
           updatedAt
         }
-      }`
-    )
-  ) as Observable<OnCreateUserSessionSubscription>;
-  OnUpdateUserSessionListener: Observable<OnUpdateUserSessionSubscription> = API.graphql(
-    graphqlOperation(
-      `subscription OnUpdateUserSession($owner: String!) {
-        onUpdateUserSession(owner: $owner) {
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <CreateUserSessionMutation>response.data.createUserSession;
+  }
+  async UpdateUserSession(
+    input: UpdateUserSessionInput,
+    condition?: ModelUserSessionConditionInput
+  ): Promise<UpdateUserSessionMutation> {
+    const statement = `mutation UpdateUserSession($input: UpdateUserSessionInput!, $condition: ModelUserSessionConditionInput) {
+        updateUserSession(input: $input, condition: $condition) {
           __typename
           id
           fingerprint
@@ -1243,13 +1254,24 @@ export class APIService {
           createdAt
           updatedAt
         }
-      }`
-    )
-  ) as Observable<OnUpdateUserSessionSubscription>;
-  OnDeleteUserSessionListener: Observable<OnDeleteUserSessionSubscription> = API.graphql(
-    graphqlOperation(
-      `subscription OnDeleteUserSession($owner: String!) {
-        onDeleteUserSession(owner: $owner) {
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <UpdateUserSessionMutation>response.data.updateUserSession;
+  }
+  async DeleteUserSession(
+    input: DeleteUserSessionInput,
+    condition?: ModelUserSessionConditionInput
+  ): Promise<DeleteUserSessionMutation> {
+    const statement = `mutation DeleteUserSession($input: DeleteUserSessionInput!, $condition: ModelUserSessionConditionInput) {
+        deleteUserSession(input: $input, condition: $condition) {
           __typename
           id
           fingerprint
@@ -1260,9 +1282,18 @@ export class APIService {
           createdAt
           updatedAt
         }
-      }`
-    )
-  ) as Observable<OnDeleteUserSessionSubscription>;
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <DeleteUserSessionMutation>response.data.deleteUserSession;
+  }
   async CreateGroupPreferences(
     input: CreateGroupPreferencesInput,
     condition?: ModelGroupPreferencesConditionInput
@@ -1777,13 +1808,9 @@ export class APIService {
     )) as any;
     return <ListUserPreferencessQuery>response.data.listUserPreferencess;
   }
-
-  async CreateUserSession(
-    input: CreateUserSessionInput,
-    condition?: ModelUserSessionConditionInput
-  ): Promise<CreateUserSessionMutation> {
-    const statement = `mutation CreateUserSession($input: CreateUserSessionInput!, $condition: ModelUserSessionConditionInput) {
-        createUserSession(input: $input, condition: $condition) {
+  async GetUserSession(id: string): Promise<GetUserSessionQuery> {
+    const statement = `query GetUserSession($id: ID!) {
+        getUserSession(id: $id) {
           __typename
           id
           fingerprint
@@ -1796,44 +1823,49 @@ export class APIService {
         }
       }`;
     const gqlAPIServiceArguments: any = {
-      input
+      id
     };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
-    return <CreateUserSessionMutation>response.data.createUserSession;
+    return <GetUserSessionQuery>response.data.getUserSession;
   }
-
-  async UpdateUserSession(
-    input: UpdateUserSessionInput,
-    condition?: ModelUserSessionConditionInput
-  ): Promise<UpdateUserSessionMutation> {
-    const statement = `mutation UpdateUserSession($input: UpdateUserSessionInput!, $condition: ModelUserSessionConditionInput) {
-        updateUserSession(input: $input, condition: $condition) {
+  async ListUserSessions(
+    filter?: ModelUserSessionFilterInput,
+    limit?: number,
+    nextToken?: string
+  ): Promise<ListUserSessionsQuery> {
+    const statement = `query ListUserSessions($filter: ModelUserSessionFilterInput, $limit: Int, $nextToken: String) {
+        listUserSessions(filter: $filter, limit: $limit, nextToken: $nextToken) {
           __typename
-          id
-          fingerprint
-          client
-          open
-          owner
-          ttl
-          createdAt
-          updatedAt
+          items {
+            __typename
+            id
+            fingerprint
+            client
+            open
+            owner
+            ttl
+            createdAt
+            updatedAt
+          }
+          nextToken
         }
       }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
+    const gqlAPIServiceArguments: any = {};
+    if (filter) {
+      gqlAPIServiceArguments.filter = filter;
+    }
+    if (limit) {
+      gqlAPIServiceArguments.limit = limit;
+    }
+    if (nextToken) {
+      gqlAPIServiceArguments.nextToken = nextToken;
     }
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
-    return <UpdateUserSessionMutation>response.data.updateUserSession;
+    return <ListUserSessionsQuery>response.data.listUserSessions;
   }
   async GetGroupPreferences(id: string): Promise<GetGroupPreferencesQuery> {
     const statement = `query GetGroupPreferences($id: ID!) {
@@ -2209,12 +2241,12 @@ export class APIService {
     )
   ) as Observable<OnDeleteUserPreferencesSubscription>;
 
-  async DeleteUserSession(
-    input: DeleteUserSessionInput,
-    condition?: ModelUserSessionConditionInput
-  ): Promise<DeleteUserSessionMutation> {
-    const statement = `mutation DeleteUserSession($input: DeleteUserSessionInput!, $condition: ModelUserSessionConditionInput) {
-        deleteUserSession(input: $input, condition: $condition) {
+  OnCreateUserSessionListener: Observable<
+    OnCreateUserSessionSubscription
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnCreateUserSession {
+        onCreateUserSession {
           __typename
           id
           fingerprint
@@ -2225,22 +2257,16 @@ export class APIService {
           createdAt
           updatedAt
         }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <DeleteUserSessionMutation>response.data.deleteUserSession;
-  }
+      }`
+    )
+  ) as Observable<OnCreateUserSessionSubscription>;
 
-  async GetUserSession(id: string): Promise<GetUserSessionQuery> {
-    const statement = `query GetUserSession($id: ID!) {
-        getUserSession(id: $id) {
+  OnUpdateUserSessionListener: Observable<
+    OnUpdateUserSessionSubscription
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnUpdateUserSession {
+        onUpdateUserSession {
           __typename
           id
           fingerprint
@@ -2251,53 +2277,29 @@ export class APIService {
           createdAt
           updatedAt
         }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      id
-    };
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <GetUserSessionQuery>response.data.getUserSession;
-  }
+      }`
+    )
+  ) as Observable<OnUpdateUserSessionSubscription>;
 
-  async ListUserSessions(
-    filter?: ModelUserSessionFilterInput,
-    limit?: number,
-    nextToken?: string
-  ): Promise<ListUserSessionsQuery> {
-    const statement = `query ListUserSessions($filter: ModelUserSessionFilterInput, $limit: Int, $nextToken: String) {
-        listUserSessions(filter: $filter, limit: $limit, nextToken: $nextToken) {
+  OnDeleteUserSessionListener: Observable<
+    OnDeleteUserSessionSubscription
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnDeleteUserSession {
+        onDeleteUserSession {
           __typename
-          items {
-            __typename
-            id
-            fingerprint
-            client
-            open
-            owner
-            ttl
-            createdAt
-            updatedAt
-          }
-          nextToken
+          id
+          fingerprint
+          client
+          open
+          owner
+          ttl
+          createdAt
+          updatedAt
         }
-      }`;
-    const gqlAPIServiceArguments: any = {};
-    if (filter) {
-      gqlAPIServiceArguments.filter = filter;
-    }
-    if (limit) {
-      gqlAPIServiceArguments.limit = limit;
-    }
-    if (nextToken) {
-      gqlAPIServiceArguments.nextToken = nextToken;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <ListUserSessionsQuery>response.data.listUserSessions;
-  }
+      }`
+    )
+  ) as Observable<OnDeleteUserSessionSubscription>;
 
   OnCreateGroupPreferencesListener: Observable<
     OnCreateGroupPreferencesSubscription
