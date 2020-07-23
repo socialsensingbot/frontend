@@ -2,7 +2,7 @@ export const environment = {
   production:           true,
   name:                 "production",
   demo:                 false,
-  version:              "1.3.2",
+  version: "1.3.4",
   // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
   timezone:             "UTC",
   locale:               "en-GB",
