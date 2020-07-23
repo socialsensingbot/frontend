@@ -32,6 +32,7 @@ import {RegionSelection} from "./region-selection";
 import {PreferenceService} from "../pref/preference.service";
 import {APIService} from "../API.service";
 import {NgForageCache} from "ngforage";
+import {environment} from "../../environments/environment";
 
 
 const log = new Logger("map");
@@ -246,8 +247,7 @@ export class MapComponent implements OnInit, OnDestroy {
   public options: any = {
     layers: [
       tileLayer(
-        // tslint:disable-next-line:max-line-length
-        "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
+        environment.mapTileUrlTemplate,
         {
           maxZoom:     18,
           attribution: "Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, " +
@@ -406,7 +406,7 @@ export class MapComponent implements OnInit, OnDestroy {
     if (this.route.snapshot.paramMap.has("dataset")) {
       this._dataset = this.route.snapshot.paramMap.get("dataset");
     } else {
-      this._dataset = this.pref.group.defaultDataSet;
+      this._dataset = this.pref.combined.defaultDataSet;
     }
     await this.data.init();
     await this.data.switchDataSet(this.dataset);
@@ -433,7 +433,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this._exec.changeState("map-init");
     await this.load(true);
-    if (this.pref.group.showLoadingMessages) {
+    if (this.pref.combined.showLoadingMessages) {
       this._notify.show("Loading application ...", "OK", 60);
     }
     this._searchParams.subscribe(async params => {
@@ -466,6 +466,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
                              });
                            this._notify.dismiss();
+                           this._map.invalidateSize();
                            $("#loading-div").css("opacity", 0.0);
                            setTimeout(() => $("#loading-div").remove(), 1000);
                            this.activity = false;

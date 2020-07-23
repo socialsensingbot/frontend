@@ -116,11 +116,11 @@ export class MapDataService {
                .then(async i => {
                  await this._pref.waitUntilReady();
                  this.serviceMetadata = i;
-                 if (this._pref.group.availableDataSets
-                   && this._pref.group.availableDataSets.length > 0
-                   && this._pref.group.availableDataSets[0] !== "*") {
+                 if (this._pref.combined.availableDataSets
+                   && this._pref.combined.availableDataSets.length > 0
+                   && this._pref.combined.availableDataSets[0] !== "*") {
                    this.availableDataSets = this.serviceMetadata.datasets.filter(
-                     ds => this._pref.group.availableDataSets.includes(ds.id));
+                     ds => this._pref.combined.availableDataSets.includes(ds.id));
                  } else {
                    this.availableDataSets = this.serviceMetadata.datasets;
                  }
@@ -137,7 +137,7 @@ export class MapDataService {
     log.debug("loadStats()");
     const version = environment.version + ":" + this.dataSetMetdata.version;
     const promises = {};
-    if (this._pref.group.showLoadingMessages) {
+    if (this._pref.combined.showLoadingMessages) {
       this._notify.show("Loading reference data ...", "OK", 60);
     }
     for (const regionGroup of this.dataSetMetdata.regionGroups) {
@@ -150,11 +150,11 @@ export class MapDataService {
       ));
     }
     for (const regionGroup of this.dataSetMetdata.regionGroups) {
-      if (this._pref.group.showLoadingMessages) {
+      if (this._pref.combined.showLoadingMessages) {
         this._notify.show("Loading '" + regionGroup.title + "' statistics...", "OK", 60);
       }
       this.stats[regionGroup.id] = (await promises["stats:" + regionGroup.id]) as RegionData<any, any, any>;
-      if (this._pref.group.showLoadingMessages) {
+      if (this._pref.combined.showLoadingMessages) {
         this._notify.show("Loading '" + regionGroup.title + "' geography ...", "OK", 60);
       }
       this.polygonData[regionGroup.id] = (await promises["features:" + regionGroup.id]) as geojson.GeoJsonObject;
@@ -184,7 +184,7 @@ export class MapDataService {
       return cacheValue.data;
     } else {
       log.info(`${name} not in cache.`);
-      if (loadingMessage !== null && this._pref.group.showLoadingMessages) {
+      if (loadingMessage !== null && this._pref.combined.showLoadingMessages) {
         this._notify.show(loadingMessage, "OK", 60);
       }
       const url = await Storage.get(name);
@@ -381,7 +381,7 @@ export class MapDataService {
     log.verbose("Exporting egion: " + region);
     return this._twitterData.tweets(regionGrouping, region)
                .filter(i => i.valid && !this._pref.isBlacklisted(i))
-               .map(i => i.asCSV(regionMap, this._pref.group.sanitizeForGDPR));
+               .map(i => i.asCSV(regionMap, this._pref.combined.sanitizeForGDPR));
 
   }
 

@@ -22,8 +22,11 @@ export const environment = {
   showLoadingMessages:  true,
   sanitizeForGDPR:      true,
   defaultDataSet:       "live",
-  availableDataSets:    ["live", "july-17"],
-  cacheProcessedTweets: false
+  availableDataSets:    ["*"],
+  cacheProcessedTweets: false,
+  // mapTileUrlTemplate:   "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"
+  mapTileUrlTemplate:   "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"
+
 };
 
 /*
@@ -33,4 +36,4 @@ export const environment = {
  * This import should be commented out in production mode because it will have a negative impact
  * on performance if an error is thrown.
  */
-import "zone.js/dist/zone-error";  // Included with Angular CLI.
+import "zone.js/dist/zone-error"; // Included with Angular CLI.

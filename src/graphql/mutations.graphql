@@ -11,6 +11,7 @@ mutation CreateUserPreferences(
     ignorePeople {
       nextToken
     }
+    prefs
     createdAt
     updatedAt
     owner
@@ -28,6 +29,7 @@ mutation UpdateUserPreferences(
     ignorePeople {
       nextToken
     }
+    prefs
     createdAt
     updatedAt
     owner
@@ -45,6 +47,7 @@ mutation DeleteUserPreferences(
     ignorePeople {
       nextToken
     }
+    prefs
     createdAt
     updatedAt
     owner
@@ -59,9 +62,10 @@ mutation CreateUserSession(
     fingerprint
     client
     open
+    owner
+    ttl
     createdAt
     updatedAt
-    owner
   }
 }
 mutation UpdateUserSession(
@@ -73,9 +77,10 @@ mutation UpdateUserSession(
     fingerprint
     client
     open
+    owner
+    ttl
     createdAt
     updatedAt
-    owner
   }
 }
 mutation DeleteUserSession(
@@ -87,9 +92,10 @@ mutation DeleteUserSession(
     fingerprint
     client
     open
+    owner
+    ttl
     createdAt
     updatedAt
-    owner
   }
 }
 mutation CreateGroupPreferences(
@@ -99,12 +105,7 @@ mutation CreateGroupPreferences(
   createGroupPreferences(input: $input, condition: $condition) {
     id
     group
-    locale
-    timezone
-    multipleSessions
-    sanitizeForGDPR
-    defaultDataSet
-    availableDataSets
+    prefs
     createdAt
     updatedAt
   }
@@ -116,12 +117,7 @@ mutation UpdateGroupPreferences(
   updateGroupPreferences(input: $input, condition: $condition) {
     id
     group
-    locale
-    timezone
-    multipleSessions
-    sanitizeForGDPR
-    defaultDataSet
-    availableDataSets
+    prefs
     createdAt
     updatedAt
   }
@@ -133,12 +129,7 @@ mutation DeleteGroupPreferences(
   deleteGroupPreferences(input: $input, condition: $condition) {
     id
     group
-    locale
-    timezone
-    multipleSessions
-    sanitizeForGDPR
-    defaultDataSet
-    availableDataSets
+    prefs
     createdAt
     updatedAt
   }
@@ -240,6 +231,7 @@ mutation CreateTweetIgnore(
     tweetId
     user {
       id
+      prefs
       createdAt
       updatedAt
       owner
@@ -259,6 +251,7 @@ mutation UpdateTweetIgnore(
     tweetId
     user {
       id
+      prefs
       createdAt
       updatedAt
       owner
@@ -278,6 +271,7 @@ mutation DeleteTweetIgnore(
     tweetId
     user {
       id
+      prefs
       createdAt
       updatedAt
       owner
@@ -296,6 +290,7 @@ mutation CreateTwitterUserIgnore(
     twitterScreenName
     user {
       id
+      prefs
       createdAt
       updatedAt
       owner
@@ -314,6 +309,7 @@ mutation UpdateTwitterUserIgnore(
     twitterScreenName
     user {
       id
+      prefs
       createdAt
       updatedAt
       owner
@@ -332,6 +328,7 @@ mutation DeleteTwitterUserIgnore(
     twitterScreenName
     user {
       id
+      prefs
       createdAt
       updatedAt
       owner

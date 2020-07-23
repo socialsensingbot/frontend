@@ -170,7 +170,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
     const regionData = [];
     regionData.push(
       ...this.visibleTweets.filter(i => i.valid)
-             .map(i => i.asCSV(this.selection.regionMap(), this.pref.group.sanitizeForGDPR)));
+             .map(i => i.asCSV(this.selection.regionMap(), this.pref.combined.sanitizeForGDPR)));
 
 
     this.csvExporter.generateCsv(regionData);

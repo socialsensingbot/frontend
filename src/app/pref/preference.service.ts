@@ -1,7 +1,8 @@
 import {EventEmitter, Injectable} from "@angular/core";
 import {Auth, Logger} from "aws-amplify";
 import {
-  APIService, GetGroupPreferencesQuery,
+  APIService,
+  GetGroupPreferencesQuery,
   OnCreateGroupTweetIgnoreSubscription,
   OnCreateGroupTwitterUserIgnoreSubscription,
   OnDeleteGroupTweetIgnoreSubscription,
@@ -17,10 +18,15 @@ const log = new Logger("pref-service");
               providedIn: "root"
             })
 export class PreferenceService {
-  private _ready: boolean;
 
   public get groups(): string[] {
     return this._groups;
+  }
+
+  private _ready: boolean;
+
+  constructor(private _notify: NotificationService, private _api: APIService) {
+    this.combined = {...environment};
   }
 
   private _preferences: any;
@@ -60,16 +66,31 @@ export class PreferenceService {
   public tweetUnignored = new EventEmitter<OnDeleteGroupTweetIgnoreSubscription>();
   public twitterUserUnignored = new EventEmitter<OnDeleteGroupTwitterUserIgnoreSubscription>();
 
-  public group: any;
+  public combined: any;
 
-  constructor(private _notify: NotificationService, private _api: APIService) {
-    this.group = {...environment};
+  private static combine(...prefs: any) {
+    const result = {};
+    for (const pref of prefs) {
+      for (const field in pref) {
+        if (pref.hasOwnProperty(field)
+          && !field.startsWith("__")
+          && typeof pref[field] !== "undefined"
+          && pref[field] !== null) {
+          result[field] = pref[field];
+        }
+      }
+    }
+    return result;
   }
 
   public async init(userInfo: any) {
     this._userInfo = userInfo;
     const groups = (await Auth.currentAuthenticatedUser()).signInUserSession.accessToken.payload["cognito:groups"];
-    this._email = userInfo.attributes.email;
+    if (typeof userInfo.attributes !== "undefined") {
+      this._email = userInfo.attributes.email;
+    } else {
+      log.error("No attributes in ", userInfo);
+    }
     if (!groups || groups.length === 1) {
       this._groups = groups;
     } else {
@@ -85,7 +106,7 @@ export class PreferenceService {
       log.debug("Created new preferences.");
       this._preferences = await this._api.GetUserPreferences(userInfo.username);
     } else {
-      log.debug("Existing preferences.");
+      log.debug("Existing preferences", pref);
       this._preferences = pref;
 
     }
@@ -108,8 +129,20 @@ export class PreferenceService {
         this._groupPreferences = groupPref;
 
       }
-      this.group = this.combine(this.group, this._preferences, this._groupPreferences);
-      log.info("Combined preferences are: ", this.group);
+      try {
+        log.debug("GROUP PREFS", JSON.parse(this._groupPreferences.prefs));
+        this.combined = PreferenceService.combine(this.combined,
+                                                  (typeof this._preferences.prefs !== "undefined" ?
+                                                    JSON.parse(this._preferences.prefs) : this._preferences),
+                                                  (typeof this._groupPreferences.prefs !== "undefined" ?
+                                                    JSON.parse(this._groupPreferences.prefs) : this._groupPreferences));
+      } catch (e) {
+        log.error(
+          "Defaulting to environment preferences most probably we couldn't parse the preferences, check the stack trace below.");
+        log.error(e);
+      }
+
+      log.info("Combined preferences are: ", this.combined);
       this._ready = true;
     }
     this.readBlacklist();
@@ -247,7 +280,7 @@ export class PreferenceService {
     const result = await this._api.GetGroupTwitterUserIgnore(id);
     log.debug(result);
     if (!result) {
-      const result = this._api.CreateGroupTwitterUserIgnore(
+      this._api.CreateGroupTwitterUserIgnore(
         {
           id,
           twitterScreenName: tweet.sender,
@@ -287,7 +320,7 @@ export class PreferenceService {
     const result = await this._api.GetGroupTweetIgnore(id);
     log.debug(result);
     if (!result) {
-      const result = this._api.CreateGroupTweetIgnore(
+      this._api.CreateGroupTweetIgnore(
         {
           id,
           url:         tweet.url,
@@ -363,17 +396,5 @@ export class PreferenceService {
     } else {
       this._notify.show("Not ignoring " + tweet.id);
     }
-  }
-
-  private combine(...prefs: any) {
-    const result = {};
-    for (const pref of prefs) {
-      for (const field in pref) {
-        if (!field.startsWith("__") && typeof pref[field] !== "undefined" && pref[field] !== null) {
-          result[field] = pref[field];
-        }
-      }
-    }
-    return result;
   }
 }

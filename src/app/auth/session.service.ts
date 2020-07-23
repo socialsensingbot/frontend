@@ -1,4 +1,4 @@
-import {Injectable, OnDestroy, OnInit} from '@angular/core';
+import {Injectable, OnDestroy, OnInit} from "@angular/core";
 import {API, graphqlOperation, Logger} from "aws-amplify";
 import {
   APIService,
@@ -17,7 +17,7 @@ const SESSION_TOKEN = "app-session-token";
 const SESSION_END = "app-session-end";
 
 @Injectable({
-              providedIn: 'root'
+              providedIn: "root"
             })
 export class SessionService implements OnInit, OnDestroy {
   /**
@@ -86,14 +86,15 @@ export class SessionService implements OnInit, OnDestroy {
    * @param userInfo
    */
   public async open(userInfo) {
+    await this._pref.waitUntilReady();
     if (userInfo && !this._sessionId) {
       const sessionToken = window.localStorage.getItem(SESSION_TOKEN);
       const sessionEndTime = window.localStorage.getItem(SESSION_END);
 
-      //We place a token in localStorage so that the session is only unique
-      //per browser. It also keeps the session token active during restarts.
-      //Mostly this is for auditing sessions, but also to determine which is the
-      //oldest session on DynamoDB as that is the session that will be logged out.
+      // We place a token in localStorage so that the session is only unique
+      // per browser. It also keeps the session token active during restarts.
+      // Mostly this is for auditing sessions, but also to determine which is the
+      // oldest session on DynamoDB as that is the session that will be logged out.
 
       if (sessionToken && sessionEndTime && +sessionEndTime > Date.now()) {
         this._sessionId = sessionToken;
@@ -114,6 +115,34 @@ export class SessionService implements OnInit, OnDestroy {
     }
   }
 
+  public async heartbeat() {
+    await this._pref.waitUntilReady();
+    window.localStorage.setItem(SESSION_END, "" + this.localTTL());
+    if (this._auth.loggedIn) {
+      try {
+        await this._api.UpdateUserSession({id: this._sessionId, open: true, ttl: this.serverTTL()});
+      } catch (e) {
+        log.error("Heartbeat failed", e);
+      }
+    }
+  }
+
+  /**
+   * The session has been actively terminated (likely by logout).
+   */
+  public async close() {
+    await this._pref.waitUntilReady();
+    if (this._auth.loggedIn) {
+      await this._api.UpdateUserSession({id: this._sessionId, open: false});
+      log.info("Closing user session");
+      this.removeSessionSubscription();
+      this.stopHeartbeat();
+    }
+
+    this._sessionId = null;
+    window.localStorage.removeItem(SESSION_TOKEN);
+  }
+
   /**
    * Listens for new sessions to be created in DynamoDB
    *
@@ -122,16 +151,16 @@ export class SessionService implements OnInit, OnDestroy {
    */
   private async listenForNewServerSessions(userInfo, sessionToken: string) {
 
-    //This is run when a new session is created on DynamoDB
+    // This is run when a new session is created on DynamoDB
     const onSession = (subObj: any) => {
       log.info("New session detected.");
       const sub: OnCreateUserSessionSubscription = subObj.value.data.onCreateUserSession;
       if (!sub.id) {
-        log.warn('Invalid id for sub', sub);
+        log.warn("Invalid id for sub", sub);
       }
 
       if (sub.id && sub.id !== this._sessionId) {
-        log.debug(`${sub.owner} is not ${userInfo.username}`);
+        log.debug(`${sub.id} is not ${this._sessionId}`);
         log.debug(sub);
         this.moreThanOneSession(Date.parse(this._session.createdAt) < Date.parse(sub.createdAt));
       }
@@ -150,6 +179,13 @@ export class SessionService implements OnInit, OnDestroy {
         }
       }`
         , {owner: userInfo.username})) as any).subscribe(onSession);
+  }
+
+  private createLocalSession(userInfo) {
+    log.info("New session");
+    this._sessionId = userInfo.attributes.email + ":" + Date.now() + ":" + this.calculateFingerprintHash() + ":" + Math.floor(
+      Math.random() * 1000000000000);
+    window.localStorage.setItem(SESSION_TOKEN, this._sessionId);
   }
 
   /**
@@ -180,7 +216,7 @@ export class SessionService implements OnInit, OnDestroy {
       if (fail) {
         throw e;
       } else {
-        //Potential race condition here with another window logging in so we retry (but fail next time for real)
+        // Potential race condition here with another window logging in so we retry (but fail next time for real)
         return this.getOrCreateServerSession(userInfo, true);
       }
     }
@@ -192,7 +228,7 @@ export class SessionService implements OnInit, OnDestroy {
   private async createServerSession(): Promise<CreateUserSessionMutation> {
     let client: string;
     try {
-      client = await (await fetch('https://ipapi.co/json/')).text();
+      client = await (await fetch("https://ipapi.co/json/")).text();
     } catch (e) {
       client = "Client info error: " + e;
     }
@@ -202,24 +238,9 @@ export class SessionService implements OnInit, OnDestroy {
                                          id:          this._sessionId,
                                          fingerprint: this.calculateFingerPrint(),
                                          client,
-                                         open:        true
+                                         open:        true,
+                                         ttl: this.serverTTL()
                                        });
-  }
-
-  private createLocalSession(userInfo) {
-    log.info("New session");
-    this._sessionId = userInfo.attributes.email + ":" + Date.now() + ":" + this.calculateFingerprintHash() + ":" + Math.floor(
-      Math.random() * 1000000000000);
-    window.localStorage.setItem(SESSION_TOKEN, this._sessionId);
-  }
-
-  public async heartbeat() {
-    window.localStorage.setItem(SESSION_END, "" + (Date.now() + 1000 * this.sessionDurationInSeconds));
-    try {
-      await this._api.UpdateUserSession({id: this._sessionId, open: true})
-    } catch (e) {
-      log.error("Heartbeat failed", e);
-    }
   }
 
   /**
@@ -230,7 +251,7 @@ export class SessionService implements OnInit, OnDestroy {
    * @TODO: remove oldest param
    */
   private async moreThanOneSession(oldest: boolean = true) {
-    if (this._pref.group.multipleSessions) {
+    if (this._pref.combined.multipleSessions) {
       log.info("User logged in more than once, which group preferences or the environment allow.");
     } else {
       this._notify.show("You are logged in more than once this session will now be logged out.", "OK", 30);
@@ -248,23 +269,20 @@ export class SessionService implements OnInit, OnDestroy {
     log.info("User logged into more than one window but one log in session, this message is informational only.");
   }
 
-  /**
-   * The session has been actively terminated (likely by logout).
-   */
-  public async close() {
-    log.info("Closing user session");
-    this.removeSessionSubscription();
-    this.stopHeartbeat();
-    await this._api.UpdateUserSession({id: this._sessionId, open: false})
-    this._sessionId = null;
-    window.localStorage.removeItem(SESSION_TOKEN);
+  private localTTL(): number {
+    return Date.now() + 1000 * this.sessionDurationInSeconds;
+  }
+
+
+  private serverTTL(): number {
+    return (Math.floor(Date.now() / 1000) + 24 * 60 * 60);
   }
 
   /**
    * The fingerprint hash is a string roughly unique to the browser a user is using.
    */
   private calculateFingerprintHash() {
-    log.debug("calculateFingerprintHash()")
+    log.debug("calculateFingerprintHash()");
     return this.checksum(this.calculateFingerPrint());
 
   }
@@ -273,7 +291,7 @@ export class SessionService implements OnInit, OnDestroy {
    * // http://stackoverflow.com/a/4167870/1250044
    */
   private map(arr, fn) {
-    var i = 0, len = arr.length, ret = [];
+    let i = 0, len = arr.length, ret = [];
     while (i < len) {
       ret[i] = fn(arr[i++]);
     }
@@ -282,7 +300,7 @@ export class SessionService implements OnInit, OnDestroy {
 
   // https://github.com/darkskyapp/string-hash
   private checksum(str) {
-    var hash = 5381,
+    let hash = 5381,
       i = str.length;
 
     while (i--) {
@@ -300,7 +318,7 @@ export class SessionService implements OnInit, OnDestroy {
   private calculateFingerPrint() {
     return [
       navigator.userAgent,
-      [screen.height, screen.width, screen.colorDepth].join('x'),
+      [screen.height, screen.width, screen.colorDepth].join("x"),
       new Date().getTimezoneOffset(),
       !!window.sessionStorage,
       !!window.localStorage,
@@ -309,10 +327,10 @@ export class SessionService implements OnInit, OnDestroy {
           plugin.name,
           plugin.description,
           this.map(plugin, (mime) => {
-            return [mime.type, mime.suffixes].join('~');
-          }).join(',')
+            return [mime.type, mime.suffixes].join("~");
+          }).join(",")
         ].join("::");
-      }).join(';')
-    ].join('###');
+      }).join(";")
+    ].join("###");
   }
 }

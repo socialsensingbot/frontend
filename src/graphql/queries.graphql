@@ -8,6 +8,7 @@ query GetUserPreferences($id: ID!) {
     ignorePeople {
       nextToken
     }
+    prefs
     createdAt
     updatedAt
     owner
@@ -21,6 +22,7 @@ query ListUserPreferencess(
   listUserPreferencess(filter: $filter, limit: $limit, nextToken: $nextToken) {
     items {
       id
+      prefs
       createdAt
       updatedAt
       owner
@@ -34,9 +36,10 @@ query GetUserSession($id: ID!) {
     fingerprint
     client
     open
+    owner
+    ttl
     createdAt
     updatedAt
-    owner
   }
 }
 query ListUserSessions(
@@ -50,9 +53,10 @@ query ListUserSessions(
       fingerprint
       client
       open
+      owner
+      ttl
       createdAt
       updatedAt
-      owner
     }
     nextToken
   }
@@ -61,12 +65,7 @@ query GetGroupPreferences($id: ID!) {
   getGroupPreferences(id: $id) {
     id
     group
-    locale
-    timezone
-    multipleSessions
-    sanitizeForGDPR
-    defaultDataSet
-    availableDataSets
+    prefs
     createdAt
     updatedAt
   }
@@ -80,12 +79,7 @@ query ListGroupPreferencess(
     items {
       id
       group
-      locale
-      timezone
-      multipleSessions
-      sanitizeForGDPR
-      defaultDataSet
-      availableDataSets
+      prefs
       createdAt
       updatedAt
     }
@@ -163,6 +157,7 @@ query GetTweetIgnore($id: ID!) {
     tweetId
     user {
       id
+      prefs
       createdAt
       updatedAt
       owner
@@ -195,6 +190,7 @@ query GetTwitterUserIgnore($id: ID!) {
     twitterScreenName
     user {
       id
+      prefs
       createdAt
       updatedAt
       owner

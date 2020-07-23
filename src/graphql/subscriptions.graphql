@@ -8,6 +8,7 @@ subscription OnCreateUserPreferences($owner: String!) {
     ignorePeople {
       nextToken
     }
+    prefs
     createdAt
     updatedAt
     owner
@@ -22,6 +23,7 @@ subscription OnUpdateUserPreferences($owner: String!) {
     ignorePeople {
       nextToken
     }
+    prefs
     createdAt
     updatedAt
     owner
@@ -36,6 +38,7 @@ subscription OnDeleteUserPreferences($owner: String!) {
     ignorePeople {
       nextToken
     }
+    prefs
     createdAt
     updatedAt
     owner
@@ -47,9 +50,10 @@ subscription OnCreateUserSession($owner: String!) {
     fingerprint
     client
     open
+    owner
+    ttl
     createdAt
     updatedAt
-    owner
   }
 }
 subscription OnUpdateUserSession($owner: String!) {
@@ -58,9 +62,10 @@ subscription OnUpdateUserSession($owner: String!) {
     fingerprint
     client
     open
+    owner
+    ttl
     createdAt
     updatedAt
-    owner
   }
 }
 subscription OnDeleteUserSession($owner: String!) {
@@ -69,21 +74,17 @@ subscription OnDeleteUserSession($owner: String!) {
     fingerprint
     client
     open
+    owner
+    ttl
     createdAt
     updatedAt
-    owner
   }
 }
 subscription OnCreateGroupPreferences {
   onCreateGroupPreferences {
     id
     group
-    locale
-    timezone
-    multipleSessions
-    sanitizeForGDPR
-    defaultDataSet
-    availableDataSets
+    prefs
     createdAt
     updatedAt
   }
@@ -92,12 +93,7 @@ subscription OnUpdateGroupPreferences {
   onUpdateGroupPreferences {
     id
     group
-    locale
-    timezone
-    multipleSessions
-    sanitizeForGDPR
-    defaultDataSet
-    availableDataSets
+    prefs
     createdAt
     updatedAt
   }
@@ -106,12 +102,7 @@ subscription OnDeleteGroupPreferences {
   onDeleteGroupPreferences {
     id
     group
-    locale
-    timezone
-    multipleSessions
-    sanitizeForGDPR
-    defaultDataSet
-    availableDataSets
+    prefs
     createdAt
     updatedAt
   }
@@ -192,6 +183,7 @@ subscription OnCreateTweetIgnore($owner: String!) {
     tweetId
     user {
       id
+      prefs
       createdAt
       updatedAt
       owner
@@ -208,6 +200,7 @@ subscription OnUpdateTweetIgnore($owner: String!) {
     tweetId
     user {
       id
+      prefs
       createdAt
       updatedAt
       owner
@@ -224,6 +217,7 @@ subscription OnDeleteTweetIgnore($owner: String!) {
     tweetId
     user {
       id
+      prefs
       createdAt
       updatedAt
       owner
@@ -239,6 +233,7 @@ subscription OnCreateTwitterUserIgnore($owner: String!) {
     twitterScreenName
     user {
       id
+      prefs
       createdAt
       updatedAt
       owner
@@ -254,6 +249,7 @@ subscription OnUpdateTwitterUserIgnore($owner: String!) {
     twitterScreenName
     user {
       id
+      prefs
       createdAt
       updatedAt
       owner
@@ -269,6 +265,7 @@ subscription OnDeleteTwitterUserIgnore($owner: String!) {
     twitterScreenName
     user {
       id
+      prefs
       createdAt
       updatedAt
       owner
