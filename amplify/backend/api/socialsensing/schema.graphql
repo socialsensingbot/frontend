@@ -17,14 +17,15 @@ type UserPreferences @model @auth(
 }
 
 type UserSession @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" }) @auth(
-  rules: [{
-    allow: private, operations:[create, read]},
+  rules: [
     {allow: owner, operations:[create, update, delete, read]},
   ]){
   id: ID!
   fingerprint: String
   client: AWSJSON
   open: Boolean!
+  owner: String
+  ttl: AWSTimestamp
 }
 
 

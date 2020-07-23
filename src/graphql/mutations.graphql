@@ -62,9 +62,10 @@ mutation CreateUserSession(
     fingerprint
     client
     open
+    owner
+    ttl
     createdAt
     updatedAt
-    owner
   }
 }
 mutation UpdateUserSession(
@@ -76,9 +77,10 @@ mutation UpdateUserSession(
     fingerprint
     client
     open
+    owner
+    ttl
     createdAt
     updatedAt
-    owner
   }
 }
 mutation DeleteUserSession(
@@ -90,9 +92,10 @@ mutation DeleteUserSession(
     fingerprint
     client
     open
+    owner
+    ttl
     createdAt
     updatedAt
-    owner
   }
 }
 mutation CreateGroupPreferences(

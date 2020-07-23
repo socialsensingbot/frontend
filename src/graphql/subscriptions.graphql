@@ -50,9 +50,10 @@ subscription OnCreateUserSession($owner: String!) {
     fingerprint
     client
     open
+    owner
+    ttl
     createdAt
     updatedAt
-    owner
   }
 }
 subscription OnUpdateUserSession($owner: String!) {
@@ -61,9 +62,10 @@ subscription OnUpdateUserSession($owner: String!) {
     fingerprint
     client
     open
+    owner
+    ttl
     createdAt
     updatedAt
-    owner
   }
 }
 subscription OnDeleteUserSession($owner: String!) {
@@ -72,9 +74,10 @@ subscription OnDeleteUserSession($owner: String!) {
     fingerprint
     client
     open
+    owner
+    ttl
     createdAt
     updatedAt
-    owner
   }
 }
 subscription OnCreateGroupPreferences {
