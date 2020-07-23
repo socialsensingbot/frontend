@@ -86,7 +86,11 @@ export class PreferenceService {
   public async init(userInfo: any) {
     this._userInfo = userInfo;
     const groups = (await Auth.currentAuthenticatedUser()).signInUserSession.accessToken.payload["cognito:groups"];
-    this._email = userInfo.attributes.email;
+    if (typeof userInfo.attributes !== "undefined") {
+      this._email = userInfo.attributes.email;
+    } else {
+      log.error("No attributes in ", userInfo);
+    }
     if (!groups || groups.length === 1) {
       this._groups = groups;
     } else {

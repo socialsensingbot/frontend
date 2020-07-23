@@ -1,4 +1,4 @@
-import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
+import {Component, Inject} from "@angular/core";
 import {AmplifyService} from "aws-amplify-angular";
 import {AuthService} from "./auth/auth.service";
 import {Auth, Logger} from "aws-amplify";
@@ -6,7 +6,7 @@ import {Router} from "@angular/router";
 import {environment} from "../environments/environment";
 import {PreferenceService} from "./pref/preference.service";
 import {NotificationService} from "./services/notification.service";
-import {APIService, OnCreateUserSessionSubscription} from "./API.service";
+import {APIService} from "./API.service";
 import {SessionService} from "./auth/session.service";
 import * as Rollbar from "rollbar";
 import {RollbarService} from "./error";
@@ -57,7 +57,6 @@ export class AppComponent {
         this.user = undefined;
         this.isAuthenticated = false;
         this.isSignup = !environment.production;
-        this._session.close();
         this._pref.clear();
       }
     });
@@ -74,6 +73,7 @@ export class AppComponent {
     }
     log.debug("Authenticated");
 
+    const user = await Auth.currentAuthenticatedUser();
     const userInfo = await Auth.currentUserInfo();
     if (userInfo) {
       try {
@@ -86,17 +86,16 @@ export class AppComponent {
           "There was a problem with your application preferences, please ask an administrator to fix this. The application may not work correctly until you do.",
           "I Will",
           30);
+        return;
       }
       try {
-      await this._session.open(userInfo);
+        await this._session.open(userInfo);
       } catch (e) {
-        this._rollbar.error(e);
-        log.error(e);
-        this._notify.show(
-          // tslint:disable-next-line:max-line-length
-          "There was a problem with creating your session, please ask an administrator to look into this.",
-          "Sure",
-          30);
+        console.error("There was a problem with creating your session, please ask an administrator to look into this.",
+                      e);
+        console.error(user);
+        this._rollbar.error(
+          "There was a problem with creating your session, please ask an administrator to look into this.", e);
       }
       log.info("Locale detected: " + getLang());
       log.info("Locale in use: " + this._pref.combined.locale);
@@ -117,12 +116,12 @@ export class AppComponent {
             // environment: environment.name,
             environment_info: environment,
             prefs:            {
-                group: this._pref.combined
-              }
+              group: this._pref.combined
             }
           }
-        );
-      }
+        }
+      );
+    }
 
     if (userInfo && userInfo.attributes.profile) {
 

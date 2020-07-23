@@ -118,10 +118,12 @@ export class SessionService implements OnInit, OnDestroy {
   public async heartbeat() {
     await this._pref.waitUntilReady();
     window.localStorage.setItem(SESSION_END, "" + this.ttl());
-    try {
-      await this._api.UpdateUserSession({id: this._sessionId, open: true});
-    } catch (e) {
-      log.error("Heartbeat failed", e);
+    if (this._auth.loggedIn) {
+      try {
+        await this._api.UpdateUserSession({id: this._sessionId, open: true});
+      } catch (e) {
+        log.error("Heartbeat failed", e);
+      }
     }
   }
 
@@ -130,11 +132,13 @@ export class SessionService implements OnInit, OnDestroy {
    */
   public async close() {
     await this._pref.waitUntilReady();
+    if (this._auth.loggedIn) {
+      await this._api.UpdateUserSession({id: this._sessionId, open: false});
+      log.info("Closing user session");
+      this.removeSessionSubscription();
+      this.stopHeartbeat();
+    }
 
-    log.info("Closing user session");
-    this.removeSessionSubscription();
-    this.stopHeartbeat();
-    await this._api.UpdateUserSession({id: this._sessionId, open: false});
     this._sessionId = null;
     window.localStorage.removeItem(SESSION_TOKEN);
   }
