@@ -44,40 +44,40 @@ subscription OnDeleteUserPreferences($owner: String!) {
     owner
   }
 }
-subscription OnCreateUserSession {
-  onCreateUserSession {
+subscription OnCreateUserSession($owner: String!) {
+  onCreateUserSession(owner: $owner) {
     id
     fingerprint
     client
     open
-    owner
     ttl
     createdAt
     updatedAt
+    owner
   }
 }
-subscription OnUpdateUserSession {
-  onUpdateUserSession {
+subscription OnUpdateUserSession($owner: String!) {
+  onUpdateUserSession(owner: $owner) {
     id
     fingerprint
     client
     open
-    owner
     ttl
     createdAt
     updatedAt
+    owner
   }
 }
-subscription OnDeleteUserSession {
-  onDeleteUserSession {
+subscription OnDeleteUserSession($owner: String!) {
+  onDeleteUserSession(owner: $owner) {
     id
     fingerprint
     client
     open
-    owner
     ttl
     createdAt
     updatedAt
+    owner
   }
 }
 subscription OnCreateGroupPreferences {

@@ -175,6 +175,11 @@ export class SessionService implements OnInit, OnDestroy {
           __typename
           id
           fingerprint
+          client
+          open
+          ttl
+          createdAt
+          updatedAt
           owner
         }
       }`

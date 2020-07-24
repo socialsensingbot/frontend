@@ -71,7 +71,6 @@ export type CreateUserSessionInput = {
   fingerprint?: string | null;
   client?: string | null;
   open: boolean;
-  owner?: string | null;
   ttl?: number | null;
 };
 
@@ -109,7 +108,6 @@ export type UpdateUserSessionInput = {
   fingerprint?: string | null;
   client?: string | null;
   open?: boolean | null;
-  owner?: string | null;
   ttl?: number | null;
 };
 
@@ -279,7 +277,6 @@ export type ModelUserSessionFilterInput = {
   fingerprint?: ModelStringInput | null;
   client?: ModelStringInput | null;
   open?: ModelBooleanInput | null;
-  owner?: ModelStringInput | null;
   ttl?: ModelIntInput | null;
   and?: Array<ModelUserSessionFilterInput | null> | null;
   or?: Array<ModelUserSessionFilterInput | null> | null;
@@ -392,10 +389,10 @@ export type CreateUserSessionMutation = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  owner: string | null;
   ttl: number | null;
   createdAt: string;
   updatedAt: string;
+  owner: string | null;
 };
 
 export type UpdateUserSessionMutation = {
@@ -404,10 +401,10 @@ export type UpdateUserSessionMutation = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  owner: string | null;
   ttl: number | null;
   createdAt: string;
   updatedAt: string;
+  owner: string | null;
 };
 
 export type DeleteUserSessionMutation = {
@@ -416,10 +413,10 @@ export type DeleteUserSessionMutation = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  owner: string | null;
   ttl: number | null;
   createdAt: string;
   updatedAt: string;
+  owner: string | null;
 };
 
 export type CreateGroupPreferencesMutation = {
@@ -659,10 +656,10 @@ export type GetUserSessionQuery = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  owner: string | null;
   ttl: number | null;
   createdAt: string;
   updatedAt: string;
+  owner: string | null;
 };
 
 export type ListUserSessionsQuery = {
@@ -673,10 +670,10 @@ export type ListUserSessionsQuery = {
     fingerprint: string | null;
     client: string | null;
     open: boolean;
-    owner: string | null;
     ttl: number | null;
     createdAt: string;
     updatedAt: string;
+    owner: string | null;
   } | null> | null;
   nextToken: string | null;
 };
@@ -876,10 +873,10 @@ export type OnCreateUserSessionSubscription = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  owner: string | null;
   ttl: number | null;
   createdAt: string;
   updatedAt: string;
+  owner: string | null;
 };
 
 export type OnUpdateUserSessionSubscription = {
@@ -888,10 +885,10 @@ export type OnUpdateUserSessionSubscription = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  owner: string | null;
   ttl: number | null;
   createdAt: string;
   updatedAt: string;
+  owner: string | null;
 };
 
 export type OnDeleteUserSessionSubscription = {
@@ -900,10 +897,10 @@ export type OnDeleteUserSessionSubscription = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  owner: string | null;
   ttl: number | null;
   createdAt: string;
   updatedAt: string;
+  owner: string | null;
 };
 
 export type OnCreateGroupPreferencesSubscription = {
@@ -1221,10 +1218,10 @@ export class APIService {
           fingerprint
           client
           open
-          owner
           ttl
           createdAt
           updatedAt
+          owner
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1249,10 +1246,10 @@ export class APIService {
           fingerprint
           client
           open
-          owner
           ttl
           createdAt
           updatedAt
+          owner
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1277,10 +1274,10 @@ export class APIService {
           fingerprint
           client
           open
-          owner
           ttl
           createdAt
           updatedAt
+          owner
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1816,10 +1813,10 @@ export class APIService {
           fingerprint
           client
           open
-          owner
           ttl
           createdAt
           updatedAt
+          owner
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1844,10 +1841,10 @@ export class APIService {
             fingerprint
             client
             open
-            owner
             ttl
             createdAt
             updatedAt
+            owner
           }
           nextToken
         }
@@ -2245,17 +2242,17 @@ export class APIService {
     OnCreateUserSessionSubscription
   > = API.graphql(
     graphqlOperation(
-      `subscription OnCreateUserSession {
-        onCreateUserSession {
+      `subscription OnCreateUserSession($owner: String!) {
+        onCreateUserSession(owner: $owner) {
           __typename
           id
           fingerprint
           client
           open
-          owner
           ttl
           createdAt
           updatedAt
+          owner
         }
       }`
     )
@@ -2265,17 +2262,17 @@ export class APIService {
     OnUpdateUserSessionSubscription
   > = API.graphql(
     graphqlOperation(
-      `subscription OnUpdateUserSession {
-        onUpdateUserSession {
+      `subscription OnUpdateUserSession($owner: String!) {
+        onUpdateUserSession(owner: $owner) {
           __typename
           id
           fingerprint
           client
           open
-          owner
           ttl
           createdAt
           updatedAt
+          owner
         }
       }`
     )
@@ -2285,17 +2282,17 @@ export class APIService {
     OnDeleteUserSessionSubscription
   > = API.graphql(
     graphqlOperation(
-      `subscription OnDeleteUserSession {
-        onDeleteUserSession {
+      `subscription OnDeleteUserSession($owner: String!) {
+        onDeleteUserSession(owner: $owner) {
           __typename
           id
           fingerprint
           client
           open
-          owner
           ttl
           createdAt
           updatedAt
+          owner
         }
       }`
     )

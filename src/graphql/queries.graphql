@@ -36,10 +36,10 @@ query GetUserSession($id: ID!) {
     fingerprint
     client
     open
-    owner
     ttl
     createdAt
     updatedAt
+    owner
   }
 }
 query ListUserSessions(
@@ -53,10 +53,10 @@ query ListUserSessions(
       fingerprint
       client
       open
-      owner
       ttl
       createdAt
       updatedAt
+      owner
     }
     nextToken
   }
