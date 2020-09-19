@@ -246,14 +246,20 @@ export class MapComponent implements OnInit, OnDestroy {
   public options: any = {
     layers: [
       tileLayer(
-        // tslint:disable-next-line:max-line-length
-        "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
+         // tslint:disable-next-line:max-line-length
+        //old
+        //"https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
+        //new
+        "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
         {
           maxZoom:     18,
           attribution: "Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, " +
                          "<a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, " +
                          "Imagery © <a href=\"http://mapbox.com\">Mapbox</a>",
-          id:          "mapbox.streets"
+          //id:          "mapbox.streets"
+          id: "mapbox/streets-v11",
+          tileSize: 512,
+          zoomOffset: -1
         }),
       this._statsLayer,
       this._countyLayer
@@ -522,7 +528,7 @@ export class MapComponent implements OnInit, OnDestroy {
                       color:       "#B1205F",
                       opacity:     1,
                       dashArray:   "",
-                      fillOpacity: count > 0 ? 1.0 : 0.1,
+                      fillOpacity: count > 0 ? 0.7 : 0.1,
                     });
 
     if (!Browser.ie && !Browser.opera && !Browser.edge) {
@@ -540,7 +546,7 @@ export class MapComponent implements OnInit, OnDestroy {
                       opacity:     0.5,
                       color:       "white",
                       dashArray:   "",
-                      fillOpacity: count > 0 ? 1.0 : 0.1,
+                      fillOpacity: count > 0 ? 0.7 : 0.1,
                     });
 
     if (!Browser.ie && !Browser.opera && !Browser.edge) {
