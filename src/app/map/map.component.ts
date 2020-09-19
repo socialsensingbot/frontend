@@ -548,7 +548,7 @@ export class MapComponent implements OnInit, OnDestroy {
                       dashArray:   "",
                       fillOpacity: count > 0 ? 0.7 : 0.1,
                     });
-    console.log("testing")
+
     if (!Browser.ie && !Browser.opera && !Browser.edge) {
       target.bringToFront();
     }
