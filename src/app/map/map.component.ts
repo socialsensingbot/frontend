@@ -526,7 +526,7 @@ export class MapComponent implements OnInit, OnDestroy {
                       stroke:      true,
                       weight,
                       color:       "#B1205F",
-                      opacity:     1,
+                      opacity:     0.5,
                       dashArray:   "",
                       fillOpacity: count > 0 ? 1.0 : 0.1,
                     });
