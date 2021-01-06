@@ -247,13 +247,20 @@ export class MapComponent implements OnInit, OnDestroy {
   public options: any = {
     layers: [
       tileLayer(
-        environment.mapTileUrlTemplate,
-        {
+         // tslint:disable-next-line:max-line-length
+        //old
+        //"https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
+        //new
+         environment.mapTileUrlTemplate,
+                {
           maxZoom:     18,
           attribution: "Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, " +
                          "<a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, " +
                          "Imagery © <a href=\"http://mapbox.com\">Mapbox</a>",
-          id:          "mapbox.streets"
+          //id:          "mapbox.streets"
+          id: "mapbox/streets-v11",
+          tileSize: 512,
+          zoomOffset: -1
         }),
       this._statsLayer,
       this._countyLayer
@@ -406,7 +413,7 @@ export class MapComponent implements OnInit, OnDestroy {
     if (this.route.snapshot.paramMap.has("dataset")) {
       this._dataset = this.route.snapshot.paramMap.get("dataset");
     } else {
-      this._dataset = this.pref.combined.defaultDataSet;
+      this._dataset = this.pref.group.defaultDataSet;
     }
     await this.data.init();
     await this.data.switchDataSet(this.dataset);
@@ -433,7 +440,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this._exec.changeState("map-init");
     await this.load(true);
-    if (this.pref.combined.showLoadingMessages) {
+    if (this.pref.group.showLoadingMessages) {
       this._notify.show("Loading application ...", "OK", 60);
     }
     this._searchParams.subscribe(async params => {
@@ -466,7 +473,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
                              });
                            this._notify.dismiss();
-                           this._map.invalidateSize();
                            $("#loading-div").css("opacity", 0.0);
                            setTimeout(() => $("#loading-div").remove(), 1000);
                            this.activity = false;
