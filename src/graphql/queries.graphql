@@ -1,19 +1,4 @@
 # this is an auto generated file. This will be overwritten
-query GetUserPreferences($id: ID!) {
-  getUserPreferences(id: $id) {
-    id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
-    prefs
-    createdAt
-    updatedAt
-    owner
-  }
-}
 query ListUserPreferencess(
   $filter: ModelUserPreferencesFilterInput
   $limit: Int
@@ -23,11 +8,61 @@ query ListUserPreferencess(
     items {
       id
       prefs
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
       owner
     }
     nextToken
+    startedAt
+  }
+}
+query GetUserPreferences($id: ID!) {
+  getUserPreferences(id: $id) {
+    id
+    prefs
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+    owner
+    ignoreTweets {
+      nextToken
+      startedAt
+    }
+    ignorePeople {
+      nextToken
+      startedAt
+    }
+  }
+}
+query SyncUserPreferences(
+  $filter: ModelUserPreferencesFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncUserPreferences(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      prefs
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+      owner
+    }
+    nextToken
+    startedAt
   }
 }
 query GetUserSession($id: ID!) {
@@ -37,9 +72,11 @@ query GetUserSession($id: ID!) {
     client
     open
     ttl
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
-    owner
   }
 }
 query ListUserSessions(
@@ -54,11 +91,42 @@ query ListUserSessions(
       client
       open
       ttl
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
-      owner
     }
     nextToken
+    startedAt
+  }
+}
+query SyncUserSessions(
+  $filter: ModelUserSessionFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncUserSessions(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      fingerprint
+      client
+      open
+      ttl
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
   }
 }
 query GetGroupPreferences($id: ID!) {
@@ -66,6 +134,9 @@ query GetGroupPreferences($id: ID!) {
     id
     group
     prefs
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -80,10 +151,40 @@ query ListGroupPreferencess(
       id
       group
       prefs
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }
     nextToken
+    startedAt
+  }
+}
+query SyncGroupPreferences(
+  $filter: ModelGroupPreferencesFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncGroupPreferences(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      group
+      prefs
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
   }
 }
 query GetGroupTweetIgnore($id: ID!) {
@@ -94,6 +195,9 @@ query GetGroupTweetIgnore($id: ID!) {
     tweetId
     ownerGroups
     scope
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -111,10 +215,43 @@ query ListGroupTweetIgnores(
       tweetId
       ownerGroups
       scope
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }
     nextToken
+    startedAt
+  }
+}
+query SyncGroupTweetIgnores(
+  $filter: ModelGroupTweetIgnoreFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncGroupTweetIgnores(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      url
+      ignoredBy
+      tweetId
+      ownerGroups
+      scope
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
   }
 }
 query GetGroupTwitterUserIgnore($id: ID!) {
@@ -124,6 +261,9 @@ query GetGroupTwitterUserIgnore($id: ID!) {
     ignoredBy
     ownerGroups
     scope
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -144,10 +284,42 @@ query ListGroupTwitterUserIgnores(
       ignoredBy
       ownerGroups
       scope
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }
     nextToken
+    startedAt
+  }
+}
+query SyncGroupTwitterUserIgnores(
+  $filter: ModelGroupTwitterUserIgnoreFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncGroupTwitterUserIgnores(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      twitterScreenName
+      ignoredBy
+      ownerGroups
+      scope
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
   }
 }
 query GetTweetIgnore($id: ID!) {
@@ -155,16 +327,21 @@ query GetTweetIgnore($id: ID!) {
     id
     url
     tweetId
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
     user {
       id
       prefs
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
       owner
     }
-    createdAt
-    updatedAt
-    owner
   }
 }
 query ListTweetIgnores(
@@ -177,27 +354,61 @@ query ListTweetIgnores(
       id
       url
       tweetId
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
-      owner
     }
     nextToken
+    startedAt
+  }
+}
+query SyncTweetIgnores(
+  $filter: ModelTweetIgnoreFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncTweetIgnores(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      url
+      tweetId
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
   }
 }
 query GetTwitterUserIgnore($id: ID!) {
   getTwitterUserIgnore(id: $id) {
     id
     twitterScreenName
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
     user {
       id
       prefs
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
       owner
     }
-    createdAt
-    updatedAt
-    owner
   }
 }
 query ListTwitterUserIgnores(
@@ -213,10 +424,38 @@ query ListTwitterUserIgnores(
     items {
       id
       twitterScreenName
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
-      owner
     }
     nextToken
+    startedAt
+  }
+}
+query SyncTwitterUserIgnores(
+  $filter: ModelTwitterUserIgnoreFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncTwitterUserIgnores(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      twitterScreenName
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
   }
 }

@@ -1,23 +1,11 @@
-type UserPreferences @model @auth(
-  rules: [
-    {allow:private, operations:[create]},
-    {allow: owner, operations: [create, update, delete, read]},
-  ]){
+type UserPreferences @model @auth(rules: [{allow: private, operations: [create]}, {allow: owner, operations: [create, update, delete, read]}]) {
   id: ID!
   ignoreTweets: [TweetIgnore] @connection(name: "UserTweetIgnores")
   ignorePeople: [TwitterUserIgnore] @connection(name: "UserTwitterUserIgnores")
   prefs: AWSJSON
-  #  locale: String
-  #  timezone: String
-  #  multipleSessions: Boolean
-  #  sanitizeForGDPR: Boolean
-  #  defaultDataSet: String
-  #  availableDataSets:[String]
-  #  showLoadingMessages: Boolean
 }
 
-type UserSession @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" })
-@auth( rules: [ {allow: owner}]){
+type UserSession @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}) @auth(rules: [{allow: private}]) {
   id: ID!
   fingerprint: String
   client: AWSJSON
@@ -25,24 +13,13 @@ type UserSession @model(timestamps: {createdAt: "createdAt", updatedAt: "updated
   ttl: AWSTimestamp
 }
 
-
-type GroupPreferences @model
-@auth(rules: [{allow:private, operations:[read]}, {allow: groups, groupsField: "group"}]){
+type GroupPreferences @model @auth(rules: [{allow: private, operations: [read]}, {allow: groups, groupsField: "group"}]) {
   id: ID!
   group: String!
-  #  locale: String
-  #  timezone: String
-  #  multipleSessions: Boolean
-  #  sanitizeForGDPR: Boolean
-  #  defaultDataSet: String
-  #  availableDataSets:[String]
-  #  showLoadingMessages: Boolean
   prefs: AWSJSON
 }
 
-
-type GroupTweetIgnore @model( timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" })
-@auth( rules: [ { allow: groups, groupsField: "ownerGroups"},{allow:private, operations:[read] } ]){
+type GroupTweetIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}) @auth(rules: [{allow: groups, groupsField: "ownerGroups"}, {allow: private, operations: [read]}]) {
   id: ID!
   url: String!
   ignoredBy: String!
@@ -51,8 +28,7 @@ type GroupTweetIgnore @model( timestamps: {createdAt: "createdAt", updatedAt: "u
   scope: String!
 }
 
-type GroupTwitterUserIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" })
-@auth( rules: [ { allow: groups, groupsField: "ownerGroups"},{allow:private, operations:[read] } ]){
+type GroupTwitterUserIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}) @auth(rules: [{allow: groups, groupsField: "ownerGroups"}, {allow: private, operations: [read]}]) {
   id: ID!
   twitterScreenName: String!
   ignoredBy: String!
@@ -60,18 +36,16 @@ type GroupTwitterUserIgnore @model(timestamps: {createdAt: "createdAt", updatedA
   scope: String!
 }
 
-
-
-type TweetIgnore @model @auth(rules: [ {allow: owner}]) {
+type TweetIgnore @model @auth(rules: [{allow: private}]) {
   id: ID!
   url: String!
   tweetId: String
   user: UserPreferences @connection(name: "UserTweetIgnores")
 }
 
-
-type TwitterUserIgnore @model  @auth(rules: [ {allow: owner}]) {
+type TwitterUserIgnore @model @auth(rules: [{allow: private}]) {
   id: ID!
   twitterScreenName: String!
   user: UserPreferences @connection(name: "UserTwitterUserIgnores")
 }
+ 

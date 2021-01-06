@@ -26,6 +26,7 @@
     "@angular/router": "~9.1.11",
     "@asymmetrik/ngx-leaflet": "^5.0.2",
     "@aws-amplify/api": "^3.1.17",
+    "@aws-amplify/datastore": "^2.9.2",
     "@aws-amplify/pubsub": "^3.0.18",
     "@types/graphql": "^14.5.0",
     "@types/leaflet": "^1.5.12",

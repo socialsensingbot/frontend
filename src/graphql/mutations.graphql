@@ -5,16 +5,21 @@ mutation CreateUserPreferences(
 ) {
   createUserPreferences(input: $input, condition: $condition) {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
     prefs
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
     owner
+    ignoreTweets {
+      nextToken
+      startedAt
+    }
+    ignorePeople {
+      nextToken
+      startedAt
+    }
   }
 }
 mutation UpdateUserPreferences(
@@ -23,16 +28,21 @@ mutation UpdateUserPreferences(
 ) {
   updateUserPreferences(input: $input, condition: $condition) {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
     prefs
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
     owner
+    ignoreTweets {
+      nextToken
+      startedAt
+    }
+    ignorePeople {
+      nextToken
+      startedAt
+    }
   }
 }
 mutation DeleteUserPreferences(
@@ -41,16 +51,21 @@ mutation DeleteUserPreferences(
 ) {
   deleteUserPreferences(input: $input, condition: $condition) {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
     prefs
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
     owner
+    ignoreTweets {
+      nextToken
+      startedAt
+    }
+    ignorePeople {
+      nextToken
+      startedAt
+    }
   }
 }
 mutation CreateUserSession(
@@ -63,9 +78,11 @@ mutation CreateUserSession(
     client
     open
     ttl
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
-    owner
   }
 }
 mutation UpdateUserSession(
@@ -78,9 +95,11 @@ mutation UpdateUserSession(
     client
     open
     ttl
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
-    owner
   }
 }
 mutation DeleteUserSession(
@@ -93,9 +112,11 @@ mutation DeleteUserSession(
     client
     open
     ttl
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
-    owner
   }
 }
 mutation CreateGroupPreferences(
@@ -106,6 +127,9 @@ mutation CreateGroupPreferences(
     id
     group
     prefs
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -118,6 +142,9 @@ mutation UpdateGroupPreferences(
     id
     group
     prefs
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -130,6 +157,9 @@ mutation DeleteGroupPreferences(
     id
     group
     prefs
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -145,6 +175,9 @@ mutation CreateGroupTweetIgnore(
     tweetId
     ownerGroups
     scope
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -160,6 +193,9 @@ mutation UpdateGroupTweetIgnore(
     tweetId
     ownerGroups
     scope
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -175,6 +211,9 @@ mutation DeleteGroupTweetIgnore(
     tweetId
     ownerGroups
     scope
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -189,6 +228,9 @@ mutation CreateGroupTwitterUserIgnore(
     ignoredBy
     ownerGroups
     scope
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -203,6 +245,9 @@ mutation UpdateGroupTwitterUserIgnore(
     ignoredBy
     ownerGroups
     scope
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -217,6 +262,9 @@ mutation DeleteGroupTwitterUserIgnore(
     ignoredBy
     ownerGroups
     scope
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -229,16 +277,21 @@ mutation CreateTweetIgnore(
     id
     url
     tweetId
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
     user {
       id
       prefs
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
       owner
     }
-    createdAt
-    updatedAt
-    owner
   }
 }
 mutation UpdateTweetIgnore(
@@ -249,16 +302,21 @@ mutation UpdateTweetIgnore(
     id
     url
     tweetId
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
     user {
       id
       prefs
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
       owner
     }
-    createdAt
-    updatedAt
-    owner
   }
 }
 mutation DeleteTweetIgnore(
@@ -269,16 +327,21 @@ mutation DeleteTweetIgnore(
     id
     url
     tweetId
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
     user {
       id
       prefs
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
       owner
     }
-    createdAt
-    updatedAt
-    owner
   }
 }
 mutation CreateTwitterUserIgnore(
@@ -288,16 +351,21 @@ mutation CreateTwitterUserIgnore(
   createTwitterUserIgnore(input: $input, condition: $condition) {
     id
     twitterScreenName
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
     user {
       id
       prefs
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
       owner
     }
-    createdAt
-    updatedAt
-    owner
   }
 }
 mutation UpdateTwitterUserIgnore(
@@ -307,16 +375,21 @@ mutation UpdateTwitterUserIgnore(
   updateTwitterUserIgnore(input: $input, condition: $condition) {
     id
     twitterScreenName
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
     user {
       id
       prefs
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
       owner
     }
-    createdAt
-    updatedAt
-    owner
   }
 }
 mutation DeleteTwitterUserIgnore(
@@ -326,15 +399,20 @@ mutation DeleteTwitterUserIgnore(
   deleteTwitterUserIgnore(input: $input, condition: $condition) {
     id
     twitterScreenName
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
     user {
       id
       prefs
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
       owner
     }
-    createdAt
-    updatedAt
-    owner
   }
 }

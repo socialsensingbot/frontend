@@ -1,11 +1,11 @@
 {
-    "AppSyncApiName": "socialsensing",
-    "DynamoDBBillingMode": "PAY_PER_REQUEST",
-    "DynamoDBEnableServerSideEncryption": "false",
-    "AuthCognitoUserPoolId": {
-        "Fn::GetAtt": [
-            "authsocialsensingf07a871c",
-            "Outputs.UserPoolId"
-        ]
-    }
+  "AppSyncApiName": "socialsensing",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": "false",
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authsocialsensingf07a871c",
+      "Outputs.UserPoolId"
+    ]
+  }
 }
