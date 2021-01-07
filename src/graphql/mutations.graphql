@@ -50,6 +50,8 @@ mutation CreateUserSession(
     fingerprint
     client
     open
+    group
+    owner
     ttl
     _version
     _deleted
@@ -67,6 +69,8 @@ mutation UpdateUserSession(
     fingerprint
     client
     open
+    group
+    owner
     ttl
     _version
     _deleted
@@ -84,6 +88,8 @@ mutation DeleteUserSession(
     fingerprint
     client
     open
+    group
+    owner
     ttl
     _version
     _deleted

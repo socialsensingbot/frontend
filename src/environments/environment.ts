@@ -12,7 +12,8 @@ export const environment = {
   toolbarColor:         "primary",
   // timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   timezone:             "UTC",
-  multipleSessions:     false,
+  multipleSessions:     true,
+  maxUsers:          1,
   locale:               "en-GB",
   confirm:              {
     email:    "",

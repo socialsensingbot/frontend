@@ -38,6 +38,8 @@ subscription OnCreateUserSession {
     fingerprint
     client
     open
+    group
+    owner
     ttl
     _version
     _deleted
@@ -52,6 +54,8 @@ subscription OnUpdateUserSession {
     fingerprint
     client
     open
+    group
+    owner
     ttl
     _version
     _deleted
@@ -66,6 +70,8 @@ subscription OnDeleteUserSession {
     fingerprint
     client
     open
+    group
+    owner
     ttl
     _version
     _deleted

@@ -77,6 +77,8 @@ export type CreateUserSessionInput = {
   fingerprint?: string | null;
   client?: string | null;
   open: boolean;
+  group?: string | null;
+  owner?: string | null;
   ttl?: number | null;
   _version?: number | null;
 };
@@ -85,6 +87,7 @@ export type ModelUserSessionConditionInput = {
   fingerprint?: ModelStringInput | null;
   client?: ModelStringInput | null;
   open?: ModelBooleanInput | null;
+  group?: ModelStringInput | null;
   ttl?: ModelIntInput | null;
   and?: Array<ModelUserSessionConditionInput | null> | null;
   or?: Array<ModelUserSessionConditionInput | null> | null;
@@ -115,6 +118,8 @@ export type UpdateUserSessionInput = {
   fingerprint?: string | null;
   client?: string | null;
   open?: boolean | null;
+  group?: string | null;
+  owner?: string | null;
   ttl?: number | null;
   _version?: number | null;
 };
@@ -246,6 +251,8 @@ export type ModelUserSessionFilterInput = {
   fingerprint?: ModelStringInput | null;
   client?: ModelStringInput | null;
   open?: ModelBooleanInput | null;
+  group?: ModelStringInput | null;
+  owner?: ModelStringInput | null;
   ttl?: ModelIntInput | null;
   and?: Array<ModelUserSessionFilterInput | null> | null;
   or?: Array<ModelUserSessionFilterInput | null> | null;
@@ -323,6 +330,8 @@ export type CreateUserSessionMutation = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
+  group: string | null;
+  owner: string | null;
   ttl: number | null;
   _version: number;
   _deleted: boolean | null;
@@ -337,6 +346,8 @@ export type UpdateUserSessionMutation = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
+  group: string | null;
+  owner: string | null;
   ttl: number | null;
   _version: number;
   _deleted: boolean | null;
@@ -351,6 +362,8 @@ export type DeleteUserSessionMutation = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
+  group: string | null;
+  owner: string | null;
   ttl: number | null;
   _version: number;
   _deleted: boolean | null;
@@ -531,6 +544,8 @@ export type GetUserSessionQuery = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
+  group: string | null;
+  owner: string | null;
   ttl: number | null;
   _version: number;
   _deleted: boolean | null;
@@ -547,6 +562,8 @@ export type ListUserSessionsQuery = {
     fingerprint: string | null;
     client: string | null;
     open: boolean;
+    group: string | null;
+    owner: string | null;
     ttl: number | null;
     _version: number;
     _deleted: boolean | null;
@@ -566,6 +583,8 @@ export type SyncUserSessionsQuery = {
     fingerprint: string | null;
     client: string | null;
     open: boolean;
+    group: string | null;
+    owner: string | null;
     ttl: number | null;
     _version: number;
     _deleted: boolean | null;
@@ -769,6 +788,8 @@ export type OnCreateUserSessionSubscription = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
+  group: string | null;
+  owner: string | null;
   ttl: number | null;
   _version: number;
   _deleted: boolean | null;
@@ -783,6 +804,8 @@ export type OnUpdateUserSessionSubscription = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
+  group: string | null;
+  owner: string | null;
   ttl: number | null;
   _version: number;
   _deleted: boolean | null;
@@ -797,6 +820,8 @@ export type OnDeleteUserSessionSubscription = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
+  group: string | null;
+  owner: string | null;
   ttl: number | null;
   _version: number;
   _deleted: boolean | null;
@@ -1024,6 +1049,8 @@ export class APIService {
           fingerprint
           client
           open
+          group
+          owner
           ttl
           _version
           _deleted
@@ -1054,6 +1081,8 @@ export class APIService {
           fingerprint
           client
           open
+          group
+          owner
           ttl
           _version
           _deleted
@@ -1084,6 +1113,8 @@ export class APIService {
           fingerprint
           client
           open
+          group
+          owner
           ttl
           _version
           _deleted
@@ -1483,6 +1514,8 @@ export class APIService {
           fingerprint
           client
           open
+          group
+          owner
           ttl
           _version
           _deleted
@@ -1513,6 +1546,8 @@ export class APIService {
             fingerprint
             client
             open
+            group
+            owner
             ttl
             _version
             _deleted
@@ -1554,6 +1589,8 @@ export class APIService {
             fingerprint
             client
             open
+            group
+            owner
             ttl
             _version
             _deleted
@@ -1980,6 +2017,8 @@ export class APIService {
           fingerprint
           client
           open
+          group
+          owner
           ttl
           _version
           _deleted
@@ -2002,6 +2041,8 @@ export class APIService {
           fingerprint
           client
           open
+          group
+          owner
           ttl
           _version
           _deleted
@@ -2024,6 +2065,8 @@ export class APIService {
           fingerprint
           client
           open
+          group
+          owner
           ttl
           _version
           _deleted

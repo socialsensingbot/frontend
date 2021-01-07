@@ -60,6 +60,8 @@ query GetUserSession($id: ID!) {
     fingerprint
     client
     open
+    group
+    owner
     ttl
     _version
     _deleted
@@ -79,6 +81,8 @@ query ListUserSessions(
       fingerprint
       client
       open
+      group
+      owner
       ttl
       _version
       _deleted
@@ -107,6 +111,8 @@ query SyncUserSessions(
       fingerprint
       client
       open
+      group
+      owner
       ttl
       _version
       _deleted

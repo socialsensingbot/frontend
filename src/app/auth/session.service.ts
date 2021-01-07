@@ -1,5 +1,5 @@
 import {Injectable, OnDestroy, OnInit} from "@angular/core";
-import {API, graphqlOperation, Logger} from "aws-amplify";
+import {API, Auth, graphqlOperation, Logger} from "aws-amplify";
 import {
   APIService,
   CreateUserSessionMutation,
@@ -63,23 +63,8 @@ export class SessionService implements OnInit, OnDestroy {
     this.stopHeartbeat();
   }
 
-  private stopHeartbeat() {
-    if (this._heartbeatTimer) {
-      this._heartbeatTimer.unsubscribe();
-      this._heartbeatTimer = null;
-    }
-  }
-
-  private removeSessionSubscription() {
-    if (this._sessionSubscription) {
-      this._sessionSubscription.unsubscribe();
-      this._sessionSubscription = null;
-    }
-  }
-
   public ngOnInit(): void {
   }
-
 
   /**
    * Create an application level session for a logged in user.
@@ -143,6 +128,20 @@ export class SessionService implements OnInit, OnDestroy {
     window.localStorage.removeItem(SESSION_TOKEN);
   }
 
+  private stopHeartbeat() {
+    if (this._heartbeatTimer) {
+      this._heartbeatTimer.unsubscribe();
+      this._heartbeatTimer = null;
+    }
+  }
+
+  private removeSessionSubscription() {
+    if (this._sessionSubscription) {
+      this._sessionSubscription.unsubscribe();
+      this._sessionSubscription = null;
+    }
+  }
+
   /**
    * Listens for new sessions to be created in DynamoDB
    *
@@ -203,19 +202,24 @@ export class SessionService implements OnInit, OnDestroy {
    */
   private async getOrCreateServerSession(userInfo, fail = false): Promise<GetUserSessionQuery> {
     try {
-      const existingSession = await this._api.GetUserSession(this._sessionId);
-      if (existingSession) {
-        if (existingSession.open) {
-          this.moreThanOnce();
-          return existingSession;
+      if (await this.checkUserLimit()) {
+
+        const existingSession = await this._api.GetUserSession(this._sessionId);
+        if (existingSession) {
+          if (existingSession.open) {
+            this.moreThanOnce();
+            return existingSession;
+          } else {
+            this.createLocalSession(userInfo);
+            await this.createServerSession();
+            return this._api.GetUserSession(this._sessionId);
+          }
         } else {
-          this.createLocalSession(userInfo);
           await this.createServerSession();
           return this._api.GetUserSession(this._sessionId);
         }
       } else {
-        await this.createServerSession();
-        return this._api.GetUserSession(this._sessionId);
+        return null;
       }
     } catch (e) {
       if (fail) {
@@ -244,8 +248,12 @@ export class SessionService implements OnInit, OnDestroy {
                                          fingerprint: this.calculateFingerPrint(),
                                          client,
                                          open:        true,
-                                         ttl: this.serverTTL()
+                                         ttl:         this.serverTTL(),
+                                         group:       this._pref.groups[0],
+                                         owner:       (await Auth.currentUserInfo()).username
                                        });
+
+
   }
 
   /**
@@ -264,6 +272,39 @@ export class SessionService implements OnInit, OnDestroy {
         await this._auth.signOut();
         window.location.reload();
       }, 8000);
+    }
+  }
+
+  private async checkUserLimit() {
+    await this._pref.waitUntilReady();
+    const group = this._pref.groups[0];
+    const sessionItems = await this._api.ListUserSessions(
+      {group: {eq: group}, fingerprint: {ne: this.calculateFingerPrint()}});
+    const userSessions = sessionItems.items.map(i => i.owner);
+    const loggedInCount = new Set(userSessions).size;
+    if (this._pref.combined.maxUsers > -1) {
+      if (loggedInCount > this._pref.combined.maxUsers) {
+        window.setTimeout(async () => {
+          await this._auth.signOut();
+          window.location.reload();
+        }, 15000);
+        window.setTimeout(async () => {
+          this._notify.show(
+            `Your group's account has a limit of ${this._pref.combined.maxUsers} concurrent users, you will now be logged out.`,
+            "OK", 30);
+        }, 8000);
+        log.info(
+          `${loggedInCount} logged in users for group ${group} and exceeded concurrent user limit of ${this._pref.combined.maxUsers}.`);
+        return false;
+      } else {
+        log.info(
+          `${loggedInCount} logged in users for group  ${group} and within concurrent user limit of ${this._pref.combined.maxUsers}.`);
+        return true;
+      }
+    } else {
+      log.info(
+        `${loggedInCount} logged in users for group ${group} and NO concurrent user limit of ${this._pref.combined.maxUsers}.`);
+      return true;
     }
   }
 
