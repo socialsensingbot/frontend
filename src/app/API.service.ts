@@ -217,61 +217,6 @@ export type DeleteGroupTwitterUserIgnoreInput = {
   _version?: number | null;
 };
 
-export type CreateTweetIgnoreInput = {
-  id?: string | null;
-  url: string;
-  tweetId?: string | null;
-  _version?: number | null;
-  tweetIgnoreUserId?: string | null;
-};
-
-export type ModelTweetIgnoreConditionInput = {
-  url?: ModelStringInput | null;
-  tweetId?: ModelStringInput | null;
-  and?: Array<ModelTweetIgnoreConditionInput | null> | null;
-  or?: Array<ModelTweetIgnoreConditionInput | null> | null;
-  not?: ModelTweetIgnoreConditionInput | null;
-};
-
-export type UpdateTweetIgnoreInput = {
-  id: string;
-  url?: string | null;
-  tweetId?: string | null;
-  _version?: number | null;
-  tweetIgnoreUserId?: string | null;
-};
-
-export type DeleteTweetIgnoreInput = {
-  id?: string | null;
-  _version?: number | null;
-};
-
-export type CreateTwitterUserIgnoreInput = {
-  id?: string | null;
-  twitterScreenName: string;
-  _version?: number | null;
-  twitterUserIgnoreUserId?: string | null;
-};
-
-export type ModelTwitterUserIgnoreConditionInput = {
-  twitterScreenName?: ModelStringInput | null;
-  and?: Array<ModelTwitterUserIgnoreConditionInput | null> | null;
-  or?: Array<ModelTwitterUserIgnoreConditionInput | null> | null;
-  not?: ModelTwitterUserIgnoreConditionInput | null;
-};
-
-export type UpdateTwitterUserIgnoreInput = {
-  id: string;
-  twitterScreenName?: string | null;
-  _version?: number | null;
-  twitterUserIgnoreUserId?: string | null;
-};
-
-export type DeleteTwitterUserIgnoreInput = {
-  id?: string | null;
-  _version?: number | null;
-};
-
 export type ModelUserPreferencesFilterInput = {
   id?: ModelIDInput | null;
   prefs?: ModelStringInput | null;
@@ -339,23 +284,6 @@ export type ModelGroupTwitterUserIgnoreFilterInput = {
   not?: ModelGroupTwitterUserIgnoreFilterInput | null;
 };
 
-export type ModelTweetIgnoreFilterInput = {
-  id?: ModelIDInput | null;
-  url?: ModelStringInput | null;
-  tweetId?: ModelStringInput | null;
-  and?: Array<ModelTweetIgnoreFilterInput | null> | null;
-  or?: Array<ModelTweetIgnoreFilterInput | null> | null;
-  not?: ModelTweetIgnoreFilterInput | null;
-};
-
-export type ModelTwitterUserIgnoreFilterInput = {
-  id?: ModelIDInput | null;
-  twitterScreenName?: ModelStringInput | null;
-  and?: Array<ModelTwitterUserIgnoreFilterInput | null> | null;
-  or?: Array<ModelTwitterUserIgnoreFilterInput | null> | null;
-  not?: ModelTwitterUserIgnoreFilterInput | null;
-};
-
 export type CreateUserPreferencesMutation = {
   __typename: "UserPreferences";
   id: string;
@@ -365,17 +293,6 @@ export type CreateUserPreferencesMutation = {
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
-  owner: string | null;
-  ignoreTweets: {
-    __typename: "ModelTweetIgnoreConnection";
-    nextToken: string | null;
-    startedAt: number | null;
-  } | null;
-  ignorePeople: {
-    __typename: "ModelTwitterUserIgnoreConnection";
-    nextToken: string | null;
-    startedAt: number | null;
-  } | null;
 };
 
 export type UpdateUserPreferencesMutation = {
@@ -387,17 +304,6 @@ export type UpdateUserPreferencesMutation = {
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
-  owner: string | null;
-  ignoreTweets: {
-    __typename: "ModelTweetIgnoreConnection";
-    nextToken: string | null;
-    startedAt: number | null;
-  } | null;
-  ignorePeople: {
-    __typename: "ModelTwitterUserIgnoreConnection";
-    nextToken: string | null;
-    startedAt: number | null;
-  } | null;
 };
 
 export type DeleteUserPreferencesMutation = {
@@ -409,17 +315,6 @@ export type DeleteUserPreferencesMutation = {
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
-  owner: string | null;
-  ignoreTweets: {
-    __typename: "ModelTweetIgnoreConnection";
-    nextToken: string | null;
-    startedAt: number | null;
-  } | null;
-  ignorePeople: {
-    __typename: "ModelTwitterUserIgnoreConnection";
-    nextToken: string | null;
-    startedAt: number | null;
-  } | null;
 };
 
 export type CreateUserSessionMutation = {
@@ -587,139 +482,15 @@ export type DeleteGroupTwitterUserIgnoreMutation = {
   updatedAt: string;
 };
 
-export type CreateTweetIgnoreMutation = {
-  __typename: "TweetIgnore";
+export type GetUserPreferencesQuery = {
+  __typename: "UserPreferences";
   id: string;
-  url: string;
-  tweetId: string | null;
+  prefs: string | null;
   _version: number;
   _deleted: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    prefs: string | null;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-};
-
-export type UpdateTweetIgnoreMutation = {
-  __typename: "TweetIgnore";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  _version: number;
-  _deleted: boolean | null;
-  _lastChangedAt: number;
-  createdAt: string;
-  updatedAt: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    prefs: string | null;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-};
-
-export type DeleteTweetIgnoreMutation = {
-  __typename: "TweetIgnore";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  _version: number;
-  _deleted: boolean | null;
-  _lastChangedAt: number;
-  createdAt: string;
-  updatedAt: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    prefs: string | null;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-};
-
-export type CreateTwitterUserIgnoreMutation = {
-  __typename: "TwitterUserIgnore";
-  id: string;
-  twitterScreenName: string;
-  _version: number;
-  _deleted: boolean | null;
-  _lastChangedAt: number;
-  createdAt: string;
-  updatedAt: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    prefs: string | null;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-};
-
-export type UpdateTwitterUserIgnoreMutation = {
-  __typename: "TwitterUserIgnore";
-  id: string;
-  twitterScreenName: string;
-  _version: number;
-  _deleted: boolean | null;
-  _lastChangedAt: number;
-  createdAt: string;
-  updatedAt: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    prefs: string | null;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-};
-
-export type DeleteTwitterUserIgnoreMutation = {
-  __typename: "TwitterUserIgnore";
-  id: string;
-  twitterScreenName: string;
-  _version: number;
-  _deleted: boolean | null;
-  _lastChangedAt: number;
-  createdAt: string;
-  updatedAt: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    prefs: string | null;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
 };
 
 export type ListUserPreferencessQuery = {
@@ -733,32 +504,9 @@ export type ListUserPreferencessQuery = {
     _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
-    owner: string | null;
   } | null> | null;
   nextToken: string | null;
   startedAt: number | null;
-};
-
-export type GetUserPreferencesQuery = {
-  __typename: "UserPreferences";
-  id: string;
-  prefs: string | null;
-  _version: number;
-  _deleted: boolean | null;
-  _lastChangedAt: number;
-  createdAt: string;
-  updatedAt: string;
-  owner: string | null;
-  ignoreTweets: {
-    __typename: "ModelTweetIgnoreConnection";
-    nextToken: string | null;
-    startedAt: number | null;
-  } | null;
-  ignorePeople: {
-    __typename: "ModelTwitterUserIgnoreConnection";
-    nextToken: string | null;
-    startedAt: number | null;
-  } | null;
 };
 
 export type SyncUserPreferencesQuery = {
@@ -772,7 +520,6 @@ export type SyncUserPreferencesQuery = {
     _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
-    owner: string | null;
   } | null> | null;
   nextToken: string | null;
   startedAt: number | null;
@@ -983,117 +730,6 @@ export type SyncGroupTwitterUserIgnoresQuery = {
   startedAt: number | null;
 };
 
-export type GetTweetIgnoreQuery = {
-  __typename: "TweetIgnore";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  _version: number;
-  _deleted: boolean | null;
-  _lastChangedAt: number;
-  createdAt: string;
-  updatedAt: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    prefs: string | null;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-};
-
-export type ListTweetIgnoresQuery = {
-  __typename: "ModelTweetIgnoreConnection";
-  items: Array<{
-    __typename: "TweetIgnore";
-    id: string;
-    url: string;
-    tweetId: string | null;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-  } | null> | null;
-  nextToken: string | null;
-  startedAt: number | null;
-};
-
-export type SyncTweetIgnoresQuery = {
-  __typename: "ModelTweetIgnoreConnection";
-  items: Array<{
-    __typename: "TweetIgnore";
-    id: string;
-    url: string;
-    tweetId: string | null;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-  } | null> | null;
-  nextToken: string | null;
-  startedAt: number | null;
-};
-
-export type GetTwitterUserIgnoreQuery = {
-  __typename: "TwitterUserIgnore";
-  id: string;
-  twitterScreenName: string;
-  _version: number;
-  _deleted: boolean | null;
-  _lastChangedAt: number;
-  createdAt: string;
-  updatedAt: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    prefs: string | null;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-};
-
-export type ListTwitterUserIgnoresQuery = {
-  __typename: "ModelTwitterUserIgnoreConnection";
-  items: Array<{
-    __typename: "TwitterUserIgnore";
-    id: string;
-    twitterScreenName: string;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-  } | null> | null;
-  nextToken: string | null;
-  startedAt: number | null;
-};
-
-export type SyncTwitterUserIgnoresQuery = {
-  __typename: "ModelTwitterUserIgnoreConnection";
-  items: Array<{
-    __typename: "TwitterUserIgnore";
-    id: string;
-    twitterScreenName: string;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-  } | null> | null;
-  nextToken: string | null;
-  startedAt: number | null;
-};
-
 export type OnCreateUserPreferencesSubscription = {
   __typename: "UserPreferences";
   id: string;
@@ -1103,17 +739,6 @@ export type OnCreateUserPreferencesSubscription = {
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
-  owner: string | null;
-  ignoreTweets: {
-    __typename: "ModelTweetIgnoreConnection";
-    nextToken: string | null;
-    startedAt: number | null;
-  } | null;
-  ignorePeople: {
-    __typename: "ModelTwitterUserIgnoreConnection";
-    nextToken: string | null;
-    startedAt: number | null;
-  } | null;
 };
 
 export type OnUpdateUserPreferencesSubscription = {
@@ -1125,17 +750,6 @@ export type OnUpdateUserPreferencesSubscription = {
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
-  owner: string | null;
-  ignoreTweets: {
-    __typename: "ModelTweetIgnoreConnection";
-    nextToken: string | null;
-    startedAt: number | null;
-  } | null;
-  ignorePeople: {
-    __typename: "ModelTwitterUserIgnoreConnection";
-    nextToken: string | null;
-    startedAt: number | null;
-  } | null;
 };
 
 export type OnDeleteUserPreferencesSubscription = {
@@ -1147,17 +761,6 @@ export type OnDeleteUserPreferencesSubscription = {
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
-  owner: string | null;
-  ignoreTweets: {
-    __typename: "ModelTweetIgnoreConnection";
-    nextToken: string | null;
-    startedAt: number | null;
-  } | null;
-  ignorePeople: {
-    __typename: "ModelTwitterUserIgnoreConnection";
-    nextToken: string | null;
-    startedAt: number | null;
-  } | null;
 };
 
 export type OnCreateUserSessionSubscription = {
@@ -1325,141 +928,6 @@ export type OnDeleteGroupTwitterUserIgnoreSubscription = {
   updatedAt: string;
 };
 
-export type OnCreateTweetIgnoreSubscription = {
-  __typename: "TweetIgnore";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  _version: number;
-  _deleted: boolean | null;
-  _lastChangedAt: number;
-  createdAt: string;
-  updatedAt: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    prefs: string | null;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-};
-
-export type OnUpdateTweetIgnoreSubscription = {
-  __typename: "TweetIgnore";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  _version: number;
-  _deleted: boolean | null;
-  _lastChangedAt: number;
-  createdAt: string;
-  updatedAt: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    prefs: string | null;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-};
-
-export type OnDeleteTweetIgnoreSubscription = {
-  __typename: "TweetIgnore";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  _version: number;
-  _deleted: boolean | null;
-  _lastChangedAt: number;
-  createdAt: string;
-  updatedAt: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    prefs: string | null;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-};
-
-export type OnCreateTwitterUserIgnoreSubscription = {
-  __typename: "TwitterUserIgnore";
-  id: string;
-  twitterScreenName: string;
-  _version: number;
-  _deleted: boolean | null;
-  _lastChangedAt: number;
-  createdAt: string;
-  updatedAt: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    prefs: string | null;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-};
-
-export type OnUpdateTwitterUserIgnoreSubscription = {
-  __typename: "TwitterUserIgnore";
-  id: string;
-  twitterScreenName: string;
-  _version: number;
-  _deleted: boolean | null;
-  _lastChangedAt: number;
-  createdAt: string;
-  updatedAt: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    prefs: string | null;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-};
-
-export type OnDeleteTwitterUserIgnoreSubscription = {
-  __typename: "TwitterUserIgnore";
-  id: string;
-  twitterScreenName: string;
-  _version: number;
-  _deleted: boolean | null;
-  _lastChangedAt: number;
-  createdAt: string;
-  updatedAt: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    prefs: string | null;
-    _version: number;
-    _deleted: boolean | null;
-    _lastChangedAt: number;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-};
-
 @Injectable({
   providedIn: "root"
 })
@@ -1478,17 +946,6 @@ export class APIService {
           _lastChangedAt
           createdAt
           updatedAt
-          owner
-          ignoreTweets {
-            __typename
-            nextToken
-            startedAt
-          }
-          ignorePeople {
-            __typename
-            nextToken
-            startedAt
-          }
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1516,17 +973,6 @@ export class APIService {
           _lastChangedAt
           createdAt
           updatedAt
-          owner
-          ignoreTweets {
-            __typename
-            nextToken
-            startedAt
-          }
-          ignorePeople {
-            __typename
-            nextToken
-            startedAt
-          }
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1554,17 +1000,6 @@ export class APIService {
           _lastChangedAt
           createdAt
           updatedAt
-          owner
-          ignoreTweets {
-            __typename
-            nextToken
-            startedAt
-          }
-          ignorePeople {
-            __typename
-            nextToken
-            startedAt
-          }
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1941,242 +1376,26 @@ export class APIService {
       response.data.deleteGroupTwitterUserIgnore
     );
   }
-  async CreateTweetIgnore(
-    input: CreateTweetIgnoreInput,
-    condition?: ModelTweetIgnoreConditionInput
-  ): Promise<CreateTweetIgnoreMutation> {
-    const statement = `mutation CreateTweetIgnore($input: CreateTweetIgnoreInput!, $condition: ModelTweetIgnoreConditionInput) {
-        createTweetIgnore(input: $input, condition: $condition) {
+  async GetUserPreferences(id: string): Promise<GetUserPreferencesQuery> {
+    const statement = `query GetUserPreferences($id: ID!) {
+        getUserPreferences(id: $id) {
           __typename
           id
-          url
-          tweetId
+          prefs
           _version
           _deleted
           _lastChangedAt
           createdAt
           updatedAt
-          user {
-            __typename
-            id
-            prefs
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-            owner
-          }
         }
       }`;
     const gqlAPIServiceArguments: any = {
-      input
+      id
     };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
-    return <CreateTweetIgnoreMutation>response.data.createTweetIgnore;
-  }
-  async UpdateTweetIgnore(
-    input: UpdateTweetIgnoreInput,
-    condition?: ModelTweetIgnoreConditionInput
-  ): Promise<UpdateTweetIgnoreMutation> {
-    const statement = `mutation UpdateTweetIgnore($input: UpdateTweetIgnoreInput!, $condition: ModelTweetIgnoreConditionInput) {
-        updateTweetIgnore(input: $input, condition: $condition) {
-          __typename
-          id
-          url
-          tweetId
-          _version
-          _deleted
-          _lastChangedAt
-          createdAt
-          updatedAt
-          user {
-            __typename
-            id
-            prefs
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-            owner
-          }
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <UpdateTweetIgnoreMutation>response.data.updateTweetIgnore;
-  }
-  async DeleteTweetIgnore(
-    input: DeleteTweetIgnoreInput,
-    condition?: ModelTweetIgnoreConditionInput
-  ): Promise<DeleteTweetIgnoreMutation> {
-    const statement = `mutation DeleteTweetIgnore($input: DeleteTweetIgnoreInput!, $condition: ModelTweetIgnoreConditionInput) {
-        deleteTweetIgnore(input: $input, condition: $condition) {
-          __typename
-          id
-          url
-          tweetId
-          _version
-          _deleted
-          _lastChangedAt
-          createdAt
-          updatedAt
-          user {
-            __typename
-            id
-            prefs
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-            owner
-          }
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <DeleteTweetIgnoreMutation>response.data.deleteTweetIgnore;
-  }
-  async CreateTwitterUserIgnore(
-    input: CreateTwitterUserIgnoreInput,
-    condition?: ModelTwitterUserIgnoreConditionInput
-  ): Promise<CreateTwitterUserIgnoreMutation> {
-    const statement = `mutation CreateTwitterUserIgnore($input: CreateTwitterUserIgnoreInput!, $condition: ModelTwitterUserIgnoreConditionInput) {
-        createTwitterUserIgnore(input: $input, condition: $condition) {
-          __typename
-          id
-          twitterScreenName
-          _version
-          _deleted
-          _lastChangedAt
-          createdAt
-          updatedAt
-          user {
-            __typename
-            id
-            prefs
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-            owner
-          }
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <CreateTwitterUserIgnoreMutation>(
-      response.data.createTwitterUserIgnore
-    );
-  }
-  async UpdateTwitterUserIgnore(
-    input: UpdateTwitterUserIgnoreInput,
-    condition?: ModelTwitterUserIgnoreConditionInput
-  ): Promise<UpdateTwitterUserIgnoreMutation> {
-    const statement = `mutation UpdateTwitterUserIgnore($input: UpdateTwitterUserIgnoreInput!, $condition: ModelTwitterUserIgnoreConditionInput) {
-        updateTwitterUserIgnore(input: $input, condition: $condition) {
-          __typename
-          id
-          twitterScreenName
-          _version
-          _deleted
-          _lastChangedAt
-          createdAt
-          updatedAt
-          user {
-            __typename
-            id
-            prefs
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-            owner
-          }
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <UpdateTwitterUserIgnoreMutation>(
-      response.data.updateTwitterUserIgnore
-    );
-  }
-  async DeleteTwitterUserIgnore(
-    input: DeleteTwitterUserIgnoreInput,
-    condition?: ModelTwitterUserIgnoreConditionInput
-  ): Promise<DeleteTwitterUserIgnoreMutation> {
-    const statement = `mutation DeleteTwitterUserIgnore($input: DeleteTwitterUserIgnoreInput!, $condition: ModelTwitterUserIgnoreConditionInput) {
-        deleteTwitterUserIgnore(input: $input, condition: $condition) {
-          __typename
-          id
-          twitterScreenName
-          _version
-          _deleted
-          _lastChangedAt
-          createdAt
-          updatedAt
-          user {
-            __typename
-            id
-            prefs
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-            owner
-          }
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <DeleteTwitterUserIgnoreMutation>(
-      response.data.deleteTwitterUserIgnore
-    );
+    return <GetUserPreferencesQuery>response.data.getUserPreferences;
   }
   async ListUserPreferencess(
     filter?: ModelUserPreferencesFilterInput,
@@ -2195,7 +1414,6 @@ export class APIService {
             _lastChangedAt
             createdAt
             updatedAt
-            owner
           }
           nextToken
           startedAt
@@ -2216,38 +1434,6 @@ export class APIService {
     )) as any;
     return <ListUserPreferencessQuery>response.data.listUserPreferencess;
   }
-  async GetUserPreferences(id: string): Promise<GetUserPreferencesQuery> {
-    const statement = `query GetUserPreferences($id: ID!) {
-        getUserPreferences(id: $id) {
-          __typename
-          id
-          prefs
-          _version
-          _deleted
-          _lastChangedAt
-          createdAt
-          updatedAt
-          owner
-          ignoreTweets {
-            __typename
-            nextToken
-            startedAt
-          }
-          ignorePeople {
-            __typename
-            nextToken
-            startedAt
-          }
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      id
-    };
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <GetUserPreferencesQuery>response.data.getUserPreferences;
-  }
   async SyncUserPreferences(
     filter?: ModelUserPreferencesFilterInput,
     limit?: number,
@@ -2266,7 +1452,6 @@ export class APIService {
             _lastChangedAt
             createdAt
             updatedAt
-            owner
           }
           nextToken
           startedAt
@@ -2727,235 +1912,12 @@ export class APIService {
       response.data.syncGroupTwitterUserIgnores
     );
   }
-  async GetTweetIgnore(id: string): Promise<GetTweetIgnoreQuery> {
-    const statement = `query GetTweetIgnore($id: ID!) {
-        getTweetIgnore(id: $id) {
-          __typename
-          id
-          url
-          tweetId
-          _version
-          _deleted
-          _lastChangedAt
-          createdAt
-          updatedAt
-          user {
-            __typename
-            id
-            prefs
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-            owner
-          }
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      id
-    };
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <GetTweetIgnoreQuery>response.data.getTweetIgnore;
-  }
-  async ListTweetIgnores(
-    filter?: ModelTweetIgnoreFilterInput,
-    limit?: number,
-    nextToken?: string
-  ): Promise<ListTweetIgnoresQuery> {
-    const statement = `query ListTweetIgnores($filter: ModelTweetIgnoreFilterInput, $limit: Int, $nextToken: String) {
-        listTweetIgnores(filter: $filter, limit: $limit, nextToken: $nextToken) {
-          __typename
-          items {
-            __typename
-            id
-            url
-            tweetId
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-          }
-          nextToken
-          startedAt
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {};
-    if (filter) {
-      gqlAPIServiceArguments.filter = filter;
-    }
-    if (limit) {
-      gqlAPIServiceArguments.limit = limit;
-    }
-    if (nextToken) {
-      gqlAPIServiceArguments.nextToken = nextToken;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <ListTweetIgnoresQuery>response.data.listTweetIgnores;
-  }
-  async SyncTweetIgnores(
-    filter?: ModelTweetIgnoreFilterInput,
-    limit?: number,
-    nextToken?: string,
-    lastSync?: number
-  ): Promise<SyncTweetIgnoresQuery> {
-    const statement = `query SyncTweetIgnores($filter: ModelTweetIgnoreFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
-        syncTweetIgnores(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
-          __typename
-          items {
-            __typename
-            id
-            url
-            tweetId
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-          }
-          nextToken
-          startedAt
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {};
-    if (filter) {
-      gqlAPIServiceArguments.filter = filter;
-    }
-    if (limit) {
-      gqlAPIServiceArguments.limit = limit;
-    }
-    if (nextToken) {
-      gqlAPIServiceArguments.nextToken = nextToken;
-    }
-    if (lastSync) {
-      gqlAPIServiceArguments.lastSync = lastSync;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <SyncTweetIgnoresQuery>response.data.syncTweetIgnores;
-  }
-  async GetTwitterUserIgnore(id: string): Promise<GetTwitterUserIgnoreQuery> {
-    const statement = `query GetTwitterUserIgnore($id: ID!) {
-        getTwitterUserIgnore(id: $id) {
-          __typename
-          id
-          twitterScreenName
-          _version
-          _deleted
-          _lastChangedAt
-          createdAt
-          updatedAt
-          user {
-            __typename
-            id
-            prefs
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-            owner
-          }
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      id
-    };
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <GetTwitterUserIgnoreQuery>response.data.getTwitterUserIgnore;
-  }
-  async ListTwitterUserIgnores(
-    filter?: ModelTwitterUserIgnoreFilterInput,
-    limit?: number,
-    nextToken?: string
-  ): Promise<ListTwitterUserIgnoresQuery> {
-    const statement = `query ListTwitterUserIgnores($filter: ModelTwitterUserIgnoreFilterInput, $limit: Int, $nextToken: String) {
-        listTwitterUserIgnores(filter: $filter, limit: $limit, nextToken: $nextToken) {
-          __typename
-          items {
-            __typename
-            id
-            twitterScreenName
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-          }
-          nextToken
-          startedAt
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {};
-    if (filter) {
-      gqlAPIServiceArguments.filter = filter;
-    }
-    if (limit) {
-      gqlAPIServiceArguments.limit = limit;
-    }
-    if (nextToken) {
-      gqlAPIServiceArguments.nextToken = nextToken;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <ListTwitterUserIgnoresQuery>response.data.listTwitterUserIgnores;
-  }
-  async SyncTwitterUserIgnores(
-    filter?: ModelTwitterUserIgnoreFilterInput,
-    limit?: number,
-    nextToken?: string,
-    lastSync?: number
-  ): Promise<SyncTwitterUserIgnoresQuery> {
-    const statement = `query SyncTwitterUserIgnores($filter: ModelTwitterUserIgnoreFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
-        syncTwitterUserIgnores(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
-          __typename
-          items {
-            __typename
-            id
-            twitterScreenName
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-          }
-          nextToken
-          startedAt
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {};
-    if (filter) {
-      gqlAPIServiceArguments.filter = filter;
-    }
-    if (limit) {
-      gqlAPIServiceArguments.limit = limit;
-    }
-    if (nextToken) {
-      gqlAPIServiceArguments.nextToken = nextToken;
-    }
-    if (lastSync) {
-      gqlAPIServiceArguments.lastSync = lastSync;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <SyncTwitterUserIgnoresQuery>response.data.syncTwitterUserIgnores;
-  }
   OnCreateUserPreferencesListener: Observable<
     SubscriptionResponse<OnCreateUserPreferencesSubscription>
   > = API.graphql(
     graphqlOperation(
-      `subscription OnCreateUserPreferences($owner: String) {
-        onCreateUserPreferences(owner: $owner) {
+      `subscription OnCreateUserPreferences {
+        onCreateUserPreferences {
           __typename
           id
           prefs
@@ -2964,17 +1926,6 @@ export class APIService {
           _lastChangedAt
           createdAt
           updatedAt
-          owner
-          ignoreTweets {
-            __typename
-            nextToken
-            startedAt
-          }
-          ignorePeople {
-            __typename
-            nextToken
-            startedAt
-          }
         }
       }`
     )
@@ -2984,8 +1935,8 @@ export class APIService {
     SubscriptionResponse<OnUpdateUserPreferencesSubscription>
   > = API.graphql(
     graphqlOperation(
-      `subscription OnUpdateUserPreferences($owner: String) {
-        onUpdateUserPreferences(owner: $owner) {
+      `subscription OnUpdateUserPreferences {
+        onUpdateUserPreferences {
           __typename
           id
           prefs
@@ -2994,17 +1945,6 @@ export class APIService {
           _lastChangedAt
           createdAt
           updatedAt
-          owner
-          ignoreTweets {
-            __typename
-            nextToken
-            startedAt
-          }
-          ignorePeople {
-            __typename
-            nextToken
-            startedAt
-          }
         }
       }`
     )
@@ -3014,8 +1954,8 @@ export class APIService {
     SubscriptionResponse<OnDeleteUserPreferencesSubscription>
   > = API.graphql(
     graphqlOperation(
-      `subscription OnDeleteUserPreferences($owner: String) {
-        onDeleteUserPreferences(owner: $owner) {
+      `subscription OnDeleteUserPreferences {
+        onDeleteUserPreferences {
           __typename
           id
           prefs
@@ -3024,17 +1964,6 @@ export class APIService {
           _lastChangedAt
           createdAt
           updatedAt
-          owner
-          ignoreTweets {
-            __typename
-            nextToken
-            startedAt
-          }
-          ignorePeople {
-            __typename
-            nextToken
-            startedAt
-          }
         }
       }`
     )
@@ -3306,187 +2235,4 @@ export class APIService {
   ) as Observable<
     SubscriptionResponse<OnDeleteGroupTwitterUserIgnoreSubscription>
   >;
-
-  OnCreateTweetIgnoreListener: Observable<
-    SubscriptionResponse<OnCreateTweetIgnoreSubscription>
-  > = API.graphql(
-    graphqlOperation(
-      `subscription OnCreateTweetIgnore {
-        onCreateTweetIgnore {
-          __typename
-          id
-          url
-          tweetId
-          _version
-          _deleted
-          _lastChangedAt
-          createdAt
-          updatedAt
-          user {
-            __typename
-            id
-            prefs
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-            owner
-          }
-        }
-      }`
-    )
-  ) as Observable<SubscriptionResponse<OnCreateTweetIgnoreSubscription>>;
-
-  OnUpdateTweetIgnoreListener: Observable<
-    SubscriptionResponse<OnUpdateTweetIgnoreSubscription>
-  > = API.graphql(
-    graphqlOperation(
-      `subscription OnUpdateTweetIgnore {
-        onUpdateTweetIgnore {
-          __typename
-          id
-          url
-          tweetId
-          _version
-          _deleted
-          _lastChangedAt
-          createdAt
-          updatedAt
-          user {
-            __typename
-            id
-            prefs
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-            owner
-          }
-        }
-      }`
-    )
-  ) as Observable<SubscriptionResponse<OnUpdateTweetIgnoreSubscription>>;
-
-  OnDeleteTweetIgnoreListener: Observable<
-    SubscriptionResponse<OnDeleteTweetIgnoreSubscription>
-  > = API.graphql(
-    graphqlOperation(
-      `subscription OnDeleteTweetIgnore {
-        onDeleteTweetIgnore {
-          __typename
-          id
-          url
-          tweetId
-          _version
-          _deleted
-          _lastChangedAt
-          createdAt
-          updatedAt
-          user {
-            __typename
-            id
-            prefs
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-            owner
-          }
-        }
-      }`
-    )
-  ) as Observable<SubscriptionResponse<OnDeleteTweetIgnoreSubscription>>;
-
-  OnCreateTwitterUserIgnoreListener: Observable<
-    SubscriptionResponse<OnCreateTwitterUserIgnoreSubscription>
-  > = API.graphql(
-    graphqlOperation(
-      `subscription OnCreateTwitterUserIgnore {
-        onCreateTwitterUserIgnore {
-          __typename
-          id
-          twitterScreenName
-          _version
-          _deleted
-          _lastChangedAt
-          createdAt
-          updatedAt
-          user {
-            __typename
-            id
-            prefs
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-            owner
-          }
-        }
-      }`
-    )
-  ) as Observable<SubscriptionResponse<OnCreateTwitterUserIgnoreSubscription>>;
-
-  OnUpdateTwitterUserIgnoreListener: Observable<
-    SubscriptionResponse<OnUpdateTwitterUserIgnoreSubscription>
-  > = API.graphql(
-    graphqlOperation(
-      `subscription OnUpdateTwitterUserIgnore {
-        onUpdateTwitterUserIgnore {
-          __typename
-          id
-          twitterScreenName
-          _version
-          _deleted
-          _lastChangedAt
-          createdAt
-          updatedAt
-          user {
-            __typename
-            id
-            prefs
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-            owner
-          }
-        }
-      }`
-    )
-  ) as Observable<SubscriptionResponse<OnUpdateTwitterUserIgnoreSubscription>>;
-
-  OnDeleteTwitterUserIgnoreListener: Observable<
-    SubscriptionResponse<OnDeleteTwitterUserIgnoreSubscription>
-  > = API.graphql(
-    graphqlOperation(
-      `subscription OnDeleteTwitterUserIgnore {
-        onDeleteTwitterUserIgnore {
-          __typename
-          id
-          twitterScreenName
-          _version
-          _deleted
-          _lastChangedAt
-          createdAt
-          updatedAt
-          user {
-            __typename
-            id
-            prefs
-            _version
-            _deleted
-            _lastChangedAt
-            createdAt
-            updatedAt
-            owner
-          }
-        }
-      }`
-    )
-  ) as Observable<SubscriptionResponse<OnDeleteTwitterUserIgnoreSubscription>>;
 }

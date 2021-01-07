@@ -1,4 +1,15 @@
 # this is an auto generated file. This will be overwritten
+query GetUserPreferences($id: ID!) {
+  getUserPreferences(id: $id) {
+    id
+    prefs
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
 query ListUserPreferencess(
   $filter: ModelUserPreferencesFilterInput
   $limit: Int
@@ -13,30 +24,9 @@ query ListUserPreferencess(
       _lastChangedAt
       createdAt
       updatedAt
-      owner
     }
     nextToken
     startedAt
-  }
-}
-query GetUserPreferences($id: ID!) {
-  getUserPreferences(id: $id) {
-    id
-    prefs
-    _version
-    _deleted
-    _lastChangedAt
-    createdAt
-    updatedAt
-    owner
-    ignoreTweets {
-      nextToken
-      startedAt
-    }
-    ignorePeople {
-      nextToken
-      startedAt
-    }
   }
 }
 query SyncUserPreferences(
@@ -59,7 +49,6 @@ query SyncUserPreferences(
       _lastChangedAt
       createdAt
       updatedAt
-      owner
     }
     nextToken
     startedAt
@@ -312,143 +301,6 @@ query SyncGroupTwitterUserIgnores(
       ignoredBy
       ownerGroups
       scope
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-    }
-    nextToken
-    startedAt
-  }
-}
-query GetTweetIgnore($id: ID!) {
-  getTweetIgnore(id: $id) {
-    id
-    url
-    tweetId
-    _version
-    _deleted
-    _lastChangedAt
-    createdAt
-    updatedAt
-    user {
-      id
-      prefs
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-}
-query ListTweetIgnores(
-  $filter: ModelTweetIgnoreFilterInput
-  $limit: Int
-  $nextToken: String
-) {
-  listTweetIgnores(filter: $filter, limit: $limit, nextToken: $nextToken) {
-    items {
-      id
-      url
-      tweetId
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-    }
-    nextToken
-    startedAt
-  }
-}
-query SyncTweetIgnores(
-  $filter: ModelTweetIgnoreFilterInput
-  $limit: Int
-  $nextToken: String
-  $lastSync: AWSTimestamp
-) {
-  syncTweetIgnores(
-    filter: $filter
-    limit: $limit
-    nextToken: $nextToken
-    lastSync: $lastSync
-  ) {
-    items {
-      id
-      url
-      tweetId
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-    }
-    nextToken
-    startedAt
-  }
-}
-query GetTwitterUserIgnore($id: ID!) {
-  getTwitterUserIgnore(id: $id) {
-    id
-    twitterScreenName
-    _version
-    _deleted
-    _lastChangedAt
-    createdAt
-    updatedAt
-    user {
-      id
-      prefs
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-}
-query ListTwitterUserIgnores(
-  $filter: ModelTwitterUserIgnoreFilterInput
-  $limit: Int
-  $nextToken: String
-) {
-  listTwitterUserIgnores(
-    filter: $filter
-    limit: $limit
-    nextToken: $nextToken
-  ) {
-    items {
-      id
-      twitterScreenName
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-    }
-    nextToken
-    startedAt
-  }
-}
-query SyncTwitterUserIgnores(
-  $filter: ModelTwitterUserIgnoreFilterInput
-  $limit: Int
-  $nextToken: String
-  $lastSync: AWSTimestamp
-) {
-  syncTwitterUserIgnores(
-    filter: $filter
-    limit: $limit
-    nextToken: $nextToken
-    lastSync: $lastSync
-  ) {
-    items {
-      id
-      twitterScreenName
       _version
       _deleted
       _lastChangedAt

@@ -1,7 +1,7 @@
-type UserPreferences @model @auth(rules: [{allow: private, operations: [create]}, {allow: owner, operations: [create, update, delete, read]}]) {
+type UserPreferences @model @auth(rules: [{allow: private}, {allow: owner, operations: [create, update, delete, read]}]) {
   id: ID!
-  ignoreTweets: [TweetIgnore] @connection(name: "UserTweetIgnores")
-  ignorePeople: [TwitterUserIgnore] @connection(name: "UserTwitterUserIgnores")
+#  ignoreTweets: [TweetIgnore] @connection(name: "UserTweetIgnores")
+#  ignorePeople: [TwitterUserIgnore] @connection(name: "UserTwitterUserIgnores")
   prefs: AWSJSON
 }
 
@@ -36,16 +36,16 @@ type GroupTwitterUserIgnore @model(timestamps: {createdAt: "createdAt", updatedA
   scope: String!
 }
 
-type TweetIgnore @model @auth(rules: [{allow: private}]) {
-  id: ID!
-  url: String!
-  tweetId: String
-  user: UserPreferences @connection(name: "UserTweetIgnores")
-}
-
-type TwitterUserIgnore @model @auth(rules: [{allow: private}]) {
-  id: ID!
-  twitterScreenName: String!
-  user: UserPreferences @connection(name: "UserTwitterUserIgnores")
-}
- 
+#type TweetIgnore @model @auth(rules: [{allow: private}]) {
+#  id: ID!
+#  url: String!
+#  tweetId: String
+#  user: UserPreferences @connection(name: "UserTweetIgnores")
+#}
+#
+#type TwitterUserIgnore @model @auth(rules: [{allow: private}]) {
+#  id: ID!
+#  twitterScreenName: String!
+#  user: UserPreferences @connection(name: "UserTwitterUserIgnores")
+#}
+#

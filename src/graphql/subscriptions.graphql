@@ -1,6 +1,6 @@
 # this is an auto generated file. This will be overwritten
-subscription OnCreateUserPreferences($owner: String) {
-  onCreateUserPreferences(owner: $owner) {
+subscription OnCreateUserPreferences {
+  onCreateUserPreferences {
     id
     prefs
     _version
@@ -8,19 +8,10 @@ subscription OnCreateUserPreferences($owner: String) {
     _lastChangedAt
     createdAt
     updatedAt
-    owner
-    ignoreTweets {
-      nextToken
-      startedAt
-    }
-    ignorePeople {
-      nextToken
-      startedAt
-    }
   }
 }
-subscription OnUpdateUserPreferences($owner: String) {
-  onUpdateUserPreferences(owner: $owner) {
+subscription OnUpdateUserPreferences {
+  onUpdateUserPreferences {
     id
     prefs
     _version
@@ -28,19 +19,10 @@ subscription OnUpdateUserPreferences($owner: String) {
     _lastChangedAt
     createdAt
     updatedAt
-    owner
-    ignoreTweets {
-      nextToken
-      startedAt
-    }
-    ignorePeople {
-      nextToken
-      startedAt
-    }
   }
 }
-subscription OnDeleteUserPreferences($owner: String) {
-  onDeleteUserPreferences(owner: $owner) {
+subscription OnDeleteUserPreferences {
+  onDeleteUserPreferences {
     id
     prefs
     _version
@@ -48,15 +30,6 @@ subscription OnDeleteUserPreferences($owner: String) {
     _lastChangedAt
     createdAt
     updatedAt
-    owner
-    ignoreTweets {
-      nextToken
-      startedAt
-    }
-    ignorePeople {
-      nextToken
-      startedAt
-    }
   }
 }
 subscription OnCreateUserSession {
@@ -222,134 +195,5 @@ subscription OnDeleteGroupTwitterUserIgnore {
     _lastChangedAt
     createdAt
     updatedAt
-  }
-}
-subscription OnCreateTweetIgnore {
-  onCreateTweetIgnore {
-    id
-    url
-    tweetId
-    _version
-    _deleted
-    _lastChangedAt
-    createdAt
-    updatedAt
-    user {
-      id
-      prefs
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-}
-subscription OnUpdateTweetIgnore {
-  onUpdateTweetIgnore {
-    id
-    url
-    tweetId
-    _version
-    _deleted
-    _lastChangedAt
-    createdAt
-    updatedAt
-    user {
-      id
-      prefs
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-}
-subscription OnDeleteTweetIgnore {
-  onDeleteTweetIgnore {
-    id
-    url
-    tweetId
-    _version
-    _deleted
-    _lastChangedAt
-    createdAt
-    updatedAt
-    user {
-      id
-      prefs
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-}
-subscription OnCreateTwitterUserIgnore {
-  onCreateTwitterUserIgnore {
-    id
-    twitterScreenName
-    _version
-    _deleted
-    _lastChangedAt
-    createdAt
-    updatedAt
-    user {
-      id
-      prefs
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-}
-subscription OnUpdateTwitterUserIgnore {
-  onUpdateTwitterUserIgnore {
-    id
-    twitterScreenName
-    _version
-    _deleted
-    _lastChangedAt
-    createdAt
-    updatedAt
-    user {
-      id
-      prefs
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-}
-subscription OnDeleteTwitterUserIgnore {
-  onDeleteTwitterUserIgnore {
-    id
-    twitterScreenName
-    _version
-    _deleted
-    _lastChangedAt
-    createdAt
-    updatedAt
-    user {
-      id
-      prefs
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-      owner
-    }
   }
 }

@@ -11,15 +11,6 @@ mutation CreateUserPreferences(
     _lastChangedAt
     createdAt
     updatedAt
-    owner
-    ignoreTweets {
-      nextToken
-      startedAt
-    }
-    ignorePeople {
-      nextToken
-      startedAt
-    }
   }
 }
 mutation UpdateUserPreferences(
@@ -34,15 +25,6 @@ mutation UpdateUserPreferences(
     _lastChangedAt
     createdAt
     updatedAt
-    owner
-    ignoreTweets {
-      nextToken
-      startedAt
-    }
-    ignorePeople {
-      nextToken
-      startedAt
-    }
   }
 }
 mutation DeleteUserPreferences(
@@ -57,15 +39,6 @@ mutation DeleteUserPreferences(
     _lastChangedAt
     createdAt
     updatedAt
-    owner
-    ignoreTweets {
-      nextToken
-      startedAt
-    }
-    ignorePeople {
-      nextToken
-      startedAt
-    }
   }
 }
 mutation CreateUserSession(
@@ -267,152 +240,5 @@ mutation DeleteGroupTwitterUserIgnore(
     _lastChangedAt
     createdAt
     updatedAt
-  }
-}
-mutation CreateTweetIgnore(
-  $input: CreateTweetIgnoreInput!
-  $condition: ModelTweetIgnoreConditionInput
-) {
-  createTweetIgnore(input: $input, condition: $condition) {
-    id
-    url
-    tweetId
-    _version
-    _deleted
-    _lastChangedAt
-    createdAt
-    updatedAt
-    user {
-      id
-      prefs
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-}
-mutation UpdateTweetIgnore(
-  $input: UpdateTweetIgnoreInput!
-  $condition: ModelTweetIgnoreConditionInput
-) {
-  updateTweetIgnore(input: $input, condition: $condition) {
-    id
-    url
-    tweetId
-    _version
-    _deleted
-    _lastChangedAt
-    createdAt
-    updatedAt
-    user {
-      id
-      prefs
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-}
-mutation DeleteTweetIgnore(
-  $input: DeleteTweetIgnoreInput!
-  $condition: ModelTweetIgnoreConditionInput
-) {
-  deleteTweetIgnore(input: $input, condition: $condition) {
-    id
-    url
-    tweetId
-    _version
-    _deleted
-    _lastChangedAt
-    createdAt
-    updatedAt
-    user {
-      id
-      prefs
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-}
-mutation CreateTwitterUserIgnore(
-  $input: CreateTwitterUserIgnoreInput!
-  $condition: ModelTwitterUserIgnoreConditionInput
-) {
-  createTwitterUserIgnore(input: $input, condition: $condition) {
-    id
-    twitterScreenName
-    _version
-    _deleted
-    _lastChangedAt
-    createdAt
-    updatedAt
-    user {
-      id
-      prefs
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-}
-mutation UpdateTwitterUserIgnore(
-  $input: UpdateTwitterUserIgnoreInput!
-  $condition: ModelTwitterUserIgnoreConditionInput
-) {
-  updateTwitterUserIgnore(input: $input, condition: $condition) {
-    id
-    twitterScreenName
-    _version
-    _deleted
-    _lastChangedAt
-    createdAt
-    updatedAt
-    user {
-      id
-      prefs
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-}
-mutation DeleteTwitterUserIgnore(
-  $input: DeleteTwitterUserIgnoreInput!
-  $condition: ModelTwitterUserIgnoreConditionInput
-) {
-  deleteTwitterUserIgnore(input: $input, condition: $condition) {
-    id
-    twitterScreenName
-    _version
-    _deleted
-    _lastChangedAt
-    createdAt
-    updatedAt
-    user {
-      id
-      prefs
-      _version
-      _deleted
-      _lastChangedAt
-      createdAt
-      updatedAt
-      owner
-    }
   }
 }
