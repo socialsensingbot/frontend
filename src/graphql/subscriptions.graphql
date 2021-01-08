@@ -161,6 +161,51 @@ subscription OnDeleteGroupTweetIgnore {
     updatedAt
   }
 }
+subscription OnCreateGroupTweetAnnotations {
+  onCreateGroupTweetAnnotations {
+    id
+    url
+    annotatedBy
+    tweetId
+    ownerGroups
+    annotations
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+subscription OnUpdateGroupTweetAnnotations {
+  onUpdateGroupTweetAnnotations {
+    id
+    url
+    annotatedBy
+    tweetId
+    ownerGroups
+    annotations
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+subscription OnDeleteGroupTweetAnnotations {
+  onDeleteGroupTweetAnnotations {
+    id
+    url
+    annotatedBy
+    tweetId
+    ownerGroups
+    annotations
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
 subscription OnCreateGroupTwitterUserIgnore {
   onCreateGroupTwitterUserIgnore {
     id

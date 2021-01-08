@@ -249,6 +249,77 @@ query SyncGroupTweetIgnores(
     startedAt
   }
 }
+query GetGroupTweetAnnotations($id: ID!) {
+  getGroupTweetAnnotations(id: $id) {
+    id
+    url
+    annotatedBy
+    tweetId
+    ownerGroups
+    annotations
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+query ListGroupTweetAnnotationss(
+  $filter: ModelGroupTweetAnnotationsFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listGroupTweetAnnotationss(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      url
+      annotatedBy
+      tweetId
+      ownerGroups
+      annotations
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query SyncGroupTweetAnnotations(
+  $filter: ModelGroupTweetAnnotationsFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncGroupTweetAnnotations(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      url
+      annotatedBy
+      tweetId
+      ownerGroups
+      annotations
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
 query GetGroupTwitterUserIgnore($id: ID!) {
   getGroupTwitterUserIgnore(id: $id) {
     id

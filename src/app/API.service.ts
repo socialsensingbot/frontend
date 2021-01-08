@@ -190,6 +190,41 @@ export type DeleteGroupTweetIgnoreInput = {
   _version?: number | null;
 };
 
+export type CreateGroupTweetAnnotationsInput = {
+  id?: string | null;
+  url: string;
+  annotatedBy: string;
+  tweetId: string;
+  ownerGroups?: Array<string | null> | null;
+  annotations?: string | null;
+  _version?: number | null;
+};
+
+export type ModelGroupTweetAnnotationsConditionInput = {
+  url?: ModelStringInput | null;
+  annotatedBy?: ModelStringInput | null;
+  tweetId?: ModelStringInput | null;
+  annotations?: ModelStringInput | null;
+  and?: Array<ModelGroupTweetAnnotationsConditionInput | null> | null;
+  or?: Array<ModelGroupTweetAnnotationsConditionInput | null> | null;
+  not?: ModelGroupTweetAnnotationsConditionInput | null;
+};
+
+export type UpdateGroupTweetAnnotationsInput = {
+  id: string;
+  url?: string | null;
+  annotatedBy?: string | null;
+  tweetId?: string | null;
+  ownerGroups?: Array<string | null> | null;
+  annotations?: string | null;
+  _version?: number | null;
+};
+
+export type DeleteGroupTweetAnnotationsInput = {
+  id?: string | null;
+  _version?: number | null;
+};
+
 export type CreateGroupTwitterUserIgnoreInput = {
   id?: string | null;
   twitterScreenName: string;
@@ -278,6 +313,18 @@ export type ModelGroupTweetIgnoreFilterInput = {
   and?: Array<ModelGroupTweetIgnoreFilterInput | null> | null;
   or?: Array<ModelGroupTweetIgnoreFilterInput | null> | null;
   not?: ModelGroupTweetIgnoreFilterInput | null;
+};
+
+export type ModelGroupTweetAnnotationsFilterInput = {
+  id?: ModelIDInput | null;
+  url?: ModelStringInput | null;
+  annotatedBy?: ModelStringInput | null;
+  tweetId?: ModelStringInput | null;
+  ownerGroups?: ModelStringInput | null;
+  annotations?: ModelStringInput | null;
+  and?: Array<ModelGroupTweetAnnotationsFilterInput | null> | null;
+  or?: Array<ModelGroupTweetAnnotationsFilterInput | null> | null;
+  not?: ModelGroupTweetAnnotationsFilterInput | null;
 };
 
 export type ModelGroupTwitterUserIgnoreFilterInput = {
@@ -446,6 +493,51 @@ export type DeleteGroupTweetIgnoreMutation = {
   tweetId: string;
   ownerGroups: Array<string | null> | null;
   scope: string;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateGroupTweetAnnotationsMutation = {
+  __typename: "GroupTweetAnnotations";
+  id: string;
+  url: string;
+  annotatedBy: string;
+  tweetId: string;
+  ownerGroups: Array<string | null> | null;
+  annotations: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type UpdateGroupTweetAnnotationsMutation = {
+  __typename: "GroupTweetAnnotations";
+  id: string;
+  url: string;
+  annotatedBy: string;
+  tweetId: string;
+  ownerGroups: Array<string | null> | null;
+  annotations: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type DeleteGroupTweetAnnotationsMutation = {
+  __typename: "GroupTweetAnnotations";
+  id: string;
+  url: string;
+  annotatedBy: string;
+  tweetId: string;
+  ownerGroups: Array<string | null> | null;
+  annotations: string | null;
   _version: number;
   _deleted: boolean | null;
   _lastChangedAt: number;
@@ -697,6 +789,61 @@ export type SyncGroupTweetIgnoresQuery = {
   startedAt: number | null;
 };
 
+export type GetGroupTweetAnnotationsQuery = {
+  __typename: "GroupTweetAnnotations";
+  id: string;
+  url: string;
+  annotatedBy: string;
+  tweetId: string;
+  ownerGroups: Array<string | null> | null;
+  annotations: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ListGroupTweetAnnotationssQuery = {
+  __typename: "ModelGroupTweetAnnotationsConnection";
+  items: Array<{
+    __typename: "GroupTweetAnnotations";
+    id: string;
+    url: string;
+    annotatedBy: string;
+    tweetId: string;
+    ownerGroups: Array<string | null> | null;
+    annotations: string | null;
+    _version: number;
+    _deleted: boolean | null;
+    _lastChangedAt: number;
+    createdAt: string;
+    updatedAt: string;
+  } | null> | null;
+  nextToken: string | null;
+  startedAt: number | null;
+};
+
+export type SyncGroupTweetAnnotationsQuery = {
+  __typename: "ModelGroupTweetAnnotationsConnection";
+  items: Array<{
+    __typename: "GroupTweetAnnotations";
+    id: string;
+    url: string;
+    annotatedBy: string;
+    tweetId: string;
+    ownerGroups: Array<string | null> | null;
+    annotations: string | null;
+    _version: number;
+    _deleted: boolean | null;
+    _lastChangedAt: number;
+    createdAt: string;
+    updatedAt: string;
+  } | null> | null;
+  nextToken: string | null;
+  startedAt: number | null;
+};
+
 export type GetGroupTwitterUserIgnoreQuery = {
   __typename: "GroupTwitterUserIgnore";
   id: string;
@@ -904,6 +1051,51 @@ export type OnDeleteGroupTweetIgnoreSubscription = {
   tweetId: string;
   ownerGroups: Array<string | null> | null;
   scope: string;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OnCreateGroupTweetAnnotationsSubscription = {
+  __typename: "GroupTweetAnnotations";
+  id: string;
+  url: string;
+  annotatedBy: string;
+  tweetId: string;
+  ownerGroups: Array<string | null> | null;
+  annotations: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OnUpdateGroupTweetAnnotationsSubscription = {
+  __typename: "GroupTweetAnnotations";
+  id: string;
+  url: string;
+  annotatedBy: string;
+  tweetId: string;
+  ownerGroups: Array<string | null> | null;
+  annotations: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OnDeleteGroupTweetAnnotationsSubscription = {
+  __typename: "GroupTweetAnnotations";
+  id: string;
+  url: string;
+  annotatedBy: string;
+  tweetId: string;
+  ownerGroups: Array<string | null> | null;
+  annotations: string | null;
   _version: number;
   _deleted: boolean | null;
   _lastChangedAt: number;
@@ -1310,6 +1502,105 @@ export class APIService {
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
     return <DeleteGroupTweetIgnoreMutation>response.data.deleteGroupTweetIgnore;
+  }
+  async CreateGroupTweetAnnotations(
+    input: CreateGroupTweetAnnotationsInput,
+    condition?: ModelGroupTweetAnnotationsConditionInput
+  ): Promise<CreateGroupTweetAnnotationsMutation> {
+    const statement = `mutation CreateGroupTweetAnnotations($input: CreateGroupTweetAnnotationsInput!, $condition: ModelGroupTweetAnnotationsConditionInput) {
+        createGroupTweetAnnotations(input: $input, condition: $condition) {
+          __typename
+          id
+          url
+          annotatedBy
+          tweetId
+          ownerGroups
+          annotations
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <CreateGroupTweetAnnotationsMutation>(
+      response.data.createGroupTweetAnnotations
+    );
+  }
+  async UpdateGroupTweetAnnotations(
+    input: UpdateGroupTweetAnnotationsInput,
+    condition?: ModelGroupTweetAnnotationsConditionInput
+  ): Promise<UpdateGroupTweetAnnotationsMutation> {
+    const statement = `mutation UpdateGroupTweetAnnotations($input: UpdateGroupTweetAnnotationsInput!, $condition: ModelGroupTweetAnnotationsConditionInput) {
+        updateGroupTweetAnnotations(input: $input, condition: $condition) {
+          __typename
+          id
+          url
+          annotatedBy
+          tweetId
+          ownerGroups
+          annotations
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <UpdateGroupTweetAnnotationsMutation>(
+      response.data.updateGroupTweetAnnotations
+    );
+  }
+  async DeleteGroupTweetAnnotations(
+    input: DeleteGroupTweetAnnotationsInput,
+    condition?: ModelGroupTweetAnnotationsConditionInput
+  ): Promise<DeleteGroupTweetAnnotationsMutation> {
+    const statement = `mutation DeleteGroupTweetAnnotations($input: DeleteGroupTweetAnnotationsInput!, $condition: ModelGroupTweetAnnotationsConditionInput) {
+        deleteGroupTweetAnnotations(input: $input, condition: $condition) {
+          __typename
+          id
+          url
+          annotatedBy
+          tweetId
+          ownerGroups
+          annotations
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <DeleteGroupTweetAnnotationsMutation>(
+      response.data.deleteGroupTweetAnnotations
+    );
   }
   async CreateGroupTwitterUserIgnore(
     input: CreateGroupTwitterUserIgnoreInput,
@@ -1833,6 +2124,125 @@ export class APIService {
     )) as any;
     return <SyncGroupTweetIgnoresQuery>response.data.syncGroupTweetIgnores;
   }
+  async GetGroupTweetAnnotations(
+    id: string
+  ): Promise<GetGroupTweetAnnotationsQuery> {
+    const statement = `query GetGroupTweetAnnotations($id: ID!) {
+        getGroupTweetAnnotations(id: $id) {
+          __typename
+          id
+          url
+          annotatedBy
+          tweetId
+          ownerGroups
+          annotations
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      id
+    };
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <GetGroupTweetAnnotationsQuery>(
+      response.data.getGroupTweetAnnotations
+    );
+  }
+  async ListGroupTweetAnnotationss(
+    filter?: ModelGroupTweetAnnotationsFilterInput,
+    limit?: number,
+    nextToken?: string
+  ): Promise<ListGroupTweetAnnotationssQuery> {
+    const statement = `query ListGroupTweetAnnotationss($filter: ModelGroupTweetAnnotationsFilterInput, $limit: Int, $nextToken: String) {
+        listGroupTweetAnnotationss(filter: $filter, limit: $limit, nextToken: $nextToken) {
+          __typename
+          items {
+            __typename
+            id
+            url
+            annotatedBy
+            tweetId
+            ownerGroups
+            annotations
+            _version
+            _deleted
+            _lastChangedAt
+            createdAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {};
+    if (filter) {
+      gqlAPIServiceArguments.filter = filter;
+    }
+    if (limit) {
+      gqlAPIServiceArguments.limit = limit;
+    }
+    if (nextToken) {
+      gqlAPIServiceArguments.nextToken = nextToken;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <ListGroupTweetAnnotationssQuery>(
+      response.data.listGroupTweetAnnotationss
+    );
+  }
+  async SyncGroupTweetAnnotations(
+    filter?: ModelGroupTweetAnnotationsFilterInput,
+    limit?: number,
+    nextToken?: string,
+    lastSync?: number
+  ): Promise<SyncGroupTweetAnnotationsQuery> {
+    const statement = `query SyncGroupTweetAnnotations($filter: ModelGroupTweetAnnotationsFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
+        syncGroupTweetAnnotations(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
+          __typename
+          items {
+            __typename
+            id
+            url
+            annotatedBy
+            tweetId
+            ownerGroups
+            annotations
+            _version
+            _deleted
+            _lastChangedAt
+            createdAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {};
+    if (filter) {
+      gqlAPIServiceArguments.filter = filter;
+    }
+    if (limit) {
+      gqlAPIServiceArguments.limit = limit;
+    }
+    if (nextToken) {
+      gqlAPIServiceArguments.nextToken = nextToken;
+    }
+    if (lastSync) {
+      gqlAPIServiceArguments.lastSync = lastSync;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <SyncGroupTweetAnnotationsQuery>(
+      response.data.syncGroupTweetAnnotations
+    );
+  }
   async GetGroupTwitterUserIgnore(
     id: string
   ): Promise<GetGroupTwitterUserIgnoreQuery> {
@@ -2206,6 +2616,81 @@ export class APIService {
       }`
     )
   ) as Observable<SubscriptionResponse<OnDeleteGroupTweetIgnoreSubscription>>;
+
+  OnCreateGroupTweetAnnotationsListener: Observable<
+    SubscriptionResponse<OnCreateGroupTweetAnnotationsSubscription>
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnCreateGroupTweetAnnotations {
+        onCreateGroupTweetAnnotations {
+          __typename
+          id
+          url
+          annotatedBy
+          tweetId
+          ownerGroups
+          annotations
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<
+    SubscriptionResponse<OnCreateGroupTweetAnnotationsSubscription>
+  >;
+
+  OnUpdateGroupTweetAnnotationsListener: Observable<
+    SubscriptionResponse<OnUpdateGroupTweetAnnotationsSubscription>
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnUpdateGroupTweetAnnotations {
+        onUpdateGroupTweetAnnotations {
+          __typename
+          id
+          url
+          annotatedBy
+          tweetId
+          ownerGroups
+          annotations
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<
+    SubscriptionResponse<OnUpdateGroupTweetAnnotationsSubscription>
+  >;
+
+  OnDeleteGroupTweetAnnotationsListener: Observable<
+    SubscriptionResponse<OnDeleteGroupTweetAnnotationsSubscription>
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnDeleteGroupTweetAnnotations {
+        onDeleteGroupTweetAnnotations {
+          __typename
+          id
+          url
+          annotatedBy
+          tweetId
+          ownerGroups
+          annotations
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<
+    SubscriptionResponse<OnDeleteGroupTweetAnnotationsSubscription>
+  >;
 
   OnCreateGroupTwitterUserIgnoreListener: Observable<
     SubscriptionResponse<OnCreateGroupTwitterUserIgnoreSubscription>

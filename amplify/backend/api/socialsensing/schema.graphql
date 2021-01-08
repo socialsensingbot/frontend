@@ -32,6 +32,17 @@ type GroupTweetIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "up
   scope: String!
 }
 
+type GroupTweetAnnotations @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}) @auth(rules: [{allow:
+groups, groupsField: "ownerGroups"}, {allow: private, operations: [read]}]) {
+  id: ID!
+  url: String!
+  annotatedBy: String!
+  tweetId: String!
+  ownerGroups: [String]
+  annotations: AWSJSON
+}
+
+
 type GroupTwitterUserIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}) @auth(rules: [{allow: groups, groupsField: "ownerGroups"}, {allow: private, operations: [read]}]) {
   id: ID!
   twitterScreenName: String!
