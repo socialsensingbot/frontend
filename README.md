@@ -35,7 +35,8 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 # Getting Started
 
-### Installation and Quick Start
+
+## Installation and Quick Start
 
 <https://aws-amplify.github.io/docs/js/start?platform=angular>
 
@@ -57,6 +58,31 @@ Make sure you are in the top level of the project and follow the instructions be
 
        amplify status
        
+      
+      
+## The Application
+
+### Preferences
+
+Preferences can be set per environment, per group  or per user.
+They have this order :-
+default value -> environment override -> group preference -> user preference
+
+The default preference values are in :- [src/environments/environment.ts](https://github.com/socialsensingbot/frontend/blob/master/src/environments/environment.ts)
+
+They are overriden by other files in the [environments](https://github.com/socialsensingbot/frontend/tree/master/src/environments) folder for each environment. 
+
+They appear in the Group & UserPreference table and the value is a JSON string called **prefs** containing arbitrary values. (See [schema.graphql](https://github.com/socialsensingbot/frontend/blob/release/1.4/amplify/backend/api/socialsensing/schema.graphql) for details.
+
+That JSON can overide any value specified in  [src/environments/environment.ts](https://github.com/socialsensingbot/frontend/blob/master/src/environments/environment.ts)
+
+
+e.g.
+```json
+  {
+    "toolbarColor": "warn"
+  }
+```  
        
 ## Development Quick Reference
 
@@ -99,6 +125,7 @@ Within the src folder you will find the [app](/src/app) folder which contains th
 The [environments](/src/environments) folder contains application variables that are environment specific. Most importantly [environment.production](/src/environments/environment.prod.ts) which contains amongst other things the version number of the application - this needs to be updated every time a new release/x.y.z branch is created.
 
 The [amplify](/amplify) folder contains all the amplify generated configuration and should not be manually edited.
+
 
 ### The Application Structure
 
