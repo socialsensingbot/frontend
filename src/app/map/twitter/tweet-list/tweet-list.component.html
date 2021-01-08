@@ -23,6 +23,19 @@
       </button>
       <button *ngIf="ti" (click)="unIgnoreTweet(tweet,$event);" mat-menu-item>Unignore Tweet
       </button>
+      <ng-container *ngIf="pref.combined.features.impact.active">
+        <ng-container *ngFor="let level of pref.combined.features.impact.levels">
+          <button *ngIf="annotationValueIs(tweet, 'impact',level.value) | async"
+                  (click)="annotateTweet(tweet,{impact:''}, $event);"
+                  mat-menu-item><strong>{{level.title}}</strong>
+          </button>
+          <button *ngIf="annotationValueIsNot(tweet, 'impact',level.value) | async"
+                  (click)="annotateTweet(tweet,{impact:level.value}, $event);"
+                  mat-menu-item>{{level.title}}
+          </button>
+        </ng-container>
+
+      </ng-container>
 
       <!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
 
