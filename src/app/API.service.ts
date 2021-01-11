@@ -78,7 +78,7 @@ export type CreateUserSessionInput = {
   client?: string | null;
   open: boolean;
   group?: string | null;
-  owner?: string | null;
+  user?: string | null;
   ttl?: number | null;
   _version?: number | null;
 };
@@ -88,6 +88,7 @@ export type ModelUserSessionConditionInput = {
   client?: ModelStringInput | null;
   open?: ModelBooleanInput | null;
   group?: ModelStringInput | null;
+  user?: ModelStringInput | null;
   ttl?: ModelIntInput | null;
   and?: Array<ModelUserSessionConditionInput | null> | null;
   or?: Array<ModelUserSessionConditionInput | null> | null;
@@ -119,7 +120,7 @@ export type UpdateUserSessionInput = {
   client?: string | null;
   open?: boolean | null;
   group?: string | null;
-  owner?: string | null;
+  user?: string | null;
   ttl?: number | null;
   _version?: number | null;
 };
@@ -287,7 +288,7 @@ export type ModelUserSessionFilterInput = {
   client?: ModelStringInput | null;
   open?: ModelBooleanInput | null;
   group?: ModelStringInput | null;
-  owner?: ModelStringInput | null;
+  user?: ModelStringInput | null;
   ttl?: ModelIntInput | null;
   and?: Array<ModelUserSessionFilterInput | null> | null;
   or?: Array<ModelUserSessionFilterInput | null> | null;
@@ -378,7 +379,7 @@ export type CreateUserSessionMutation = {
   client: string | null;
   open: boolean;
   group: string | null;
-  owner: string | null;
+  user: string | null;
   ttl: number | null;
   _version: number;
   _deleted: boolean | null;
@@ -394,7 +395,7 @@ export type UpdateUserSessionMutation = {
   client: string | null;
   open: boolean;
   group: string | null;
-  owner: string | null;
+  user: string | null;
   ttl: number | null;
   _version: number;
   _deleted: boolean | null;
@@ -410,7 +411,7 @@ export type DeleteUserSessionMutation = {
   client: string | null;
   open: boolean;
   group: string | null;
-  owner: string | null;
+  user: string | null;
   ttl: number | null;
   _version: number;
   _deleted: boolean | null;
@@ -637,7 +638,7 @@ export type GetUserSessionQuery = {
   client: string | null;
   open: boolean;
   group: string | null;
-  owner: string | null;
+  user: string | null;
   ttl: number | null;
   _version: number;
   _deleted: boolean | null;
@@ -655,7 +656,7 @@ export type ListUserSessionsQuery = {
     client: string | null;
     open: boolean;
     group: string | null;
-    owner: string | null;
+    user: string | null;
     ttl: number | null;
     _version: number;
     _deleted: boolean | null;
@@ -676,7 +677,7 @@ export type SyncUserSessionsQuery = {
     client: string | null;
     open: boolean;
     group: string | null;
-    owner: string | null;
+    user: string | null;
     ttl: number | null;
     _version: number;
     _deleted: boolean | null;
@@ -936,7 +937,7 @@ export type OnCreateUserSessionSubscription = {
   client: string | null;
   open: boolean;
   group: string | null;
-  owner: string | null;
+  user: string | null;
   ttl: number | null;
   _version: number;
   _deleted: boolean | null;
@@ -952,7 +953,7 @@ export type OnUpdateUserSessionSubscription = {
   client: string | null;
   open: boolean;
   group: string | null;
-  owner: string | null;
+  user: string | null;
   ttl: number | null;
   _version: number;
   _deleted: boolean | null;
@@ -968,7 +969,7 @@ export type OnDeleteUserSessionSubscription = {
   client: string | null;
   open: boolean;
   group: string | null;
-  owner: string | null;
+  user: string | null;
   ttl: number | null;
   _version: number;
   _deleted: boolean | null;
@@ -1242,7 +1243,7 @@ export class APIService {
           client
           open
           group
-          owner
+          user
           ttl
           _version
           _deleted
@@ -1274,7 +1275,7 @@ export class APIService {
           client
           open
           group
-          owner
+          user
           ttl
           _version
           _deleted
@@ -1306,7 +1307,7 @@ export class APIService {
           client
           open
           group
-          owner
+          user
           ttl
           _version
           _deleted
@@ -1806,7 +1807,7 @@ export class APIService {
           client
           open
           group
-          owner
+          user
           ttl
           _version
           _deleted
@@ -1838,7 +1839,7 @@ export class APIService {
             client
             open
             group
-            owner
+            user
             ttl
             _version
             _deleted
@@ -1881,7 +1882,7 @@ export class APIService {
             client
             open
             group
-            owner
+            user
             ttl
             _version
             _deleted
@@ -2428,7 +2429,7 @@ export class APIService {
           client
           open
           group
-          owner
+          user
           ttl
           _version
           _deleted
@@ -2452,7 +2453,7 @@ export class APIService {
           client
           open
           group
-          owner
+          user
           ttl
           _version
           _deleted
@@ -2476,7 +2477,7 @@ export class APIService {
           client
           open
           group
-          owner
+          user
           ttl
           _version
           _deleted

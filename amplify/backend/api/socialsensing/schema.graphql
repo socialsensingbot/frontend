@@ -7,13 +7,13 @@ type UserPreferences @model @auth(rules: [{allow: private}, {allow: owner, opera
 
 type UserSession
 @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
-@auth(rules: [{allow: private}{allow: owner, ownerField: "owner", operations: [create, update, delete, read]}]) {
+@auth(rules: [{allow: private}{allow: owner, operations: [create, update, delete, read]}]) {
   id: ID!
   fingerprint: String
   client: AWSJSON
   open: Boolean!
   group: String
-  owner:String
+  user: String
   ttl: AWSTimestamp
 }
 

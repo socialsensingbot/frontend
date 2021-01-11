@@ -51,7 +51,7 @@ mutation CreateUserSession(
     client
     open
     group
-    owner
+    user
     ttl
     _version
     _deleted
@@ -70,7 +70,7 @@ mutation UpdateUserSession(
     client
     open
     group
-    owner
+    user
     ttl
     _version
     _deleted
@@ -89,7 +89,7 @@ mutation DeleteUserSession(
     client
     open
     group
-    owner
+    user
     ttl
     _version
     _deleted

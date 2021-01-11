@@ -61,7 +61,7 @@ query GetUserSession($id: ID!) {
     client
     open
     group
-    owner
+    user
     ttl
     _version
     _deleted
@@ -82,7 +82,7 @@ query ListUserSessions(
       client
       open
       group
-      owner
+      user
       ttl
       _version
       _deleted
@@ -112,7 +112,7 @@ query SyncUserSessions(
       client
       open
       group
-      owner
+      user
       ttl
       _version
       _deleted

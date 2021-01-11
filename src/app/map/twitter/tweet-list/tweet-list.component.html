@@ -23,8 +23,8 @@
       </button>
       <button *ngIf="ti" (click)="unIgnoreTweet(tweet,$event);" mat-menu-item>Unignore Tweet
       </button>
-      <ng-container *ngIf="pref.combined.features.impact.active">
-        <ng-container *ngFor="let level of pref.combined.features.impact.levels">
+      <ng-container *ngIf="pref.combined.features.includes('impact')">
+        <ng-container *ngFor="let level of pref.combined.impact.levels">
           <button *ngIf="annotationValueIs(tweet, 'impact',level.value) | async"
                   (click)="annotateTweet(tweet,{impact:''}, $event);"
                   mat-menu-item><strong>{{level.title}}</strong>

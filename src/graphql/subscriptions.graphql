@@ -39,7 +39,7 @@ subscription OnCreateUserSession {
     client
     open
     group
-    owner
+    user
     ttl
     _version
     _deleted
@@ -55,7 +55,7 @@ subscription OnUpdateUserSession {
     client
     open
     group
-    owner
+    user
     ttl
     _version
     _deleted
@@ -71,7 +71,7 @@ subscription OnDeleteUserSession {
     client
     open
     group
-    owner
+    user
     ttl
     _version
     _deleted

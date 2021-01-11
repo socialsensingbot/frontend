@@ -19,18 +19,16 @@ export const environment = {
     email:    "",
     password: ""
   },
-  features:             {
-    impact: {
-      //The ability to tag tweets with an impact annotation
-      active: true, // Is this feature active
-      levels: [
-        {title: "1 – minimal", value: "minimal"},
-        {title: "2 – minor", value: "minor"},
-        {title: "3 - significant", value: "significant"},
-        {title: "4 - severe", value: "severe"}
-      ]
-    }
+  impact: {
+    //The ability to tag tweets with an impact annotation
+    levels: [
+      {title: "1 – Minimal", value: "minimal"},
+      {title: "2 – Minor", value: "minor"},
+      {title: "3 - Significant", value: "significant"},
+      {title: "4 - Severe", value: "severe"}
+    ]
   },
+  features:             ["impact"],
   showErrors:           false,
   showLoadingMessages:  true,
   sanitizeForGDPR:      true,

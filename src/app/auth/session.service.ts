@@ -170,16 +170,19 @@ export class SessionService implements OnInit, OnDestroy {
     return (await API.graphql(
       graphqlOperation(
         `subscription OnCreateUserSession($owner: String!) {
-        onCreateUserSession(owner: $owner) {
-          __typename
-          id
-          fingerprint
-          client
-          open
-          ttl
-          createdAt
-          updatedAt
-          owner
+        onCreateUserSession(user: $owner) {
+         id
+    fingerprint
+    client
+    open
+    group
+    user
+    ttl
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
         }
       }`
         , {owner: userInfo.username})) as any).subscribe(onSession);
@@ -250,7 +253,7 @@ export class SessionService implements OnInit, OnDestroy {
                                          open:        true,
                                          ttl:         this.serverTTL(),
                                          group:       this._pref.groups[0],
-                                         owner:       (await Auth.currentUserInfo()).username
+                                         user:       (await Auth.currentUserInfo()).username
                                        });
 
 
@@ -280,7 +283,7 @@ export class SessionService implements OnInit, OnDestroy {
     const group = this._pref.groups[0];
     const sessionItems = await this._api.ListUserSessions(
       {group: {eq: group}, fingerprint: {ne: this.calculateFingerPrint()}});
-    const userSessions = sessionItems.items.map(i => i.owner);
+    const userSessions = sessionItems.items.map(i => i.user);
     const loggedInCount = new Set(userSessions).size;
     if (this._pref.combined.maxUsers > -1) {
       if (loggedInCount > this._pref.combined.maxUsers) {
