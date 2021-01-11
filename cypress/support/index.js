@@ -16,7 +16,7 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 
-require('cypress-plugin-retries');
+// require('cypress-plugin-retries');
 
 // Cypress.on("window:before:load", win => {
 //     win.indexedDB.deleteDatabase("ngForage");

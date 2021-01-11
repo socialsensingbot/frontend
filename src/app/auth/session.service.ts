@@ -19,7 +19,7 @@ const SESSION_END = "app-session-end";
 @Injectable({
               providedIn: "root"
             })
-export class SessionService implements OnInit, OnDestroy {
+export class SessionService  {
   /**
    * A string id for the session, it is irrelevant what this contains as long as it is unique.
    */
@@ -58,13 +58,11 @@ export class SessionService implements OnInit, OnDestroy {
    *
    * (Good housekeeping)
    */
-  public ngOnDestroy(): void {
+  public finish(): void {
     this.removeSessionSubscription();
     this.stopHeartbeat();
   }
 
-  public ngOnInit(): void {
-  }
 
   /**
    * Create an application level session for a logged in user.

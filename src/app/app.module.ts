@@ -72,7 +72,7 @@ import {SafeHtmlPipe} from "./safe.pipe";
               ReactiveFormsModule,
               Ng5SliderModule,
               InfiniteScrollModule,
-              LeafletModule.forRoot()
+              LeafletModule
             ],
             providers:       [{
               provide: AmplifyService,
