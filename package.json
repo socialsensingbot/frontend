@@ -34,6 +34,7 @@
         "@aws-amplify/interactions": "^3.3.17",
         "@aws-amplify/pubsub": "^3.2.15",
         "@aws-amplify/storage": "^3.3.17",
+        "@aws-amplify/ui": "^2.0.2",
         "@aws-amplify/ui-angular": "^0.4.17",
         "@aws-amplify/xr": "^2.2.17",
         "@types/graphql": "^14.5.0",
