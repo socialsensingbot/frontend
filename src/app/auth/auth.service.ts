@@ -3,7 +3,8 @@ import Auth from '@aws-amplify/auth';
 import {Hub} from '@aws-amplify/core';
 import {Observable, Subject} from 'rxjs';
 import {CognitoUser} from 'amazon-cognito-identity-js';
-import {Logger} from "aws-amplify";
+import {Logger} from "@aws-amplify/core";
+import {DataStore} from "@aws-amplify/datastore";
 
 export interface NewUser {
   email: string,
@@ -66,6 +67,7 @@ export class AuthService {
 
   async signOut(): Promise<any> {
     this.loggedIn = false;
+    await DataStore.clear();
     return Auth.signOut()
                .then(() => this.loggedIn = false);
   }

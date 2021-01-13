@@ -1,5 +1,5 @@
 import {Component, NgZone, OnDestroy, OnInit} from "@angular/core";
-import {Auth, Logger} from "aws-amplify";
+import {Logger} from "@aws-amplify/core";
 import {Browser, GeoJSON, latLng, LayerGroup, layerGroup, LeafletMouseEvent, Map, tileLayer} from "leaflet";
 import "jquery-ui/ui/widgets/slider.js";
 import {ActivatedRoute, NavigationStart, Params, Router} from "@angular/router";
@@ -33,6 +33,7 @@ import {PreferenceService} from "../pref/preference.service";
 import {APIService} from "../API.service";
 import {NgForageCache} from "ngforage";
 import {environment} from "../../environments/environment";
+import Auth from "@aws-amplify/auth";
 
 
 const log = new Logger("map");
@@ -156,7 +157,6 @@ export class MapComponent implements OnInit, OnDestroy {
               private _color: ColorCodeService,
               public data: MapDataService,
               public pref: PreferenceService,
-              private _api: APIService,
               private readonly cache: NgForageCache,
   ) {
     // save the query parameter observable

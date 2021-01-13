@@ -1,23 +1,26 @@
-type UserPreferences @model @auth(rules: [{allow: private}, {allow: owner, operations: [create, update, delete, read]}]) {
+type UserPreferences @model @auth(rules: [{allow: owner,  operations: [create, update, delete, read]}]) {
   id: ID!
-#  ignoreTweets: [TweetIgnore] @connection(name: "UserTweetIgnores")
-#  ignorePeople: [TwitterUserIgnore] @connection(name: "UserTwitterUserIgnores")
+  owner: String
+  #  ignoreTweets: [TweetIgnore] @connection(name: "UserTweetIgnores")
+  #  ignorePeople: [TwitterUserIgnore] @connection(name: "UserTwitterUserIgnores")
   prefs: AWSJSON
 }
 
 type UserSession
 @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
-@auth(rules: [{allow: private}{allow: owner, operations: [create, update, delete, read]}]) {
+@auth(rules: [{allow: owner, operations: [create, update, delete, read]}]) {
   id: ID!
   fingerprint: String
   client: AWSJSON
   open: Boolean!
-  group: String
-  user: String
-  ttl: AWSTimestamp
+  group: String!
+  owner: String
+  ttl: Int
+  createdAt: AWSDateTime
+  sessionId: String
 }
 
-type GroupPreferences @model @auth(rules: [{allow: private, operations: [read]}, {allow: groups, groupsField: "group"}]) {
+type GroupPreferences @model @auth(rules: [ {allow: groups, groupsField: "group"}]) {
   id: ID!
   group: String!
   prefs: AWSJSON

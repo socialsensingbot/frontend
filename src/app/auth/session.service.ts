@@ -1,15 +1,12 @@
-import {Injectable, OnDestroy, OnInit} from "@angular/core";
-import {API, Auth, graphqlOperation, Logger} from "aws-amplify";
-import {
-  APIService,
-  CreateUserSessionMutation,
-  GetUserSessionQuery,
-  OnCreateUserSessionSubscription
-} from "../API.service";
+import {Injectable} from "@angular/core";
+import {  Logger} from "@aws-amplify/core";
 import {NotificationService} from "../services/notification.service";
 import {Subscription, timer} from "rxjs";
 import {PreferenceService} from "../pref/preference.service";
 import {AuthService} from "./auth.service";
+import {DataStore} from "@aws-amplify/datastore";
+import {UserSession} from "../../models";
+import Auth from "@aws-amplify/auth";
 
 const log = new Logger("session");
 
@@ -19,11 +16,7 @@ const SESSION_END = "app-session-end";
 @Injectable({
               providedIn: "root"
             })
-export class SessionService  {
-  /**
-   * A string id for the session, it is irrelevant what this contains as long as it is unique.
-   */
-  private _sessionId: string;
+export class SessionService {
 
   /**
    * This is the subscription to new sessions being added. It is closed OnDestroy.
@@ -41,13 +34,10 @@ export class SessionService  {
    */
   private _heartbeatTimer: Subscription;
 
-  /**
-   * The session as returned from GetUserSession
-   */
-  private _session: GetUserSessionQuery;
+  private session: UserSession;
+  private _sessionId: string;
 
   constructor(private _notify: NotificationService,
-              private _api: APIService,
               private _pref: PreferenceService,
               private _auth: AuthService) {
 
@@ -70,7 +60,7 @@ export class SessionService  {
    */
   public async open(userInfo) {
     await this._pref.waitUntilReady();
-    if (userInfo && !this._sessionId) {
+    if (userInfo && !this.session) {
       const sessionToken = window.localStorage.getItem(SESSION_TOKEN);
       const sessionEndTime = window.localStorage.getItem(SESSION_END);
 
@@ -80,7 +70,7 @@ export class SessionService  {
       // oldest session on DynamoDB as that is the session that will be logged out.
 
       if (sessionToken && sessionEndTime && +sessionEndTime > Date.now()) {
-        this._sessionId = sessionToken;
+        this.session = await this.getSessionOrNull();
         this.heartbeat();
         log.info("Existing session");
       } else {
@@ -88,7 +78,7 @@ export class SessionService  {
       }
 
 
-      this._session = await this.getOrCreateServerSession(userInfo);
+      this.session = await this.getOrCreateServerSession(userInfo);
       this._sessionSubscription = await this.listenForNewServerSessions(userInfo, sessionToken);
 
       // Start the heartbeat which keeps the session active
@@ -103,7 +93,11 @@ export class SessionService  {
     window.localStorage.setItem(SESSION_END, "" + this.localTTL());
     if (this._auth.loggedIn) {
       try {
-        await this._api.UpdateUserSession({id: this._sessionId, open: true, ttl: this.serverTTL()});
+
+        this.session = await DataStore.save(UserSession.copyOf(this.session, updated => {
+          updated.ttl = this.serverTTL();
+          updated.open = true;
+        }));
       } catch (e) {
         log.error("Heartbeat failed", e);
       }
@@ -116,13 +110,16 @@ export class SessionService  {
   public async close() {
     await this._pref.waitUntilReady();
     if (this._auth.loggedIn) {
-      await this._api.UpdateUserSession({id: this._sessionId, open: false});
+      this.session = await DataStore.save(UserSession.copyOf(this.session, updated => {
+        updated.ttl = this.serverTTL();
+        updated.open = false;
+      }));
       log.info("Closing user session");
       this.removeSessionSubscription();
       this.stopHeartbeat();
     }
 
-    this._sessionId = null;
+    this.session = null;
     window.localStorage.removeItem(SESSION_TOKEN);
   }
 
@@ -146,44 +143,24 @@ export class SessionService  {
    * @param userInfo the Cognito info for the current user.
    * @param sessionToken a session token using our
    */
-  private async listenForNewServerSessions(userInfo, sessionToken: string) {
-
-    // This is run when a new session is created on DynamoDB
-    const onSession = (subObj: any) => {
-      log.info("New session detected.");
-      const sub: OnCreateUserSessionSubscription = subObj.value.data.onCreateUserSession;
-      if (!sub.id) {
-        log.warn("Invalid id for sub", sub);
-      }
-
-      if (sub.id && sub.id !== this._sessionId) {
-        log.debug(`${sub.id} is not ${this._sessionId}`);
-        log.debug(sub);
-        this.moreThanOneSession(Date.parse(this._session.createdAt) < Date.parse(sub.createdAt));
-      }
-    };
-
-
-    // @ts-ignore
-    return (await API.graphql(
-      graphqlOperation(
-        `subscription OnCreateUserSession($owner: String!) {
-        onCreateUserSession(user: $owner) {
-         id
-    fingerprint
-    client
-    open
-    group
-    user
-    ttl
-    _version
-    _deleted
-    _lastChangedAt
-    createdAt
-    updatedAt
+  private async listenForNewServerSessions(userInfo, sessionToken: string){
+    return await DataStore.observe(UserSession).subscribe(msg => {
+      console.log(msg.model, msg.opType, msg.element);
+      if (msg.element.owner === userInfo.username) {
+        log.info("New session detected.");
+        const sub = msg.element;
+        if (!sub.id) {
+          log.warn("Invalid id for sub", sub);
         }
-      }`
-        , {owner: userInfo.username})) as any).subscribe(onSession);
+
+        if (sub.id && sub.id !== this.session.id) {
+          log.debug(`${sub.id} is not ${this.session.id}`);
+          log.debug(sub);
+          this.moreThanOneSession(this.session.createdAt < sub.createdAt);
+        }
+      }
+    });
+
   }
 
   private createLocalSession(userInfo) {
@@ -201,11 +178,11 @@ export class SessionService  {
    * @param userInfo the Cognito info for the current user.
    * @param fail if true fail on error, if false then retry.
    */
-  private async getOrCreateServerSession(userInfo, fail = false): Promise<GetUserSessionQuery> {
+  private async getOrCreateServerSession(userInfo, fail = false): Promise<UserSession> {
     try {
       if (await this.checkUserLimit()) {
 
-        const existingSession = await this._api.GetUserSession(this._sessionId);
+        const existingSession = await this.getSessionOrNull();
         if (existingSession) {
           if (existingSession.open) {
             this.moreThanOnce();
@@ -213,11 +190,11 @@ export class SessionService  {
           } else {
             this.createLocalSession(userInfo);
             await this.createServerSession();
-            return this._api.GetUserSession(this._sessionId);
+            return await this.getSessionOrNull();
           }
         } else {
           await this.createServerSession();
-          return this._api.GetUserSession(this._sessionId);
+          return await this.getSessionOrNull();
         }
       } else {
         return null;
@@ -232,10 +209,19 @@ export class SessionService  {
     }
   }
 
+  private async getSessionOrNull(): Promise<UserSession | null> {
+    const result = await DataStore.query(UserSession, q => q.sessionId("eq", this._sessionId));
+    if (result.length === 0) {
+      return null;
+    } else {
+      return result[0];
+    }
+  }
+
   /**
    * Creates a new server session which includes auditing information
    */
-  private async createServerSession(): Promise<CreateUserSessionMutation> {
+  private async createServerSession(): Promise<UserSession> {
     let client: string;
     try {
       client = await (await fetch("https://ipapi.co/json/")).text();
@@ -244,15 +230,14 @@ export class SessionService  {
     }
 
 
-    return this._api.CreateUserSession({
-                                         id:          this._sessionId,
-                                         fingerprint: this.calculateFingerPrint(),
-                                         client,
-                                         open:        true,
-                                         ttl:         this.serverTTL(),
-                                         group:       this._pref.groups[0],
-                                         user:       (await Auth.currentUserInfo()).username
-                                       });
+    return DataStore.save(new UserSession({
+                                            fingerprint: this.calculateFingerPrint(),
+                                            client,
+                                            open:        true,
+                                            ttl:         this.serverTTL(),
+                                            group:       this._pref.groups[0],
+                                            owner:       (await Auth.currentUserInfo()).username
+                                          }));
 
 
   }
@@ -279,9 +264,10 @@ export class SessionService  {
   private async checkUserLimit() {
     await this._pref.waitUntilReady();
     const group = this._pref.groups[0];
-    const sessionItems = await this._api.ListUserSessions(
-      {group: {eq: group}, fingerprint: {ne: this.calculateFingerPrint()}});
-    const userSessions = sessionItems.items.map(i => i.user);
+    const sessionItems = await DataStore.query(UserSession,
+                                               q => q.group("eq", group)
+                                                     .fingerprint("ne", this.calculateFingerPrint()));
+    const userSessions = sessionItems.map(i => i.owner);
     const loggedInCount = new Set(userSessions).size;
     if (this._pref.combined.maxUsers > -1) {
       if (loggedInCount > this._pref.combined.maxUsers) {

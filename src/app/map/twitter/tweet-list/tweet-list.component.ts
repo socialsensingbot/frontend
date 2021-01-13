@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output} from "@angular/core";
 import {Tweet} from "../tweet";
 import {PreferenceService} from "../../../pref/preference.service";
-import {Hub, Logger} from "aws-amplify";
+import {Hub, Logger} from "@aws-amplify/core";
 import * as $ from "jquery";
 import {IInfiniteScrollEvent} from "ngx-infinite-scroll";
 import {Subscription, timer} from "rxjs";

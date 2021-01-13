@@ -1,7 +1,8 @@
 # this is an auto generated file. This will be overwritten
-subscription OnCreateUserPreferences {
-  onCreateUserPreferences {
+subscription OnCreateUserPreferences($owner: String) {
+  onCreateUserPreferences(owner: $owner) {
     id
+    owner
     prefs
     _version
     _deleted
@@ -10,9 +11,10 @@ subscription OnCreateUserPreferences {
     updatedAt
   }
 }
-subscription OnUpdateUserPreferences {
-  onUpdateUserPreferences {
+subscription OnUpdateUserPreferences($owner: String) {
+  onUpdateUserPreferences(owner: $owner) {
     id
+    owner
     prefs
     _version
     _deleted
@@ -21,9 +23,10 @@ subscription OnUpdateUserPreferences {
     updatedAt
   }
 }
-subscription OnDeleteUserPreferences {
-  onDeleteUserPreferences {
+subscription OnDeleteUserPreferences($owner: String) {
+  onDeleteUserPreferences(owner: $owner) {
     id
+    owner
     prefs
     _version
     _deleted
@@ -32,51 +35,54 @@ subscription OnDeleteUserPreferences {
     updatedAt
   }
 }
-subscription OnCreateUserSession {
-  onCreateUserSession {
+subscription OnCreateUserSession($owner: String) {
+  onCreateUserSession(owner: $owner) {
     id
     fingerprint
     client
     open
     group
-    user
+    owner
     ttl
+    createdAt
+    sessionId
     _version
     _deleted
     _lastChangedAt
-    createdAt
     updatedAt
   }
 }
-subscription OnUpdateUserSession {
-  onUpdateUserSession {
+subscription OnUpdateUserSession($owner: String) {
+  onUpdateUserSession(owner: $owner) {
     id
     fingerprint
     client
     open
     group
-    user
+    owner
     ttl
+    createdAt
+    sessionId
     _version
     _deleted
     _lastChangedAt
-    createdAt
     updatedAt
   }
 }
-subscription OnDeleteUserSession {
-  onDeleteUserSession {
+subscription OnDeleteUserSession($owner: String) {
+  onDeleteUserSession(owner: $owner) {
     id
     fingerprint
     client
     open
     group
-    user
+    owner
     ttl
+    createdAt
+    sessionId
     _version
     _deleted
     _lastChangedAt
-    createdAt
     updatedAt
   }
 }

@@ -2,7 +2,7 @@ import {Injectable, NgZone, OnDestroy, OnInit} from '@angular/core';
 import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 import {Subscription} from 'rxjs';
 import {environment} from "../../environments/environment";
-import {Logger} from "aws-amplify";
+import {Logger} from "@aws-amplify/core";
 
 const log = new Logger('map');
 

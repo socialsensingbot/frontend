@@ -1,7 +1,6 @@
 import {Component, Inject} from "@angular/core";
-import {AmplifyService} from "aws-amplify-angular";
 import {AuthService} from "./auth/auth.service";
-import {Auth, Logger} from "aws-amplify";
+import {Logger} from "@aws-amplify/core";
 import {Router} from "@angular/router";
 import {environment} from "../environments/environment";
 import {PreferenceService} from "./pref/preference.service";
@@ -10,6 +9,8 @@ import {APIService} from "./API.service";
 import {SessionService} from "./auth/session.service";
 import * as Rollbar from "rollbar";
 import {RollbarService} from "./error";
+import {DataStore} from "@aws-amplify/datastore";
+import Auth from "@aws-amplify/auth";
 
 
 const log = new Logger("app");
@@ -35,12 +36,10 @@ export class AppComponent {
   isAuthenticated: boolean;
   public isSignup: boolean = !environment.production;
 
-  constructor(private amplifyService: AmplifyService,
-              public auth: AuthService,
+  constructor(public auth: AuthService,
               public pref: PreferenceService,
               private _router: Router, private _pref: PreferenceService,
               private _notify: NotificationService,
-              private _api: APIService,
               private _session: SessionService,
               @Inject(RollbarService) private _rollbar: Rollbar) {
     Auth.currentAuthenticatedUser({bypassCache: true})
@@ -101,6 +100,7 @@ export class AppComponent {
       log.info("Locale in use: " + this._pref.combined.locale);
       log.info("Timezone detected: " + Intl.DateTimeFormat().resolvedOptions().timeZone);
       log.info("Timezone in use: " + this._pref.combined.timezone);
+      await DataStore.start();
       this._rollbar.configure(
         {
           enabled:      environment.rollbar,
@@ -136,6 +136,7 @@ export class AppComponent {
   public logout() {
     this.isAuthenticated = false;
     this._session.close();
+    DataStore.clear();
     Auth.signOut()
         .then(data => this._router.navigate(["/"], {queryParamsHandling: "merge"}))
         .catch(err => log.debug(err));

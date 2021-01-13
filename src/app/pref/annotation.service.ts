@@ -1,13 +1,10 @@
 import {EventEmitter, Injectable} from "@angular/core";
-import {Auth, Logger} from "aws-amplify";
-import {
-  APIService,
-  OnCreateGroupTweetAnnotationsSubscription,
-  OnDeleteGroupTweetAnnotationsSubscription,
-  OnUpdateGroupTweetAnnotationsSubscription
-} from "../API.service";
+import {Logger} from "@aws-amplify/core";
 import {NotificationService} from "../services/notification.service";
 import {Tweet} from "../map/twitter/tweet";
+import {DataStore, OpType} from "@aws-amplify/datastore";
+import {GroupTweetAnnotations} from "../../models";
+import Auth from "@aws-amplify/auth";
 
 const log = new Logger("annotation-service");
 
@@ -16,8 +13,8 @@ const log = new Logger("annotation-service");
             })
 export class AnnotationService {
 
-  public tweetAnnotated = new EventEmitter<OnUpdateGroupTweetAnnotationsSubscription | OnCreateGroupTweetAnnotationsSubscription>();
-  public tweetAnnotationsRemoved = new EventEmitter<OnDeleteGroupTweetAnnotationsSubscription>();
+  public tweetAnnotated = new EventEmitter<GroupTweetAnnotations>();
+  public tweetAnnotationsRemoved = new EventEmitter<GroupTweetAnnotations>();
   private _ready: boolean;
   private _readyPromise: Promise<boolean> = new Promise<boolean>((resolve) => {
     const loop = () => {
@@ -33,7 +30,7 @@ export class AnnotationService {
   private _email: string;
   private _userInfo: any;
 
-  constructor(private _notify: NotificationService, private _api: APIService) {
+  constructor(private _notify: NotificationService) {
   }
 
   private _groups: string[] = [];
@@ -67,33 +64,12 @@ export class AnnotationService {
       this._groups = ["__invalid__"];
     }
 
-    this._api.OnCreateGroupTweetIgnoreListener.subscribe((subObj: any) => {
-      const sub: OnCreateGroupTweetAnnotationsSubscription = subObj.value.data.onCreateGroupTweetAnnotations;
-      log.debug("New tweet annotation detected ");
-      if (!sub.id) {
-        log.warn("Invalid id for sub", sub);
+    DataStore.observe(GroupTweetAnnotations).subscribe(msg => {
+      if (msg.opType === OpType.DELETE) {
+        this.tweetAnnotationsRemoved.emit(msg.element);
+      } else {
+        this.tweetAnnotated.emit(msg.element);
       }
-      this.tweetAnnotated.emit(sub);
-
-    });
-
-    this._api.OnUpdateGroupTweetAnnotationsListener.subscribe((subObj: any) => {
-      const sub: OnUpdateGroupTweetAnnotationsSubscription = subObj.value.data.onUpdateGroupTweetAnnotations;
-      log.debug("Tweet annotation update detected ");
-      if (!sub.id) {
-        log.warn("Invalid id for sub", sub);
-      }
-      this.tweetAnnotated.emit(sub);
-    });
-
-
-    this._api.OnDeleteGroupTweetAnnotationsListener.subscribe((subObj: any) => {
-      const sub: OnDeleteGroupTweetAnnotationsSubscription = subObj.value.data.onDeleteGroupTweetAnnotations;
-      log.debug("New tweet unignore detected ");
-      if (!sub.id) {
-        log.warn("Invalid id for sub", sub);
-      }
-      this.tweetAnnotationsRemoved.emit(sub);
     });
 
 
@@ -110,12 +86,12 @@ export class AnnotationService {
       return;
     }
     try {
-      const result = await this._api.GetGroupTweetAnnotations(tweet.id);
+      const result = await DataStore.query(GroupTweetAnnotations, q => q.tweetId("eq", tweet.id));
       log.debug(result);
-      if (!result) {
+      if (result.length === 0) {
         return {};
       } else {
-        return result;
+        return result[0];
       }
     } catch (e) {
       log.error(e);
@@ -126,7 +102,6 @@ export class AnnotationService {
   }
 
 
-
   public async addAnnotations(tweet: Tweet, annotations: any) {
     if (!tweet.valid) {
       throw new Error("Shouldn't be trying to annotate an unparseable tweet.");
@@ -134,24 +109,25 @@ export class AnnotationService {
     }
     try {
 
-      const id = tweet.id;
-      const result = await this._api.GetGroupTweetAnnotations(id);
+      const result = await DataStore.query(GroupTweetAnnotations, q => q.tweetId("eq", tweet.id));
       log.debug(result);
-      if (!result) {
-        this._api.CreateGroupTweetAnnotations(
+      if (result.length === 0) {
+        return await DataStore.save(new GroupTweetAnnotations(
           {
-            id,
             url:         tweet.url,
             tweetId:     tweet.id,
             annotatedBy: this._email,
             ownerGroups: this._groups,
             annotations: JSON.stringify(annotations)
           }
-        );
+        ));
 
       } else {
-        const mergedAnnotations = JSON.stringify({...JSON.parse(result.annotations), ...annotations});
-        this._api.UpdateGroupTweetAnnotations({id, annotations: mergedAnnotations, annotatedBy: this._email});
+        const mergedAnnotations = JSON.stringify({...JSON.parse(result[0].annotations), ...annotations});
+        return await DataStore.save(GroupTweetAnnotations.copyOf(result[0], m => {
+          m.annotations = mergedAnnotations;
+          m.annotatedBy = this._email;
+        }));
       }
     } catch (e) {
       log.error(e);
@@ -168,15 +144,7 @@ export class AnnotationService {
       return;
     }
     try {
-      const id = tweet.id;
-      const result = await this._api.GetGroupTweetAnnotations(id);
-      log.debug(result);
-      if (result) {
-        await this._api.DeleteGroupTweetAnnotations({id});
-        log.debug(result);
-      } else {
-        log.debug("Removed annotations for " + tweet.id);
-      }
+      return await DataStore.delete(GroupTweetAnnotations, q => q.tweetId("eq", tweet.id));
     } catch (e) {
       log.error(e);
       this._notify.show("Failed to remove annotations for Tweet, this could be a network error. Refresh the page and" +

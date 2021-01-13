@@ -6,6 +6,7 @@ import { ModelInit, MutableModel, PersistentModelConstructor } from "@aws-amplif
 
 export declare class UserPreferences {
   readonly id: string;
+  readonly owner?: string;
   readonly prefs?: string;
   constructor(init: ModelInit<UserPreferences>);
   static copyOf(source: UserPreferences, mutator: (draft: MutableModel<UserPreferences>) => MutableModel<UserPreferences> | void): UserPreferences;
@@ -16,9 +17,11 @@ export declare class UserSession {
   readonly fingerprint?: string;
   readonly client?: string;
   readonly open: boolean;
-  readonly group?: string;
-  readonly user?: string;
+  readonly group: string;
+  readonly owner?: string;
   readonly ttl?: number;
+  readonly createdAt?: string;
+  readonly sessionId?: string;
   constructor(init: ModelInit<UserSession>);
   static copyOf(source: UserSession, mutator: (draft: MutableModel<UserSession>) => MutableModel<UserSession> | void): UserSession;
 }

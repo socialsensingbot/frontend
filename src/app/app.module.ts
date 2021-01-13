@@ -1,6 +1,5 @@
 import {BrowserModule} from "@angular/platform-browser";
 import {ErrorHandler, NgModule} from "@angular/core";
-import {AmplifyAngularModule, AmplifyService, AmplifyModules} from "aws-amplify-angular";
 import Auth from "@aws-amplify/auth";
 import Interactions from "@aws-amplify/interactions";
 import Storage from "@aws-amplify/storage";
@@ -37,6 +36,7 @@ import {HelpDialogComponent} from "./help/help-dialog.component";
 import {TweetListComponent} from "./map/twitter/tweet-list/tweet-list.component";
 import {RollbarErrorHandler, rollbarFactory, RollbarService} from "./error";
 import {SafeHtmlPipe} from "./safe.pipe";
+import {AmplifyUIAngularModule} from "@aws-amplify/ui-angular";
 
 @NgModule({
             declarations:    [
@@ -63,7 +63,7 @@ import {SafeHtmlPipe} from "./safe.pipe";
               BrowserModule,
               HttpClientModule,
               BrowserAnimationsModule,
-              AmplifyAngularModule,
+              AmplifyUIAngularModule,
               MaterialModule,
               MatSidenavModule,
               MatSliderModule,
@@ -74,19 +74,8 @@ import {SafeHtmlPipe} from "./safe.pipe";
               InfiniteScrollModule,
               LeafletModule
             ],
-            providers:       [{
-              provide: AmplifyService,
-
-              useFactory: () => {
-                return AmplifyModules({
-                                        Auth,
-                                        Storage,
-                                        Interactions
-                                      });
-              },
-
-            },
-                              {
+            providers:       [
+               {
                                 provide:  ErrorHandler,
                                 useClass: RollbarErrorHandler
                               },

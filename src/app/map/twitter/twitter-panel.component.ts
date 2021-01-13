@@ -1,6 +1,6 @@
 import {Component, Input, NgZone, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
 import {PreferenceService} from "../../pref/preference.service";
-import {Hub, Logger} from "aws-amplify";
+import {Hub, Logger} from "@aws-amplify/core";
 import {Tweet} from "./tweet";
 import {
   OnCreateGroupTweetIgnoreSubscription,

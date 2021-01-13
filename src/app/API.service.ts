@@ -11,6 +11,7 @@ export interface SubscriptionResponse<T> {
 
 export type CreateUserPreferencesInput = {
   id?: string | null;
+  owner?: string | null;
   prefs?: string | null;
   _version?: number | null;
 };
@@ -63,6 +64,7 @@ export type ModelSizeInput = {
 
 export type UpdateUserPreferencesInput = {
   id: string;
+  owner?: string | null;
   prefs?: string | null;
   _version?: number | null;
 };
@@ -77,9 +79,11 @@ export type CreateUserSessionInput = {
   fingerprint?: string | null;
   client?: string | null;
   open: boolean;
-  group?: string | null;
-  user?: string | null;
+  group: string;
+  owner?: string | null;
   ttl?: number | null;
+  createdAt?: string | null;
+  sessionId?: string | null;
   _version?: number | null;
 };
 
@@ -88,8 +92,9 @@ export type ModelUserSessionConditionInput = {
   client?: ModelStringInput | null;
   open?: ModelBooleanInput | null;
   group?: ModelStringInput | null;
-  user?: ModelStringInput | null;
   ttl?: ModelIntInput | null;
+  createdAt?: ModelStringInput | null;
+  sessionId?: ModelStringInput | null;
   and?: Array<ModelUserSessionConditionInput | null> | null;
   or?: Array<ModelUserSessionConditionInput | null> | null;
   not?: ModelUserSessionConditionInput | null;
@@ -120,8 +125,10 @@ export type UpdateUserSessionInput = {
   client?: string | null;
   open?: boolean | null;
   group?: string | null;
-  user?: string | null;
+  owner?: string | null;
   ttl?: number | null;
+  createdAt?: string | null;
+  sessionId?: string | null;
   _version?: number | null;
 };
 
@@ -260,6 +267,7 @@ export type DeleteGroupTwitterUserIgnoreInput = {
 
 export type ModelUserPreferencesFilterInput = {
   id?: ModelIDInput | null;
+  owner?: ModelStringInput | null;
   prefs?: ModelStringInput | null;
   and?: Array<ModelUserPreferencesFilterInput | null> | null;
   or?: Array<ModelUserPreferencesFilterInput | null> | null;
@@ -288,8 +296,10 @@ export type ModelUserSessionFilterInput = {
   client?: ModelStringInput | null;
   open?: ModelBooleanInput | null;
   group?: ModelStringInput | null;
-  user?: ModelStringInput | null;
+  owner?: ModelStringInput | null;
   ttl?: ModelIntInput | null;
+  createdAt?: ModelStringInput | null;
+  sessionId?: ModelStringInput | null;
   and?: Array<ModelUserSessionFilterInput | null> | null;
   or?: Array<ModelUserSessionFilterInput | null> | null;
   not?: ModelUserSessionFilterInput | null;
@@ -342,6 +352,7 @@ export type ModelGroupTwitterUserIgnoreFilterInput = {
 export type CreateUserPreferencesMutation = {
   __typename: "UserPreferences";
   id: string;
+  owner: string | null;
   prefs: string | null;
   _version: number;
   _deleted: boolean | null;
@@ -353,6 +364,7 @@ export type CreateUserPreferencesMutation = {
 export type UpdateUserPreferencesMutation = {
   __typename: "UserPreferences";
   id: string;
+  owner: string | null;
   prefs: string | null;
   _version: number;
   _deleted: boolean | null;
@@ -364,6 +376,7 @@ export type UpdateUserPreferencesMutation = {
 export type DeleteUserPreferencesMutation = {
   __typename: "UserPreferences";
   id: string;
+  owner: string | null;
   prefs: string | null;
   _version: number;
   _deleted: boolean | null;
@@ -378,13 +391,14 @@ export type CreateUserSessionMutation = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  group: string | null;
-  user: string | null;
+  group: string;
+  owner: string | null;
   ttl: number | null;
+  createdAt: string | null;
+  sessionId: string | null;
   _version: number;
   _deleted: boolean | null;
   _lastChangedAt: number;
-  createdAt: string;
   updatedAt: string;
 };
 
@@ -394,13 +408,14 @@ export type UpdateUserSessionMutation = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  group: string | null;
-  user: string | null;
+  group: string;
+  owner: string | null;
   ttl: number | null;
+  createdAt: string | null;
+  sessionId: string | null;
   _version: number;
   _deleted: boolean | null;
   _lastChangedAt: number;
-  createdAt: string;
   updatedAt: string;
 };
 
@@ -410,13 +425,14 @@ export type DeleteUserSessionMutation = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  group: string | null;
-  user: string | null;
+  group: string;
+  owner: string | null;
   ttl: number | null;
+  createdAt: string | null;
+  sessionId: string | null;
   _version: number;
   _deleted: boolean | null;
   _lastChangedAt: number;
-  createdAt: string;
   updatedAt: string;
 };
 
@@ -591,6 +607,7 @@ export type DeleteGroupTwitterUserIgnoreMutation = {
 export type GetUserPreferencesQuery = {
   __typename: "UserPreferences";
   id: string;
+  owner: string | null;
   prefs: string | null;
   _version: number;
   _deleted: boolean | null;
@@ -604,6 +621,7 @@ export type ListUserPreferencessQuery = {
   items: Array<{
     __typename: "UserPreferences";
     id: string;
+    owner: string | null;
     prefs: string | null;
     _version: number;
     _deleted: boolean | null;
@@ -620,6 +638,7 @@ export type SyncUserPreferencesQuery = {
   items: Array<{
     __typename: "UserPreferences";
     id: string;
+    owner: string | null;
     prefs: string | null;
     _version: number;
     _deleted: boolean | null;
@@ -637,13 +656,14 @@ export type GetUserSessionQuery = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  group: string | null;
-  user: string | null;
+  group: string;
+  owner: string | null;
   ttl: number | null;
+  createdAt: string | null;
+  sessionId: string | null;
   _version: number;
   _deleted: boolean | null;
   _lastChangedAt: number;
-  createdAt: string;
   updatedAt: string;
 };
 
@@ -655,13 +675,14 @@ export type ListUserSessionsQuery = {
     fingerprint: string | null;
     client: string | null;
     open: boolean;
-    group: string | null;
-    user: string | null;
+    group: string;
+    owner: string | null;
     ttl: number | null;
+    createdAt: string | null;
+    sessionId: string | null;
     _version: number;
     _deleted: boolean | null;
     _lastChangedAt: number;
-    createdAt: string;
     updatedAt: string;
   } | null> | null;
   nextToken: string | null;
@@ -676,13 +697,14 @@ export type SyncUserSessionsQuery = {
     fingerprint: string | null;
     client: string | null;
     open: boolean;
-    group: string | null;
-    user: string | null;
+    group: string;
+    owner: string | null;
     ttl: number | null;
+    createdAt: string | null;
+    sessionId: string | null;
     _version: number;
     _deleted: boolean | null;
     _lastChangedAt: number;
-    createdAt: string;
     updatedAt: string;
   } | null> | null;
   nextToken: string | null;
@@ -900,6 +922,7 @@ export type SyncGroupTwitterUserIgnoresQuery = {
 export type OnCreateUserPreferencesSubscription = {
   __typename: "UserPreferences";
   id: string;
+  owner: string | null;
   prefs: string | null;
   _version: number;
   _deleted: boolean | null;
@@ -911,6 +934,7 @@ export type OnCreateUserPreferencesSubscription = {
 export type OnUpdateUserPreferencesSubscription = {
   __typename: "UserPreferences";
   id: string;
+  owner: string | null;
   prefs: string | null;
   _version: number;
   _deleted: boolean | null;
@@ -922,6 +946,7 @@ export type OnUpdateUserPreferencesSubscription = {
 export type OnDeleteUserPreferencesSubscription = {
   __typename: "UserPreferences";
   id: string;
+  owner: string | null;
   prefs: string | null;
   _version: number;
   _deleted: boolean | null;
@@ -936,13 +961,14 @@ export type OnCreateUserSessionSubscription = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  group: string | null;
-  user: string | null;
+  group: string;
+  owner: string | null;
   ttl: number | null;
+  createdAt: string | null;
+  sessionId: string | null;
   _version: number;
   _deleted: boolean | null;
   _lastChangedAt: number;
-  createdAt: string;
   updatedAt: string;
 };
 
@@ -952,13 +978,14 @@ export type OnUpdateUserSessionSubscription = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  group: string | null;
-  user: string | null;
+  group: string;
+  owner: string | null;
   ttl: number | null;
+  createdAt: string | null;
+  sessionId: string | null;
   _version: number;
   _deleted: boolean | null;
   _lastChangedAt: number;
-  createdAt: string;
   updatedAt: string;
 };
 
@@ -968,13 +995,14 @@ export type OnDeleteUserSessionSubscription = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  group: string | null;
-  user: string | null;
+  group: string;
+  owner: string | null;
   ttl: number | null;
+  createdAt: string | null;
+  sessionId: string | null;
   _version: number;
   _deleted: boolean | null;
   _lastChangedAt: number;
-  createdAt: string;
   updatedAt: string;
 };
 
@@ -1158,6 +1186,7 @@ export class APIService {
         createUserPreferences(input: $input, condition: $condition) {
           __typename
           id
+          owner
           prefs
           _version
           _deleted
@@ -1185,6 +1214,7 @@ export class APIService {
         updateUserPreferences(input: $input, condition: $condition) {
           __typename
           id
+          owner
           prefs
           _version
           _deleted
@@ -1212,6 +1242,7 @@ export class APIService {
         deleteUserPreferences(input: $input, condition: $condition) {
           __typename
           id
+          owner
           prefs
           _version
           _deleted
@@ -1243,12 +1274,13 @@ export class APIService {
           client
           open
           group
-          user
+          owner
           ttl
+          createdAt
+          sessionId
           _version
           _deleted
           _lastChangedAt
-          createdAt
           updatedAt
         }
       }`;
@@ -1275,12 +1307,13 @@ export class APIService {
           client
           open
           group
-          user
+          owner
           ttl
+          createdAt
+          sessionId
           _version
           _deleted
           _lastChangedAt
-          createdAt
           updatedAt
         }
       }`;
@@ -1307,12 +1340,13 @@ export class APIService {
           client
           open
           group
-          user
+          owner
           ttl
+          createdAt
+          sessionId
           _version
           _deleted
           _lastChangedAt
-          createdAt
           updatedAt
         }
       }`;
@@ -1704,6 +1738,7 @@ export class APIService {
         getUserPreferences(id: $id) {
           __typename
           id
+          owner
           prefs
           _version
           _deleted
@@ -1731,6 +1766,7 @@ export class APIService {
           items {
             __typename
             id
+            owner
             prefs
             _version
             _deleted
@@ -1769,6 +1805,7 @@ export class APIService {
           items {
             __typename
             id
+            owner
             prefs
             _version
             _deleted
@@ -1807,12 +1844,13 @@ export class APIService {
           client
           open
           group
-          user
+          owner
           ttl
+          createdAt
+          sessionId
           _version
           _deleted
           _lastChangedAt
-          createdAt
           updatedAt
         }
       }`;
@@ -1839,12 +1877,13 @@ export class APIService {
             client
             open
             group
-            user
+            owner
             ttl
+            createdAt
+            sessionId
             _version
             _deleted
             _lastChangedAt
-            createdAt
             updatedAt
           }
           nextToken
@@ -1882,12 +1921,13 @@ export class APIService {
             client
             open
             group
-            user
+            owner
             ttl
+            createdAt
+            sessionId
             _version
             _deleted
             _lastChangedAt
-            createdAt
             updatedAt
           }
           nextToken
@@ -2364,10 +2404,11 @@ export class APIService {
     SubscriptionResponse<OnCreateUserPreferencesSubscription>
   > = API.graphql(
     graphqlOperation(
-      `subscription OnCreateUserPreferences {
-        onCreateUserPreferences {
+      `subscription OnCreateUserPreferences($owner: String) {
+        onCreateUserPreferences(owner: $owner) {
           __typename
           id
+          owner
           prefs
           _version
           _deleted
@@ -2383,10 +2424,11 @@ export class APIService {
     SubscriptionResponse<OnUpdateUserPreferencesSubscription>
   > = API.graphql(
     graphqlOperation(
-      `subscription OnUpdateUserPreferences {
-        onUpdateUserPreferences {
+      `subscription OnUpdateUserPreferences($owner: String) {
+        onUpdateUserPreferences(owner: $owner) {
           __typename
           id
+          owner
           prefs
           _version
           _deleted
@@ -2402,10 +2444,11 @@ export class APIService {
     SubscriptionResponse<OnDeleteUserPreferencesSubscription>
   > = API.graphql(
     graphqlOperation(
-      `subscription OnDeleteUserPreferences {
-        onDeleteUserPreferences {
+      `subscription OnDeleteUserPreferences($owner: String) {
+        onDeleteUserPreferences(owner: $owner) {
           __typename
           id
+          owner
           prefs
           _version
           _deleted
@@ -2421,20 +2464,21 @@ export class APIService {
     SubscriptionResponse<OnCreateUserSessionSubscription>
   > = API.graphql(
     graphqlOperation(
-      `subscription OnCreateUserSession {
-        onCreateUserSession {
+      `subscription OnCreateUserSession($owner: String) {
+        onCreateUserSession(owner: $owner) {
           __typename
           id
           fingerprint
           client
           open
           group
-          user
+          owner
           ttl
+          createdAt
+          sessionId
           _version
           _deleted
           _lastChangedAt
-          createdAt
           updatedAt
         }
       }`
@@ -2445,20 +2489,21 @@ export class APIService {
     SubscriptionResponse<OnUpdateUserSessionSubscription>
   > = API.graphql(
     graphqlOperation(
-      `subscription OnUpdateUserSession {
-        onUpdateUserSession {
+      `subscription OnUpdateUserSession($owner: String) {
+        onUpdateUserSession(owner: $owner) {
           __typename
           id
           fingerprint
           client
           open
           group
-          user
+          owner
           ttl
+          createdAt
+          sessionId
           _version
           _deleted
           _lastChangedAt
-          createdAt
           updatedAt
         }
       }`
@@ -2469,20 +2514,21 @@ export class APIService {
     SubscriptionResponse<OnDeleteUserSessionSubscription>
   > = API.graphql(
     graphqlOperation(
-      `subscription OnDeleteUserSession {
-        onDeleteUserSession {
+      `subscription OnDeleteUserSession($owner: String) {
+        onDeleteUserSession(owner: $owner) {
           __typename
           id
           fingerprint
           client
           open
           group
-          user
+          owner
           ttl
+          createdAt
+          sessionId
           _version
           _deleted
           _lastChangedAt
-          createdAt
           updatedAt
         }
       }`

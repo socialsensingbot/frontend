@@ -1,6 +1,6 @@
 import {EventEmitter, Injectable, NgZone} from "@angular/core";
 import {Geometry, PolygonData, RegionData, TimeSlice} from "../types";
-import {Logger, Storage} from "aws-amplify";
+import {Logger} from "@aws-amplify/core";
 import {HttpClient} from "@angular/common/http";
 import {UIExecutionService} from "../../services/uiexecution.service";
 import {ProcessedData, ProcessedPolygonData} from "./processed-data";
@@ -12,8 +12,8 @@ import {ExportToCsv} from "export-to-csv";
 import {PreferenceService} from "../../pref/preference.service";
 import {toTitleCase} from "../../common";
 import * as geojson from "geojson";
-import {APIService} from "../../API.service";
 import {environment} from "../../../environments/environment";
+import Storage from "@aws-amplify/storage";
 
 
 const log = new Logger("map-data");
@@ -105,8 +105,7 @@ export class MapDataService {
   constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
               private _notify: NotificationService, private readonly cache: NgForageCache,
               private readonly ngf: NgForage,
-              private _pref: PreferenceService,
-              private _api: APIService) {
+              private _pref: PreferenceService) {
 
   }
 

@@ -5,6 +5,7 @@ mutation CreateUserPreferences(
 ) {
   createUserPreferences(input: $input, condition: $condition) {
     id
+    owner
     prefs
     _version
     _deleted
@@ -19,6 +20,7 @@ mutation UpdateUserPreferences(
 ) {
   updateUserPreferences(input: $input, condition: $condition) {
     id
+    owner
     prefs
     _version
     _deleted
@@ -33,6 +35,7 @@ mutation DeleteUserPreferences(
 ) {
   deleteUserPreferences(input: $input, condition: $condition) {
     id
+    owner
     prefs
     _version
     _deleted
@@ -51,12 +54,13 @@ mutation CreateUserSession(
     client
     open
     group
-    user
+    owner
     ttl
+    createdAt
+    sessionId
     _version
     _deleted
     _lastChangedAt
-    createdAt
     updatedAt
   }
 }
@@ -70,12 +74,13 @@ mutation UpdateUserSession(
     client
     open
     group
-    user
+    owner
     ttl
+    createdAt
+    sessionId
     _version
     _deleted
     _lastChangedAt
-    createdAt
     updatedAt
   }
 }
@@ -89,12 +94,13 @@ mutation DeleteUserSession(
     client
     open
     group
-    user
+    owner
     ttl
+    createdAt
+    sessionId
     _version
     _deleted
     _lastChangedAt
-    createdAt
     updatedAt
   }
 }
