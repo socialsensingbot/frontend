@@ -70,6 +70,7 @@ export class SessionService {
       // oldest session on DynamoDB as that is the session that will be logged out.
 
       if (sessionToken && sessionEndTime && +sessionEndTime > Date.now()) {
+        this._sessionId= sessionToken;
         this.session = await this.getSessionOrNull();
         this.heartbeat();
         log.info("Existing session");
@@ -153,7 +154,7 @@ export class SessionService {
           log.warn("Invalid id for sub", sub);
         }
 
-        if (sub.id && sub.id !== this.session.id) {
+        if (this.session && sub.id && sub.id !== this.session.id) {
           log.debug(`${sub.id} is not ${this.session.id}`);
           log.debug(sub);
           this.moreThanOneSession(this.session.createdAt < sub.createdAt);
