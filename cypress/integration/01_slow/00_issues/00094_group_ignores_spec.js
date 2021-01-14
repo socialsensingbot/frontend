@@ -13,7 +13,7 @@ const testUnhide = (refresh, count, fail) => {
     } else {
       cy.get(tweetHidden).scrollIntoView().should('be.visible');
       cy.unignoreTweet(tweetHidden);
-      cy.wait(500);
+      cy.wait(1000);
     }
   })
 };
@@ -29,7 +29,7 @@ const testHide = (refresh, count) => {
       const index = t.first().parents(".atr-visible").attr("data-index");
       cy.get(`.atr-visible.atr-${index}`, {timeout: 60000}).scrollIntoView().should('be.visible');
       cy.ignoreTweet(`.atr-visible.atr-${index}`);
-      cy.wait(500);
+      cy.wait(1000);
     });
 
 
@@ -50,8 +50,8 @@ describe('#94 Group Ignore Prefs : https://github.com/socialsensingbot/frontend/
 
   it('Reproduce issue ', () => {
     cy.visit(url);
-
     cy.login("cypress1@example.com");
+    cy.wait(5000);
 
     cy.get(".app-tweet-drawer", {timeout: 30000});
 
@@ -71,10 +71,13 @@ describe('#94 Group Ignore Prefs : https://github.com/socialsensingbot/frontend/
     for (let i = 0; i < 5; i++) {
       testHide(false, i);
     }
-
+    cy.wait(1000);
     cy.withTweetCounts((vis1, hid1) => {
+      cy.wait(5000);
       cy.logout();
+      cy.wait(5000);
       cy.login("cypress2@example.com");
+      cy.wait(5000);
       cy.visitAndWait(url);
       cy.get(".app-tweet-drawer", {timeout: 30000});
       cy.withTweetCounts((vis2, hid2) => {
@@ -84,10 +87,14 @@ describe('#94 Group Ignore Prefs : https://github.com/socialsensingbot/frontend/
       });
 
     });
-
+    cy.wait(1000);
     cy.withTweetCounts((vis1, hid1) => {
+      cy.wait(5000);
       cy.logout();
+      cy.wait(5000);
       cy.login("cypress3@example.com");
+      cy.wait(5000);
+
       cy.visitAndWait(url);
       cy.get(".app-tweet-drawer", {timeout: 30000});
       cy.withTweetCounts((vis2, hid2) => {

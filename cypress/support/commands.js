@@ -76,12 +76,12 @@ Cypress.Commands.add("visitAndWait", (url) => {
 
 Cypress.Commands.add("noSpinner", () => {
   cy.get('.map');
-  cy.get("mat-spinner", {timeout: LONG_TIMEOUT}).should("not.exist");
+  cy.get(".map-spinner", {timeout: LONG_TIMEOUT}).should("not.exist");
   noLoadingDiv();
   cy.get('body').should(el => {
     if (el) {
-      if (el.find("mat-spinner").length > 0) {
-        cy.get("mat-spinner", {timeout: LONG_TIMEOUT}).should("not.exist");
+      if (el.find(".map-spinner").length > 0) {
+        cy.get(".map-spinner", {timeout: LONG_TIMEOUT}).should("not.exist");
       } else {
       }
     } else {

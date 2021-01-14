@@ -50,7 +50,6 @@ export class PreferenceService {
     };
     setTimeout(loop, 50);
   });
-  private _email: string;
 
   constructor(private _notify: NotificationService) {
     this.combined = {...environment};
@@ -80,11 +79,6 @@ export class PreferenceService {
   public async init(userInfo: any) {
     this._userInfo = userInfo;
     const groups = (await Auth.currentAuthenticatedUser()).signInUserSession.accessToken.payload["cognito:groups"];
-    if (typeof userInfo.attributes !== "undefined") {
-      this._email = userInfo.attributes.email;
-    } else {
-      log.error("No attributes in ", userInfo);
-    }
     if (!groups || groups.length === 1) {
       this._groups = groups;
     } else {
@@ -125,12 +119,12 @@ export class PreferenceService {
       }
       try {
         log.debug("GROUP PREFS", this._groupPreferences.prefs);
-        log.debug("GROUP PREFS", JSON.parse(this._groupPreferences.prefs));
         let groupPrefs: any = {};
         if (this._groupPreferences.prefs) {
           groupPrefs = typeof this._groupPreferences.prefs !== "undefined" ?
             JSON.parse(this._groupPreferences.prefs) : this._groupPreferences;
         }
+        log.debug("USER PREFS", this._preferences.prefs);
         let prefs: any = {};
         if (this._preferences.prefs) {
           prefs = typeof this._preferences.prefs !== "undefined" ?
@@ -148,7 +142,7 @@ export class PreferenceService {
     }
 
     try {
-      this.readBlacklist();
+      await this.readBlacklist();
     } catch (e) {
       log.error(e);
       this._notify.show("Failed to load the ignores list, this could be a network error. Refresh the page and try" +
@@ -238,7 +232,7 @@ export class PreferenceService {
     while (true) {
       const groupTweetIgnores = await DataStore.query(GroupTweetIgnore,
                                                       q => q.or(
-                                                        g => g.scope("eq", this.groupScope()).scope("eq", "*")),
+                                                        g => g.scope("eq", this.groupScope())),
                                                       {limit: 1000, page});
       if (groupTweetIgnores.length > 0) {
         this._tweetBlackList.push(...groupTweetIgnores.map(i => i.tweetId));
@@ -251,7 +245,7 @@ export class PreferenceService {
     page = 0;
     while (true) {
       const groupUserIgnores = await DataStore.query(GroupTwitterUserIgnore,
-                                                     q => q.or(g => g.scope("eq", this.groupScope()).scope("eq", "*")),
+                                                     q => q.or(g => g.scope("eq", this.groupScope())),
                                                      {limit: 1000, page});
       if (groupUserIgnores.length > 0) {
         this._twitterUserBlackList.push(...groupUserIgnores.map(i => i.twitterScreenName));
@@ -353,7 +347,7 @@ export class PreferenceService {
       await DataStore.save(new GroupTwitterUserIgnore(
         {
           twitterScreenName: tweet.sender,
-          ignoredBy:         this._email,
+          ignoredBy:         this._userInfo.attributes.email,
           ownerGroups:       this._groups,
           scope
         }
@@ -384,7 +378,7 @@ export class PreferenceService {
         {
           url:         tweet.url,
           tweetId:     tweet.id,
-          ignoredBy:   this._email,
+          ignoredBy:   this._userInfo.attributes.email,
           ownerGroups: this._groups,
           scope
         }
