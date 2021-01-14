@@ -26,7 +26,7 @@ type GroupPreferences @model @auth(rules: [ {allow: groups, groupsField: "group"
   prefs: AWSJSON
 }
 
-type GroupTweetIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}) @auth(rules: [{allow: groups, groupsField: "ownerGroups"}, {allow: private, operations: [read]}]) {
+type GroupTweetIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}) @auth(rules: [{allow: groups, groupsField: "ownerGroups"}]) {
   id: ID!
   url: String!
   ignoredBy: String!
@@ -36,7 +36,7 @@ type GroupTweetIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "up
 }
 
 type GroupTweetAnnotations @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}) @auth(rules: [{allow:
-groups, groupsField: "ownerGroups"}, {allow: private, operations: [read]}]) {
+groups, groupsField: "ownerGroups"}]) {
   id: ID!
   url: String!
   annotatedBy: String!
@@ -46,7 +46,7 @@ groups, groupsField: "ownerGroups"}, {allow: private, operations: [read]}]) {
 }
 
 
-type GroupTwitterUserIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}) @auth(rules: [{allow: groups, groupsField: "ownerGroups"}, {allow: private, operations: [read]}]) {
+type GroupTwitterUserIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}) @auth(rules: [{allow: groups, groupsField: "ownerGroups"}]) {
   id: ID!
   twitterScreenName: String!
   ignoredBy: String!

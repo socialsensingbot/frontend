@@ -282,12 +282,6 @@ export const schema = {
                                     "delete",
                                     "read"
                                 ]
-                            },
-                            {
-                                "allow": "private",
-                                "operations": [
-                                    "read"
-                                ]
                             }
                         ]
                     }
@@ -369,12 +363,6 @@ export const schema = {
                                     "delete",
                                     "read"
                                 ]
-                            },
-                            {
-                                "allow": "private",
-                                "operations": [
-                                    "read"
-                                ]
                             }
                         ]
                     }
@@ -447,12 +435,6 @@ export const schema = {
                                     "create",
                                     "update",
                                     "delete",
-                                    "read"
-                                ]
-                            },
-                            {
-                                "allow": "private",
-                                "operations": [
                                     "read"
                                 ]
                             }

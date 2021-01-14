@@ -1,6 +1,5 @@
 import {EventEmitter, Injectable} from "@angular/core";
 import {Logger} from "@aws-amplify/core";
-import {OnCreateGroupTweetIgnoreSubscription} from "../API.service";
 import {NotificationService} from "../services/notification.service";
 import {Tweet} from "../map/twitter/tweet";
 import {environment} from "../../environments/environment";
@@ -104,6 +103,7 @@ export class PreferenceService {
         "I Will",
         180);
       this._groups = ["__invalid__"];
+      return;
     } else {
       const groupPref = await DataStore.query(GroupPreferences, q => q.group("eq", this._groups[0]));
       if (groupPref.length === 0) {
@@ -138,11 +138,12 @@ export class PreferenceService {
       }
 
       log.info("Combined preferences are: ", this.combined);
-      this._ready = true;
     }
 
     try {
       await this.readBlacklist();
+      this._ready = true;
+      this._notify.show("Blacklist loaded.", "OK", 60);
     } catch (e) {
       log.error(e);
       this._notify.show("Failed to load the ignores list, this could be a network error. Refresh the page and try" +
@@ -156,6 +157,9 @@ export class PreferenceService {
   public isBlacklisted(tweet: Tweet): boolean {
     if (!tweet.valid) {
       return false;
+    }
+    if(!this._ready) {
+      throw new Error("Preference service not initialized");
     }
     return this._tweetBlackList.includes(tweet.id) || this._twitterUserBlackList.includes(tweet.sender);
   }
@@ -228,6 +232,7 @@ export class PreferenceService {
   }
 
   private async readBlacklist() {
+    await DataStore.start();
     let page = 0;
     while (true) {
       const groupTweetIgnores = await DataStore.query(GroupTweetIgnore,
@@ -255,24 +260,11 @@ export class PreferenceService {
       }
     }
 
+    log.debug("Blacklist", this._tweetBlackList);
     log.debug(this._tweetBlackList);
     log.debug(this._twitterUserBlackList);
-
-    // TODO: Filtering here is done on the client see https://github.com/socialsensingbot/frontend/issues/114
-    const onTweetIgnore = (subObj: any) => {
-      const sub: OnCreateGroupTweetIgnoreSubscription = subObj.value.data.onCreateGroupTweetIgnore;
-      log.debug("New tweet ignore detected ");
-      if (!sub.id) {
-        log.warn("Invalid id for sub", sub);
-      }
-      if (this.isInScope(sub)) {
-        log.debug("New tweet ignore is meant for us.", sub);
-        this._tweetBlackList.push(sub.tweetId);
-        this.tweetIgnored.emit(sub);
-      } else {
-        log.debug(`Ignoring out of scope tweet ignore from scope ${sub.scope}`);
-      }
-    };
+    //Dirty hack to make sure the tweets list is up to dayte. Consider a better route.
+    this.tweetIgnored.emit(null);
 
     DataStore.observe(GroupTweetIgnore).subscribe((msg) => {
       const sub: GroupTweetIgnore = msg.element;
