@@ -13,7 +13,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
   - [The Application Structure] 
 - [The Application]
   - [Preferences] 
-  - [Datasets] 
+  - [Datasets]  
 - [The Development/Release Cycle]  
   - [The Branches] 
   - [The Process]  
