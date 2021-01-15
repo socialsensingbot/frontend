@@ -11,6 +11,9 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
   - [Running end-to-end tests] 
   - [Key files and folders for development] 
   - [The Application Structure] 
+- [The Application]
+  - [Preferences] 
+  - [Datasets] 
 - [The Development/Release Cycle]  
   - [The Branches] 
   - [The Process]  
@@ -651,6 +654,12 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 [The Process]: #the-process
 [Live.json]: #livejson
 [Cross-Browser Testing]: #cross-browser-testing
+[The Application]: #the-application
+[Preferences]: #preferences
+[Datasets]: #datasets
+
+
+
 
 
 
