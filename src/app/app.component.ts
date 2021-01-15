@@ -179,23 +179,4 @@ export class AppComponent {
         .catch(err => log.debug(err));
   }
 
-  // ngOnInit(): void {
-  //   let routeParams: string;
-  //   this._router.events
-  //       .subscribe(routeEvent => {
-  //         if (!(routeEvent instanceof NavigationEnd)) {
-  //           return
-  //         }
-  //
-  //         const params = routeEvent.url.split('?')[1];
-  //         log.debug(routeEvent.url);
-  //
-  //         if (params) {
-  //           routeParams = params;
-  //           return
-  //         }
-  //
-  //         window.history.replaceState({}, '', `${location.pathname}?${routeParams}`)
-  //       })
-  // }
 }

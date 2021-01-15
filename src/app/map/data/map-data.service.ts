@@ -34,17 +34,47 @@ export interface RegionMetadata {
   key: string;
 }
 
+
+export interface LayerMetadata {
+  id: string;
+  /**
+   * which data source does this come from e.g. pollution-monitoring, twitter
+   */
+  source: string;
+  /**
+   * What hazard does this data represent if any e.g. flood, pollution.
+   */
+  hazard?: string;
+  /**
+   * Where, relative to the top level metadata.json file can we find this layer's data.
+   */
+  file: string;
+}
+
+/**
+ * The layer group consists of a set of layers grouped together to form one visual result.
+ */
+export interface LayerGroupMetadata {
+  id: string;
+  title: string;
+  layers: string[];
+}
+
 export interface StartMetadata {
   "lat": number;
   "lng": number;
   "zoom": number;
 }
 
+
 export interface DataSetMetadata {
   id: string;
   title: string;
   version?: string;
   regionGroups: RegionMetadata[];
+  layerGroups: LayerGroupMetadata[];
+  defaultLayerGroup: string;
+  layers: LayerMetadata[];
   start: StartMetadata;
   location: string;
   hazards: string[];
@@ -167,7 +197,10 @@ export class MapDataService {
    */
   public async loadLiveData(): Promise<TimeSlice[]> {
     log.debug("loadLiveData()");
-    const result = this.loadFromS3(this.dataset + "/twitter.json", environment.version, 2 * 1000,
+    // TODO :- use the defaultLayerGroup to select a layergroup and then load the layers into seperate layer
+    //  datastructures and return those instead.
+    //
+    const result = this.loadFromS3(this.dataSetMetdata.layers[0].file , environment.version, 2 * 1000,
                                    "Loading Twitter data ...").finally(() => this._notify.dismiss());
     return result as Promise<TimeSlice[]>;
   }

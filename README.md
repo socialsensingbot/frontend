@@ -83,7 +83,120 @@ e.g.
     "toolbarColor": "warn"
   }
 ```  
-       
+### Datasets
+The application supports multiple data sets they can be found in the public area of the general S3 bucket for the app (i.e. <https://s3.console.aws.amazon.com/s3/buckets/json183906-dev?region=eu-west-2&prefix=public/&showversions=false> or prod).
+
+Within that is a metadata.json file and a folder for each dataset.
+
+![](docs/images/fad68d56.png)
+
+```json
+{
+"version":"1.0",
+"datasets":[
+{"id":"live","title":"Flood"},
+{"id":"india","title":"India Flood"},
+{"id":"dataset-a","title":"Other Flood"},
+{"id":"july-17","title":"July 17th 2020"},
+{"id":"july-23","title":"July 23rd 2020"}
+  ],
+  "start": {
+    "lat": 53,
+    "lng": -2,
+    "zoom": 6
+  }
+}
+
+```
+
+The **version** marks which version of the metadata schema to use (always 1.0 at the moment).
+
+The **datasets** gives the list of available datasets, the **id** is used as the folder name to load the rest of the data from. The **title** is what is put in the dropdown when choosing the dataset.
+
+THe **start** defines the default starting position for the map. This can be overriden for each dataset.
+
+#### The dataset folders
+
+In each dataset there is a twitter.json file containing all the twitter based data for the dataset. This is the data.
+
+There is also a metadata.json file 
+
+```json
+{
+  "id": "live",
+  "title": "Live",
+  "version": "1.2",
+  "location": "GB",
+  "hazards": [
+    "flood","snow"
+  ],
+  "layers": [
+    {
+      "id": "flood-twitter",
+      "source": "twitter",
+      "hazard": "flood",
+      "file": "data/twitter/flood.json"
+    },
+    {
+      "id": "snow-twitter",
+      "source": "twitter",
+      "hazard": "snow",
+      "file": "data/twitter/snow.json"
+    }
+  ],
+  "layerGroups": [
+    {
+      "id": "flood-group",
+      "title": "Flood (Twitter)",
+      "layers": ["flood-twitter"]
+    },
+    {
+      "id": "flood-snow-group",
+      "title": "Flood and Snow (Twitter)",
+      "layers": ["flood-twitter", "snow-twitter"]
+    }
+  ],
+  "regionGroups": [
+    {
+      "id": "county",
+      "title": "Local Authority",
+      "key": "county"
+    },
+    {
+      "id": "fine",
+      "title": "Fine Grid",
+      "key": "60"
+    },
+    {
+      "id": "coarse",
+      "title": "Coarse Grid",
+      "key": "15"
+    }
+  ],
+  "defaultLayerGroup": "flood-group",
+  "start": {
+    "lat": 53,
+    "lng": -2,
+    "zoom": 6
+  }
+}
+```
+
+Which provides the dataset **id** and **title*, these should be the same as in the parent metadata.json (may be removed at some point). The **version** number (currently *"1.2"*). 
+
+The **location**, which is currently an arbitrary string, that is used on dataset switching to determine if a new location's data is being used. If the **location** string changes between datasets then the map navigates to the specified start position for that dataset, otherwise the navigation remains unchanged.
+
+The **hazards** is a list of hazards types (these are built into the app) supported in this dataset.
+
+The **layers** are basically the raw data within the dataset, they have an **id**, a **source** such as *"twitter"* or *"pollution-monitor"* a **hazard** type (optional) which is an application understood value for what this data represents and finally the **file** in which the data is stored.
+
+The **layerGroups** organise these layers into a single visual representation. Each layer group can contain a single later or a grouping of layers.
+
+The **defaultLayerGroup** should be shown by default.
+
+The **start** position is where this dataset should start from and the zoom level.
+
+      
 ## Development Quick Reference
 
 ### Development server
