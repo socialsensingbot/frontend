@@ -117,9 +117,8 @@ THe **start** defines the default starting position for the map. This can be ove
 
 #### The dataset folders
 
-In each dataset there is a twitter.json file containing all the twitter based data for the dataset. This is the data.
 
-There is also a metadata.json file 
+For each dataset there os a metadata.json file 
 
 ```json
 {
@@ -135,13 +134,13 @@ There is also a metadata.json file
       "id": "flood-twitter",
       "source": "twitter",
       "hazard": "flood",
-      "file": "data/twitter/flood.json"
+      "dataFile": "data/twitter/flood.json"
     },
     {
       "id": "snow-twitter",
       "source": "twitter",
       "hazard": "snow",
-      "file": "data/twitter/snow.json"
+      "dataFile": "data/twitter/snow.json"
     }
   ],
   "layerGroups": [
@@ -192,9 +191,13 @@ The **layers** are basically the raw data within the dataset, they have an **id*
 
 The **layerGroups** organise these layers into a single visual representation. Each layer group can contain a single later or a grouping of layers.
 
+The **regionGroups** decide how to split up the map into regions for this dataset. They contain and **id** used to find the sub folder with the region metadata in. A **title** used for dropdowns and a **key** which is the key within the json datafiles to use (please try and keep this the same as **id**).
+
 The **defaultLayerGroup** should be shown by default.
 
 The **start** position is where this dataset should start from and the zoom level.
+
+Inside the region subfolder you'll find all the regions (see **regionGroups.id**) and within those region subfolders are the features.json and xxx-stats.json (where xxx is the id of a layer) metadata files.   
 
       
 ## Development Quick Reference

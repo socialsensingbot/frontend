@@ -104,6 +104,15 @@ export class MapDataService {
 
   public timeKeyUpdate = new EventEmitter<any>();
   /**
+   * This is the semi static stats data which is loaded from assets/data.
+   */
+  public stats: { [regionName: string]: any } = {};
+  public reverseTimeKeys: any; // The times in the input JSON
+  public dataset: string;
+  public dataSetMetdata: DataSetMetadata;
+  public serviceMetadata: ServiceMetadata;
+  public availableDataSets: DataSetCoreMetadata[];
+  /**
    * The unprocessed twitter data that's come in from the server
    * or null if the data has been processed.
    */
@@ -114,22 +123,7 @@ export class MapDataService {
    * @see _rawTwitterData for the unprocessed data.
    */
   private _twitterData: ProcessedData = null;
-  /**
-   * This is the semi static stats data which is loaded from assets/data.
-   */
-  public stats: { [regionName: string]: any } = {};
-
-
-  public reverseTimeKeys: any; // The times in the input JSON
-
-
   private _updating: boolean;
-  public dataset: string;
-
-
-  public dataSetMetdata: DataSetMetadata;
-  public serviceMetadata: ServiceMetadata;
-  public availableDataSets: DataSetCoreMetadata[];
   private initialized: boolean;
 
   constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
@@ -173,7 +167,8 @@ export class MapDataService {
       // Note the use of a random time to make sure that we don't refresh all datasets at once!!
       const cacheDuration = ONE_DAY * (7.0 + 7.0 * Math.random());
       promises["stats:" + regionGroup.id] = (this.loadFromS3(
-        this.dataset + "/regions/" + regionGroup.id + "/stats.json", version, cacheDuration));
+        this.dataset + "/regions/" + regionGroup.id + "/" + this.getCurrentLayer().id + "-stats.json", version,
+        cacheDuration));
       promises["features:" + regionGroup.id] = (this.loadFromS3(
         this.dataset + "/regions/" + regionGroup.id + "/features.json", version, cacheDuration,
       ));
@@ -200,31 +195,9 @@ export class MapDataService {
     // TODO :- use the defaultLayerGroup to select a layergroup and then load the layers into seperate layer
     //  datastructures and return those instead.
     //
-    const result = this.loadFromS3(this.dataSetMetdata.layers[0].file , environment.version, 2 * 1000,
+    const result = this.loadFromS3(this.getCurrentLayer().file, environment.version, 2 * 1000,
                                    "Loading Twitter data ...").finally(() => this._notify.dismiss());
     return result as Promise<TimeSlice[]>;
-  }
-
-
-  private async loadFromS3(name: string, version: string = environment.version, cacheDuration = ONE_DAY,
-                           loadingMessage: string = null) {
-    const key = `${environment.name}:${version}:${name}`;
-    const cacheValue: CachedItem<any> = await this.cache.getCached(key);
-    if (cacheValue != null && !cacheValue.expired && cacheValue.hasData && cacheValue.data) {
-      log.info(`Retrieved ${name} from cache (${key}) .`);
-      log.debug(cacheValue);
-      return cacheValue.data;
-    } else {
-      log.info(`${name} not in cache.`);
-      if (loadingMessage !== null && this._pref.combined.showLoadingMessages) {
-        this._notify.show(loadingMessage, "OK", 60);
-      }
-      const url = await Storage.get(name);
-      const jsonData = await this._http.get(url.toString(), {observe: "body", responseType: "json"})
-                                 .toPromise();
-      this.cache.setCached(key, jsonData, cacheDuration);
-      return jsonData;
-    }
   }
 
   public async load() {
@@ -251,7 +224,6 @@ export class MapDataService {
     return tweets;
   }
 
-
   /**
    * @returns reverse sorted time keys from the data
    */
@@ -261,7 +233,6 @@ export class MapDataService {
     timeKeys.reverse();
     return timeKeys;
   }
-
 
   /**
    * This updates the map features and the {@link _twitterData} field
@@ -291,34 +262,6 @@ export class MapDataService {
     // if (this._clicked != "") {
     //   this.updateTwitterHeader(this._clicked.target.feature);
     // }
-  }
-
-  /**
-   * Updates the {@link _twitterData} field to contain a processed
-   * version of the incoming TimeSlice[] data.
-   *
-   * @param tweetInfo the raw data to process.
-   */
-  private async updateTweetsData(_dateMin, _dateMax) {
-    const key = this.createKey(_dateMin, _dateMax);
-    const cacheValue: CachedItem<ProcessedData> = await this.cache.getCached(key);
-    if (environment.cacheProcessedTweets && cacheValue != null && !cacheValue.expired && cacheValue.hasData && cacheValue.data) {
-      log.info("Retrieved tweet data from cache.", cacheValue.data);
-      log.debug(cacheValue);
-      this._twitterData = new ProcessedData().populate(cacheValue.data, this.regionTypes());
-      log.debug(this._twitterData);
-    } else {
-      log.info("Tweet data not in cache.");
-      this._twitterData = new ProcessedData(_dateMin, _dateMax, this.reverseTimeKeys, this._rawTwitterData,
-                                            this.stats, this.dataSetMetdata.regionGroups);
-      this.cache.setCached(key, this._twitterData, ONE_DAY);
-    }
-  }
-
-
-  private createKey(_dateMin, _dateMax) {
-    const key = `${environment.version}:${this.serviceMetadata.version}:${this.dataSetMetdata.version};${this.dataset}${_dateMin}:${_dateMax}:${this.reverseTimeKeys}`;
-    return key;
   }
 
   public entryCount(): number {
@@ -352,7 +295,6 @@ export class MapDataService {
                              tstring.substring(8, 10), tstring.substring(10, 12), 0, 0));
   }
 
-
   public regionData(regionType: string): ProcessedPolygonData {
     return this._twitterData.regionData(regionType);
   }
@@ -381,40 +323,6 @@ export class MapDataService {
       count++;
     }
     return -this.reverseTimeKeys.length + 1;
-  }
-
-  private downloadRegion(regionGrouping: string, region: string, geometry: Geometry): CSVExportTweet[] {
-    const regionMap = {};
-    if (region.match(/\d+/)) {
-      let minX = null;
-      let maxX = null;
-      let minY = null;
-      let maxY = null;
-      for (const point of geometry.coordinates[0]) {
-        if (minX === null || point[0] < minX) {
-          minX = point[0];
-        }
-        if (minY === null || point[1] < minY) {
-          minY = point[1];
-        }
-        if (maxX === null || point[0] > maxX) {
-          maxX = point[0];
-        }
-        if (maxY === null || point[1] > maxY) {
-          maxY = point[1];
-        }
-      }
-      log.verbose(
-        `Bounding box of ${JSON.stringify(geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`);
-      regionMap[region] = `(${minX},${minY}),(${maxX},${maxY})`;
-    } else {
-      regionMap[region] = toTitleCase(region);
-    }
-    log.verbose("Exporting egion: " + region);
-    return this._twitterData.tweets(regionGrouping, region)
-               .filter(i => i.valid && !this._pref.isBlacklisted(i))
-               .map(i => i.asCSV(regionMap, this._pref.combined.sanitizeForGDPR));
-
   }
 
   public download(regionGrouping: string, polygonDatum: PolygonData) {
@@ -451,7 +359,6 @@ export class MapDataService {
 
   }
 
-
   public async switchDataSet(dataset: string) {
     if (!this.initialized) {
       this._notify.error("Map Data Service not Initialized");
@@ -465,5 +372,91 @@ export class MapDataService {
 
   public regionTypes() {
     return this.dataSetMetdata.regionGroups.map(i => i.id);
+  }
+
+  private getCurrentLayer() {
+    return this.dataSetMetdata.layers[0];
+  }
+
+  private async loadFromS3(name: string, version: string = environment.version, cacheDuration = ONE_DAY,
+                           loadingMessage: string = null) {
+    const key = `${environment.name}:${version}:${name}`;
+    const cacheValue: CachedItem<any> = await this.cache.getCached(key);
+    if (cacheValue != null && !cacheValue.expired && cacheValue.hasData && cacheValue.data) {
+      log.info(`Retrieved ${name} from cache (${key}) .`);
+      log.debug(cacheValue);
+      return cacheValue.data;
+    } else {
+      log.info(`${name} not in cache.`);
+      if (loadingMessage !== null && this._pref.combined.showLoadingMessages) {
+        this._notify.show(loadingMessage, "OK", 60);
+      }
+      const url = await Storage.get(name);
+      const jsonData = await this._http.get(url.toString(), {observe: "body", responseType: "json"})
+                                 .toPromise();
+      this.cache.setCached(key, jsonData, cacheDuration);
+      return jsonData;
+    }
+  }
+
+  /**
+   * Updates the {@link _twitterData} field to contain a processed
+   * version of the incoming TimeSlice[] data.
+   *
+   * @param tweetInfo the raw data to process.
+   */
+  private async updateTweetsData(_dateMin, _dateMax) {
+    const key = this.createKey(_dateMin, _dateMax);
+    const cacheValue: CachedItem<ProcessedData> = await this.cache.getCached(key);
+    if (environment.cacheProcessedTweets && cacheValue != null && !cacheValue.expired && cacheValue.hasData && cacheValue.data) {
+      log.info("Retrieved tweet data from cache.", cacheValue.data);
+      log.debug(cacheValue);
+      this._twitterData = new ProcessedData().populate(cacheValue.data, this.regionTypes());
+      log.debug(this._twitterData);
+    } else {
+      log.info("Tweet data not in cache.");
+      this._twitterData = new ProcessedData(_dateMin, _dateMax, this.reverseTimeKeys, this._rawTwitterData,
+                                            this.stats, this.dataSetMetdata.regionGroups);
+      this.cache.setCached(key, this._twitterData, ONE_DAY);
+    }
+  }
+
+  private createKey(_dateMin, _dateMax) {
+    const key = `${environment.version}:${this.serviceMetadata.version}:${this.dataSetMetdata.version};${this.dataset}${_dateMin}:${_dateMax}:${this.reverseTimeKeys}`;
+    return key;
+  }
+
+  private downloadRegion(regionGrouping: string, region: string, geometry: Geometry): CSVExportTweet[] {
+    const regionMap = {};
+    if (region.match(/\d+/)) {
+      let minX = null;
+      let maxX = null;
+      let minY = null;
+      let maxY = null;
+      for (const point of geometry.coordinates[0]) {
+        if (minX === null || point[0] < minX) {
+          minX = point[0];
+        }
+        if (minY === null || point[1] < minY) {
+          minY = point[1];
+        }
+        if (maxX === null || point[0] > maxX) {
+          maxX = point[0];
+        }
+        if (maxY === null || point[1] > maxY) {
+          maxY = point[1];
+        }
+      }
+      log.verbose(
+        `Bounding box of ${JSON.stringify(geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`);
+      regionMap[region] = `(${minX},${minY}),(${maxX},${maxY})`;
+    } else {
+      regionMap[region] = toTitleCase(region);
+    }
+    log.verbose("Exporting egion: " + region);
+    return this._twitterData.tweets(regionGrouping, region)
+               .filter(i => i.valid && !this._pref.isBlacklisted(i))
+               .map(i => i.asCSV(regionMap, this._pref.combined.sanitizeForGDPR));
+
   }
 }
