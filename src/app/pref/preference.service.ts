@@ -85,69 +85,78 @@ export class PreferenceService {
     }
     log.debug("** Preference Service Initializing **");
     log.debug(userInfo);
-
-    const pref = await DataStore.query(UserPreferences, q => q.owner("eq", userInfo.username));
-    if (!pref) {
-      log.debug("No existing preferences.");
-      this._preferences = await DataStore.save(new UserPreferences({owner: userInfo.username}));
-      log.debug("Created new preferences.");
-    } else {
-      log.debug("Existing preferences", pref);
-      this._preferences = pref;
-
-    }
-    if (!groups || groups.length === 0) {
-      this._notify.show(
-        // tslint:disable-next-line:max-line-length
-        "Your account is not a member of a group, please ask an administrator to fix this. The application will not work correctly until you do.",
-        "I Will",
-        180);
-      this._groups = ["__invalid__"];
-      return;
-    } else {
-      const groupPref = await DataStore.query(GroupPreferences, q => q.group("eq", this._groups[0]));
-      if (groupPref.length === 0) {
-        log.debug("No existing preferences.");
-
-        log.debug("Created new group preferences.");
-        this._groupPreferences = await DataStore.save(
-          new GroupPreferences({group: this._groups[0]}));
-      } else {
-        log.debug("Existing group preferences.");
-        this._groupPreferences = groupPref[0];
-
-      }
-      try {
-        log.debug("GROUP PREFS", this._groupPreferences.prefs);
-        let groupPrefs: any = {};
-        if (this._groupPreferences.prefs) {
-          groupPrefs = typeof this._groupPreferences.prefs !== "undefined" ?
-            JSON.parse(this._groupPreferences.prefs) : this._groupPreferences;
-        }
-        log.debug("USER PREFS", this._preferences.prefs);
-        let prefs: any = {};
-        if (this._preferences.prefs) {
-          prefs = typeof this._preferences.prefs !== "undefined" ?
-            JSON.parse(this._preferences.prefs) : this._preferences;
-        }
-        this.combined = PreferenceService.combine(this.combined, prefs, groupPrefs);
-      } catch (e) {
-        log.error(
-          "Defaulting to environment preferences most probably we couldn't parse the preferences, check the stack trace below.");
-        log.error(e);
-      }
-
-      log.info("Combined preferences are: ", this.combined);
-    }
-
     try {
-      await this.readBlacklist();
-      this._ready = true;
-      this._notify.show("Blacklist loaded.", "OK", 60);
+      log.debug("Making sure storage is ready.");
+      const pref = await DataStore.query(UserPreferences, q => q.owner("eq", userInfo.username));
+      if (!pref) {
+        log.debug("No existing preferences.");
+        this._preferences = await DataStore.save(new UserPreferences({owner: userInfo.username}));
+        log.debug("Created new preferences.");
+      } else {
+        log.debug("Existing preferences", pref);
+        this._preferences = pref;
+
+      }
+      if (!groups || groups.length === 0) {
+        this._notify.show(
+          // tslint:disable-next-line:max-line-length
+          "Your account is not a member of a group, please ask an administrator to fix this. The application will not work correctly until you do.",
+          "I Will",
+          180);
+        this._groups = ["__invalid__"];
+        return;
+      } else {
+        const groupPref = await DataStore.query(GroupPreferences, q => q.group("eq", this._groups[0]));
+        if (groupPref.length === 0) {
+          log.debug("No existing preferences.");
+
+          log.debug("Created new group preferences.");
+          this._groupPreferences = await DataStore.save(
+            new GroupPreferences({group: this._groups[0]}));
+        } else {
+          log.debug("Existing group preferences.");
+          this._groupPreferences = groupPref[0];
+
+        }
+        try {
+          log.debug("GROUP PREFS", this._groupPreferences.prefs);
+          let groupPrefs: any = {};
+          if (this._groupPreferences.prefs) {
+            groupPrefs = typeof this._groupPreferences.prefs !== "undefined" ?
+              JSON.parse(this._groupPreferences.prefs) : this._groupPreferences;
+          }
+          log.debug("USER PREFS", this._preferences.prefs);
+          let prefs: any = {};
+          if (this._preferences.prefs) {
+            prefs = typeof this._preferences.prefs !== "undefined" ?
+              JSON.parse(this._preferences.prefs) : this._preferences;
+          }
+          this.combined = PreferenceService.combine(this.combined, prefs, groupPrefs);
+        } catch (e) {
+          log.error(
+            "Defaulting to environment preferences most probably we couldn't parse the preferences, check the stack trace below.");
+          log.error(e);
+        }
+
+
+        log.info("Combined preferences are: ", this.combined);
+      }
+
+      try {
+        log.info("Loading the ignores list");
+        await this.readBlacklist();
+        log.info("Loaded the ignores list");
+      } catch (e) {
+        log.error(e);
+        this._notify.show("Failed to load the ignores list, this could be a network error. Refresh the page and try" +
+                            " again.", "OK", 60);
+      } finally {
+        this._ready = true;
+      }
+
     } catch (e) {
       log.error(e);
-      this._notify.show("Failed to load the ignores list, this could be a network error. Refresh the page and try" +
-                          " again.", "OK", 60);
+
     }
     log.info("Preference Service Initialized");
 
@@ -158,7 +167,7 @@ export class PreferenceService {
     if (!tweet.valid) {
       return false;
     }
-    if(!this._ready) {
+    if (!this._ready) {
       throw new Error("Preference service not initialized");
     }
     return this._tweetBlackList.includes(tweet.id) || this._twitterUserBlackList.includes(tweet.sender);
@@ -232,7 +241,6 @@ export class PreferenceService {
   }
 
   private async readBlacklist() {
-    await DataStore.start();
     let page = 0;
     while (true) {
       const groupTweetIgnores = await DataStore.query(GroupTweetIgnore,
