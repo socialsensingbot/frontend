@@ -116,12 +116,12 @@ The **version** marks which version of the metadata schema to use (always 1.0 at
 
 The **datasets** gives the list of available datasets, the **id** is used as the folder name to load the rest of the data from. The **title** is what is put in the dropdown when choosing the dataset.
 
-THe **start** defines the default starting position for the map. This can be overriden for each dataset.
+The **start** defines the default starting position for the map. This can be overriden for each dataset.
 
 #### The dataset folders
 
 
-For each dataset there os a metadata.json file 
+For each dataset there is a metadata.json file 
 
 ```json
 {
@@ -184,7 +184,7 @@ For each dataset there os a metadata.json file
 }
 ```
 
-Which provides the dataset **id** and **title*, these should be the same as in the parent metadata.json (may be removed at some point). The **version** number (currently *"1.2"*). 
+Which provides the dataset **id** and **title**, these should be the same as in the parent metadata.json (may be removed at some point). The **version** number (currently *"1.2"*). 
 
 The **location**, which is currently an arbitrary string, that is used on dataset switching to determine if a new location's data is being used. If the **location** string changes between datasets then the map navigates to the specified start position for that dataset, otherwise the navigation remains unchanged.
 
@@ -192,15 +192,18 @@ The **hazards** is a list of hazards types (these are built into the app) suppor
 
 The **layers** are basically the raw data within the dataset, they have an **id**, a **source** such as *"twitter"* or *"pollution-monitor"* a **hazard** type (optional) which is an application understood value for what this data represents and finally the **file** in which the data is stored.
 
-The **layerGroups** organise these layers into a single visual representation. Each layer group can contain a single later or a grouping of layers.
+The **layerGroups** organise these layers into a single visual representation. Each layer group can contain a single layer or a grouping of layers.
 
-The **regionGroups** decide how to split up the map into regions for this dataset. They contain and **id** used to find the sub folder with the region metadata in. A **title** used for dropdowns and a **key** which is the key within the json datafiles to use (please try and keep this the same as **id**).
+The **regionGroups** decide how to split up the map into regions for this dataset. They contain an **id** used to find the sub folder with the region metadata in. A **title** used for dropdowns and a **key** which is the key within the json datafiles to use (please try and keep this the same as **id**).
 
 The **defaultLayerGroup** should be shown by default.
 
 The **start** position is where this dataset should start from and the zoom level.
 
-Inside the region subfolder you'll find all the regions (see **regionGroups.id**) and within those region subfolders are the features.json and xxx-stats.json (where xxx is the id of a layer) metadata files.   
+Inside the region subfolder you'll find all the regions (see **regionGroups.id**) and within those region subfolders are :-
+ 
+   - features.json - the [GeoJSON](https://geojson.org/) of the region
+   - xxx-stats.json (where xxx is the id of each layer) previous statistics files used to compare the current data with.   
 
       
 ## Development Quick Reference
