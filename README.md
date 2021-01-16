@@ -87,9 +87,11 @@ e.g.
   }
 ```  
 ### Datasets
+
+#### The Top Level S3 Folder
 The application supports multiple data sets they can be found in the public area of the general S3 bucket for the app (i.e. <https://s3.console.aws.amazon.com/s3/buckets/json183906-dev?region=eu-west-2&prefix=public/&showversions=false> or prod).
 
-Within that is a metadata.json file and a folder for each dataset.
+Within that is a **metadata.json** file and a folder for each dataset.
 
 ![](docs/images/fad68d56.png)
 
@@ -121,7 +123,7 @@ The **start** defines the default starting position for the map. This can be ove
 #### The dataset folders
 
 
-For each dataset there is a metadata.json file 
+For each dataset there is a **metadata.json** file in the top level of it's folder. 
 
 ```json
 {
@@ -137,13 +139,13 @@ For each dataset there is a metadata.json file
       "id": "flood-twitter",
       "source": "twitter",
       "hazard": "flood",
-      "dataFile": "data/twitter/flood.json"
+      "file": "data/twitter/flood.json"
     },
     {
       "id": "snow-twitter",
       "source": "twitter",
       "hazard": "snow",
-      "dataFile": "data/twitter/snow.json"
+      "file": "data/twitter/snow.json"
     }
   ],
   "layerGroups": [
@@ -186,19 +188,19 @@ For each dataset there is a metadata.json file
 
 Which provides the dataset **id** and **title**, these should be the same as in the parent metadata.json (may be removed at some point). The **version** number (currently *"1.2"*). 
 
-The **location**, which is currently an arbitrary string, that is used on dataset switching to determine if a new location's data is being used. If the **location** string changes between datasets then the map navigates to the specified start position for that dataset, otherwise the navigation remains unchanged.
+The **location**, which is currently an arbitrary string, (I suggest using the ISO 2 letter country code) that is used on dataset switching to determine if a new location's data is being used. If the **location** string changes between datasets then the map navigates to the specified start position for that dataset, otherwise the navigation remains unchanged.
 
-The **hazards** is a list of hazards types (these are built into the app) supported in this dataset.
+The **hazards** is a list of hazards types (these will built into the app, as of 1.4 this is purely informational) supported in this dataset.
 
-The **layers** are basically the raw data within the dataset, they have an **id**, a **source** such as *"twitter"* or *"pollution-monitor"* a **hazard** type (optional) which is an application understood value for what this data represents and finally the **file** in which the data is stored.
+The **layers** are basically the raw data within the dataset, they have an **id**, a **source** such as *"twitter"* or *"pollution-monitor"* a **hazard** type (optional) which will be an application understood value for what this data represents (as of 1.4 this is informational only) and finally the **file** in which the data is stored.
 
-The **layerGroups** organise these layers into a single visual representation. Each layer group can contain a single layer or a grouping of layers.
+The **layerGroups** organise these layers into a single visual representation. Each layer group can contain a single layer or a grouping of layers. (As of 1.4 this is ignored and the first layer is used for the dataset, will be supported in future releases).
 
 The **regionGroups** decide how to split up the map into regions for this dataset. They contain an **id** used to find the sub folder with the region metadata in. A **title** used for dropdowns and a **key** which is the key within the json datafiles to use (please try and keep this the same as **id**).
 
-The **defaultLayerGroup** should be shown by default.
+The **defaultLayerGroup** should be shown by default (not used yet, as of 1.4).
 
-The **start** position is where this dataset should start from and the zoom level.
+The **start** position is where the map should start from for this dataset and the zoom level.
 
 Inside the region subfolder you'll find all the regions (see **regionGroups.id**) and within those region subfolders are :-
  

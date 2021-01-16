@@ -46,7 +46,7 @@ export interface LayerMetadata {
    */
   hazard?: string;
   /**
-   * Where, relative to the top level metadata.json file can we find this layer's data.
+   * Where, relative to the top level public dir in S3, can we find this layer's data.
    */
   file: string;
 }
