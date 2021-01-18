@@ -47,6 +47,7 @@ export class AppComponent {
 
     Auth.currentAuthenticatedUser({bypassCache: true})
         .then(user => this.isAuthenticated = (user != null))
+        .then(user => this.auth.loggedIn = (user != null))
         .then(() => this.checkSession())
         .catch(err => log.debug(err));
     auth.state.subscribe((event: string) => {
@@ -86,7 +87,9 @@ export class AppComponent {
       if (event === "outboxStatus") {
         this.dataStoreSynced = data.isEmpty;
         if (data.isEmpty && this.initiateLogout) {
-          await this.doLogout();
+          this._notify.show("Data synced.", "OK", 2);
+
+          setTimeout(() => this.doLogout(), 500);
         }
 
       }
@@ -162,6 +165,7 @@ export class AppComponent {
     await this._session.close();
     if (!this.dataStoreSynced) {
       this.initiateLogout = true;
+
       this._notify.show("Syncing data before logout.", "OK", 30);
     } else {
       await this.doLogout();
@@ -173,10 +177,13 @@ export class AppComponent {
   private async doLogout() {
     this.initiateLogout = false;
     this.isAuthenticated = false;
+    log.info("Clearing data store.");
     await DataStore.clear();
-    Auth.signOut()
-        .then(i => this._router.navigate(["/"], {queryParamsHandling: "merge"}))
-        .catch(err => log.debug(err));
+    log.info("Performing sign out.");
+    await Auth.signOut()
+              .then(i => this._router.navigate(["/"], {queryParamsHandling: "merge"}))
+              .catch(err => log.error(err));
+    log.info("Performed sign out.");
   }
 
 }

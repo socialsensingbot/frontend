@@ -73,10 +73,10 @@ export class SessionService {
         this._sessionId = sessionToken;
         this.session = await this.getSessionOrNull();
         this.heartbeat();
-        log.info("Existing session "+this._sessionId);
+        log.info("Existing session " + this._sessionId);
       } else {
         this.createLocalSession(userInfo);
-        log.info("New session "+this._sessionId);
+        log.info("New session " + this._sessionId);
       }
 
 
@@ -93,7 +93,7 @@ export class SessionService {
   public async heartbeat() {
     await this._pref.waitUntilReady();
     window.localStorage.setItem(SESSION_END, "" + this.localTTL());
-    if (this._auth.loggedIn) {
+    if (this._auth.loggedIn && this.session !== null) {
       try {
 
         this.session = await DataStore.save(UserSession.copyOf(this.session, updated => {
@@ -112,16 +112,22 @@ export class SessionService {
   public async close() {
     await this._pref.waitUntilReady();
     if (this._auth.loggedIn) {
-      this.session = await DataStore.save(UserSession.copyOf(this.session, updated => {
-        updated.ttl = this.serverTTL();
-        updated.open = false;
-      }));
-      log.info("Closing user session");
-      this.removeSessionSubscription();
       this.stopHeartbeat();
+      log.info("Closing server session");
+      try {
+        this.session = await DataStore.save(UserSession.copyOf(this.session, updated => {
+          updated.open = false;
+        }));
+      } catch (e) {
+        log.error("Failed to close server session", e);
+      }
+      this.removeSessionSubscription();
+    } else {
+      log.warn("Logout called but user not logged in!")
     }
 
     this.session = null;
+    this._sessionId = null;
     window.localStorage.removeItem(SESSION_TOKEN);
   }
 
@@ -148,7 +154,7 @@ export class SessionService {
   private async listenForNewServerSessions(userInfo, sessionToken: string) {
     return await DataStore.observe(UserSession).subscribe(msg => {
       console.log(msg.model, msg.opType, msg.element);
-      if (msg.element.owner === userInfo.username) {
+      if (msg.element.owner === userInfo.username && msg.element.open === true) {
         log.info("New session detected.");
         const sub = msg.element;
         if (!sub.id) {
