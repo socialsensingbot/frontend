@@ -73,9 +73,10 @@ export class SessionService {
         this._sessionId = sessionToken;
         this.session = await this.getSessionOrNull();
         this.heartbeat();
-        log.info("Existing session");
+        log.info("Existing session "+this._sessionId);
       } else {
         this.createLocalSession(userInfo);
+        log.info("New session "+this._sessionId);
       }
 
 
