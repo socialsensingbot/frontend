@@ -8,7 +8,7 @@ type UserPreferences @model @auth(rules: [{allow: owner,  operations: [create, u
 
 type UserSession
 @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
-@auth(rules: [{allow: owner, operations: [create, update, delete, read]}]) {
+@auth(rules: [{allow: private}]) {
   id: ID!
   fingerprint: String
   client: AWSJSON

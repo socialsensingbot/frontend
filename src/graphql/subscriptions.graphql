@@ -35,8 +35,8 @@ subscription OnDeleteUserPreferences($owner: String) {
     updatedAt
   }
 }
-subscription OnCreateUserSession($owner: String) {
-  onCreateUserSession(owner: $owner) {
+subscription OnCreateUserSession {
+  onCreateUserSession {
     id
     fingerprint
     client
@@ -52,8 +52,8 @@ subscription OnCreateUserSession($owner: String) {
     updatedAt
   }
 }
-subscription OnUpdateUserSession($owner: String) {
-  onUpdateUserSession(owner: $owner) {
+subscription OnUpdateUserSession {
+  onUpdateUserSession {
     id
     fingerprint
     client
@@ -69,8 +69,8 @@ subscription OnUpdateUserSession($owner: String) {
     updatedAt
   }
 }
-subscription OnDeleteUserSession($owner: String) {
-  onDeleteUserSession(owner: $owner) {
+subscription OnDeleteUserSession {
+  onDeleteUserSession {
     id
     fingerprint
     client

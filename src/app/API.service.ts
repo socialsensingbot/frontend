@@ -92,6 +92,7 @@ export type ModelUserSessionConditionInput = {
   client?: ModelStringInput | null;
   open?: ModelBooleanInput | null;
   group?: ModelStringInput | null;
+  owner?: ModelStringInput | null;
   ttl?: ModelIntInput | null;
   createdAt?: ModelStringInput | null;
   sessionId?: ModelStringInput | null;
@@ -2464,8 +2465,8 @@ export class APIService {
     SubscriptionResponse<OnCreateUserSessionSubscription>
   > = API.graphql(
     graphqlOperation(
-      `subscription OnCreateUserSession($owner: String) {
-        onCreateUserSession(owner: $owner) {
+      `subscription OnCreateUserSession {
+        onCreateUserSession {
           __typename
           id
           fingerprint
@@ -2489,8 +2490,8 @@ export class APIService {
     SubscriptionResponse<OnUpdateUserSessionSubscription>
   > = API.graphql(
     graphqlOperation(
-      `subscription OnUpdateUserSession($owner: String) {
-        onUpdateUserSession(owner: $owner) {
+      `subscription OnUpdateUserSession {
+        onUpdateUserSession {
           __typename
           id
           fingerprint
@@ -2514,8 +2515,8 @@ export class APIService {
     SubscriptionResponse<OnDeleteUserSessionSubscription>
   > = API.graphql(
     graphqlOperation(
-      `subscription OnDeleteUserSession($owner: String) {
-        onDeleteUserSession(owner: $owner) {
+      `subscription OnDeleteUserSession {
+        onDeleteUserSession {
           __typename
           id
           fingerprint
