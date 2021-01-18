@@ -266,8 +266,7 @@ export class SessionService {
     await this._pref.waitUntilReady();
     const group = this._pref.groups[0];
     const sessionItems = await DataStore.query(UserSession,
-                                               q => q.group("eq", group)
-                                                     .fingerprint("ne", this.calculateFingerPrint()));
+                                               q => q.group("eq", group));
     const userSessions = sessionItems.map(i => i.owner);
     const loggedInCount = new Set(userSessions).size;
     if (this._pref.combined.maxUsers > -1) {
