@@ -93,7 +93,7 @@ export class AppComponent {
         }
 
       }
-      if (event === "ready") {
+      if (event === "ready" && !this.initiateLogout) {
         this._notify.show("Synced data with the server ...", "OK", 5);
 
         const user = await Auth.currentAuthenticatedUser();
@@ -175,7 +175,6 @@ export class AppComponent {
   }
 
   private async doLogout() {
-    this.initiateLogout = false;
     this.isAuthenticated = false;
     log.info("Clearing data store.");
     await DataStore.clear();
@@ -184,6 +183,7 @@ export class AppComponent {
               .then(i => this._router.navigate(["/"], {queryParamsHandling: "merge"}))
               .catch(err => log.error(err));
     log.info("Performed sign out.");
+    this.initiateLogout = false;
   }
 
 }

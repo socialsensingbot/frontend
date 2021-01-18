@@ -21,7 +21,7 @@ export class SessionService {
   /**
    * This is the subscription to new sessions being added. It is closed OnDestroy.
    */
-  private _sessionSubscription: any;
+  private _sessionSubscription: any = null;
 
   /**
    * The time a session should remain active for. If you close a browser and reopen
@@ -32,10 +32,10 @@ export class SessionService {
    * The heartbeat timer executes to show the session is still active, it updates localStorage and
    * the DynamoDB table.
    */
-  private _heartbeatTimer: Subscription;
+  private _heartbeatTimer: Subscription = null;
 
-  private session: UserSession;
-  private _sessionId: string;
+  private session: UserSession = null;
+  private _sessionId: string = null;
 
   constructor(private _notify: NotificationService,
               private _pref: PreferenceService,
@@ -59,8 +59,9 @@ export class SessionService {
    * @param userInfo
    */
   public async open(userInfo) {
+    log.info("Opening session");
     await this._pref.waitUntilReady();
-    if (userInfo && !this.session) {
+    if (userInfo && this.session === null) {
       const sessionToken = window.localStorage.getItem(SESSION_TOKEN);
       const sessionEndTime = window.localStorage.getItem(SESSION_END);
 
@@ -72,7 +73,7 @@ export class SessionService {
       if (sessionToken && sessionEndTime && +sessionEndTime > Date.now()) {
         this._sessionId = sessionToken;
         this.session = await this.getSessionOrNull();
-        this.heartbeat();
+        await this.heartbeat();
         log.info("Existing session " + this._sessionId);
       } else {
         this.createLocalSession(userInfo);
@@ -84,7 +85,7 @@ export class SessionService {
       this._sessionSubscription = await this.listenForNewServerSessions(userInfo, sessionToken);
 
       // Start the heartbeat which keeps the session active
-      this._heartbeatTimer = timer(0, 60 * 1000).subscribe(() => this.heartbeat());
+      this._heartbeatTimer = timer(60 * 1000, 60 * 1000).subscribe(() => this.heartbeat());
 
       return;
     }
@@ -111,35 +112,37 @@ export class SessionService {
    */
   public async close() {
     await this._pref.waitUntilReady();
+    const session = this.session;
+    this.session = null;
+    this.removeSessionSubscription();
     if (this._auth.loggedIn) {
       this.stopHeartbeat();
       log.info("Closing server session");
       try {
-        this.session = await DataStore.save(UserSession.copyOf(this.session, updated => {
+        await DataStore.save(UserSession.copyOf(session, updated => {
           updated.open = false;
         }));
+        log.info("Closed server session");
       } catch (e) {
         log.error("Failed to close server session", e);
       }
-      this.removeSessionSubscription();
     } else {
-      log.warn("Logout called but user not logged in!")
+      log.warn("Logout called but user not logged in!");
     }
 
-    this.session = null;
     this._sessionId = null;
     window.localStorage.removeItem(SESSION_TOKEN);
   }
 
   private stopHeartbeat() {
-    if (this._heartbeatTimer) {
+    if (this._heartbeatTimer !== null) {
       this._heartbeatTimer.unsubscribe();
       this._heartbeatTimer = null;
     }
   }
 
   private removeSessionSubscription() {
-    if (this._sessionSubscription) {
+    if (this._sessionSubscription !== null) {
       this._sessionSubscription.unsubscribe();
       this._sessionSubscription = null;
     }
