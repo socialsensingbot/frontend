@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {  Logger} from "@aws-amplify/core";
+import {Logger} from "@aws-amplify/core";
 import {NotificationService} from "../services/notification.service";
 import {Subscription, timer} from "rxjs";
 import {PreferenceService} from "../pref/preference.service";
@@ -70,7 +70,7 @@ export class SessionService {
       // oldest session on DynamoDB as that is the session that will be logged out.
 
       if (sessionToken && sessionEndTime && +sessionEndTime > Date.now()) {
-        this._sessionId= sessionToken;
+        this._sessionId = sessionToken;
         this.session = await this.getSessionOrNull();
         this.heartbeat();
         log.info("Existing session");
@@ -144,7 +144,7 @@ export class SessionService {
    * @param userInfo the Cognito info for the current user.
    * @param sessionToken a session token using our
    */
-  private async listenForNewServerSessions(userInfo, sessionToken: string){
+  private async listenForNewServerSessions(userInfo, sessionToken: string) {
     return await DataStore.observe(UserSession).subscribe(msg => {
       console.log(msg.model, msg.opType, msg.element);
       if (msg.element.owner === userInfo.username) {
@@ -237,7 +237,8 @@ export class SessionService {
                                             open:        true,
                                             ttl:         this.serverTTL(),
                                             group:       this._pref.groups[0],
-                                            owner:       (await Auth.currentUserInfo()).username
+                                            owner:       (await Auth.currentUserInfo()).username,
+                                            sessionId:   this._sessionId
                                           }));
 
 
