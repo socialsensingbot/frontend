@@ -4,16 +4,16 @@ import PubSub from "@aws-amplify/pubsub";
 import API from "@aws-amplify/api";
 import awsconfig from "./aws-exports";
 import "@angular/compiler";
+import {AppModule} from "./app/app.module";
+import {environment} from "./environments/environment";
+import Amplify, {Logger} from "@aws-amplify/core";
+
 const log = new Logger("main");
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
 Amplify.configure(awsconfig);
 // Storage.configure({ level: 'private' });
-
-import {AppModule} from "./app/app.module";
-import {environment} from "./environments/environment";
-import Amplify, {Logger} from "@aws-amplify/core";
 
 if (environment.production) {
   enableProdMode();
@@ -35,3 +35,5 @@ log.info("");
 
 const bootstrap = () => platformBrowserDynamic().bootstrapModule(AppModule);
 bootstrap().catch(err => log.debug(err));
+
+$("#loading-div-img").attr("src", "assets/loading-2.jpg");
