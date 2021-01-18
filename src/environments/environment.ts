@@ -13,7 +13,7 @@ export const environment = {
   // timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   timezone:             "UTC",
   multipleSessions:     true, //Can the user be logged into multiple devices/browsers at once?
-  maxUsers:             1, // can be -1 (no limit), 0 - no logins, 1 - single user at a time, n - n concurrent users.
+  maxUsers:             -1, // can be -1 (no limit), 0 - no logins, 1 - single user at a time, n - n concurrent users.
   locale:               "en-GB",
   confirm:              {
     email:    "",
