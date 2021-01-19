@@ -13,6 +13,8 @@ const log = new Logger("session");
 const SESSION_TOKEN = "app-session-token";
 const SESSION_END = "app-session-end";
 
+const HEARTBEAT_FREQ = 60 * 1000;
+
 @Injectable({
               providedIn: "root"
             })
@@ -85,7 +87,7 @@ export class SessionService {
       this._sessionSubscription = await this.listenForNewServerSessions(userInfo, sessionToken);
 
       // Start the heartbeat which keeps the session active
-      this._heartbeatTimer = timer(60 * 1000, 60 * 1000).subscribe(() => this.heartbeat());
+      this._heartbeatTimer = timer(HEARTBEAT_FREQ, HEARTBEAT_FREQ).subscribe(() => this.heartbeat());
 
       return;
     }
@@ -319,7 +321,7 @@ export class SessionService {
 
 
   private serverTTL(): number {
-    return (Math.floor(Date.now() / 1000) + 24 * 60 * 60);
+    return Math.floor((Date.now() + 5 * HEARTBEAT_FREQ) / 1000);
   }
 
   /**
