@@ -2,13 +2,14 @@ export const environment = {
   production:           true,
   name:                 "production",
   demo:                 false,
-  version:              "1.3.2",
+  version: "1.3.4",
   // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
   timezone:             "UTC",
   locale:               "en-GB",
   toolbarColor:         "primary",
   rollbar:              true,
-  multipleSessions:     false,
+  multipleSessions:     true,
+  maxUsers: -1,
   hmr:                  false,
   showErrors:           false,
   showLoadingMessages:  true,
@@ -19,6 +20,6 @@ export const environment = {
   },
   defaultDataSet:       "live",
   availableDataSets:    ["*"],
-  cacheProcessedTweets: false
+  cacheProcessedTweets: false,
 
 };
