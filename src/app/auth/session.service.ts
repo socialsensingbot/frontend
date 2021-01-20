@@ -336,6 +336,12 @@ export class SessionService {
   }
 
 
+  /**
+   * If after 5 heartbeats ({@link HEARTBEAT_FREQ}) the server hasn't heard from us it will delete the session from
+   *  the server However, the local client id still exists and will trigger the recreation of a server session when
+   *  active again i.e. browser re-opened or network connection re-established.
+   * The local session itself will be deleted after {@link this.sessionDurationInSeconds}
+   */
   private serverTTL(): number {
     return Math.floor((Date.now() + 5 * HEARTBEAT_FREQ) / 1000);
   }
