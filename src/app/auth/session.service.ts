@@ -86,7 +86,9 @@ export class SessionService {
       this.session = await this.getOrCreateServerSession(userInfo);
       if (!await this.checkUserLimit()) {
         window.localStorage.removeItem(SESSION_TOKEN);
+        await this.closeServerSession(this.session);
         this._sessionId = null;
+        this.session = null;
       } else if (this.session === null) {
         log.warn("Failed to get or create server session, see elsewhere in the" +
                    " log.");
@@ -131,19 +133,23 @@ export class SessionService {
     if (this._auth.loggedIn) {
       this.stopHeartbeat();
       log.info("Closing server session");
-      try {
-        await DataStore.save(UserSession.copyOf(session, updated => {
-          updated.open = false;
-        }));
-        log.info("Closed server session");
-      } catch (e) {
-        log.error("Failed to close server session", e);
-      }
+      await this.closeServerSession(session);
     } else {
       log.warn("Logout called but user not logged in!");
     }
 
     this._sessionId = null;
+  }
+
+  private async closeServerSession(session: UserSession) {
+    try {
+      await DataStore.save(UserSession.copyOf(session, updated => {
+        updated.open = false;
+      }));
+      log.info("Closed server session");
+    } catch (e) {
+      log.error("Failed to close server session", e);
+    }
   }
 
   private stopHeartbeat() {
