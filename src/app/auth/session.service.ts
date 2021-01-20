@@ -84,10 +84,17 @@ export class SessionService {
 
 
       this.session = await this.getOrCreateServerSession(userInfo);
-      this._sessionSubscription = await this.listenForNewServerSessions(userInfo, sessionToken);
+      if (this.session === null) {
+        log.warn("Failed to get or create server session, this may be because of user limit, see elsewhere in the" +
+                      " log.");
+        window.localStorage.removeItem(SESSION_TOKEN);
+        this._sessionId = null;
+      } else {
+        this._sessionSubscription = await this.listenForNewServerSessions(userInfo, sessionToken);
+        // Start the heartbeat which keeps the session active
+        this._heartbeatTimer = timer(HEARTBEAT_FREQ, HEARTBEAT_FREQ).subscribe(() => this.heartbeat());
+      }
 
-      // Start the heartbeat which keeps the session active
-      this._heartbeatTimer = timer(HEARTBEAT_FREQ, HEARTBEAT_FREQ).subscribe(() => this.heartbeat());
 
       return;
     }
@@ -113,6 +120,7 @@ export class SessionService {
    * The session has been actively terminated (likely by logout).
    */
   public async close() {
+    window.localStorage.removeItem(SESSION_TOKEN);
     await this._pref.waitUntilReady();
     const session = this.session;
     this.session = null;
@@ -133,7 +141,6 @@ export class SessionService {
     }
 
     this._sessionId = null;
-    window.localStorage.removeItem(SESSION_TOKEN);
   }
 
   private stopHeartbeat() {
@@ -265,7 +272,7 @@ export class SessionService {
    */
   private async moreThanOneSession(oldest: boolean = true) {
     if (this._pref.combined.multipleSessions) {
-      log.info("User logged in more than once, which group preferences or the environment allow.");
+      log.info("User logged in more than once, which group preferences, or the environment allows.");
     } else {
       this._notify.show("You are logged in more than once this session will now be logged out.", "OK", 30);
       window.setTimeout(async () => {
@@ -294,16 +301,16 @@ export class SessionService {
             "OK", 30);
         }, 8000);
         log.info(
-          `${loggedInCount} logged in users for group ${group} and exceeded concurrent user limit of ${this._pref.combined.maxUsers}.`);
+          `${loggedInCount} logged-in users for group ${group} and exceeded concurrent user limit of ${this._pref.combined.maxUsers}.`);
         return false;
       } else {
         log.info(
-          `${loggedInCount} logged in users for group  ${group} and within concurrent user limit of ${this._pref.combined.maxUsers}.`);
+          `${loggedInCount} logged-in users for group  ${group} and within concurrent user limit of ${this._pref.combined.maxUsers}.`);
         return true;
       }
     } else {
       log.info(
-        `${loggedInCount} logged in users for group ${group} and NO concurrent user limit of ${this._pref.combined.maxUsers}.`);
+        `${loggedInCount} logged-in users for group ${group} and NO concurrent user limit of ${this._pref.combined.maxUsers}.`);
       return true;
     }
   }
