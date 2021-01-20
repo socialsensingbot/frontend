@@ -84,9 +84,12 @@ export class SessionService {
 
 
       this.session = await this.getOrCreateServerSession(userInfo);
-      if (this.session === null) {
-        log.warn("Failed to get or create server session, this may be because of user limit, see elsewhere in the" +
-                      " log.");
+      if (!await this.checkUserLimit()) {
+        window.localStorage.removeItem(SESSION_TOKEN);
+        this._sessionId = null;
+      } else if (this.session === null) {
+        log.warn("Failed to get or create server session, see elsewhere in the" +
+                   " log.");
         window.localStorage.removeItem(SESSION_TOKEN);
         this._sessionId = null;
       } else {
@@ -200,24 +203,22 @@ export class SessionService {
    */
   private async getOrCreateServerSession(userInfo, fail = false): Promise<UserSession> {
     try {
-      if (await this.checkUserLimit()) {
-
-        const existingSession = await this.getSessionOrNull();
-        if (existingSession) {
-          if (existingSession.open) {
-            this.moreThanOnce();
-            return existingSession;
-          } else {
-            this.createLocalSession(userInfo);
-            await this.createServerSession();
-            return await this.getSessionOrNull();
-          }
+      const existingSession = await this.getSessionOrNull();
+      if (existingSession) {
+        if (existingSession.open) {
+          log.info("Using existing open session");
+          this.moreThanOnce();
+          return existingSession;
         } else {
+          log.info("Creating new session as existing server session is marked closed.");
+          this.createLocalSession(userInfo);
           await this.createServerSession();
           return await this.getSessionOrNull();
         }
       } else {
-        return null;
+        log.info("Creating new server session as no ");
+        await this.createServerSession();
+        return await this.getSessionOrNull();
       }
     } catch (e) {
       if (fail) {
@@ -287,8 +288,10 @@ export class SessionService {
     const group = this._pref.groups[0];
     const sessionItems = await DataStore.query(UserSession,
                                                q => q.group("eq", group).open("eq", true));
+    log.info(`Currently ${sessionItems.length} active sessions for group ${group}.`);
     const userSessions = sessionItems.map(i => i.owner);
     const loggedInCount = new Set(userSessions).size;
+    log.info(`Currently ${loggedInCount} active users for group ${group}.`);
     if (this._pref.combined.maxUsers > -1) {
       if (loggedInCount > this._pref.combined.maxUsers) {
         window.setTimeout(async () => {
