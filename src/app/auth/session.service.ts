@@ -172,10 +172,10 @@ export class SessionService {
    * @param sessionToken a session token using our
    */
   private async listenForNewServerSessions(userInfo, sessionToken: string) {
-    return await DataStore.observe(UserSession).subscribe(msg => {
+    return await DataStore.observe(UserSession, q => q.group("eq", this._pref.groups[0]).open("eq", true)).subscribe(msg => {
       console.log(msg.model, msg.opType, msg.element);
       if (msg.element.owner === userInfo.username && msg.element.open === true) {
-        log.info("New session detected.");
+        log.info(`New session detected for ${msg.element.owner}.`);
         const sub = msg.element;
         if (!sub.id) {
           log.warn("Invalid id for sub", sub);
