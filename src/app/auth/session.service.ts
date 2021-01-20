@@ -8,7 +8,7 @@ import {DataStore} from "@aws-amplify/datastore";
 import {UserSession} from "../../models";
 import Auth from "@aws-amplify/auth";
 
-const log = new Logger("session");
+const log = new Logger("SessionService");
 
 const SESSION_TOKEN = "app-session-token";
 const SESSION_END = "app-session-end";
@@ -58,7 +58,6 @@ export class SessionService {
 
   /**
    * Create an application level session for a logged in user.
-   * @param userInfo
    */
   public async open(userInfo) {
     log.info("Opening session");
@@ -359,7 +358,9 @@ export class SessionService {
    * // http://stackoverflow.com/a/4167870/1250044
    */
   private map(arr, fn) {
-    let i = 0, len = arr.length, ret = [];
+    let i = 0;
+    const len = arr.length;
+    const ret = [];
     while (i < len) {
       ret[i] = fn(arr[i++]);
     }
@@ -368,13 +369,15 @@ export class SessionService {
 
   // https://github.com/darkskyapp/string-hash
   private checksum(str) {
-    let hash = 5381,
-      i = str.length;
+    let hash = 5381;
+    let i = str.length;
 
     while (i--) {
+      // tslint:disable-next-line:no-bitwise
       hash = (hash * 33) ^ str.charCodeAt(i);
     }
 
+    // tslint:disable-next-line:no-bitwise
     return hash >>> 0;
   }
 
