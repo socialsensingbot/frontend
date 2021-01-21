@@ -87,4 +87,12 @@ export class AuthService {
     );
 
   }
+
+  public async email() {
+    return (await this.userInfo()).attributes.email;
+  }
+
+  public async userInfo() {
+    return Auth.currentUserInfo();
+  }
 }

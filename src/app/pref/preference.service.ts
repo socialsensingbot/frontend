@@ -50,6 +50,7 @@ export class PreferenceService {
     setTimeout(loop, 50);
   });
 
+
   constructor(private _notify: NotificationService) {
     this.combined = {...environment};
   }

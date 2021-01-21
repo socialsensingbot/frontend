@@ -200,12 +200,14 @@ export class TweetListComponent implements OnInit, OnDestroy {
   }
 
   public async annotateTweet(tweet, annotations, $event: MouseEvent) {
-    await this.annotate.addAnnotations(tweet, annotations);
+    const groupTweetAnnotations = await this.annotate.addAnnotations(tweet, annotations);
+    this.annotations[tweet.id] = groupTweetAnnotations.annotations;
     this.update.emit(tweet);
   }
 
   public async removeTweetAnnotations(tweet, $event: MouseEvent) {
     await this.annotate.removeAllAnnotations(tweet);
+    this.annotations[tweet.id] = {};
     this.update.emit(tweet);
   }
 
@@ -393,17 +395,26 @@ export class TweetListComponent implements OnInit, OnDestroy {
       }
 
       this._tweets[i] = tweet;
+      if (tweet.valid) {
+        this.annotate.getAnnotations(tweet).then(tweetAnnotationRecord => {
+          if (tweetAnnotationRecord) {
+            this.annotations[tweet.id] = JSON.parse(tweetAnnotationRecord.annotations);
+          } else {
+            this.annotations[tweet.id] = {};
+          }
+        });
+      }
       if (this._tweets[i] && this._tweets[i].id !== tweet.id) {
         this._tweets[i] = tweet;
       }
     }
+    log.warn(this.annotations);
 
 
     log.debug(this.tweets);
     this.loadPagesOfTweets();
     this.moreToShow = this.maxPage < this.pages.length;
-    this.ready = true;
-
+    this.pref.waitUntilReady().then(i => this.ready = true);
   }
 
   private loadPagesOfTweets() {

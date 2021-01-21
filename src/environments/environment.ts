@@ -3,13 +3,13 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  name:                 "dev",
-  version:              "dev",
-  demo:                 false,
-  production:           false,
-  hmr:                  false,
-  rollbar:              false,
-  toolbarColor:         "primary",
+  name:         "dev",
+  version:      "dev",
+  demo:         false,
+  production:   false,
+  hmr:          false,
+  rollbar:      false,
+  toolbarColor: "primary",
   // timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   timezone:             "UTC",
   multipleSessions:     true, //Can the user be logged into multiple devices/browsers at once?
@@ -19,13 +19,13 @@ export const environment = {
     email:    "",
     password: ""
   },
-  impact: {
+  impact:               {
     //The ability to tag tweets with an impact annotation
     levels: [
-      {title: "1 – Minimal", value: "minimal"},
-      {title: "2 – Minor", value: "minor"},
-      {title: "3 - Significant", value: "significant"},
-      {title: "4 - Severe", value: "severe"}
+      {title: "1 – Minimal", value: "minimal", color: "blue"},
+      {title: "2 – Minor", value: "minor", color: "green"},
+      {title: "3 - Significant", value: "significant", color: "yellow"},
+      {title: "4 - Severe", value: "severe", color: "red"}
     ]
   },
   features:             [""],
