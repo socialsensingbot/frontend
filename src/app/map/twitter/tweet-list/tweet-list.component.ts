@@ -201,7 +201,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
 
   public async annotateTweet(tweet, annotations, $event: MouseEvent) {
     const groupTweetAnnotations = await this.annotate.addAnnotations(tweet, annotations);
-    this.annotations[tweet.id] = groupTweetAnnotations.annotations;
+    this.annotations[tweet.id] = JSON.parse(groupTweetAnnotations.annotations);
     this.update.emit(tweet);
   }
 
