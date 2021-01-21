@@ -2,5 +2,9 @@
   "env": {
     "RETRIES": 0
   },
+  "retries" : {
+    "runMode" : 3, "openMode": 0
+  },
+  "numTestsKeptInMemory" : 10,
   "projectId": "zxxo89"
 }
