@@ -31,6 +31,7 @@ export class AnnotationService {
     setTimeout(loop, 50);
   });
   private _userInfo: any;
+  private _cached = {};
 
   constructor(private _notify: NotificationService, private _pref: PreferenceService, private _auth: AuthService,
               private _cache: NgForageCache) {
@@ -45,10 +46,10 @@ export class AnnotationService {
     this._observable.subscribe(msg => {
       log.info("Annotation subscription message received", msg);
       if (msg.opType === OpType.DELETE) {
-        this._cache.removeCached("annotations-" + msg.element.tweetId);
+        delete this._cached[msg.element.tweetId];
         this.tweetAnnotationsRemoved.emit(msg.element);
       } else {
-        this._cache.setItem("annotations-" + msg.element.tweetId, msg.element);
+        this._cached[msg.element.tweetId] = msg.element;
         this.tweetAnnotated.emit(msg.element);
       }
     });
@@ -63,18 +64,19 @@ export class AnnotationService {
     return this._readyPromise;
   }
 
-  public async getAnnotations(tweet: Tweet): Promise<GroupTweetAnnotations> {
+  public async getAnnotations(tweet: Tweet): Promise<GroupTweetAnnotations | null> {
     await this.waitUntilReady();
     if (!tweet.valid) {
       throw new Error("Shouldn't be trying to retrieve annotations an unparseable tweet.");
       return;
     }
 
-    log.debug(await this._cache.getCached("annotations-" + tweet.id));
-    return (await this._cache.getCached("annotations-" + tweet.id)).data as GroupTweetAnnotations;
+    log.debug(this._cached[tweet.id]);
+    return this._cached[tweet.id] || null;
   }
 
   public async addAnnotations(tweet: Tweet, annotations: any): Promise<GroupTweetAnnotations> {
+    await this.waitUntilReady();
     if (!tweet.valid) {
       throw new Error("Shouldn't be trying to annotate an unparseable tweet.");
       return;
@@ -103,7 +105,7 @@ export class AnnotationService {
           m.annotations = mergedAnnotations;
           m.annotatedBy = email;
         }));
-        saved.then(i => this._cache.setCached("annotations-" + tweet.id, i, 24 * 60 * 60 * 1000));
+        saved.then(i => this._cached[tweet.id] = i);
         return await saved;
       }
     } catch (e) {
@@ -120,7 +122,7 @@ export class AnnotationService {
       return;
     }
     try {
-      this._cache.removeCached("annotations-" + tweet.id);
+      delete this._cached[tweet.id];
       return await DataStore.delete(GroupTweetAnnotations,
                                     q => q.tweetId("eq", tweet.id)
                                           .ownerGroups("contains", this._pref.groups[0])
@@ -134,16 +136,16 @@ export class AnnotationService {
   }
 
   private async updateCache() {
-    await DataStore.query(GroupTweetAnnotations,
-                          q => q.ownerGroups("contains", this._pref.groups[0]))
-                   .then(result => {
-                     log.debug(result);
-                     if (result.length === 0) {
-                       return null;
-                     } else {
-                       result.forEach(i => this._cache.setCached("annotations-" + i.tweetId, i, 24 * 60 * 60 * 1000));
-                     }
-                   });
+    return await DataStore.query(GroupTweetAnnotations,
+                                 q => q.ownerGroups("contains", this._pref.groups[0]))
+                          .then(result => {
+                            log.debug(result);
+                            if (result.length === 0) {
+                              return null;
+                            } else {
+                              result.forEach(i => this._cached[i.tweetId] = i);
+                            }
+                          });
   }
 
 }
