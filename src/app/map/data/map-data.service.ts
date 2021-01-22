@@ -14,6 +14,7 @@ import {toTitleCase} from "../../common";
 import * as geojson from "geojson";
 import {environment} from "../../../environments/environment";
 import Storage from "@aws-amplify/storage";
+import {AnnotationService} from "../../pref/annotation.service";
 
 
 const log = new Logger("map-data");
@@ -129,7 +130,9 @@ export class MapDataService {
   constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
               private _notify: NotificationService, private readonly cache: NgForageCache,
               private readonly ngf: NgForage,
-              private _pref: PreferenceService) {
+              private _pref: PreferenceService,
+              private _annotation: AnnotationService
+  ) {
 
   }
 
@@ -325,7 +328,7 @@ export class MapDataService {
     return -this.reverseTimeKeys.length + 1;
   }
 
-  public download(regionGrouping: string, polygonDatum: PolygonData) {
+  public async download(regionGrouping: string, polygonDatum: PolygonData) {
     const exportedTweets: CSVExportTweet[] = [];
     const options = {
       fieldSeparator:   ",",
@@ -350,7 +353,12 @@ export class MapDataService {
       if (typeof geometry === "undefined") {
         log.warn("No geometry for " + region);
       } else {
-        exportedTweets.push(...this.downloadRegion(regionGrouping, region, geometry));
+
+        const exportedPromises = await this.downloadRegion(regionGrouping, region,
+                                                     geometry);
+        for (const exportedElement of exportedPromises) {
+          exportedTweets.push(exportedElement);
+        }
       }
     }
     const csvExporter = new ExportToCsv(options);
@@ -426,7 +434,7 @@ export class MapDataService {
     return key;
   }
 
-  private downloadRegion(regionGrouping: string, region: string, geometry: Geometry): CSVExportTweet[] {
+  private async downloadRegion(regionGrouping: string, region: string, geometry: Geometry): Promise<CSVExportTweet[]> {
     const regionMap = {};
     if (region.match(/\d+/)) {
       let minX = null;
@@ -454,9 +462,22 @@ export class MapDataService {
       regionMap[region] = toTitleCase(region);
     }
     log.verbose("Exporting egion: " + region);
-    return this._twitterData.tweets(regionGrouping, region)
-               .filter(i => i.valid && !this._pref.isBlacklisted(i))
-               .map(i => i.asCSV(regionMap, this._pref.combined.sanitizeForGDPR));
+    const exportedPromises = await this._twitterData.tweets(regionGrouping, region)
+                                       .filter(i => i.valid && !this._pref.isBlacklisted(i))
+                                       .map(
+                                         async i => {
+                                           const annotationRecord = await this._annotation.getAnnotations(i);
+                                           let annotations = {};
+                                           if (annotationRecord && annotationRecord.annotations) {
+                                             annotations = JSON.parse(annotationRecord.annotations);
+                                           }
+                                           return i.asCSV(regionMap, this._pref.combined.sanitizeForGDPR, annotations);
+                                         });
+    const result: CSVExportTweet[] = [];
+    for (const exportedPromise of exportedPromises) {
+      result.push(await exportedPromise);
+    }
+    return result;
 
   }
 }

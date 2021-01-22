@@ -146,6 +146,7 @@ export type CreateGroupPreferencesInput = {
 };
 
 export type ModelGroupPreferencesConditionInput = {
+  group?: ModelStringInput | null;
   prefs?: ModelStringInput | null;
   and?: Array<ModelGroupPreferencesConditionInput | null> | null;
   or?: Array<ModelGroupPreferencesConditionInput | null> | null;
@@ -178,6 +179,7 @@ export type ModelGroupTweetIgnoreConditionInput = {
   url?: ModelStringInput | null;
   ignoredBy?: ModelStringInput | null;
   tweetId?: ModelStringInput | null;
+  ownerGroups?: ModelStringInput | null;
   scope?: ModelStringInput | null;
   and?: Array<ModelGroupTweetIgnoreConditionInput | null> | null;
   or?: Array<ModelGroupTweetIgnoreConditionInput | null> | null;
@@ -213,6 +215,7 @@ export type ModelGroupTweetAnnotationsConditionInput = {
   url?: ModelStringInput | null;
   annotatedBy?: ModelStringInput | null;
   tweetId?: ModelStringInput | null;
+  ownerGroups?: ModelStringInput | null;
   annotations?: ModelStringInput | null;
   and?: Array<ModelGroupTweetAnnotationsConditionInput | null> | null;
   or?: Array<ModelGroupTweetAnnotationsConditionInput | null> | null;
@@ -246,6 +249,7 @@ export type CreateGroupTwitterUserIgnoreInput = {
 export type ModelGroupTwitterUserIgnoreConditionInput = {
   twitterScreenName?: ModelStringInput | null;
   ignoredBy?: ModelStringInput | null;
+  ownerGroups?: ModelStringInput | null;
   scope?: ModelStringInput | null;
   and?: Array<ModelGroupTwitterUserIgnoreConditionInput | null> | null;
   or?: Array<ModelGroupTwitterUserIgnoreConditionInput | null> | null;

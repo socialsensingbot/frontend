@@ -1,3 +1,8 @@
+# See https://github.com/aws-amplify/amplify-cli/issues/3118#issuecomment-674593946 - datastore works very badly with
+# groups so when you see [{allow: private}] it should be [{allow: groups, groupsField: "ownerGroups"}]
+# TODO: Change this when better support exists for dynamic groups in DataStore.
+
+
 type UserPreferences @model @auth(rules: [{allow: owner,  operations: [create, update, delete, read]}]) {
   id: ID!
   owner: String
@@ -20,13 +25,17 @@ type UserSession
   sessionId: String
 }
 
-type GroupPreferences @model @auth(rules: [ {allow: groups, groupsField: "group"}]) {
+type GroupPreferences
+@model
+@auth(rules: [{allow: private}]) {
   id: ID!
   group: String!
   prefs: AWSJSON
 }
 
-type GroupTweetIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}) @auth(rules: [{allow: groups, groupsField: "ownerGroups"}]) {
+type GroupTweetIgnore
+@model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
+@auth(rules: [{allow: private}]) {
   id: ID!
   url: String!
   ignoredBy: String!
@@ -35,8 +44,9 @@ type GroupTweetIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "up
   scope: String!
 }
 
-type GroupTweetAnnotations @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}) @auth(rules: [{allow:
-groups, groupsField: "ownerGroups"}]) {
+type GroupTweetAnnotations
+@model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
+@auth(rules: [{allow: private}]) {
   id: ID!
   url: String!
   annotatedBy: String!
@@ -46,7 +56,9 @@ groups, groupsField: "ownerGroups"}]) {
 }
 
 
-type GroupTwitterUserIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"}) @auth(rules: [{allow: groups, groupsField: "ownerGroups"}]) {
+type GroupTwitterUserIgnore
+@model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
+@auth(rules: [{allow: private}]) {
   id: ID!
   twitterScreenName: String!
   ignoredBy: String!

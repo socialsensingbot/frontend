@@ -10,6 +10,7 @@ import * as Rollbar from "rollbar";
 import {RollbarService} from "./error";
 import {DataStore} from "@aws-amplify/datastore";
 import Auth from "@aws-amplify/auth";
+import {AnnotationService} from "./pref/annotation.service";
 
 
 const log = new Logger("app");
@@ -43,6 +44,7 @@ export class AppComponent {
               private _router: Router, private _pref: PreferenceService,
               private _notify: NotificationService,
               private _session: SessionService,
+              private _annotation: AnnotationService,
               @Inject(RollbarService) private _rollbar: Rollbar) {
 
     Auth.currentAuthenticatedUser({bypassCache: true})
@@ -121,6 +123,18 @@ export class AppComponent {
             this._rollbar.error(
               "There was a problem with creating your session, please ask an administrator to look into this.", e);
           }
+          try {
+            await this._annotation.init(userInfo);
+          } catch (e) {
+            console.error(
+              "There was a problem with the annotation service, please ask an administrator to look into this.",
+              e);
+            console.error(user);
+            this._rollbar.error(
+              "There was a problem with creating the annotation service, " +
+              "please ask an administrator to look into this.",
+              e);
+          }
           log.info("Locale detected: " + getLang());
           log.info("Locale in use: " + this._pref.combined.locale);
           log.info("Timezone detected: " + Intl.DateTimeFormat().resolvedOptions().timeZone);
@@ -157,7 +171,13 @@ export class AppComponent {
         }
       }
     });
-    await DataStore.start();
+    try {
+      await DataStore.start();
+    } catch (e) {
+      log.error(e);
+      await DataStore.clear();
+      await DataStore.start();
+    }
     this._notify.show("Syncing data with the server ...", "OK", 30);
   }
 

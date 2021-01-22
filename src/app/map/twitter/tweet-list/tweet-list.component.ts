@@ -217,11 +217,27 @@ export class TweetListComponent implements OnInit, OnDestroy {
         this.showDateHeader = false;
       }
     });
+    this._annotationRemovalSubscription = this.annotate.tweetAnnotationsRemoved.subscribe(
+      groupTweetAnnotations => delete this.annotations[groupTweetAnnotations.tweetId]);
+    this._annotationSubscription = this.annotate.tweetAnnotated.subscribe(groupTweetAnnotations => {
+      if (groupTweetAnnotations.annotations) {
+        log.info("Received new annotation record of ",groupTweetAnnotations);
+        this.annotations[groupTweetAnnotations.tweetId] = JSON.parse(groupTweetAnnotations.annotations);
+      }
+    });
   }
 
   public ngOnDestroy(): void {
     this._destroyed = true;
     this._dateHeaderTimer.unsubscribe();
+    if (this._annotationSubscription) {
+      this._annotationSubscription.unsubscribe();
+      this._annotationSubscription = null;
+    }
+    if (this._annotationRemovalSubscription) {
+      this._annotationRemovalSubscription.unsubscribe();
+      this._annotationRemovalSubscription = null;
+    }
   }
 
   public isNewDate(i: number) {
@@ -397,7 +413,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
       this._tweets[i] = tweet;
       if (tweet.valid) {
         this.annotate.getAnnotations(tweet).then(tweetAnnotationRecord => {
-          if (tweetAnnotationRecord) {
+          if (tweetAnnotationRecord && tweetAnnotationRecord.annotations && tweetAnnotationRecord.annotations[0] !== "u") {
             this.annotations[tweet.id] = JSON.parse(tweetAnnotationRecord.annotations);
           } else {
             this.annotations[tweet.id] = {};

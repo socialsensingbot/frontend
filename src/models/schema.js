@@ -187,11 +187,7 @@ export const schema = {
                     "properties": {
                         "rules": [
                             {
-                                "groupClaim": "cognito:groups",
-                                "provider": "userPools",
-                                "allow": "groups",
-                                "groupsField": "group",
-                                "groupField": "groups",
+                                "allow": "private",
                                 "operations": [
                                     "create",
                                     "update",
@@ -268,11 +264,7 @@ export const schema = {
                     "properties": {
                         "rules": [
                             {
-                                "groupClaim": "cognito:groups",
-                                "provider": "userPools",
-                                "allow": "groups",
-                                "groupsField": "ownerGroups",
-                                "groupField": "groups",
+                                "allow": "private",
                                 "operations": [
                                     "create",
                                     "update",
@@ -349,11 +341,7 @@ export const schema = {
                     "properties": {
                         "rules": [
                             {
-                                "groupClaim": "cognito:groups",
-                                "provider": "userPools",
-                                "allow": "groups",
-                                "groupsField": "ownerGroups",
-                                "groupField": "groups",
+                                "allow": "private",
                                 "operations": [
                                     "create",
                                     "update",
@@ -423,11 +411,7 @@ export const schema = {
                     "properties": {
                         "rules": [
                             {
-                                "groupClaim": "cognito:groups",
-                                "provider": "userPools",
-                                "allow": "groups",
-                                "groupsField": "ownerGroups",
-                                "groupField": "groups",
+                                "allow": "private",
                                 "operations": [
                                     "create",
                                     "update",

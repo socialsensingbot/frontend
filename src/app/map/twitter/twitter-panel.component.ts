@@ -1,10 +1,11 @@
 import {Component, Input, NgZone, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {Hub, Logger} from "@aws-amplify/core";
-import {Tweet} from "./tweet";
+import {CSVExportTweet, Tweet} from "./tweet";
 import {Subscription} from "rxjs";
 import {ExportToCsv} from "export-to-csv";
 import {RegionSelection} from "../region-selection";
+import {AnnotationService} from "../../pref/annotation.service";
 
 const log = new Logger("twitter-panel");
 
@@ -30,7 +31,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
   private twitterUserUnignoreSub: Subscription;
   private csvExporter: ExportToCsv;
 
-  constructor(private _zone: NgZone, public pref: PreferenceService) {
+  constructor(private _zone: NgZone, public pref: PreferenceService, private _annotation: AnnotationService) {
     Hub.listen("twitter-panel", (e) => {
       if (e.payload.message === "refresh") {
         this._zone.run(() => this.updateTweets(this._tweets));
@@ -122,7 +123,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
       });
   }
 
-  public download() {
+  public async download() {
     let filename;
     if (this.selection.count === 1) {
       filename = this.selection.firstRegion().name + "-tweet-export";
@@ -145,13 +146,22 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
     };
 
     this.csvExporter = new ExportToCsv(options);
-    const regionData = [];
-    regionData.push(
-      ...this.visibleTweets.filter(i => i.valid)
-             .map(i => i.asCSV(this.selection.regionMap(), this.pref.combined.sanitizeForGDPR)));
+    const exportedPromises = await this.visibleTweets.filter(i => i.valid)
+                                       .map(
+                                         async i => {
+                                           const annotationRecord = await this._annotation.getAnnotations(i);
+                                           let annotations = {};
+                                           if (annotationRecord && annotationRecord.annotations) {
+                                             annotations = JSON.parse(annotationRecord.annotations);
+                                           }
+                                           return i.asCSV(this.selection.regionMap(), this.pref.combined.sanitizeForGDPR, annotations);
+                                         });
+    const result: CSVExportTweet[] = [];
+    for (const exportedPromise of exportedPromises) {
+      result.push(await exportedPromise);
+    }
 
-
-    this.csvExporter.generateCsv(regionData);
+    this.csvExporter.generateCsv(result);
   }
 
   private updateTweets(val: Tweet[]) {
