@@ -96,7 +96,7 @@ export class AnnotationService {
             annotations: JSON.stringify(annotations)
           }
         ));
-        saved.then(i => this._cache.setCached("annotations-" + tweet.id, i, 24 * 60 * 60 * 1000));
+        saved.then(i => this._cached[tweet.id] = i);
         return await saved;
 
       } else {
