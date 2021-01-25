@@ -203,6 +203,9 @@ export class TweetListComponent implements OnInit, OnDestroy {
   }
 
   public async annotateTweet(tweet, annotations, $event: MouseEvent) {
+    // This is a simple optimization, that changes our local version of the annotations first
+    // we then get the authoritative version from the server
+    this.annotations[tweet.id] = {...this.annotationsFor(tweet), ...annotations};
     const groupTweetAnnotations = await this.annotate.addAnnotations(tweet, annotations);
     this.annotations[tweet.id] = JSON.parse(groupTweetAnnotations.annotations);
     this.update.emit(tweet);
