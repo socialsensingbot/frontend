@@ -139,6 +139,9 @@ export class TweetListComponent implements OnInit, OnDestroy {
   public maxPage = this.INITIAL_PAGES - 1;
   private lastDateShow: number;
   private _dateHeaderTimer: Subscription;
+  private annotations: { [key: string]: any } = {};
+  private _annotationSubscription: any;
+  private _annotationRemovalSubscription: Subscription;
 
   constructor(private _zone: NgZone, public pref: PreferenceService, public annotate: AnnotationService) {}
 
@@ -347,6 +350,33 @@ export class TweetListComponent implements OnInit, OnDestroy {
     return JSON.parse(localStorage.getItem("tweet:" + id)).html;
   }
 
+  public annotationsFor(tweet: Tweet) {
+    return this.annotations[tweet.id] || {};
+  }
+
+  public annotationValueFor(tweet: Tweet, key: string) {
+    return (this.annotationsFor(tweet))[key];
+  }
+
+  public annotationValueIs(tweet: Tweet, key: string, value) {
+    return (this.annotationValueFor(tweet, key)) === value;
+  }
+
+  public annotationValueIsNot(tweet: Tweet, key: string, value) {
+    return !this.annotationValueIs(tweet, key, value);
+  }
+
+  public styleForImpact(tweet: Tweet) {
+    const impactValue = this.annotationValueFor(tweet, "impact");
+    for (const level of this.pref.combined.impact.levels) {
+      if (level.value === impactValue) {
+        return "border-left-color:" + level.color;
+      }
+    }
+    return "border-left-color:rgba(0,0,0,0.0)";
+
+  }
+
   /**
    * Update the tweets stored in this list.
    * @param val an array of {@link Tweet}s
@@ -445,18 +475,5 @@ export class TweetListComponent implements OnInit, OnDestroy {
       loadTweets = true;
       this.pages[page].loaded = true;
     }
-  }
-
-  public async annotationsFor(tweet: Tweet) {
-    return await this.annotate.getAnnotations(tweet);
-  }
-  public async annotationValueFor(tweet: Tweet, key: string) {
-    return (await this.annotate.getAnnotations(tweet))[key];
-  }
-  public async annotationValueIs(tweet: Tweet, key: string, value) {
-    return (await this.annotate.getAnnotations(tweet))[key] === value;
-  }
-  public async annotationValueIsNot(tweet: Tweet, key: string, value) {
-    return !this.annotationValueIs(tweet,key,value);
   }
 }

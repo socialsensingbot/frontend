@@ -28,7 +28,7 @@ export const environment = {
       {title: "4 - Severe", value: "severe", color: "red"}
     ]
   },
-  features:             [""],
+  features:             ["impact"],
   showErrors:           false,
   showLoadingMessages:  true,
   sanitizeForGDPR:      true,

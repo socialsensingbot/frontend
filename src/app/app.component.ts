@@ -89,7 +89,7 @@ export class AppComponent {
       if (event === "outboxStatus") {
         this.dataStoreSynced = data.isEmpty;
         if (data.isEmpty && this.initiateLogout) {
-          this._notify.show("Data synced.", "OK", 2);
+          this._notify.show("Synced", "OK", 1);
 
           setTimeout(() => this.doLogout(), 500);
         }
@@ -185,8 +185,9 @@ export class AppComponent {
     await this._session.close();
     if (!this.dataStoreSynced) {
       this.initiateLogout = true;
-
-      this._notify.show("Syncing data before logout.", "OK", 30);
+      // failsafe
+      setTimeout(() => this.doLogout(), 5000);
+      this._notify.show("Syncing data before logout.", "OK", 5);
     } else {
       await this.doLogout();
     }
@@ -195,6 +196,9 @@ export class AppComponent {
   }
 
   private async doLogout() {
+    if (!this.initiateLogout) {
+      return;
+    }
     this.isAuthenticated = false;
     log.info("Clearing data store.");
     await DataStore.clear();
