@@ -8,7 +8,7 @@ import {DataStore} from "@aws-amplify/datastore";
 import {UserSession} from "../../models";
 import Auth from "@aws-amplify/auth";
 
-const log = new Logger("SessionService");
+const log = new Logger("session");
 
 const SESSION_TOKEN = "app-session-token";
 const SESSION_END = "app-session-end";
@@ -58,6 +58,7 @@ export class SessionService {
 
   /**
    * Create an application level session for a logged in user.
+   * @param userInfo
    */
   public async open(userInfo) {
     log.info("Opening session");
@@ -83,22 +84,10 @@ export class SessionService {
 
 
       this.session = await this.getOrCreateServerSession(userInfo);
-      if (!await this.checkUserLimit()) {
-        window.localStorage.removeItem(SESSION_TOKEN);
-        await this.closeServerSession(this.session);
-        this._sessionId = null;
-        this.session = null;
-      } else if (this.session === null) {
-        log.warn("Failed to get or create server session, see elsewhere in the" +
-                   " log.");
-        window.localStorage.removeItem(SESSION_TOKEN);
-        this._sessionId = null;
-      } else {
-        this._sessionSubscription = await this.listenForNewServerSessions(userInfo, sessionToken);
-        // Start the heartbeat which keeps the session active
-        this._heartbeatTimer = timer(HEARTBEAT_FREQ, HEARTBEAT_FREQ).subscribe(() => this.heartbeat());
-      }
+      this._sessionSubscription = await this.listenForNewServerSessions(userInfo, sessionToken);
 
+      // Start the heartbeat which keeps the session active
+      this._heartbeatTimer = timer(HEARTBEAT_FREQ, HEARTBEAT_FREQ).subscribe(() => this.heartbeat());
 
       return;
     }
@@ -124,7 +113,6 @@ export class SessionService {
    * The session has been actively terminated (likely by logout).
    */
   public async close() {
-    window.localStorage.removeItem(SESSION_TOKEN);
     await this._pref.waitUntilReady();
     const session = this.session;
     this.session = null;
@@ -132,23 +120,20 @@ export class SessionService {
     if (this._auth.loggedIn) {
       this.stopHeartbeat();
       log.info("Closing server session");
-      await this.closeServerSession(session);
+      try {
+        await DataStore.save(UserSession.copyOf(session, updated => {
+          updated.open = false;
+        }));
+        log.info("Closed server session");
+      } catch (e) {
+        log.error("Failed to close server session", e);
+      }
     } else {
       log.warn("Logout called but user not logged in!");
     }
 
     this._sessionId = null;
-  }
-
-  private async closeServerSession(session: UserSession) {
-    try {
-      await DataStore.save(UserSession.copyOf(session, updated => {
-        updated.open = false;
-      }));
-      log.info("Closed server session");
-    } catch (e) {
-      log.error("Failed to close server session", e);
-    }
+    window.localStorage.removeItem(SESSION_TOKEN);
   }
 
   private stopHeartbeat() {
@@ -172,10 +157,10 @@ export class SessionService {
    * @param sessionToken a session token using our
    */
   private async listenForNewServerSessions(userInfo, sessionToken: string) {
-    return await DataStore.observe(UserSession, q => q.group("eq", this._pref.groups[0]).open("eq", true)).subscribe(msg => {
+    return await DataStore.observe(UserSession).subscribe(msg => {
       console.log(msg.model, msg.opType, msg.element);
       if (msg.element.owner === userInfo.username && msg.element.open === true) {
-        log.info(`New session detected for ${msg.element.owner}.`);
+        log.info("New session detected.");
         const sub = msg.element;
         if (!sub.id) {
           log.warn("Invalid id for sub", sub);
@@ -208,22 +193,24 @@ export class SessionService {
    */
   private async getOrCreateServerSession(userInfo, fail = false): Promise<UserSession> {
     try {
-      const existingSession = await this.getSessionOrNull();
-      if (existingSession) {
-        if (existingSession.open) {
-          log.info("Using existing open session");
-          this.moreThanOnce();
-          return existingSession;
+      if (await this.checkUserLimit()) {
+
+        const existingSession = await this.getSessionOrNull();
+        if (existingSession) {
+          if (existingSession.open) {
+            this.moreThanOnce();
+            return existingSession;
+          } else {
+            this.createLocalSession(userInfo);
+            await this.createServerSession();
+            return await this.getSessionOrNull();
+          }
         } else {
-          log.info("Creating new session as existing server session is marked closed.");
-          this.createLocalSession(userInfo);
           await this.createServerSession();
           return await this.getSessionOrNull();
         }
       } else {
-        log.info("Creating new server session as no ");
-        await this.createServerSession();
-        return await this.getSessionOrNull();
+        return null;
       }
     } catch (e) {
       if (fail) {
@@ -278,7 +265,7 @@ export class SessionService {
    */
   private async moreThanOneSession(oldest: boolean = true) {
     if (this._pref.combined.multipleSessions) {
-      log.info("User logged in more than once, which group preferences, or the environment allows.");
+      log.info("User logged in more than once, which group preferences or the environment allow.");
     } else {
       this._notify.show("You are logged in more than once this session will now be logged out.", "OK", 30);
       window.setTimeout(async () => {
@@ -292,11 +279,9 @@ export class SessionService {
     await this._pref.waitUntilReady();
     const group = this._pref.groups[0];
     const sessionItems = await DataStore.query(UserSession,
-                                               q => q.group("eq", group).open("eq", true));
-    log.info(`Currently ${sessionItems.length} active sessions for group ${group}.`);
+                                               q => q.group("eq", group));
     const userSessions = sessionItems.map(i => i.owner);
     const loggedInCount = new Set(userSessions).size;
-    log.info(`Currently ${loggedInCount} active users for group ${group}.`);
     if (this._pref.combined.maxUsers > -1) {
       if (loggedInCount > this._pref.combined.maxUsers) {
         window.setTimeout(async () => {
@@ -309,16 +294,16 @@ export class SessionService {
             "OK", 30);
         }, 8000);
         log.info(
-          `${loggedInCount} logged-in users for group ${group} and exceeded concurrent user limit of ${this._pref.combined.maxUsers}.`);
+          `${loggedInCount} logged in users for group ${group} and exceeded concurrent user limit of ${this._pref.combined.maxUsers}.`);
         return false;
       } else {
         log.info(
-          `${loggedInCount} logged-in users for group  ${group} and within concurrent user limit of ${this._pref.combined.maxUsers}.`);
+          `${loggedInCount} logged in users for group  ${group} and within concurrent user limit of ${this._pref.combined.maxUsers}.`);
         return true;
       }
     } else {
       log.info(
-        `${loggedInCount} logged-in users for group ${group} and NO concurrent user limit of ${this._pref.combined.maxUsers}.`);
+        `${loggedInCount} logged in users for group ${group} and NO concurrent user limit of ${this._pref.combined.maxUsers}.`);
       return true;
     }
   }
@@ -335,12 +320,6 @@ export class SessionService {
   }
 
 
-  /**
-   * If after 5 heartbeats ({@link HEARTBEAT_FREQ}) the server hasn't heard from us it will delete the session from
-   *  the server However, the local client id still exists and will trigger the recreation of a server session when
-   *  active again i.e. browser re-opened or network connection re-established.
-   * The local session itself will be deleted after {@link this.sessionDurationInSeconds}
-   */
   private serverTTL(): number {
     return Math.floor((Date.now() + 5 * HEARTBEAT_FREQ) / 1000);
   }
@@ -358,9 +337,7 @@ export class SessionService {
    * // http://stackoverflow.com/a/4167870/1250044
    */
   private map(arr, fn) {
-    let i = 0;
-    const len = arr.length;
-    const ret = [];
+    let i = 0, len = arr.length, ret = [];
     while (i < len) {
       ret[i] = fn(arr[i++]);
     }
@@ -369,15 +346,13 @@ export class SessionService {
 
   // https://github.com/darkskyapp/string-hash
   private checksum(str) {
-    let hash = 5381;
-    let i = str.length;
+    let hash = 5381,
+      i = str.length;
 
     while (i--) {
-      // tslint:disable-next-line:no-bitwise
       hash = (hash * 33) ^ str.charCodeAt(i);
     }
 
-    // tslint:disable-next-line:no-bitwise
     return hash >>> 0;
   }
 
