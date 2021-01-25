@@ -16,5 +16,4 @@ export class TweetCopyDialogComponent implements OnInit {
     this.value = new StripHtmlPipe().transform(this.data.tweet.html);
   }
 
-
 }
