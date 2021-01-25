@@ -1,9 +1,6 @@
 import {BrowserModule} from "@angular/platform-browser";
 import {ErrorHandler, NgModule} from "@angular/core";
-import Auth from "@aws-amplify/auth";
-import Interactions from "@aws-amplify/interactions";
-import Storage from "@aws-amplify/storage";
-
+import {ClipboardModule} from '@angular/cdk/clipboard';
 import {AppComponent} from "./app.component";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {MaterialModule} from "./material/material.module";
@@ -37,10 +34,13 @@ import {TweetListComponent} from "./map/twitter/tweet-list/tweet-list.component"
 import {RollbarErrorHandler, rollbarFactory, RollbarService} from "./error";
 import {SafeHtmlPipe} from "./safe.pipe";
 import {AmplifyUIAngularModule} from "@aws-amplify/ui-angular";
+import { TweetCopyDialogComponent } from "./map/twitter/tweet-list/tweet-copy-dialog/tweet-copy-dialog.component";
+import {StripHtmlPipe} from "./strip.pipe";
 
 @NgModule({
             declarations:    [
               SafeHtmlPipe,
+              StripHtmlPipe,
               AppComponent,
               MapComponent,
               SignUpComponent,
@@ -57,9 +57,10 @@ import {AmplifyUIAngularModule} from "@aws-amplify/ui-angular";
               HelpButtonComponent,
               HelpDialogComponent,
               HelpSpanComponent,
-              TweetListComponent
+              TweetListComponent,
+              TweetCopyDialogComponent
             ],
-            imports:         [
+            imports: [
               BrowserModule,
               HttpClientModule,
               BrowserAnimationsModule,
@@ -72,7 +73,8 @@ import {AmplifyUIAngularModule} from "@aws-amplify/ui-angular";
               ReactiveFormsModule,
               Ng5SliderModule,
               InfiniteScrollModule,
-              LeafletModule
+              LeafletModule,
+              ClipboardModule
             ],
             providers:       [
                {
@@ -89,7 +91,7 @@ import {AmplifyUIAngularModule} from "@aws-amplify/ui-angular";
             ],
             bootstrap:       [AppComponent],
             entryComponents: [CountryCodeSelectComponent, HelpDialogComponent]
-          },)
+          }, )
 export class AppModule {
   public constructor(ngfConfig: NgForageConfig) {
     ngfConfig.configure({});

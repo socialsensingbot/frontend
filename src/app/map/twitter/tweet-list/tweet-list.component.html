@@ -49,6 +49,11 @@
               [matMenuTriggerFor]="impact" mat-menu-item>Impact
       </button>
 
+      <button
+        (click)="copy(tweet,$event);"
+        class="tweet-list-item-menu-copy"
+        mat-menu-item>Copy
+      </button>
 
       <!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
 

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output} from "@angular/core";
+import {Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild} from "@angular/core";
 import {Tweet} from "../tweet";
 import {PreferenceService} from "../../../pref/preference.service";
 import {Hub, Logger} from "@aws-amplify/core";
@@ -7,6 +7,9 @@ import {IInfiniteScrollEvent} from "ngx-infinite-scroll";
 import {Subscription, timer} from "rxjs";
 import {environment} from "../../../../environments/environment";
 import {AnnotationService} from "../../../pref/annotation.service";
+import {MatDialog} from "@angular/material/dialog";
+import {MatMenuTrigger} from "@angular/material/menu";
+import {TweetCopyDialogComponent} from "./tweet-copy-dialog/tweet-copy-dialog.component";
 
 const log = new Logger("tweet-list");
 let loadTweets = false;
@@ -132,6 +135,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
   public showDateHeader: boolean;
   public utc: boolean = environment.timezone === "UTC";
   public cache: any = {};
+  @ViewChild("appMenu") menuTrigger: MatMenuTrigger;
   private _destroyed = false;
   // Infinite scroll start: https://github.com/socialsensingbot/frontend/issues/10
   private readonly PAGE_SIZE = 5;
@@ -143,7 +147,8 @@ export class TweetListComponent implements OnInit, OnDestroy {
   private _annotationSubscription: any;
   private _annotationRemovalSubscription: Subscription;
 
-  constructor(private _zone: NgZone, public pref: PreferenceService, public annotate: AnnotationService) {}
+  constructor(private _zone: NgZone, private _dialog: MatDialog, public pref: PreferenceService,
+              public annotate: AnnotationService) {}
 
   private _tweets: Tweet[] | null = [];
 
@@ -227,7 +232,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
       groupTweetAnnotations => delete this.annotations[groupTweetAnnotations.tweetId]);
     this._annotationSubscription = this.annotate.tweetAnnotated.subscribe(groupTweetAnnotations => {
       if (groupTweetAnnotations.annotations) {
-        log.info("Received new annotation record of ",groupTweetAnnotations);
+        log.info("Received new annotation record of ", groupTweetAnnotations);
         this.annotations[groupTweetAnnotations.tweetId] = JSON.parse(groupTweetAnnotations.annotations);
       }
     });
@@ -380,6 +385,13 @@ export class TweetListComponent implements OnInit, OnDestroy {
 
   }
 
+  public copy(tweet: Tweet, $event: MouseEvent) {
+    const dialogRef = this._dialog.open(TweetCopyDialogComponent, {data: {tweet}});
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+    });
+  }
+
   /**
    * Update the tweets stored in this list.
    * @param val an array of {@link Tweet}s
@@ -480,3 +492,5 @@ export class TweetListComponent implements OnInit, OnDestroy {
     }
   }
 }
+
+
