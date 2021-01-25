@@ -1,4 +1,11 @@
-<label for="clipboard-example-textarea">Text to Copy</label>
+<h2 mat-dialog-title>Copy Tweet to Clipboard</h2>
+<mat-dialog-content class="mat-typography">
 <p><textarea id="clipboard-example-textarea" cols="30" rows="10" [(ngModel)]="value"></textarea></p>
-<button #copyButton [cdkCopyToClipboard]="value" (cdkCopyToClipboardCopied)="copyButton.textContent='Copied'">Copy to
-  clipboard</button>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button #copyButton [cdkCopyToClipboard]="value" cdkFocusInitial
+          (cdkCopyToClipboardCopied)="copyButton._getHostElement().textContent='Copied'">Copy</button>
+  <button mat-button mat-dialog-close>Done</button>
+</mat-dialog-actions>
+
+
