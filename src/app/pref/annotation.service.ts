@@ -75,6 +75,7 @@ export class AnnotationService {
     return this._cached[tweet.id] || null;
   }
 
+
   public async addAnnotations(tweet: Tweet, annotations: any): Promise<GroupTweetAnnotations> {
     await this.waitUntilReady();
     if (!tweet.valid) {
