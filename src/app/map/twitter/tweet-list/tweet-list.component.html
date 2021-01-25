@@ -13,7 +13,22 @@
      (scrolled)="onScrollDown($event)"
      (scrolledUp)="onUp($event)">
 
+
   <ng-template #tweetEntry let-tweet="tweet" let-si="senderIgnore" let-ti="tweetIgnore">
+    <mat-menu #impact="matMenu" >
+      <ng-container *ngFor="let level of pref.combined.impact.levels">
+        <button *ngIf="annotationValueIs(tweet, 'impact',level.value)"
+                (click)="annotateTweet(tweet,{impact:''}, $event);"
+                mat-menu-item><strong>{{level.title}}</strong>
+        </button>
+        <button *ngIf="annotationValueIsNot(tweet, 'impact',level.value)"
+                (click)="annotateTweet(tweet,{impact:level.value}, $event);"
+                mat-menu-item>{{level.title}}
+        </button>
+      </ng-container>
+
+    </mat-menu>
+
     <mat-menu #appMenu="matMenu">
       <button *ngIf="!si" (click)="ignoreSender(tweet,$event);" mat-menu-item>Ignore
         @{{sender(tweet)}}</button>
@@ -23,20 +38,9 @@
       </button>
       <button *ngIf="ti" (click)="unIgnoreTweet(tweet,$event);" mat-menu-item>Unignore Tweet
       </button>
+      <button *ngIf="pref.combined.features.includes('impact')" [matMenuTriggerFor]="impact" mat-menu-item>Impact
+      </button>
 
-      <ng-container *ngIf="pref.combined.features.includes('impact')">
-        <ng-container *ngFor="let level of pref.combined.impact.levels">
-          <button *ngIf="annotationValueIs(tweet, 'impact',level.value)"
-                  (click)="annotateTweet(tweet,{impact:''}, $event);"
-                  mat-menu-item><strong>{{level.title}}</strong>
-          </button>
-          <button *ngIf="annotationValueIsNot(tweet, 'impact',level.value)"
-                  (click)="annotateTweet(tweet,{impact:level.value}, $event);"
-                  mat-menu-item>{{level.title}}
-          </button>
-        </ng-container>
-
-      </ng-container>
 
       <!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
 
