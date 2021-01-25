@@ -17,15 +17,22 @@
   <ng-template #tweetEntry let-tweet="tweet" let-si="senderIgnore" let-ti="tweetIgnore">
     <mat-menu #impact="matMenu" >
       <ng-container *ngFor="let level of pref.combined.impact.levels">
-        <button *ngIf="annotationValueIs(tweet, 'impact',level.value)"
-                (click)="annotateTweet(tweet,{impact:''}, $event);"
+        <button
+          class="tweet-list-item-menu-impact-level-{{level.value}} tweet-list-item-menu-impact-level-{{level.value}}-selected" *ngIf="annotationValueIs(tweet,
+        'impact',level.value)"
                 mat-menu-item><strong>{{level.title}}</strong>
         </button>
         <button *ngIf="annotationValueIsNot(tweet, 'impact',level.value)"
                 (click)="annotateTweet(tweet,{impact:level.value}, $event);"
+                class="tweet-list-item-menu-impact-level-{{level.value}} tweet-list-item-menu-impact-level-{{level.value}}-not-selected"
                 mat-menu-item>{{level.title}}
         </button>
       </ng-container>
+      <button
+              (click)="annotateTweet(tweet,{impact:''}, $event);"
+              class="tweet-list-item-menu-impact-level-clear"
+              mat-menu-item>Clear
+      </button>
 
     </mat-menu>
 
@@ -38,7 +45,8 @@
       </button>
       <button *ngIf="ti" (click)="unIgnoreTweet(tweet,$event);" mat-menu-item>Unignore Tweet
       </button>
-      <button *ngIf="pref.combined.features.includes('impact')" [matMenuTriggerFor]="impact" mat-menu-item>Impact
+      <button class="tweet-list-item-menu-impact" *ngIf="pref.combined.features.includes('impact')"
+              [matMenuTriggerFor]="impact" mat-menu-item>Impact
       </button>
 
 
