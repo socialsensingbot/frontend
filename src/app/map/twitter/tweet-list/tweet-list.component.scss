@@ -30,15 +30,17 @@
     transform: scaleY(1);
     transform-origin: top;
     opacity: 1.0;
-
-    &.app-tweet-row-animate-in {
-      opacity: 0.0;
-    }
+    max-height: 156px;
+    transition: max-height 0.4s ease-in-out 0.1s;
 
     &.app-tweet-row-rendered {
       //transform: scaleY(1);
       opacity: 1.0;
       transition: opacity 0.1s ease-in-out;
+      max-height:100%;
+      .app-tweet-item {
+        border-left: 2px solid;
+      }
     }
 
     //max-height: 0;
@@ -60,7 +62,7 @@
       width: 100%;
       min-height: 32px;
 
-      border-left: 2px solid;
+      border-left: 2px none;
       border-radius: 6px;
 
       padding-left: 4px;
