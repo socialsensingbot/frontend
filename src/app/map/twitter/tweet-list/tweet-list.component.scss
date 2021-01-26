@@ -38,7 +38,7 @@
     &.app-tweet-row-rendered {
       //transform: scaleY(1);
       opacity: 1.0;
-      transition: opacity 1s ease-in-out;
+      transition: opacity 0.1s ease-in-out;
     }
 
     //max-height: 0;
@@ -49,7 +49,7 @@
       top: 0px;
       z-index: 10;
       opacity: 0.0;
-      transition: opacity 1s ease-in-out 1s;
+      transition: opacity 0.1s ease-in-out 0.1s;
       //border: 1px solid red;
     }
 
