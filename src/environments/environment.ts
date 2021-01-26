@@ -19,13 +19,14 @@ export const environment = {
     email:    "",
     password: ""
   },
+
   impact:               {
     //The ability to tag tweets with an impact annotation
     levels: [
-      {title: "1 – Minimal", value: "minimal", color: "blue"},
-      {title: "2 – Minor", value: "minor", color: "green"},
-      {title: "3 - Significant", value: "significant", color: "yellow"},
-      {title: "4 - Severe", value: "severe", color: "red"}
+      {title: "1 – Minimal", value: "minimal", color: "#43a047"},
+      {title: "2 – Minor", value: "minor", color: "#ffee58"},
+      {title: "3 - Significant", value: "significant", color: "#ffb300"},
+      {title: "4 - Severe", value: "severe", color: "#f4511e"}
     ]
   },
   features:             ["impact"],
