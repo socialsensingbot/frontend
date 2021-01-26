@@ -2,7 +2,7 @@ import {environment} from "../../../environments/environment";
 
 export class CSVExportTweet {
   constructor(public region: string, public id: string, public date: string, public url: string, public text: string,
-              public impact: string) {
+              public impact: string = "", public source: string = "") {
 
   }
 
@@ -129,15 +129,16 @@ export class Tweet {
     if (annotations.impact) {
       impact = annotations.impact;
     }
+    let source = "";
     this.lazyInit();
     if (sanitize) {
       return new CSVExportTweet(regionMap[this._place], this._id, this._date.toUTCString(),
                                 "https://twitter.com/username_removed/status/" + this._id,
-                                this.sanitizeForGDPR($("<div>").html(this._html).text()), impact);
+                                this.sanitizeForGDPR($("<div>").html(this._html).text()), impact, source);
 
     } else {
       return new CSVExportTweet(regionMap[this._place], this._id, this._date.toUTCString(), this._url,
-                                $("<div>").html(this._html).text(), impact);
+                                $("<div>").html(this._html).text(), impact, source);
     }
   }
 
