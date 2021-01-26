@@ -21,11 +21,11 @@
   .app-tweet-row {
     flex-direction: row;
     flex-wrap: nowrap;
-    align-items: center;
+    align-items: flex-start;
     //border: 1px solid blue;
     position: relative;
-    max-width: $tweetWidth + $tweetMargin * 2;
-    min-width: $tweetWidth + $tweetMargin * 2;
+    max-width: $tweetWidth + $tweetMargin;
+    min-width: $tweetWidth + $tweetMargin;
     //background-color: #eee;
     transform: scaleY(1);
     transform-origin: top;
@@ -45,7 +45,7 @@
 
     .app-tweet-item-menu {
       position: absolute;
-      right: -42px;
+      left: ($tweetWidth + $tweetMargin +14px);
       top: 0px;
       z-index: 10;
       opacity: 0.0;
@@ -60,10 +60,11 @@
       width: 100%;
       min-height: 32px;
 
-      border-left : 2px solid;
+      border-left: 2px solid;
       border-radius: 6px;
 
       padding-left: 4px;
+
       ::ng-deep {
 
 
