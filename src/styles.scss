@@ -5,9 +5,9 @@
 $tweetWidth: 380px;
 $tweetMargin: 14px;
 $tweetAndMargin: $tweetWidth + $tweetMargin * 2;
-$blackish: rgba(black, 0.7);
-$lighter-black: rgba(black, 0.5);
-$disabled-black:rgba(black, 0.3);
+$blackish: rgba(black, 200, 200, 200, 1.0);
+$lighter-black: rgba(128, 128, 128, 1.0);
+$disabled-black: rgba(75, 75, 75, 1.0);
 .amplify-block {
   @import "~@aws-amplify/ui/src/Angular";
 
@@ -41,11 +41,11 @@ $app-theme: mat-light-theme($app-primary, $app-accent, $app-warn);
 @function my-mat-light-theme-foreground($color) {
   @return (
     base: $blackish,
-    divider:           $lighter-black,
-    dividers:          $lighter-black,
-    disabled:          rgba(black, 0.3),
-    disabled-button:   rgba(black, 0.3),
-    disabled-text:     rgba(black, 0.3),
+    divider: $lighter-black,
+    dividers: $lighter-black,
+    disabled: rgba(black, 0.3),
+    disabled-button: rgba(black, 0.3),
+    disabled-text: rgba(black, 0.3),
     hint-text: $blackish,
     secondary-text: $blackish,
     icon: $blackish,
@@ -55,7 +55,9 @@ $app-theme: mat-light-theme($app-primary, $app-accent, $app-warn);
     slider-off: $blackish,
     slider-off-active: $blackish,
   );
-};
+}
+
+;
 
 // You can put any color here. I've chosen mat-color($my-app-primary, 700)
 $my-foreground: my-mat-light-theme-foreground(mat-color($app-primary, 700));
@@ -144,8 +146,8 @@ blockquote {
   box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.3);
 }
 
-.mat-tab-label,.mat-tab-link {
-  font-weight:lighter !important;
+.mat-tab-label, .mat-tab-link {
+  font-weight: lighter !important;
 }
 
 .mat-tab-label-active {
