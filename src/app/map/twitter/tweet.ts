@@ -1,8 +1,7 @@
 import {environment} from "../../../environments/environment";
 
 export class CSVExportTweet {
-  constructor(public region: string, public id: string, public date: string, public url: string, public text: string,
-              public impact: string = "", public source: string = "") {
+  constructor(public region: string, public impact: string = "", public source: string = "", public id: string, public date: string, public url: string, public text: string) {
 
   }
 
