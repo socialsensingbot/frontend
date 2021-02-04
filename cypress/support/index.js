@@ -23,6 +23,8 @@ import './commands'
 // });
 export const MAP_URL = "http://localhost:4200/map/live"
 
+
+// https://github.com/cypress-io/cypress/issues/8525
 afterEach(() => {
   cy.window().then(win => {
     // window.gc is enabled with --js-flags=--expose-gc chrome flag
