@@ -5,6 +5,6 @@
   "retries" : {
     "runMode" : 3, "openMode": 0
   },
-  "numTestsKeptInMemory" : 10,
+  "numTestsKeptInMemory" : 0,
   "projectId": "zxxo89"
 }
