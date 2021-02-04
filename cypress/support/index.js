@@ -22,3 +22,17 @@ import './commands'
 //     win.indexedDB.deleteDatabase("ngForage");
 // });
 export const MAP_URL = "http://localhost:4200/map/live"
+
+afterEach(() => {
+  cy.window().then(win => {
+    // window.gc is enabled with --js-flags=--expose-gc chrome flag
+    if (typeof win.gc === 'function') {
+      // run gc multiple times in an attempt to force a major GC between tests
+      win.gc();
+      win.gc();
+      win.gc();
+      win.gc();
+      win.gc();
+    }
+  });
+});
