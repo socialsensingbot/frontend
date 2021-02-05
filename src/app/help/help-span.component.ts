@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {MatDialog} from "@angular/material/dialog";
 import {HelpDialogComponent} from "./help-dialog.component";
-import {Logger} from "aws-amplify";
+import {Logger} from "@aws-amplify/core";
 import {DomSanitizer} from "@angular/platform-browser";
 
 const log = new Logger('help-span');

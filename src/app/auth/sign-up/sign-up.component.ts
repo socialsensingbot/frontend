@@ -6,7 +6,7 @@ import { CountryCode } from '../country-code-select/country-codes';
 import { AuthService } from '../auth.service';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
-import {Logger} from "aws-amplify";
+import {Logger} from "@aws-amplify/core";
 const log = new Logger('sign-up');
 
 @Component({

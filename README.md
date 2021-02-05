@@ -11,6 +11,9 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
   - [Running end-to-end tests] 
   - [Key files and folders for development] 
   - [The Application Structure] 
+- [The Application]
+  - [Preferences] 
+  - [Datasets]  
 - [The Development/Release Cycle]  
   - [The Branches] 
   - [The Process]  
@@ -35,7 +38,8 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 # Getting Started
 
-### Installation and Quick Start
+
+## Installation and Quick Start
 
 <https://aws-amplify.github.io/docs/js/start?platform=angular>
 
@@ -57,7 +61,153 @@ Make sure you are in the top level of the project and follow the instructions be
 
        amplify status
        
-       
+      
+      
+## The Application
+
+### Preferences
+
+Preferences can be set per environment, per group  or per user.
+They have this order :-
+default value -> environment override -> group preference -> user preference
+
+The default preference values are in :- [src/environments/environment.ts](https://github.com/socialsensingbot/frontend/blob/master/src/environments/environment.ts)
+
+They are overriden by other files in the [environments](https://github.com/socialsensingbot/frontend/tree/master/src/environments) folder for each environment. 
+
+They appear in the Group & UserPreference table and the value is a JSON string called **prefs** containing arbitrary values. (See [schema.graphql](https://github.com/socialsensingbot/frontend/blob/release/1.4/amplify/backend/api/socialsensing/schema.graphql) for details.
+
+That JSON can overide any value specified in  [src/environments/environment.ts](https://github.com/socialsensingbot/frontend/blob/master/src/environments/environment.ts)
+
+
+e.g.
+```json
+  {
+    "toolbarColor": "warn"
+  }
+```  
+### Datasets
+
+#### The Top Level S3 Folder
+The application supports multiple data sets they can be found in the public area of the general S3 bucket for the app (i.e. <https://s3.console.aws.amazon.com/s3/buckets/json183906-dev?region=eu-west-2&prefix=public/&showversions=false> or prod).
+
+Within that is a **metadata.json** file and a folder for each dataset.
+
+![](docs/images/fad68d56.png)
+
+```json
+{
+"version":"1.0",
+"datasets":[
+{"id":"live","title":"Flood"},
+{"id":"india","title":"India Flood"},
+{"id":"dataset-a","title":"Other Flood"},
+{"id":"july-17","title":"July 17th 2020"},
+{"id":"july-23","title":"July 23rd 2020"}
+  ],
+  "start": {
+    "lat": 53,
+    "lng": -2,
+    "zoom": 6
+  }
+}
+
+```
+
+The **version** marks which version of the metadata schema to use (always 1.0 at the moment).
+
+The **datasets** gives the list of available datasets, the **id** is used as the folder name to load the rest of the data from. The **title** is what is put in the dropdown when choosing the dataset.
+
+The **start** defines the default starting position for the map. This can be overriden for each dataset.
+
+#### The dataset folders
+
+
+For each dataset there is a **metadata.json** file in the top level of it's folder. 
+
+```json
+{
+  "id": "live",
+  "title": "Live",
+  "version": "1.2",
+  "location": "GB",
+  "hazards": [
+    "flood","snow"
+  ],
+  "layers": [
+    {
+      "id": "flood-twitter",
+      "source": "twitter",
+      "hazard": "flood",
+      "file": "data/twitter/flood.json"
+    },
+    {
+      "id": "snow-twitter",
+      "source": "twitter",
+      "hazard": "snow",
+      "file": "data/twitter/snow.json"
+    }
+  ],
+  "layerGroups": [
+    {
+      "id": "flood-group",
+      "title": "Flood (Twitter)",
+      "layers": ["flood-twitter"]
+    },
+    {
+      "id": "flood-snow-group",
+      "title": "Flood and Snow (Twitter)",
+      "layers": ["flood-twitter", "snow-twitter"]
+    }
+  ],
+  "regionGroups": [
+    {
+      "id": "county",
+      "title": "Local Authority",
+      "key": "county"
+    },
+    {
+      "id": "fine",
+      "title": "Fine Grid",
+      "key": "60"
+    },
+    {
+      "id": "coarse",
+      "title": "Coarse Grid",
+      "key": "15"
+    }
+  ],
+  "defaultLayerGroup": "flood-group",
+  "start": {
+    "lat": 53,
+    "lng": -2,
+    "zoom": 6
+  }
+}
+```
+
+Which provides the dataset **id** and **title**, these should be the same as in the parent metadata.json (may be removed at some point). The **version** number (currently *"1.2"*). 
+
+The **location**, which is currently an arbitrary string, (I suggest using the ISO 2 letter country code) that is used on dataset switching to determine if a new location's data is being used. If the **location** string changes between datasets then the map navigates to the specified start position for that dataset, otherwise the navigation remains unchanged.
+
+The **hazards** is a list of hazards types (these will built into the app, as of 1.4 this is purely informational) supported in this dataset.
+
+The **layers** are basically the raw data within the dataset, they have an **id**, a **source** such as *"twitter"* or *"pollution-monitor"* a **hazard** type (optional) which will be an application understood value for what this data represents (as of 1.4 this is informational only) and finally the **file** in which the data is stored.
+
+The **layerGroups** organise these layers into a single visual representation. Each layer group can contain a single layer or a grouping of layers. (As of 1.4 this is ignored and the first layer is used for the dataset, will be supported in future releases).
+
+The **regionGroups** decide how to split up the map into regions for this dataset. They contain an **id** used to find the sub folder with the region metadata in. A **title** used for dropdowns and a **key** which is the key within the json datafiles to use (please try and keep this the same as **id**).
+
+The **defaultLayerGroup** should be shown by default (not used yet, as of 1.4).
+
+The **start** position is where the map should start from for this dataset and the zoom level.
+
+Inside the region subfolder you'll find all the regions (see **regionGroups.id**) and within those region subfolders are :-
+ 
+   - features.json - the [GeoJSON](https://geojson.org/) of the region
+   - xxx-stats.json (where xxx is the id of each layer) previous statistics files used to compare the current data with.   
+
+      
 ## Development Quick Reference
 
 ### Development server
@@ -99,6 +249,7 @@ Within the src folder you will find the [app](/src/app) folder which contains th
 The [environments](/src/environments) folder contains application variables that are environment specific. Most importantly [environment.production](/src/environments/environment.prod.ts) which contains amongst other things the version number of the application - this needs to be updated every time a new release/x.y.z branch is created.
 
 The [amplify](/amplify) folder contains all the amplify generated configuration and should not be manually edited.
+
 
 ### The Application Structure
 
@@ -508,6 +659,12 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 [The Process]: #the-process
 [Live.json]: #livejson
 [Cross-Browser Testing]: #cross-browser-testing
+[The Application]: #the-application
+[Preferences]: #preferences
+[Datasets]: #datasets
+
+
+
 
 
 

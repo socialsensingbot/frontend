@@ -5,7 +5,7 @@ import {CognitoUser} from '@aws-amplify/auth';
 import {NotificationService} from 'src/app/services/notification.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from 'src/environments/environment';
-import {Logger} from "aws-amplify";
+import {Logger} from "@aws-amplify/core";
 
 const log = new Logger('sign-in');
 

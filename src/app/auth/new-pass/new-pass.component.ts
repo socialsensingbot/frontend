@@ -1,11 +1,11 @@
 import {Component, OnInit} from "@angular/core";
 import {FormGroup, FormControl, Validators, ValidationErrors} from "@angular/forms";
 import {AuthService} from "../auth.service";
-import {CognitoUser} from "@aws-amplify/auth";
+import {Auth} from "@aws-amplify/auth";
 import {NotificationService} from "src/app/services/notification.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {environment} from "src/environments/environment";
-import {Auth, Logger} from "aws-amplify";
+import { Logger} from "@aws-amplify/core";
 
 const log = new Logger("new-pass");
 

@@ -1,43 +1,26 @@
 /* tslint:disable */
 /* eslint-disable */
 //  This file was automatically generated and should not be edited.
-import {Injectable} from "@angular/core";
-import API, {graphqlOperation} from "@aws-amplify/api";
-import {GraphQLResult} from "@aws-amplify/api/lib/types";
-import {Observable} from "zen-observable-ts";
+import { Injectable } from "@angular/core";
+import API, { graphqlOperation, GraphQLResult } from "@aws-amplify/api-graphql";
+import { Observable } from "zen-observable-ts";
+
+export interface SubscriptionResponse<T> {
+  value: GraphQLResult<T>;
+}
 
 export type CreateUserPreferencesInput = {
   id?: string | null;
+  owner?: string | null;
+  prefs?: string | null;
+  _version?: number | null;
 };
 
 export type ModelUserPreferencesConditionInput = {
+  prefs?: ModelStringInput | null;
   and?: Array<ModelUserPreferencesConditionInput | null> | null;
   or?: Array<ModelUserPreferencesConditionInput | null> | null;
   not?: ModelUserPreferencesConditionInput | null;
-};
-
-export type UpdateUserPreferencesInput = {
-  id: string;
-};
-
-export type DeleteUserPreferencesInput = {
-  id?: string | null;
-};
-
-export type CreateUserSessionInput = {
-  id?: string | null;
-  fingerprint?: string | null;
-  client?: string | null;
-  open: boolean;
-};
-
-export type ModelUserSessionConditionInput = {
-  fingerprint?: ModelStringInput | null;
-  client?: ModelStringInput | null;
-  open?: ModelBooleanInput | null;
-  and?: Array<ModelUserSessionConditionInput | null> | null;
-  or?: Array<ModelUserSessionConditionInput | null> | null;
-  not?: ModelUserSessionConditionInput | null;
 };
 
 export type ModelStringInput = {
@@ -79,9 +62,60 @@ export type ModelSizeInput = {
   between?: Array<number | null> | null;
 };
 
+export type UpdateUserPreferencesInput = {
+  id: string;
+  owner?: string | null;
+  prefs?: string | null;
+  _version?: number | null;
+};
+
+export type DeleteUserPreferencesInput = {
+  id?: string | null;
+  _version?: number | null;
+};
+
+export type CreateUserSessionInput = {
+  id?: string | null;
+  fingerprint?: string | null;
+  client?: string | null;
+  open: boolean;
+  group: string;
+  owner?: string | null;
+  ttl?: number | null;
+  createdAt?: string | null;
+  sessionId?: string | null;
+  _version?: number | null;
+};
+
+export type ModelUserSessionConditionInput = {
+  fingerprint?: ModelStringInput | null;
+  client?: ModelStringInput | null;
+  open?: ModelBooleanInput | null;
+  group?: ModelStringInput | null;
+  owner?: ModelStringInput | null;
+  ttl?: ModelIntInput | null;
+  createdAt?: ModelStringInput | null;
+  sessionId?: ModelStringInput | null;
+  and?: Array<ModelUserSessionConditionInput | null> | null;
+  or?: Array<ModelUserSessionConditionInput | null> | null;
+  not?: ModelUserSessionConditionInput | null;
+};
+
 export type ModelBooleanInput = {
   ne?: boolean | null;
   eq?: boolean | null;
+  attributeExists?: boolean | null;
+  attributeType?: ModelAttributeTypes | null;
+};
+
+export type ModelIntInput = {
+  ne?: number | null;
+  eq?: number | null;
+  le?: number | null;
+  lt?: number | null;
+  ge?: number | null;
+  gt?: number | null;
+  between?: Array<number | null> | null;
   attributeExists?: boolean | null;
   attributeType?: ModelAttributeTypes | null;
 };
@@ -91,30 +125,29 @@ export type UpdateUserSessionInput = {
   fingerprint?: string | null;
   client?: string | null;
   open?: boolean | null;
+  group?: string | null;
+  owner?: string | null;
+  ttl?: number | null;
+  createdAt?: string | null;
+  sessionId?: string | null;
+  _version?: number | null;
 };
 
 export type DeleteUserSessionInput = {
   id?: string | null;
+  _version?: number | null;
 };
 
 export type CreateGroupPreferencesInput = {
   id?: string | null;
   group: string;
-  locale?: string | null;
-  timezone?: string | null;
-  multipleSessions?: boolean | null;
-  sanitizeForGDPR?: boolean | null;
-  defaultDataSet?: string | null;
-  availableDataSets?: Array<string | null> | null;
+  prefs?: string | null;
+  _version?: number | null;
 };
 
 export type ModelGroupPreferencesConditionInput = {
-  locale?: ModelStringInput | null;
-  timezone?: ModelStringInput | null;
-  multipleSessions?: ModelBooleanInput | null;
-  sanitizeForGDPR?: ModelBooleanInput | null;
-  defaultDataSet?: ModelStringInput | null;
-  availableDataSets?: ModelStringInput | null;
+  group?: ModelStringInput | null;
+  prefs?: ModelStringInput | null;
   and?: Array<ModelGroupPreferencesConditionInput | null> | null;
   or?: Array<ModelGroupPreferencesConditionInput | null> | null;
   not?: ModelGroupPreferencesConditionInput | null;
@@ -123,16 +156,13 @@ export type ModelGroupPreferencesConditionInput = {
 export type UpdateGroupPreferencesInput = {
   id: string;
   group?: string | null;
-  locale?: string | null;
-  timezone?: string | null;
-  multipleSessions?: boolean | null;
-  sanitizeForGDPR?: boolean | null;
-  defaultDataSet?: string | null;
-  availableDataSets?: Array<string | null> | null;
+  prefs?: string | null;
+  _version?: number | null;
 };
 
 export type DeleteGroupPreferencesInput = {
   id?: string | null;
+  _version?: number | null;
 };
 
 export type CreateGroupTweetIgnoreInput = {
@@ -142,12 +172,14 @@ export type CreateGroupTweetIgnoreInput = {
   tweetId: string;
   ownerGroups?: Array<string | null> | null;
   scope: string;
+  _version?: number | null;
 };
 
 export type ModelGroupTweetIgnoreConditionInput = {
   url?: ModelStringInput | null;
   ignoredBy?: ModelStringInput | null;
   tweetId?: ModelStringInput | null;
+  ownerGroups?: ModelStringInput | null;
   scope?: ModelStringInput | null;
   and?: Array<ModelGroupTweetIgnoreConditionInput | null> | null;
   or?: Array<ModelGroupTweetIgnoreConditionInput | null> | null;
@@ -161,10 +193,48 @@ export type UpdateGroupTweetIgnoreInput = {
   tweetId?: string | null;
   ownerGroups?: Array<string | null> | null;
   scope?: string | null;
+  _version?: number | null;
 };
 
 export type DeleteGroupTweetIgnoreInput = {
   id?: string | null;
+  _version?: number | null;
+};
+
+export type CreateGroupTweetAnnotationsInput = {
+  id?: string | null;
+  url: string;
+  annotatedBy: string;
+  tweetId: string;
+  ownerGroups?: Array<string | null> | null;
+  annotations?: string | null;
+  _version?: number | null;
+};
+
+export type ModelGroupTweetAnnotationsConditionInput = {
+  url?: ModelStringInput | null;
+  annotatedBy?: ModelStringInput | null;
+  tweetId?: ModelStringInput | null;
+  ownerGroups?: ModelStringInput | null;
+  annotations?: ModelStringInput | null;
+  and?: Array<ModelGroupTweetAnnotationsConditionInput | null> | null;
+  or?: Array<ModelGroupTweetAnnotationsConditionInput | null> | null;
+  not?: ModelGroupTweetAnnotationsConditionInput | null;
+};
+
+export type UpdateGroupTweetAnnotationsInput = {
+  id: string;
+  url?: string | null;
+  annotatedBy?: string | null;
+  tweetId?: string | null;
+  ownerGroups?: Array<string | null> | null;
+  annotations?: string | null;
+  _version?: number | null;
+};
+
+export type DeleteGroupTweetAnnotationsInput = {
+  id?: string | null;
+  _version?: number | null;
 };
 
 export type CreateGroupTwitterUserIgnoreInput = {
@@ -173,11 +243,13 @@ export type CreateGroupTwitterUserIgnoreInput = {
   ignoredBy: string;
   ownerGroups?: Array<string | null> | null;
   scope: string;
+  _version?: number | null;
 };
 
 export type ModelGroupTwitterUserIgnoreConditionInput = {
   twitterScreenName?: ModelStringInput | null;
   ignoredBy?: ModelStringInput | null;
+  ownerGroups?: ModelStringInput | null;
   scope?: ModelStringInput | null;
   and?: Array<ModelGroupTwitterUserIgnoreConditionInput | null> | null;
   or?: Array<ModelGroupTwitterUserIgnoreConditionInput | null> | null;
@@ -190,63 +262,18 @@ export type UpdateGroupTwitterUserIgnoreInput = {
   ignoredBy?: string | null;
   ownerGroups?: Array<string | null> | null;
   scope?: string | null;
+  _version?: number | null;
 };
 
 export type DeleteGroupTwitterUserIgnoreInput = {
   id?: string | null;
-};
-
-export type CreateTweetIgnoreInput = {
-  id?: string | null;
-  url: string;
-  tweetId?: string | null;
-  tweetIgnoreUserId?: string | null;
-};
-
-export type ModelTweetIgnoreConditionInput = {
-  url?: ModelStringInput | null;
-  tweetId?: ModelStringInput | null;
-  and?: Array<ModelTweetIgnoreConditionInput | null> | null;
-  or?: Array<ModelTweetIgnoreConditionInput | null> | null;
-  not?: ModelTweetIgnoreConditionInput | null;
-};
-
-export type UpdateTweetIgnoreInput = {
-  id: string;
-  url?: string | null;
-  tweetId?: string | null;
-  tweetIgnoreUserId?: string | null;
-};
-
-export type DeleteTweetIgnoreInput = {
-  id?: string | null;
-};
-
-export type CreateTwitterUserIgnoreInput = {
-  id?: string | null;
-  twitterScreenName: string;
-  twitterUserIgnoreUserId?: string | null;
-};
-
-export type ModelTwitterUserIgnoreConditionInput = {
-  twitterScreenName?: ModelStringInput | null;
-  and?: Array<ModelTwitterUserIgnoreConditionInput | null> | null;
-  or?: Array<ModelTwitterUserIgnoreConditionInput | null> | null;
-  not?: ModelTwitterUserIgnoreConditionInput | null;
-};
-
-export type UpdateTwitterUserIgnoreInput = {
-  id: string;
-  twitterScreenName?: string | null;
-  twitterUserIgnoreUserId?: string | null;
-};
-
-export type DeleteTwitterUserIgnoreInput = {
-  id?: string | null;
+  _version?: number | null;
 };
 
 export type ModelUserPreferencesFilterInput = {
   id?: ModelIDInput | null;
+  owner?: ModelStringInput | null;
+  prefs?: ModelStringInput | null;
   and?: Array<ModelUserPreferencesFilterInput | null> | null;
   or?: Array<ModelUserPreferencesFilterInput | null> | null;
   not?: ModelUserPreferencesFilterInput | null;
@@ -273,6 +300,11 @@ export type ModelUserSessionFilterInput = {
   fingerprint?: ModelStringInput | null;
   client?: ModelStringInput | null;
   open?: ModelBooleanInput | null;
+  group?: ModelStringInput | null;
+  owner?: ModelStringInput | null;
+  ttl?: ModelIntInput | null;
+  createdAt?: ModelStringInput | null;
+  sessionId?: ModelStringInput | null;
   and?: Array<ModelUserSessionFilterInput | null> | null;
   or?: Array<ModelUserSessionFilterInput | null> | null;
   not?: ModelUserSessionFilterInput | null;
@@ -281,12 +313,7 @@ export type ModelUserSessionFilterInput = {
 export type ModelGroupPreferencesFilterInput = {
   id?: ModelIDInput | null;
   group?: ModelStringInput | null;
-  locale?: ModelStringInput | null;
-  timezone?: ModelStringInput | null;
-  multipleSessions?: ModelBooleanInput | null;
-  sanitizeForGDPR?: ModelBooleanInput | null;
-  defaultDataSet?: ModelStringInput | null;
-  availableDataSets?: ModelStringInput | null;
+  prefs?: ModelStringInput | null;
   and?: Array<ModelGroupPreferencesFilterInput | null> | null;
   or?: Array<ModelGroupPreferencesFilterInput | null> | null;
   not?: ModelGroupPreferencesFilterInput | null;
@@ -304,6 +331,18 @@ export type ModelGroupTweetIgnoreFilterInput = {
   not?: ModelGroupTweetIgnoreFilterInput | null;
 };
 
+export type ModelGroupTweetAnnotationsFilterInput = {
+  id?: ModelIDInput | null;
+  url?: ModelStringInput | null;
+  annotatedBy?: ModelStringInput | null;
+  tweetId?: ModelStringInput | null;
+  ownerGroups?: ModelStringInput | null;
+  annotations?: ModelStringInput | null;
+  and?: Array<ModelGroupTweetAnnotationsFilterInput | null> | null;
+  or?: Array<ModelGroupTweetAnnotationsFilterInput | null> | null;
+  not?: ModelGroupTweetAnnotationsFilterInput | null;
+};
+
 export type ModelGroupTwitterUserIgnoreFilterInput = {
   id?: ModelIDInput | null;
   twitterScreenName?: ModelStringInput | null;
@@ -315,69 +354,40 @@ export type ModelGroupTwitterUserIgnoreFilterInput = {
   not?: ModelGroupTwitterUserIgnoreFilterInput | null;
 };
 
-export type ModelTweetIgnoreFilterInput = {
-  id?: ModelIDInput | null;
-  url?: ModelStringInput | null;
-  tweetId?: ModelStringInput | null;
-  and?: Array<ModelTweetIgnoreFilterInput | null> | null;
-  or?: Array<ModelTweetIgnoreFilterInput | null> | null;
-  not?: ModelTweetIgnoreFilterInput | null;
-};
-
-export type ModelTwitterUserIgnoreFilterInput = {
-  id?: ModelIDInput | null;
-  twitterScreenName?: ModelStringInput | null;
-  and?: Array<ModelTwitterUserIgnoreFilterInput | null> | null;
-  or?: Array<ModelTwitterUserIgnoreFilterInput | null> | null;
-  not?: ModelTwitterUserIgnoreFilterInput | null;
-};
-
 export type CreateUserPreferencesMutation = {
   __typename: "UserPreferences";
   id: string;
-  ignoreTweets: {
-    __typename: "ModelTweetIgnoreConnection";
-    nextToken: string | null;
-  } | null;
-  ignorePeople: {
-    __typename: "ModelTwitterUserIgnoreConnection";
-    nextToken: string | null;
-  } | null;
+  owner: string | null;
+  prefs: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
-  owner: string | null;
 };
 
 export type UpdateUserPreferencesMutation = {
   __typename: "UserPreferences";
   id: string;
-  ignoreTweets: {
-    __typename: "ModelTweetIgnoreConnection";
-    nextToken: string | null;
-  } | null;
-  ignorePeople: {
-    __typename: "ModelTwitterUserIgnoreConnection";
-    nextToken: string | null;
-  } | null;
+  owner: string | null;
+  prefs: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
-  owner: string | null;
 };
 
 export type DeleteUserPreferencesMutation = {
   __typename: "UserPreferences";
   id: string;
-  ignoreTweets: {
-    __typename: "ModelTweetIgnoreConnection";
-    nextToken: string | null;
-  } | null;
-  ignorePeople: {
-    __typename: "ModelTwitterUserIgnoreConnection";
-    nextToken: string | null;
-  } | null;
+  owner: string | null;
+  prefs: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
-  owner: string | null;
 };
 
 export type CreateUserSessionMutation = {
@@ -386,9 +396,15 @@ export type CreateUserSessionMutation = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  createdAt: string;
-  updatedAt: string;
+  group: string;
   owner: string | null;
+  ttl: number | null;
+  createdAt: string | null;
+  sessionId: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  updatedAt: string;
 };
 
 export type UpdateUserSessionMutation = {
@@ -397,9 +413,15 @@ export type UpdateUserSessionMutation = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  createdAt: string;
-  updatedAt: string;
+  group: string;
   owner: string | null;
+  ttl: number | null;
+  createdAt: string | null;
+  sessionId: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  updatedAt: string;
 };
 
 export type DeleteUserSessionMutation = {
@@ -408,21 +430,25 @@ export type DeleteUserSessionMutation = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  createdAt: string;
-  updatedAt: string;
+  group: string;
   owner: string | null;
+  ttl: number | null;
+  createdAt: string | null;
+  sessionId: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  updatedAt: string;
 };
 
 export type CreateGroupPreferencesMutation = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
+  prefs: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -431,12 +457,10 @@ export type UpdateGroupPreferencesMutation = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
+  prefs: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -445,12 +469,10 @@ export type DeleteGroupPreferencesMutation = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
+  prefs: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -463,6 +485,9 @@ export type CreateGroupTweetIgnoreMutation = {
   tweetId: string;
   ownerGroups: Array<string | null> | null;
   scope: string;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -475,6 +500,9 @@ export type UpdateGroupTweetIgnoreMutation = {
   tweetId: string;
   ownerGroups: Array<string | null> | null;
   scope: string;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -487,6 +515,54 @@ export type DeleteGroupTweetIgnoreMutation = {
   tweetId: string;
   ownerGroups: Array<string | null> | null;
   scope: string;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateGroupTweetAnnotationsMutation = {
+  __typename: "GroupTweetAnnotations";
+  id: string;
+  url: string;
+  annotatedBy: string;
+  tweetId: string;
+  ownerGroups: Array<string | null> | null;
+  annotations: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type UpdateGroupTweetAnnotationsMutation = {
+  __typename: "GroupTweetAnnotations";
+  id: string;
+  url: string;
+  annotatedBy: string;
+  tweetId: string;
+  ownerGroups: Array<string | null> | null;
+  annotations: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type DeleteGroupTweetAnnotationsMutation = {
+  __typename: "GroupTweetAnnotations";
+  id: string;
+  url: string;
+  annotatedBy: string;
+  tweetId: string;
+  ownerGroups: Array<string | null> | null;
+  annotations: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -498,6 +574,9 @@ export type CreateGroupTwitterUserIgnoreMutation = {
   ignoredBy: string;
   ownerGroups: Array<string | null> | null;
   scope: string;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -509,6 +588,9 @@ export type UpdateGroupTwitterUserIgnoreMutation = {
   ignoredBy: string;
   ownerGroups: Array<string | null> | null;
   scope: string;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -520,123 +602,23 @@ export type DeleteGroupTwitterUserIgnoreMutation = {
   ignoredBy: string;
   ownerGroups: Array<string | null> | null;
   scope: string;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
-};
-
-export type CreateTweetIgnoreMutation = {
-  __typename: "TweetIgnore";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-  createdAt: string;
-  updatedAt: string;
-  owner: string | null;
-};
-
-export type UpdateTweetIgnoreMutation = {
-  __typename: "TweetIgnore";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-  createdAt: string;
-  updatedAt: string;
-  owner: string | null;
-};
-
-export type DeleteTweetIgnoreMutation = {
-  __typename: "TweetIgnore";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-  createdAt: string;
-  updatedAt: string;
-  owner: string | null;
-};
-
-export type CreateTwitterUserIgnoreMutation = {
-  __typename: "TwitterUserIgnore";
-  id: string;
-  twitterScreenName: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-  createdAt: string;
-  updatedAt: string;
-  owner: string | null;
-};
-
-export type UpdateTwitterUserIgnoreMutation = {
-  __typename: "TwitterUserIgnore";
-  id: string;
-  twitterScreenName: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-  createdAt: string;
-  updatedAt: string;
-  owner: string | null;
-};
-
-export type DeleteTwitterUserIgnoreMutation = {
-  __typename: "TwitterUserIgnore";
-  id: string;
-  twitterScreenName: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-  createdAt: string;
-  updatedAt: string;
-  owner: string | null;
 };
 
 export type GetUserPreferencesQuery = {
   __typename: "UserPreferences";
   id: string;
-  ignoreTweets: {
-    __typename: "ModelTweetIgnoreConnection";
-    nextToken: string | null;
-  } | null;
-  ignorePeople: {
-    __typename: "ModelTwitterUserIgnoreConnection";
-    nextToken: string | null;
-  } | null;
+  owner: string | null;
+  prefs: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
-  owner: string | null;
 };
 
 export type ListUserPreferencessQuery = {
@@ -644,11 +626,33 @@ export type ListUserPreferencessQuery = {
   items: Array<{
     __typename: "UserPreferences";
     id: string;
+    owner: string | null;
+    prefs: string | null;
+    _version: number;
+    _deleted: boolean | null;
+    _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
-    owner: string | null;
   } | null> | null;
   nextToken: string | null;
+  startedAt: number | null;
+};
+
+export type SyncUserPreferencesQuery = {
+  __typename: "ModelUserPreferencesConnection";
+  items: Array<{
+    __typename: "UserPreferences";
+    id: string;
+    owner: string | null;
+    prefs: string | null;
+    _version: number;
+    _deleted: boolean | null;
+    _lastChangedAt: number;
+    createdAt: string;
+    updatedAt: string;
+  } | null> | null;
+  nextToken: string | null;
+  startedAt: number | null;
 };
 
 export type GetUserSessionQuery = {
@@ -657,9 +661,15 @@ export type GetUserSessionQuery = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  createdAt: string;
-  updatedAt: string;
+  group: string;
   owner: string | null;
+  ttl: number | null;
+  createdAt: string | null;
+  sessionId: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  updatedAt: string;
 };
 
 export type ListUserSessionsQuery = {
@@ -670,23 +680,50 @@ export type ListUserSessionsQuery = {
     fingerprint: string | null;
     client: string | null;
     open: boolean;
-    createdAt: string;
-    updatedAt: string;
+    group: string;
     owner: string | null;
+    ttl: number | null;
+    createdAt: string | null;
+    sessionId: string | null;
+    _version: number;
+    _deleted: boolean | null;
+    _lastChangedAt: number;
+    updatedAt: string;
   } | null> | null;
   nextToken: string | null;
+  startedAt: number | null;
+};
+
+export type SyncUserSessionsQuery = {
+  __typename: "ModelUserSessionConnection";
+  items: Array<{
+    __typename: "UserSession";
+    id: string;
+    fingerprint: string | null;
+    client: string | null;
+    open: boolean;
+    group: string;
+    owner: string | null;
+    ttl: number | null;
+    createdAt: string | null;
+    sessionId: string | null;
+    _version: number;
+    _deleted: boolean | null;
+    _lastChangedAt: number;
+    updatedAt: string;
+  } | null> | null;
+  nextToken: string | null;
+  startedAt: number | null;
 };
 
 export type GetGroupPreferencesQuery = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
+  prefs: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -697,16 +734,32 @@ export type ListGroupPreferencessQuery = {
     __typename: "GroupPreferences";
     id: string;
     group: string;
-    locale: string | null;
-    timezone: string | null;
-    multipleSessions: boolean | null;
-    sanitizeForGDPR: boolean | null;
-    defaultDataSet: string | null;
-    availableDataSets: Array<string | null> | null;
+    prefs: string | null;
+    _version: number;
+    _deleted: boolean | null;
+    _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
   nextToken: string | null;
+  startedAt: number | null;
+};
+
+export type SyncGroupPreferencesQuery = {
+  __typename: "ModelGroupPreferencesConnection";
+  items: Array<{
+    __typename: "GroupPreferences";
+    id: string;
+    group: string;
+    prefs: string | null;
+    _version: number;
+    _deleted: boolean | null;
+    _lastChangedAt: number;
+    createdAt: string;
+    updatedAt: string;
+  } | null> | null;
+  nextToken: string | null;
+  startedAt: number | null;
 };
 
 export type GetGroupTweetIgnoreQuery = {
@@ -717,6 +770,9 @@ export type GetGroupTweetIgnoreQuery = {
   tweetId: string;
   ownerGroups: Array<string | null> | null;
   scope: string;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -731,10 +787,89 @@ export type ListGroupTweetIgnoresQuery = {
     tweetId: string;
     ownerGroups: Array<string | null> | null;
     scope: string;
+    _version: number;
+    _deleted: boolean | null;
+    _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
   nextToken: string | null;
+  startedAt: number | null;
+};
+
+export type SyncGroupTweetIgnoresQuery = {
+  __typename: "ModelGroupTweetIgnoreConnection";
+  items: Array<{
+    __typename: "GroupTweetIgnore";
+    id: string;
+    url: string;
+    ignoredBy: string;
+    tweetId: string;
+    ownerGroups: Array<string | null> | null;
+    scope: string;
+    _version: number;
+    _deleted: boolean | null;
+    _lastChangedAt: number;
+    createdAt: string;
+    updatedAt: string;
+  } | null> | null;
+  nextToken: string | null;
+  startedAt: number | null;
+};
+
+export type GetGroupTweetAnnotationsQuery = {
+  __typename: "GroupTweetAnnotations";
+  id: string;
+  url: string;
+  annotatedBy: string;
+  tweetId: string;
+  ownerGroups: Array<string | null> | null;
+  annotations: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ListGroupTweetAnnotationssQuery = {
+  __typename: "ModelGroupTweetAnnotationsConnection";
+  items: Array<{
+    __typename: "GroupTweetAnnotations";
+    id: string;
+    url: string;
+    annotatedBy: string;
+    tweetId: string;
+    ownerGroups: Array<string | null> | null;
+    annotations: string | null;
+    _version: number;
+    _deleted: boolean | null;
+    _lastChangedAt: number;
+    createdAt: string;
+    updatedAt: string;
+  } | null> | null;
+  nextToken: string | null;
+  startedAt: number | null;
+};
+
+export type SyncGroupTweetAnnotationsQuery = {
+  __typename: "ModelGroupTweetAnnotationsConnection";
+  items: Array<{
+    __typename: "GroupTweetAnnotations";
+    id: string;
+    url: string;
+    annotatedBy: string;
+    tweetId: string;
+    ownerGroups: Array<string | null> | null;
+    annotations: string | null;
+    _version: number;
+    _deleted: boolean | null;
+    _lastChangedAt: number;
+    createdAt: string;
+    updatedAt: string;
+  } | null> | null;
+  nextToken: string | null;
+  startedAt: number | null;
 };
 
 export type GetGroupTwitterUserIgnoreQuery = {
@@ -744,6 +879,9 @@ export type GetGroupTwitterUserIgnoreQuery = {
   ignoredBy: string;
   ownerGroups: Array<string | null> | null;
   scope: string;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -757,118 +895,69 @@ export type ListGroupTwitterUserIgnoresQuery = {
     ignoredBy: string;
     ownerGroups: Array<string | null> | null;
     scope: string;
+    _version: number;
+    _deleted: boolean | null;
+    _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
   nextToken: string | null;
+  startedAt: number | null;
 };
 
-export type GetTweetIgnoreQuery = {
-  __typename: "TweetIgnore";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-  createdAt: string;
-  updatedAt: string;
-  owner: string | null;
-};
-
-export type ListTweetIgnoresQuery = {
-  __typename: "ModelTweetIgnoreConnection";
+export type SyncGroupTwitterUserIgnoresQuery = {
+  __typename: "ModelGroupTwitterUserIgnoreConnection";
   items: Array<{
-    __typename: "TweetIgnore";
-    id: string;
-    url: string;
-    tweetId: string | null;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null> | null;
-  nextToken: string | null;
-};
-
-export type GetTwitterUserIgnoreQuery = {
-  __typename: "TwitterUserIgnore";
-  id: string;
-  twitterScreenName: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-  createdAt: string;
-  updatedAt: string;
-  owner: string | null;
-};
-
-export type ListTwitterUserIgnoresQuery = {
-  __typename: "ModelTwitterUserIgnoreConnection";
-  items: Array<{
-    __typename: "TwitterUserIgnore";
+    __typename: "GroupTwitterUserIgnore";
     id: string;
     twitterScreenName: string;
+    ignoredBy: string;
+    ownerGroups: Array<string | null> | null;
+    scope: string;
+    _version: number;
+    _deleted: boolean | null;
+    _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
-    owner: string | null;
   } | null> | null;
   nextToken: string | null;
+  startedAt: number | null;
 };
 
 export type OnCreateUserPreferencesSubscription = {
   __typename: "UserPreferences";
   id: string;
-  ignoreTweets: {
-    __typename: "ModelTweetIgnoreConnection";
-    nextToken: string | null;
-  } | null;
-  ignorePeople: {
-    __typename: "ModelTwitterUserIgnoreConnection";
-    nextToken: string | null;
-  } | null;
+  owner: string | null;
+  prefs: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
-  owner: string | null;
 };
 
 export type OnUpdateUserPreferencesSubscription = {
   __typename: "UserPreferences";
   id: string;
-  ignoreTweets: {
-    __typename: "ModelTweetIgnoreConnection";
-    nextToken: string | null;
-  } | null;
-  ignorePeople: {
-    __typename: "ModelTwitterUserIgnoreConnection";
-    nextToken: string | null;
-  } | null;
+  owner: string | null;
+  prefs: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
-  owner: string | null;
 };
 
 export type OnDeleteUserPreferencesSubscription = {
   __typename: "UserPreferences";
   id: string;
-  ignoreTweets: {
-    __typename: "ModelTweetIgnoreConnection";
-    nextToken: string | null;
-  } | null;
-  ignorePeople: {
-    __typename: "ModelTwitterUserIgnoreConnection";
-    nextToken: string | null;
-  } | null;
+  owner: string | null;
+  prefs: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
-  owner: string | null;
 };
 
 export type OnCreateUserSessionSubscription = {
@@ -877,9 +966,15 @@ export type OnCreateUserSessionSubscription = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  createdAt: string;
-  updatedAt: string;
+  group: string;
   owner: string | null;
+  ttl: number | null;
+  createdAt: string | null;
+  sessionId: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  updatedAt: string;
 };
 
 export type OnUpdateUserSessionSubscription = {
@@ -888,9 +983,15 @@ export type OnUpdateUserSessionSubscription = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  createdAt: string;
-  updatedAt: string;
+  group: string;
   owner: string | null;
+  ttl: number | null;
+  createdAt: string | null;
+  sessionId: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  updatedAt: string;
 };
 
 export type OnDeleteUserSessionSubscription = {
@@ -899,21 +1000,25 @@ export type OnDeleteUserSessionSubscription = {
   fingerprint: string | null;
   client: string | null;
   open: boolean;
-  createdAt: string;
-  updatedAt: string;
+  group: string;
   owner: string | null;
+  ttl: number | null;
+  createdAt: string | null;
+  sessionId: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  updatedAt: string;
 };
 
 export type OnCreateGroupPreferencesSubscription = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
+  prefs: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -922,12 +1027,10 @@ export type OnUpdateGroupPreferencesSubscription = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
+  prefs: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -936,12 +1039,10 @@ export type OnDeleteGroupPreferencesSubscription = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  locale: string | null;
-  timezone: string | null;
-  multipleSessions: boolean | null;
-  sanitizeForGDPR: boolean | null;
-  defaultDataSet: string | null;
-  availableDataSets: Array<string | null> | null;
+  prefs: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -954,6 +1055,9 @@ export type OnCreateGroupTweetIgnoreSubscription = {
   tweetId: string;
   ownerGroups: Array<string | null> | null;
   scope: string;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -966,6 +1070,9 @@ export type OnUpdateGroupTweetIgnoreSubscription = {
   tweetId: string;
   ownerGroups: Array<string | null> | null;
   scope: string;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -978,6 +1085,54 @@ export type OnDeleteGroupTweetIgnoreSubscription = {
   tweetId: string;
   ownerGroups: Array<string | null> | null;
   scope: string;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OnCreateGroupTweetAnnotationsSubscription = {
+  __typename: "GroupTweetAnnotations";
+  id: string;
+  url: string;
+  annotatedBy: string;
+  tweetId: string;
+  ownerGroups: Array<string | null> | null;
+  annotations: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OnUpdateGroupTweetAnnotationsSubscription = {
+  __typename: "GroupTweetAnnotations";
+  id: string;
+  url: string;
+  annotatedBy: string;
+  tweetId: string;
+  ownerGroups: Array<string | null> | null;
+  annotations: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OnDeleteGroupTweetAnnotationsSubscription = {
+  __typename: "GroupTweetAnnotations";
+  id: string;
+  url: string;
+  annotatedBy: string;
+  tweetId: string;
+  ownerGroups: Array<string | null> | null;
+  annotations: string | null;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -989,6 +1144,9 @@ export type OnCreateGroupTwitterUserIgnoreSubscription = {
   ignoredBy: string;
   ownerGroups: Array<string | null> | null;
   scope: string;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -1000,6 +1158,9 @@ export type OnUpdateGroupTwitterUserIgnoreSubscription = {
   ignoredBy: string;
   ownerGroups: Array<string | null> | null;
   scope: string;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -1011,112 +1172,16 @@ export type OnDeleteGroupTwitterUserIgnoreSubscription = {
   ignoredBy: string;
   ownerGroups: Array<string | null> | null;
   scope: string;
+  _version: number;
+  _deleted: boolean | null;
+  _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
-};
-
-export type OnCreateTweetIgnoreSubscription = {
-  __typename: "TweetIgnore";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-  createdAt: string;
-  updatedAt: string;
-  owner: string | null;
-};
-
-export type OnUpdateTweetIgnoreSubscription = {
-  __typename: "TweetIgnore";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-  createdAt: string;
-  updatedAt: string;
-  owner: string | null;
-};
-
-export type OnDeleteTweetIgnoreSubscription = {
-  __typename: "TweetIgnore";
-  id: string;
-  url: string;
-  tweetId: string | null;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-  createdAt: string;
-  updatedAt: string;
-  owner: string | null;
-};
-
-export type OnCreateTwitterUserIgnoreSubscription = {
-  __typename: "TwitterUserIgnore";
-  id: string;
-  twitterScreenName: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-  createdAt: string;
-  updatedAt: string;
-  owner: string | null;
-};
-
-export type OnUpdateTwitterUserIgnoreSubscription = {
-  __typename: "TwitterUserIgnore";
-  id: string;
-  twitterScreenName: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-  createdAt: string;
-  updatedAt: string;
-  owner: string | null;
-};
-
-export type OnDeleteTwitterUserIgnoreSubscription = {
-  __typename: "TwitterUserIgnore";
-  id: string;
-  twitterScreenName: string;
-  user: {
-    __typename: "UserPreferences";
-    id: string;
-    createdAt: string;
-    updatedAt: string;
-    owner: string | null;
-  } | null;
-  createdAt: string;
-  updatedAt: string;
-  owner: string | null;
 };
 
 @Injectable({
-              providedIn: "root"
-            })
+  providedIn: "root"
+})
 export class APIService {
   async CreateUserPreferences(
     input: CreateUserPreferencesInput,
@@ -1126,17 +1191,13 @@ export class APIService {
         createUserPreferences(input: $input, condition: $condition) {
           __typename
           id
-          ignoreTweets {
-            __typename
-            nextToken
-          }
-          ignorePeople {
-            __typename
-            nextToken
-          }
+          owner
+          prefs
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
-          owner
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1158,17 +1219,13 @@ export class APIService {
         updateUserPreferences(input: $input, condition: $condition) {
           __typename
           id
-          ignoreTweets {
-            __typename
-            nextToken
-          }
-          ignorePeople {
-            __typename
-            nextToken
-          }
+          owner
+          prefs
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
-          owner
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1190,17 +1247,13 @@ export class APIService {
         deleteUserPreferences(input: $input, condition: $condition) {
           __typename
           id
-          ignoreTweets {
-            __typename
-            nextToken
-          }
-          ignorePeople {
-            __typename
-            nextToken
-          }
+          owner
+          prefs
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
-          owner
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1225,9 +1278,15 @@ export class APIService {
           fingerprint
           client
           open
-          createdAt
-          updatedAt
+          group
           owner
+          ttl
+          createdAt
+          sessionId
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1252,9 +1311,15 @@ export class APIService {
           fingerprint
           client
           open
-          createdAt
-          updatedAt
+          group
           owner
+          ttl
+          createdAt
+          sessionId
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1279,9 +1344,15 @@ export class APIService {
           fingerprint
           client
           open
-          createdAt
-          updatedAt
+          group
           owner
+          ttl
+          createdAt
+          sessionId
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1304,12 +1375,10 @@ export class APIService {
           __typename
           id
           group
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
+          prefs
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
@@ -1334,12 +1403,10 @@ export class APIService {
           __typename
           id
           group
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
+          prefs
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
@@ -1364,12 +1431,10 @@ export class APIService {
           __typename
           id
           group
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
+          prefs
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
@@ -1398,6 +1463,9 @@ export class APIService {
           tweetId
           ownerGroups
           scope
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
@@ -1426,6 +1494,9 @@ export class APIService {
           tweetId
           ownerGroups
           scope
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
@@ -1454,6 +1525,9 @@ export class APIService {
           tweetId
           ownerGroups
           scope
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
@@ -1469,6 +1543,105 @@ export class APIService {
     )) as any;
     return <DeleteGroupTweetIgnoreMutation>response.data.deleteGroupTweetIgnore;
   }
+  async CreateGroupTweetAnnotations(
+    input: CreateGroupTweetAnnotationsInput,
+    condition?: ModelGroupTweetAnnotationsConditionInput
+  ): Promise<CreateGroupTweetAnnotationsMutation> {
+    const statement = `mutation CreateGroupTweetAnnotations($input: CreateGroupTweetAnnotationsInput!, $condition: ModelGroupTweetAnnotationsConditionInput) {
+        createGroupTweetAnnotations(input: $input, condition: $condition) {
+          __typename
+          id
+          url
+          annotatedBy
+          tweetId
+          ownerGroups
+          annotations
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <CreateGroupTweetAnnotationsMutation>(
+      response.data.createGroupTweetAnnotations
+    );
+  }
+  async UpdateGroupTweetAnnotations(
+    input: UpdateGroupTweetAnnotationsInput,
+    condition?: ModelGroupTweetAnnotationsConditionInput
+  ): Promise<UpdateGroupTweetAnnotationsMutation> {
+    const statement = `mutation UpdateGroupTweetAnnotations($input: UpdateGroupTweetAnnotationsInput!, $condition: ModelGroupTweetAnnotationsConditionInput) {
+        updateGroupTweetAnnotations(input: $input, condition: $condition) {
+          __typename
+          id
+          url
+          annotatedBy
+          tweetId
+          ownerGroups
+          annotations
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <UpdateGroupTweetAnnotationsMutation>(
+      response.data.updateGroupTweetAnnotations
+    );
+  }
+  async DeleteGroupTweetAnnotations(
+    input: DeleteGroupTweetAnnotationsInput,
+    condition?: ModelGroupTweetAnnotationsConditionInput
+  ): Promise<DeleteGroupTweetAnnotationsMutation> {
+    const statement = `mutation DeleteGroupTweetAnnotations($input: DeleteGroupTweetAnnotationsInput!, $condition: ModelGroupTweetAnnotationsConditionInput) {
+        deleteGroupTweetAnnotations(input: $input, condition: $condition) {
+          __typename
+          id
+          url
+          annotatedBy
+          tweetId
+          ownerGroups
+          annotations
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <DeleteGroupTweetAnnotationsMutation>(
+      response.data.deleteGroupTweetAnnotations
+    );
+  }
   async CreateGroupTwitterUserIgnore(
     input: CreateGroupTwitterUserIgnoreInput,
     condition?: ModelGroupTwitterUserIgnoreConditionInput
@@ -1481,6 +1654,9 @@ export class APIService {
           ignoredBy
           ownerGroups
           scope
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
@@ -1510,6 +1686,9 @@ export class APIService {
           ignoredBy
           ownerGroups
           scope
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
@@ -1539,6 +1718,9 @@ export class APIService {
           ignoredBy
           ownerGroups
           scope
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
@@ -1556,223 +1738,18 @@ export class APIService {
       response.data.deleteGroupTwitterUserIgnore
     );
   }
-  async CreateTweetIgnore(
-    input: CreateTweetIgnoreInput,
-    condition?: ModelTweetIgnoreConditionInput
-  ): Promise<CreateTweetIgnoreMutation> {
-    const statement = `mutation CreateTweetIgnore($input: CreateTweetIgnoreInput!, $condition: ModelTweetIgnoreConditionInput) {
-        createTweetIgnore(input: $input, condition: $condition) {
-          __typename
-          id
-          url
-          tweetId
-          user {
-            __typename
-            id
-            createdAt
-            updatedAt
-            owner
-          }
-          createdAt
-          updatedAt
-          owner
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <CreateTweetIgnoreMutation>response.data.createTweetIgnore;
-  }
-  async UpdateTweetIgnore(
-    input: UpdateTweetIgnoreInput,
-    condition?: ModelTweetIgnoreConditionInput
-  ): Promise<UpdateTweetIgnoreMutation> {
-    const statement = `mutation UpdateTweetIgnore($input: UpdateTweetIgnoreInput!, $condition: ModelTweetIgnoreConditionInput) {
-        updateTweetIgnore(input: $input, condition: $condition) {
-          __typename
-          id
-          url
-          tweetId
-          user {
-            __typename
-            id
-            createdAt
-            updatedAt
-            owner
-          }
-          createdAt
-          updatedAt
-          owner
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <UpdateTweetIgnoreMutation>response.data.updateTweetIgnore;
-  }
-  async DeleteTweetIgnore(
-    input: DeleteTweetIgnoreInput,
-    condition?: ModelTweetIgnoreConditionInput
-  ): Promise<DeleteTweetIgnoreMutation> {
-    const statement = `mutation DeleteTweetIgnore($input: DeleteTweetIgnoreInput!, $condition: ModelTweetIgnoreConditionInput) {
-        deleteTweetIgnore(input: $input, condition: $condition) {
-          __typename
-          id
-          url
-          tweetId
-          user {
-            __typename
-            id
-            createdAt
-            updatedAt
-            owner
-          }
-          createdAt
-          updatedAt
-          owner
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <DeleteTweetIgnoreMutation>response.data.deleteTweetIgnore;
-  }
-  async CreateTwitterUserIgnore(
-    input: CreateTwitterUserIgnoreInput,
-    condition?: ModelTwitterUserIgnoreConditionInput
-  ): Promise<CreateTwitterUserIgnoreMutation> {
-    const statement = `mutation CreateTwitterUserIgnore($input: CreateTwitterUserIgnoreInput!, $condition: ModelTwitterUserIgnoreConditionInput) {
-        createTwitterUserIgnore(input: $input, condition: $condition) {
-          __typename
-          id
-          twitterScreenName
-          user {
-            __typename
-            id
-            createdAt
-            updatedAt
-            owner
-          }
-          createdAt
-          updatedAt
-          owner
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <CreateTwitterUserIgnoreMutation>(
-      response.data.createTwitterUserIgnore
-    );
-  }
-  async UpdateTwitterUserIgnore(
-    input: UpdateTwitterUserIgnoreInput,
-    condition?: ModelTwitterUserIgnoreConditionInput
-  ): Promise<UpdateTwitterUserIgnoreMutation> {
-    const statement = `mutation UpdateTwitterUserIgnore($input: UpdateTwitterUserIgnoreInput!, $condition: ModelTwitterUserIgnoreConditionInput) {
-        updateTwitterUserIgnore(input: $input, condition: $condition) {
-          __typename
-          id
-          twitterScreenName
-          user {
-            __typename
-            id
-            createdAt
-            updatedAt
-            owner
-          }
-          createdAt
-          updatedAt
-          owner
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <UpdateTwitterUserIgnoreMutation>(
-      response.data.updateTwitterUserIgnore
-    );
-  }
-  async DeleteTwitterUserIgnore(
-    input: DeleteTwitterUserIgnoreInput,
-    condition?: ModelTwitterUserIgnoreConditionInput
-  ): Promise<DeleteTwitterUserIgnoreMutation> {
-    const statement = `mutation DeleteTwitterUserIgnore($input: DeleteTwitterUserIgnoreInput!, $condition: ModelTwitterUserIgnoreConditionInput) {
-        deleteTwitterUserIgnore(input: $input, condition: $condition) {
-          __typename
-          id
-          twitterScreenName
-          user {
-            __typename
-            id
-            createdAt
-            updatedAt
-            owner
-          }
-          createdAt
-          updatedAt
-          owner
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <DeleteTwitterUserIgnoreMutation>(
-      response.data.deleteTwitterUserIgnore
-    );
-  }
   async GetUserPreferences(id: string): Promise<GetUserPreferencesQuery> {
     const statement = `query GetUserPreferences($id: ID!) {
         getUserPreferences(id: $id) {
           __typename
           id
-          ignoreTweets {
-            __typename
-            nextToken
-          }
-          ignorePeople {
-            __typename
-            nextToken
-          }
+          owner
+          prefs
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
-          owner
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1794,11 +1771,16 @@ export class APIService {
           items {
             __typename
             id
+            owner
+            prefs
+            _version
+            _deleted
+            _lastChangedAt
             createdAt
             updatedAt
-            owner
           }
           nextToken
+          startedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {};
@@ -1816,6 +1798,48 @@ export class APIService {
     )) as any;
     return <ListUserPreferencessQuery>response.data.listUserPreferencess;
   }
+  async SyncUserPreferences(
+    filter?: ModelUserPreferencesFilterInput,
+    limit?: number,
+    nextToken?: string,
+    lastSync?: number
+  ): Promise<SyncUserPreferencesQuery> {
+    const statement = `query SyncUserPreferences($filter: ModelUserPreferencesFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
+        syncUserPreferences(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
+          __typename
+          items {
+            __typename
+            id
+            owner
+            prefs
+            _version
+            _deleted
+            _lastChangedAt
+            createdAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {};
+    if (filter) {
+      gqlAPIServiceArguments.filter = filter;
+    }
+    if (limit) {
+      gqlAPIServiceArguments.limit = limit;
+    }
+    if (nextToken) {
+      gqlAPIServiceArguments.nextToken = nextToken;
+    }
+    if (lastSync) {
+      gqlAPIServiceArguments.lastSync = lastSync;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <SyncUserPreferencesQuery>response.data.syncUserPreferences;
+  }
   async GetUserSession(id: string): Promise<GetUserSessionQuery> {
     const statement = `query GetUserSession($id: ID!) {
         getUserSession(id: $id) {
@@ -1824,9 +1848,15 @@ export class APIService {
           fingerprint
           client
           open
-          createdAt
-          updatedAt
+          group
           owner
+          ttl
+          createdAt
+          sessionId
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {
@@ -1851,11 +1881,18 @@ export class APIService {
             fingerprint
             client
             open
-            createdAt
-            updatedAt
+            group
             owner
+            ttl
+            createdAt
+            sessionId
+            _version
+            _deleted
+            _lastChangedAt
+            updatedAt
           }
           nextToken
+          startedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {};
@@ -1873,18 +1910,63 @@ export class APIService {
     )) as any;
     return <ListUserSessionsQuery>response.data.listUserSessions;
   }
+  async SyncUserSessions(
+    filter?: ModelUserSessionFilterInput,
+    limit?: number,
+    nextToken?: string,
+    lastSync?: number
+  ): Promise<SyncUserSessionsQuery> {
+    const statement = `query SyncUserSessions($filter: ModelUserSessionFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
+        syncUserSessions(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
+          __typename
+          items {
+            __typename
+            id
+            fingerprint
+            client
+            open
+            group
+            owner
+            ttl
+            createdAt
+            sessionId
+            _version
+            _deleted
+            _lastChangedAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {};
+    if (filter) {
+      gqlAPIServiceArguments.filter = filter;
+    }
+    if (limit) {
+      gqlAPIServiceArguments.limit = limit;
+    }
+    if (nextToken) {
+      gqlAPIServiceArguments.nextToken = nextToken;
+    }
+    if (lastSync) {
+      gqlAPIServiceArguments.lastSync = lastSync;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <SyncUserSessionsQuery>response.data.syncUserSessions;
+  }
   async GetGroupPreferences(id: string): Promise<GetGroupPreferencesQuery> {
     const statement = `query GetGroupPreferences($id: ID!) {
         getGroupPreferences(id: $id) {
           __typename
           id
           group
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
+          prefs
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
@@ -1909,16 +1991,15 @@ export class APIService {
             __typename
             id
             group
-            locale
-            timezone
-            multipleSessions
-            sanitizeForGDPR
-            defaultDataSet
-            availableDataSets
+            prefs
+            _version
+            _deleted
+            _lastChangedAt
             createdAt
             updatedAt
           }
           nextToken
+          startedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {};
@@ -1936,6 +2017,48 @@ export class APIService {
     )) as any;
     return <ListGroupPreferencessQuery>response.data.listGroupPreferencess;
   }
+  async SyncGroupPreferences(
+    filter?: ModelGroupPreferencesFilterInput,
+    limit?: number,
+    nextToken?: string,
+    lastSync?: number
+  ): Promise<SyncGroupPreferencesQuery> {
+    const statement = `query SyncGroupPreferences($filter: ModelGroupPreferencesFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
+        syncGroupPreferences(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
+          __typename
+          items {
+            __typename
+            id
+            group
+            prefs
+            _version
+            _deleted
+            _lastChangedAt
+            createdAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {};
+    if (filter) {
+      gqlAPIServiceArguments.filter = filter;
+    }
+    if (limit) {
+      gqlAPIServiceArguments.limit = limit;
+    }
+    if (nextToken) {
+      gqlAPIServiceArguments.nextToken = nextToken;
+    }
+    if (lastSync) {
+      gqlAPIServiceArguments.lastSync = lastSync;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <SyncGroupPreferencesQuery>response.data.syncGroupPreferences;
+  }
   async GetGroupTweetIgnore(id: string): Promise<GetGroupTweetIgnoreQuery> {
     const statement = `query GetGroupTweetIgnore($id: ID!) {
         getGroupTweetIgnore(id: $id) {
@@ -1946,6 +2069,9 @@ export class APIService {
           tweetId
           ownerGroups
           scope
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
@@ -1974,10 +2100,14 @@ export class APIService {
             tweetId
             ownerGroups
             scope
+            _version
+            _deleted
+            _lastChangedAt
             createdAt
             updatedAt
           }
           nextToken
+          startedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {};
@@ -1995,6 +2125,170 @@ export class APIService {
     )) as any;
     return <ListGroupTweetIgnoresQuery>response.data.listGroupTweetIgnores;
   }
+  async SyncGroupTweetIgnores(
+    filter?: ModelGroupTweetIgnoreFilterInput,
+    limit?: number,
+    nextToken?: string,
+    lastSync?: number
+  ): Promise<SyncGroupTweetIgnoresQuery> {
+    const statement = `query SyncGroupTweetIgnores($filter: ModelGroupTweetIgnoreFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
+        syncGroupTweetIgnores(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
+          __typename
+          items {
+            __typename
+            id
+            url
+            ignoredBy
+            tweetId
+            ownerGroups
+            scope
+            _version
+            _deleted
+            _lastChangedAt
+            createdAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {};
+    if (filter) {
+      gqlAPIServiceArguments.filter = filter;
+    }
+    if (limit) {
+      gqlAPIServiceArguments.limit = limit;
+    }
+    if (nextToken) {
+      gqlAPIServiceArguments.nextToken = nextToken;
+    }
+    if (lastSync) {
+      gqlAPIServiceArguments.lastSync = lastSync;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <SyncGroupTweetIgnoresQuery>response.data.syncGroupTweetIgnores;
+  }
+  async GetGroupTweetAnnotations(
+    id: string
+  ): Promise<GetGroupTweetAnnotationsQuery> {
+    const statement = `query GetGroupTweetAnnotations($id: ID!) {
+        getGroupTweetAnnotations(id: $id) {
+          __typename
+          id
+          url
+          annotatedBy
+          tweetId
+          ownerGroups
+          annotations
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      id
+    };
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <GetGroupTweetAnnotationsQuery>(
+      response.data.getGroupTweetAnnotations
+    );
+  }
+  async ListGroupTweetAnnotationss(
+    filter?: ModelGroupTweetAnnotationsFilterInput,
+    limit?: number,
+    nextToken?: string
+  ): Promise<ListGroupTweetAnnotationssQuery> {
+    const statement = `query ListGroupTweetAnnotationss($filter: ModelGroupTweetAnnotationsFilterInput, $limit: Int, $nextToken: String) {
+        listGroupTweetAnnotationss(filter: $filter, limit: $limit, nextToken: $nextToken) {
+          __typename
+          items {
+            __typename
+            id
+            url
+            annotatedBy
+            tweetId
+            ownerGroups
+            annotations
+            _version
+            _deleted
+            _lastChangedAt
+            createdAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {};
+    if (filter) {
+      gqlAPIServiceArguments.filter = filter;
+    }
+    if (limit) {
+      gqlAPIServiceArguments.limit = limit;
+    }
+    if (nextToken) {
+      gqlAPIServiceArguments.nextToken = nextToken;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <ListGroupTweetAnnotationssQuery>(
+      response.data.listGroupTweetAnnotationss
+    );
+  }
+  async SyncGroupTweetAnnotations(
+    filter?: ModelGroupTweetAnnotationsFilterInput,
+    limit?: number,
+    nextToken?: string,
+    lastSync?: number
+  ): Promise<SyncGroupTweetAnnotationsQuery> {
+    const statement = `query SyncGroupTweetAnnotations($filter: ModelGroupTweetAnnotationsFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
+        syncGroupTweetAnnotations(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
+          __typename
+          items {
+            __typename
+            id
+            url
+            annotatedBy
+            tweetId
+            ownerGroups
+            annotations
+            _version
+            _deleted
+            _lastChangedAt
+            createdAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {};
+    if (filter) {
+      gqlAPIServiceArguments.filter = filter;
+    }
+    if (limit) {
+      gqlAPIServiceArguments.limit = limit;
+    }
+    if (nextToken) {
+      gqlAPIServiceArguments.nextToken = nextToken;
+    }
+    if (lastSync) {
+      gqlAPIServiceArguments.lastSync = lastSync;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <SyncGroupTweetAnnotationsQuery>(
+      response.data.syncGroupTweetAnnotations
+    );
+  }
   async GetGroupTwitterUserIgnore(
     id: string
   ): Promise<GetGroupTwitterUserIgnoreQuery> {
@@ -2006,6 +2300,9 @@ export class APIService {
           ignoredBy
           ownerGroups
           scope
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
@@ -2035,10 +2332,14 @@ export class APIService {
             ignoredBy
             ownerGroups
             scope
+            _version
+            _deleted
+            _lastChangedAt
             createdAt
             updatedAt
           }
           nextToken
+          startedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {};
@@ -2058,111 +2359,30 @@ export class APIService {
       response.data.listGroupTwitterUserIgnores
     );
   }
-  async GetTweetIgnore(id: string): Promise<GetTweetIgnoreQuery> {
-    const statement = `query GetTweetIgnore($id: ID!) {
-        getTweetIgnore(id: $id) {
-          __typename
-          id
-          url
-          tweetId
-          user {
-            __typename
-            id
-            createdAt
-            updatedAt
-            owner
-          }
-          createdAt
-          updatedAt
-          owner
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      id
-    };
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <GetTweetIgnoreQuery>response.data.getTweetIgnore;
-  }
-  async ListTweetIgnores(
-    filter?: ModelTweetIgnoreFilterInput,
+  async SyncGroupTwitterUserIgnores(
+    filter?: ModelGroupTwitterUserIgnoreFilterInput,
     limit?: number,
-    nextToken?: string
-  ): Promise<ListTweetIgnoresQuery> {
-    const statement = `query ListTweetIgnores($filter: ModelTweetIgnoreFilterInput, $limit: Int, $nextToken: String) {
-        listTweetIgnores(filter: $filter, limit: $limit, nextToken: $nextToken) {
-          __typename
-          items {
-            __typename
-            id
-            url
-            tweetId
-            createdAt
-            updatedAt
-            owner
-          }
-          nextToken
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {};
-    if (filter) {
-      gqlAPIServiceArguments.filter = filter;
-    }
-    if (limit) {
-      gqlAPIServiceArguments.limit = limit;
-    }
-    if (nextToken) {
-      gqlAPIServiceArguments.nextToken = nextToken;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <ListTweetIgnoresQuery>response.data.listTweetIgnores;
-  }
-  async GetTwitterUserIgnore(id: string): Promise<GetTwitterUserIgnoreQuery> {
-    const statement = `query GetTwitterUserIgnore($id: ID!) {
-        getTwitterUserIgnore(id: $id) {
-          __typename
-          id
-          twitterScreenName
-          user {
-            __typename
-            id
-            createdAt
-            updatedAt
-            owner
-          }
-          createdAt
-          updatedAt
-          owner
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
-      id
-    };
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <GetTwitterUserIgnoreQuery>response.data.getTwitterUserIgnore;
-  }
-  async ListTwitterUserIgnores(
-    filter?: ModelTwitterUserIgnoreFilterInput,
-    limit?: number,
-    nextToken?: string
-  ): Promise<ListTwitterUserIgnoresQuery> {
-    const statement = `query ListTwitterUserIgnores($filter: ModelTwitterUserIgnoreFilterInput, $limit: Int, $nextToken: String) {
-        listTwitterUserIgnores(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    nextToken?: string,
+    lastSync?: number
+  ): Promise<SyncGroupTwitterUserIgnoresQuery> {
+    const statement = `query SyncGroupTwitterUserIgnores($filter: ModelGroupTwitterUserIgnoreFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
+        syncGroupTwitterUserIgnores(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
           __typename
           items {
             __typename
             id
             twitterScreenName
+            ignoredBy
+            ownerGroups
+            scope
+            _version
+            _deleted
+            _lastChangedAt
             createdAt
             updatedAt
-            owner
           }
           nextToken
+          startedAt
         }
       }`;
     const gqlAPIServiceArguments: any = {};
@@ -2175,190 +2395,214 @@ export class APIService {
     if (nextToken) {
       gqlAPIServiceArguments.nextToken = nextToken;
     }
+    if (lastSync) {
+      gqlAPIServiceArguments.lastSync = lastSync;
+    }
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
-    return <ListTwitterUserIgnoresQuery>response.data.listTwitterUserIgnores;
+    return <SyncGroupTwitterUserIgnoresQuery>(
+      response.data.syncGroupTwitterUserIgnores
+    );
   }
-
-  OnCreateUserPreferencesListener: Observable<OnCreateUserPreferencesSubscription> = API.graphql(
+  OnCreateUserPreferencesListener: Observable<
+    SubscriptionResponse<OnCreateUserPreferencesSubscription>
+  > = API.graphql(
     graphqlOperation(
-      `subscription OnCreateUserPreferences($owner: String!) {
+      `subscription OnCreateUserPreferences($owner: String) {
         onCreateUserPreferences(owner: $owner) {
           __typename
           id
-          ignoreTweets {
-            __typename
-            nextToken
-          }
-          ignorePeople {
-            __typename
-            nextToken
-          }
+          owner
+          prefs
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
-          owner
         }
       }`
     )
-  ) as Observable<OnCreateUserPreferencesSubscription>;
+  ) as Observable<SubscriptionResponse<OnCreateUserPreferencesSubscription>>;
 
-  OnUpdateUserPreferencesListener: Observable<OnUpdateUserPreferencesSubscription> = API.graphql(
+  OnUpdateUserPreferencesListener: Observable<
+    SubscriptionResponse<OnUpdateUserPreferencesSubscription>
+  > = API.graphql(
     graphqlOperation(
-      `subscription OnUpdateUserPreferences($owner: String!) {
+      `subscription OnUpdateUserPreferences($owner: String) {
         onUpdateUserPreferences(owner: $owner) {
           __typename
           id
-          ignoreTweets {
-            __typename
-            nextToken
-          }
-          ignorePeople {
-            __typename
-            nextToken
-          }
+          owner
+          prefs
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
-          owner
         }
       }`
     )
-  ) as Observable<OnUpdateUserPreferencesSubscription>;
+  ) as Observable<SubscriptionResponse<OnUpdateUserPreferencesSubscription>>;
 
-  OnDeleteUserPreferencesListener: Observable<OnDeleteUserPreferencesSubscription> = API.graphql(
+  OnDeleteUserPreferencesListener: Observable<
+    SubscriptionResponse<OnDeleteUserPreferencesSubscription>
+  > = API.graphql(
     graphqlOperation(
-      `subscription OnDeleteUserPreferences($owner: String!) {
+      `subscription OnDeleteUserPreferences($owner: String) {
         onDeleteUserPreferences(owner: $owner) {
           __typename
           id
-          ignoreTweets {
-            __typename
-            nextToken
-          }
-          ignorePeople {
-            __typename
-            nextToken
-          }
+          owner
+          prefs
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
-          owner
         }
       }`
     )
-  ) as Observable<OnDeleteUserPreferencesSubscription>;
+  ) as Observable<SubscriptionResponse<OnDeleteUserPreferencesSubscription>>;
 
-  OnCreateUserSessionListener: Observable<OnCreateUserSessionSubscription> = API.graphql(
+  OnCreateUserSessionListener: Observable<
+    SubscriptionResponse<OnCreateUserSessionSubscription>
+  > = API.graphql(
     graphqlOperation(
-      `subscription OnCreateUserSession($owner: String!) {
-        onCreateUserSession(owner: $owner) {
+      `subscription OnCreateUserSession {
+        onCreateUserSession {
           __typename
           id
           fingerprint
           client
           open
-          createdAt
-          updatedAt
+          group
           owner
+          ttl
+          createdAt
+          sessionId
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
         }
       }`
     )
-  ) as Observable<OnCreateUserSessionSubscription>;
+  ) as Observable<SubscriptionResponse<OnCreateUserSessionSubscription>>;
 
-  OnUpdateUserSessionListener: Observable<OnUpdateUserSessionSubscription> = API.graphql(
+  OnUpdateUserSessionListener: Observable<
+    SubscriptionResponse<OnUpdateUserSessionSubscription>
+  > = API.graphql(
     graphqlOperation(
-      `subscription OnUpdateUserSession($owner: String!) {
-        onUpdateUserSession(owner: $owner) {
+      `subscription OnUpdateUserSession {
+        onUpdateUserSession {
           __typename
           id
           fingerprint
           client
           open
-          createdAt
-          updatedAt
+          group
           owner
+          ttl
+          createdAt
+          sessionId
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
         }
       }`
     )
-  ) as Observable<OnUpdateUserSessionSubscription>;
+  ) as Observable<SubscriptionResponse<OnUpdateUserSessionSubscription>>;
 
-  OnDeleteUserSessionListener: Observable<OnDeleteUserSessionSubscription> = API.graphql(
+  OnDeleteUserSessionListener: Observable<
+    SubscriptionResponse<OnDeleteUserSessionSubscription>
+  > = API.graphql(
     graphqlOperation(
-      `subscription OnDeleteUserSession($owner: String!) {
-        onDeleteUserSession(owner: $owner) {
+      `subscription OnDeleteUserSession {
+        onDeleteUserSession {
           __typename
           id
           fingerprint
           client
           open
-          createdAt
-          updatedAt
+          group
           owner
+          ttl
+          createdAt
+          sessionId
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
         }
       }`
     )
-  ) as Observable<OnDeleteUserSessionSubscription>;
+  ) as Observable<SubscriptionResponse<OnDeleteUserSessionSubscription>>;
 
-  OnCreateGroupPreferencesListener: Observable<OnCreateGroupPreferencesSubscription> = API.graphql(
+  OnCreateGroupPreferencesListener: Observable<
+    SubscriptionResponse<OnCreateGroupPreferencesSubscription>
+  > = API.graphql(
     graphqlOperation(
       `subscription OnCreateGroupPreferences {
         onCreateGroupPreferences {
           __typename
           id
           group
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
+          prefs
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
       }`
     )
-  ) as Observable<OnCreateGroupPreferencesSubscription>;
+  ) as Observable<SubscriptionResponse<OnCreateGroupPreferencesSubscription>>;
 
-  OnUpdateGroupPreferencesListener: Observable<OnUpdateGroupPreferencesSubscription> = API.graphql(
+  OnUpdateGroupPreferencesListener: Observable<
+    SubscriptionResponse<OnUpdateGroupPreferencesSubscription>
+  > = API.graphql(
     graphqlOperation(
       `subscription OnUpdateGroupPreferences {
         onUpdateGroupPreferences {
           __typename
           id
           group
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
+          prefs
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
       }`
     )
-  ) as Observable<OnUpdateGroupPreferencesSubscription>;
+  ) as Observable<SubscriptionResponse<OnUpdateGroupPreferencesSubscription>>;
 
-  OnDeleteGroupPreferencesListener: Observable<OnDeleteGroupPreferencesSubscription> = API.graphql(
+  OnDeleteGroupPreferencesListener: Observable<
+    SubscriptionResponse<OnDeleteGroupPreferencesSubscription>
+  > = API.graphql(
     graphqlOperation(
       `subscription OnDeleteGroupPreferences {
         onDeleteGroupPreferences {
           __typename
           id
           group
-          locale
-          timezone
-          multipleSessions
-          sanitizeForGDPR
-          defaultDataSet
-          availableDataSets
+          prefs
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
       }`
     )
-  ) as Observable<OnDeleteGroupPreferencesSubscription>;
+  ) as Observable<SubscriptionResponse<OnDeleteGroupPreferencesSubscription>>;
 
-  OnCreateGroupTweetIgnoreListener: Observable<OnCreateGroupTweetIgnoreSubscription> = API.graphql(
+  OnCreateGroupTweetIgnoreListener: Observable<
+    SubscriptionResponse<OnCreateGroupTweetIgnoreSubscription>
+  > = API.graphql(
     graphqlOperation(
       `subscription OnCreateGroupTweetIgnore {
         onCreateGroupTweetIgnore {
@@ -2369,14 +2613,19 @@ export class APIService {
           tweetId
           ownerGroups
           scope
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
       }`
     )
-  ) as Observable<OnCreateGroupTweetIgnoreSubscription>;
+  ) as Observable<SubscriptionResponse<OnCreateGroupTweetIgnoreSubscription>>;
 
-  OnUpdateGroupTweetIgnoreListener: Observable<OnUpdateGroupTweetIgnoreSubscription> = API.graphql(
+  OnUpdateGroupTweetIgnoreListener: Observable<
+    SubscriptionResponse<OnUpdateGroupTweetIgnoreSubscription>
+  > = API.graphql(
     graphqlOperation(
       `subscription OnUpdateGroupTweetIgnore {
         onUpdateGroupTweetIgnore {
@@ -2387,14 +2636,19 @@ export class APIService {
           tweetId
           ownerGroups
           scope
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
       }`
     )
-  ) as Observable<OnUpdateGroupTweetIgnoreSubscription>;
+  ) as Observable<SubscriptionResponse<OnUpdateGroupTweetIgnoreSubscription>>;
 
-  OnDeleteGroupTweetIgnoreListener: Observable<OnDeleteGroupTweetIgnoreSubscription> = API.graphql(
+  OnDeleteGroupTweetIgnoreListener: Observable<
+    SubscriptionResponse<OnDeleteGroupTweetIgnoreSubscription>
+  > = API.graphql(
     graphqlOperation(
       `subscription OnDeleteGroupTweetIgnore {
         onDeleteGroupTweetIgnore {
@@ -2405,14 +2659,94 @@ export class APIService {
           tweetId
           ownerGroups
           scope
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
       }`
     )
-  ) as Observable<OnDeleteGroupTweetIgnoreSubscription>;
+  ) as Observable<SubscriptionResponse<OnDeleteGroupTweetIgnoreSubscription>>;
 
-  OnCreateGroupTwitterUserIgnoreListener: Observable<OnCreateGroupTwitterUserIgnoreSubscription> = API.graphql(
+  OnCreateGroupTweetAnnotationsListener: Observable<
+    SubscriptionResponse<OnCreateGroupTweetAnnotationsSubscription>
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnCreateGroupTweetAnnotations {
+        onCreateGroupTweetAnnotations {
+          __typename
+          id
+          url
+          annotatedBy
+          tweetId
+          ownerGroups
+          annotations
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<
+    SubscriptionResponse<OnCreateGroupTweetAnnotationsSubscription>
+  >;
+
+  OnUpdateGroupTweetAnnotationsListener: Observable<
+    SubscriptionResponse<OnUpdateGroupTweetAnnotationsSubscription>
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnUpdateGroupTweetAnnotations {
+        onUpdateGroupTweetAnnotations {
+          __typename
+          id
+          url
+          annotatedBy
+          tweetId
+          ownerGroups
+          annotations
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<
+    SubscriptionResponse<OnUpdateGroupTweetAnnotationsSubscription>
+  >;
+
+  OnDeleteGroupTweetAnnotationsListener: Observable<
+    SubscriptionResponse<OnDeleteGroupTweetAnnotationsSubscription>
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnDeleteGroupTweetAnnotations {
+        onDeleteGroupTweetAnnotations {
+          __typename
+          id
+          url
+          annotatedBy
+          tweetId
+          ownerGroups
+          annotations
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<
+    SubscriptionResponse<OnDeleteGroupTweetAnnotationsSubscription>
+  >;
+
+  OnCreateGroupTwitterUserIgnoreListener: Observable<
+    SubscriptionResponse<OnCreateGroupTwitterUserIgnoreSubscription>
+  > = API.graphql(
     graphqlOperation(
       `subscription OnCreateGroupTwitterUserIgnore {
         onCreateGroupTwitterUserIgnore {
@@ -2422,14 +2756,21 @@ export class APIService {
           ignoredBy
           ownerGroups
           scope
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
       }`
     )
-  ) as Observable<OnCreateGroupTwitterUserIgnoreSubscription>;
+  ) as Observable<
+    SubscriptionResponse<OnCreateGroupTwitterUserIgnoreSubscription>
+  >;
 
-  OnUpdateGroupTwitterUserIgnoreListener: Observable<OnUpdateGroupTwitterUserIgnoreSubscription> = API.graphql(
+  OnUpdateGroupTwitterUserIgnoreListener: Observable<
+    SubscriptionResponse<OnUpdateGroupTwitterUserIgnoreSubscription>
+  > = API.graphql(
     graphqlOperation(
       `subscription OnUpdateGroupTwitterUserIgnore {
         onUpdateGroupTwitterUserIgnore {
@@ -2439,14 +2780,21 @@ export class APIService {
           ignoredBy
           ownerGroups
           scope
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
       }`
     )
-  ) as Observable<OnUpdateGroupTwitterUserIgnoreSubscription>;
+  ) as Observable<
+    SubscriptionResponse<OnUpdateGroupTwitterUserIgnoreSubscription>
+  >;
 
-  OnDeleteGroupTwitterUserIgnoreListener: Observable<OnDeleteGroupTwitterUserIgnoreSubscription> = API.graphql(
+  OnDeleteGroupTwitterUserIgnoreListener: Observable<
+    SubscriptionResponse<OnDeleteGroupTwitterUserIgnoreSubscription>
+  > = API.graphql(
     graphqlOperation(
       `subscription OnDeleteGroupTwitterUserIgnore {
         onDeleteGroupTwitterUserIgnore {
@@ -2456,145 +2804,15 @@ export class APIService {
           ignoredBy
           ownerGroups
           scope
+          _version
+          _deleted
+          _lastChangedAt
           createdAt
           updatedAt
         }
       }`
     )
-  ) as Observable<OnDeleteGroupTwitterUserIgnoreSubscription>;
-
-  OnCreateTweetIgnoreListener: Observable<OnCreateTweetIgnoreSubscription> = API.graphql(
-    graphqlOperation(
-      `subscription OnCreateTweetIgnore($owner: String!) {
-        onCreateTweetIgnore(owner: $owner) {
-          __typename
-          id
-          url
-          tweetId
-          user {
-            __typename
-            id
-            createdAt
-            updatedAt
-            owner
-          }
-          createdAt
-          updatedAt
-          owner
-        }
-      }`
-    )
-  ) as Observable<OnCreateTweetIgnoreSubscription>;
-
-  OnUpdateTweetIgnoreListener: Observable<OnUpdateTweetIgnoreSubscription> = API.graphql(
-    graphqlOperation(
-      `subscription OnUpdateTweetIgnore($owner: String!) {
-        onUpdateTweetIgnore(owner: $owner) {
-          __typename
-          id
-          url
-          tweetId
-          user {
-            __typename
-            id
-            createdAt
-            updatedAt
-            owner
-          }
-          createdAt
-          updatedAt
-          owner
-        }
-      }`
-    )
-  ) as Observable<OnUpdateTweetIgnoreSubscription>;
-
-  OnDeleteTweetIgnoreListener: Observable<OnDeleteTweetIgnoreSubscription> = API.graphql(
-    graphqlOperation(
-      `subscription OnDeleteTweetIgnore($owner: String!) {
-        onDeleteTweetIgnore(owner: $owner) {
-          __typename
-          id
-          url
-          tweetId
-          user {
-            __typename
-            id
-            createdAt
-            updatedAt
-            owner
-          }
-          createdAt
-          updatedAt
-          owner
-        }
-      }`
-    )
-  ) as Observable<OnDeleteTweetIgnoreSubscription>;
-
-  OnCreateTwitterUserIgnoreListener: Observable<OnCreateTwitterUserIgnoreSubscription> = API.graphql(
-    graphqlOperation(
-      `subscription OnCreateTwitterUserIgnore($owner: String!) {
-        onCreateTwitterUserIgnore(owner: $owner) {
-          __typename
-          id
-          twitterScreenName
-          user {
-            __typename
-            id
-            createdAt
-            updatedAt
-            owner
-          }
-          createdAt
-          updatedAt
-          owner
-        }
-      }`
-    )
-  ) as Observable<OnCreateTwitterUserIgnoreSubscription>;
-
-  OnUpdateTwitterUserIgnoreListener: Observable<OnUpdateTwitterUserIgnoreSubscription> = API.graphql(
-    graphqlOperation(
-      `subscription OnUpdateTwitterUserIgnore($owner: String!) {
-        onUpdateTwitterUserIgnore(owner: $owner) {
-          __typename
-          id
-          twitterScreenName
-          user {
-            __typename
-            id
-            createdAt
-            updatedAt
-            owner
-          }
-          createdAt
-          updatedAt
-          owner
-        }
-      }`
-    )
-  ) as Observable<OnUpdateTwitterUserIgnoreSubscription>;
-
-  OnDeleteTwitterUserIgnoreListener: Observable<OnDeleteTwitterUserIgnoreSubscription> = API.graphql(
-    graphqlOperation(
-      `subscription OnDeleteTwitterUserIgnore($owner: String!) {
-        onDeleteTwitterUserIgnore(owner: $owner) {
-          __typename
-          id
-          twitterScreenName
-          user {
-            __typename
-            id
-            createdAt
-            updatedAt
-            owner
-          }
-          createdAt
-          updatedAt
-          owner
-        }
-      }`
-    )
-  ) as Observable<OnDeleteTwitterUserIgnoreSubscription>;
+  ) as Observable<
+    SubscriptionResponse<OnDeleteGroupTwitterUserIgnoreSubscription>
+  >;
 }
