@@ -1,9 +1,10 @@
 import {EventEmitter, Inject, Injectable} from "@angular/core";
 import {Subscription, timer} from "rxjs";
-import {Auth, Logger} from "aws-amplify";
+import {Logger} from "@aws-amplify/core";
 import {NotificationService} from "./notification.service";
 import {RollbarService} from "../error";
 import * as Rollbar from "rollbar";
+import Auth from "@aws-amplify/auth";
 
 const log = new Logger("uiexecution");
 
@@ -12,7 +13,7 @@ class ExecutionTask {
   constructor(private _resolve: (value?: any) => void, private _reject: (reason?: any) => void,
               private _task: () => any, public name: string, public waitForStates: UIState[] | null,
               private _dedup: string, private _notify: NotificationService, public reschedule: boolean,
-              public silentFailure: boolean,) {
+              public silentFailure: boolean) {
 
   }
 

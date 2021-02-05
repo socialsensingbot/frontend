@@ -5,7 +5,7 @@ import {
   Stats,
   TimeSlice
 } from "../types";
-import {Logger} from "aws-amplify";
+import {Logger} from "@aws-amplify/core";
 import {RegionMetadata} from "./map-data.service";
 
 const log = new Logger("processed-data");

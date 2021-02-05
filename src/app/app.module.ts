@@ -1,10 +1,6 @@
 import {BrowserModule} from "@angular/platform-browser";
 import {ErrorHandler, NgModule} from "@angular/core";
-import {AmplifyAngularModule, AmplifyService, AmplifyModules} from "aws-amplify-angular";
-import Auth from "@aws-amplify/auth";
-import Interactions from "@aws-amplify/interactions";
-import Storage from "@aws-amplify/storage";
-
+import {ClipboardModule} from '@angular/cdk/clipboard';
 import {AppComponent} from "./app.component";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {MaterialModule} from "./material/material.module";
@@ -37,10 +33,14 @@ import {HelpDialogComponent} from "./help/help-dialog.component";
 import {TweetListComponent} from "./map/twitter/tweet-list/tweet-list.component";
 import {RollbarErrorHandler, rollbarFactory, RollbarService} from "./error";
 import {SafeHtmlPipe} from "./safe.pipe";
+import {AmplifyUIAngularModule} from "@aws-amplify/ui-angular";
+import { TweetCopyDialogComponent } from "./map/twitter/tweet-list/tweet-copy-dialog/tweet-copy-dialog.component";
+import {StripHtmlPipe} from "./strip.pipe";
 
 @NgModule({
             declarations:    [
               SafeHtmlPipe,
+              StripHtmlPipe,
               AppComponent,
               MapComponent,
               SignUpComponent,
@@ -57,13 +57,14 @@ import {SafeHtmlPipe} from "./safe.pipe";
               HelpButtonComponent,
               HelpDialogComponent,
               HelpSpanComponent,
-              TweetListComponent
+              TweetListComponent,
+              TweetCopyDialogComponent
             ],
-            imports:         [
+            imports: [
               BrowserModule,
               HttpClientModule,
               BrowserAnimationsModule,
-              AmplifyAngularModule,
+              AmplifyUIAngularModule,
               MaterialModule,
               MatSidenavModule,
               MatSliderModule,
@@ -72,21 +73,11 @@ import {SafeHtmlPipe} from "./safe.pipe";
               ReactiveFormsModule,
               Ng5SliderModule,
               InfiniteScrollModule,
-              LeafletModule.forRoot()
+              LeafletModule,
+              ClipboardModule
             ],
-            providers:       [{
-              provide: AmplifyService,
-
-              useFactory: () => {
-                return AmplifyModules({
-                                        Auth,
-                                        Storage,
-                                        Interactions
-                                      });
-              },
-
-            },
-                              {
+            providers:       [
+               {
                                 provide:  ErrorHandler,
                                 useClass: RollbarErrorHandler
                               },
@@ -100,7 +91,7 @@ import {SafeHtmlPipe} from "./safe.pipe";
             ],
             bootstrap:       [AppComponent],
             entryComponents: [CountryCodeSelectComponent, HelpDialogComponent]
-          },)
+          }, )
 export class AppModule {
   public constructor(ngfConfig: NgForageConfig) {
     ngfConfig.configure({});

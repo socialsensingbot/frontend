@@ -1,5 +1,5 @@
 import {Component, NgZone, OnDestroy, OnInit} from "@angular/core";
-import {Auth, Logger} from "aws-amplify";
+import {Logger} from "@aws-amplify/core";
 import {Browser, GeoJSON, latLng, LayerGroup, layerGroup, LeafletMouseEvent, Map, tileLayer} from "leaflet";
 import "jquery-ui/ui/widgets/slider.js";
 import {ActivatedRoute, NavigationStart, Params, Router} from "@angular/router";
@@ -32,6 +32,8 @@ import {RegionSelection} from "./region-selection";
 import {PreferenceService} from "../pref/preference.service";
 import {APIService} from "../API.service";
 import {NgForageCache} from "ngforage";
+import {environment} from "../../environments/environment";
+import Auth from "@aws-amplify/auth";
 
 
 const log = new Logger("map");
@@ -155,7 +157,6 @@ export class MapComponent implements OnInit, OnDestroy {
               private _color: ColorCodeService,
               public data: MapDataService,
               public pref: PreferenceService,
-              private _api: APIService,
               private readonly cache: NgForageCache,
   ) {
     // save the query parameter observable
@@ -247,16 +248,12 @@ export class MapComponent implements OnInit, OnDestroy {
     layers: [
       tileLayer(
          // tslint:disable-next-line:max-line-length
-        //old
-        //"https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
-        //new
-        "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
-        {
+         environment.mapTileUrlTemplate,
+                {
           maxZoom:     18,
           attribution: "Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, " +
                          "<a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, " +
                          "Imagery © <a href=\"http://mapbox.com\">Mapbox</a>",
-          //id:          "mapbox.streets"
           id: "mapbox/streets-v11",
           tileSize: 512,
           zoomOffset: -1
@@ -412,7 +409,7 @@ export class MapComponent implements OnInit, OnDestroy {
     if (this.route.snapshot.paramMap.has("dataset")) {
       this._dataset = this.route.snapshot.paramMap.get("dataset");
     } else {
-      this._dataset = this.pref.group.defaultDataSet;
+      this._dataset = this.pref.combined.defaultDataSet;
     }
     await this.data.init();
     await this.data.switchDataSet(this.dataset);
@@ -439,7 +436,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this._exec.changeState("map-init");
     await this.load(true);
-    if (this.pref.group.showLoadingMessages) {
+    if (this.pref.combined.showLoadingMessages) {
       this._notify.show("Loading application ...", "OK", 60);
     }
     this._searchParams.subscribe(async params => {
@@ -528,7 +525,7 @@ export class MapComponent implements OnInit, OnDestroy {
                       color:       "#B1205F",
                       opacity:     1,
                       dashArray:   "",
-                      fillOpacity: count > 0 ? 0.7 : 0.1,
+                      fillOpacity: count > 0 ? 1.0 : 0.1,
                     });
 
     if (!Browser.ie && !Browser.opera && !Browser.edge) {
@@ -546,7 +543,7 @@ export class MapComponent implements OnInit, OnDestroy {
                       opacity:     0.5,
                       color:       "white",
                       dashArray:   "",
-                      fillOpacity: count > 0 ? 0.7 : 0.1,
+                      fillOpacity: count > 0 ? 1.0 : 0.1,
                     });
 
     if (!Browser.ie && !Browser.opera && !Browser.edge) {

@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import {ConfirmCodeComponent} from './confirm-code.component';
 
@@ -6,7 +6,7 @@ describe('ConfirmCodeComponent', () => {
   let component: ConfirmCodeComponent;
   let fixture: ComponentFixture<ConfirmCodeComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
                                      declarations: [ConfirmCodeComponent]
                                    })

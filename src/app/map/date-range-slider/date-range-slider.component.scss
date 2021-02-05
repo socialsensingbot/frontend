@@ -1,5 +1,5 @@
 @import '~@angular/material/theming';
-
+@import "../../../styles";
 
 //
 //// We need to use ::ng-deep to overcome view encapsulation
@@ -79,12 +79,12 @@
 
 
     .ng5-slider .ng5-slider-bar {
-      background: #999999;
+      background:$lighter-black;
       height: 1px;
     }
 
     .ng5-slider .ng5-slider-selection {
-      background: #222222;
+      background: $blackish;
       height: 2px;
     }
 
@@ -109,7 +109,7 @@
       height: 16px;
       top: -8px;
       bottom: 0;
-      background-color: #333;
+      background-color: $blackish;
       border-radius: 8px;
     }
 

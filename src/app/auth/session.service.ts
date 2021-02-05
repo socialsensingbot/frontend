@@ -1,34 +1,29 @@
-import {Injectable, OnDestroy, OnInit} from '@angular/core';
-import {API, graphqlOperation, Logger} from "aws-amplify";
-import {
-  APIService,
-  CreateUserSessionMutation,
-  GetUserSessionQuery,
-  OnCreateUserSessionSubscription
-} from "../API.service";
+import {Injectable} from "@angular/core";
+import {Logger} from "@aws-amplify/core";
 import {NotificationService} from "../services/notification.service";
 import {Subscription, timer} from "rxjs";
 import {PreferenceService} from "../pref/preference.service";
 import {AuthService} from "./auth.service";
+import {DataStore} from "@aws-amplify/datastore";
+import {UserSession} from "../../models";
+import Auth from "@aws-amplify/auth";
 
-const log = new Logger("session");
+const log = new Logger("SessionService");
 
 const SESSION_TOKEN = "app-session-token";
 const SESSION_END = "app-session-end";
 
+const HEARTBEAT_FREQ = 60 * 1000;
+
 @Injectable({
-              providedIn: 'root'
+              providedIn: "root"
             })
-export class SessionService implements OnInit, OnDestroy {
-  /**
-   * A string id for the session, it is irrelevant what this contains as long as it is unique.
-   */
-  private _sessionId: string;
+export class SessionService {
 
   /**
    * This is the subscription to new sessions being added. It is closed OnDestroy.
    */
-  private _sessionSubscription: any;
+  private _sessionSubscription: any = null;
 
   /**
    * The time a session should remain active for. If you close a browser and reopen
@@ -39,15 +34,12 @@ export class SessionService implements OnInit, OnDestroy {
    * The heartbeat timer executes to show the session is still active, it updates localStorage and
    * the DynamoDB table.
    */
-  private _heartbeatTimer: Subscription;
+  private _heartbeatTimer: Subscription = null;
 
-  /**
-   * The session as returned from GetUserSession
-   */
-  private _session: GetUserSessionQuery;
+  private session: UserSession = null;
+  private _sessionId: string = null;
 
   constructor(private _notify: NotificationService,
-              private _api: APIService,
               private _pref: PreferenceService,
               private _auth: AuthService) {
 
@@ -58,59 +50,118 @@ export class SessionService implements OnInit, OnDestroy {
    *
    * (Good housekeeping)
    */
-  public ngOnDestroy(): void {
+  public finish(): void {
     this.removeSessionSubscription();
     this.stopHeartbeat();
   }
 
+
+  /**
+   * Create an application level session for a logged in user.
+   */
+  public async open(userInfo) {
+    log.info("Opening session");
+    await this._pref.waitUntilReady();
+    if (userInfo && this.session === null) {
+      const sessionToken = window.localStorage.getItem(SESSION_TOKEN);
+      const sessionEndTime = window.localStorage.getItem(SESSION_END);
+
+      // We place a token in localStorage so that the session is only unique
+      // per browser. It also keeps the session token active during restarts.
+      // Mostly this is for auditing sessions, but also to determine which is the
+      // oldest session on DynamoDB as that is the session that will be logged out.
+
+      if (sessionToken && sessionEndTime && +sessionEndTime > Date.now()) {
+        this._sessionId = sessionToken;
+        this.session = await this.getSessionOrNull();
+        await this.heartbeat();
+        log.info("Existing session " + this._sessionId);
+      } else {
+        this.createLocalSession(userInfo);
+        log.info("New session " + this._sessionId);
+      }
+
+
+      this.session = await this.getOrCreateServerSession(userInfo);
+      if (!await this.checkUserLimit()) {
+        window.localStorage.removeItem(SESSION_TOKEN);
+        await this.closeServerSession(this.session);
+        this._sessionId = null;
+        this.session = null;
+      } else if (this.session === null) {
+        log.warn("Failed to get or create server session, see elsewhere in the" +
+                   " log.");
+        window.localStorage.removeItem(SESSION_TOKEN);
+        this._sessionId = null;
+      } else {
+        this._sessionSubscription = await this.listenForNewServerSessions(userInfo, sessionToken);
+        // Start the heartbeat which keeps the session active
+        this._heartbeatTimer = timer(HEARTBEAT_FREQ, HEARTBEAT_FREQ).subscribe(() => this.heartbeat());
+      }
+
+
+      return;
+    }
+  }
+
+  public async heartbeat() {
+    await this._pref.waitUntilReady();
+    window.localStorage.setItem(SESSION_END, "" + this.localTTL());
+    if (this._auth.loggedIn && this.session !== null) {
+      try {
+
+        this.session = await DataStore.save(UserSession.copyOf(this.session, updated => {
+          updated.ttl = this.serverTTL();
+          updated.open = true;
+        }));
+      } catch (e) {
+        log.error("Heartbeat failed", e);
+      }
+    }
+  }
+
+  /**
+   * The session has been actively terminated (likely by logout).
+   */
+  public async close() {
+    window.localStorage.removeItem(SESSION_TOKEN);
+    await this._pref.waitUntilReady();
+    const session = this.session;
+    this.session = null;
+    this.removeSessionSubscription();
+    if (this._auth.loggedIn) {
+      this.stopHeartbeat();
+      log.info("Closing server session");
+      await this.closeServerSession(session);
+    } else {
+      log.warn("Logout called but user not logged in!");
+    }
+
+    this._sessionId = null;
+  }
+
+  private async closeServerSession(session: UserSession) {
+    try {
+      await DataStore.save(UserSession.copyOf(session, updated => {
+        updated.open = false;
+      }));
+      log.info("Closed server session");
+    } catch (e) {
+      log.error("Failed to close server session", e);
+    }
+  }
+
   private stopHeartbeat() {
-    if (this._heartbeatTimer) {
+    if (this._heartbeatTimer !== null) {
       this._heartbeatTimer.unsubscribe();
       this._heartbeatTimer = null;
     }
   }
 
   private removeSessionSubscription() {
-    if (this._sessionSubscription) {
+    if (this._sessionSubscription !== null) {
       this._sessionSubscription.unsubscribe();
       this._sessionSubscription = null;
-    }
-  }
-
-  public ngOnInit(): void {
-  }
-
-
-  /**
-   * Create an application level session for a logged in user.
-   * @param userInfo
-   */
-  public async open(userInfo) {
-    if (userInfo && !this._sessionId) {
-      const sessionToken = window.localStorage.getItem(SESSION_TOKEN);
-      const sessionEndTime = window.localStorage.getItem(SESSION_END);
-
-      //We place a token in localStorage so that the session is only unique
-      //per browser. It also keeps the session token active during restarts.
-      //Mostly this is for auditing sessions, but also to determine which is the
-      //oldest session on DynamoDB as that is the session that will be logged out.
-
-      if (sessionToken && sessionEndTime && +sessionEndTime > Date.now()) {
-        this._sessionId = sessionToken;
-        this.heartbeat();
-        log.info("Existing session");
-      } else {
-        this.createLocalSession(userInfo);
-      }
-
-
-      this._session = await this.getOrCreateServerSession(userInfo);
-      this._sessionSubscription = await this.listenForNewServerSessions(userInfo, sessionToken);
-
-      // Start the heartbeat which keeps the session active
-      this._heartbeatTimer = timer(0, 60 * 1000).subscribe(() => this.heartbeat());
-
-      return;
     }
   }
 
@@ -121,35 +172,30 @@ export class SessionService implements OnInit, OnDestroy {
    * @param sessionToken a session token using our
    */
   private async listenForNewServerSessions(userInfo, sessionToken: string) {
-
-    //This is run when a new session is created on DynamoDB
-    const onSession = (subObj: any) => {
-      log.info("New session detected.");
-      const sub: OnCreateUserSessionSubscription = subObj.value.data.onCreateUserSession;
-      if (!sub.id) {
-        log.warn('Invalid id for sub', sub);
-      }
-
-      if (sub.id && sub.id !== this._sessionId) {
-        log.debug(`${sub.owner} is not ${userInfo.username}`);
-        log.debug(sub);
-        this.moreThanOneSession(Date.parse(this._session.createdAt) < Date.parse(sub.createdAt));
-      }
-    };
-
-
-    // @ts-ignore
-    return (await API.graphql(
-      graphqlOperation(
-        `subscription OnCreateUserSession($owner: String!) {
-        onCreateUserSession(owner: $owner) {
-          __typename
-          id
-          fingerprint
-          owner
+    return await DataStore.observe(UserSession, q => q.group("eq", this._pref.groups[0]).open("eq", true)).subscribe(msg => {
+      console.log(msg.model, msg.opType, msg.element);
+      if (msg.element.owner === userInfo.username && msg.element.open === true) {
+        log.info(`New session detected for ${msg.element.owner}.`);
+        const sub = msg.element;
+        if (!sub.id) {
+          log.warn("Invalid id for sub", sub);
         }
-      }`
-        , {owner: userInfo.username})) as any).subscribe(onSession);
+
+        if (this.session && sub.id && sub.id !== this.session.id) {
+          log.debug(`${sub.id} is not ${this.session.id}`);
+          log.debug(sub);
+          this.moreThanOneSession(this.session.createdAt < sub.createdAt);
+        }
+      }
+    });
+
+  }
+
+  private createLocalSession(userInfo) {
+    log.info("New session");
+    this._sessionId = userInfo.attributes.email + ":" + Date.now() + ":" + this.calculateFingerprintHash() + ":" + Math.floor(
+      Math.random() * 1000000000000);
+    window.localStorage.setItem(SESSION_TOKEN, this._sessionId);
   }
 
   /**
@@ -160,66 +206,67 @@ export class SessionService implements OnInit, OnDestroy {
    * @param userInfo the Cognito info for the current user.
    * @param fail if true fail on error, if false then retry.
    */
-  private async getOrCreateServerSession(userInfo, fail = false): Promise<GetUserSessionQuery> {
+  private async getOrCreateServerSession(userInfo, fail = false): Promise<UserSession> {
     try {
-      const existingSession = await this._api.GetUserSession(this._sessionId);
+      const existingSession = await this.getSessionOrNull();
       if (existingSession) {
         if (existingSession.open) {
+          log.info("Using existing open session");
           this.moreThanOnce();
           return existingSession;
         } else {
+          log.info("Creating new session as existing server session is marked closed.");
           this.createLocalSession(userInfo);
           await this.createServerSession();
-          return this._api.GetUserSession(this._sessionId);
+          return await this.getSessionOrNull();
         }
       } else {
+        log.info("Creating new server session as no ");
         await this.createServerSession();
-        return this._api.GetUserSession(this._sessionId);
+        return await this.getSessionOrNull();
       }
     } catch (e) {
       if (fail) {
         throw e;
       } else {
-        //Potential race condition here with another window logging in so we retry (but fail next time for real)
+        // Potential race condition here with another window logging in so we retry (but fail next time for real)
         return this.getOrCreateServerSession(userInfo, true);
       }
+    }
+  }
+
+  private async getSessionOrNull(): Promise<UserSession | null> {
+    const result = await DataStore.query(UserSession, q => q.sessionId("eq", this._sessionId));
+    if (result.length === 0) {
+      return null;
+    } else {
+      return result[0];
     }
   }
 
   /**
    * Creates a new server session which includes auditing information
    */
-  private async createServerSession(): Promise<CreateUserSessionMutation> {
+  private async createServerSession(): Promise<UserSession> {
     let client: string;
     try {
-      client = await (await fetch('https://ipapi.co/json/')).text();
+      client = await (await fetch("https://ipapi.co/json/")).text();
     } catch (e) {
       client = "Client info error: " + e;
     }
 
 
-    return this._api.CreateUserSession({
-                                         id:          this._sessionId,
-                                         fingerprint: this.calculateFingerPrint(),
-                                         client,
-                                         open:        true
-                                       });
-  }
+    return DataStore.save(new UserSession({
+                                            fingerprint: this.calculateFingerPrint(),
+                                            client,
+                                            open:        true,
+                                            ttl:         this.serverTTL(),
+                                            group:       this._pref.groups[0],
+                                            owner:       (await Auth.currentUserInfo()).username,
+                                            sessionId:   this._sessionId
+                                          }));
 
-  private createLocalSession(userInfo) {
-    log.info("New session");
-    this._sessionId = userInfo.attributes.email + ":" + Date.now() + ":" + this.calculateFingerprintHash() + ":" + Math.floor(
-      Math.random() * 1000000000000);
-    window.localStorage.setItem(SESSION_TOKEN, this._sessionId);
-  }
 
-  public async heartbeat() {
-    window.localStorage.setItem(SESSION_END, "" + (Date.now() + 1000 * this.sessionDurationInSeconds));
-    try {
-      await this._api.UpdateUserSession({id: this._sessionId, open: true})
-    } catch (e) {
-      log.error("Heartbeat failed", e);
-    }
   }
 
   /**
@@ -230,14 +277,49 @@ export class SessionService implements OnInit, OnDestroy {
    * @TODO: remove oldest param
    */
   private async moreThanOneSession(oldest: boolean = true) {
-    if (this._pref.group.multipleSessions) {
-      log.info("User logged in more than once, which group preferences or the environment allow.");
+    if (this._pref.combined.multipleSessions) {
+      log.info("User logged in more than once, which group preferences, or the environment allows.");
     } else {
       this._notify.show("You are logged in more than once this session will now be logged out.", "OK", 30);
       window.setTimeout(async () => {
         await this._auth.signOut();
         window.location.reload();
       }, 8000);
+    }
+  }
+
+  private async checkUserLimit() {
+    await this._pref.waitUntilReady();
+    const group = this._pref.groups[0];
+    const sessionItems = await DataStore.query(UserSession,
+                                               q => q.group("eq", group).open("eq", true));
+    log.info(`Currently ${sessionItems.length} active sessions for group ${group}.`);
+    const userSessions = sessionItems.map(i => i.owner);
+    const loggedInCount = new Set(userSessions).size;
+    log.info(`Currently ${loggedInCount} active users for group ${group}.`);
+    if (this._pref.combined.maxUsers > -1) {
+      if (loggedInCount > this._pref.combined.maxUsers) {
+        window.setTimeout(async () => {
+          await this._auth.signOut();
+          window.location.reload();
+        }, 15000);
+        window.setTimeout(async () => {
+          this._notify.show(
+            `Your group's account has a limit of ${this._pref.combined.maxUsers} concurrent users, you will now be logged out.`,
+            "OK", 30);
+        }, 8000);
+        log.info(
+          `${loggedInCount} logged-in users for group ${group} and exceeded concurrent user limit of ${this._pref.combined.maxUsers}.`);
+        return false;
+      } else {
+        log.info(
+          `${loggedInCount} logged-in users for group  ${group} and within concurrent user limit of ${this._pref.combined.maxUsers}.`);
+        return true;
+      }
+    } else {
+      log.info(
+        `${loggedInCount} logged-in users for group ${group} and NO concurrent user limit of ${this._pref.combined.maxUsers}.`);
+      return true;
     }
   }
 
@@ -248,23 +330,26 @@ export class SessionService implements OnInit, OnDestroy {
     log.info("User logged into more than one window but one log in session, this message is informational only.");
   }
 
+  private localTTL(): number {
+    return Date.now() + 1000 * this.sessionDurationInSeconds;
+  }
+
+
   /**
-   * The session has been actively terminated (likely by logout).
+   * If after 5 heartbeats ({@link HEARTBEAT_FREQ}) the server hasn't heard from us it will delete the session from
+   *  the server However, the local client id still exists and will trigger the recreation of a server session when
+   *  active again i.e. browser re-opened or network connection re-established.
+   * The local session itself will be deleted after {@link this.sessionDurationInSeconds}
    */
-  public async close() {
-    log.info("Closing user session");
-    this.removeSessionSubscription();
-    this.stopHeartbeat();
-    await this._api.UpdateUserSession({id: this._sessionId, open: false})
-    this._sessionId = null;
-    window.localStorage.removeItem(SESSION_TOKEN);
+  private serverTTL(): number {
+    return Math.floor((Date.now() + 5 * HEARTBEAT_FREQ) / 1000);
   }
 
   /**
    * The fingerprint hash is a string roughly unique to the browser a user is using.
    */
   private calculateFingerprintHash() {
-    log.debug("calculateFingerprintHash()")
+    log.debug("calculateFingerprintHash()");
     return this.checksum(this.calculateFingerPrint());
 
   }
@@ -273,7 +358,9 @@ export class SessionService implements OnInit, OnDestroy {
    * // http://stackoverflow.com/a/4167870/1250044
    */
   private map(arr, fn) {
-    var i = 0, len = arr.length, ret = [];
+    let i = 0;
+    const len = arr.length;
+    const ret = [];
     while (i < len) {
       ret[i] = fn(arr[i++]);
     }
@@ -282,13 +369,15 @@ export class SessionService implements OnInit, OnDestroy {
 
   // https://github.com/darkskyapp/string-hash
   private checksum(str) {
-    var hash = 5381,
-      i = str.length;
+    let hash = 5381;
+    let i = str.length;
 
     while (i--) {
+      // tslint:disable-next-line:no-bitwise
       hash = (hash * 33) ^ str.charCodeAt(i);
     }
 
+    // tslint:disable-next-line:no-bitwise
     return hash >>> 0;
   }
 
@@ -300,7 +389,7 @@ export class SessionService implements OnInit, OnDestroy {
   private calculateFingerPrint() {
     return [
       navigator.userAgent,
-      [screen.height, screen.width, screen.colorDepth].join('x'),
+      [screen.height, screen.width, screen.colorDepth].join("x"),
       new Date().getTimezoneOffset(),
       !!window.sessionStorage,
       !!window.localStorage,
@@ -309,10 +398,10 @@ export class SessionService implements OnInit, OnDestroy {
           plugin.name,
           plugin.description,
           this.map(plugin, (mime) => {
-            return [mime.type, mime.suffixes].join('~');
-          }).join(',')
+            return [mime.type, mime.suffixes].join("~");
+          }).join(",")
         ].join("::");
-      }).join(';')
-    ].join('###');
+      }).join(";")
+    ].join("###");
   }
 }

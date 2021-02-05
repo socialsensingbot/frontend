@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
 import Auth from '@aws-amplify/auth';
 import {Hub} from '@aws-amplify/core';
-import {Subject} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {CognitoUser} from 'amazon-cognito-identity-js';
-import {Logger} from "aws-amplify";
-import {Observable} from 'rxjs';
+import {Logger} from "@aws-amplify/core";
+import {DataStore} from "@aws-amplify/datastore";
 
 export interface NewUser {
   email: string,
@@ -66,6 +66,8 @@ export class AuthService {
   }
 
   async signOut(): Promise<any> {
+    this.loggedIn = false;
+    await DataStore.clear();
     return Auth.signOut()
                .then(() => this.loggedIn = false);
   }
@@ -84,5 +86,13 @@ export class AuthService {
                        }
     );
 
+  }
+
+  public async email() {
+    return (await this.userInfo()).attributes.email;
+  }
+
+  public async userInfo() {
+    return Auth.currentUserInfo();
   }
 }

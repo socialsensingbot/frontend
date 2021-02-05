@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { TwitterPanelComponent } from './twitter-panel.component';
 
@@ -6,7 +6,7 @@ describe('TwitterPanelComponent', () => {
   let component: TwitterPanelComponent;
   let fixture: ComponentFixture<TwitterPanelComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ TwitterPanelComponent ]
     })
