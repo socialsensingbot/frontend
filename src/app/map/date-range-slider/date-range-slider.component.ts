@@ -1,16 +1,16 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from "@angular/core";
 import {ChangeContext, LabelType, Options} from "ng5-slider";
 import {Subscription} from "rxjs";
 import {Logger} from "@aws-amplify/core";
 import {MapDataService} from "../data/map-data.service";
 import {environment} from "../../../environments/environment";
 
-const log = new Logger('date-range');
+const log = new Logger("date-range");
 
 @Component({
-             selector:    'date-range-slider',
-             templateUrl: './date-range-slider.component.html',
-             styleUrls:   ['./date-range-slider.component.scss']
+             selector:    "date-range-slider",
+             templateUrl: "./date-range-slider.component.html",
+             styleUrls:   ["./date-range-slider.component.scss"]
            })
 
 /**
@@ -54,7 +54,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
       if (value === 0) {
         return "now";
       }
-      return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0, "") : ""
+      return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0, "") : "";
     },
     translate:            (value: number, label: LabelType): string => {
       if (typeof this.timeKeyedData !== "undefined" && typeof this.timeKeyedData[-value] !== "undefined") {
@@ -81,7 +81,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
 
   }
 
-  private _lowerValue: number = -1;
+  private _lowerValue = -1;
 
   public get lowerValue(): number {
     return this._lowerValue;
@@ -101,7 +101,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     this._lowerValue = value;
   }
 
-  private _upperValue: number = 0;
+  private _upperValue = 0;
 
   public get upperValue(): number {
     return this._upperValue;
@@ -161,22 +161,17 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     } else {
       const date = new Date(Date.UTC(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
                                      tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0));
-      const ye = new Intl.DateTimeFormat(environment.locale, {year: '2-digit', timeZone: environment.timezone}).format(
+      const ye = new Intl.DateTimeFormat(environment.locale, {year: "2-digit", timeZone: environment.timezone}).format(
         date);
-      const mo = new Intl.DateTimeFormat(environment.locale, {month: 'short', timeZone: environment.timezone}).format(
+      const mo = new Intl.DateTimeFormat(environment.locale, {month: "short", timeZone: environment.timezone}).format(
         date);
-      const da = new Intl.DateTimeFormat(environment.locale, {day: '2-digit', timeZone: environment.timezone}).format(
+      const da = new Intl.DateTimeFormat(environment.locale, {day: "2-digit", timeZone: environment.timezone}).format(
         date);
       const hr = new Intl.DateTimeFormat(environment.locale,
-                                         {hour: '2-digit', hour12: true, timeZone: environment.timezone}).format(date);
+                                         {hour: "2-digit", hour12: true, timeZone: environment.timezone}).format(date);
 
-      let text = "";
-      if (Date.now() - date.getTime() < 60000) {
-        text = "now";
-      } else {
-        text = `<span class="slider-date-time slider-date-time-${label}"><span class='slider-time'>${hr}</span> <span class='slider-date'>${da}-${mo}-${ye}</span></span>`;
-      }
-      //var date = new Date( tstring.substring(0,4), tstring.substring(4,6)-1, tstring.substring(6,8), +tstring.substring(8,10)+add, 0, 0, 0);
+      const text = `<span class="slider-date-time slider-date-time-${label}"><span class='slider-time'>${hr}</span> <span class='slider-date'>${da}-${mo}-${ye}</span></span>`;
+      // var date = new Date( tstring.substring(0,4), tstring.substring(4,6)-1, tstring.substring(6,8), +tstring.substring(8,10)+add, 0, 0, 0);
       this.cache[key] = text;
       return text;
     }
@@ -194,8 +189,8 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     if (this.timeKeyedData) {
       // this.sliderOptions.ticksArray = [];
       this.sliderOptions.stepsArray = [];
-      console.log(this.timeKeyedData[0]);
-      console.log(this.timeKeyedData[0].substring(10, 12));
+      // console.log(this.timeKeyedData[0]);
+      // console.log(this.timeKeyedData[0].substring(10, 12));
       for (let step = this.sliderOptions.floor + (+this.timeKeyedData[0].substring(10,
                                                                                    12)); step < this.sliderOptions.ceil; step = step + 60) {
         // this.sliderOptions.ticksArray.push(step);
@@ -205,7 +200,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
         // this.sliderOptions.ticksArray.push(this.sliderOptions.ceil);
         this.sliderOptions.stepsArray.push({value: this.sliderOptions.ceil});
       }
-      console.log(this.sliderOptions.stepsArray);
+      // console.log(this.sliderOptions.stepsArray);
     }
   }
 }
