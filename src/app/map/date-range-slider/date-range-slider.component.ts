@@ -40,20 +40,27 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
    * @see https://angular-slider.github.io/ng5-slider
    */
   public sliderOptions: Options = {
-    floor:                0,
-    ceil:                 0,
-    step:                 60,
-    showTicks:            false,
+    floor:      0,
+    ceil:       0,
+    showTicks:  false,
+    ticksArray: [],
+    stepsArray: [],
     // handleDimension: 12,
     inputEventsInterval:  100,
     mouseEventsInterval:  100,
     outputEventsInterval: 100,
     touchEventsInterval:  100,
     ticksTooltip:         (value: number): string => {
+      if (value === 0) {
+        return "now";
+      }
       return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0, "") : ""
     },
     translate:            (value: number, label: LabelType): string => {
       if (typeof this.timeKeyedData !== "undefined" && typeof this.timeKeyedData[-value] !== "undefined") {
+        if (value === 0) {
+          return "now";
+        }
         switch (label) {
           case LabelType.Low:
             return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0, "min") : "";
@@ -130,12 +137,14 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     this._lowerValue = value.startMin;
     this._upperValue = value.startMax;
     this.sliderOptions = {...this.sliderOptions, ceil: value.max, floor: value.min};
+    this.updateTicks();
   }
 
   ngOnInit() {
     this.timeKeySub = this._data.timeKeyUpdate.subscribe(i => {
-      log.debug("Received new time-keyed data")
+      log.debug("Received new time-keyed data");
       this.timeKeyedData = i;
+      this.updateTicks();
       this.refresh.emit();
     });
   }
@@ -143,7 +152,6 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.timeKeySub.unsubscribe();
   }
-
 
   cleanDate(tstring, add, label): string {
     const key = ":clean-date:" + tstring + ":" + add + ":" + label;
@@ -162,7 +170,12 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
       const hr = new Intl.DateTimeFormat(environment.locale,
                                          {hour: '2-digit', hour12: true, timeZone: environment.timezone}).format(date);
 
-      const text = `<span class="slider-date-time slider-date-time-${label}"><span class='slider-time'>${hr}</span> <span class='slider-date'>${da}-${mo}-${ye}</span></span>`;
+      let text = "";
+      if (Date.now() - date.getTime() < 60000) {
+        text = "now";
+      } else {
+        text = `<span class="slider-date-time slider-date-time-${label}"><span class='slider-time'>${hr}</span> <span class='slider-date'>${da}-${mo}-${ye}</span></span>`;
+      }
       //var date = new Date( tstring.substring(0,4), tstring.substring(4,6)-1, tstring.substring(6,8), +tstring.substring(8,10)+add, 0, 0, 0);
       this.cache[key] = text;
       return text;
@@ -174,6 +187,25 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     if (typeof this.timeKeyedData !== "undefined") {
       log.debug($event);
       this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
+    }
+  }
+
+  private updateTicks() {
+    if (this.timeKeyedData) {
+      // this.sliderOptions.ticksArray = [];
+      this.sliderOptions.stepsArray = [];
+      console.log(this.timeKeyedData[0]);
+      console.log(this.timeKeyedData[0].substring(10, 12));
+      for (let step = this.sliderOptions.floor + (+this.timeKeyedData[0].substring(10,
+                                                                                   12)); step < this.sliderOptions.ceil; step = step + 60) {
+        // this.sliderOptions.ticksArray.push(step);
+        this.sliderOptions.stepsArray.push({value: step});
+      }
+      if (this.sliderOptions.stepsArray[this.sliderOptions.stepsArray.length - 1].value !== this.sliderOptions.ceil) {
+        // this.sliderOptions.ticksArray.push(this.sliderOptions.ceil);
+        this.sliderOptions.stepsArray.push({value: this.sliderOptions.ceil});
+      }
+      console.log(this.sliderOptions.stepsArray);
     }
   }
 }
