@@ -59,7 +59,8 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     translate:            (value: number, label: LabelType): string => {
       if (typeof this.timeKeyedData !== "undefined" && typeof this.timeKeyedData[-value] !== "undefined") {
         if (value === 0) {
-          return "now";
+          return    `<span class="slider-date-time slider-date-time-max"><span class='slider-time'></span> <span class='slider-date'>now</span></span>`;
+
         }
         switch (label) {
           case LabelType.Low:

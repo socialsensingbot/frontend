@@ -33,7 +33,7 @@ const multipleKey = Cypress.platform === "darwin" ? "{command}" : "{ctrl}";
 
 const noLoadingDiv = () => {
 
-  cy.get("#loading-div",{timeout: LONG_TIMEOUT}).should("not.exist");
+  cy.get("#loading-div",{timeout: VERY_LONG_TIMEOUT}).should("not.exist");
 
 };
 

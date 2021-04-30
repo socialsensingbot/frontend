@@ -439,6 +439,8 @@ export class MapComponent implements OnInit, OnDestroy {
     if (this.pref.combined.showLoadingMessages) {
       this._notify.show("Loading application ...", "OK", 60);
     }
+    $("#loading-div").css("opacity", 0.0);
+    setTimeout(() => $("#loading-div").remove(), 1000);
     this._searchParams.subscribe(async params => {
 
       if (!this._params) {
@@ -845,7 +847,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     } catch (e) {
       this._exec.changeState("data-load-failed");
-
+      console.error(e);
       this._notify.error(e);
     } finally {
     }

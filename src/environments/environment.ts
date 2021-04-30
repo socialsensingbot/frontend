@@ -30,7 +30,7 @@ export const environment = {
     ]
   },
   features:             ["impact"],
-  showErrors:           false,
+  showErrors:           true,
   showLoadingMessages:  true,
   sanitizeForGDPR:      true,
   defaultDataSet:       "live",

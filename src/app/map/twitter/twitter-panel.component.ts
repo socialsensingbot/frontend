@@ -33,7 +33,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
   constructor(private _zone: NgZone, public pref: PreferenceService, private _annotation: AnnotationService) {
     Hub.listen("twitter-panel", (e) => {
-      if (e.payload.message === "refresh") {
+      if (e.payload && e.payload.message === "refresh") {
         this._zone.run(() => this.updateTweets(this._tweets));
       }
     });
