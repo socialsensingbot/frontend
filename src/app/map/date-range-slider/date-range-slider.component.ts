@@ -4,6 +4,7 @@ import {Subscription} from "rxjs";
 import {Logger} from "@aws-amplify/core";
 import {MapDataService} from "../data/map-data.service";
 import {environment} from "../../../environments/environment";
+import {PreferenceService} from "../../pref/preference.service";
 
 const log = new Logger("date-range");
 
@@ -58,7 +59,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     },
     translate:            (value: number, label: LabelType): string => {
       if (typeof this.timeKeyedData !== "undefined" && typeof this.timeKeyedData[-value] !== "undefined") {
-        if (value === 0) {
+        if (value === 0 &&  this._pref.combined.mostRecentDateIsNow) {
           return    `<span class="slider-date-time slider-date-time-max"><span class='slider-time'></span> <span class='slider-date'>now</span></span>`;
 
         }
@@ -78,7 +79,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
   private cache: any = {};
   private timeKeySub: Subscription;
 
-  constructor(private _data: MapDataService) {
+  constructor(private _data: MapDataService, private _pref: PreferenceService,) {
 
   }
 

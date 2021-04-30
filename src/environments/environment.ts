@@ -11,11 +11,11 @@ export const environment = {
   rollbar:      false,
   toolbarColor: "primary",
   // timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  timezone:             "UTC",
-  multipleSessions:     true, //Can the user be logged into multiple devices/browsers at once?
-  maxUsers:             -1, // can be -1 (no limit), 0 - no logins, 1 - single user at a time, n - n concurrent users.
-  locale:               "en-GB",
-  confirm:              {
+  timezone:         "UTC",
+  multipleSessions: true, //Can the user be logged into multiple devices/browsers at once?
+  maxUsers:         -1, // can be -1 (no limit), 0 - no logins, 1 - single user at a time, n - n concurrent users.
+  locale:           "en-GB",
+  confirm:          {
     email:    "",
     password: ""
   },
@@ -23,15 +23,16 @@ export const environment = {
   impact:               {
     //The ability to tag tweets with an impact annotation
     levels: [
-      {title: "1 – Minimal", value: "minimal", color: "#43a047"},
-      {title: "2 – Minor", value: "minor", color: "#ffee58"},
-      {title: "3 - Significant", value: "significant", color: "#ffb300"},
-      {title: "4 - Severe", value: "severe", color: "#f4511e"}
+      {title: "1 – Minimal", value: "minimal", color: "#43A047"},
+      {title: "2 – Minor", value: "minor", color: "#FFEE58"},
+      {title: "3 - Significant", value: "significant", color: "#FFB300"},
+      {title: "4 - Severe", value: "severe", color: "#F4511E"}
     ]
   },
   features:             ["impact"],
   showErrors:           true,
   showLoadingMessages:  true,
+  mostRecentDateIsNow:  true,
   sanitizeForGDPR:      true,
   defaultDataSet:       "live",
   availableDataSets:    ["*"], // A list of datasets that will appear in the toolbar dropdown, or "*" for all.

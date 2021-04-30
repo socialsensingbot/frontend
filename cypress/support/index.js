@@ -38,3 +38,14 @@ afterEach(() => {
     }
   });
 });
+
+Cypress.on('uncaught:exception', (err, runnable,promise) => {
+  // returning false here prevents Cypress from
+  // failing the test
+  console.error(err);
+  console.error(promise);
+  if (err && err.message) {
+    console.error(err.message);
+  }
+  return false;
+})

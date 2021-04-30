@@ -6,7 +6,7 @@ function confirmSlider() {
   cy.get(".slider-date-time-min .slider-date", {timeout: 20000}).should("contain.text", "25-Apr-20");
   cy.get(".slider-date-time-min .slider-time").should("contain.text", "10 pm");
   cy.get(".slider-date-time-max .slider-date", {timeout: 20000}).should("contain.text", "now");
-  cy.get(".slider-date-time-max .slider-time").should("eq", "");
+  cy.get(".slider-date-time-max .slider-time").should("contain.text", "");
 }
 
 

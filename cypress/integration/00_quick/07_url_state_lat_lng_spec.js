@@ -31,8 +31,8 @@ describe('07 URL State (lat/lng): ', function () {
       cy.visitAndWait(url);
       cy.get(".slider-date-time", {timeout: 20000});
       cy.url({timeout: 30000}).should("equal", url);
-      cy.get(".slider-date-time-min .slider-date", {timeout: 20000}).should("contain.text", "11-Oct-18");
-      cy.get(".slider-date-time-min .slider-time").should("contain.text", "5 am");
+      cy.get(".slider-date-time-min .slider-date", {timeout: 20000}).should("contain.text", "now");
+      cy.get(".slider-date-time-min .slider-time").should("contain.text", "");
       cy.get(".app-tweet-drawer", {timeout: 20000}).should("be.visible");
       cy.url({timeout: 30000}).should("equal", url);
       cy.twitterPanelHeader("Powys");

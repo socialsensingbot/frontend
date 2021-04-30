@@ -24,28 +24,28 @@ export const RollbarService = new InjectionToken<Rollbar>("rollbar");
 @Injectable()
 export class RollbarErrorHandler implements ErrorHandler {
   constructor(@Inject(RollbarService) private rollbar: Rollbar, private _notify: NotificationService) {
-    window.onerror = (message, file, line, col, e) => {
-      this.handleError(message);
-      return false;
-    };
-    window.addEventListener("error", (e) => {
-      this.handleError(e);
-      return false;
-    });
-    window.addEventListener("unhandledrejection", (e) => {
-      this.handleError(e);
-    });
+    // window.onerror = (message, file, line, col, e) => {
+    //   this.handleError(message);
+    //   return false;
+    // };
+    // window.addEventListener("error", (e) => {
+    //   this.handleError(e.error || e);
+    //   e.preventDefault();
+    // });
+    // window.addEventListener("unhandledrejection", (e) => {
+    //   this.handleError(e.reason || e);
+    //   e.preventDefault();
+    // });
   }
 
   handleError(err: any): void {
     if (environment.rollbar) {
       this.rollbar.error(err.originalError || err);
+    }
+    if (environment.showErrors) {
+      this._notify.error(err.originalError || err);
     } else {
-      if (environment.showErrors) {
-        this._notify.error(err.originalError || err);
-      } else {
-        console.error(err.originalError || err);
-      }
+      console.error(err.originalError || err);
     }
   }
 }
