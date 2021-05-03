@@ -3,7 +3,7 @@ cd $(dirname $0)
 cd ..
 tests="cypress/integration/00_quick"
 browsers="electron"
-record="" #Or "--record"
+record="--record false" #Or "--record"
 
 if [[ "${AWS_BRANCH}" == feature* ]]; then
   tests="cypress/integration/00_quick"
@@ -41,8 +41,13 @@ function test() {
     for dir in $( find ${tests} -name "*.js" | sort)
     do
       echo "Running tests in ${dir}"
-      npx cypress run $record -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser ${browser} --headless --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-${browser}-$( basename $dir  | tr '.' '_'), overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" --spec "${dir}"
-    done
+      ( cmdpid=$BASHPID; (sleep 600; kill -2 $cmdpid) &
+      exec npx cypress run $record -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} \
+      --browser ${browser} \
+      --headless --reporter mochawesome \
+      --reporter-options "reportDir=cypress/report/mochawesome-report-${browser}-$( basename $dir  | tr '.' '_'), overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"\
+      --spec "${dir}")
+      done
     #npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser firefox --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-firefox,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"
   done
 }
