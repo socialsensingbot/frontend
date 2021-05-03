@@ -36,6 +36,27 @@
 
     </mat-menu>
 
+    <mat-menu #source="matMenu" >
+      <ng-container *ngFor="let type of pref.combined.source.types">
+        <button
+          class="tweet-list-item-menu-source-type-{{type.value}} tweet-list-item-menu-source-type-{{type.value}}-selected" *ngIf="annotationValueIs(tweet,
+        'source',type.value)"
+          mat-menu-item><strong>{{type.title}}</strong>
+        </button>
+        <button *ngIf="annotationValueIsNot(tweet, 'source',type.value)"
+                (click)="annotateTweet(tweet,{source:type.value}, $event);"
+                class="tweet-list-item-menu-source-type-{{type.value}} tweet-list-item-menu-source-type-{{type.value}}-not-selected"
+                mat-menu-item>{{type.title}}
+        </button>
+      </ng-container>
+      <button
+        (click)="annotateTweet(tweet,{source:''}, $event);"
+        class="tweet-list-item-menu-source-type-clear"
+        mat-menu-item>Clear
+      </button>
+
+    </mat-menu>
+
     <mat-menu #appMenu="matMenu">
       <button *ngIf="!si" (click)="ignoreSender(tweet,$event);" mat-menu-item>Ignore
         @{{sender(tweet)}}</button>
@@ -47,6 +68,9 @@
       </button>
       <button class="tweet-list-item-menu-impact" *ngIf="pref.combined.features.includes('impact')"
               [matMenuTriggerFor]="impact" mat-menu-item>Impact
+      </button>
+      <button class="tweet-list-item-menu-source" *ngIf="pref.combined.features.includes('source')"
+              [matMenuTriggerFor]="source" mat-menu-item>Source
       </button>
 
       <button

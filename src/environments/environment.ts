@@ -29,7 +29,16 @@ export const environment = {
       {title: "4 - Severe", value: "severe", color: "#F4511E"}
     ]
   },
-  features:             ["impact"],
+  source:               {
+    //The ability to tag tweets with a source
+    types: [
+      {title: "River", value: "river", color: "#43A047"},
+      {title: "Surface", value: "surface", color: "#FFEE58"},
+      {title: "Groundwater", value: "groundwater", color: "#FFB300"},
+      {title: "Coastal", value: "coastal", color: "#F4511E"}
+    ]
+  },
+  features:             ["impact", "source"],
   showErrors:           true,
   showLoadingMessages:  true,
   mostRecentDateIsNow:  true,

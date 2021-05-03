@@ -129,6 +129,9 @@ export class Tweet {
       impact = annotations.impact;
     }
     let source = "";
+    if (annotations.source) {
+      source = annotations.source;
+    }
     this.lazyInit();
     if (sanitize) {
       return new CSVExportTweet(regionMap[this._place], impact, source, this._id, this._date.toUTCString(),
