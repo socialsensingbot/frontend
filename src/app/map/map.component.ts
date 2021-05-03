@@ -916,7 +916,9 @@ export class MapComponent implements OnInit, OnDestroy {
     this._dateMax = this.data.entryDate(upper).getTime();
     this._dateMin = this.data.entryDate(lower).getTime();
     this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
-    this._sliderIsStale = true;
+    if(this.pref.combined.animateOnTimeSliderChange) {
+      this._sliderIsStale = true;
+    }
 
   }
 
@@ -952,7 +954,9 @@ export class MapComponent implements OnInit, OnDestroy {
    */
   public sliderChangeOnEnd($event: any) {
     log.debug("sliderChangeOnEnd()");
-
+    if(!this.pref.combined.animateOnTimeSliderChange) {
+      this._sliderIsStale = true;
+    }
   }
 
   /**
