@@ -1,20 +1,20 @@
 # Script to run the for the Amplify Console CI Cypress testing
 cd $(dirname $0)
 cd ..
-tests="cypress/integration/00_quick/**"
+tests="cypress/integration/00_quick"
 browsers="electron"
 record="" #Or "--record"
 
 if [[ "${AWS_BRANCH}" == feature* ]]; then
-  tests="cypress/integration/00_quick/**"
+  tests="cypress/integration/00_quick"
   browsers="electron"
 fi
 if [[ "${AWS_BRANCH}" == release* ]]; then
-  tests="cypress/integration/**"
+  tests="cypress/integration"
   browsers="electron"
 fi
 if [[ "${AWS_BRANCH}" == "" ]]; then
-  tests="cypress/integration/**"
+  tests="cypress/integration"
   browsers="electron"
 fi
 if [[ "${AWS_BRANCH}" == staging ]]; then
@@ -38,7 +38,11 @@ function test() {
     export DEBUG=cypress:server:util:process_profiler
     export CYPRESS_PROCESS_PROFILER_INTERVAL=60000
     export ELECTRON_EXTRA_LAUNCH_ARGS=--js-flags=--expose_gc
-    npx cypress run $record -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser ${browser} --headless --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-${browser},overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" --spec "${tests}"
+    for dir in $( find ${tests} -name "*.js" | sort)
+    do
+      echo "Running tests in ${dir}"
+      npx cypress run $record -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser ${browser} --headless --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-${browser}-$( basename $dir  | tr '.' '_'), overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" --spec "${dir}"
+    done
     #npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser firefox --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-firefox,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"
   done
 }
