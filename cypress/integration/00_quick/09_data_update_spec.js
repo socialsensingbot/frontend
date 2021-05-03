@@ -3,9 +3,9 @@
  */
 import {MAP_URL} from "../../support";
 
-describe('Data Update: ', function () {
+describe('09 Data Update: ', function () {
   describe('slider change', () => {
-    const url = MAP_URL + "?selected=powys&max_time=1587941160000&min_time=1587854760000&active_number=stats&active_polygon=county";
+    const url = MAP_URL + "?selected=powys&max_time=1587940000000&min_time=1587854760000&active_number=stats&active_polygon=county";
     it('after scheduled update', () => {
       //See commands.js - stubLiveJson stubs out the call to S3 to get live.json
       cy.stubLiveJson("live-short");
