@@ -161,6 +161,7 @@ export class MapComponent implements OnInit, OnDestroy {
             this.data.switchDataSet(value).then(async () => {
                 this.hideTweets();
                 await this.data.loadStats();
+                await this.data.loadAggregations();
                 log.debug(`Old location ${oldLocation} new location ${this.data.dataSetMetdata.location}`);
                 if (this.data.dataSetMetdata.location !== oldLocation) {
                     this.selection.clear();
@@ -437,6 +438,12 @@ export class MapComponent implements OnInit, OnDestroy {
                            this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
     }
 
+    public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
+        this.data.downloadAggregate(aggregrationSetId, id,
+                                    this.activePolyLayerShortName,
+                                    this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
+    }
+
     public zoomIn() {
         if (this._map.getZoom() < 18) {
             this._map.setZoom(this._map.getZoom() + 1);
@@ -562,6 +569,7 @@ export class MapComponent implements OnInit, OnDestroy {
         await this.data.init();
         await this.data.switchDataSet(this.dataset);
         await this.data.loadStats();
+        await this.data.loadAggregations();
         const {zoom, lng, lat} = {
             ...this.data.serviceMetadata.start,
             ...this.data.dataSetMetdata.start,
