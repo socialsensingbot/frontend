@@ -43,6 +43,7 @@ export const environment = {
   showLoadingMessages:  true,
   mostRecentDateIsNow:  true,
   sanitizeForGDPR:      true,
+  continuousUpdateThresholdInMinutes: 90,
   animateOnTimeSliderChange: false,
   defaultDataSet:       "live",
   availableDataSets:    ["*"], // A list of datasets that will appear in the toolbar dropdown, or "*" for all.

@@ -26,5 +26,28 @@ describe('09 Data Update: ', function () {
 
   });
 
+  describe('slider change when at NOW', () => {
+    const url = MAP_URL + "?selected=powys&max_time=1587940500000&min_time=1587854760000&active_number=stats&active_polygon=county";
+    it('after scheduled update', () => {
+      //See commands.js - stubLiveJson stubs out the call to S3 to get live.json
+      cy.stubLiveJson("live-short");
+      cy.visit(url);
+      cy.login();
+      cy.visitAndWait(url);
+      cy.get(".slider-date-time", {timeout: 20000});
+      cy.get(".slider-date-time-max .slider-date").should("contain.text", "now");
+      cy.get(".slider-date-time-max .slider-time").should("contain.text", "");
+      cy.url().should("equal", url)
+      cy.stubLiveJson("live-long"); // and prosper
+      cy.wait(90 * 1000);
+      cy.get(".slider-date-time-max .slider-date").should("contain.text", "now");
+      cy.get(".slider-date-time-max .slider-time").should("contain.text", "");
+      cy.url().should("not.equal", url);
+      cy.logout();
+    });
+
+  });
+
+
 
 });
