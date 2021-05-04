@@ -44,7 +44,8 @@ function test() {
       timeout 600 cypress run $record -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} \
       --browser ${browser} \
       --headless --reporter mochawesome \
-      --reporter-options "reportDir=cypress/report/mochawesome-report-${browser}-$( basename $dir  | tr '.' '_'), overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"\
+      --reporter-options "reportDir=cypress/report/mochawesome-report-${browser}-$(basename $dir)on,
+      overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"\
       --spec "${dir}"
       done
     #npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser firefox --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-firefox,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"
