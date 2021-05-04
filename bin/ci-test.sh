@@ -38,16 +38,14 @@ function test() {
     export DEBUG=cypress:server:util:process_profiler
     export CYPRESS_PROCESS_PROFILER_INTERVAL=60000
     export ELECTRON_EXTRA_LAUNCH_ARGS=--js-flags=--expose_gc
-    for dir in $( find ${tests} -name "*.js" | sort)
-    do
+    for dir in $(find ${tests} -name "*.js" | sort); do
       echo "Running tests in ${dir}"
       timeout 600 cypress run $record -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} \
-      --browser ${browser} \
-      --headless --reporter mochawesome \
-      --reporter-options "reportDir=cypress/report/mochawesome-report-${browser}-$(basename $dir)on,
-      overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"\
-      --spec "${dir}"
-      done
+        --browser ${browser} \
+        --headless --reporter mochawesome \
+        --reporter-options "reportDir=cypress/report/mochawesome-report-${browser}-$(basename $dir)on,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" \
+        --spec "${dir}"
+    done
     #npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser firefox --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-firefox,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"
   done
 }
