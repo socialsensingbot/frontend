@@ -4,7 +4,7 @@ cd ..
 tests="cypress/integration/00_quick"
 browsers="electron"
 record="--record false" #Or "--record"
-
+timeoutDuration=600
 if [[ "${AWS_BRANCH}" == feature* ]]; then
   tests="cypress/integration/00_quick"
   browsers="electron"
@@ -39,12 +39,12 @@ function test() {
     export CYPRESS_PROCESS_PROFILER_INTERVAL=60000
     export ELECTRON_EXTRA_LAUNCH_ARGS=--js-flags=--expose_gc
     for dir in $(find ${tests} -name "*.js" | sort); do
-      echo "Running tests in ${dir}"
-      timeout 600 cypress run $record -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} \
+      echo "Running tests in ${dir} with a timeout of ${timeoutDuration} seconds."
+      timeout $timeoutDuration cypress run $record -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} \
         --browser ${browser} \
         --headless --reporter mochawesome \
         --reporter-options "reportDir=cypress/report/mochawesome-report-${browser}-$(basename $dir)on,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" \
-        --spec "${dir}"
+        --spec "${dir}" || echo "ERROR: TEST ${dir} TIMED OUT after ${timeoutDuration} seconds"
     done
     #npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser firefox --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-firefox,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"
   done
