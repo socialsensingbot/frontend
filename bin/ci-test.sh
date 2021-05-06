@@ -40,7 +40,7 @@ function test() {
     export ELECTRON_EXTRA_LAUNCH_ARGS=--js-flags=--expose_gc
     for file in $(find ${tests} -name "*.js" | sort); do
       echo "Running tests in ${file} with a timeout of ${timeoutDuration} seconds."
-      timeout $timeoutDuration cypress run $record -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} \
+      timeout $timeoutDuration npx cypress run $record -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} \
         --browser ${browser} \
         --headless --reporter mochawesome \
         --reporter-options "reportDir=cypress/report/mochawesome-report-${browser},overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" \
