@@ -30,13 +30,13 @@ test:
     preTest:
       commands:
         - npm ci
-        - npm install cypress
-        - npm install pm2
-        - npm install wait-on
+        - npm install -g cypress
+        - npm install -g pm2
+        - npm install -g wait-on
         - npm install mocha@7.1.1 mochawesome mochawesome-merge mochawesome-report-generator react react-dom
-        - npx pm2 start npm -- start
-        - npx pm2 list
-        - npx wait-on http://localhost:3000
+        - pm2 start npm -- start
+        - pm2 list
+        - wait-on http://localhost:3000
     test:
       commands:
         - mkdir -p dist/frontend
