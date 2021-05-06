@@ -406,6 +406,10 @@ export class MapDataService {
             filename:         `${aggregrationSetId}-tweet-export-${selectedAggregates.join("-")}-${readableTimestamp()}`
             // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
         };
+        if (selectedAggregates.length === this.aggregations[aggregrationSetId]
+            .aggregates.length) {
+            options.filename = `${aggregrationSetId}-tweet-export-all-${readableTimestamp()}`;
+        }
         const layerAggregationList = this.aggregations[aggregrationSetId]
             .aggregates
             .filter(i => selectedAggregates.includes(i.id))
