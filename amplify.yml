@@ -36,7 +36,7 @@ test:
         - npm install mocha@7.1.1 mochawesome mochawesome-merge mochawesome-report-generator react react-dom
         - pm2 start npm -- start
         - pm2 list
-        - wait-on http://localhost:3000
+        - wait-on http://localhost:4200
     test:
       commands:
         - mkdir -p dist/frontend
