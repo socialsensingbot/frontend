@@ -35,7 +35,7 @@ test:
         - npm install wait-on
         - npm install mocha@7.1.1 mochawesome mochawesome-merge mochawesome-report-generator react react-dom
         - npx pm2 start npm -- start
-        - pm2 list
+        - npx pm2 list
         - npx wait-on http://localhost:3000
     test:
       commands:
@@ -45,7 +45,7 @@ test:
       commands:
 #        - npx mochawesome-merge cypress/report/mochawesome-report-chrome/mochawesome*.json cypress/report/mochawesome-report-firefox/mochawesome*.json > cypress/report/mochawesome.json
         - npx mochawesome-merge cypress/report/mochawesome-report-electron/mochawesome*.json > cypress/report/mochawesome.json
-        - pm2 kill
+        - npx pm2 kill
   artifacts:
     baseDirectory: cypress
     configFilePath: '**/mochawesome.json'
