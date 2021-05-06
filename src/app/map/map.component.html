@@ -11,25 +11,6 @@
     </mat-sidenav>
 
 
-    <mat-menu #downloadMenu="matMenu">
-        <ng-container *ngIf="data.aggregations['countries']">
-
-            <ng-container *ngFor="let agg of data.aggregations['countries'].aggregates">
-                <button
-                        (click)="downloadAggregateAsCSV('countries',agg.id, $event);"
-                        mat-menu-item>{{agg.title}}
-                </button>
-            </ng-container>
-        </ng-container>
-
-        <button
-                (click)="downloadTweetsAsCSV()"
-                class="tweet-list-item-menu-source-type-clear"
-                mat-menu-item>All
-        </button>
-
-    </mat-menu>
-
     <mat-sidenav-content style="overflow:hidden">
         <mat-toolbar class="app-toolbar">
             <button class="app-toolbar-btn map-zoom-in" mat-icon-button (click)="zoomIn()">
@@ -83,11 +64,20 @@
                 </mat-form-field>
 
                 <div class="app-toolbar-separator"></div>
-                <div class="app-toolbar-btn">
-                    <button mat-icon-button [matMenuTriggerData]="{data:data}" [matMenuTriggerFor]="downloadMenu">
-                        <mat-icon matTooltip="Download all Tweets as a CSV file.">cloud_download</mat-icon>
-                    </button>
-                </div>
+                <button [disabled]="selectedCountries.length === 0" class="app-toolbar-btn" mat-icon-button
+                        (click)="downloadTweetsAsCSV()">
+                    <mat-icon matTooltip="Download all Tweets as a CSV file.">cloud_download</mat-icon>
+                </button>
+                <mat-form-field>
+                    <!--                    <mat-label>Countries</mat-label>-->
+                    <mat-select [formControl]="countries" multiple [(ngModel)]="selectedCountries">
+                        <mat-select-trigger>
+                            <span class="country-additional-selection">{{selectedCountriesText()}}</span>
+                        </mat-select-trigger>
+                        <mat-option *ngFor="let agg of data.aggregations['countries'].aggregates"
+                                    [value]="agg.id">{{agg.title}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
             </ng-container>
         </mat-toolbar>
         <div class="map-surround">

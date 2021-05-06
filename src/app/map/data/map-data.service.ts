@@ -390,7 +390,8 @@ export class MapDataService {
 
     }
 
-    public async downloadAggregate(aggregrationSetId, aggregateId, regionGrouping: string, polygonDatum: PolygonData) {
+    public async downloadAggregate(aggregrationSetId: string, selectedAggregates: string[], regionGrouping: string,
+                                   polygonDatum: PolygonData) {
         const exportedTweets: CSVExportTweet[] = [];
         const options = {
             fieldSeparator:   ",",
@@ -402,12 +403,13 @@ export class MapDataService {
             useTextFile:      false,
             useBom:           true,
             useKeysAsHeaders: true,
-            filename:         `${aggregrationSetId}-tweet-export-${aggregateId}-${readableTimestamp()}`
+            filename:         `${aggregrationSetId}-tweet-export-${selectedAggregates.join("-")}-${readableTimestamp()}`
             // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
         };
-        const aggregationSet = this.aggregations[aggregrationSetId];
-        const aggregationData: AggregationRegion = aggregationSet.aggregates.filter(i => i.id === aggregateId)[0];
-        const layerAggregationList = aggregationData.layers[regionGrouping];
+        const layerAggregationList = this.aggregations[aggregrationSetId]
+            .aggregates
+            .filter(i => selectedAggregates.includes(i.id))
+            .flatMap(x => x.layers[regionGrouping]);
         for (const region of this._twitterData.regionNames(regionGrouping).keys()) {
             if (layerAggregationList.includes(region)) {
                 await this.exportRegionForCSV(polygonDatum, region, regionGrouping,

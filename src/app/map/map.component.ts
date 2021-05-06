@@ -33,6 +33,7 @@ import {PreferenceService} from "../pref/preference.service";
 import {NgForageCache} from "ngforage";
 import {environment} from "../../environments/environment";
 import Auth from "@aws-amplify/auth";
+import {FormControl} from "@angular/forms";
 
 
 const log = new Logger("map");
@@ -61,6 +62,8 @@ export class MapComponent implements OnInit, OnDestroy {
     public showTwitterTimeline: boolean;
     _routerStateChangeSub: Subscription;
     _popState: boolean;
+    public countries: FormControl = new FormControl();
+    public selectedCountries: string[] = [];
     // The Map & Map Layers
     private _statsLayer: LayerGroup = layerGroup();
     private _countyLayer: LayerGroup = layerGroup(); // dummy layers to fool layer control
@@ -87,8 +90,6 @@ export class MapComponent implements OnInit, OnDestroy {
     private _map: Map;
     private _numberLayers: NumberLayers = {stats: null, count: null};
     private _polyLayers: PolyLayers = {county: null, coarse: null, fine: null};
-
-
     // URL state management //
     private _geojson: { stats: GeoJSON, count: GeoJSON } = {stats: null, count: null};
     // ... URL parameters
@@ -434,15 +435,16 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     public downloadTweetsAsCSV() {
-        this.data.download(this.activePolyLayerShortName,
-                           this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
-    }
-
-    public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
-        this.data.downloadAggregate(aggregrationSetId, id,
+        this.data.downloadAggregate("countries", this.selectedCountries,
                                     this.activePolyLayerShortName,
                                     this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
     }
+
+    // public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
+    //     // this.data.downloadAggregate(aggregrationSetId, id,
+    //     //                             this.activePolyLayerShortName,
+    //     //                             this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
+    // }
 
     public zoomIn() {
         if (this._map.getZoom() < 18) {
@@ -457,6 +459,29 @@ export class MapComponent implements OnInit, OnDestroy {
             this._map.setZoom(this._map.getZoom() - 1);
         } else {
             this._notify.show("Minimum Zoom");
+        }
+    }
+
+    public selectedCountriesText() {
+        // log.info("selectedCountriesText()");
+        // log.info(countries.value);
+        if (!this.countries.value || this.countries.value.length === 0) {
+            console.log("None");
+            return "Download none";
+        } else {
+            const countryCount = this.countries.value.length;
+            const countryData = this.data.aggregations.countries.aggregates;
+            if (countryData.length === countryCount) {
+                        return "Download all";
+                    } else {
+                        if (countryCount === 1) {
+                            const countryTitle = countryData.filter(
+                                i => i.id === this.countries.value[0])[0].title;
+                            return `Download ${countryTitle}`;
+                        } else {
+                            return `Download ${countryCount} countries`;
+                        }
+                    }
         }
     }
 
@@ -570,6 +595,7 @@ export class MapComponent implements OnInit, OnDestroy {
         await this.data.switchDataSet(this.dataset);
         await this.data.loadStats();
         await this.data.loadAggregations();
+        this.data.aggregations.countries.aggregates.forEach(i => this.selectedCountries.push(i.id));
         const {zoom, lng, lat} = {
             ...this.data.serviceMetadata.start,
             ...this.data.dataSetMetdata.start,
