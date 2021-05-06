@@ -43,6 +43,7 @@ test:
       commands:
 #        - npx mochawesome-merge cypress/report/mochawesome-report-chrome/mochawesome*.json cypress/report/mochawesome-report-firefox/mochawesome*.json > cypress/report/mochawesome.json
         - npx mochawesome-merge cypress/report/mochawesome-report-electron/mochawesome*.json > cypress/report/mochawesome.json
+        - pm2 kill
   artifacts:
     baseDirectory: cypress
     configFilePath: '**/mochawesome.json'
