@@ -1,7 +1,7 @@
 version: 0.1
 env:
   variables:
-    NODE_OPTIONS: --max-old-space-size=6144
+    NODE_OPTIONS: --max-old-space-size=4096
 backend:
   phases:
     build:
