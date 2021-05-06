@@ -32,8 +32,9 @@ test:
         - npm ci
         - npm install mocha@7.1.1 mochawesome mochawesome-merge mochawesome-report-generator react react-dom
         - npm install -g cypress pm2 wait-on
-        - pm2 start npm -- start
-        - wait-on http://localhost:3000
+        - npx pm2 start npm -- start
+        - pm2 list
+        - npx wait-on http://localhost:3000
     test:
       commands:
         - mkdir -p dist/frontend
