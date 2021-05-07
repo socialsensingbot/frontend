@@ -445,6 +445,7 @@ export class MapComponent implements OnInit, OnDestroy {
     //     //                             this.activePolyLayerShortName,
     //     //                             this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
     // }
+    public appToolbarExpanded: boolean;
 
     public zoomIn() {
         if (this._map.getZoom() < 18) {
