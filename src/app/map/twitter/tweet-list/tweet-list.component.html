@@ -77,13 +77,18 @@
 
 
         <mat-menu #markAs="matMenu">
-            <button *ngIf="!si" (click)="ignoreSender(tweet,$event);" mat-menu-item>Ignored Sender
+            <button *ngIf="!si" (click)="ignoreSender(tweet,$event);" mat-menu-item
+                    class="tweet-menu-ignore-sender">Ignored Sender
                 @{{sender(tweet)}}</button>
-            <button *ngIf="si" (click)="unIgnoreSender(tweet,$event);" mat-menu-item>Unignored Sender
+            <button *ngIf="si" (click)="unIgnoreSender(tweet,$event);" mat-menu-item
+                    class="tweet-menu-unignore-sender">Unignored Sender
                 @{{sender(tweet)}}</button>
-            <button *ngIf="!ti" (click)="ignoreTweet(tweet,$event);" mat-menu-item>Ignored Tweet
+            <button *ngIf="!ti" (click)="ignoreTweet(tweet,$event);" mat-menu-item
+                    class="tweet-menu-ignore-tweet">Ignored Tweet
+
             </button>
-            <button *ngIf="ti" (click)="unIgnoreTweet(tweet,$event);" mat-menu-item>Unignored Tweet
+            <button *ngIf="ti" (click)="unIgnoreTweet(tweet,$event);" mat-menu-item
+                    class="tweet-menu-unignore-tweet">Unignored Tweet
             </button>
             <ng-container
                     *ngTemplateOutlet="toggleAnnotation; context: {tweet:tweet,key:'relevant', positiveTitle:'Relevant',
