@@ -40,6 +40,10 @@ $drawer-width: $tweetAndMargin + 52px;
   box-shadow: inset 0px 0px 4px 1px rgba(0, 0, 0, 0.3);
 }
 
+.map-surround-tb-expanded{
+  height: calc(100% - 128px);
+}
+
 .map {
   overflow: hidden;
   top: 0px;

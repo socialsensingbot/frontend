@@ -13,74 +13,86 @@
 
     <mat-sidenav-content style="overflow:hidden">
         <mat-toolbar class="app-toolbar">
-            <button class="app-toolbar-btn map-zoom-in" mat-icon-button (click)="zoomIn()">
-                <mat-icon matTooltip="Zoom In">zoom_in</mat-icon>
-            </button>
-            <button class="app-toolbar-btn map-zoom-out" mat-icon-button (click)="zoomOut()">
-                <mat-icon matTooltip="Zoom Out">zoom_out</mat-icon>
-            </button>
-            <div class="app-toolbar-separator"></div>
             <ng-container *ngIf="ready">
+                <mat-toolbar-row>
+                    <button class="app-toolbar-btn map-zoom-in" mat-icon-button (click)="zoomIn()">
+                        <mat-icon matTooltip="Zoom In">zoom_in</mat-icon>
+                    </button>
+                    <button class="app-toolbar-btn map-zoom-out" mat-icon-button (click)="zoomOut()">
+                        <mat-icon matTooltip="Zoom Out">zoom_out</mat-icon>
+                    </button>
+                    <div class="app-toolbar-separator"></div>
 
-                <!--      <mat-select>-->
-                <!--        <mat-option *ngFor="let polyLayer of polyLayers()" [value]="polyLayer[1]">-->
-                <!--          {{polyLayer[0]}}-->
-                <!--        </mat-option>-->
-                <!--      </mat-select>-->
-                <!--      <mat-select>-->
-                <!--        <mat-option *ngFor="let numLayer of numberLayers()" [value]="numLayer[1]">-->
-                <!--          {{numLayer[0]}}-->
-                <!--        </mat-option>-->
-                <!--      </mat-select>-->
-                <div class="app-toolbar-separator"></div>
-                <div class="date-slider">
-                    <date-range-slider (dateRange)="sliderChange($event)"
-                                       (onEnd)="sliderChangeOnEnd($event)"
-                                       [options]="sliderOptions"></date-range-slider>
-                </div>
-                <ng-container *ngIf="data.availableDataSets && data.availableDataSets.length > 1">
+                    <!--      <mat-select>-->
+                    <!--        <mat-option *ngFor="let polyLayer of polyLayers()" [value]="polyLayer[1]">-->
+                    <!--          {{polyLayer[0]}}-->
+                    <!--        </mat-option>-->
+                    <!--      </mat-select>-->
+                    <!--      <mat-select>-->
+                    <!--        <mat-option *ngFor="let numLayer of numberLayers()" [value]="numLayer[1]">-->
+                    <!--          {{numLayer[0]}}-->
+                    <!--        </mat-option>-->
+                    <!--      </mat-select>-->
+                    <div class="app-toolbar-separator"></div>
+                    <div class="date-slider">
+                        <date-range-slider (dateRange)="sliderChange($event)"
+                                           (onEnd)="sliderChangeOnEnd($event)"
+                                           [options]="sliderOptions"></date-range-slider>
+                    </div>
+                    <div class="app-toolbar-expanding-separator"></div>
+                    <button mat-icon-button  aria-label="Expand or shrink toolbar">
+                        <mat-icon matTooltip="Expand toolbar" *ngIf="!appToolbarExpanded"
+                                  (click)="appToolbarExpanded=true">arrow_drop_down
+                        </mat-icon>
+                        <mat-icon matTooltip="Shrink toolbar" *ngIf="appToolbarExpanded"
+                                  (click)="appToolbarExpanded=false">arrow_drop_up</mat-icon>
+                    </button>
+                </mat-toolbar-row>
+                <mat-toolbar-row *ngIf="appToolbarExpanded">
+                    <ng-container *ngIf="data.availableDataSets && data.availableDataSets.length > 1">
+                        <div class="app-toolbar-separator"></div>
+                        <mat-form-field>
+                            <mat-select [(value)]="dataset">
+                                <mat-option *ngFor="let ds of data.availableDataSets" [value]="ds.id">
+                                    {{ds.title}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </ng-container>
                     <div class="app-toolbar-separator"></div>
                     <mat-form-field>
-                        <mat-select [(value)]="dataset">
-                            <mat-option *ngFor="let ds of data.availableDataSets" [value]="ds.id">
-                                {{ds.title}}
-                            </mat-option>
+                        <mat-select [(value)]="activePolyLayerShortName" class="map-polygon-layer-select">
+                            <mat-option *ngFor="let regionGrouping of data.dataSetMetdata.regionGroups"
+                                        [value]="regionGrouping.id">{{regionGrouping.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>
-                </ng-container>
-                <div class="app-toolbar-separator"></div>
-                <mat-form-field>
-                    <mat-select [(value)]="activePolyLayerShortName" class="map-polygon-layer-select">
-                        <mat-option *ngFor="let regionGrouping of data.dataSetMetdata.regionGroups"
-                                    [value]="regionGrouping.id">{{regionGrouping.title}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <div class="app-toolbar-separator"></div>
-                <mat-form-field>
-                    <mat-select [(value)]="activeNumberLayerShortName" class="map-number-layer-select">
-                        <mat-option value="stats">Exceedance</mat-option>
-                        <mat-option value="count">Tweet Count</mat-option>
-                    </mat-select>
-                </mat-form-field>
+                    <div class="app-toolbar-separator"></div>
+                    <mat-form-field>
+                        <mat-select [(value)]="activeNumberLayerShortName" class="map-number-layer-select">
+                            <mat-option value="stats">Exceedance</mat-option>
+                            <mat-option value="count">Tweet Count</mat-option>
+                        </mat-select>
+                    </mat-form-field>
 
-                <div class="app-toolbar-separator"></div>
-                <button [disabled]="selectedCountries.length === 0" class="app-toolbar-btn" mat-icon-button
-                        (click)="downloadTweetsAsCSV()">
-                    <mat-icon matTooltip="Download all Tweets as a CSV file.">cloud_download</mat-icon>
-                </button>
-                <mat-form-field>
-                    <!--                    <mat-label>Countries</mat-label>-->
-                    <mat-select [formControl]="countries" multiple [(ngModel)]="selectedCountries">
-                        <mat-select-trigger>
-                            <span class="country-additional-selection">{{selectedCountriesText()}}</span>
-                        </mat-select-trigger>
-                        <mat-option *ngFor="let agg of data.aggregations['countries'].aggregates"
-                                    [value]="agg.id">{{agg.title}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
+                    <div class="app-toolbar-separator"></div>
+                    <button [disabled]="selectedCountries.length === 0" class="app-toolbar-btn" mat-icon-button
+                            (click)="downloadTweetsAsCSV()">
+                        <mat-icon matTooltip="Download all Tweets as a CSV file.">cloud_download</mat-icon>
+                    </button>
+                    <mat-form-field>
+                        <!--                    <mat-label>Countries</mat-label>-->
+                        <mat-select [formControl]="countries" multiple [(ngModel)]="selectedCountries">
+                            <mat-select-trigger>
+                                <span class="country-additional-selection">{{selectedCountriesText()}}</span>
+                            </mat-select-trigger>
+                            <mat-option *ngFor="let agg of data.aggregations['countries'].aggregates"
+                                        [value]="agg.id">{{agg.title}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </mat-toolbar-row>
             </ng-container>
         </mat-toolbar>
-        <div class="map-surround">
+        <div [class]="appToolbarExpanded ? 'map-surround map-surround-tb-expanded' : 'map-surround'">
             <div class="map" aria-label="Map"
                  style="height:100%"
                  leaflet
