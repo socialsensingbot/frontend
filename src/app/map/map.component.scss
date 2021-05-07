@@ -15,7 +15,8 @@ $drawer-width: $tweetAndMargin + 52px;
 
   @keyframes blinker {
     50% {
-      stroke: rgb(255,200,200);
+      stroke: rgb(100,100,100);
+      stroke-width: 3px;
     }
   }
 }

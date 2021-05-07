@@ -858,14 +858,14 @@ export class MapComponent implements OnInit, OnDestroy {
                 // noinspection JSUnfilteredForInLoop
                 const shortNumberLayerName = key;
                 const regionTweetMap = this.data.recentTweets(this.activePolyLayerShortName);
-                console.log("Region Tweet Map", regionTweetMap);
+                log.debug("Region Tweet Map", regionTweetMap);
 
                 const styleFunc = (feature: geojson.Feature) => {
 
                     const style = this._color.colorFunctions[shortNumberLayerName].getFeatureStyle(
                         feature);
                     if (regionTweetMap[feature.properties.name]) {
-                        console.log(`Adding style for ${feature.properties.name}`);
+                        log.debug(`Adding style for ${feature.properties.name}`);
                         style.className = style.className + " leaflet-new-tweet";
                     }
                     return style;

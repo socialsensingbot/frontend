@@ -274,11 +274,11 @@ export class MapDataService {
                                               this.offset(this.lastEntryDate().getTime()), this.reverseTimeKeys,
                                               this._rawTwitterData,
                                               this.stats, this.dataSetMetdata.regionGroups).layer(activePolyLayerShortName);
-        console.log(`Recent Tweets Twitter Data for ${activePolyLayerShortName}`, twitterData);
+       log.debug(`Recent Tweets Twitter Data for ${activePolyLayerShortName}`, twitterData);
         const tweets: RegionTweetMap = {};
         for (const name of twitterData.places()) {
             const t = twitterData.countForPlace(name);
-            console.log(`Recent Tweets Twitter Data for ${name}`, t);
+           log.debug(`Recent Tweets Twitter Data for ${name}`, t);
             if (t) {
                 tweets[name] = t;
             }

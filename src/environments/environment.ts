@@ -45,7 +45,7 @@ export const environment = {
   sanitizeForGDPR:      true,
   continuousUpdateThresholdInMinutes: 90,
   animateOnTimeSliderChange: false,
-  recentTweetHighlightOffsetInSeconds: 36000,
+  recentTweetHighlightOffsetInSeconds: 1200,
   defaultDataSet:       "live",
   availableDataSets:    ["*"], // A list of datasets that will appear in the toolbar dropdown, or "*" for all.
   cacheProcessedTweets: false,
