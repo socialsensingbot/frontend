@@ -25,6 +25,7 @@ describe('03 Ignore tweets: ', function () {
         cy.get(tweetVisible + " .app-tweet-item", {timeout: 60000});
         cy.get(tweetVisible + " .app-tweet-item", {timeout: 60000}).should('be.visible');
         cy.get(tweetVisible + " .mat-icon", {timeout: 60000}).click({force: true});
+        cy.wait(1000);
         cy.get(markAsMenu).click();
         cy.wait(1000);
         cy.get(markAsIgnoredMenu).click();
@@ -39,6 +40,7 @@ describe('03 Ignore tweets: ', function () {
       } else {
         cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000}).click({force: true});
         cy.get(tweetHidden + " .mat-icon", {timeout: 60000}).click({force: true});
+        cy.wait(1000);
         cy.get(markAsMenu).click();
         cy.wait(1000);
         cy.get(markAsUnignoredMenu).click();
