@@ -9,6 +9,15 @@ $drawer-width: $tweetAndMargin + 52px;
   .leaflet-control-container {
     display: none;
   }
+  .leaflet-new-tweet {
+    animation: blinker 0.5s ease-in-out infinite;
+  }
+
+  @keyframes blinker {
+    50% {
+      stroke: rgb(255,200,200);
+    }
+  }
 }
 
 .draw-close-button {

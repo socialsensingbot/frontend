@@ -472,16 +472,16 @@ export class MapComponent implements OnInit, OnDestroy {
             const countryCount = this.countries.value.length;
             const countryData = this.data.aggregations.countries.aggregates;
             if (countryData.length === countryCount) {
-                        return "Download all";
-                    } else {
-                        if (countryCount === 1) {
-                            const countryTitle = countryData.filter(
-                                i => i.id === this.countries.value[0])[0].title;
-                            return `Download ${countryTitle}`;
-                        } else {
-                            return `Download ${countryCount} countries`;
-                        }
-                    }
+                return "Download all";
+            } else {
+                if (countryCount === 1) {
+                    const countryTitle = countryData.filter(
+                        i => i.id === this.countries.value[0])[0].title;
+                    return `Download ${countryTitle}`;
+                } else {
+                    return `Download ${countryCount} countries`;
+                }
+            }
         }
     }
 
@@ -857,10 +857,23 @@ export class MapComponent implements OnInit, OnDestroy {
 
                 // noinspection JSUnfilteredForInLoop
                 const shortNumberLayerName = key;
+                const regionTweetMap = this.data.recentTweets(this.activePolyLayerShortName);
+                console.log("Region Tweet Map", regionTweetMap);
+
+                const styleFunc = (feature: geojson.Feature) => {
+
+                    const style = this._color.colorFunctions[shortNumberLayerName].getFeatureStyle(
+                        feature);
+                    if (regionTweetMap[feature.properties.name]) {
+                        console.log(`Adding style for ${feature.properties.name}`);
+                        style.className = style.className + " leaflet-new-tweet";
+                    }
+                    return style;
+
+                };
                 this._geojson[shortNumberLayerName] = new GeoJSON(
                     this.data.polygonData[this.activePolyLayerShortName] as geojson.GeoJsonObject, {
-                        style:         (feature) => this._color.colorFunctions[shortNumberLayerName].getFeatureStyle(
-                            feature),
+                        style:         styleFunc,
                         onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
                     }).addTo(curLayerGroup);
             } else {

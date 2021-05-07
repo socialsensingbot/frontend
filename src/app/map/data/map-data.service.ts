@@ -107,6 +107,10 @@ export interface AggregationData {
     aggregates: AggregationRegion[];
 }
 
+interface RegionTweetMap {
+    [region: string]: number;
+}
+
 @Injectable({
                 providedIn: "root"
             })
@@ -117,6 +121,7 @@ export class MapDataService {
 
 
     public timeKeyUpdate = new EventEmitter<any>();
+    public regionUpdated = new EventEmitter<any>();
     /**
      * This is the semi static stats data which is loaded from assets/data.
      */
@@ -259,6 +264,23 @@ export class MapDataService {
             const t = this._twitterData.tweets(activePolyLayerShortName, name);
             if (t) {
                 tweets.push(...t);
+            }
+        }
+        return tweets;
+    }
+
+    public recentTweets(activePolyLayerShortName: string): RegionTweetMap {
+        const twitterData = new ProcessedData(this.offset(this.lastEntryDate().getTime() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000),
+                                              this.offset(this.lastEntryDate().getTime()), this.reverseTimeKeys,
+                                              this._rawTwitterData,
+                                              this.stats, this.dataSetMetdata.regionGroups).layer(activePolyLayerShortName);
+        console.log(`Recent Tweets Twitter Data for ${activePolyLayerShortName}`, twitterData);
+        const tweets: RegionTweetMap = {};
+        for (const name of twitterData.places()) {
+            const t = twitterData.countForPlace(name);
+            console.log(`Recent Tweets Twitter Data for ${name}`, t);
+            if (t) {
+                tweets[name] = t;
             }
         }
         return tweets;
