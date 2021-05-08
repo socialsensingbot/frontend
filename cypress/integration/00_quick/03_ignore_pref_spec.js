@@ -1,4 +1,5 @@
 import {MAP_URL} from "../../support";
+import {markAsIgnoredMenu, markAsMenu, markAsUnignoredMenu} from "../../support/commands";
 
 const twitterIdClass = ".app-twitter-id-1051568984070479874";
 
@@ -7,9 +8,6 @@ describe('03 Ignore tweets: ', function () {
     cy.stubLiveJson("live-old");
   })
 
-  const markAsIgnoredMenu = "body .mat-menu-item.tweet-menu-ignore-tweet";
-  const markAsUnignoredMenu = "body .mat-menu-item.tweet-menu-unignore-tweet";
-  const markAsMenu = "body .mat-menu-item.tweet-list-item-menu-mark-as";
   const url = MAP_URL + "?selected=carmarthenshire&max_offset=0&min_offset=-1439";
   const test = () => {
     cy.visit(url);
