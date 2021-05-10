@@ -728,7 +728,7 @@ export class MapComponent implements OnInit, OnDestroy {
                             opacity:     0.5,
                             color:       "white",
                             dashArray:   "",
-                            fillOpacity: count > 0 ? 1.0 : 0.1,
+                            fillOpacity: count > 0 ? 0.7 : 0.1,
                         });
 
         if (!Browser.ie && !Browser.opera && !Browser.edge) {
