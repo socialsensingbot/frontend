@@ -64,6 +64,8 @@ export class MapComponent implements OnInit, OnDestroy {
     _popState: boolean;
     public countries: FormControl = new FormControl();
     public selectedCountries: string[] = [];
+    // }
+    public appToolbarExpanded: boolean;
     // The Map & Map Layers
     private _statsLayer: LayerGroup = layerGroup();
     private _countyLayer: LayerGroup = layerGroup(); // dummy layers to fool layer control
@@ -434,18 +436,21 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    public downloadTweetsAsCSV() {
-        this.data.downloadAggregate("countries", this.selectedCountries,
-                                    this.activePolyLayerShortName,
-                                    this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
-    }
-
     // public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
     //     // this.data.downloadAggregate(aggregrationSetId, id,
     //     //                             this.activePolyLayerShortName,
     //     //                             this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
-    // }
-    public appToolbarExpanded: boolean;
+
+    public downloadTweetsAsCSV() {
+        if (this.data.hasCountryAggregates()) {
+            this.data.downloadAggregate("countries", this.selectedCountries,
+                                        this.activePolyLayerShortName,
+                                        this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
+        } else {
+            this.data.download(this.activePolyLayerShortName,
+                               this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
+        }
+    }
 
     public zoomIn() {
         if (this._map.getZoom() < 18) {
@@ -596,7 +601,9 @@ export class MapComponent implements OnInit, OnDestroy {
         await this.data.switchDataSet(this.dataset);
         await this.data.loadStats();
         await this.data.loadAggregations();
-        this.data.aggregations.countries.aggregates.forEach(i => this.selectedCountries.push(i.id));
+        if (this.data.hasCountryAggregates()) {
+            this.data.aggregations.countries.aggregates.forEach(i => this.selectedCountries.push(i.id));
+        }
         const {zoom, lng, lat} = {
             ...this.data.serviceMetadata.start,
             ...this.data.dataSetMetdata.start,

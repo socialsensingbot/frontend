@@ -218,6 +218,9 @@ export class MapDataService {
         if (this._pref.combined.showLoadingMessages) {
             this._notify.show("Loading aggregation data ...", "OK", 60);
         }
+        if (typeof this.dataSetMetdata.regionAggregations === "undefined") {
+            this.dataSetMetdata.regionAggregations = [];
+        }
         for (const agg of this.dataSetMetdata.regionAggregations) {
             // Note the use of a random time to make sure that we don't refresh all datasets at once!!
             const cacheDuration = ONE_DAY * (7.0 + 7.0 * Math.random());
@@ -270,15 +273,17 @@ export class MapDataService {
     }
 
     public recentTweets(activePolyLayerShortName: string): RegionTweetMap {
-        const twitterData = new ProcessedData(this.offset(this.lastEntryDate().getTime() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000),
+        const twitterData = new ProcessedData(this.offset(
+            this.lastEntryDate().getTime() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000),
                                               this.offset(this.lastEntryDate().getTime()), this.reverseTimeKeys,
                                               this._rawTwitterData,
-                                              this.stats, this.dataSetMetdata.regionGroups).layer(activePolyLayerShortName);
-       log.debug(`Recent Tweets Twitter Data for ${activePolyLayerShortName}`, twitterData);
+                                              this.stats, this.dataSetMetdata.regionGroups).layer(
+            activePolyLayerShortName);
+        log.debug(`Recent Tweets Twitter Data for ${activePolyLayerShortName}`, twitterData);
         const tweets: RegionTweetMap = {};
         for (const name of twitterData.places()) {
             const t = twitterData.countForPlace(name);
-           log.debug(`Recent Tweets Twitter Data for ${name}`, t);
+            log.debug(`Recent Tweets Twitter Data for ${name}`, t);
             if (t) {
                 tweets[name] = t;
             }
@@ -583,5 +588,9 @@ export class MapDataService {
         }
         return result;
 
+    }
+
+    public hasCountryAggregates() {
+        return this.dataSetMetdata.regionAggregations.length > 0;
     }
 }
