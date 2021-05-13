@@ -39,6 +39,7 @@
                                            (onEnd)="sliderChangeOnEnd($event)"
                                            [options]="sliderOptions"></date-range-slider>
                     </div>
+                    <div *ngIf="liveUpdating">(live)</div>
                     <div class="app-toolbar-expanding-separator"></div>
                     <button mat-icon-button  aria-label="Expand or shrink toolbar">
                         <mat-icon matTooltip="Expand toolbar" *ngIf="!appToolbarExpanded"

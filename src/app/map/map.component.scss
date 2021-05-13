@@ -10,13 +10,24 @@ $drawer-width: $tweetAndMargin + 52px;
     display: none;
   }
   .leaflet-new-tweet {
-    animation: blinker 0.5s ease-in-out infinite;
+    animation: blinker 2.5s ease-in-out infinite;
   }
 
   @keyframes blinker {
-    50% {
-      stroke: rgb(100,100,100);
-      stroke-width: 3px;
+    0% {
+      //stroke-opacity: 0.5;
+      stroke: rgba(255,255,255,1.0);
+      stroke-width: 2px;
+    }
+    10% {
+      //stroke-opacity: 0.5;
+      stroke: rgba(0,0,0,0.8);
+      stroke-width: 2px;
+    }
+    20% {
+      //stroke-opacity: 0.5;
+      stroke: rgba(255,255,255,1.0);
+      stroke-width: 2px;
     }
   }
 }

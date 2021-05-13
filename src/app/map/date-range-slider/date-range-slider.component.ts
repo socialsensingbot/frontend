@@ -22,7 +22,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
 
 
   @Output()
-  public onEnd = new EventEmitter<any>();
+  public onEnd = new EventEmitter<DateRange>();
 
   /**
    * Time series data, keyed by one minute interval.
@@ -180,10 +180,17 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
 
   }
 
-  public change($event: ChangeContext) {
+  public changeEvent($event: ChangeContext) {
     if (typeof this.timeKeyedData !== "undefined") {
       log.debug($event);
       this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
+    }
+  }
+
+  public onEndEvent($event: ChangeContext) {
+    if (typeof this.timeKeyedData !== "undefined") {
+      log.debug($event);
+      this.onEnd.emit(new DateRange(this._lowerValue, this._upperValue));
     }
   }
 

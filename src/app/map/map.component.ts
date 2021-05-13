@@ -66,6 +66,7 @@ export class MapComponent implements OnInit, OnDestroy {
     public selectedCountries: string[] = [];
     // }
     public appToolbarExpanded: boolean;
+    public liveUpdating: boolean = true;
     // The Map & Map Layers
     private _statsLayer: LayerGroup = layerGroup();
     private _countyLayer: LayerGroup = layerGroup(); // dummy layers to fool layer control
@@ -385,11 +386,15 @@ export class MapComponent implements OnInit, OnDestroy {
         }
 
         try {
+
             await this.data.load();
 
             if (first) {
                 await this._exec.queue("Update Slider", ["data-loaded"],
-                                       () => {this.updateSliderFromData(); });
+                                       async () => {
+                                           await this.updateSliderFromData();
+                                       });
+
                 this._exec.changeState("no-params");
             } else {
                 await this.updateLayers("Data Load", clearSelected);
@@ -429,11 +434,13 @@ export class MapComponent implements OnInit, OnDestroy {
     /**
      * Triggered when the user has finished sliding the slider.
      */
-    public sliderChangeOnEnd($event: any) {
-        log.debug("sliderChangeOnEnd()");
+    public sliderChangeOnEnd(range: DateRange) {
+        log.info("sliderChangeOnEnd()", range);
         if (!this.pref.combined.animateOnTimeSliderChange) {
             this._sliderIsStale = true;
         }
+
+
     }
 
     // public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
@@ -872,8 +879,8 @@ export class MapComponent implements OnInit, OnDestroy {
 
                     const style = this._color.colorFunctions[shortNumberLayerName].getFeatureStyle(
                         feature);
-                    if (regionTweetMap[feature.properties.name]) {
-                        log.debug(`Adding style for ${feature.properties.name}`);
+                    if (this.liveUpdating && regionTweetMap[feature.properties.name]) {
+                        log.debug(`Adding new tweet style for ${feature.properties.name}`);
                         style.className = style.className + " leaflet-new-tweet";
                     }
                     return style;
@@ -944,6 +951,8 @@ export class MapComponent implements OnInit, OnDestroy {
                                         try {
 
                                             this._exec.changeState("data-refresh");
+                                            console.log("Start Max", this.data.offset(this._dateMax) );
+                                            this.liveUpdating = (- this.data.offset(this._dateMax)) < this.pref.combined.continuousUpdateThresholdInMinutes;
                                             await this.data.update(this._dateMin, this._dateMax);
                                             this.clearMapFeatures();
                                             this.updateRegionData();
