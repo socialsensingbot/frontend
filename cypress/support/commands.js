@@ -249,7 +249,7 @@ Cypress.Commands.add("stubLiveJson", (file) => {
              // have a POST, if you're pushing data up
              method:   "GET",
              // more on the URL below
-             url:      /.*\/public\/data\/twitter\/uk-flood-live.json?.*/g,
+             url:      /.*\/public\/data\/twitter\/uk-flood-2018.json?.*/g,
              // the fixture: shortcut will know to
              // look in cypress/fixtures,
              // unless you configure cypress to
