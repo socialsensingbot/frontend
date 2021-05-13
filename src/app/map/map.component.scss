@@ -6,183 +6,196 @@ $bottom-margin: 36px;
 $drawer-width: $tweetAndMargin + 52px;
 
 ::ng-deep {
-  .leaflet-control-container {
-    display: none;
-  }
-  .leaflet-new-tweet {
-    animation: blinker 2.5s ease-in-out infinite;
-  }
+    .leaflet-control-container {
+        display: none;
+    }
 
-  @keyframes blinker {
-    0% {
-      //stroke-opacity: 0.5;
-      stroke: rgba(255,255,255,1.0);
-      stroke-width: 2px;
+    .leaflet-new-tweet {
+        animation: blinker 2.5s ease-in-out infinite;
     }
-    10% {
-      //stroke-opacity: 0.5;
-      stroke: rgba(0,0,0,0.8);
-      stroke-width: 2px;
+
+    @keyframes blinker {
+        0% {
+            //stroke-opacity: 0.5;
+            stroke: rgba(255, 255, 255, 1.0);
+            stroke-width: 2px;
+        }
+        10% {
+            //stroke-opacity: 0.5;
+            stroke: rgba(0, 0, 0, 0.8);
+            stroke-width: 2px;
+        }
+        20% {
+            //stroke-opacity: 0.5;
+            stroke: rgba(255, 255, 255, 1.0);
+            stroke-width: 2px;
+        }
     }
-    20% {
-      //stroke-opacity: 0.5;
-      stroke: rgba(255,255,255,1.0);
-      stroke-width: 2px;
-    }
-  }
 }
 
 .draw-close-button {
-  position: absolute;
-  right: -4px;
-  top: -4px;
-  z-index: 100;
-  opacity: 0.5;
+    position: absolute;
+    right: -4px;
+    top: -4px;
+    z-index: 100;
+    opacity: 0.5;
 
-  .mat-icon {
-    font-size: 1em;
-    //width: 0.3em;
-    //height:0.3em;
-    transition: opacity 2s ease-in-out;
+    .mat-icon {
+        font-size: 1em;
+        //width: 0.3em;
+        //height:0.3em;
+        transition: opacity 2s ease-in-out;
 
-    &:hover {
-      opacity: 1.0;
+        &:hover {
+            opacity: 1.0;
+        }
     }
-  }
 }
 
 //The Map
 .map-surround {
-  overflow: hidden;
-  width: 100%;
-  height: calc(100% - 64px);
-  position: relative;
-  pointer-events: none;
-  box-shadow: inset 0px 0px 4px 1px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    width: 100%;
+    height: calc(100% - 64px);
+    position: relative;
+    pointer-events: none;
+    box-shadow: inset 0px 0px 4px 1px rgba(0, 0, 0, 0.3);
 }
 
-.map-surround-tb-expanded{
-  height: calc(100% - 128px);
+.map-surround-tb-expanded {
+    height: calc(100% - 128px);
 }
 
 .map {
-  overflow: hidden;
-  top: 0px;
-  left: 0px;
-  bottom: 0px;
-  right: 0px;
-  position: absolute !important;
-  z-index: -10;
-  pointer-events: all;
+    overflow: hidden;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    position: absolute !important;
+    z-index: -10;
+    pointer-events: all;
 
 }
 
 
 .map-outer {
-  overflow: hidden;
-  display: block;
-  position: absolute;
+    overflow: hidden;
+    display: block;
+    position: absolute;
 
-  top: 0px;
-  left: 0px;
-  bottom: 0px;
-  right: 0px;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
 }
 
 
 .app-toolbar {
 
-  .date-slider {
-    display: flex;
-    z-index: 10;
-    //border: 1px solid red;
-    margin-right: 2em;
-    //margin: 2em auto;
-    date-range-slider {
-      max-width: 40em;
-      min-width: 30em;
-      display: block;
-      margin: 0em auto;
-      min-height: 1em
+    .date-slider {
+        display: flex;
+        z-index: 10;
+        //border: 1px solid red;
+        margin-right: 2em;
+        //margin: 2em auto;
+        date-range-slider {
+            max-width: 40em;
+            min-width: 30em;
+            display: block;
+            margin: 0em auto;
+            min-height: 1em
+        }
     }
-  }
+
+    .app-date-slider-live {
+        background: #e91e63;
+        border-radius: 3px;
+        font-size: 80%;
+        color: white;
+        top: -0.3em;
+        line-height: 1.2em;
+        padding: 3px;
+        margin: 2px;
+    }
 
 }
 
 .app-tweet-drawer {
-  max-width: $drawer-width;
-  width: $drawer-width;
-  min-width: $drawer-width;
-  max-height: 100%;
-  overflow: hidden;
-  background: rgb(250, 250, 250);
-  //box-shadow: 0px 0px 4px rgba(17, 17, 17, 0.63);;
-  //overflow: hidden;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: stretch;
-  @media screen and (max-width: 768px) {
+    max-width: $drawer-width;
+    width: $drawer-width;
+    min-width: $drawer-width;
+    max-height: 100%;
+    overflow: hidden;
+    background: rgb(250, 250, 250);
+    //box-shadow: 0px 0px 4px rgba(17, 17, 17, 0.63);;
+    //overflow: hidden;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    @media screen and (max-width: 768px) {
 
-  }
+    }
 
 }
 
 
 .map-actions {
-  top: 2em;
-  max-height: 3em;
-  min-height: 3em;
-  position: absolute;
-  background: none;
-  z-index: 10;
-  max-width: 3em;
-  min-width: 3em;
-  right: $right-hand-margin;
+    top: 2em;
+    max-height: 3em;
+    min-height: 3em;
+    position: absolute;
+    background: none;
+    z-index: 10;
+    max-width: 3em;
+    min-width: 3em;
+    right: $right-hand-margin;
 
-  .mat-card {
-    padding: 4px !important;
-  }
+    .mat-card {
+        padding: 4px !important;
+    }
 }
 
 .legend {
-  max-height: 8em;
-  min-height: 6em;
-  top: 7em;
-  position: absolute;
-  background: none;
-  //border: 3px solid red;
-  z-index: 0;
-  max-width: 6em;
-  min-width: 3em;
-  right: $right-hand-margin;
+    max-height: 8em;
+    min-height: 6em;
+    top: 7em;
+    position: absolute;
+    background: none;
+    //border: 3px solid red;
+    z-index: 0;
+    max-width: 6em;
+    min-width: 3em;
+    right: $right-hand-margin;
 
 
 }
 
 .map-spinner {
-  top: 50vh;
-  bottom: 50vh;
-  left: 50vw;
-  right: 50vw;
-  padding-left: -100%;
-  padding-top: -100%;
-  position: fixed;
-  z-index: 20000;
-  opacity: 0.4;
+    top: 50vh;
+    bottom: 50vh;
+    left: 50vw;
+    right: 50vw;
+    padding-left: -100%;
+    padding-top: -100%;
+    position: fixed;
+    z-index: 20000;
+    opacity: 0.4;
 }
 
 .map-progress {
-  top: 0;
-  left: 0;
-  right: 0;
-  //margin-left: -100%;
-  //margin-top: -100%;
-  position: absolute;
-  z-index: 1000;
+    top: 0;
+    left: 0;
+    right: 0;
+    //margin-left: -100%;
+    //margin-top: -100%;
+    position: absolute;
+    z-index: 1000;
 }
+
 .country-additional-selection {
-  opacity: 0.75;
-  font-size: 0.75em;
+    opacity: 0.75;
+    font-size: 0.75em;
 }
