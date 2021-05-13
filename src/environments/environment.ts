@@ -46,7 +46,7 @@ export const environment = {
   continuousUpdateThresholdInMinutes: 90,
   animateOnTimeSliderChange: false,
   recentTweetHighlightOffsetInSeconds: 1200,
-  defaultDataSet:       "live",
+  defaultDataSet:       "uk-flood-live",
   availableDataSets:    ["*"], // A list of datasets that will appear in the toolbar dropdown, or "*" for all.
   cacheProcessedTweets: false,
   mapTileUrlTemplate:   "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"
