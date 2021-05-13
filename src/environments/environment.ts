@@ -39,7 +39,7 @@ export const environment = {
     ]
   },
   features:             ["impact", "source"],
-  showErrors:           true,
+  showErrors:           false,
   showLoadingMessages:  true,
   mostRecentDateIsNow:  true,
   sanitizeForGDPR:      true,

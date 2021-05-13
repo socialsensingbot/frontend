@@ -216,6 +216,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
         this.annotations[tweet.id] = {...this.annotationsFor(tweet), ...annotations};
         const groupTweetAnnotations = await this.annotate.addAnnotations(tweet, annotations);
         this.annotations[tweet.id] = JSON.parse(groupTweetAnnotations.annotations);
+        log.info("Emitting ",tweet);
         this.update.emit(tweet);
     }
 
