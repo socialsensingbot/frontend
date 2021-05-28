@@ -387,7 +387,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
         try {
 
-            await this.data.load();
+            await this.data.load(first);
 
             if (first) {
                 await this._exec.queue("Update Slider", ["data-loaded"],

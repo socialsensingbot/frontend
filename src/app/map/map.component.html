@@ -81,7 +81,7 @@
                             (click)="downloadTweetsAsCSV()">
                         <mat-icon matTooltip="Download all Tweets as a CSV file.">cloud_download</mat-icon>
                     </button>
-                    <mat-form-field *mgIf="data.hasCountryAggregates()">
+                    <mat-form-field *ngIf="data.hasCountryAggregates()">
                         <!--                    <mat-label>Countries</mat-label>-->
                         <mat-select [formControl]="countries" multiple [(ngModel)]="selectedCountries">
                             <mat-select-trigger>

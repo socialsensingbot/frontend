@@ -247,12 +247,16 @@ export class MapDataService {
         return result as Promise<TimeSlice[]>;
     }
 
-    public async load() {
+    public async load(first: boolean) {
         return await this._exec.queue("Load Data", ["ready", "map-init", "data-loaded", "data-load-failed"],
                                       async () => {
                                           this._rawTwitterData = await this.loadLiveData() as TimeSlice[];
                                           this.reverseTimeKeys = this.getTimes();
-                                          this._exec.changeState("data-loaded");
+                                          if (first) {
+                                              this._exec.changeState("data-loaded");
+                                          } else {
+                                              this._exec.changeState("ready");
+                                          }
                                           log.debug("Loading live data completed", this._rawTwitterData);
                                       }, Date.now(), true, true, true);
 
@@ -469,6 +473,10 @@ export class MapDataService {
         return this.dataSetMetdata.regionGroups.map(i => i.id);
     }
 
+    public hasCountryAggregates() {
+        return this.dataSetMetdata.regionAggregations.length > 0;
+    }
+
     private async exportRegionForCSV(polygonDatum: PolygonData, region: string, regionGrouping: string,
                                      exportedTweets: CSVExportTweet[]) {
         let geometry;
@@ -588,9 +596,5 @@ export class MapDataService {
         }
         return result;
 
-    }
-
-    public hasCountryAggregates() {
-        return this.dataSetMetdata.regionAggregations.length > 0;
     }
 }
