@@ -11,11 +11,11 @@ export const environment = {
   rollbar:      false,
   toolbarColor: "primary",
   // timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  timezone:             "UTC",
-  multipleSessions:     true, //Can the user be logged into multiple devices/browsers at once?
-  maxUsers:             -1, // can be -1 (no limit), 0 - no logins, 1 - single user at a time, n - n concurrent users.
-  locale:               "en-GB",
-  confirm:              {
+  timezone:         "UTC",
+  multipleSessions: true, //Can the user be logged into multiple devices/browsers at once?
+  maxUsers:         -1, // can be -1 (no limit), 0 - no logins, 1 - single user at a time, n - n concurrent users.
+  locale:           "en-GB",
+  confirm:          {
     email:    "",
     password: ""
   },
@@ -23,17 +23,30 @@ export const environment = {
   impact:               {
     //The ability to tag tweets with an impact annotation
     levels: [
-      {title: "1 – Minimal", value: "minimal", color: "#43a047"},
-      {title: "2 – Minor", value: "minor", color: "#ffee58"},
-      {title: "3 - Significant", value: "significant", color: "#ffb300"},
-      {title: "4 - Severe", value: "severe", color: "#f4511e"}
+      {title: "1 – Minimal", value: "minimal", color: "#43A047"},
+      {title: "2 – Minor", value: "minor", color: "#FFEE58"},
+      {title: "3 - Significant", value: "significant", color: "#FFB300"},
+      {title: "4 - Severe", value: "severe", color: "#F4511E"}
     ]
   },
-  features:             ["impact"],
+  source:               {
+    //The ability to tag tweets with a source
+    types: [
+      {title: "River", value: "river", color: "#43A047"},
+      {title: "Surface", value: "surface", color: "#FFEE58"},
+      {title: "Groundwater", value: "groundwater", color: "#FFB300"},
+      {title: "Coastal", value: "coastal", color: "#F4511E"}
+    ]
+  },
+  features:             ["impact", "source"],
   showErrors:           false,
   showLoadingMessages:  true,
+  mostRecentDateIsNow:  true,
   sanitizeForGDPR:      true,
-  defaultDataSet:       "live",
+  continuousUpdateThresholdInMinutes: 90,
+  animateOnTimeSliderChange: false,
+  recentTweetHighlightOffsetInSeconds: 1200,
+  defaultDataSet:       "uk-flood-live",
   availableDataSets:    ["*"], // A list of datasets that will appear in the toolbar dropdown, or "*" for all.
   cacheProcessedTweets: false,
   mapTileUrlTemplate:   "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"

@@ -131,7 +131,7 @@ export class UIExecutionService {
             this.dedupMap.set(dedupKey, executionTask);
           } else {
             if (silentFailure) {
-              resolve();
+              resolve(null);
             } else {
               log.warn(
                 `Skipped duplicate ${name} (${dedupKey}) on execution queue as this task is already queued.`);

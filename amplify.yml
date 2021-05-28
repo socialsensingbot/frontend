@@ -1,7 +1,7 @@
 version: 0.1
 env:
   variables:
-    NODE_OPTIONS: --max-old-space-size=6144
+    NODE_OPTIONS: --max-old-space-size=4096
 backend:
   phases:
     build:
@@ -30,9 +30,13 @@ test:
     preTest:
       commands:
         - npm ci
-        - npm install wait-on
+        - npm install -g cypress
+        - npm install -g pm2
+        - npm install -g wait-on
         - npm install mocha@7.1.1 mochawesome mochawesome-merge mochawesome-report-generator react react-dom
-        - 'npm start & npx wait-on http://localhost:4200'
+        - pm2 start npm -- start
+        - pm2 list
+        - wait-on http://localhost:4200
     test:
       commands:
         - mkdir -p dist/frontend
@@ -41,6 +45,7 @@ test:
       commands:
 #        - npx mochawesome-merge cypress/report/mochawesome-report-chrome/mochawesome*.json cypress/report/mochawesome-report-firefox/mochawesome*.json > cypress/report/mochawesome.json
         - npx mochawesome-merge cypress/report/mochawesome-report-electron/mochawesome*.json > cypress/report/mochawesome.json
+        - npx pm2 kill
   artifacts:
     baseDirectory: cypress
     configFilePath: '**/mochawesome.json'

@@ -6,6 +6,7 @@ import {Subscription} from "rxjs";
 import {ExportToCsv} from "export-to-csv";
 import {RegionSelection} from "../region-selection";
 import {AnnotationService} from "../../pref/annotation.service";
+import {readableTimestamp} from "../../common";
 
 const log = new Logger("twitter-panel");
 
@@ -33,7 +34,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
   constructor(private _zone: NgZone, public pref: PreferenceService, private _annotation: AnnotationService) {
     Hub.listen("twitter-panel", (e) => {
-      if (e.payload.message === "refresh") {
+      if (e.payload && e.payload.message === "refresh") {
         this._zone.run(() => this.updateTweets(this._tweets));
       }
     });
@@ -126,9 +127,9 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
   public async download() {
     let filename;
     if (this.selection.count === 1) {
-      filename = this.selection.firstRegion().name + "-tweet-export";
+      filename = `${this.selection.firstRegion().name}-tweet-export-${readableTimestamp()}`;
     } else {
-      filename = `multiple-regions-tweet-export`;
+      filename = `multiple-regions-tweet-export-${readableTimestamp()}`;
     }
 
     const options = {
@@ -154,7 +155,8 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
                                            if (annotationRecord && annotationRecord.annotations) {
                                              annotations = JSON.parse(annotationRecord.annotations);
                                            }
-                                           return i.asCSV(this.selection.regionMap(), this.pref.combined.sanitizeForGDPR, annotations);
+                                           return i.asCSV(this.selection.regionMap(),
+                                                          this.pref.combined.sanitizeForGDPR, annotations);
                                          });
     const result: CSVExportTweet[] = [];
     for (const exportedPromise of exportedPromises) {

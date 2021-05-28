@@ -29,11 +29,14 @@ const LONG_TIMEOUT = 60000;
 const VERY_LONG_TIMEOUT = 120000;
 const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
 const multipleKey = Cypress.platform === "darwin" ? "{command}" : "{ctrl}";
+export const markAsIgnoredMenu = "body .mat-menu-item.tweet-menu-ignore-tweet";
+export const markAsUnignoredMenu = "body .mat-menu-item.tweet-menu-unignore-tweet";
+export const markAsMenu = "body .mat-menu-item.tweet-list-item-menu-mark-as";
 
 
 const noLoadingDiv = () => {
 
-  cy.get("#loading-div",{timeout: LONG_TIMEOUT}).should("not.exist");
+  cy.get("#loading-div",{timeout: VERY_LONG_TIMEOUT}).should("not.exist");
 
 };
 
@@ -168,18 +171,21 @@ Cypress.Commands.add("clickTweetTab", (index) => {
 Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
   cy.get(tweetSelector + " .mat-icon", {timeout: 10000})
   cy.get(tweetSelector + " .mat-icon").trigger("click", {force: true});
-  cy.get(menu2ndOpt, {timeout: 30000});
-  cy.get(menu2ndOpt).contains("Ignore Tweet");
-  cy.get(menu2ndOpt).click({force: true});
+  cy.wait(1000);
+  cy.get(markAsMenu, {timeout: LONG_TIMEOUT}).click();
+  cy.wait(1000);
+  cy.get(markAsIgnoredMenu).click();
 
 });
 
 Cypress.Commands.add("unignoreTweet", (tweetSelector) => {
   cy.get(tweetSelector + " .mat-icon", {timeout: 10000})
   cy.get(tweetSelector + " .mat-icon").trigger("click", {force: true});
-  cy.get(menu2ndOpt, {timeout: 30000});
-  cy.get(menu2ndOpt).contains("Unignore Tweet");
-  cy.get(menu2ndOpt).click({force: true});
+  cy.wait(1000);
+  cy.get(markAsMenu,{timeout: LONG_TIMEOUT}).click();
+  cy.wait(1000);
+  cy.get(markAsUnignoredMenu).click();
+
 
 });
 
@@ -243,7 +249,7 @@ Cypress.Commands.add("stubLiveJson", (file) => {
              // have a POST, if you're pushing data up
              method:   "GET",
              // more on the URL below
-             url:      /.*\/public\/data\/twitter\/flood.json?.*/g,
+             url:      /.*\/public\/data\/twitter\/uk-flood-2018.json?.*/g,
              // the fixture: shortcut will know to
              // look in cypress/fixtures,
              // unless you configure cypress to

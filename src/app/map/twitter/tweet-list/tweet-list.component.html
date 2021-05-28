@@ -1,5 +1,5 @@
 <div *ngIf="firstVisibleDate" [style.opacity]="showDateHeader ? '0.8':'0'" class="app-tweet-list-date-float">
-  <div class="app-tweet-list-date-float-inner">{{firstVisibleDate.toUTCString()}}</div>
+    <div class="app-tweet-list-date-float-inner">{{firstVisibleDate.toUTCString()}}</div>
 </div>
 
 <div class="app-tweet-list app-tweet-list-{{group}}"
@@ -12,109 +12,171 @@
      (scroll)="calcFirstVisibleDate()"
      (scrolled)="onScrollDown($event)"
      (scrolledUp)="onUp($event)">
-
-
-  <ng-template #tweetEntry let-tweet="tweet" let-si="senderIgnore" let-ti="tweetIgnore">
-    <mat-menu #impact="matMenu" >
-      <ng-container *ngFor="let level of pref.combined.impact.levels">
+    <ng-template #toggleAnnotation let-tweet="tweet" let-key="key" let-positiveTitle="positiveTitle"
+                 let-negativeTitle="negativeTitle">
         <button
-          class="tweet-list-item-menu-impact-level-{{level.value}} tweet-list-item-menu-impact-level-{{level.value}}-selected" *ngIf="annotationValueIs(tweet,
+                class="tweet-list-item-menu-{{key}}"
+                *ngIf="annotationValueIsNot(tweet,
+        key,true)"
+                (click)="annotateTweetKeyValue(tweet,key, true, $event);"
+                mat-menu-item>{{positiveTitle}}
+        </button>
+        <button
+                class="tweet-list-item-menu-not-{{key}}"
+                *ngIf="annotationValueIs(tweet,key,true)"
+                (click)="annotateTweetKeyValue(tweet,key,false, $event);"
+                mat-menu-item>{{negativeTitle}}
+        </button>
+    </ng-template>
+
+
+    <ng-template #tweetEntry let-tweet="tweet" let-si="senderIgnore" let-ti="tweetIgnore">
+        <mat-menu #impact="matMenu">
+            <ng-container *ngFor="let level of pref.combined.impact.levels">
+                <button
+                        class="tweet-list-item-menu-impact-level-{{level.value}} tweet-list-item-menu-impact-level-{{level.value}}-selected"
+                        *ngIf="annotationValueIs(tweet,
         'impact',level.value)"
-                mat-menu-item><strong>{{level.title}}</strong>
-        </button>
-        <button *ngIf="annotationValueIsNot(tweet, 'impact',level.value)"
-                (click)="annotateTweet(tweet,{impact:level.value}, $event);"
-                class="tweet-list-item-menu-impact-level-{{level.value}} tweet-list-item-menu-impact-level-{{level.value}}-not-selected"
-                mat-menu-item>{{level.title}}
-        </button>
-      </ng-container>
-      <button
-              (click)="annotateTweet(tweet,{impact:''}, $event);"
-              class="tweet-list-item-menu-impact-level-clear"
-              mat-menu-item>Clear
-      </button>
+                        mat-menu-item><strong>{{level.title}}</strong>
+                </button>
+                <button *ngIf="annotationValueIsNot(tweet, 'impact',level.value)"
+                        (click)="annotateTweet(tweet,{impact:level.value}, $event);"
+                        class="tweet-list-item-menu-impact-level-{{level.value}} tweet-list-item-menu-impact-level-{{level.value}}-not-selected"
+                        mat-menu-item>{{level.title}}
+                </button>
+            </ng-container>
+            <button
+                    (click)="annotateTweet(tweet,{impact:''}, $event);"
+                    class="tweet-list-item-menu-impact-level-clear"
+                    mat-menu-item>Clear
+            </button>
 
-    </mat-menu>
+        </mat-menu>
 
-    <mat-menu #appMenu="matMenu">
-      <button *ngIf="!si" (click)="ignoreSender(tweet,$event);" mat-menu-item>Ignore
-        @{{sender(tweet)}}</button>
-      <button *ngIf="si" (click)="unIgnoreSender(tweet,$event);" mat-menu-item>Unignore
-        @{{sender(tweet)}}</button>
-      <button *ngIf="!ti" (click)="ignoreTweet(tweet,$event);" mat-menu-item>Ignore Tweet
-      </button>
-      <button *ngIf="ti" (click)="unIgnoreTweet(tweet,$event);" mat-menu-item>Unignore Tweet
-      </button>
-      <button class="tweet-list-item-menu-impact" *ngIf="pref.combined.features.includes('impact')"
-              [matMenuTriggerFor]="impact" mat-menu-item>Impact
-      </button>
+        <mat-menu #source="matMenu">
+            <ng-container *ngFor="let type of pref.combined.source.types">
+                <button
+                        class="tweet-list-item-menu-source-type-{{type.value}} tweet-list-item-menu-source-type-{{type.value}}-selected"
+                        *ngIf="annotationValueIs(tweet,
+        'source',type.value)"
+                        mat-menu-item><strong>{{type.title}}</strong>
+                </button>
+                <button *ngIf="annotationValueIsNot(tweet, 'source',type.value)"
+                        (click)="annotateTweet(tweet,{source:type.value}, $event);"
+                        class="tweet-list-item-menu-source-type-{{type.value}} tweet-list-item-menu-source-type-{{type.value}}-not-selected"
+                        mat-menu-item>{{type.title}}
+                </button>
+            </ng-container>
+            <button
+                    (click)="annotateTweet(tweet,{source:''}, $event);"
+                    class="tweet-list-item-menu-source-type-clear"
+                    mat-menu-item>Clear
+            </button>
 
-      <button
-        (click)="copy(tweet,$event);"
-        class="tweet-list-item-menu-copy"
-        mat-menu-item>Copy
-      </button>
+        </mat-menu>
 
-      <!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
 
-    </mat-menu>
-    <div class="app-tweet-item app-tweet-row-active"  [style]="styleForImpact(tweet)"
-    >
-      <div class="app-tweet-item-text" [innerHtml]="tweet.html|safeHtml" style="background:
+        <mat-menu #markAs="matMenu">
+            <button *ngIf="!si" (click)="ignoreSender(tweet,$event);" mat-menu-item
+                    class="tweet-menu-ignore-sender">Ignored Sender
+                @{{sender(tweet)}}</button>
+            <button *ngIf="si" (click)="unIgnoreSender(tweet,$event);" mat-menu-item
+                    class="tweet-menu-unignore-sender">Unignored Sender
+                @{{sender(tweet)}}</button>
+            <button *ngIf="!ti" (click)="ignoreTweet(tweet,$event);" mat-menu-item
+                    class="tweet-menu-ignore-tweet">Ignored Tweet
+
+            </button>
+            <button *ngIf="ti" (click)="unIgnoreTweet(tweet,$event);" mat-menu-item
+                    class="tweet-menu-unignore-tweet">Unignored Tweet
+            </button>
+            <ng-container
+                    *ngTemplateOutlet="toggleAnnotation; context: {tweet:tweet,key:'relevant', positiveTitle:'Relevant',
+              negativeTitle:'Not Relevant'}"></ng-container>
+            <ng-container
+                    *ngTemplateOutlet="toggleAnnotation; context: {tweet:tweet,key:'mislocated', positiveTitle:'Mis-located',
+              negativeTitle:'Location Correct'}"></ng-container>
+
+        </mat-menu>
+
+        <mat-menu #appMenu="matMenu">
+
+            <button class="tweet-list-item-menu-mark-as"
+                    [matMenuTriggerFor]="markAs" mat-menu-item>Mark As ...
+            </button>
+            <button class="tweet-list-item-menu-impact" *ngIf="pref.combined.features.includes('impact')"
+                    [matMenuTriggerFor]="impact" mat-menu-item>Impact
+            </button>
+            <button class="tweet-list-item-menu-source" *ngIf="pref.combined.features.includes('source')"
+                    [matMenuTriggerFor]="source" mat-menu-item>Source
+            </button>
+
+            <button
+                    (click)="copy(tweet,$event);"
+                    class="tweet-list-item-menu-copy"
+                    mat-menu-item>Copy
+            </button>
+
+            <!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
+
+        </mat-menu>
+        <div class="app-tweet-item app-tweet-row-active" [style]="styleForImpact(tweet)"
+        >
+            <div class="app-tweet-item-text" [innerHtml]="tweet.html|safeHtml" style="background:
       url('assets/tweet-place-holder.png') no-repeat; min-height: 156px"
 
-      ></div>
-    </div>
-    <div class="app-tweet-item-menu">
-      <button mat-icon-button [matMenuTriggerData]="{tweet:tweet,si:si,ti:ti}" [matMenuTriggerFor]="appMenu">
-        <mat-icon>more_vert</mat-icon>
-      </button>
-    </div>
-  </ng-template>
+            ></div>
+        </div>
+        <div class="app-tweet-item-menu">
+            <button mat-icon-button [matMenuTriggerData]="{tweet:tweet,si:si,ti:ti}" [matMenuTriggerFor]="appMenu">
+                <mat-icon>more_vert</mat-icon>
+            </button>
+        </div>
+    </ng-template>
 
 
-  <div class="app-tweet-paged app-tweet-page-{{p}}" *ngFor="let page of pages; let p= index">
-    <ng-container *ngIf="page">
-      <div class="app-tweet-scroll-
+    <div class="app-tweet-paged app-tweet-page-{{p}}" *ngFor="let page of pages; let p= index">
+        <ng-container *ngIf="page">
+            <div class="app-tweet-scroll-
       -outer" *ngIf="p == 0 && p < minPage">
-<!--        <mat-spinner diameter="24" class="app-tweet-load-spinner"></mat-spinner>-->
-      </div>
-      <ng-container *ngFor="let tweet of page.tweets; let i = index">
-        <div [attr.data-index]="i+ page.start"
-             [attr.data-i]="i"
-             [attr.data-page]="p"
-             [attr.data-tweet-id]="tweet.id"
-             class="app-tweet-row atr-{{group}} atr-{{i+ page.start}} app-twitter-id-{{tweet.id}}"
-        >
-          <!--          <div class="app-tweet-date-separator"-->
-          <!--               *ngIf="isNewDate(i + page.start)">{{tweet.date | date:"mediumDate"}}</div>-->
-          <ng-container *ngIf="page.page <= maxPage">
-            <div class="app-tweet-item-card-surround" *ngIf="!isPlaceholder(tweet)">
-              <mat-spinner diameter="24" class="app-tweet-load-spinner"></mat-spinner>
-              <ng-container>
-                <ng-container
-                  *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i + page.start,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
-              </ng-container>
+                <!--        <mat-spinner diameter="24" class="app-tweet-load-spinner"></mat-spinner>-->
             </div>
-            <div class="app-tweet-item-card-surround" *ngIf="isPlaceholder(tweet)">
-              <div class="app-tweet-item-card">
-                <div class="app-tweet-item-placeholder app-tweet-row-active">
-                  <span class="app-tweet-item-no-longer-available">Tweet no longer available</span>
+            <ng-container *ngFor="let tweet of page.tweets; let i = index">
+                <div [attr.data-index]="i+ page.start"
+                     [attr.data-i]="i"
+                     [attr.data-page]="p"
+                     [attr.data-tweet-id]="tweet.id"
+                     class="app-tweet-row atr-{{group}} atr-{{i+ page.start}} app-twitter-id-{{tweet.id}}"
+                >
+                    <!--          <div class="app-tweet-date-separator"-->
+                    <!--               *ngIf="isNewDate(i + page.start)">{{tweet.date | date:"mediumDate"}}</div>-->
+                    <ng-container *ngIf="page.page <= maxPage">
+                        <div class="app-tweet-item-card-surround" *ngIf="!isPlaceholder(tweet)">
+                            <mat-spinner diameter="24" class="app-tweet-load-spinner"></mat-spinner>
+                            <ng-container>
+                                <ng-container
+                                        *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i + page.start,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
+                            </ng-container>
+                        </div>
+                        <div class="app-tweet-item-card-surround" *ngIf="isPlaceholder(tweet)">
+                            <div class="app-tweet-item-card">
+                                <div class="app-tweet-item-placeholder app-tweet-row-active">
+                                    <span class="app-tweet-item-no-longer-available">Tweet no longer available</span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
                 </div>
-              </div>
-            </div>
-          </ng-container>
-        </div>
-      </ng-container>
-      <ng-container *ngIf="p == pages.length -1">
-        <div class="app-tweet-scroll-spinner-outer" *ngIf="p > maxPage">
-<!--          <mat-spinner diameter="24" class="app-tweet-load-spinner"></mat-spinner>-->
-        </div>
-        <div class="app-tweet-scroll-spinner-outer" *ngIf="p == maxPage">
-          <span class="app-tweet-list-end-tilde"> ~ </span>
-        </div>
-      </ng-container>
-    </ng-container>
-  </div>
+            </ng-container>
+            <ng-container *ngIf="p == pages.length -1">
+                <div class="app-tweet-scroll-spinner-outer" *ngIf="p > maxPage">
+                    <!--          <mat-spinner diameter="24" class="app-tweet-load-spinner"></mat-spinner>-->
+                </div>
+                <div class="app-tweet-scroll-spinner-outer" *ngIf="p == maxPage">
+                    <span class="app-tweet-list-end-tilde"> ~ </span>
+                </div>
+            </ng-container>
+        </ng-container>
+    </div>
 </div>
 

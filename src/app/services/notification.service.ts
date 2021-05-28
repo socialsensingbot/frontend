@@ -67,6 +67,7 @@ export class NotificationService implements OnDestroy {
       console.error(e);
     } else {
       log.error(e);
+      console.error(e);
       return this.toast.open(`ERROR: ${e.toString()} (this message will not appear in production)`, "got it", {
         duration:   30000,
         politeness: "assertive",
