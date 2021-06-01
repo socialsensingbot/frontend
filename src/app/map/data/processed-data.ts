@@ -162,7 +162,7 @@ export class ProcessedData {
     return this.layer(activePolyLayerShortName).places();
   }
 
-  private layer(activePolyLayerShortName: string): ProcessedPolygonData {
+  public layer(activePolyLayerShortName: string): ProcessedPolygonData {
     return this.data[activePolyLayerShortName];
   }
 

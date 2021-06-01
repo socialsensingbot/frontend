@@ -172,13 +172,19 @@ export class AppComponent {
       }
     });
     try {
+      if (this.pref.combined.showLoadingMessages) {
+        this._notify.show("Syncing data with the server ...", "OK", 300);
+      }
       await DataStore.start();
+      if (this.pref.combined.showLoadingMessages) {
+        this._notify.show("Data synced with the server ...", "OK", 10);
+      }
     } catch (e) {
       log.error(e);
       await DataStore.clear();
       await DataStore.start();
+      this._notify.show("Failed to sync data with the server. Please refresh the page.", "OK", 300);
     }
-    this._notify.show("Syncing data with the server ...", "OK", 30);
   }
 
   public async logout() {

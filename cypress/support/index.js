@@ -21,7 +21,7 @@ import './commands'
 // Cypress.on("window:before:load", win => {
 //     win.indexedDB.deleteDatabase("ngForage");
 // });
-export const MAP_URL = "http://localhost:4200/map/live"
+export const MAP_URL = "http://localhost:4200/map/uk-flood-2018"
 
 
 // https://github.com/cypress-io/cypress/issues/8525
@@ -38,3 +38,14 @@ afterEach(() => {
     }
   });
 });
+
+Cypress.on('uncaught:exception', (err, runnable,promise) => {
+  // returning false here prevents Cypress from
+  // failing the test
+  console.error(err);
+  console.error(promise);
+  if (err && err.message) {
+    console.error(err.message);
+  }
+  return false;
+})

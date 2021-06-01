@@ -19,3 +19,4 @@ echo "Changing the release number in src/environments/environment.prod.ts"
 sed -i bak -e "s/version:.*\".*\",/version: \"$1\",/" src/environments/environment.prod.ts
 git commit -am "Branch for Release $1 created."
 git push origin release/$1
+git branch release/$1 --set-upstream-to origin/release/$1

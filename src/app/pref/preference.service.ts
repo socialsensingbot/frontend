@@ -243,30 +243,42 @@ export class PreferenceService {
 
   private async readBlacklist() {
     let page = 0;
-    while (true) {
+    //This is the maximum allowable calls to the datastore, more than this means a bug has crept in
+    let safety = 10000;
+    const pageSize = 1000;
+    while (safety-- > 0) {
       const groupTweetIgnores = await DataStore.query(GroupTweetIgnore,
                                                       q => q.or(
                                                         g => g.scope("eq", this.groupScope())),
-                                                      {limit: 1000, page});
-      if (groupTweetIgnores.length > 0) {
-        this._tweetBlackList.push(...groupTweetIgnores.map(i => i.tweetId));
+                                                      {limit: pageSize, page});
+      log.info(`Reading page ${page} of GroupTweetIgnore size was ${groupTweetIgnores.length}`);
+      log.info(groupTweetIgnores);
+      this._tweetBlackList.push(...groupTweetIgnores.map(i => i.tweetId));
+      if (groupTweetIgnores.length === pageSize) {
         page++;
       } else {
         break;
       }
     }
-
+    if (safety === 0) {
+      log.error("Potential infinite loop detected while reading GroupTweetIgnore");
+    }
     page = 0;
-    while (true) {
+    safety = 10000;
+    while (safety-- > 0) {
+      log.info(`Reading page ${page} of GroupTwitterUserIgnore`);
       const groupUserIgnores = await DataStore.query(GroupTwitterUserIgnore,
                                                      q => q.or(g => g.scope("eq", this.groupScope())),
                                                      {limit: 1000, page});
-      if (groupUserIgnores.length > 0) {
-        this._twitterUserBlackList.push(...groupUserIgnores.map(i => i.twitterScreenName));
+      this._twitterUserBlackList.push(...groupUserIgnores.map(i => i.twitterScreenName));
+      if (groupUserIgnores.length === pageSize) {
         page++;
       } else {
         break;
       }
+    }
+    if (safety === 0) {
+      log.error("Potential infinite loop detected while reading GroupTwitterUserIgnore");
     }
 
     log.debug("Blacklist", this._tweetBlackList);
