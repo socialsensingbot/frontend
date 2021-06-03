@@ -2,8 +2,8 @@
   <ng5-slider [manualRefresh]="refresh" [(value)]="lowerValue"
               [(highValue)]="upperValue"
               [options]="sliderOptions"
-              (userChange)="change($event)"
-              (userChangeEnd)="onEnd.emit($event)"></ng5-slider>
+              (userChange)="changeEvent($event)"
+              (userChangeEnd)="onEndEvent($event)"></ng5-slider>
 </div>
 
 

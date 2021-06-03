@@ -63,3 +63,4 @@ amplifyxc.config
 /.idea/workspace.xml
 /cypress/videos/
 /cypress/report/
+/cypress/screenshots/

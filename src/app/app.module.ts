@@ -1,10 +1,6 @@
 import {BrowserModule} from "@angular/platform-browser";
 import {ErrorHandler, NgModule} from "@angular/core";
-import {AmplifyAngularModule, AmplifyService, AmplifyModules} from "aws-amplify-angular";
-import Auth from "@aws-amplify/auth";
-import Interactions from "@aws-amplify/interactions";
-import Storage from "@aws-amplify/storage";
-
+import {ClipboardModule} from '@angular/cdk/clipboard';
 import {AppComponent} from "./app.component";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {MaterialModule} from "./material/material.module";
@@ -44,10 +40,14 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { LayoutModule } from '@angular/cdk/layout';
+import {AmplifyUIAngularModule} from "@aws-amplify/ui-angular";
+import { TweetCopyDialogComponent } from "./map/twitter/tweet-list/tweet-copy-dialog/tweet-copy-dialog.component";
+import {StripHtmlPipe} from "./strip.pipe";
 
 @NgModule({
             declarations:    [
               SafeHtmlPipe,
+              StripHtmlPipe,
               AppComponent,
               MapComponent,
               SignUpComponent,
@@ -66,12 +66,14 @@ import { LayoutModule } from '@angular/cdk/layout';
               HelpSpanComponent,
               TweetListComponent,
               DashboardComponent
+              TweetListComponent,
+              TweetCopyDialogComponent
             ],
-            imports:         [
+            imports: [
               BrowserModule,
               HttpClientModule,
               BrowserAnimationsModule,
-              AmplifyAngularModule,
+              AmplifyUIAngularModule,
               MaterialModule,
               MatSidenavModule,
               MatSliderModule,
@@ -80,7 +82,8 @@ import { LayoutModule } from '@angular/cdk/layout';
               ReactiveFormsModule,
               Ng5SliderModule,
               InfiniteScrollModule,
-              LeafletModule.forRoot(),
+              LeafletModule,
+              ClipboardModule,
               MatGridListModule,
               MatCardModule,
               MatMenuModule,
@@ -88,19 +91,8 @@ import { LayoutModule } from '@angular/cdk/layout';
               MatButtonModule,
               LayoutModule
             ],
-            providers:       [{
-              provide: AmplifyService,
-
-              useFactory: () => {
-                return AmplifyModules({
-                                        Auth,
-                                        Storage,
-                                        Interactions
-                                      });
-              },
-
-            },
-                              {
+            providers:       [
+               {
                                 provide:  ErrorHandler,
                                 useClass: RollbarErrorHandler
                               },
@@ -114,7 +106,7 @@ import { LayoutModule } from '@angular/cdk/layout';
             ],
             bootstrap:       [AppComponent],
             entryComponents: [CountryCodeSelectComponent, HelpDialogComponent]
-          },)
+          }, )
 export class AppModule {
   public constructor(ngfConfig: NgForageConfig) {
     ngfConfig.configure({});

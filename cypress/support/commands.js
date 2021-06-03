@@ -29,12 +29,35 @@ const LONG_TIMEOUT = 60000;
 const VERY_LONG_TIMEOUT = 120000;
 const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
 const multipleKey = Cypress.platform === "darwin" ? "{command}" : "{ctrl}";
+export const markAsIgnoredMenu = "body .mat-menu-item.tweet-menu-ignore-tweet";
+export const markAsUnignoredMenu = "body .mat-menu-item.tweet-menu-unignore-tweet";
+export const markAsMenu = "body .mat-menu-item.tweet-list-item-menu-mark-as";
 
+
+const noLoadingDiv = () => {
+
+  cy.get("#loading-div",{timeout: VERY_LONG_TIMEOUT}).should("not.exist");
+
+};
+
+const elNotVisible = (selector) => {
+  cy.get('body').then(($body) => {
+    let el = $body.find(selector);
+    if (el.length) {
+      cy.get(selector,{timeout: LONG_TIMEOUT}).should("not.be.visible");
+    }
+  });
+};
+
+
+const noTweetLoadingSpinner = function () {
+  elNotVisible(".app-tweet-area-loading-spinner");
+};
 
 Cypress.Commands.add("login", (username = "cypress1@example.com") => {
   //Login
-  cy.url({timeout: LONG_TIMEOUT}).should("contain", "auth/signin")
-  cy.get("#loading-div", {timeout: VERY_LONG_TIMEOUT}).should("not.be.visible");
+  cy.url({timeout: LONG_TIMEOUT}).should("contain", "auth/signin");
+  noLoadingDiv();
   cy.get('input[type=email]').type(username);
   cy.get('input[type=password]').type(Cypress.env("TEST_AC_PASS"));
   cy.get('.mat-button-base.mat-raised-button').contains('Sign In');
@@ -43,7 +66,7 @@ Cypress.Commands.add("login", (username = "cypress1@example.com") => {
 });
 
 Cypress.Commands.add("logout", () => {
-  cy.get("#loading-div", {timeout: VERY_LONG_TIMEOUT}).should("not.be.visible");
+  noLoadingDiv();
   cy.get('#logout').click();
 });
 
@@ -56,12 +79,11 @@ Cypress.Commands.add("visitAndWait", (url) => {
 
 Cypress.Commands.add("noSpinner", () => {
   cy.get('.map');
-  cy.get("mat-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
-  cy.get("#loading-div", {timeout: VERY_LONG_TIMEOUT}).should("not.be.visible");
+  noLoadingDiv();
   cy.get('body').should(el => {
     if (el) {
-      if (el.find("mat-spinner").length > 0) {
-        cy.get("mat-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+      if (el.find(".map-spinner").length > 0) {
+        cy.get(".map-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
       } else {
       }
     } else {
@@ -71,9 +93,9 @@ Cypress.Commands.add("noSpinner", () => {
 
 Cypress.Commands.add("twitterPanelHeader", (text, subheadingText) => {
   cy.get("twitter-panel");
-  cy.get(".app-tweet-area-loading-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  noTweetLoadingSpinner();
   cy.wait(1000);
-  cy.get(".app-tweet-area-loading-spinner", {timeout: LONG_TIMEOUT}).should("not.be.visible");
+  noTweetLoadingSpinner();
   cy.get(".app-tweet-heading", {timeout: LONG_TIMEOUT});
   cy.get(".app-tweet-heading", {timeout: LONG_TIMEOUT}).should("contain.text", text);
   if (subheadingText) {
@@ -149,18 +171,21 @@ Cypress.Commands.add("clickTweetTab", (index) => {
 Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
   cy.get(tweetSelector + " .mat-icon", {timeout: 10000})
   cy.get(tweetSelector + " .mat-icon").trigger("click", {force: true});
-  cy.get(menu2ndOpt, {timeout: 30000});
-  cy.get(menu2ndOpt).contains("Ignore Tweet");
-  cy.get(menu2ndOpt).click({force: true});
+  cy.wait(1000);
+  cy.get(markAsMenu, {timeout: LONG_TIMEOUT}).click();
+  cy.wait(1000);
+  cy.get(markAsIgnoredMenu).click();
 
 });
 
 Cypress.Commands.add("unignoreTweet", (tweetSelector) => {
   cy.get(tweetSelector + " .mat-icon", {timeout: 10000})
   cy.get(tweetSelector + " .mat-icon").trigger("click", {force: true});
-  cy.get(menu2ndOpt, {timeout: 30000});
-  cy.get(menu2ndOpt).contains("Unignore Tweet");
-  cy.get(menu2ndOpt).click({force: true});
+  cy.wait(1000);
+  cy.get(markAsMenu,{timeout: LONG_TIMEOUT}).click();
+  cy.wait(1000);
+  cy.get(markAsUnignoredMenu).click();
+
 
 });
 
@@ -224,7 +249,7 @@ Cypress.Commands.add("stubLiveJson", (file) => {
              // have a POST, if you're pushing data up
              method:   "GET",
              // more on the URL below
-             url:      /.*\/public\/live\/twitter.json?.*/g,
+             url:      /.*\/public\/data\/twitter\/uk-flood-2018.json?.*/g,
              // the fixture: shortcut will know to
              // look in cypress/fixtures,
              // unless you configure cypress to
