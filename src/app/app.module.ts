@@ -37,6 +37,13 @@ import {HelpDialogComponent} from "./help/help-dialog.component";
 import {TweetListComponent} from "./map/twitter/tweet-list/tweet-list.component";
 import {RollbarErrorHandler, rollbarFactory, RollbarService} from "./error";
 import {SafeHtmlPipe} from "./safe.pipe";
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatCardModule } from '@angular/material/card';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { LayoutModule } from '@angular/cdk/layout';
 
 @NgModule({
             declarations:    [
@@ -57,7 +64,8 @@ import {SafeHtmlPipe} from "./safe.pipe";
               HelpButtonComponent,
               HelpDialogComponent,
               HelpSpanComponent,
-              TweetListComponent
+              TweetListComponent,
+              DashboardComponent
             ],
             imports:         [
               BrowserModule,
@@ -72,7 +80,13 @@ import {SafeHtmlPipe} from "./safe.pipe";
               ReactiveFormsModule,
               Ng5SliderModule,
               InfiniteScrollModule,
-              LeafletModule.forRoot()
+              LeafletModule.forRoot(),
+              MatGridListModule,
+              MatCardModule,
+              MatMenuModule,
+              MatIconModule,
+              MatButtonModule,
+              LayoutModule
             ],
             providers:       [{
               provide: AmplifyService,
