@@ -16,7 +16,12 @@
           </mat-card-title>
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
-          <div>Card Content Here</div>
+          <ng-container [ngSwitch]="card.type">
+            <ng-container *ngSwitchCase="'twitter-timeseries'">
+
+            </ng-container>
+            <ng-container *ngSwitchCase="'blank'"><h3>This card is intentionally blank</h3></ng-container>
+          </ng-container>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>

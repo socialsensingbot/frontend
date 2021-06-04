@@ -1,6 +1,6 @@
 import {BrowserModule} from "@angular/platform-browser";
 import {ErrorHandler, NgModule} from "@angular/core";
-import {ClipboardModule} from '@angular/cdk/clipboard';
+import {ClipboardModule} from "@angular/cdk/clipboard";
 import {AppComponent} from "./app.component";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {MaterialModule} from "./material/material.module";
@@ -33,13 +33,11 @@ import {HelpDialogComponent} from "./help/help-dialog.component";
 import {TweetListComponent} from "./map/twitter/tweet-list/tweet-list.component";
 import {RollbarErrorHandler, rollbarFactory, RollbarService} from "./error";
 import {SafeHtmlPipe} from "./safe.pipe";
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatCardModule } from '@angular/material/card';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { LayoutModule } from '@angular/cdk/layout';
+import {DashboardComponent} from "./dashboard/dashboard.component";
+import {TimeSeriesChartComponent} from "./charts/timeseries-chart/timeseries-chart.component";
+import {BarChartComponent} from "./charts/bar-chart/bar-chart.component";
+import {PieChartComponent} from "./charts/pie-chart/pie-chart.component";
+import { TwitterTimeseriesComponent } from "./dashboard/widgets/twitter-timeseries/twitter-timeseries.component";
 import {AmplifyUIAngularModule} from "@aws-amplify/ui-angular";
 import { TweetCopyDialogComponent } from "./map/twitter/tweet-list/tweet-copy-dialog/tweet-copy-dialog.component";
 import {StripHtmlPipe} from "./strip.pipe";
@@ -65,9 +63,13 @@ import {StripHtmlPipe} from "./strip.pipe";
               HelpDialogComponent,
               HelpSpanComponent,
               TweetListComponent,
-              DashboardComponent
+              DashboardComponent,
               TweetListComponent,
-              TweetCopyDialogComponent
+              TweetCopyDialogComponent,
+              TimeSeriesChartComponent,
+              BarChartComponent,
+              PieChartComponent,
+              TwitterTimeseriesComponent
             ],
             imports: [
               BrowserModule,
@@ -83,13 +85,7 @@ import {StripHtmlPipe} from "./strip.pipe";
               Ng5SliderModule,
               InfiniteScrollModule,
               LeafletModule,
-              ClipboardModule,
-              MatGridListModule,
-              MatCardModule,
-              MatMenuModule,
-              MatIconModule,
-              MatButtonModule,
-              LayoutModule
+              ClipboardModule
             ],
             providers:       [
                {
@@ -108,7 +104,7 @@ import {StripHtmlPipe} from "./strip.pipe";
             entryComponents: [CountryCodeSelectComponent, HelpDialogComponent]
           }, )
 export class AppModule {
-  public constructor(ngfConfig: NgForageConfig) {
-    ngfConfig.configure({});
-  }
+    public constructor(ngfConfig: NgForageConfig) {
+        ngfConfig.configure({});
+    }
 }

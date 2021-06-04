@@ -4,6 +4,7 @@
 
 export const environment = {
   name:         "dev",
+  lamdaEnvironment: "dev",
   version:      "dev",
   demo:         false,
   production:   false,

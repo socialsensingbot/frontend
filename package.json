@@ -16,6 +16,10 @@
   },
   "private": true,
   "dependencies": {
+    "aws-sdk": "^2.921.0",
+    "@amcharts/amcharts4": "^4.10.18",
+    "@amcharts/amcharts4-fonts": "^4.0.1",
+    "@amcharts/amcharts4-geodata": "^4.1.20",
     "@angular/animations": "^11.2.14",
     "@angular/cdk": "^11.2.12",
     "@angular/common": "^11.2.14",
