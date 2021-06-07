@@ -1,4 +1,4 @@
-import {Component, NgZone, OnDestroy, OnInit} from "@angular/core";
+import {Component, Input, NgZone, OnDestroy, OnInit} from "@angular/core";
 import {StandardGraphComponent} from "../../standard-graph-component";
 import {MetadataService} from "../../../api/metadata.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -10,6 +10,8 @@ import {HistoricalDataService} from "../../../api/historical-data.service";
                styleUrls:   ["./twitter-timeseries.component.scss"]
            })
 export class TwitterTimeseriesComponent extends StandardGraphComponent implements OnInit, OnDestroy {
+    @Input()
+    public height: number;
 
     constructor(metadata: MetadataService, zone: NgZone, router: Router, route: ActivatedRoute,
                 _api: HistoricalDataService) {

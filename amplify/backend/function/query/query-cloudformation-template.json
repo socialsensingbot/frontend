@@ -1,11 +1,16 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Lambda resource stack creation using Amplify CLI",
+  "Description": "Lambda Function resource stack creation using Amplify CLI",
   "Parameters": {
-    "env": {
-      "Type": "String"
+    "CloudWatchRule": {
+      "Type": "String",
+      "Default": "NONE",
+      "Description": " Schedule Expression"
     },
     "deploymentBucketName": {
+      "Type": "String"
+    },
+    "env": {
       "Type": "String"
     },
     "s3Key": {
@@ -30,16 +35,24 @@
         "aws:asset:property": "Code"
       },
       "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": {
+            "Ref": "s3Key"
+          }
+        },
         "Handler": "index.handler",
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "S3Triggerb3a090e2",
+            "query",
             {
               "Fn::Join": [
                 "",
                 [
-                  "S3Triggerb3a090e2",
+                  "query",
                   "-",
                   {
                     "Ref": "env"
@@ -53,6 +66,9 @@
           "Variables": {
             "ENV": {
               "Ref": "env"
+            },
+            "REGION": {
+              "Ref": "AWS::Region"
             }
           }
         },
@@ -62,16 +78,9 @@
             "Arn"
           ]
         },
-        "Runtime": "nodejs12.x",
-        "Timeout": "25",
-        "Code": {
-          "S3Bucket": {
-            "Ref": "deploymentBucketName"
-          },
-          "S3Key": {
-            "Ref": "s3Key"
-          }
-        }
+        "Runtime": "nodejs14.x",
+        "Layers": [],
+        "Timeout": "25"
       }
     },
     "LambdaExecutionRole": {
@@ -80,12 +89,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "S3Triggerb3a090e2LambdaRoleb3a090e2",
+            "socialsensingLambdaRole314177d4",
             {
               "Fn::Join": [
                 "",
                 [
-                  "S3Triggerb3a090e2LambdaRoleb3a090e2",
+                  "socialsensingLambdaRole314177d4",
                   "-",
                   {
                     "Ref": "env"

@@ -29,9 +29,11 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
   rollingAvg = false;
 
   @ViewChild("chart") chartRef: ElementRef;
-  @Input()
+   @Input()
   public updating: boolean;
 
+  @Input()
+  public height: number;
 
   @Input()
   public noData: boolean;
@@ -67,7 +69,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
   public set data(value: any[]) {
     this._data = value;
     if (this.chart) {
-      if (this._data && this._data.length != 0) {
+      if (this._data && this._data.length !== 0) {
 
         let count = 0;
         for (const item of this._data) {

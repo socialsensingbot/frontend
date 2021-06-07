@@ -54,18 +54,6 @@ export abstract class StandardGraphComponent {
             } else {
                 this.query.location = "devon";
             }
-            if (params.nuts) {
-                this.query.nuts = params.nuts;
-                fromQuery = true;
-            } else {
-                this.query.nuts = "nuts2";
-            }
-            if (params.topics) {
-                this.query.topics = params.topics;
-                fromQuery = true;
-            } else {
-                this.query.topics = (await metadata.topics).map(i => i.value);
-            }
             if (fromQuery) {
                 this._changed = true;
             }
@@ -102,7 +90,7 @@ export abstract class StandardGraphComponent {
     protected async performGraphUpdate() {
         await this._router.navigate([], {queryParams: this.query});
         this.ready = false;
-        if (this.query.nuts && this.query.location && this.query.topics && this.query.topics.length > 0) {
+        if (this.query.location) {
             this._changed = false;
             this.updating = true;
             try {
