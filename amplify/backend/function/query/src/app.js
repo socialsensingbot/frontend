@@ -25,7 +25,7 @@ app.use(awsServerlessExpressMiddleware.eventContext())
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Credentials", true);
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "*");
   res.header(
       "Access-Control-Allow-Headers",
       "x-www-form-urlencoded, Origin, X-Requested-With, Content-Type, Accept, Authorization"
@@ -54,7 +54,7 @@ app.get('/query/:queryName/*', function(req, res) {
 
 app.post('/query/:queryName', function(req, res) {
   // Add your code here
-  res.json({success: 'post query succeeded', result: [{date:1622811528,count:10},{date:1622897928,count:30},{date:1622984328,count:8},{date:1623070728,count:4}], url: req.url});
+  res.json({success: 'get query succeeded', result: [{date:"2021-06-4",count:10},{date:"2021-06-5",count:30},{date:"2021-06-6",count:8},{date:"2021-06-7",count:4}], url: req.url});
 });
 
 app.post('/query/:queryName/*', function(req, res) {
