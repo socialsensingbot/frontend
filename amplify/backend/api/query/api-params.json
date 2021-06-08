@@ -6,7 +6,11 @@
             "privacy": {
                 "private": true,
                 "auth": [
-                    "/GET"
+                    "/POST",
+                    "/GET",
+                    "/PUT",
+                    "/PATCH",
+                    "/DELETE"
                 ]
             },
             "policyResourceName": "/query/*"
@@ -34,5 +38,6 @@
                 "Arn"
             ]
         }
-    ]
+    ],
+    "uuid": "e58d4b24"
 }

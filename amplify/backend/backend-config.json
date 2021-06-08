@@ -112,6 +112,18 @@
           }
         }
       }
+    },
+    "query": {
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "query",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        }
+      ]
     }
   }
 }

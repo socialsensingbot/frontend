@@ -23,7 +23,7 @@
         },
         "query": {
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
-          "s3Key": "amplify-builds/query-67366d2f2b4252304c62-build.zip"
+          "s3Key": "amplify-builds/query-43756a395a6e316d6e47-build.zip"
         }
       },
       "hosting": {
