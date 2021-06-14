@@ -23,40 +23,12 @@ app.use(awsServerlessExpressMiddleware.eventContext())
 
 // Enable CORS for all methods
 app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Credentials", true);
-    res.setHeader("Access-Control-Allow-Methods", "*");
-    res.header(
-        "Access-Control-Allow-Headers",
-        "x-www-form-urlencoded, Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    );
+    res.header("Access-Control-Allow-Origin", "*")
+    res.header("Access-Control-Allow-Headers", "*")
+    next()
     next()
 });
 
-
-/**********************
- * Example get method *
- **********************/
-
-app.get('/query/:queryName', function (req, res) {
-    // Add your code here
-    res.json({
-                 success:                       'get query succeeded', result: [{date: "2021-06-4", count: 10}, {
-            date: "2021-06-5", count: 30
-        }, {
-            date: "2021-06-6", count: 8
-        }, {date: "2021-06-7", count: 4}], url: req.url
-             });
-});
-
-app.get('/query/:queryName/*', function (req, res) {
-    // Add your code here
-    res.json({success: 'get call succeed!', url: req.url});
-});
-
-/****************************
- * Example post method *
- ****************************/
 
 app.post('/query/:queryName', function (req, res) {
     // Add your code here
@@ -70,39 +42,16 @@ app.post('/query/:queryName', function (req, res) {
                  {date: "06 June 2021", count: 8},
                  {date: "07 June 2021", count: 4}]);
 });
+app.post('/refdata/regions', function (req, res) {
+    // Add your code here
+    res.json( [{text: "England", value: "england"}, {text: "Wales", value: "wales"}]);
+});
 
 app.post('/query/:queryName/*', function (req, res) {
     // Add your code here
     res.json({success: 'post call succeed!', url: req.url, body: req.body})
 });
 
-/****************************
- * Example put method *
- ****************************/
-
-app.put('/query/:queryName', function (req, res) {
-    // Add your code here
-    res.json({success: 'put call succeed!', url: req.url, body: req.body})
-});
-
-app.put('/query/:queryName/*', function (req, res) {
-    // Add your code here
-    res.json({success: 'put call succeed!', url: req.url, body: req.body})
-});
-
-/****************************
- * Example delete method *
- ****************************/
-
-app.delete('/query/:queryName', function (req, res) {
-    // Add your code here
-    res.json({success: 'delete call succeed!', url: req.url});
-});
-
-app.delete('/query/:queryName/*', function (req, res) {
-    // Add your code here
-    res.json({success: 'delete call succeed!', url: req.url});
-});
 
 app.listen(3000, function () {
     console.log("App started")

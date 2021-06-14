@@ -1,6 +1,21 @@
 {
     "paths": [
         {
+            "name": "/refdata/{dataset}",
+            "lambdaFunction": "query",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/POST",
+                    "/GET",
+                    "/PUT",
+                    "/PATCH",
+                    "/DELETE"
+                ]
+            },
+            "policyResourceName": "/refdata/*"
+        },
+        {
             "name": "/query/{queryName}",
             "lambdaFunction": "query",
             "privacy": {
@@ -24,7 +39,7 @@
         }
     ],
     "privacy": {
-        "auth": 1,
+        "auth": 2,
         "unauth": 0,
         "authRoleName": "amplify-socialsensing-dev-183906-authRole",
         "unAuthRoleName": "amplify-socialsensing-dev-183906-unauthRole"
@@ -39,5 +54,5 @@
             ]
         }
     ],
-    "uuid": "e58d4b24"
+    "uuid": "52b1cc1a"
 }

@@ -50,10 +50,7 @@ export class HistoricalDataService {
             const path = "/" + functionName + "/" + payload.name;
             if (functionName === "query") {
                 return API.post("query", path, {
-                    body:    payload,
-                    headers: {
-                        Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`
-                    },
+                    body:    payload
 
                 }).catch(e => {
                     console.error(e);
@@ -62,11 +59,7 @@ export class HistoricalDataService {
                     return new Promise<any>((resolve, reject) => {
                         setTimeout(async () => {
                             API.post("query", path, {
-                                body:    payload,
-                                headers: {
-                                    Authorization: `Bearer ${(await Auth.currentSession()).getIdToken()
-                                                                                          .getJwtToken()}`
-                                },
+                                body:    payload
                             }).then(data => this._ngZone.run(() => {
                                 this._notify.show("Problem resolved", "Good", 2000);
                                 resolve(data);

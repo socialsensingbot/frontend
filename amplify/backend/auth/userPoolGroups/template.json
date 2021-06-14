@@ -41,65 +41,11 @@
     },
     "Resources": {
     
-        "demoGroup": {
-          "Type" : "AWS::Cognito::UserPoolGroup",
-          "Properties" : {
-              "GroupName" : "demo",
-              "Precedence" : 1,
-              
-              "RoleArn" : {
-                "Fn::GetAtt": [
-                    "demoGroupRole",
-                    "Arn"
-                ]
-              },
-              
-              "UserPoolId" : {
-                "Ref": "authsocialsensingf07a871cUserPoolId"
-              }
-            }
-        },
-        
-        "demoGroupRole": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-                "RoleName":{
-                    "Fn::Join": [
-                        "",
-                        [
-                          {
-                            "Ref": "authsocialsensingf07a871cUserPoolId"
-                          },
-                          "-demoGroupRole"
-                        ]
-                    ]
-                },
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Sid": "",
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Federated": "cognito-identity.amazonaws.com"
-                            },
-                            "Action": "sts:AssumeRoleWithWebIdentity",
-                            "Condition": {
-                              "StringEquals": {"cognito-identity.amazonaws.com:aud": {"Ref":"authsocialsensingf07a871cIdentityPoolId"}},
-                              "ForAnyValue:StringLike": {"cognito-identity.amazonaws.com:amr": "authenticated"}
-                            }
-                        }
-                    ]
-                }
-            }
-        },
-     
-    
         "metofficeGroup": {
           "Type" : "AWS::Cognito::UserPoolGroup",
           "Properties" : {
               "GroupName" : "metoffice",
-              "Precedence" : 2,
+              "Precedence" : 1,
               
               "RoleArn" : {
                 "Fn::GetAtt": [
@@ -125,6 +71,60 @@
                             "Ref": "authsocialsensingf07a871cUserPoolId"
                           },
                           "-metofficeGroupRole"
+                        ]
+                    ]
+                },
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Federated": "cognito-identity.amazonaws.com"
+                            },
+                            "Action": "sts:AssumeRoleWithWebIdentity",
+                            "Condition": {
+                              "StringEquals": {"cognito-identity.amazonaws.com:aud": {"Ref":"authsocialsensingf07a871cIdentityPoolId"}},
+                              "ForAnyValue:StringLike": {"cognito-identity.amazonaws.com:amr": "authenticated"}
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+     
+    
+        "demoGroup": {
+          "Type" : "AWS::Cognito::UserPoolGroup",
+          "Properties" : {
+              "GroupName" : "demo",
+              "Precedence" : 2,
+              
+              "RoleArn" : {
+                "Fn::GetAtt": [
+                    "demoGroupRole",
+                    "Arn"
+                ]
+              },
+              
+              "UserPoolId" : {
+                "Ref": "authsocialsensingf07a871cUserPoolId"
+              }
+            }
+        },
+        
+        "demoGroupRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName":{
+                    "Fn::Join": [
+                        "",
+                        [
+                          {
+                            "Ref": "authsocialsensingf07a871cUserPoolId"
+                          },
+                          "-demoGroupRole"
                         ]
                     ]
                 },
@@ -565,10 +565,10 @@
     
     "Outputs": {
       
-        "demoGroupRole": {
+        "metofficeGroupRole": {
             "Value": {
                 "Fn::GetAtt": [
-                    "demoGroupRole",
+                    "metofficeGroupRole",
                     "Arn"
                 ]
             }
@@ -576,10 +576,10 @@
         },
         
       
-        "metofficeGroupRole": {
+        "demoGroupRole": {
             "Value": {
                 "Fn::GetAtt": [
-                    "metofficeGroupRole",
+                    "demoGroupRole",
                     "Arn"
                 ]
             }
