@@ -89,12 +89,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "socialsensingLambdaRole314177d4",
+            "socialsensingLambdaRole8e725c47",
             {
               "Fn::Join": [
                 "",
                 [
-                  "socialsensingLambdaRole314177d4",
+                  "socialsensingLambdaRole8e725c47",
                   "-",
                   {
                     "Ref": "env"
