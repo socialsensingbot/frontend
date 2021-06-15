@@ -1,42 +1,58 @@
 {
-  "paths": [
-    {
-      "name": "/query/{queryName}",
-      "lambdaFunction": "query",
-      "privacy": {
-        "private": true,
-        "auth": [
-          "/POST",
-          "/GET",
-          "/PUT",
-          "/PATCH",
-          "/DELETE"
-        ]
-      },
-      "policyResourceName": "/query/*"
-    }
-  ],
-  "resourceName": "query",
-  "apiName": "query",
-  "functionArns": [
-    {
-      "lambdaFunction": "query"
-    }
-  ],
-  "privacy": {
-    "auth": 1,
-    "unauth": 0,
-    "authRoleName": "amplify-socialsensing-dev-183906-authRole",
-    "unAuthRoleName": "amplify-socialsensing-dev-183906-unauthRole"
-  },
-  "dependsOn": [
-    {
-      "category": "function",
-      "resourceName": "query",
-      "attributes": [
-        "Name",
-        "Arn"
-      ]
-    }
-  ]
+    "paths": [
+        {
+            "name": "/query/{queryName}",
+            "lambdaFunction": "query",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/POST",
+                    "/GET",
+                    "/PUT",
+                    "/PATCH",
+                    "/DELETE"
+                ]
+            },
+            "policyResourceName": "/query/*"
+        },
+        {
+            "name": "/refdata/{dataset}",
+            "lambdaFunction": "query",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/POST",
+                    "/GET",
+                    "/PUT",
+                    "/PATCH",
+                    "/DELETE"
+                ]
+            },
+            "policyResourceName": "/refdata/*"
+        }
+    ],
+    "resourceName": "query",
+    "apiName": "query",
+    "functionArns": [
+        {
+            "lambdaFunction": "query"
+        }
+    ],
+    "privacy": {
+        "auth": 2,
+        "unauth": 0,
+        "authRoleName": "amplify-socialsensing-dev-183906-authRole",
+        "unAuthRoleName": "amplify-socialsensing-dev-183906-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "query",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ],
+    "uuid": "db3dac80"
 }
