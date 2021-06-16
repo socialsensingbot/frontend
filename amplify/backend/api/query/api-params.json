@@ -1,21 +1,6 @@
 {
     "paths": [
         {
-            "name": "/query/{queryName}",
-            "lambdaFunction": "query",
-            "privacy": {
-                "private": true,
-                "auth": [
-                    "/POST",
-                    "/GET",
-                    "/PUT",
-                    "/PATCH",
-                    "/DELETE"
-                ]
-            },
-            "policyResourceName": "/query/*"
-        },
-        {
             "name": "/refdata/{dataset}",
             "lambdaFunction": "query",
             "privacy": {
@@ -29,6 +14,21 @@
                 ]
             },
             "policyResourceName": "/refdata/*"
+        },
+        {
+            "name": "/query/{queryName}",
+            "lambdaFunction": "query",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/POST",
+                    "/GET",
+                    "/PUT",
+                    "/PATCH",
+                    "/DELETE"
+                ]
+            },
+            "policyResourceName": "/query/*"
         }
     ],
     "resourceName": "query",
@@ -54,5 +54,5 @@
             ]
         }
     ],
-    "uuid": "db3dac80"
+    "uuid": "8012b8b2"
 }

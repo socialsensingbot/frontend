@@ -1,6 +1,6 @@
 {
     "identityPoolName": "socialsensingf07a871c_identitypool_f07a871c",
-    "allowUnauthenticatedIdentities": true,
+    "allowUnauthenticatedIdentities": false,
     "resourceNameTruncated": "socialf07a871c",
     "userPoolName": "socialsensingf07a871c_userpool_f07a871c",
     "autoVerifiedAttributes": [
@@ -67,5 +67,6 @@
         "Ref": "AWS::StackId"
     },
     "permissions": [],
-    "authProviders": []
+    "authProviders": [],
+    "breakCircularDependency": false
 }

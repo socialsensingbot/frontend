@@ -50,7 +50,10 @@ export class HistoricalDataService {
             const path = "/" + functionName + "/" + payload.name;
             if (functionName === "query") {
                 return API.post("query", path, {
-                    body:    payload
+                    body:    payload,
+                    headers: {
+                        Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+                    },
 
                 }).catch(e => {
                     console.error(e);

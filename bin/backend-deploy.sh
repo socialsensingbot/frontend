@@ -20,3 +20,4 @@ elif [[ "${AWS_BRANCH}" == release* ]]; then
 else
   amplifyPush --simple
 fi
+
