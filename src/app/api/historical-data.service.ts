@@ -62,7 +62,10 @@ export class HistoricalDataService {
                     return new Promise<any>((resolve, reject) => {
                         setTimeout(async () => {
                             API.post("query", path, {
-                                body:    payload
+                                body:    payload,
+                                headers: {
+                                    Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+                                },
                             }).then(data => this._ngZone.run(() => {
                                 this._notify.show("Problem resolved", "Good", 2000);
                                 resolve(data);
