@@ -12,6 +12,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "amplify-modelgen": "node amplify/scripts/amplify-modelgen.js",
+    "amplify:query": "cd amplify/backend/function/query/src && npx tsc *.ts",
     "amplify-push": "node amplify/scripts/amplify-push.js"
   },
   "private": true,

@@ -32,7 +32,7 @@ export class MetadataService {
         // this.nuts2 =  _api.callAPI("refdata",  {name:"nuts2"});
         // this.nuts3 =  _api.callAPI("refdata",  {name:"nuts3"});
         // this.topics =  _api.callAPI("refdata",  {name:"topic"});
-        this.regions = _api.callAPI("refdata", {name: "regions"});
+        this.regions = _api.callAPI("refdata", {name: "regions1"});
     }
 
 }

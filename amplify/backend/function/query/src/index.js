@@ -1,9 +1,9 @@
-const awsServerlessExpress = require('aws-serverless-express');
-const app = require('./app');
-
-const server = awsServerlessExpress.createServer(app);
-
-exports.handler = (event, context) => {
-  console.log(`EVENT: ${JSON.stringify(event)}`);
-  return awsServerlessExpress.proxy(server, event, context, 'PROMISE').promise;
+"use strict";
+exports.__esModule = true;
+exports.handler = void 0;
+var awsServerlessExpress = require('aws-serverless-express');
+var server = awsServerlessExpress.createServer(require('./app'));
+exports.handler = function (event, context) {
+    console.log("EVENT: " + JSON.stringify(event));
+    return awsServerlessExpress.proxy(server, event, context, 'PROMISE').promise;
 };

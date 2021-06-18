@@ -80,9 +80,19 @@
         },
         "Runtime": "nodejs14.x",
         "Layers": [],
-        "Timeout": "25"
+        "Timeout": "25",
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-c0f105a1"
+          ],
+          "SubnetIds": [
+            "subnet-6a99e303",
+            "subnet-2c6abf60",
+            "subnet-bbb234c1"
+          ]
+        }
       }
-    },
+      },
     "LambdaExecutionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -137,6 +147,15 @@
         "PolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface"
+              ],
+              "Resource": "*"
+            },
             {
               "Effect": "Allow",
               "Action": [
