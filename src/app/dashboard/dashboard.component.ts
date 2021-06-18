@@ -21,7 +21,7 @@ export class DashboardComponent implements OnInit {
             }
 
             return [
-                {title: "Timeseries", cols: 2, rows: 1, type: "twitter-timeseries", data: {}},
+                {title: "Tweets by Date", cols: 2, rows: 1, type: "twitter-timeseries", data: {}},
                 {title: "Card 2", cols: 1, rows: 1, type: "blank", data: {}},
                 {title: "Card 3", cols: 1, rows: 2, type: "blank", data: {}},
                 {title: "Card 4", cols: 1, rows: 1, type: "blank", data: {}}

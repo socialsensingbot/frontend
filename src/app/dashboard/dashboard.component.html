@@ -1,6 +1,6 @@
 <div class="grid-container">
     <h1 class="mat-h1">Dashboard</h1>
-    <mat-grid-list cols="2" rowHeight="500px">
+    <mat-grid-list cols="2" rowHeight="600px">
         <mat-grid-tile *ngFor="let card of cards | async" [colspan]="card.cols" [rowspan]="card.rows">
             <mat-card class="dashboard-card  dashboard-card-{{card.cols}}x{{card.rows}}
                     dashboard-card-cols-{{card.cols}} dashboard-card-rows-{{card.rows}}">
@@ -19,7 +19,7 @@
                 <mat-card-content class="dashboard-card-content">
                     <ng-container [ngSwitch]="card.type">
                         <ng-container *ngSwitchCase="'twitter-timeseries'">
-                            <app-twitter-timeseries [height]="card.rows*400"></app-twitter-timeseries>
+                            <app-twitter-timeseries [height]="card.rows*600"></app-twitter-timeseries>
                         </ng-container>
                         <ng-container *ngSwitchCase="'blank'"><h3>This card is intentionally blank</h3></ng-container>
                     </ng-container>

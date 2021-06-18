@@ -23,7 +23,8 @@ export abstract class StandardGraphComponent {
 
 
     constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
-                protected _route: ActivatedRoute, protected _api: HistoricalDataService, protected restQueryName: string,
+                protected _route: ActivatedRoute, protected _api: HistoricalDataService,
+                protected restQueryName: string,
                 protected dateRange = true) {
         this._route.queryParams.subscribe(async params => {
             let fromQuery = false;
@@ -96,7 +97,11 @@ export abstract class StandardGraphComponent {
             try {
                 const serverResults = await this._api.callAPI("query", {
                     ...this.query,
-                    name: this.restQueryName
+                    name:   this.restQueryName,
+                    source: "twitter",
+                    hazard: "flood",
+                    from:   new Date(2021, 0, 1).getTime(),
+                    to:     Date.now()
                 });
                 this.noData = serverResults.length === 0;
                 this.error = false;

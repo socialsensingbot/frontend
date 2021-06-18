@@ -11,18 +11,30 @@ const dateFromMillis = (time: number) => {
 
 
 export const queries: { [id: string]: (params) => QueryOptions } = {
-    count_by_date: (params: any) => {
+    count_by_date_for_regions: (params: any) => {
         return {
-            sql: `SELECT count(source_date), source_date as date
+            sql: `SELECT count(source_date) as count, source_date as date
                   FROM text_by_region_and_source
-                  WHERE source = 'twitter'
-                    and hazard = 'flood'
+                  WHERE source = ?
+                    and hazard = ?
                     and source_date between ? and ?
-                    and region_1 = ?
+                    and region_1 in (?)
                   group by source_date
                   order by source_date`,
             values: [params.source, params.hazard, dateFromMillis(params.from), dateFromMillis(params.to),
-                     params.region1]
+                     params.regions]
+        };
+    },
+    count_by_date_for_all_regions: (params: any) => {
+        return {
+            sql: `SELECT count(source_date) as count, source_date as date
+                  FROM text_by_region_and_source
+                  WHERE source = ?
+                    and hazard = ?
+                    and source_date between ? and ?
+                  group by source_date
+                  order by source_date`,
+            values: [params.source, params.hazard, dateFromMillis(params.from), dateFromMillis(params.to)]
         };
     }
 
