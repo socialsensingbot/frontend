@@ -13,7 +13,8 @@ export class DashboardComponent implements OnInit {
         map(({matches}) => {
             if (matches) {
                 return [
-                    {title: "Timeseries", cols: 1, rows: 1, type: "twitter-timeseries", data: {}},
+                    {title: "Text Search", cols: 1, rows: 1, type: "twitter-timeseries-text-and-region", data: {}},
+                    {title: "Text Search", cols: 1, rows: 1, type: "twitter-timeseries-total", data: {}},
                     {title: "Card 2", cols: 1, rows: 1, type: "blank", data: {}},
                     {title: "Card 3", cols: 1, rows: 1, type: "blank", data: {}},
                     {title: "Card 4", cols: 1, rows: 1, type: "blank", data: {}}
@@ -21,8 +22,8 @@ export class DashboardComponent implements OnInit {
             }
 
             return [
-                {title: "Tweets by Date", cols: 2, rows: 1, type: "twitter-timeseries", data: {}},
-                {title: "Card 2", cols: 1, rows: 1, type: "blank", data: {}},
+                {title: "Text Search", cols: 2, rows: 1, type: "twitter-timeseries-text-and-region", data: {}},
+                {title: "Total Tweets", cols: 2, rows: 1, type: "twitter-timeseries-total", data: {}},
                 {title: "Card 3", cols: 1, rows: 2, type: "blank", data: {}},
                 {title: "Card 4", cols: 1, rows: 1, type: "blank", data: {}}
             ];
@@ -33,6 +34,7 @@ export class DashboardComponent implements OnInit {
 
     public ngOnInit(): void {
         $("#loading-div").css("opacity", 0.0);
+        setTimeout(() => $("#loading-div").remove(), 1000);
     }
 
 

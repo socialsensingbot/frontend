@@ -37,72 +37,73 @@ import {DashboardComponent} from "./dashboard/dashboard.component";
 import {TimeSeriesChartComponent} from "./charts/timeseries-chart/timeseries-chart.component";
 import {BarChartComponent} from "./charts/bar-chart/bar-chart.component";
 import {PieChartComponent} from "./charts/pie-chart/pie-chart.component";
-import { TwitterTimeseriesComponent } from "./dashboard/widgets/twitter-timeseries/twitter-timeseries.component";
+import {TwitterTimeseriesComponent} from "./dashboard/widgets/twitter-timeseries/twitter-timeseries.component";
 import {AmplifyUIAngularModule} from "@aws-amplify/ui-angular";
-import { TweetCopyDialogComponent } from "./map/twitter/tweet-list/tweet-copy-dialog/tweet-copy-dialog.component";
+import {TweetCopyDialogComponent} from "./map/twitter/tweet-list/tweet-copy-dialog/tweet-copy-dialog.component";
 import {StripHtmlPipe} from "./strip.pipe";
+import {TimeseriesConfigDialogComponent} from "./dashboard/widgets/twitter-timeseries/timeseries-config-dialog-component";
 
 @NgModule({
-            declarations:    [
-              SafeHtmlPipe,
-              StripHtmlPipe,
-              AppComponent,
-              MapComponent,
-              SignUpComponent,
-              AuthComponent,
-              CountryCodeSelectComponent,
-              FilterPipe,
-              SignInComponent,
-              ConfirmCodeComponent,
-              HomeComponent,
-              TwitterPanelComponent,
-              DateRangeSliderComponent,
-              NewPassComponent,
-              LegendComponent,
-              HelpButtonComponent,
-              HelpDialogComponent,
-              HelpSpanComponent,
-              TweetListComponent,
-              DashboardComponent,
-              TweetListComponent,
-              TweetCopyDialogComponent,
-              TimeSeriesChartComponent,
-              BarChartComponent,
-              PieChartComponent,
-              TwitterTimeseriesComponent
-            ],
-            imports: [
-              BrowserModule,
-              HttpClientModule,
-              BrowserAnimationsModule,
-              AmplifyUIAngularModule,
-              MaterialModule,
-              MatSidenavModule,
-              MatSliderModule,
-              AppRoutingModule,
-              FormsModule,
-              ReactiveFormsModule,
-              Ng5SliderModule,
-              InfiniteScrollModule,
-              LeafletModule,
-              ClipboardModule
-            ],
-            providers:       [
-               {
-                                provide:  ErrorHandler,
-                                useClass: RollbarErrorHandler
-                              },
+              declarations:    [
+                  SafeHtmlPipe,
+                  StripHtmlPipe,
+                  AppComponent,
+                  MapComponent,
+                  SignUpComponent,
+                  AuthComponent,
+                  CountryCodeSelectComponent,
+                  FilterPipe,
+                  SignInComponent,
+                  ConfirmCodeComponent,
+                  HomeComponent,
+                  TwitterPanelComponent,
+                  DateRangeSliderComponent,
+                  NewPassComponent,
+                  LegendComponent,
+                  HelpButtonComponent,
+                  HelpDialogComponent,
+                  HelpSpanComponent,
+                  TweetListComponent,
+                  DashboardComponent,
+                  TweetListComponent,
+                  TweetCopyDialogComponent,
+                  TimeSeriesChartComponent,
+                  BarChartComponent,
+                  PieChartComponent,
+                  TwitterTimeseriesComponent, TimeseriesConfigDialogComponent
+              ],
+              imports:         [
+                  BrowserModule,
+                  HttpClientModule,
+                  BrowserAnimationsModule,
+                  AmplifyUIAngularModule,
+                  MaterialModule,
+                  MatSidenavModule,
+                  MatSliderModule,
+                  AppRoutingModule,
+                  FormsModule,
+                  ReactiveFormsModule,
+                  Ng5SliderModule,
+                  InfiniteScrollModule,
+                  LeafletModule,
+                  ClipboardModule
+              ],
+              providers:       [
+                  {
+                      provide:  ErrorHandler,
+                      useClass: RollbarErrorHandler
+                  },
 
-                              {
-                                provide:    RollbarService,
-                                useFactory: rollbarFactory
-                              },
-                              AuthService,
-                              NgEventBus
-            ],
-            bootstrap:       [AppComponent],
-            entryComponents: [CountryCodeSelectComponent, HelpDialogComponent]
-          }, )
+                  {
+                      provide:    RollbarService,
+                      useFactory: rollbarFactory
+                  },
+                  AuthService,
+                  NgEventBus
+              ],
+              bootstrap:       [AppComponent],
+              entryComponents: [CountryCodeSelectComponent, HelpDialogComponent]
+          },)
 export class AppModule {
     public constructor(ngfConfig: NgForageConfig) {
         ngfConfig.configure({});

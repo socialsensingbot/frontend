@@ -20,6 +20,7 @@ export abstract class StandardGraphComponent {
     error: boolean;
     protected _interval: number;
     protected _changed: boolean;
+    protected _storeQueryInURL: boolean;
 
 
     constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
@@ -28,7 +29,7 @@ export abstract class StandardGraphComponent {
                 protected dateRange = true) {
         this._route.queryParams.subscribe(async params => {
             let fromQuery = false;
-            if (true) {
+            if (this._storeQueryInURL) {
 
                 if (params.from) {
                     this.query.from = +params.from;
@@ -89,32 +90,33 @@ export abstract class StandardGraphComponent {
     }
 
     protected async performGraphUpdate() {
-        await this._router.navigate([], {queryParams: this.query});
-        this.ready = false;
-        if (this.query.location) {
-            this._changed = false;
-            this.updating = true;
-            try {
-                const serverResults = await this._api.callAPI("query", {
-                    ...this.query,
-                    name:   this.restQueryName,
-                    source: "twitter",
-                    hazard: "flood",
-                    from:   new Date(2021, 0, 1).getTime(),
-                    to:     Date.now()
-                });
-                this.noData = serverResults.length === 0;
-                this.error = false;
-                this.results = this.queryTransform(serverResults);
-            } catch (e) {
-                console.error(e);
-                this.error = true;
-                this.noData = false;
-            } finally {
-                this.updating = false;
-            }
-
+        if (this._storeQueryInURL) {
+            await this._router.navigate([], {queryParams: this.query});
         }
+        this.ready = false;
+        this._changed = false;
+        this.updating = true;
+        try {
+            const serverResults = await this._api.callAPI("query", {
+                ...this.query,
+                name:   this.restQueryName,
+                source: "twitter",
+                hazard: "flood",
+                from:   new Date(2021, 0, 1).getTime(),
+                to:     Date.now()
+            });
+            this.noData = serverResults.length === 0;
+            this.error = false;
+            this.results = this.queryTransform(serverResults);
+        } catch (e) {
+            console.error(e);
+            this.error = true;
+            this.noData = false;
+        } finally {
+            this.updating = false;
+        }
+
+      
         this.ready = true;
     }
 

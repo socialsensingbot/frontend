@@ -5,13 +5,13 @@
 export class QueryMetadataSets {
 
   private regions1: Promise<string[]>;
-  private region2: Promise<string[]>;
+  private regions2: Promise<string[]>;
   private regions3: Promise<string[]>;
 
   constructor(connection: any) {
-    this.regions1 = this.inferLocationMetadata(connection, "regions_1");
-    this.region2 = this.inferLocationMetadata(connection, "regions_2");
-    this.regions3 = this.inferLocationMetadata(connection, "regions_3");
+    this.regions1 = this.inferLocationMetadata(connection, "region_1");
+    this.regions2 = this.inferLocationMetadata(connection, "region_2");
+    this.regions3 = this.inferLocationMetadata(connection, "region_3");
      }
 
   private toTitleCase(str: string) {
@@ -33,7 +33,7 @@ export class QueryMetadataSets {
       connection.query({
                          sql:
                            `SELECT ${field} as text, ${field} as value
-                              FROM text_by_region_and_source
+                              FROM text_by_region
                               WHERE ${field} IS NOT NULL
                               GROUP BY ${field}
                               ORDER BY ${field} ASC`,

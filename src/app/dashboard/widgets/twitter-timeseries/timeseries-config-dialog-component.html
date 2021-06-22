@@ -1,0 +1,40 @@
+<form class="ttc-form">
+    <mat-form-field *ngIf="data.textFilter" class="text-search" appearance="fill">
+        <mat-label>Filter by Text</mat-label>
+        <input #textSearchInput [formControl]="searchControl" matInput placeholder="Text search, e.g. coastal"
+               (ngModelChange)="data.markChanged();"
+               (change)="data.updateGraph(data.query)"
+               [(ngModel)]="data.query.textSearch">
+    </mat-form-field>
+    <mat-form-field *ngIf="data.regionFilter"  class="region-chooser" appearance="fill">
+        <mat-label>Filter by Region</mat-label>
+        <mat-chip-list #chipList aria-label="Topic selection">
+            <a mat-button (click)="selectAllRegions()">Add All</a><a mat-button (click)="clearRegions()">Clear
+            Filter</a>
+            <br/>
+            <mat-chip
+                    *ngFor="let region of regions"
+                    [selectable]="true"
+                    [removable]="data.removable"
+                    [value]="region"
+                    (removed)="remove(region)">
+                {{region.text}}
+                <mat-icon matChipRemove *ngIf="data.removable">cancel</mat-icon>
+            </mat-chip>
+            <input
+                    placeholder="Add regions ..."
+                    #regionInput
+                    [formControl]="regionControl"
+                    [matAutocomplete]="auto"
+                    [matChipInputFor]="chipList"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                    (matChipInputTokenEnd)="add($event)">
+        </mat-chip-list>
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+            <mat-option *ngFor="let region of filteredRegions | async" [value]="region">
+                {{region.text}}
+            </mat-option>
+        </mat-autocomplete>
+    </mat-form-field>
+
+</form>

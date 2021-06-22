@@ -18,8 +18,11 @@
                 </mat-card-header>
                 <mat-card-content class="dashboard-card-content">
                     <ng-container [ngSwitch]="card.type">
-                        <ng-container *ngSwitchCase="'twitter-timeseries'">
-                            <app-twitter-timeseries [height]="card.rows*600"></app-twitter-timeseries>
+                        <ng-container *ngSwitchCase="'twitter-timeseries-text-and-region'">
+                            <app-twitter-timeseries [height]="card.rows*600"
+                                                    regionFilter="true" textFilter="true"></app-twitter-timeseries>
+                        </ng-container>       <ng-container *ngSwitchCase="'twitter-timeseries-total'">
+                            <app-twitter-timeseries [height]="card.rows*600" ></app-twitter-timeseries>
                         </ng-container>
                         <ng-container *ngSwitchCase="'blank'"><h3>This card is intentionally blank</h3></ng-container>
                     </ng-container>

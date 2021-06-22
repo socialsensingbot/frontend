@@ -78,7 +78,9 @@ export class HistoricalDataService {
                     });
                 });
             } else {
-                return API.get("query", path, {});
+                return API.get("query", path, {headers: {
+                        Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+                    }});
             }
         }
 

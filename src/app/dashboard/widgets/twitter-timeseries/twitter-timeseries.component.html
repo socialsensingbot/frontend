@@ -1,37 +1,5 @@
 <div class="dashboard-card-toolbar">
-
-    <form class="ttc-form">
-        <mat-form-field class="region-chooser" appearance="fill">
-            <mat-label>Region</mat-label>
-            <mat-chip-list #chipList aria-label="Topic selection"  >
-                <a mat-button (click)="selectAllRegions()">All</a><a mat-button (click)="clearRegions()">None</a>
-                <br/>
-                <mat-chip
-                        *ngFor="let region of regions"
-                        [selectable]="true"
-                        [removable]="removable"
-                        [value]="region"
-                        (removed)="remove(region)">
-                    {{region.text}}
-                    <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-                </mat-chip>
-                <input
-                        placeholder="New topics..."
-                        #regionInput
-                        [formControl]="regionControl"
-                        [matAutocomplete]="auto"
-                        [matChipInputFor]="chipList"
-                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                        (matChipInputTokenEnd)="add($event)">
-            </mat-chip-list>
-            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-                <mat-option *ngFor="let region of filteredRegions | async" [value]="region">
-                    {{region.text}}
-                </mat-option>
-            </mat-autocomplete>
-        </mat-form-field>
-
-    </form>
+    <button *ngIf="textFilter || regionFilter" mat-raised-button (click)="openDialog()">Configure</button>
 
 </div>
 <app-timeseries-chart (ready)="updateGraph(query)"
