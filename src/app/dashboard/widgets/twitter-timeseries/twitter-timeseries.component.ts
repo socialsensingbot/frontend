@@ -25,6 +25,14 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     @Input()
     public textFilter: boolean;
 
+    @Input()
+    public source = "twitter";
+
+    @Input()
+    public hazard = "flood";
+
+    @Input()
+    public yLabel = "Count";
 
     @Input()
     public query: {

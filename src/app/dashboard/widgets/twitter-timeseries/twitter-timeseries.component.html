@@ -2,12 +2,27 @@
     <button *ngIf="textFilter || regionFilter" mat-raised-button (click)="openDialog()">Configure</button>
 
 </div>
-<app-timeseries-chart (ready)="updateGraph(query)"
-                      [updating]="updating"
-                      [error]="error"
-                      [noData]="noData"
-                      yLabel="Tweets"
-                      [data]="results"
-                      [height]="height-190"
-                      class="twitter-timeseries-chart"
-></app-timeseries-chart>
+
+<ng-container n *ngIf="regionFilter">
+    <app-timeseries-multi-chart (ready)="updateGraph(query)"
+                                [updating]="updating"
+                                [error]="error"
+                                [noData]="noData"
+                                [yLabel]="yLabel"
+                                [data]="results"
+                                [height]="height-190"
+                                [mappingColumns]="['region_1']"
+                                class="twitter-timeseries-chart"
+    ></app-timeseries-multi-chart>
+</ng-container>
+<ng-container n *ngIf="!regionFilter">
+    <app-timeseries-chart (ready)="updateGraph(query)"
+                                [updating]="updating"
+                                [error]="error"
+                                [noData]="noData"
+                                [yLabel]="yLabel"
+                                [data]="results"
+                                [height]="height-90"
+                                class="twitter-timeseries-chart"
+    ></app-timeseries-chart>
+</ng-container>

@@ -21,7 +21,8 @@ export abstract class StandardGraphComponent {
     protected _interval: number;
     protected _changed: boolean;
     protected _storeQueryInURL: boolean;
-
+    protected source = "twitter";
+    protected hazard = "flood";
 
     constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
                 protected _route: ActivatedRoute, protected _api: HistoricalDataService,
@@ -100,10 +101,8 @@ export abstract class StandardGraphComponent {
             const serverResults = await this._api.callAPI("query", {
                 ...this.query,
                 name:   this.restQueryName,
-                source: "twitter",
-                hazard: "flood",
-                from:   new Date(2021, 0, 1).getTime(),
-                to:     Date.now()
+                source: this.source,
+                hazard: this.hazard
             });
             this.noData = serverResults.length === 0;
             this.error = false;
@@ -116,7 +115,7 @@ export abstract class StandardGraphComponent {
             this.updating = false;
         }
 
-      
+
         this.ready = true;
     }
 
