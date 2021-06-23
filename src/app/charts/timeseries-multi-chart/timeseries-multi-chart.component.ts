@@ -54,6 +54,8 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     @Input()
     public mappingColumns = [];
     private trend: LineSeries;
+    private scrollBarSeries: LineSeries;
+    private lineSeriesMap: { [key: string]: LineSeries } = {};
 
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
@@ -69,7 +71,6 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     @Input()
     public set data(value: any[]) {
         this._data = value;
-        this.createSeries()
         if (this.chart) {
             if (this._data && this._data.length !== 0) {
 
@@ -83,12 +84,13 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                     }
                     count++;
                 }
-                this.chart.data = this._data;
-                this.trend.data = this._data;
+                this.createSeries();
+
+                // this.trend.data = this._data;
 
             } else {
-                this.chart.data = [];
-                this.trend.data = [];
+
+                // this.trend.data = [];
             }
         }
     }
@@ -119,25 +121,22 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
             valueAxis.title.text = this.yLabel;
             // valueAxis.title.fontWeight = "bold";
             valueAxis.title.opacity = 0.5;
-
-            // // Create series
-            // // Add scrollbar
-            this.chart.scrollbarX = new am4charts.XYChartScrollbar();
-
-            this.trend = this.chart.series.push(new am4charts.LineSeries());
-            this.trend.dataFields.valueY = "trend";
-            this.trend.dataFields.dateX = this.xField;
-            this.trend.strokeWidth = 1;
-            this.trend.stroke = this.trend.fill = am4core.color("#E5210C", 0.4);
-            this.trend.data = this.chart.data;
-            const avgText = this.rollingAvg ? "Rolling Avg" : "Trend";
-            this.trend.tooltipText = `{dateX}\n[bold font-size: 17px]${this.avgLength}-day ${avgText}: {trend}[/]`;
-            this.trend.tensionX = 0.75;
+            //
+            //
+            // this.trend = this.chart.series.push(new am4charts.LineSeries());
+            // this.trend.dataFields.valueY = "trend";
+            // this.trend.dataFields.dateX = this.xField;
+            // this.trend.strokeWidth = 1;
+            // this.trend.stroke = this.trend.fill = am4core.color("#E5210C", 0.4);
+            // this.trend.data = this.chart.data;
+            // const avgText = this.rollingAvg ? "Rolling Avg" : "Trend";
+            // this.trend.tooltipText = `{dateX}\n[bold font-size: 17px]${this.avgLength}-day ${avgText}: {trend}[/]`;
+            // this.trend.tensionX = 0.75;
             // Add cursor
             this.chart.cursor = new am4charts.XYCursor();
             this.chart.cursor.xAxis = dateAxis;
-            // @ts-ignore
-            this.chart.scrollbarX.series.push(this.trend);
+
+            this.createSeries();
 
 
         });
@@ -150,7 +149,8 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
 
 
     private createSeriesFromMappedData(mappedKey, mappedData: any[]) {
-        const series = this.chart.series.push(new am4charts.LineSeries());
+        let series: LineSeries;
+        series = this.chart.series.push(new am4charts.LineSeries());
         series.data = mappedData;
         series.dataFields.valueY = this.yField;
         series.dataFields.dateX = this.xField;
@@ -163,20 +163,57 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
         series.tooltip.background.cornerRadius = 20;
         series.tooltip.background.fillOpacity = 0.5;
         series.tooltip.label.padding(12, 12, 12, 12);
-        series.tensionX = 0.99;
+        series.tensionX = 0.95;
+        series.connect = false;
+
         series.name = mappedKey;
-        this.chart.cursor.snapToSeries = series;
         return series;
 
     }
 
+
+    private createScrollBarSeries(data: any[]) {
+        this.scrollBarSeries = this.chart.series.push(new am4charts.LineSeries());
+        this.scrollBarSeries.data = data;
+        this.scrollBarSeries.dataFields.valueY = "total";
+        // This hides the series from the main chart
+        this.scrollBarSeries.hide();
+        this.scrollBarSeries.hiddenInLegend = true;
+        this.scrollBarSeries.dataFields.dateX = this.xField;
+        this.scrollBarSeries.strokeWidth = 2;
+        this.scrollBarSeries.minBulletDistance = 10;
+        this.scrollBarSeries.name = "total";
+        // series.stroke = series.fill = am4core.color("#9000FF", 0.5);
+
+        this.scrollBarSeries.tensionX = 0.95;
+        this.scrollBarSeries.connect = false;
+
+        this.chart.scrollbarX = new am4charts.XYChartScrollbar();
+        // @ts-ignore
+        this.chart.scrollbarX.series.push(this.scrollBarSeries);
+        // @ts-ignore
+        let scrollSeries1 = this.chart.scrollbarX.scrollbarChart.series.getIndex(0);
+        // This makes the series visible *but only in the scrollbar*
+        scrollSeries1.hidden = false;
+        this.chart.cursor.snapToSeries = this.scrollBarSeries;
+    }
+
     private createSeries() {
-        this.chart.series.clear();
+        if (this.chart) {
+            this.chart.series.clear();
+        }
         const seriesMap = {};
+        const totals = {};
         for (const row of this.data) {
             for (const mappingColumn of this.mappingColumns) {
                 const mappedKey = row[mappingColumn];
                 if (typeof mappedKey !== "undefined" && mappedKey !== null && mappedKey.length > 0) {
+                    const totalValue = totals[row[this.xField]];
+                    if (typeof totalValue === "undefined") {
+                        totals[row[this.xField]] = +(row[this.yField]);
+                    } else {
+                        totals[row[this.xField]] += row[this.yField];
+                    }
                     if (seriesMap[mappedKey]) {
                         seriesMap[mappedKey].push(row);
                     } else {
@@ -185,6 +222,18 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                 }
             }
         }
+        console.log("Totals", totals);
+        const totalRows = [];
+        for (const key in totals) {
+            if (totals.hasOwnProperty(key)) {
+                const row: any = {};
+                row[this.xField] = key;
+                row.total = totals[key];
+                totalRows.push(row);
+            }
+        }
+        console.log("Sum series", totalRows);
+        this.createScrollBarSeries(totalRows);
         for (const key in seriesMap) {
             if (seriesMap.hasOwnProperty(key)) {
                 const data = seriesMap[key].sort(
@@ -193,5 +242,6 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                 this.createSeriesFromMappedData(key, data);
             }
         }
+
     }
 }

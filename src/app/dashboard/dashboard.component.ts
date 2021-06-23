@@ -13,19 +13,18 @@ export class DashboardComponent implements OnInit {
         map(({matches}) => {
             if (matches) {
                 return [
-                    {title: "Text Search", cols: 1, rows: 1, type: "twitter-timeseries-text-and-region", data: {}},
-                    {title: "Text Search", cols: 1, rows: 1, type: "twitter-timeseries-total", data: {}},
-                    {title: "Card 2", cols: 1, rows: 1, type: "blank", data: {}},
-                    {title: "Card 3", cols: 1, rows: 1, type: "blank", data: {}},
-                    {title: "Card 4", cols: 1, rows: 1, type: "blank", data: {}}
+                    {title: "Count By Text and Region", cols: 1, rows: 1, type: "twitter-timeseries-text-and-region", data: {}},
+                    {title: "Total Count", cols: 1, rows: 1, type: "twitter-timeseries-total", data: {}},
+                    {title: "Exceedence by Date", cols: 1, rows: 1, type: "twitter-timeseries-exceed", data: {}},
+                    {title: "Exceedence by Region", cols: 1, rows: 1, type: "twitter-timeseries-exceed-region", data: {}},
                 ];
             }
 
             return [
-                {title: "Text Search", cols: 2, rows: 1, type: "twitter-timeseries-text-and-region", data: {}},
-                {title: "Total Tweets", cols: 2, rows: 1, type: "twitter-timeseries-total", data: {}},
-                {title: "Card 3", cols: 1, rows: 2, type: "blank", data: {}},
-                {title: "Card 4", cols: 1, rows: 1, type: "blank", data: {}}
+                {title: "Count By Text and Region", cols: 2, rows: 2, type: "twitter-timeseries-text-and-region", data: {}},
+                {title: "Total Count", cols: 1, rows: 1, type: "twitter-timeseries-total", data: {}},
+                {title: "Exceedence by Date", cols: 1, rows: 1, type: "twitter-timeseries-exceed", data: {}},
+                {title: "Exceedence by Region", cols: 2, rows: 1, type: "twitter-timeseries-exceed-region", data: {}},
             ];
         })
     );

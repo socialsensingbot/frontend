@@ -1,28 +1,35 @@
 <div class="dashboard-card-toolbar">
+    <span  class='dct-containing' *ngIf="textFilter && query.textSearch">Containing '<span
+            class='dct-containing-term'>{{query.textSearch}}</span>'
+    </span>&nbsp;
     <button *ngIf="textFilter || regionFilter" mat-raised-button (click)="openDialog()">Configure</button>
 
 </div>
 
-<ng-container n *ngIf="regionFilter">
+<ng-container *ngIf="regionFilter">
     <app-timeseries-multi-chart (ready)="updateGraph(query)"
                                 [updating]="updating"
                                 [error]="error"
                                 [noData]="noData"
+                                [xField]="xField"
+                                [yField]="yField"
                                 [yLabel]="yLabel"
                                 [data]="results"
-                                [height]="height-190"
-                                [mappingColumns]="['region_1']"
+                                [height]="height-120"
+                                [mappingColumns]="mappingColumns"
                                 class="twitter-timeseries-chart"
     ></app-timeseries-multi-chart>
 </ng-container>
-<ng-container n *ngIf="!regionFilter">
+<ng-container *ngIf="!regionFilter">
     <app-timeseries-chart (ready)="updateGraph(query)"
-                                [updating]="updating"
-                                [error]="error"
-                                [noData]="noData"
-                                [yLabel]="yLabel"
-                                [data]="results"
-                                [height]="height-90"
-                                class="twitter-timeseries-chart"
+                          [updating]="updating"
+                          [error]="error"
+                          [noData]="noData"
+                          [yLabel]="yLabel"
+                          [xField]="xField"
+                          [yField]="yField"
+                          [data]="results"
+                          [height]="height-90"
+                          class="twitter-timeseries-chart"
     ></app-timeseries-chart>
 </ng-container>

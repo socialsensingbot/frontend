@@ -35,6 +35,12 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     public yLabel = "Count";
 
     @Input()
+    public xField = "date";
+
+    @Input()
+    public yField = "count";
+
+    @Input()
     public query: {
         dateStep?: number;
         to?: number;
@@ -53,6 +59,8 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     public changed = new EventEmitter();
 
     public removable = true;
+    @Input()
+    public mappingColumns: string[] = [];
     private interval: number;
 
     constructor(metadata: MetadataService, zone: NgZone, router: Router, route: ActivatedRoute,
