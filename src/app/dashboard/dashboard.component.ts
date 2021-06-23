@@ -13,18 +13,18 @@ export class DashboardComponent implements OnInit {
         map(({matches}) => {
             if (matches) {
                 return [
-                    {title: "Count By Text and Region", cols: 1, rows: 1, type: "twitter-timeseries-text-and-region", data: {}},
-                    {title: "Total Count", cols: 1, rows: 1, type: "twitter-timeseries-total", data: {}},
-                    {title: "Exceedence by Date", cols: 1, rows: 1, type: "twitter-timeseries-exceed", data: {}},
-                    {title: "Exceedence by Region", cols: 1, rows: 1, type: "twitter-timeseries-exceed-region", data: {}},
+                    {title: "Count By Text and Region", cols: 1, rows: 1, type: "timeseries-text-and-region", data: {}},
+                    {title: "Total Count", cols: 1, rows: 1, type: "timeseries-total", data: {}},
+                    {title: "Exceedence by Date", cols: 1, rows: 1, type: "timeseries-exceed", data: {}},
+                    {title: "Exceedence by Region", cols: 1, rows: 1, type: "timeseries-exceed-region", data: {}},
                 ];
             }
 
             return [
-                {title: "Count By Text and Region", cols: 2, rows: 2, type: "twitter-timeseries-text-and-region", data: {}},
-                {title: "Total Count", cols: 1, rows: 1, type: "twitter-timeseries-total", data: {}},
-                {title: "Exceedence by Date", cols: 1, rows: 1, type: "twitter-timeseries-exceed", data: {}},
-                {title: "Exceedence by Region", cols: 2, rows: 1, type: "twitter-timeseries-exceed-region", data: {}},
+                {title: "Count By Text and Region", cols: 2, rows: 2, type: "timeseries-text-and-region", data: {}},
+                {title: "Total Count", cols: 1, rows: 1, type: "timeseries-total", data: {}},
+                {title: "Exceedence by Date", cols: 1, rows: 1, type: "timeseries-exceed", data: {}},
+                {title: "Exceedence by Region", cols: 2, rows: 1, type: "timeseries-exceed-region", data: {}},
             ];
         })
     );

@@ -18,18 +18,18 @@
                 </mat-card-header>
                 <mat-card-content class="dashboard-card-content">
                     <ng-container [ngSwitch]="card.type">
-                        <ng-container *ngSwitchCase="'twitter-timeseries-text-and-region'">
+                        <ng-container *ngSwitchCase="'timeseries-text-and-region'">
                             <app-twitter-timeseries [height]="card.rows*400" [mappingColumns]="['region_1']"
                                                     regionFilter="true" textFilter="true"></app-twitter-timeseries>
                         </ng-container>
-                        <ng-container *ngSwitchCase="'twitter-timeseries-total'">
+                        <ng-container *ngSwitchCase="'timeseries-total'">
                             <app-twitter-timeseries [height]="card.rows*400"></app-twitter-timeseries>
                         </ng-container>
-                        <ng-container *ngSwitchCase="'twitter-timeseries-exceed'">
+                        <ng-container *ngSwitchCase="'timeseries-exceed'">
                             <app-twitter-timeseries yField="exceedence"  yLabel="Exceedence"
                                                     [height]="card.rows*400"></app-twitter-timeseries>
                         </ng-container>
-                        <ng-container *ngSwitchCase="'twitter-timeseries-exceed-region'">
+                        <ng-container *ngSwitchCase="'timeseries-exceed-region'">
                             <app-twitter-timeseries yField="exceedence" regionFilter="true" yLabel="Exceedence"
                                                     [mappingColumns]="['region']"
                                                     [height]="card.rows*400"></app-twitter-timeseries>
