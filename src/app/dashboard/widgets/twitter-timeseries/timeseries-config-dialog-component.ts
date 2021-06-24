@@ -20,7 +20,7 @@ export class TimeseriesConfigDialogComponent implements OnInit, OnDestroy {
     public separatorKeysCodes: number[] = [ENTER, COMMA];
     public regionControl = new FormControl();
     public filteredRegions: Observable<MetadataKeyValue[]>;
-    public regions: MetadataKeyValue[];
+    public regions: MetadataKeyValue[]=[];
     @ViewChild("regionInput") regionInput: ElementRef<HTMLInputElement>;
     @ViewChild("auto") matAutocomplete: MatAutocomplete;
     public searchControl = new FormControl();
@@ -29,7 +29,7 @@ export class TimeseriesConfigDialogComponent implements OnInit, OnDestroy {
                 public route: ActivatedRoute,
                 private _api: HistoricalDataService,
                 public dialogRef: MatDialogRef<TimeseriesConfigDialogComponent>,
-                @Inject(MAT_DIALOG_DATA) public data: TwitterTimeseriesComponent) {}
+                @Inject(MAT_DIALOG_DATA) public data: { state: any, component: TwitterTimeseriesComponent }) {}
 
     onNoClick(): void {
         this.dialogRef.close();
@@ -37,12 +37,12 @@ export class TimeseriesConfigDialogComponent implements OnInit, OnDestroy {
 
     public selectAllRegions() {
         this.regions = [...this.allRegions];
-        this.data.markChanged();
+        this.data.component.markChanged();
     }
 
     public clearRegions() {
         this.regions = [];
-        this.data.markChanged();
+        this.data.component.markChanged();
     }
 
     remove(selectedTopic: MetadataKeyValue): void {
@@ -52,7 +52,7 @@ export class TimeseriesConfigDialogComponent implements OnInit, OnDestroy {
                 this.regions.splice(index, 1);
             }
             this.updateRegions();
-            this.data.markChanged();
+            this.data.component.markChanged();
         } catch (e) {
             console.error(e);
         }
@@ -64,7 +64,7 @@ export class TimeseriesConfigDialogComponent implements OnInit, OnDestroy {
         this.regionInput.nativeElement.value = "";
         this.regionControl.setValue(null);
         this.updateRegions();
-        this.data.markChanged();
+        this.data.component.markChanged();
     }
 
     public add(event: MatChipInputEvent): void {
@@ -83,7 +83,7 @@ export class TimeseriesConfigDialogComponent implements OnInit, OnDestroy {
 
         this.regionControl.setValue(null);
         this.updateRegions();
-        this.data.markChanged();
+        this.data.component.markChanged();
     }
 
     public ngOnDestroy(): void {
@@ -92,17 +92,19 @@ export class TimeseriesConfigDialogComponent implements OnInit, OnDestroy {
     async ngOnInit() {
         // this._interval = this.startChangeTimer();
         this.allRegions = (await this.metadata.regions);
-        this.regions = this.allRegions.filter(i => this.data.query.regions.includes(i.value));
+        if(this.data.state.regions) {
+            this.regions = this.allRegions.filter(i => this.data.state.regions.includes(i.value));
+        }
         this.filteredRegions = this.regionControl.valueChanges.pipe(
             startWith(null),
             map((region: string | null) => region ? this._filter(region) : this.allRegions.slice()));
-        this.searchControl.valueChanges.subscribe(value => {this.data.markChanged();});
+        this.searchControl.valueChanges.subscribe(value => {this.data.component.markChanged();});
 
     }
 
     private updateRegions() {
         if (this.regions) {
-            this.data.query.regions = this.regions.map(i => i.value);
+            this.data.state.regions = this.regions.map(i => i.value);
         }
     }
 

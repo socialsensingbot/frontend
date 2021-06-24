@@ -1,7 +1,7 @@
 <div class="grid-container">
     <h1 class="mat-h1">Dashboard</h1>
     <mat-grid-list cols="2" rowHeight="400px">
-        <mat-grid-tile *ngFor="let card of cards | async" [colspan]="card.cols" [rowspan]="card.rows">
+        <mat-grid-tile *ngFor="let card of cards; let i=index " [colspan]="card.cols" [rowspan]="card.rows">
             <mat-card class="dashboard-card  dashboard-card-{{card.cols}}x{{card.rows}}
                     dashboard-card-cols-{{card.cols}} dashboard-card-rows-{{card.rows}}">
                 <mat-card-header>
@@ -20,17 +20,26 @@
                     <ng-container [ngSwitch]="card.type">
                         <ng-container *ngSwitchCase="'timeseries-text-and-region'">
                             <app-twitter-timeseries [height]="card.rows*400" [mappingColumns]="['region_1']"
+                                                    [state]="card.state"
+                                                    (changed)="saveCard(i,$event)"
                                                     regionFilter="true" textFilter="true"></app-twitter-timeseries>
                         </ng-container>
                         <ng-container *ngSwitchCase="'timeseries-total'">
-                            <app-twitter-timeseries [height]="card.rows*400"></app-twitter-timeseries>
+                            <app-twitter-timeseries
+                                    [state]="card.state"
+                                    (changed)="saveCard(i,$event)"
+                                    [height]="card.rows*400"></app-twitter-timeseries>
                         </ng-container>
                         <ng-container *ngSwitchCase="'timeseries-exceed'">
-                            <app-twitter-timeseries yField="exceedence"  yLabel="Exceedence"
+                            <app-twitter-timeseries yField="exceedence" yLabel="Exceedence"
+                                                    [state]="card.state"
+                                                    (changed)="saveCard(i,$event)"
                                                     [height]="card.rows*400"></app-twitter-timeseries>
                         </ng-container>
                         <ng-container *ngSwitchCase="'timeseries-exceed-region'">
                             <app-twitter-timeseries yField="exceedence" regionFilter="true" yLabel="Exceedence"
+                                                    [state]="card.state"
+                                                    (changed)="saveCard(i,$event)"
                                                     [mappingColumns]="['region']"
                                                     [height]="card.rows*400"></app-twitter-timeseries>
                         </ng-container>

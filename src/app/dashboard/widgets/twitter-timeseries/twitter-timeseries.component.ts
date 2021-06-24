@@ -12,34 +12,24 @@ import {TimeseriesConfigDialogComponent} from "./timeseries-config-dialog-compon
                styleUrls:   ["./twitter-timeseries.component.scss"]
            })
 export class TwitterTimeseriesComponent extends StandardGraphComponent implements OnInit, OnDestroy {
-
     @Input()
     public height: number;
-
     @Input()
     public dateRangeFilter: boolean;
-
     @Input()
     public regionFilter: boolean;
-
     @Input()
     public textFilter: boolean;
-
     @Input()
     public source = "twitter";
-
     @Input()
     public hazard = "flood";
-
     @Input()
     public yLabel = "Count";
-
     @Input()
     public xField = "date";
-
     @Input()
     public yField = "count";
-
     @Input()
     public query: {
         dateStep?: number;
@@ -54,10 +44,8 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
         to:       new Date().getTime(),
         dateStep: 7 * 24 * 60 * 60 * 1000
     };
-
     @Output()
     public changed = new EventEmitter();
-
     public removable = true;
     @Input()
     public mappingColumns: string[] = [];
@@ -68,6 +56,16 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
         super(metadata, zone, router, route, _api, "count_by_date_for_regions_and_fulltext", false);
     }
 
+   private _state: any = {};
+
+    public get state(): any {
+        return this._state;
+    }
+    @Input()
+    public set state(value: any) {
+        this._state = value;
+        this.query = {...this.query, ...value};
+    }
 
     async ngOnInit() {
         this._interval = this.startChangeTimer();
@@ -91,7 +89,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
 
     public emitChange() {
 
-        this.changed.emit(this.query);
+        this.changed.emit(this.state);
     }
 
     public markChanged() {
@@ -106,11 +104,12 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     openDialog(): void {
         const dialogRef = this.dialog.open(TimeseriesConfigDialogComponent, {
             width: "500px",
-            data:  this
+            data:  {state: this.state, component: this}
         });
 
         dialogRef.afterClosed().subscribe(result => {
             console.log("The dialog was closed");
+            this.query = {...this.query, ...this.state};
         });
     }
 

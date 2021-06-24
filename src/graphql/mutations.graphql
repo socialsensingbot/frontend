@@ -44,6 +44,96 @@ mutation DeleteUserPreferences(
     updatedAt
   }
 }
+mutation CreateUserDashboard(
+  $input: CreateUserDashboardInput!
+  $condition: ModelUserDashboardConditionInput
+) {
+  createUserDashboard(input: $input, condition: $condition) {
+    id
+    owner
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation UpdateUserDashboard(
+  $input: UpdateUserDashboardInput!
+  $condition: ModelUserDashboardConditionInput
+) {
+  updateUserDashboard(input: $input, condition: $condition) {
+    id
+    owner
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation DeleteUserDashboard(
+  $input: DeleteUserDashboardInput!
+  $condition: ModelUserDashboardConditionInput
+) {
+  deleteUserDashboard(input: $input, condition: $condition) {
+    id
+    owner
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation CreateGroupDashboard(
+  $input: CreateGroupDashboardInput!
+  $condition: ModelGroupDashboardConditionInput
+) {
+  createGroupDashboard(input: $input, condition: $condition) {
+    id
+    group
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation UpdateGroupDashboard(
+  $input: UpdateGroupDashboardInput!
+  $condition: ModelGroupDashboardConditionInput
+) {
+  updateGroupDashboard(input: $input, condition: $condition) {
+    id
+    group
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation DeleteGroupDashboard(
+  $input: DeleteGroupDashboardInput!
+  $condition: ModelGroupDashboardConditionInput
+) {
+  deleteGroupDashboard(input: $input, condition: $condition) {
+    id
+    group
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
 mutation CreateUserSession(
   $input: CreateUserSessionInput!
   $condition: ModelUserSessionConditionInput

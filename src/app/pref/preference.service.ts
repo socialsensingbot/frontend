@@ -37,7 +37,7 @@ export class PreferenceService {
   private _twitterUserBlackList: string[] = [];
   private _userInfo: any = null;
   // todo: There must be a better way to do this!
-  private _username: Promise<string> = new Promise<string>((resolve) => {
+  public username: Promise<string> = new Promise<string>((resolve) => {
     const loop = () => {
       if (this._userInfo != null) {
         log.debug("Resolved username " + this._userInfo.username);
@@ -351,7 +351,7 @@ export class PreferenceService {
       return;
     }
     // #87 the value of the await needs to be in a temp variable
-    const username = await this._username;
+    const username = await this.username;
     const id = scope + ":" + tweet.sender;
     const result = await DataStore.query(GroupTwitterUserIgnore, q => q.twitterScreenName("eq", tweet.sender)
                                                                        .ownerGroups("contains", this._groups[0]));
@@ -372,7 +372,7 @@ export class PreferenceService {
   }
 
   private async checkInit() {
-    await this._username;
+    await this.username;
   }
 
   private async ignoreTweetForScope(tweet: Tweet, scope: string) {
@@ -381,7 +381,7 @@ export class PreferenceService {
       return;
     }
 
-    const username = await this._username;
+    const username = await this.username;
     const id = scope + ":" + tweet.id;
     const result = await DataStore.query(GroupTweetIgnore, q => q.tweetId("eq", tweet.sender)
                                                                  .ownerGroups("contains", this._groups[0]));
@@ -410,7 +410,7 @@ export class PreferenceService {
     }
 
     // this._twitterUserBlackList = this._twitterUserBlackList.filter(i => i !== tweet.sender);
-    await this._username;
+    await this.username;
     await DataStore.delete(GroupTwitterUserIgnore,
                            q => q.twitterScreenName("eq", tweet.sender).ownerGroups("contains", this._groups[0]));
   }
@@ -420,7 +420,7 @@ export class PreferenceService {
       throw new Error("Shouldn't be trying to (group) un-ignore tweet on an unparseable tweet.");
       return;
     }
-    await this._username;
+    await this.username;
     await DataStore.delete(GroupTweetIgnore,
                            q => q.tweetId("eq", tweet.id).ownerGroups("contains", this._groups[0]));
   }

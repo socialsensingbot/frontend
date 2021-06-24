@@ -12,7 +12,7 @@ const dateFromMillis = (time: number) => {
 
 export const queries: { [id: string]: (params) => QueryOptions } = {
     count_by_date_for_regions:              (params: any) => {
-        if (params.regions.includes("*") || params.regions.length === 0) {
+        if ((params.regions && params.regions.includes("*")) || params.regions.length === 0) {
             return {
                 sql: `SELECT sum(message_count) as count, aggregate_date as date, avg(exceedence) as exceedence, 'all' as region
                       FROM aggregate_counts_by_region
@@ -42,7 +42,7 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
         if (typeof params.textSearch !== "undefined" && params.textSearch.length > 0) {
             fullText = " and MATCH (source_text) AGAINST(? IN NATURAL LANGUAGE MODE) ";
         }
-        if (params.regions.includes("*") || params.regions.length === 0) {
+        if ((params.regions && params.regions.includes("*")) || params.regions.length === 0) {
             return {
                 sql: `SELECT count(*) as count, source_date as date, 'all' as region_1, '' as region_2, '' as region_3
                       FROM text_by_region
