@@ -64,10 +64,7 @@ export abstract class StandardGraphComponent {
 
     }
 
-    public async updateGraph(query: any) {
-        this.query = query;
-        this._changed = true;
-    }
+
 
     protected startChangeTimer() {
         return window.setInterval(() => {

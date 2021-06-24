@@ -56,11 +56,12 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
         super(metadata, zone, router, route, _api, "count_by_date_for_regions_and_fulltext", false);
     }
 
-   private _state: any = {};
+    private _state: any = {};
 
     public get state(): any {
         return this._state;
     }
+
     @Input()
     public set state(value: any) {
         this._state = value;
@@ -98,6 +99,11 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
 
     public ngOnDestroy(): void {
         window.clearInterval(this._interval);
+    }
+
+    public async updateGraph(state: any) {
+        this.query = {...this.query, regions: state.regions, textSearch: state.textSearch};
+        this._changed = true;
     }
 
 
