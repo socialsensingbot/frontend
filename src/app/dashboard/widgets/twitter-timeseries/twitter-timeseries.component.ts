@@ -12,15 +12,6 @@ import {TimeseriesConfigDialogComponent} from "./timeseries-config-dialog-compon
                styleUrls:   ["./twitter-timeseries.component.scss"]
            })
 export class TwitterTimeseriesComponent extends StandardGraphComponent implements OnInit, OnDestroy {
-    public get type(): string {
-        return this._type;
-    }
-
-    @Input()
-    public set type(value: string) {
-        this._type = value;
-        this.markChanged();
-    }
     @Input()
     public height: number;
     @Input()
@@ -40,6 +31,8 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     @Input()
     public yField = "count";
     @Input()
+    public animated = false;
+    @Input()
     public query: {
         dateStep?: number;
         to?: number;
@@ -58,12 +51,23 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     public removable = true;
     @Input()
     public mappingColumns: string[] = [];
-    private _type = "line";
     private interval: number;
 
     constructor(metadata: MetadataService, zone: NgZone, router: Router, route: ActivatedRoute,
                 _api: HistoricalDataService, public dialog: MatDialog) {
         super(metadata, zone, router, route, _api, "count_by_date_for_regions_and_fulltext", false);
+    }
+
+    private _type = "line";
+
+    public get type(): string {
+        return this._type;
+    }
+
+    @Input()
+    public set type(value: string) {
+        this._type = value;
+        this.markChanged();
     }
 
     private _state: any = {};
