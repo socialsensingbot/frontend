@@ -12,6 +12,15 @@ import {TimeseriesConfigDialogComponent} from "./timeseries-config-dialog-compon
                styleUrls:   ["./twitter-timeseries.component.scss"]
            })
 export class TwitterTimeseriesComponent extends StandardGraphComponent implements OnInit, OnDestroy {
+    public get type(): string {
+        return this._type;
+    }
+
+    @Input()
+    public set type(value: string) {
+        this._type = value;
+        this.markChanged();
+    }
     @Input()
     public height: number;
     @Input()
@@ -49,6 +58,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     public removable = true;
     @Input()
     public mappingColumns: string[] = [];
+    private _type = "line";
     private interval: number;
 
     constructor(metadata: MetadataService, zone: NgZone, router: Router, route: ActivatedRoute,
@@ -57,9 +67,6 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     }
 
     private _state: any = {};
-
-    @Input()
-    public type: "line" | "bar"="line";
 
     public get state(): any {
         return this._state;
@@ -105,7 +112,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     }
 
     public async updateGraph(state: any) {
-        console.log("Graph update from state",state);
+        console.log("Graph update from state", state);
         this.query = {...this.query, regions: state.regions, textSearch: state.textSearch};
         this._changed = true;
     }

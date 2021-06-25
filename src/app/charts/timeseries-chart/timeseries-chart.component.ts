@@ -22,29 +22,19 @@ import jt_theme from "../../theme/jt.theme";
                styleUrls:   ["./timeseries-chart.component.scss"]
            })
 export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
-
-    @Input()
-    public type: "line" | "bar" = "line";
-
     @Input()
     avgLength = 14;
     @Input()
     rollingAvg = false;
-
     @ViewChild("chart") chartRef: ElementRef;
     @Input()
     public updating: boolean;
-
     @Input()
     public height: number;
-
     @Input()
     public noData: boolean;
-
     @Input()
     public error: boolean;
-
-
     @Output() ready = new EventEmitter<boolean>();
     chart: XYChart;
     @Input()
@@ -58,6 +48,18 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
 
+    }
+
+    private _type = "line";
+
+    public get type(): string {
+        return this._type;
+    }
+
+    @Input()
+    public set type(value: string) {
+        this._type = value;
+        this.initSeries();
     }
 
     private _data: any;
@@ -118,10 +120,40 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
             valueAxis.title.text = this.yLabel;
             // valueAxis.title.fontWeight = "bold";
             valueAxis.title.opacity = 0.5;
+            const series = this.initSeries();
+            // Add scrollbar
+            this.chart.scrollbarX = new am4charts.XYChartScrollbar();
+
+            this.trend = this.chart.series.push(new am4charts.LineSeries());
+            this.trend.dataFields.valueY = "trend";
+            this.trend.dataFields.dateX = this.xField;
+            this.trend.strokeWidth = 1;
+            this.trend.stroke = this.trend.fill = am4core.color("#E5210C", 0.4);
+            this.trend.data = this.chart.data;
+            const avgText = this.rollingAvg ? "Rolling Avg" : "Trend";
+            this.trend.tooltipText = `{dateX}\n[bold font-size: 17px]${this.avgLength}-day ${avgText}: {trend}[/]`;
+            this.trend.tensionX = 0.75;
+            // Add cursor
+            this.chart.cursor = new am4charts.XYCursor();
+            this.chart.cursor.xAxis = dateAxis;
+            this.chart.cursor.snapToSeries = series;
+
+
+        });
+        this.ready.emit(true);
+    }
+
+    ngOnInit(): void {
+
+    }
+
+    private initSeries() {
+        if (this.chart) {
+            this.chart.series.clear();
 
             // Create series
             let series: LineSeries | ColumnSeries;
-            if(this.type === "line") {
+            if (this._type === "line") {
                 series = this.chart.series.push(new am4charts.LineSeries());
                 series.dataFields.valueY = this.yField;
                 series.dataFields.dateX = this.xField;
@@ -149,32 +181,15 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
                 series.tooltip.label.padding(12, 12, 12, 12);
 
             }
-            // Add scrollbar
-            this.chart.scrollbarX = new am4charts.XYChartScrollbar();
-            // @ts-ignore
-            this.chart.scrollbarX.series.push(series);
 
-            this.trend = this.chart.series.push(new am4charts.LineSeries());
-            this.trend.dataFields.valueY = "trend";
-            this.trend.dataFields.dateX = this.xField;
-            this.trend.strokeWidth = 1;
-            this.trend.stroke = this.trend.fill = am4core.color("#E5210C", 0.4);
-            this.trend.data = this.chart.data;
-            const avgText = this.rollingAvg ? "Rolling Avg" : "Trend";
-            this.trend.tooltipText = `{dateX}\n[bold font-size: 17px]${this.avgLength}-day ${avgText}: {trend}[/]`;
-            this.trend.tensionX = 0.75;
-            // Add cursor
-            this.chart.cursor = new am4charts.XYCursor();
-            this.chart.cursor.xAxis = dateAxis;
-            this.chart.cursor.snapToSeries = series;
-
-
-        });
-        this.ready.emit(true);
-    }
-
-    ngOnInit(): void {
-
+            if (this.chart.scrollbarX) {
+                // @ts-ignore
+                this.chart.scrollbarX.series.clear();
+                // @ts-ignore
+                this.chart.scrollbarX.series.push(series);
+            }
+            return series;
+        }
     }
 
 }

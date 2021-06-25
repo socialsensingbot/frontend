@@ -10,6 +10,7 @@ import {PreferenceService} from "./preference.service";
 const log = new Logger("dashboard-service");
 
 export interface DashboardCard {
+    variant?: string;
     hidden?: boolean;
     title: string;
     cols: number;
@@ -163,7 +164,7 @@ export class DashboardService {
 
 
     public async reset() {
-        this.dashboard = this._prefs.combined.defaultDashboard;
-       await this.persist();
+        this.dashboard = JSON.parse(this._groupDashboard.dashboard);
+        await this.persist();
     }
 }

@@ -23,27 +23,18 @@ import jt_theme from "../../theme/jt.theme";
            })
 export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     @Input()
-    public type: "line" | "bar" = "line";
-
-    @Input()
     avgLength = 14;
     @Input()
     rollingAvg = false;
-
     @ViewChild("chart") chartRef: ElementRef;
     @Input()
     public updating: boolean;
-
     @Input()
     public height: number;
-
     @Input()
     public noData: boolean;
-
     @Input()
     public error: boolean;
-
-
     @Output() ready = new EventEmitter<boolean>();
     chart: XYChart;
     @Input()
@@ -52,7 +43,6 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     xField = "date";
     @Input()
     yLabel: string;
-
     @Input()
     public mappingColumns = [];
     private scrollBarSeries: LineSeries;
@@ -60,6 +50,18 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
 
+    }
+
+    private _type = "line";
+
+    public get type(): string {
+        return this._type;
+    }
+
+    @Input()
+    public set type(value: string) {
+        this._type = value;
+        this.createSeries();
     }
 
     private _data: any;
@@ -151,7 +153,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     private createSeriesFromMappedData(mappedKey, mappedData: any[]) {
         // Create series
         let series: LineSeries | ColumnSeries;
-        if(this.type === "line") {
+        if (this._type === "line") {
             series = this.chart.series.push(new am4charts.LineSeries());
             series.data = mappedData;
             series.dataFields.valueY = this.yField;
@@ -188,29 +190,33 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
 
 
     private createScrollBarSeries(data: any[]) {
-        this.scrollBarSeries = this.chart.series.push(new am4charts.LineSeries());
-        this.scrollBarSeries.data = data;
-        this.scrollBarSeries.dataFields.valueY = "total";
-        // This hides the series from the main chart
-        this.scrollBarSeries.hide();
-        this.scrollBarSeries.hiddenInLegend = true;
-        this.scrollBarSeries.dataFields.dateX = this.xField;
-        this.scrollBarSeries.strokeWidth = 2;
-        this.scrollBarSeries.minBulletDistance = 10;
-        this.scrollBarSeries.name = "total";
-        // series.stroke = series.fill = am4core.color("#9000FF", 0.5);
+        if (this.chart) {
+            this.scrollBarSeries = this.chart.series.push(new am4charts.LineSeries());
+            this.scrollBarSeries.hide();
+            this.scrollBarSeries.data = data;
+            this.scrollBarSeries.dataFields.valueY = "total";
+            // This hides the series from the main chart
+            this.scrollBarSeries.hiddenInLegend = true;
+            this.scrollBarSeries.dataFields.dateX = this.xField;
+            this.scrollBarSeries.strokeWidth = 2;
+            this.scrollBarSeries.minBulletDistance = 10;
+            this.scrollBarSeries.name = "total";
+            // series.stroke = series.fill = am4core.color("#9000FF", 0.5);
 
-        this.scrollBarSeries.tensionX = 0.95;
-        this.scrollBarSeries.connect = false;
+            this.scrollBarSeries.tensionX = 0.95;
+            this.scrollBarSeries.connect = false;
 
-        this.chart.scrollbarX = new am4charts.XYChartScrollbar();
-        // @ts-ignore
-        this.chart.scrollbarX.series.push(this.scrollBarSeries);
-        // @ts-ignore
-        let scrollSeries1 = this.chart.scrollbarX.scrollbarChart.series.getIndex(0);
-        // This makes the series visible *but only in the scrollbar*
-        scrollSeries1.hidden = false;
-        this.chart.cursor.snapToSeries = this.scrollBarSeries;
+            this.chart.scrollbarX = new am4charts.XYChartScrollbar();
+            // @ts-ignore
+            this.chart.scrollbarX.series.push(this.scrollBarSeries);
+            // @ts-ignore
+            let scrollSeries1 = this.chart.scrollbarX.scrollbarChart.series.getIndex(0);
+            // This makes the series visible *but only in the scrollbar*
+            scrollSeries1.hidden = false;
+            this.chart.cursor.snapToSeries = this.scrollBarSeries;
+
+            this.chart.series.removeValue(this.scrollBarSeries);
+        }
     }
 
     private createSeries() {
@@ -248,15 +254,23 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
             }
         }
         console.log("Sum series", totalRows);
-        this.createScrollBarSeries(totalRows);
+        // this.createScrollBarSeries(totalRows);
+
+        let lastSeries;
         for (const key in seriesMap) {
             if (seriesMap.hasOwnProperty(key)) {
                 const data = seriesMap[key].sort(
                     (a, b) => new Date(a[this.xField]).getTime() - new Date(b[this.xField]).getTime());
                 console.log("Sorted series (by " + this.xField + ")", data);
-                this.createSeriesFromMappedData(key, data);
+                lastSeries = this.createSeriesFromMappedData(key, data);
             }
         }
+
+        this.chart.scrollbarX = new am4charts.XYChartScrollbar();
+        // @ts-ignore
+        this.chart.scrollbarX.series.push(lastSeries);
+
+        this.chart.cursor.snapToSeries = lastSeries;
 
     }
 }
