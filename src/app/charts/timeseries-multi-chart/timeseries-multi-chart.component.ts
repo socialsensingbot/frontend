@@ -137,6 +137,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
             // Add cursor
             this.chart.cursor = new am4charts.XYCursor();
             this.chart.cursor.xAxis = dateAxis;
+            this.chart.scrollbarX = new am4charts.XYChartScrollbar();
 
             this.createSeries();
 
@@ -266,7 +267,8 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
             }
         }
 
-        this.chart.scrollbarX = new am4charts.XYChartScrollbar();
+        // @ts-ignore
+        this.chart.scrollbarX.series.clear();
         // @ts-ignore
         this.chart.scrollbarX.series.push(lastSeries);
 

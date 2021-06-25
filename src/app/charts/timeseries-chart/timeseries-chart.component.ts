@@ -120,6 +120,9 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
             valueAxis.title.text = this.yLabel;
             // valueAxis.title.fontWeight = "bold";
             valueAxis.title.opacity = 0.5;
+            // Add scrollbar
+            this.chart.scrollbarX = new am4charts.XYChartScrollbar();
+
             const series = this.initSeries();
 
             this.trend = this.chart.series.push(new am4charts.LineSeries());
@@ -179,8 +182,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
                 series.tooltip.label.padding(12, 12, 12, 12);
 
             }
-            // Add scrollbar
-            this.chart.scrollbarX = new am4charts.XYChartScrollbar();
 
             // @ts-ignore
             this.chart.scrollbarX.series.clear();
