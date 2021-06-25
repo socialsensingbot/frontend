@@ -10,6 +10,7 @@ import {PreferenceService} from "./preference.service";
 const log = new Logger("dashboard-service");
 
 export interface DashboardCard {
+    hidden?: boolean;
     title: string;
     cols: number;
     rows: number;

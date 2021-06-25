@@ -22,6 +22,10 @@ export class DashboardComponent implements OnInit {
     //     })
     // );
     public deviceIndex: number;
+    private maxCols = 2;
+    private minCols = 1;
+    private maxRows = 2;
+    private minRows = 1;
 
     constructor(private breakpointObserver: BreakpointObserver, public dash: DashboardService) {}
 
@@ -35,6 +39,40 @@ export class DashboardComponent implements OnInit {
         this.initDashboard();
     }
 
+    public saveCard(index: number, data: any) {
+        this.dash.dashboard.devices[this.deviceIndex].pages[0].cards[index].state = data;
+        this.dash.persist();
+    }
+
+    public reset() {
+        this.dash.reset();
+        this.initDashboard();
+    }
+
+    public expand(card: DashboardCard) {
+        if (card.cols < this.maxCols) {
+            card.cols++;
+        }
+        if (card.rows < this.maxRows) {
+            card.rows++;
+        }
+        this.dash.persist();
+    }
+
+    public shrink(card: DashboardCard) {
+        if (card.cols > this.minCols) {
+            card.cols--;
+        }
+        if (card.rows > this.minRows) {
+            card.rows--;
+        }
+        this.dash.persist();
+    }
+
+    public hide(card: DashboardCard) {
+        card.hidden = true;
+        this.dash.persist();
+    }
 
     private initDashboard() {
         this.deviceIndex = 0;
@@ -45,15 +83,5 @@ export class DashboardComponent implements OnInit {
             }
         }
         this.cards = this.dash.dashboard.devices[this.deviceIndex].pages[0].cards;
-    }
-
-    public saveCard(index: number, data: any) {
-        this.dash.dashboard.devices[this.deviceIndex].pages[0].cards[index].state = data;
-        this.dash.persist();
-    }
-
-    public reset() {
-        this.dash.reset();
-        this.initDashboard();
     }
 }
