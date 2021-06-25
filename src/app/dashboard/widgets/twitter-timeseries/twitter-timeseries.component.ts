@@ -31,6 +31,8 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     @Input()
     public yField = "count";
     @Input()
+    public animated = false;
+    @Input()
     public query: {
         dateStep?: number;
         to?: number;
@@ -56,10 +58,19 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
         super(metadata, zone, router, route, _api, "count_by_date_for_regions_and_fulltext", false);
     }
 
-    private _state: any = {};
+    private _type = "line";
+
+    public get type(): string {
+        return this._type;
+    }
 
     @Input()
-    public type: "line" | "bar"="line";
+    public set type(value: string) {
+        this._type = value;
+        this.markChanged();
+    }
+
+    private _state: any = {};
 
     public get state(): any {
         return this._state;
@@ -105,7 +116,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     }
 
     public async updateGraph(state: any) {
-        console.log("Graph update from state",state);
+        console.log("Graph update from state", state);
         this.query = {...this.query, regions: state.regions, textSearch: state.textSearch};
         this._changed = true;
     }
