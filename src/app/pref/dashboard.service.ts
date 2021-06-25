@@ -161,4 +161,8 @@ export class DashboardService {
     }
 
 
+    public async reset() {
+        this.dashboard = this._prefs.combined.defaultDashboard;
+       await this.persist();
+    }
 }

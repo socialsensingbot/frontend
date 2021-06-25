@@ -58,6 +58,9 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
 
     private _state: any = {};
 
+    @Input()
+    public type: "line" | "bar"="line";
+
     public get state(): any {
         return this._state;
     }
@@ -80,7 +83,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
             this._zone.run(() => {
                 if (this._changed) {
                     this._changed = false;
-                    this.updateGraph(this.query);
+                    this.updateGraph(this.state);
                     this.emitChange();
                 }
             });
@@ -102,6 +105,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     }
 
     public async updateGraph(state: any) {
+        console.log("Graph update from state",state);
         this.query = {...this.query, regions: state.regions, textSearch: state.textSearch};
         this._changed = true;
     }
@@ -115,7 +119,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
 
         dialogRef.afterClosed().subscribe(result => {
             console.log("The dialog was closed");
-            this.query = {...this.query, ...this.state};
+            this.updateGraph(this.state);
         });
     }
 

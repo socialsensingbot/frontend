@@ -13,7 +13,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import * as am4core from "@amcharts/amcharts4/core";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 import * as am4charts from "@amcharts/amcharts4/charts";
-import {LineSeries, XYChart} from "@amcharts/amcharts4/charts";
+import {ColumnSeries, LineSeries, XYChart} from "@amcharts/amcharts4/charts";
 import jt_theme from "../../theme/jt.theme";
 
 @Component({
@@ -22,6 +22,8 @@ import jt_theme from "../../theme/jt.theme";
                styleUrls:   ["./timeseries-multi-chart.component.scss"]
            })
 export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
+    @Input()
+    public type: "line" | "bar" = "line";
 
     @Input()
     avgLength = 14;
@@ -53,9 +55,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
 
     @Input()
     public mappingColumns = [];
-    private trend: LineSeries;
     private scrollBarSeries: LineSeries;
-    private lineSeriesMap: { [key: string]: LineSeries } = {};
 
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
@@ -149,22 +149,37 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
 
 
     private createSeriesFromMappedData(mappedKey, mappedData: any[]) {
-        let series: LineSeries;
-        series = this.chart.series.push(new am4charts.LineSeries());
-        series.data = mappedData;
-        series.dataFields.valueY = this.yField;
-        series.dataFields.dateX = this.xField;
-        series.strokeWidth = 2;
-        series.minBulletDistance = 10;
-        // series.stroke = series.fill = am4core.color("#9000FF", 0.5);
+        // Create series
+        let series: LineSeries | ColumnSeries;
+        if(this.type === "line") {
+            series = this.chart.series.push(new am4charts.LineSeries());
+            series.data = mappedData;
+            series.dataFields.valueY = this.yField;
+            series.dataFields.dateX = this.xField;
+            series.strokeWidth = 2;
+            series.minBulletDistance = 10;
+            // series.stroke = series.fill = am4core.color("#9000FF", 0.5);
 
-        series.tooltipText = {mappedKey} + " {valueY}";
-        series.tooltip.pointerOrientation = "vertical";
-        series.tooltip.background.cornerRadius = 20;
-        series.tooltip.background.fillOpacity = 0.5;
-        series.tooltip.label.padding(12, 12, 12, 12);
-        series.tensionX = 0.95;
-        series.connect = false;
+            series.tooltipText = {mappedKey} + " {valueY}";
+            series.tooltip.pointerOrientation = "vertical";
+            series.tooltip.background.cornerRadius = 20;
+            series.tooltip.background.fillOpacity = 0.5;
+            series.tooltip.label.padding(12, 12, 12, 12);
+            series.tensionX = 0.95;
+            series.connect = false;
+        } else {
+            series = this.chart.series.push(new am4charts.ColumnSeries());
+            series.data = mappedData;
+            series.dataFields.valueY = this.yField;
+            series.dataFields.dateX = this.xField;
+            series.tooltipText = {mappedKey} + " {valueY}";
+            series.tooltip.pointerOrientation = "vertical";
+            series.tooltip.background.cornerRadius = 20;
+            series.tooltip.background.fillOpacity = 0.5;
+            series.tooltip.label.padding(12, 12, 12, 12);
+            series.stacked = true;
+            series.sequencedInterpolation = true;
+        }
 
         series.name = mappedKey;
         return series;

@@ -1,5 +1,5 @@
 <div class="grid-container">
-    <h1 class="mat-h1">Dashboard</h1>
+    <h1 class="mat-h1">Dashboard (<button mat-button (click)="reset()">reset</button>)</h1>
     <mat-grid-list cols="2" rowHeight="400px">
         <mat-grid-tile *ngFor="let card of cards; let i=index " [colspan]="card.cols" [rowspan]="card.rows">
             <mat-card class="dashboard-card  dashboard-card-{{card.cols}}x{{card.rows}}
@@ -27,6 +27,7 @@
                         <ng-container *ngSwitchCase="'timeseries-total'">
                             <app-twitter-timeseries
                                     [state]="card.state"
+                                    type="bar"
                                     (changed)="saveCard(i,$event)"
                                     [height]="card.rows*400"></app-twitter-timeseries>
                         </ng-container>
