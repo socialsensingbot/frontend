@@ -121,8 +121,6 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
             // valueAxis.title.fontWeight = "bold";
             valueAxis.title.opacity = 0.5;
             const series = this.initSeries();
-            // Add scrollbar
-            this.chart.scrollbarX = new am4charts.XYChartScrollbar();
 
             this.trend = this.chart.series.push(new am4charts.LineSeries());
             this.trend.dataFields.valueY = "trend";
@@ -181,13 +179,13 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
                 series.tooltip.label.padding(12, 12, 12, 12);
 
             }
+            // Add scrollbar
+            this.chart.scrollbarX = new am4charts.XYChartScrollbar();
 
-            if (this.chart.scrollbarX) {
-                // @ts-ignore
-                this.chart.scrollbarX.series.clear();
-                // @ts-ignore
-                this.chart.scrollbarX.series.push(series);
-            }
+            // @ts-ignore
+            this.chart.scrollbarX.series.clear();
+            // @ts-ignore
+            this.chart.scrollbarX.series.push(series);
             return series;
         }
     }
