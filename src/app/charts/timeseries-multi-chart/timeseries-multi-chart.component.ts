@@ -45,6 +45,8 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     yLabel: string;
     @Input()
     public mappingColumns = [];
+    @Input()
+    public animated = false;
     private scrollBarSeries: LineSeries;
 
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
@@ -103,7 +105,9 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
             /* Chart code */
             // Themes begin
             am4core.useTheme(jt_theme);
-            am4core.useTheme(am4themes_animated);
+            if (this.animated) {
+                am4core.useTheme(am4themes_animated);
+            }
             // Themes end
 
             this.chart = am4core.create(this.chartRef.nativeElement, am4charts.XYChart);

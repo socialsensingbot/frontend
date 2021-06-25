@@ -44,6 +44,8 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
     @Input()
     yLabel: string;
     private trend: LineSeries;
+    @Input()
+    public animated = false;
 
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
@@ -100,7 +102,9 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
             /* Chart code */
             // Themes begin
             am4core.useTheme(jt_theme);
-            am4core.useTheme(am4themes_animated);
+            if (this.animated) {
+                am4core.useTheme(am4themes_animated);
+            }
             // Themes end
 
             this.chart = am4core.create(this.chartRef.nativeElement, am4charts.XYChart);
