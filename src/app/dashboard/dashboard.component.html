@@ -2,7 +2,7 @@
     <h1 class="mat-h1">Dashboard (<button mat-button (click)="reset()">reset</button>)</h1>
     <mat-grid-list cols="2" rowHeight="400px">
         <mat-grid-tile *ngFor="let card of cards; let i=index " [colspan]="card.cols" [rowspan]="card.rows">
-            <mat-card class="dashboard-card  dashboard-card-{{card.cols}}x{{card.rows}}
+            <mat-card *ngIf="!card.hidden" class="dashboard-card  dashboard-card-{{card.cols}}x{{card.rows}}
                     dashboard-card-cols-{{card.cols}} dashboard-card-rows-{{card.rows}}">
                 <mat-card-header>
                     <mat-card-title>
@@ -11,8 +11,9 @@
                             <mat-icon>more_vert</mat-icon>
                         </button>
                         <mat-menu #menu="matMenu" xPosition="before">
-                            <button mat-menu-item>Expand</button>
-                            <button mat-menu-item>Remove</button>
+                            <button mat-menu-item (click)="expand(card)">Expand</button>
+                            <button mat-menu-item (click)="shrink(card)">Shrink</button>
+                            <button mat-menu-item (click)="hide(card)">Hide</button>
                         </mat-menu>
                     </mat-card-title>
                 </mat-card-header>
