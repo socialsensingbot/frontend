@@ -1,5 +1,4 @@
-import {Component, ElementRef, Inject, Input, NgZone, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
+import {Component, ElementRef, Input, NgZone, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {TwitterTimeseriesComponent} from "./twitter-timeseries.component";
 import {MetadataKeyValue, MetadataService} from "../../../api/metadata.service";
 import {COMMA, ENTER} from "@angular/cdk/keycodes";
@@ -32,7 +31,7 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
     constructor(public metadata: MetadataService, public zone: NgZone, public router: Router,
                 public route: ActivatedRoute,
                 private _api: HistoricalDataService,
-                ) {}
+    ) {}
 
     onNoClick(): void {
         // this.dialogRef.close();
@@ -105,6 +104,11 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
 
     }
 
+    public clearTextSearch() {
+        this.data.state.textSearch = "";
+        this.data.component.markChanged();
+    }
+
     private updateRegions() {
         if (this.regions) {
             this.data.state.regions = this.regions.map(i => i.value);
@@ -121,6 +125,4 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
             return topic;
         }
     }
-
-
 }
