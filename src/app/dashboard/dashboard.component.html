@@ -3,7 +3,7 @@
         <button mat-button (click)="reset()">reset</button>
 
     </h1>
-    <mat-grid-list cols="2" rowHeight="400px">
+    <mat-grid-list cols="2" rowHeight="500px">
         <ng-container *ngFor="let card of cards; let i=index ">
             <mat-grid-tile *ngIf="!card.hidden" [colspan]="card.cols" [rowspan]="card.rows">
                 <mat-card class="dashboard-card  dashboard-card-{{card.cols}}x{{card.rows}}
@@ -31,7 +31,7 @@
                     <mat-card-content class="dashboard-card-content">
                         <ng-container [ngSwitch]="card.type">
                             <ng-container *ngSwitchCase="'timeseries-text-and-region'">
-                                <app-twitter-timeseries [height]="card.rows*400" [mappingColumns]="['region_1']"
+                                <app-twitter-timeseries [height]="card.rows*500" [mappingColumns]="['region_1']"
                                                         [state]="card.state"
                                                         (changed)="saveCard(i,$event)"
                                                         [type]="card.variant || 'bar'"
@@ -42,14 +42,14 @@
                                         [state]="card.state"
                                         [type]="card.variant || 'bar'"
                                         (changed)="saveCard(i,$event)"
-                                        [height]="card.rows*400"></app-twitter-timeseries>
+                                        [height]="card.rows*500"></app-twitter-timeseries>
                             </ng-container>
                             <ng-container *ngSwitchCase="'timeseries-exceed'">
                                 <app-twitter-timeseries yField="exceedence" yLabel="Exceedence"
                                                         [type]="card.variant || 'bar'"
                                                         [state]="card.state"
                                                         (changed)="saveCard(i,$event)"
-                                                        [height]="card.rows*400"></app-twitter-timeseries>
+                                                        [height]="card.rows*500"></app-twitter-timeseries>
                             </ng-container>
                             <ng-container *ngSwitchCase="'timeseries-exceed-region'">
                                 <app-twitter-timeseries yField="exceedence" regionFilter="true" yLabel="Exceedence"
@@ -57,7 +57,7 @@
                                                         [state]="card.state"
                                                         (changed)="saveCard(i,$event)"
                                                         [mappingColumns]="['region']"
-                                                        [height]="card.rows*400"></app-twitter-timeseries>
+                                                        [height]="card.rows*500"></app-twitter-timeseries>
                             </ng-container>
                             <ng-container *ngSwitchCase="'blank'"><h3>This card is intentionally blank</h3>
                             </ng-container>

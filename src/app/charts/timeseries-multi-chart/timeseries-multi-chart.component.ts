@@ -184,8 +184,8 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
             series.tooltip.background.cornerRadius = 20;
             series.tooltip.background.fillOpacity = 0.5;
             series.tooltip.label.padding(12, 12, 12, 12);
-            series.stacked = true;
-            series.sequencedInterpolation = true;
+            // series.stacked = true;
+            // series.sequencedInterpolation = true;
         }
 
         series.name = mappedKey;
