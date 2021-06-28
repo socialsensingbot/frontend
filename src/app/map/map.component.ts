@@ -159,6 +159,8 @@ export class MapComponent implements OnInit, OnDestroy {
         this._activeLayerGroup = value;
         this._twitterIsStale = true;
         this.data.switchLayerGroup(value);
+        this.ready= false;
+        this.load();
     }
 
     private _dataset: string;
@@ -571,7 +573,7 @@ export class MapComponent implements OnInit, OnDestroy {
             this.sliderOptions = {...this.sliderOptions, startMax: 0};
         }
         if (typeof layer_group !== "undefined") {
-            this.activeLayerGroup = layer_group;
+            this._activeLayerGroup = layer_group;
         }
 
         // this._notify.show(JSON.stringify(this.sliderOptions));
