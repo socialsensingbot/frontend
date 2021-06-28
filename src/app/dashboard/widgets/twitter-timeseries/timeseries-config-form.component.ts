@@ -1,4 +1,4 @@
-import {Component, ElementRef, Inject, NgZone, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {Component, ElementRef, Inject, Input, NgZone, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
 import {TwitterTimeseriesComponent} from "./twitter-timeseries.component";
 import {MetadataKeyValue, MetadataService} from "../../../api/metadata.service";
@@ -12,27 +12,30 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {HistoricalDataService} from "../../../api/historical-data.service";
 
 @Component({
-               selector:    "app-timeseries-config-dialog",
-               templateUrl: "timeseries-config-dialog-component.html",
+               selector:    "app-timeseries-config-form",
+               styleUrls:   ["./timeseries-config-form.component.scss"],
+               templateUrl: "timeseries-config-form.component.html",
            })
-export class TimeseriesConfigDialogComponent implements OnInit, OnDestroy {
+export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
     public allRegions: MetadataKeyValue[];
     public separatorKeysCodes: number[] = [ENTER, COMMA];
     public regionControl = new FormControl();
     public filteredRegions: Observable<MetadataKeyValue[]>;
-    public regions: MetadataKeyValue[]=[];
+    public regions: MetadataKeyValue[] = [];
     @ViewChild("regionInput") regionInput: ElementRef<HTMLInputElement>;
     @ViewChild("auto") matAutocomplete: MatAutocomplete;
     public searchControl = new FormControl();
 
+    @Input()
+    public data: { state: any, component: TwitterTimeseriesComponent };
+
     constructor(public metadata: MetadataService, public zone: NgZone, public router: Router,
                 public route: ActivatedRoute,
                 private _api: HistoricalDataService,
-                public dialogRef: MatDialogRef<TimeseriesConfigDialogComponent>,
-                @Inject(MAT_DIALOG_DATA) public data: { state: any, component: TwitterTimeseriesComponent }) {}
+                ) {}
 
     onNoClick(): void {
-        this.dialogRef.close();
+        // this.dialogRef.close();
     }
 
     public selectAllRegions() {
@@ -92,7 +95,7 @@ export class TimeseriesConfigDialogComponent implements OnInit, OnDestroy {
     async ngOnInit() {
         // this._interval = this.startChangeTimer();
         this.allRegions = (await this.metadata.regions);
-        if(this.data.state.regions) {
+        if (this.data.state.regions) {
             this.regions = this.allRegions.filter(i => this.data.state.regions.includes(i.value));
         }
         this.filteredRegions = this.regionControl.valueChanges.pipe(

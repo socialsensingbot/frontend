@@ -4,7 +4,7 @@ import {MetadataService} from "../../../api/metadata.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {HistoricalDataService} from "../../../api/historical-data.service";
 import {MatDialog} from "@angular/material/dialog";
-import {TimeseriesConfigDialogComponent} from "./timeseries-config-dialog-component";
+import {TimeseriesConfigFormComponent} from "./timeseries-config-form.component";
 
 @Component({
                selector:    "app-twitter-timeseries",
@@ -122,17 +122,17 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     }
 
 
-    openDialog(): void {
-        const dialogRef = this.dialog.open(TimeseriesConfigDialogComponent, {
-            width: "500px",
-            data:  {state: this.state, component: this}
-        });
-
-        dialogRef.afterClosed().subscribe(result => {
-            console.log("The dialog was closed");
-            this.updateGraph(this.state);
-        });
-    }
+    // openDialog(): void {
+    //     const dialogRef = this.dialog.open(TimeseriesConfigFormComponent, {
+    //         width: "500px",
+    //         data:  {state: this.state, component: this}
+    //     });
+    //
+    //     dialogRef.afterClosed().subscribe(result => {
+    //         console.log("The dialog was closed");
+    //         this.updateGraph(this.state);
+    //     });
+    // }
 
 
 }

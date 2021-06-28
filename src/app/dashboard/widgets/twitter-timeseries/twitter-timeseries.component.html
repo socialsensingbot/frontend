@@ -1,8 +1,10 @@
 <div class="dashboard-card-toolbar">
-    <span  class='dct-containing' *ngIf="textFilter && query.textSearch">Containing '<span
-            class='dct-containing-term'>{{query.textSearch}}</span>'
-    </span>&nbsp;
-    <button *ngIf="textFilter || regionFilter" mat-raised-button (click)="openDialog()">Configure</button>
+<!--    <span class='dct-containing' *ngIf="textFilter && query.textSearch">Containing '<span-->
+<!--            class='dct-containing-term'>{{query.textSearch}}</span>'-->
+<!--    </span>&nbsp;-->
+    <ng-container *ngIf="textFilter || regionFilter" >    <app-timeseries-config-form
+            [data]="{state:state,component:this}"></app-timeseries-config-form>
+    </ng-container>
 
 </div>
 

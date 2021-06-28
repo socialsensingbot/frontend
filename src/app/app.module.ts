@@ -41,7 +41,7 @@ import {TwitterTimeseriesComponent} from "./dashboard/widgets/twitter-timeseries
 import {AmplifyUIAngularModule} from "@aws-amplify/ui-angular";
 import {TweetCopyDialogComponent} from "./map/twitter/tweet-list/tweet-copy-dialog/tweet-copy-dialog.component";
 import {StripHtmlPipe} from "./strip.pipe";
-import {TimeseriesConfigDialogComponent} from "./dashboard/widgets/twitter-timeseries/timeseries-config-dialog-component";
+import {TimeseriesConfigFormComponent} from "./dashboard/widgets/twitter-timeseries/timeseries-config-form.component";
 import {TimeSeriesMultiChartComponent} from "./charts/timeseries-multi-chart/timeseries-multi-chart.component";
 
 @NgModule({
@@ -71,7 +71,7 @@ import {TimeSeriesMultiChartComponent} from "./charts/timeseries-multi-chart/tim
                   TimeSeriesChartComponent,
                   BarChartComponent,
                   PieChartComponent,
-                  TwitterTimeseriesComponent, TimeseriesConfigDialogComponent,
+                  TwitterTimeseriesComponent, TimeseriesConfigFormComponent,
                   TimeSeriesMultiChartComponent
               ],
               imports:         [
