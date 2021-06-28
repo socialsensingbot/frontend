@@ -145,6 +145,7 @@ export class MapDataService {
     private _twitterData: ProcessedData = null;
     private _updating: boolean;
     private initialized: boolean;
+    private layerGroup: string;
 
     constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
                 private _notify: NotificationService, private readonly cache: NgForageCache,
@@ -469,6 +470,10 @@ export class MapDataService {
         this._notify.dismiss();
     }
 
+    public async switchLayerGroup(group: string) {
+        this.layerGroup = group;
+    }
+
     public regionTypes() {
         return this.dataSetMetdata.regionGroups.map(i => i.id);
     }
@@ -497,8 +502,18 @@ export class MapDataService {
         }
     }
 
-    private getCurrentLayer() {
-        return this.dataSetMetdata.layers[0];
+    private getCurrentLayer(): LayerMetadata {
+        const currentLayerId = this.currentLayerId();
+        return this.dataSetMetdata.layers.filter(i => i.id === currentLayerId)[0];
+    }
+
+    private currentLayerId(): string {
+        const layerGroupMetadata = this.dataSetMetdata.layerGroups.filter(i => i.id === this.layerGroup);
+        if (typeof layerGroupMetadata === "undefined" || layerGroupMetadata.length === 0) {
+            throw new Error("Unrecognized layer group " + this.layerGroup + " not in " + JSON.stringify(
+                this.dataSetMetdata.layerGroups));
+        }
+        return layerGroupMetadata[0].layers[0];
     }
 
     private async loadFromS3(name: string, version: string = environment.version, cacheDuration = ONE_DAY,

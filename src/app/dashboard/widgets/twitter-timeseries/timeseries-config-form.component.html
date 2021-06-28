@@ -6,7 +6,7 @@
                (ngModelChange)="data.component.markChanged();"
                (change)="data.component.updateGraph(data.state)"
                [(ngModel)]="data.state.textSearch">
-        <button mat-button mat-icon-button matSuffix (click)="data.state.textSearch=''" *ngIf="data.state.textSearch">
+        <button mat-button mat-icon-button matSuffix (click)="clearTextSearch()" *ngIf="data.state.textSearch">
             <mat-icon>close</mat-icon>
         </button>
 
