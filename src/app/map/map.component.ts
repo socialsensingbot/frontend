@@ -420,10 +420,14 @@ export class MapComponent implements OnInit, OnDestroy {
      * @param range the user selected upper and lower date range.
      */
     public sliderChange(range: DateRange) {
-        const {lower, upper} = range;
+        // tslint:disable-next-line:prefer-const
+        let {lower, upper} = range;
         log.debug("sliderChange(" + lower + "->" + upper + ")");
         this._dateMax = this.data.entryDate(upper).getTime();
         this._dateMin = this.data.entryDate(lower).getTime();
+        this.sliderOptions.startMin = lower;
+        this.sliderOptions.startMax = upper;
+
         this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
         if (this.pref.combined.animateOnTimeSliderChange) {
             this._sliderIsStale = true;
@@ -548,6 +552,7 @@ export class MapComponent implements OnInit, OnDestroy {
             this.sliderOptions = {...this.sliderOptions, startMax: 0};
         }
 
+        this.checkForLiveUpdating();
         // this._notify.show(JSON.stringify(this.sliderOptions));
         log.debug("Slider options: ", this.sliderOptions);
         // This handles the fact that the zoom and lat/lng can change independently of each other
@@ -996,9 +1001,9 @@ export class MapComponent implements OnInit, OnDestroy {
      * This is called if this._sliderIsStale === true;
      */
     private async updateFromSlider() {
-        this.liveUpdating = ((-this.data.offset(
-            this._dateMax)) < this.pref.combined.continuousUpdateThresholdInMinutes);
+        this.liveUpdating = this.sliderOptions.startMax > -this.pref.combined.continuousUpdateThresholdInMinutes;
 
+        this.checkForLiveUpdating();
         await this.updateLayers("Slider Change");
         this._twitterIsStale = true;
     }
@@ -1011,11 +1016,8 @@ export class MapComponent implements OnInit, OnDestroy {
         this._absoluteTime = this.data.lastEntryDate().getTime();
         this._dateMin = Math.max(this._dateMin,
                                  this._absoluteTime - ((this.data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
-        this.checkForLiveUpdating();
-        if (!this.liveUpdating) {
-            this._dateMax = Math.max(this._dateMax,
-                                     this._absoluteTime - ((this.data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
-        }
+        this._dateMax = Math.max(this._dateMax,
+                                 this._absoluteTime - ((this.data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
 
         this.sliderOptions = {
             max:      0,
@@ -1023,17 +1025,20 @@ export class MapComponent implements OnInit, OnDestroy {
             startMin: this.data.offset(this._dateMin),
             startMax: this.data.offset(this._dateMax)
         };
+        this.checkForLiveUpdating();
 
     }
 
     private checkForLiveUpdating() {
-        if (((-this.data.offset(this._dateMax)) < this.pref.combined.continuousUpdateThresholdInMinutes)) {
+        if (this.sliderOptions.startMax > -this.pref.combined.continuousUpdateThresholdInMinutes) {
             this.liveUpdating = true;
+        } else {
+            log.debug("LIVE UPDATES OFF: slider position was ", this.sliderOptions.startMax);
         }
         if (this.liveUpdating) {
+            log.debug("LIVE UPDATES ON");
             this._dateMax = this._absoluteTime;
             this.sliderOptions.startMax = 0;
-            this.updateSearch({max_time: this._dateMax});
         }
     }
 
