@@ -998,9 +998,7 @@ export class MapComponent implements OnInit, OnDestroy {
     private async updateFromSlider() {
         this.liveUpdating = ((-this.data.offset(
             this._dateMax)) < this.pref.combined.continuousUpdateThresholdInMinutes);
-        if (this.liveUpdating) {
-            this._dateMax = this._absoluteTime;
-        }
+
         await this.updateLayers("Slider Change");
         this._twitterIsStale = true;
     }
@@ -1013,17 +1011,12 @@ export class MapComponent implements OnInit, OnDestroy {
         this._absoluteTime = this.data.lastEntryDate().getTime();
         this._dateMin = Math.max(this._dateMin,
                                  this._absoluteTime - ((this.data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
-        if (-this.data.offset(this._dateMax) < this.pref.combined.continuousUpdateThresholdInMinutes) {
-            log.info(`The slider max (${-this.data.offset(
-                this._dateMax)}) offset was less than threshold of ${this.pref.combined.continuousUpdateThresholdInMinutes} for us to keep it at NOW`);
-            this._dateMax = Math.max(this._dateMax, this._absoluteTime);
-            this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
-
-        } else {
+        this.checkForLiveUpdating();
+        if (!this.liveUpdating) {
             this._dateMax = Math.max(this._dateMax,
                                      this._absoluteTime - ((this.data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
         }
-        this.checkForLiveUpdating();
+
         this.sliderOptions = {
             max:      0,
             min:      -this.data.entryCount() + 1,
@@ -1036,6 +1029,11 @@ export class MapComponent implements OnInit, OnDestroy {
     private checkForLiveUpdating() {
         if (((-this.data.offset(this._dateMax)) < this.pref.combined.continuousUpdateThresholdInMinutes)) {
             this.liveUpdating = true;
+        }
+        if (this.liveUpdating) {
+            this._dateMax = this._absoluteTime;
+            this.sliderOptions.startMax = 0;
+            this.updateSearch({max_time: this._dateMax});
         }
     }
 
