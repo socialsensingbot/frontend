@@ -311,7 +311,8 @@ export class MapComponent implements OnInit, OnDestroy {
         // schedulers execution.
 
         this._exec.start();
-
+        //Avoids race condition with access to this.pref.combined
+        await this.pref.waitUntilReady();
         this._stateSub = this._exec.state.subscribe((state: UIState) => {
             if (state === "ready") {
                 this.ready = true;
