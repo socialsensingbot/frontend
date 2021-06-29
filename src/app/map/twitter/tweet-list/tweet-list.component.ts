@@ -108,9 +108,9 @@ class TweetPage {
  * tweets are stored in memory but their rendering is scrolled for browser performance.
  */
 @Component({
-               selector: "app-tweet-list",
+               selector:    "app-tweet-list",
                templateUrl: "./tweet-list.component.html",
-               styleUrls: ["./tweet-list.component.scss"]
+               styleUrls:   ["./tweet-list.component.scss"]
            })
 export class TweetListComponent implements OnInit, OnDestroy {
 
@@ -216,7 +216,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
         this.annotations[tweet.id] = {...this.annotationsFor(tweet), ...annotations};
         const groupTweetAnnotations = await this.annotate.addAnnotations(tweet, annotations);
         this.annotations[tweet.id] = JSON.parse(groupTweetAnnotations.annotations);
-        log.info("Emitting ",tweet);
+        log.info("Emitting ", tweet);
         this.update.emit(tweet);
     }
 
@@ -388,10 +388,10 @@ export class TweetListComponent implements OnInit, OnDestroy {
         const impactValue = this.annotationValueFor(tweet, "impact");
         for (const level of this.pref.combined.impact.levels) {
             if (level.value === impactValue) {
-                return "border-left-color:" + level.color;
+                return "border-left: 3px solid " + level.color;
             }
         }
-        return "border-left-color:rgba(0,0,0,0.0)";
+        return "border-left: 3px solid transparent";
 
     }
 

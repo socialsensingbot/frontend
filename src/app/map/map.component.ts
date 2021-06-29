@@ -66,7 +66,7 @@ export class MapComponent implements OnInit, OnDestroy {
     public selectedCountries: string[] = [];
     // }
     public appToolbarExpanded: boolean;
-    public liveUpdating: boolean = true;
+    public liveUpdating: boolean = false;
     // The Map & Map Layers
     private _statsLayer: LayerGroup = layerGroup();
     private _countyLayer: LayerGroup = layerGroup(); // dummy layers to fool layer control
@@ -638,6 +638,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
         $("#loading-div").css("opacity", 0.0);
         setTimeout(() => $("#loading-div").remove(), 1000);
+        this.checkForLiveUpdating();
         this._searchParams.subscribe(async params => {
 
             if (!this._params) {
@@ -951,8 +952,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                         try {
 
                                             this._exec.changeState("data-refresh");
-                                            console.log("Start Max", this.data.offset(this._dateMax) );
-                                            this.liveUpdating = (- this.data.offset(this._dateMax)) < this.pref.combined.continuousUpdateThresholdInMinutes;
+                                            console.log("Start Max", this.data.offset(this._dateMax));
                                             await this.data.update(this._dateMin, this._dateMax);
                                             this.clearMapFeatures();
                                             this.updateRegionData();
@@ -996,6 +996,11 @@ export class MapComponent implements OnInit, OnDestroy {
      * This is called if this._sliderIsStale === true;
      */
     private async updateFromSlider() {
+        this.liveUpdating = ((-this.data.offset(
+            this._dateMax)) < this.pref.combined.continuousUpdateThresholdInMinutes);
+        if (this.liveUpdating) {
+            this._dateMax = this._absoluteTime;
+        }
         await this.updateLayers("Slider Change");
         this._twitterIsStale = true;
     }
@@ -1018,6 +1023,7 @@ export class MapComponent implements OnInit, OnDestroy {
             this._dateMax = Math.max(this._dateMax,
                                      this._absoluteTime - ((this.data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
         }
+        this.checkForLiveUpdating();
         this.sliderOptions = {
             max:      0,
             min:      -this.data.entryCount() + 1,
@@ -1025,6 +1031,12 @@ export class MapComponent implements OnInit, OnDestroy {
             startMax: this.data.offset(this._dateMax)
         };
 
+    }
+
+    private checkForLiveUpdating() {
+        if (((-this.data.offset(this._dateMax)) < this.pref.combined.continuousUpdateThresholdInMinutes)) {
+            this.liveUpdating = true;
+        }
     }
 
     /**

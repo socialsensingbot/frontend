@@ -43,7 +43,7 @@ export const environment = {
   showLoadingMessages:  true,
   mostRecentDateIsNow:  true,
   sanitizeForGDPR:      true,
-  continuousUpdateThresholdInMinutes: 90,
+  continuousUpdateThresholdInMinutes: 10,
   animateOnTimeSliderChange: false,
   recentTweetHighlightOffsetInSeconds: 1200,
   defaultDataSet:       "uk-flood-live",
