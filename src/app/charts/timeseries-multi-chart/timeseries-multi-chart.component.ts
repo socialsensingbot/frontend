@@ -48,6 +48,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     @Input()
     public animated = false;
     private scrollBarSeries: LineSeries;
+    private _ready: boolean;
 
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
@@ -63,7 +64,9 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     @Input()
     public set type(value: string) {
         this._type = value;
-        this.createSeries();
+        if (this.chart) {
+            this.createSeries();
+        }
     }
 
     private _data: any;
@@ -75,7 +78,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     @Input()
     public set data(value: any[]) {
         this._data = value;
-        if (this.chart) {
+        if (this._ready) {
             if (this._data && this._data.length !== 0) {
 
                 let count = 0;
@@ -143,11 +146,9 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
             this.chart.cursor.xAxis = dateAxis;
             this.chart.scrollbarX = new am4charts.XYChartScrollbar();
 
-            this.createSeries();
-
-
         });
         this.ready.emit(true);
+        this._ready = true;
     }
 
     ngOnInit(): void {
@@ -227,56 +228,57 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     private createSeries() {
         if (this.chart) {
             this.chart.series.clear();
-        }
-        const seriesMap = {};
-        const totals = {};
-        for (const row of this.data) {
-            for (const mappingColumn of this.mappingColumns) {
-                const mappedKey = row[mappingColumn];
-                if (typeof mappedKey !== "undefined" && mappedKey !== null && mappedKey.length > 0) {
-                    const totalValue = totals[row[this.xField]];
-                    if (typeof totalValue === "undefined") {
-                        totals[row[this.xField]] = +(row[this.yField]);
-                    } else {
-                        totals[row[this.xField]] += row[this.yField];
-                    }
-                    if (seriesMap[mappedKey]) {
-                        seriesMap[mappedKey].push(row);
-                    } else {
-                        seriesMap[mappedKey] = [row];
+
+            const seriesMap = {};
+            const totals = {};
+            for (const row of this.data) {
+                for (const mappingColumn of this.mappingColumns) {
+                    const mappedKey = row[mappingColumn];
+                    if (typeof mappedKey !== "undefined" && mappedKey !== null && mappedKey.length > 0) {
+                        const totalValue = totals[row[this.xField]];
+                        if (typeof totalValue === "undefined") {
+                            totals[row[this.xField]] = +(row[this.yField]);
+                        } else {
+                            totals[row[this.xField]] += row[this.yField];
+                        }
+                        if (seriesMap[mappedKey]) {
+                            seriesMap[mappedKey].push(row);
+                        } else {
+                            seriesMap[mappedKey] = [row];
+                        }
                     }
                 }
             }
-        }
-        console.log("Totals", totals);
-        const totalRows = [];
-        for (const key in totals) {
-            if (totals.hasOwnProperty(key)) {
-                const row: any = {};
-                row[this.xField] = key;
-                row.total = totals[key];
-                totalRows.push(row);
+            console.log("Totals", totals);
+            const totalRows = [];
+            for (const key in totals) {
+                if (totals.hasOwnProperty(key)) {
+                    const row: any = {};
+                    row[this.xField] = key;
+                    row.total = totals[key];
+                    totalRows.push(row);
+                }
             }
-        }
-        console.log("Sum series", totalRows);
-        // this.createScrollBarSeries(totalRows);
+            console.log("Sum series", totalRows);
+            // this.createScrollBarSeries(totalRows);
 
-        let lastSeries;
-        for (const key in seriesMap) {
-            if (seriesMap.hasOwnProperty(key)) {
-                const data = seriesMap[key].sort(
-                    (a, b) => new Date(a[this.xField]).getTime() - new Date(b[this.xField]).getTime());
-                console.log("Sorted series (by " + this.xField + ")", data);
-                lastSeries = this.createSeriesFromMappedData(key, data);
+            let lastSeries;
+            for (const key in seriesMap) {
+                if (seriesMap.hasOwnProperty(key)) {
+                    const data = seriesMap[key].sort(
+                        (a, b) => new Date(a[this.xField]).getTime() - new Date(b[this.xField]).getTime());
+                    console.log("Sorted series (by " + this.xField + ")", data);
+                    lastSeries = this.createSeriesFromMappedData(key, data);
+                }
             }
+
+
+            // @ts-ignore
+            this.chart.scrollbarX.series.clear();
+            // @ts-ignore
+            this.chart.scrollbarX.series.push(lastSeries);
+
+            this.chart.cursor.snapToSeries = lastSeries;
         }
-
-        // @ts-ignore
-        this.chart.scrollbarX.series.clear();
-        // @ts-ignore
-        this.chart.scrollbarX.series.push(lastSeries);
-
-        this.chart.cursor.snapToSeries = lastSeries;
-
     }
 }
