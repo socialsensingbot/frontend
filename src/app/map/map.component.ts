@@ -128,6 +128,7 @@ export class MapComponent implements OnInit, OnDestroy {
      * A subscription to the UI execution state.
      */
     private _stateSub: Subscription;
+    private _blinkTimer: Subscription;
 
     constructor(private _router: Router,
                 private route: ActivatedRoute,
@@ -327,6 +328,9 @@ export class MapComponent implements OnInit, OnDestroy {
             }
         });
 
+        this._blinkTimer = timer(0, this.pref.combined.blinkRateInMilliseconds).subscribe(async () => {
+            this.blinkOn= !this.blinkOn;
+        });
         this._auth.state.subscribe((event: string) => {
             if (event === AuthService.SIGN_IN) {
                 this._loggedIn = true;
@@ -364,6 +368,9 @@ export class MapComponent implements OnInit, OnDestroy {
         }
         if (this._routerStateChangeSub) {
             this._routerStateChangeSub.unsubscribe();
+        }
+        if(this._blinkTimer) {
+            this._blinkTimer.unsubscribe();
         }
 
     }
@@ -451,6 +458,7 @@ export class MapComponent implements OnInit, OnDestroy {
     //     // this.data.downloadAggregate(aggregrationSetId, id,
     //     //                             this.activePolyLayerShortName,
     //     //                             this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
+    public blinkOn= true;
 
     public downloadTweetsAsCSV() {
         if (this.data.hasCountryAggregates()) {
