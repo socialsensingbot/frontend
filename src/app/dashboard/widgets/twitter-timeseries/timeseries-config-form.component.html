@@ -1,4 +1,4 @@
-<form class="ttc-form">
+<form class="ttc-form" (keydown.enter)="$event.preventDefault()">
     <mat-form-field *ngIf="data.component.textFilter" class="text-search" appearance="fill">
         <mat-label>Filter by Text</mat-label>
         <mat-icon matPrefix>search</mat-icon>
@@ -26,6 +26,7 @@
             <input
                     placeholder="Add regions ..."
                     #regionInput
+                    (change)="data.component.updateGraph(data.state)"
                     [formControl]="regionControl"
                     [matAutocomplete]="auto"
                     [matChipInputFor]="chipList"
