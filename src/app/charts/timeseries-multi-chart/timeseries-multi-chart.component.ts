@@ -49,6 +49,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     public animated = false;
     private scrollBarSeries: LineSeries;
     private _ready: boolean;
+    private seriesMap: { [key: string]: LineSeries | ColumnSeries } = {};
 
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
@@ -157,6 +158,10 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
 
 
     private createSeriesFromMappedData(mappedKey, mappedData: any[]) {
+        if (typeof this.seriesMap[mappedKey] !== "undefined") {
+            this.seriesMap[mappedKey].data = mappedData;
+            return this.seriesMap[mappedKey];
+        }
         // Create series
         let series: LineSeries | ColumnSeries;
         if (this._type === "line") {
@@ -190,6 +195,9 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
         }
 
         series.name = mappedKey;
+        this.seriesMap[mappedKey] = series;
+        // @ts-ignore
+        this.chart.scrollbarX.series.push(series);
         return series;
 
     }
@@ -227,9 +235,8 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
 
     private createSeries() {
         if (this.chart) {
-            this.chart.series.clear();
-
-            const seriesMap = {};
+            console.log("Data for TMC", this.data);
+            const mappedData = {};
             const totals = {};
             for (const row of this.data) {
                 for (const mappingColumn of this.mappingColumns) {
@@ -241,10 +248,10 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                         } else {
                             totals[row[this.xField]] += row[this.yField];
                         }
-                        if (seriesMap[mappedKey]) {
-                            seriesMap[mappedKey].push(row);
+                        if (mappedData[mappedKey]) {
+                            mappedData[mappedKey].push(row);
                         } else {
-                            seriesMap[mappedKey] = [row];
+                            mappedData[mappedKey] = [row];
                         }
                     }
                 }
@@ -263,22 +270,29 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
             // this.createScrollBarSeries(totalRows);
 
             let lastSeries;
-            for (const key in seriesMap) {
-                if (seriesMap.hasOwnProperty(key)) {
-                    const data = seriesMap[key].sort(
+            for (const key in mappedData) {
+                if (mappedData.hasOwnProperty(key)) {
+                    const data = mappedData[key].sort(
                         (a, b) => new Date(a[this.xField]).getTime() - new Date(b[this.xField]).getTime());
                     console.log("Sorted series (by " + this.xField + ")", data);
                     lastSeries = this.createSeriesFromMappedData(key, data);
                 }
             }
 
+            // Clean up old series
+            for (const key in this.seriesMap) {
+                if (this.seriesMap.hasOwnProperty(key)) {
+                    if (typeof mappedData[key] === "undefined") {
+                        this.chart.series.removeValue(this.seriesMap[key]);
+                        // @ts-ignore
+                        this.chart.scrollbarX.series.removeValue(this.seriesMap[key]);
+                        delete this.seriesMap[key];
+                    }
+                }
+            }
 
-            // @ts-ignore
-            this.chart.scrollbarX.series.clear();
-            // @ts-ignore
-            this.chart.scrollbarX.series.push(lastSeries);
 
-            this.chart.cursor.snapToSeries = lastSeries;
+            // this.chart.cursor.snapToSeries = lastSeries;
         }
     }
 }
