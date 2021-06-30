@@ -28,12 +28,6 @@
       "service": "Lambda",
       "providerPlugin": "awscloudformation",
       "build": true
-    },
-    "query": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": []
     }
   },
   "storage": {
@@ -118,20 +112,6 @@
           }
         }
       }
-    },
-    "query": {
-      "service": "API Gateway",
-      "providerPlugin": "awscloudformation",
-      "dependsOn": [
-        {
-          "category": "function",
-          "resourceName": "query",
-          "attributes": [
-            "Name",
-            "Arn"
-          ]
-        }
-      ]
     }
   }
 }

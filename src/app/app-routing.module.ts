@@ -9,7 +9,6 @@ import {AuthGuard} from "./auth/auth.guard";
 import {UnauthGuard} from "./auth/unauth.guard";
 import {HomeComponent} from "./home/home.component";
 import {NewPassComponent} from "./auth/new-pass/new-pass.component";
-import {DashboardComponent} from "./dashboard/dashboard.component";
 
 const routes: Routes = [
   {
@@ -36,7 +35,6 @@ const routes: Routes = [
     ]
   },
   {path: "map", component: MapComponent, canActivate: [AuthGuard]},
-  {path: "dashboard", component: DashboardComponent, canActivate: [AuthGuard]},
   {path: "map/:dataset", component: MapComponent, canActivate: [AuthGuard]},
   {path: "", component: HomeComponent, canActivate: [AuthGuard]}
 ];

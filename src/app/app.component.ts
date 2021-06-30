@@ -172,11 +172,11 @@ export class AppComponent {
       }
     });
     try {
-      if (environment.showLoadingMessages) {
+      if (this.pref.combined.showLoadingMessages) {
         this._notify.show("Syncing data with the server ...", "OK", 300);
       }
       await DataStore.start();
-      if (environment.showLoadingMessages) {
+      if (this.pref.combined.showLoadingMessages) {
         this._notify.show("Data synced with the server ...", "OK", 10);
       }
     } catch (e) {

@@ -41,26 +41,26 @@
     },
     "Resources": {
     
-        "metofficeGroup": {
+        "demoGroup": {
           "Type" : "AWS::Cognito::UserPoolGroup",
           "Properties" : {
-              "GroupName" : "metoffice",
+              "GroupName" : "demo",
               "Precedence" : 1,
               
               "RoleArn" : {
                 "Fn::GetAtt": [
-                    "metofficeGroupRole",
+                    "demoGroupRole",
                     "Arn"
                 ]
               },
               
               "UserPoolId" : {
                 "Ref": "authsocialsensingf07a871cUserPoolId"
-              }
+              } 
             }
         },
         
-        "metofficeGroupRole": {
+        "demoGroupRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
                 "RoleName":{
@@ -70,7 +70,7 @@
                           {
                             "Ref": "authsocialsensingf07a871cUserPoolId"
                           },
-                          "-metofficeGroupRole"
+                          "-demoGroupRole"
                         ]
                     ]
                 },
@@ -95,26 +95,26 @@
         },
      
     
-        "demoGroup": {
+        "metofficeGroup": {
           "Type" : "AWS::Cognito::UserPoolGroup",
           "Properties" : {
-              "GroupName" : "demo",
+              "GroupName" : "metoffice",
               "Precedence" : 2,
               
               "RoleArn" : {
                 "Fn::GetAtt": [
-                    "demoGroupRole",
+                    "metofficeGroupRole",
                     "Arn"
                 ]
               },
               
               "UserPoolId" : {
                 "Ref": "authsocialsensingf07a871cUserPoolId"
-              }
+              } 
             }
         },
         
-        "demoGroupRole": {
+        "metofficeGroupRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
                 "RoleName":{
@@ -124,7 +124,7 @@
                           {
                             "Ref": "authsocialsensingf07a871cUserPoolId"
                           },
-                          "-demoGroupRole"
+                          "-metofficeGroupRole"
                         ]
                     ]
                 },
@@ -164,7 +164,7 @@
               
               "UserPoolId" : {
                 "Ref": "authsocialsensingf07a871cUserPoolId"
-              }
+              } 
             }
         },
         
@@ -218,7 +218,7 @@
               
               "UserPoolId" : {
                 "Ref": "authsocialsensingf07a871cUserPoolId"
-              }
+              } 
             }
         },
         
@@ -272,7 +272,7 @@
               
               "UserPoolId" : {
                 "Ref": "authsocialsensingf07a871cUserPoolId"
-              }
+              } 
             }
         },
         
@@ -326,7 +326,7 @@
               
               "UserPoolId" : {
                 "Ref": "authsocialsensingf07a871cUserPoolId"
-              }
+              } 
             }
         },
         
@@ -374,13 +374,13 @@
                         "ShouldNotCreateEnvResources",
                         {
                            
-                        },
+                        }, 
                         {
 
                             "Fn::Join": [
                                 "",
                                 [
-
+                                  
                                   "socialsensingf07a871c",
                                   "-ExecutionRole-",
                                   {
@@ -388,7 +388,7 @@
                                   }
                                 ]
                             ]
-                        }
+                        }       
                     ]
                 },
                 "AssumeRolePolicyDocument": {
@@ -453,10 +453,7 @@
                                     "Action": [
                                         "iam:PassRole"
                                     ],
-                                    "Resource": [
-                                        { "Ref": "AuthRoleArn" },
-                                        { "Ref": "UnauthRoleArn" }
-                                    ]
+                                    "Resource": "*"
                                 }
                             ]
                         }
@@ -506,6 +503,7 @@
                                 "    cognitoidentity.setIdentityPoolRoles(params).promise();",
                                 "    response.send(event, context, response.SUCCESS, {message: 'Successfully updated identity pool.'})",
                                 "    } catch(err) {",
+                                
                                 "        response.send(event, context, response.FAILED, {message: 'Error updating identity pool'});",
                                 "    }",
                                 "   };",
@@ -516,7 +514,7 @@
                     }
                 },
                 "Handler": "index.handler",
-                "Runtime": "nodejs12.x",
+                "Runtime": "nodejs10.x",
                 "Timeout": "300",
                 "Role": {
                     "Fn::GetAtt": [
@@ -567,17 +565,6 @@
     
     "Outputs": {
       
-        "metofficeGroupRole": {
-            "Value": {
-                "Fn::GetAtt": [
-                    "metofficeGroupRole",
-                    "Arn"
-                ]
-            }
-        
-        },
-        
-      
         "demoGroupRole": {
             "Value": {
                 "Fn::GetAtt": [
@@ -585,7 +572,18 @@
                     "Arn"
                 ]
             }
+         
+        },
         
+      
+        "metofficeGroupRole": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "metofficeGroupRole",
+                    "Arn"
+                ]
+            }
+         
         },
         
       
@@ -596,7 +594,7 @@
                     "Arn"
                 ]
             }
-        
+         
         },
         
       
@@ -607,7 +605,7 @@
                     "Arn"
                 ]
             }
-        
+         
         },
         
       
@@ -618,7 +616,7 @@
                     "Arn"
                 ]
             }
-        
+         
         },
         
       
