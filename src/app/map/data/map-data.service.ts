@@ -508,10 +508,11 @@ export class MapDataService {
     }
 
     private currentLayerId(): string {
-        const layerGroupMetadata = this.dataSetMetdata.layerGroups.filter(i => i.id === this.layerGroup);
+        let layerGroupMetadata = this.dataSetMetdata.layerGroups.filter(i => i.id === this.layerGroup);
         if (typeof layerGroupMetadata === "undefined" || layerGroupMetadata.length === 0) {
-            throw new Error("Unrecognized layer group " + this.layerGroup + " not in " + JSON.stringify(
-                this.dataSetMetdata.layerGroups));
+            log.error("Unrecognized layer group " + this.layerGroup + " not in " + JSON.stringify(
+                this.dataSetMetdata.layerGroups) + " using default value.");
+            layerGroupMetadata = this.dataSetMetdata.layerGroups.filter(i => i.id === this.dataSetMetdata.defaultLayerGroup);
         }
         return layerGroupMetadata[0].layers[0];
     }

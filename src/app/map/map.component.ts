@@ -66,7 +66,7 @@ export class MapComponent implements OnInit, OnDestroy {
     public selectedCountries: string[] = [];
     // }
     public appToolbarExpanded: boolean;
-    public liveUpdating: boolean = true;
+    public liveUpdating: boolean = false;
     // The Map & Map Layers
     private _statsLayer: LayerGroup = layerGroup();
     private _countyLayer: LayerGroup = layerGroup(); // dummy layers to fool layer control
@@ -129,7 +129,7 @@ export class MapComponent implements OnInit, OnDestroy {
      */
     private _stateSub: Subscription;
     private DEFAULT_LAYER_GROUP: string = "flood-group";
-
+    private _blinkTimer: Subscription;
     constructor(private _router: Router,
                 private route: ActivatedRoute,
                 private _zone: NgZone,
@@ -311,7 +311,8 @@ export class MapComponent implements OnInit, OnDestroy {
         // schedulers execution.
 
         this._exec.start();
-
+        //Avoids race condition with access to this.pref.combined
+        await this.pref.waitUntilReady();
         this._stateSub = this._exec.state.subscribe((state: UIState) => {
             if (state === "ready") {
                 this.ready = true;
@@ -342,6 +343,9 @@ export class MapComponent implements OnInit, OnDestroy {
             }
         });
 
+        this._blinkTimer = timer(0, this.pref.combined.blinkRateInMilliseconds).subscribe(async () => {
+            this.blinkOn= !this.blinkOn;
+        });
         this._auth.state.subscribe((event: string) => {
             if (event === AuthService.SIGN_IN) {
                 this._loggedIn = true;
@@ -379,6 +383,9 @@ export class MapComponent implements OnInit, OnDestroy {
         }
         if (this._routerStateChangeSub) {
             this._routerStateChangeSub.unsubscribe();
+        }
+        if(this._blinkTimer) {
+            this._blinkTimer.unsubscribe();
         }
 
     }
@@ -435,10 +442,14 @@ export class MapComponent implements OnInit, OnDestroy {
      * @param range the user selected upper and lower date range.
      */
     public sliderChange(range: DateRange) {
-        const {lower, upper} = range;
+        // tslint:disable-next-line:prefer-const
+        let {lower, upper} = range;
         log.debug("sliderChange(" + lower + "->" + upper + ")");
         this._dateMax = this.data.entryDate(upper).getTime();
         this._dateMin = this.data.entryDate(lower).getTime();
+        this.sliderOptions.startMin = lower;
+        this.sliderOptions.startMax = upper;
+
         this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
         if (this.pref.combined.animateOnTimeSliderChange) {
             this._sliderIsStale = true;
@@ -462,6 +473,7 @@ export class MapComponent implements OnInit, OnDestroy {
     //     // this.data.downloadAggregate(aggregrationSetId, id,
     //     //                             this.activePolyLayerShortName,
     //     //                             this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
+    public blinkOn= true;
 
     public downloadTweetsAsCSV() {
         if (this.data.hasCountryAggregates()) {
@@ -576,6 +588,7 @@ export class MapComponent implements OnInit, OnDestroy {
             this._activeLayerGroup = layer_group;
         }
 
+        this.checkForLiveUpdating();
         // this._notify.show(JSON.stringify(this.sliderOptions));
         log.debug("Slider options: ", this.sliderOptions);
         // This handles the fact that the zoom and lat/lng can change independently of each other
@@ -672,6 +685,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
         $("#loading-div").css("opacity", 0.0);
         setTimeout(() => $("#loading-div").remove(), 1000);
+        this.checkForLiveUpdating();
         this._searchParams.subscribe(async params => {
 
             if (!this._params) {
@@ -986,8 +1000,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
                                             this._exec.changeState("data-refresh");
                                             console.log("Start Max", this.data.offset(this._dateMax));
-                                            this.liveUpdating = (-this.data.offset(
-                                                this._dateMax)) < this.pref.combined.continuousUpdateThresholdInMinutes;
+
                                             await this.data.update(this._dateMin, this._dateMax);
                                             this.clearMapFeatures();
                                             this.updateRegionData();
@@ -1031,6 +1044,9 @@ export class MapComponent implements OnInit, OnDestroy {
      * This is called if this._sliderIsStale === true;
      */
     private async updateFromSlider() {
+        this.liveUpdating = this.sliderOptions.startMax > -this.pref.combined.continuousUpdateThresholdInMinutes;
+
+        this.checkForLiveUpdating();
         await this.updateLayers("Slider Change");
         this._twitterIsStale = true;
     }
@@ -1043,23 +1059,30 @@ export class MapComponent implements OnInit, OnDestroy {
         this._absoluteTime = this.data.lastEntryDate().getTime();
         this._dateMin = Math.max(this._dateMin,
                                  this._absoluteTime - ((this.data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
-        if (-this.data.offset(this._dateMax) < this.pref.combined.continuousUpdateThresholdInMinutes) {
-            log.info(`The slider max (${-this.data.offset(
-                this._dateMax)}) offset was less than threshold of ${this.pref.combined.continuousUpdateThresholdInMinutes} for us to keep it at NOW`);
-            this._dateMax = Math.max(this._dateMax, this._absoluteTime);
-            this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
+        this._dateMax = Math.max(this._dateMax,
+                                 this._absoluteTime - ((this.data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
 
-        } else {
-            this._dateMax = Math.max(this._dateMax,
-                                     this._absoluteTime - ((this.data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
-        }
         this.sliderOptions = {
             max:      0,
             min:      -this.data.entryCount() + 1,
             startMin: this.data.offset(this._dateMin),
             startMax: this.data.offset(this._dateMax)
         };
+        this.checkForLiveUpdating();
 
+    }
+
+    private checkForLiveUpdating() {
+        if (this.sliderOptions.startMax > -this.pref.combined.continuousUpdateThresholdInMinutes) {
+            this.liveUpdating = true;
+        } else {
+            log.debug("LIVE UPDATES OFF: slider position was ", this.sliderOptions.startMax);
+        }
+        if (this.liveUpdating) {
+            log.debug("LIVE UPDATES ON");
+            this._dateMax = this._absoluteTime;
+            this.sliderOptions.startMax = 0;
+        }
     }
 
     /**

@@ -104,6 +104,7 @@ export class DashboardService {
                 log.debug("No existing dashboards.");
 
                 log.debug("Created new group dashboards.");
+                await this._prefs.waitUntilReady();
                 this._groupDashboard = await DataStore.save(
                     new GroupDashboard({
                                            group:     this._groups[0],
