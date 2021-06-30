@@ -1,0 +1,71 @@
+<div class="grid-container">
+    <h1 class="mat-h1">Dashboard
+        <button mat-button (click)="reset()">reset</button>
+
+    </h1>
+    <mat-grid-list cols="2" rowHeight="500px">
+        <ng-container *ngFor="let card of cards; let i=index ">
+            <mat-grid-tile *ngIf="!card.hidden" [colspan]="card.cols" [rowspan]="card.rows">
+                <mat-card class="dashboard-card  dashboard-card-{{card.cols}}x{{card.rows}}
+                    dashboard-card-cols-{{card.cols}} dashboard-card-rows-{{card.rows}}">
+                    <mat-card-header>
+                        <mat-card-title>
+                            {{card.title}}
+                            <button mat-icon-button class="more-button" [matMenuTriggerFor]="menu"
+                                    aria-label="Toggle menu">
+                                <mat-icon>more_vert</mat-icon>
+                            </button>
+                            <mat-menu #menu="matMenu" xPosition="before">
+                                <button mat-menu-item (click)="expand(card)">Expand</button>
+                                <button mat-menu-item (click)="shrink(card)">Shrink</button>
+                                <button mat-menu-item (click)="hide(card)">Hide</button>
+                                <button *ngIf="card.variant !== 'bar'" mat-menu-item
+                                        (click)="card.variant='bar'">Switch to Bar
+                                </button>
+                                <button *ngIf="card.variant !== 'line'" mat-menu-item (click)="card.variant='line'">
+                                    Switch to Line
+                                </button>
+                            </mat-menu>
+                        </mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content class="dashboard-card-content">
+                        <ng-container [ngSwitch]="card.type">
+                            <ng-container *ngSwitchCase="'timeseries-text-and-region'">
+                                <app-twitter-timeseries [height]="card.rows*500" [mappingColumns]="['region_1']"
+                                                        [state]="card.state"
+                                                        (changed)="saveCard(i,$event)"
+                                                        [type]="card.variant || 'bar'"
+                                                        regionFilter="true" textFilter="true"></app-twitter-timeseries>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'timeseries-total'">
+                                <app-twitter-timeseries
+                                        [state]="card.state"
+                                        [type]="card.variant || 'bar'"
+                                        (changed)="saveCard(i,$event)"
+                                        [height]="card.rows*500"></app-twitter-timeseries>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'timeseries-exceed'">
+                                <app-twitter-timeseries yField="exceedence" yLabel="Exceedence"
+                                                        [type]="card.variant || 'bar'"
+                                                        [state]="card.state"
+                                                        (changed)="saveCard(i,$event)"
+                                                        [height]="card.rows*500"></app-twitter-timeseries>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'timeseries-exceed-region'">
+                                <app-twitter-timeseries yField="exceedence" regionFilter="true" yLabel="Exceedence"
+                                                        [type]="card.variant || 'bar'"
+                                                        [state]="card.state"
+                                                        (changed)="saveCard(i,$event)"
+                                                        [mappingColumns]="['region']"
+                                                        [height]="card.rows*500"></app-twitter-timeseries>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'blank'"><h3>This card is intentionally blank</h3>
+                            </ng-container>
+                        </ng-container>
+                    </mat-card-content>
+                </mat-card>
+            </mat-grid-tile>
+        </ng-container>
+
+    </mat-grid-list>
+</div>

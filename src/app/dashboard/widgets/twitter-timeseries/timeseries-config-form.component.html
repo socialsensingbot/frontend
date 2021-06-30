@@ -1,0 +1,46 @@
+<form class="ttc-form">
+    <mat-form-field *ngIf="data.component.textFilter" class="text-search" appearance="fill">
+        <mat-label>Filter by Text</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input #textSearchInput [formControl]="searchControl" matInput placeholder="Text search, e.g. coastal"
+               (ngModelChange)="data.component.markChanged();"
+               (change)="data.component.updateGraph(data.state)"
+               [(ngModel)]="data.state.textSearch">
+        <button mat-button mat-icon-button matSuffix (click)="clearTextSearch()" *ngIf="data.state.textSearch">
+            <mat-icon>close</mat-icon>
+        </button>
+
+    </mat-form-field>
+    <mat-form-field *ngIf="data.component.regionFilter"  class="region-chooser" appearance="fill">
+        <mat-label>Filter by Region</mat-label>
+        <mat-chip-list #chipList aria-label="Topic selection">
+            <mat-chip
+                    *ngFor="let region of regions"
+                    [selectable]="true"
+                    [removable]="data.component.removable"
+                    [value]="region"
+                    (removed)="remove(region)">
+                {{region.text}}
+                <mat-icon matChipRemove *ngIf="data.component.removable">cancel</mat-icon>
+            </mat-chip>
+            <input
+                    placeholder="Add regions ..."
+                    #regionInput
+                    [formControl]="regionControl"
+                    [matAutocomplete]="auto"
+                    [matChipInputFor]="chipList"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                    (matChipInputTokenEnd)="add($event)">
+        </mat-chip-list>
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+            <mat-option *ngFor="let region of filteredRegions | async" [value]="region">
+                {{region.text}}
+            </mat-option>
+        </mat-autocomplete>
+        <button mat-button mat-icon-button matSuffix (click)="clearRegions()" *ngIf="filteredRegions">
+            <mat-icon>close</mat-icon>
+        </button>
+
+    </mat-form-field>
+
+</form>
