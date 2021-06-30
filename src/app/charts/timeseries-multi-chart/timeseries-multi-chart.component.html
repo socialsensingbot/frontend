@@ -9,7 +9,7 @@
     <div *ngIf="noData">No Data</div>
 </div>
 
-<div [style.opacity]="updating ? 0.2 : 1.0">
+<div [style.opacity]="updating || noData ? 0.2 : 1.0">
     <div #chart style="width: 100%" [style.height]="height+'px'"></div>
 </div>
 
