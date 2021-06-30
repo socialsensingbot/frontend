@@ -4,12 +4,6 @@
   "Parameters": {
     "env": {
       "Type": "String"
-    },
-    "deploymentBucketName": {
-      "Type": "String"
-    },
-    "s3Key": {
-      "Type": "String"
     }
   },
   "Conditions": {
@@ -62,15 +56,11 @@
             "Arn"
           ]
         },
-        "Runtime": "nodejs12.x",
+        "Runtime": "nodejs10.x",
         "Timeout": "25",
         "Code": {
-          "S3Bucket": {
-            "Ref": "deploymentBucketName"
-          },
-          "S3Key": {
-            "Ref": "s3Key"
-          }
+          "S3Bucket": "amplify-socialsensing-prod-224245-deployment",
+          "S3Key": "amplify-builds/S3Triggerb3a090e2-754e48743050344b787a-build.zip"
         }
       }
     },

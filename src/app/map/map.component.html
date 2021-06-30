@@ -74,12 +74,6 @@
                             <mat-option value="count">Tweet Count</mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <mat-form-field>
-                        <mat-select [(value)]="activeLayerGroup" class="map-number-layer-select">
-                            <mat-option *ngFor="let layerGroup of data.dataSetMetdata.layerGroups"
-                                        [value]="layerGroup.id">{{layerGroup.title}}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
 
                     <div class="app-toolbar-separator"></div>
                     <button [disabled]="selectedCountries.length === 0 && data.hasCountryAggregates()" class="app-toolbar-btn"
