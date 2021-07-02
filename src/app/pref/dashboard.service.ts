@@ -6,6 +6,7 @@ import {DataStore} from "@aws-amplify/datastore";
 import {GroupDashboard, UserDashboard} from "../../models";
 import Auth from "@aws-amplify/auth";
 import {PreferenceService} from "./preference.service";
+import {v4 as uuidv4} from "uuid";
 
 const log = new Logger("dashboard-service");
 
@@ -17,6 +18,7 @@ export interface DashboardCard {
     rows: number;
     type: string;
     state: any;
+    id: string;
 }
 
 export interface DashboardPage {
@@ -163,7 +165,8 @@ export class DashboardService {
                                                           rows,
                                                           type,
                                                           state,
-                                                          variant
+                                                          variant,
+                                                          id: uuidv4()
                                                       });
         await this.persist();
     }

@@ -11,6 +11,7 @@ import {Dashboard} from "../app/pref/dashboard.service";
  * on performance if an error is thrown.
  */
 import "zone.js/dist/zone-error"; // Included with Angular CLI.
+import {v4 as uuidv4} from "uuid";
 
 const defaultDashboard: Dashboard = {
     devices: [{
@@ -18,8 +19,14 @@ const defaultDashboard: Dashboard = {
         pages:      [{
             title: "First Page",
             cards: [
-                {title: "Count By Text and Region", cols: 2, rows: 2, type: "timeseries-text-and-region", state: {}},
-                {title: "Total Count", cols: 1, rows: 1, type: "timeseries-total", state: {}},
+                {title:    "Count By Text and Region",
+                    cols:  2,
+                    rows:  2,
+                    type:  "timeseries-text-and-region",
+                    state: {},
+                    id:    uuidv4()
+                },
+                {title: "Total Count", cols: 1, rows: 1, type: "timeseries-total", state: {}, id: uuidv4()},
                 // {title: "Exceedence by Date", cols: 1, rows: 1, type: "timeseries-exceed", state: {}},
                 // {title: "Exceedence by Region", cols: 2, rows: 1, type: "timeseries-exceed-region", state: {}},
             ]
@@ -76,7 +83,7 @@ export const environment = {
     cacheProcessedTweets:                false,
     mapTileUrlTemplate:                  "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
     defaultDashboard:                    defaultDashboard,
-    blinkRateInMilliseconds: 1000,
+    blinkRateInMilliseconds:             1000,
     // mapTileUrlTemplate:   "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"
 
 };
