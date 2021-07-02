@@ -46,6 +46,8 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
     private trend: LineSeries;
     @Input()
     public animated = false;
+    @Input()
+    public scrollBar = true;
 
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
@@ -125,7 +127,9 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
             // valueAxis.title.fontWeight = "bold";
             valueAxis.title.opacity = 0.5;
             // Add scrollbar
-            this.chart.scrollbarX = new am4charts.XYChartScrollbar();
+            if (this.scrollBar) {
+                this.chart.scrollbarX = new am4charts.XYChartScrollbar();
+            }
 
             const series = this.initSeries();
 
@@ -187,10 +191,12 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
 
             }
 
+            if(this.scrollBar) {
             // @ts-ignore
             this.chart.scrollbarX.series.clear();
             // @ts-ignore
             this.chart.scrollbarX.series.push(series);
+            }
             return series;
         }
     }

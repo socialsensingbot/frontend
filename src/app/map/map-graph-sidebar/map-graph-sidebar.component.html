@@ -1,0 +1,39 @@
+<div class="graph-wrapper">
+    <app-twitter-timeseries [height]="500" [mappingColumns]="['region_1']"
+                            [state]="{'regions':regionList}"
+                            [type]="'bar'" [showForm]="false"
+                            [scrollBar]="false"
+                            regionFilter="true" textFilter="true"></app-twitter-timeseries>
+</div>
+
+<ng-template #expandedCountGraph>
+    <app-twitter-timeseries [height]="600" [mappingColumns]="['region_1']"
+                            [state]="{'regions':regionList}"
+                            [type]="'bar'"
+                            regionFilter="true" textFilter="true"></app-twitter-timeseries>
+
+</ng-template>
+<button mat-button (click)="expandCountGraph()">Expand</button>
+<button mat-button
+        (click)="this.dash.addGraph('timeseries-text-and-region', 'Count for regions', 1,1,{'regions':regionList});showDashboard()">Add to
+    Dashboard</button>
+<div class="graph-wrapper">
+<app-twitter-timeseries yField="exceedence" regionFilter="true" yLabel="Exceedence" [showForm]="false"
+                        [type]="'bar'"
+                        [state]="{'regions':regionList}"
+                        [mappingColumns]="['region']"
+                        [scrollBar]="false"
+                        [height]="500"></app-twitter-timeseries>
+    <ng-template #expandedExceedenceGraph>
+        <app-twitter-timeseries yField="exceedence" regionFilter="true" yLabel="Exceedence"
+                                [type]="'bar'"
+                                [state]="{'regions':regionList}"
+                                [mappingColumns]="['region']"
+
+                                [height]="500"></app-twitter-timeseries>
+    </ng-template>
+    <button mat-button (click)="expandExceedenceGraph()">Expand</button>
+    <button mat-button
+            (click)="this.dash.addGraph('timeseries-exceed-region', 'Count for regions', 1,1,{'regions':regionList});showDashboard()">Add to
+        Dashboard</button>
+</div>

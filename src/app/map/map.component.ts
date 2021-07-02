@@ -34,6 +34,7 @@ import {NgForageCache} from "ngforage";
 import {environment} from "../../environments/environment";
 import Auth from "@aws-amplify/auth";
 import {FormControl} from "@angular/forms";
+import {DashboardService} from "../pref/dashboard.service";
 
 
 const log = new Logger("map");
@@ -67,6 +68,8 @@ export class MapComponent implements OnInit, OnDestroy {
     // }
     public appToolbarExpanded: boolean;
     public liveUpdating: boolean = false;
+    //     //                             this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
+    public blinkOn = true;
     // The Map & Map Layers
     private _statsLayer: LayerGroup = layerGroup();
     private _countyLayer: LayerGroup = layerGroup(); // dummy layers to fool layer control
@@ -130,6 +133,7 @@ export class MapComponent implements OnInit, OnDestroy {
     private _stateSub: Subscription;
     private DEFAULT_LAYER_GROUP: string = "flood-group";
     private _blinkTimer: Subscription;
+
     constructor(private _router: Router,
                 private route: ActivatedRoute,
                 private _zone: NgZone,
@@ -142,6 +146,7 @@ export class MapComponent implements OnInit, OnDestroy {
                 public data: MapDataService,
                 public pref: PreferenceService,
                 private readonly cache: NgForageCache,
+                public dash: DashboardService,
     ) {
         // save the query parameter observable
         this._searchParams = this.route.queryParams;
@@ -159,7 +164,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this._activeLayerGroup = value;
         this._twitterIsStale = true;
         this.data.switchLayerGroup(value);
-        this.ready= false;
+        this.ready = false;
         this.load();
     }
 
@@ -344,7 +349,7 @@ export class MapComponent implements OnInit, OnDestroy {
         });
 
         this._blinkTimer = timer(0, this.pref.combined.blinkRateInMilliseconds).subscribe(async () => {
-            this.blinkOn= !this.blinkOn;
+            this.blinkOn = !this.blinkOn;
         });
         this._auth.state.subscribe((event: string) => {
             if (event === AuthService.SIGN_IN) {
@@ -384,7 +389,7 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this._routerStateChangeSub) {
             this._routerStateChangeSub.unsubscribe();
         }
-        if(this._blinkTimer) {
+        if (this._blinkTimer) {
             this._blinkTimer.unsubscribe();
         }
 
@@ -457,6 +462,10 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
 
+    // public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
+    //     // this.data.downloadAggregate(aggregrationSetId, id,
+    //     //                             this.activePolyLayerShortName,
+
     /**
      * Triggered when the user has finished sliding the slider.
      */
@@ -468,12 +477,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
     }
-
-    // public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
-    //     // this.data.downloadAggregate(aggregrationSetId, id,
-    //     //                             this.activePolyLayerShortName,
-    //     //                             this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
-    public blinkOn= true;
 
     public downloadTweetsAsCSV() {
         if (this.data.hasCountryAggregates()) {
@@ -633,6 +636,7 @@ export class MapComponent implements OnInit, OnDestroy {
      * @param map the leaflet.js Map
      */
     private async init(map: Map) {
+        this.dash.init();
         if (this.route.snapshot.queryParamMap.has("__clear_cache__")) {
             this.cache.clear();
         }

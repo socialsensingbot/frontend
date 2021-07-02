@@ -47,6 +47,8 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     public mappingColumns = [];
     @Input()
     public animated = false;
+    @Input()
+    public scrollBar = true;
     private scrollBarSeries: LineSeries;
     private _ready: boolean;
     private seriesMap: { [key: string]: LineSeries | ColumnSeries } = {};
@@ -113,39 +115,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                 am4core.useTheme(am4themes_animated);
             }
             // Themes end
-
-            this.chart = am4core.create(this.chartRef.nativeElement, am4charts.XYChart);
-            this.chart.paddingRight = 20;
-
-
-            this.chart.data = [];
-            this.chart.legend = new am4charts.Legend();
-            // Create axes
-            const dateAxis = this.chart.xAxes.push(new am4charts.DateAxis());
-            dateAxis.renderer.minGridDistance = 50;
-            dateAxis.title.text = "Date";
-            // dateAxis.title.fontWeight = "bold";
-            dateAxis.title.opacity = 0.5;
-
-            const valueAxis = this.chart.yAxes.push(new am4charts.ValueAxis());
-            valueAxis.title.text = this.yLabel;
-            // valueAxis.title.fontWeight = "bold";
-            valueAxis.title.opacity = 0.5;
-            //
-            //
-            // this.trend = this.chart.series.push(new am4charts.LineSeries());
-            // this.trend.dataFields.valueY = "trend";
-            // this.trend.dataFields.dateX = this.xField;
-            // this.trend.strokeWidth = 1;
-            // this.trend.stroke = this.trend.fill = am4core.color("#E5210C", 0.4);
-            // this.trend.data = this.chart.data;
-            // const avgText = this.rollingAvg ? "Rolling Avg" : "Trend";
-            // this.trend.tooltipText = `{dateX}\n[bold font-size: 17px]${this.avgLength}-day ${avgText}: {trend}[/]`;
-            // this.trend.tensionX = 0.75;
-            // Add cursor
-            this.chart.cursor = new am4charts.XYCursor();
-            this.chart.cursor.xAxis = dateAxis;
-            this.chart.scrollbarX = new am4charts.XYChartScrollbar();
+            this.initChart();
 
         });
         this.ready.emit(true);
@@ -156,10 +126,51 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
 
     }
 
+    private initChart() {
+        this.chart = am4core.create(this.chartRef.nativeElement, am4charts.XYChart);
+        this.chart.paddingRight = 20;
+
+
+        this.chart.data = [];
+        this.chart.legend = new am4charts.Legend();
+        this.chart.legend.maxHeight = 120;
+        this.chart.legend.scrollable = true;
+
+        // Create axes
+        const dateAxis = this.chart.xAxes.push(new am4charts.DateAxis());
+        dateAxis.renderer.minGridDistance = 50;
+        dateAxis.title.text = "Date";
+        // dateAxis.title.fontWeight = "bold";
+        dateAxis.title.opacity = 0.5;
+
+        const valueAxis = this.chart.yAxes.push(new am4charts.ValueAxis());
+        valueAxis.title.text = this.yLabel;
+        // valueAxis.title.fontWeight = "bold";
+        valueAxis.title.opacity = 0.5;
+        //
+        //
+        // this.trend = this.chart.series.push(new am4charts.LineSeries());
+        // this.trend.dataFields.valueY = "trend";
+        // this.trend.dataFields.dateX = this.xField;
+        // this.trend.strokeWidth = 1;
+        // this.trend.stroke = this.trend.fill = am4core.color("#E5210C", 0.4);
+        // this.trend.data = this.chart.data;
+        // const avgText = this.rollingAvg ? "Rolling Avg" : "Trend";
+        // this.trend.tooltipText = `{dateX}\n[bold font-size: 17px]${this.avgLength}-day ${avgText}: {trend}[/]`;
+        // this.trend.tensionX = 0.75;
+        // Add cursor
+        this.chart.cursor = new am4charts.XYCursor();
+        this.chart.cursor.xAxis = dateAxis;
+        if (this.scrollBar) {
+            this.chart.scrollbarX = new am4charts.XYChartScrollbar();
+        }
+        this.chart.responsive.enabled = true;
+    }
 
     private createSeriesFromMappedData(mappedKey, mappedData: any[]) {
         if (typeof this.seriesMap[mappedKey] !== "undefined") {
             this.seriesMap[mappedKey].data = mappedData;
+            this.seriesMap[mappedKey].validateData();
             return this.seriesMap[mappedKey];
         }
         // Create series
@@ -196,15 +207,18 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
 
         series.name = mappedKey;
         this.seriesMap[mappedKey] = series;
-        // @ts-ignore
-        this.chart.scrollbarX.series.push(series);
+        if (this.scrollBar) {
+            // @ts-ignore
+            this.chart.scrollbarX.series.push(series);
+        }
+
         return series;
 
     }
 
 
     private createScrollBarSeries(data: any[]) {
-        if (this.chart) {
+        if (this.chart && this.scrollBar) {
             this.scrollBarSeries = this.chart.series.push(new am4charts.LineSeries());
             this.scrollBarSeries.hide();
             this.scrollBarSeries.data = data;
@@ -284,8 +298,11 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                 if (this.seriesMap.hasOwnProperty(key)) {
                     if (typeof mappedData[key] === "undefined") {
                         this.chart.series.removeValue(this.seriesMap[key]);
-                        // @ts-ignore
-                        this.chart.scrollbarX.series.removeValue(this.seriesMap[key]);
+                        if (this.scrollBar) {
+
+                            // @ts-ignore
+                            this.chart.scrollbarX.series.removeValue(this.seriesMap[key]);
+                        }
                         delete this.seriesMap[key];
                     }
                 }

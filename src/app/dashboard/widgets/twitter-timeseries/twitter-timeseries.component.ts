@@ -1,17 +1,26 @@
-import {Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output} from "@angular/core";
+import {
+    Component,
+    EventEmitter,
+    Input,
+    NgZone,
+    OnChanges,
+    OnDestroy,
+    OnInit,
+    Output,
+    SimpleChanges
+} from "@angular/core";
 import {StandardGraphComponent} from "../../standard-graph-component";
 import {MetadataService} from "../../../api/metadata.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {HistoricalDataService} from "../../../api/historical-data.service";
 import {MatDialog} from "@angular/material/dialog";
-import {TimeseriesConfigFormComponent} from "./timeseries-config-form.component";
 
 @Component({
                selector:    "app-twitter-timeseries",
                templateUrl: "./twitter-timeseries.component.html",
                styleUrls:   ["./twitter-timeseries.component.scss"]
            })
-export class TwitterTimeseriesComponent extends StandardGraphComponent implements OnInit, OnDestroy {
+export class TwitterTimeseriesComponent extends StandardGraphComponent implements OnInit, OnDestroy, OnChanges {
     @Input()
     public height: number;
     @Input()
@@ -32,6 +41,8 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     public yField = "count";
     @Input()
     public animated = false;
+
+    @Input() scrollBar = true;
     @Input()
     public query: {
         dateStep?: number;
@@ -42,7 +53,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
         textSearch?: string;
     } = {
         regions:  [],
-        from:     new Date().getTime() - (365.25 * 24 * 60 * 60 * 1000),
+        from:     new Date().getTime() - (90 * 24 * 60 * 60 * 1000),
         to:       new Date().getTime(),
         dateStep: 7 * 24 * 60 * 60 * 1000
     };
@@ -51,6 +62,9 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     public removable = true;
     @Input()
     public mappingColumns: string[] = [];
+    // }
+    @Input()
+    public showForm: boolean = true;
     private interval: number;
 
     constructor(metadata: MetadataService, zone: NgZone, router: Router, route: ActivatedRoute,
@@ -80,6 +94,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     public set state(value: any) {
         this._state = value;
         this.query = {...this.query, ...value};
+        this.markChanged();
     }
 
     async ngOnInit() {
@@ -132,7 +147,9 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     //         console.log("The dialog was closed");
     //         this.updateGraph(this.state);
     //     });
-    // }
+
+    public ngOnChanges(changes: SimpleChanges): void {
+    }
 
 
 }
