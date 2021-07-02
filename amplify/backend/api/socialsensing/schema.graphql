@@ -16,7 +16,7 @@ type UserDashboard @model @auth(rules: [{allow: owner,  operations: [create, upd
   owner: String
   #  ignoreTweets: [TweetIgnore] @connection(name: "UserTweetIgnores")
   #  ignorePeople: [TwitterUserIgnore] @connection(name: "UserTwitterUserIgnores")
-  dashboard: AWSJSON
+  dashboard: String!
 }
 
 type GroupDashboard
@@ -24,7 +24,7 @@ type GroupDashboard
 @auth(rules: [{allow: private}]) {
   id: ID!
   group: String!
-  dashboard: AWSJSON
+  dashboard: String!
 }
 
 
