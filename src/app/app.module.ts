@@ -43,6 +43,7 @@ import {TweetCopyDialogComponent} from "./map/twitter/tweet-list/tweet-copy-dial
 import {StripHtmlPipe} from "./strip.pipe";
 import {TimeseriesConfigFormComponent} from "./dashboard/widgets/twitter-timeseries/timeseries-config-form.component";
 import {TimeSeriesMultiChartComponent} from "./charts/timeseries-multi-chart/timeseries-multi-chart.component";
+import { MapGraphSidebarComponent } from './map/map-graph-sidebar/map-graph-sidebar.component';
 
 @NgModule({
               declarations:    [
@@ -72,7 +73,8 @@ import {TimeSeriesMultiChartComponent} from "./charts/timeseries-multi-chart/tim
                   BarChartComponent,
                   PieChartComponent,
                   TwitterTimeseriesComponent, TimeseriesConfigFormComponent,
-                  TimeSeriesMultiChartComponent
+                  TimeSeriesMultiChartComponent,
+                  MapGraphSidebarComponent
               ],
               imports:         [
                   BrowserModule,

@@ -74,7 +74,7 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
     count_by_date_for_all_regions:          (params: any) => {
 
         return {
-            sql: `SELECT sum(message_count) as count, aggregate_date as date, max(exceedence) as exceedence, 'all' as region
+            sql: `SELECT sum(message_count) as count, aggregate_date as date, avg(exceedence) as exceedence, 'all' as region
                   FROM aggregate_counts_by_region
                   WHERE source = ?
                     and hazard = ?

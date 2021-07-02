@@ -2,7 +2,7 @@
 <!--    <span class='dct-containing' *ngIf="textFilter && query.textSearch">Containing '<span-->
 <!--            class='dct-containing-term'>{{query.textSearch}}</span>'-->
 <!--    </span>&nbsp;-->
-    <ng-container *ngIf="textFilter || regionFilter" >    <app-timeseries-config-form
+    <ng-container *ngIf="(textFilter || regionFilter) && showForm" >    <app-timeseries-config-form
             [data]="{state:state,component:this}"></app-timeseries-config-form>
     </ng-container>
 
@@ -21,6 +21,7 @@
                                 [mappingColumns]="mappingColumns"
                                 [type]="type"
                                 [animated]="animated"
+                                [scrollBar]="scrollBar"
                                 class="twitter-timeseries-chart"
     ></app-timeseries-multi-chart>
 </ng-container>
@@ -36,6 +37,7 @@
                           [height]="height-120"
                           [type]="type"
                           [animated]="animated"
+                          [scrollBar]="scrollBar"
                           class="twitter-timeseries-chart"
     ></app-timeseries-chart>
 </ng-container>

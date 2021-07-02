@@ -44,8 +44,8 @@ export class DashboardComponent implements OnInit {
         this.dash.persist();
     }
 
-    public reset() {
-        this.dash.reset();
+    public async reset() {
+        await this.dash.reset();
         this.initDashboard();
     }
 

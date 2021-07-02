@@ -20,8 +20,8 @@ const defaultDashboard: Dashboard = {
             cards: [
                 {title: "Count By Text and Region", cols: 2, rows: 2, type: "timeseries-text-and-region", state: {}},
                 {title: "Total Count", cols: 1, rows: 1, type: "timeseries-total", state: {}},
-                {title: "Exceedence by Date", cols: 1, rows: 1, type: "timeseries-exceed", state: {}},
-                {title: "Exceedence by Region", cols: 2, rows: 1, type: "timeseries-exceed-region", state: {}},
+                // {title: "Exceedence by Date", cols: 1, rows: 1, type: "timeseries-exceed", state: {}},
+                // {title: "Exceedence by Region", cols: 2, rows: 1, type: "timeseries-exceed-region", state: {}},
             ]
         }]
     }]

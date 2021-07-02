@@ -66,20 +66,6 @@ export class DashboardService {
         return this._groups;
     }
 
-    private static combine(...prefs: any) {
-        const result = {};
-        for (const pref of prefs) {
-            for (const field in pref) {
-                if (pref.hasOwnProperty(field)
-                    && !field.startsWith("__")
-                    && typeof pref[field] !== "undefined"
-                    && pref[field] !== null) {
-                    result[field] = pref[field];
-                }
-            }
-        }
-        return result;
-    }
 
     public async init() {
         const groups = (await Auth.currentAuthenticatedUser()).signInUserSession.accessToken.payload["cognito:groups"];
@@ -140,7 +126,7 @@ export class DashboardService {
             log.error(e);
 
         }
-        log.info("Preference Service Initialized");
+        log.info("Dashboard Service Initialized");
 
 
     }
@@ -166,6 +152,19 @@ export class DashboardService {
 
     public async reset() {
         this.dashboard = JSON.parse(this._groupDashboard.dashboard);
+        await this.persist();
+    }
+
+    public async addGraph(type: string, title: string, cols: number, rows: number, state: any,
+                          variant?: string) {
+        this.dashboard.devices[0].pages[0].cards.push({
+                                                          title,
+                                                          cols,
+                                                          rows,
+                                                          type,
+                                                          state,
+                                                          variant
+                                                      });
         await this.persist();
     }
 }
