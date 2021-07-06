@@ -9,7 +9,7 @@ elif [[ "${AWS_BRANCH}" == demo ]]; then
 elif [[ "${AWS_BRANCH}" == master ]]; then
   npm run-script build-prod
 elif [[ "${AWS_BRANCH}" == pwsdemo ]]; then
-  npm run-script build-prod
+  npm run-script build-pwsdemo
 else
   npm run-script build
 fi

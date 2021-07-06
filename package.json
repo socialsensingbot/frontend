@@ -9,6 +9,7 @@
     "build": "ng build --verbose --aot",
     "build-prod": "ng build --prod",
     "build-demo": "ng build --prod --configuration demo",
+    "build-pwsdemo": "ng build --prod --configuration pwsdemo",
     "test": "ng test",
     "lint": "ng lint",
     "amplify-modelgen": "node amplify/scripts/amplify-modelgen.js",
