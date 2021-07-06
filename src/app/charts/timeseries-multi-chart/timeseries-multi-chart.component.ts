@@ -54,6 +54,8 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     private scrollBarSeries: LineSeries;
     private _ready: boolean;
     private seriesMap: { [key: string]: LineSeries | ColumnSeries } = {};
+    private dateSpacing = 24 * 60 * 60 * 1000;
+    @Input() zeroFillMissingDates= true;
 
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
@@ -128,6 +130,34 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
 
     }
 
+    public zeroFill(mappedData: any[]) {
+        if (this.zeroFillMissingDates) {
+            const result = [];
+            let lastRowDate = null;
+            for (const row of mappedData) {
+                const rowDate = new Date(row[this.xField]).getTime();
+                if (lastRowDate !== null) {
+                    if (rowDate > lastRowDate + this.dateSpacing) {
+                        for (let fillDate = lastRowDate; fillDate < rowDate; fillDate += this.dateSpacing) {
+                            const fillRow = {};
+                            fillRow[this.xField] = new Date(fillDate);
+                            fillRow[this.yField] = 0;
+                            result.push(fillRow);
+                        }
+                    }
+                }
+                result.push(row);
+                lastRowDate = rowDate;
+            }
+            console.log("Before ZERO FILL ", mappedData);
+            console.log("After ZERO FILL ", result);
+            return result;
+        } else {
+            return mappedData;
+        }
+
+    }
+
     private initChart() {
         this.chart = am4core.create(this.chartRef.nativeElement, am4charts.XYChart);
         this.chart.paddingRight = 20;
@@ -171,7 +201,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
 
     private createSeriesFromMappedData(mappedKey, mappedData: any[]) {
         if (typeof this.seriesMap[mappedKey] !== "undefined") {
-            this.seriesMap[mappedKey].data = mappedData;
+            this.seriesMap[mappedKey].data = this.zeroFill(mappedData);
             this.seriesMap[mappedKey].validateData();
             return this.seriesMap[mappedKey];
         }
@@ -179,7 +209,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
         let series: LineSeries | ColumnSeries;
         if (this._type === "line") {
             series = this.chart.series.push(new am4charts.LineSeries());
-            series.data = mappedData;
+            series.data = this.zeroFill(mappedData);
             series.dataFields.valueY = this.yField;
             series.dataFields.dateX = this.xField;
             series.strokeWidth = 3;
@@ -191,7 +221,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
             series.tooltip.background.cornerRadius = 20;
             series.tooltip.background.fillOpacity = 0.5;
             series.tooltip.label.padding(12, 12, 12, 12);
-            series.tensionX = this.connect ? 0.9 : 0.95;
+            series.tensionX = this.connect ? 0.9 : 0.8;
             series.connect = this.connect;
         } else {
             series = this.chart.series.push(new am4charts.ColumnSeries());
@@ -217,7 +247,6 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
         return series;
 
     }
-
 
     private createScrollBarSeries(data: any[]) {
         if (this.chart && this.scrollBar) {
