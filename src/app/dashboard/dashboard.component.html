@@ -34,7 +34,7 @@
                                 <app-twitter-timeseries [height]="card.rows*500" [mappingColumns]="['region_1']"
                                                         [state]="card.state"
                                                         (changed)="saveCard(i,$event)"
-                                                        [type]="card.variant || 'bar'"
+                                                        [type]="card.variant || 'line'"
                                                         regionFilter="true" textFilter="true"></app-twitter-timeseries>
                             </ng-container>
                             <ng-container *ngSwitchCase="'timeseries-total'">
