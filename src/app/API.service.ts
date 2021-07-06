@@ -62,6 +62,18 @@ export type ModelSizeInput = {
   between?: Array<number | null> | null;
 };
 
+export type UserPreferences = {
+  __typename: "UserPreferences";
+  id?: string;
+  owner?: string | null;
+  prefs?: string | null;
+  _version?: number;
+  _deleted?: boolean | null;
+  _lastChangedAt?: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type UpdateUserPreferencesInput = {
   id: string;
   owner?: string | null;
@@ -70,7 +82,84 @@ export type UpdateUserPreferencesInput = {
 };
 
 export type DeleteUserPreferencesInput = {
+  id: string;
+  _version?: number | null;
+};
+
+export type CreateUserDashboardInput = {
   id?: string | null;
+  owner?: string | null;
+  dashboard: string;
+  _version?: number | null;
+};
+
+export type ModelUserDashboardConditionInput = {
+  dashboard?: ModelStringInput | null;
+  and?: Array<ModelUserDashboardConditionInput | null> | null;
+  or?: Array<ModelUserDashboardConditionInput | null> | null;
+  not?: ModelUserDashboardConditionInput | null;
+};
+
+export type UserDashboard = {
+  __typename: "UserDashboard";
+  id?: string;
+  owner?: string | null;
+  dashboard?: string;
+  _version?: number;
+  _deleted?: boolean | null;
+  _lastChangedAt?: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type UpdateUserDashboardInput = {
+  id: string;
+  owner?: string | null;
+  dashboard?: string | null;
+  _version?: number | null;
+};
+
+export type DeleteUserDashboardInput = {
+  id: string;
+  _version?: number | null;
+};
+
+export type CreateGroupDashboardInput = {
+  id?: string | null;
+  group: string;
+  dashboard: string;
+  _version?: number | null;
+};
+
+export type ModelGroupDashboardConditionInput = {
+  group?: ModelStringInput | null;
+  dashboard?: ModelStringInput | null;
+  and?: Array<ModelGroupDashboardConditionInput | null> | null;
+  or?: Array<ModelGroupDashboardConditionInput | null> | null;
+  not?: ModelGroupDashboardConditionInput | null;
+};
+
+export type GroupDashboard = {
+  __typename: "GroupDashboard";
+  id?: string;
+  group?: string;
+  dashboard?: string;
+  _version?: number;
+  _deleted?: boolean | null;
+  _lastChangedAt?: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type UpdateGroupDashboardInput = {
+  id: string;
+  group?: string | null;
+  dashboard?: string | null;
+  _version?: number | null;
+};
+
+export type DeleteGroupDashboardInput = {
+  id: string;
   _version?: number | null;
 };
 
@@ -120,6 +209,23 @@ export type ModelIntInput = {
   attributeType?: ModelAttributeTypes | null;
 };
 
+export type UserSession = {
+  __typename: "UserSession";
+  id?: string;
+  fingerprint?: string | null;
+  client?: string | null;
+  open?: boolean;
+  group?: string;
+  owner?: string | null;
+  ttl?: number | null;
+  createdAt?: string | null;
+  sessionId?: string | null;
+  _version?: number;
+  _deleted?: boolean | null;
+  _lastChangedAt?: number;
+  updatedAt?: string;
+};
+
 export type UpdateUserSessionInput = {
   id: string;
   fingerprint?: string | null;
@@ -134,7 +240,7 @@ export type UpdateUserSessionInput = {
 };
 
 export type DeleteUserSessionInput = {
-  id?: string | null;
+  id: string;
   _version?: number | null;
 };
 
@@ -153,6 +259,18 @@ export type ModelGroupPreferencesConditionInput = {
   not?: ModelGroupPreferencesConditionInput | null;
 };
 
+export type GroupPreferences = {
+  __typename: "GroupPreferences";
+  id?: string;
+  group?: string;
+  prefs?: string | null;
+  _version?: number;
+  _deleted?: boolean | null;
+  _lastChangedAt?: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type UpdateGroupPreferencesInput = {
   id: string;
   group?: string | null;
@@ -161,7 +279,7 @@ export type UpdateGroupPreferencesInput = {
 };
 
 export type DeleteGroupPreferencesInput = {
-  id?: string | null;
+  id: string;
   _version?: number | null;
 };
 
@@ -186,6 +304,21 @@ export type ModelGroupTweetIgnoreConditionInput = {
   not?: ModelGroupTweetIgnoreConditionInput | null;
 };
 
+export type GroupTweetIgnore = {
+  __typename: "GroupTweetIgnore";
+  id?: string;
+  url?: string;
+  ignoredBy?: string;
+  tweetId?: string;
+  ownerGroups?: Array<string | null> | null;
+  scope?: string;
+  _version?: number;
+  _deleted?: boolean | null;
+  _lastChangedAt?: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type UpdateGroupTweetIgnoreInput = {
   id: string;
   url?: string | null;
@@ -197,7 +330,7 @@ export type UpdateGroupTweetIgnoreInput = {
 };
 
 export type DeleteGroupTweetIgnoreInput = {
-  id?: string | null;
+  id: string;
   _version?: number | null;
 };
 
@@ -222,6 +355,21 @@ export type ModelGroupTweetAnnotationsConditionInput = {
   not?: ModelGroupTweetAnnotationsConditionInput | null;
 };
 
+export type GroupTweetAnnotations = {
+  __typename: "GroupTweetAnnotations";
+  id?: string;
+  url?: string;
+  annotatedBy?: string;
+  tweetId?: string;
+  ownerGroups?: Array<string | null> | null;
+  annotations?: string | null;
+  _version?: number;
+  _deleted?: boolean | null;
+  _lastChangedAt?: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type UpdateGroupTweetAnnotationsInput = {
   id: string;
   url?: string | null;
@@ -233,7 +381,7 @@ export type UpdateGroupTweetAnnotationsInput = {
 };
 
 export type DeleteGroupTweetAnnotationsInput = {
-  id?: string | null;
+  id: string;
   _version?: number | null;
 };
 
@@ -256,6 +404,20 @@ export type ModelGroupTwitterUserIgnoreConditionInput = {
   not?: ModelGroupTwitterUserIgnoreConditionInput | null;
 };
 
+export type GroupTwitterUserIgnore = {
+  __typename: "GroupTwitterUserIgnore";
+  id?: string;
+  twitterScreenName?: string;
+  ignoredBy?: string;
+  ownerGroups?: Array<string | null> | null;
+  scope?: string;
+  _version?: number;
+  _deleted?: boolean | null;
+  _lastChangedAt?: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type UpdateGroupTwitterUserIgnoreInput = {
   id: string;
   twitterScreenName?: string | null;
@@ -266,7 +428,7 @@ export type UpdateGroupTwitterUserIgnoreInput = {
 };
 
 export type DeleteGroupTwitterUserIgnoreInput = {
-  id?: string | null;
+  id: string;
   _version?: number | null;
 };
 
@@ -295,6 +457,45 @@ export type ModelIDInput = {
   size?: ModelSizeInput | null;
 };
 
+export type ModelUserPreferencesConnection = {
+  __typename: "ModelUserPreferencesConnection";
+  items?: Array<UserPreferences | null> | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
+};
+
+export type ModelUserDashboardFilterInput = {
+  id?: ModelIDInput | null;
+  owner?: ModelStringInput | null;
+  dashboard?: ModelStringInput | null;
+  and?: Array<ModelUserDashboardFilterInput | null> | null;
+  or?: Array<ModelUserDashboardFilterInput | null> | null;
+  not?: ModelUserDashboardFilterInput | null;
+};
+
+export type ModelUserDashboardConnection = {
+  __typename: "ModelUserDashboardConnection";
+  items?: Array<UserDashboard | null> | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
+};
+
+export type ModelGroupDashboardFilterInput = {
+  id?: ModelIDInput | null;
+  group?: ModelStringInput | null;
+  dashboard?: ModelStringInput | null;
+  and?: Array<ModelGroupDashboardFilterInput | null> | null;
+  or?: Array<ModelGroupDashboardFilterInput | null> | null;
+  not?: ModelGroupDashboardFilterInput | null;
+};
+
+export type ModelGroupDashboardConnection = {
+  __typename: "ModelGroupDashboardConnection";
+  items?: Array<GroupDashboard | null> | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
+};
+
 export type ModelUserSessionFilterInput = {
   id?: ModelIDInput | null;
   fingerprint?: ModelStringInput | null;
@@ -310,6 +511,13 @@ export type ModelUserSessionFilterInput = {
   not?: ModelUserSessionFilterInput | null;
 };
 
+export type ModelUserSessionConnection = {
+  __typename: "ModelUserSessionConnection";
+  items?: Array<UserSession | null> | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
+};
+
 export type ModelGroupPreferencesFilterInput = {
   id?: ModelIDInput | null;
   group?: ModelStringInput | null;
@@ -317,6 +525,13 @@ export type ModelGroupPreferencesFilterInput = {
   and?: Array<ModelGroupPreferencesFilterInput | null> | null;
   or?: Array<ModelGroupPreferencesFilterInput | null> | null;
   not?: ModelGroupPreferencesFilterInput | null;
+};
+
+export type ModelGroupPreferencesConnection = {
+  __typename: "ModelGroupPreferencesConnection";
+  items?: Array<GroupPreferences | null> | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
 };
 
 export type ModelGroupTweetIgnoreFilterInput = {
@@ -331,6 +546,13 @@ export type ModelGroupTweetIgnoreFilterInput = {
   not?: ModelGroupTweetIgnoreFilterInput | null;
 };
 
+export type ModelGroupTweetIgnoreConnection = {
+  __typename: "ModelGroupTweetIgnoreConnection";
+  items?: Array<GroupTweetIgnore | null> | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
+};
+
 export type ModelGroupTweetAnnotationsFilterInput = {
   id?: ModelIDInput | null;
   url?: ModelStringInput | null;
@@ -341,6 +563,13 @@ export type ModelGroupTweetAnnotationsFilterInput = {
   and?: Array<ModelGroupTweetAnnotationsFilterInput | null> | null;
   or?: Array<ModelGroupTweetAnnotationsFilterInput | null> | null;
   not?: ModelGroupTweetAnnotationsFilterInput | null;
+};
+
+export type ModelGroupTweetAnnotationsConnection = {
+  __typename: "ModelGroupTweetAnnotationsConnection";
+  items?: Array<GroupTweetAnnotations | null> | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
 };
 
 export type ModelGroupTwitterUserIgnoreFilterInput = {
@@ -354,13 +583,20 @@ export type ModelGroupTwitterUserIgnoreFilterInput = {
   not?: ModelGroupTwitterUserIgnoreFilterInput | null;
 };
 
+export type ModelGroupTwitterUserIgnoreConnection = {
+  __typename: "ModelGroupTwitterUserIgnoreConnection";
+  items?: Array<GroupTwitterUserIgnore | null> | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
+};
+
 export type CreateUserPreferencesMutation = {
   __typename: "UserPreferences";
   id: string;
-  owner: string | null;
-  prefs: string | null;
+  owner?: string | null;
+  prefs?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -369,10 +605,10 @@ export type CreateUserPreferencesMutation = {
 export type UpdateUserPreferencesMutation = {
   __typename: "UserPreferences";
   id: string;
-  owner: string | null;
-  prefs: string | null;
+  owner?: string | null;
+  prefs?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -381,10 +617,82 @@ export type UpdateUserPreferencesMutation = {
 export type DeleteUserPreferencesMutation = {
   __typename: "UserPreferences";
   id: string;
-  owner: string | null;
-  prefs: string | null;
+  owner?: string | null;
+  prefs?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateUserDashboardMutation = {
+  __typename: "UserDashboard";
+  id: string;
+  owner?: string | null;
+  dashboard: string;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type UpdateUserDashboardMutation = {
+  __typename: "UserDashboard";
+  id: string;
+  owner?: string | null;
+  dashboard: string;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type DeleteUserDashboardMutation = {
+  __typename: "UserDashboard";
+  id: string;
+  owner?: string | null;
+  dashboard: string;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateGroupDashboardMutation = {
+  __typename: "GroupDashboard";
+  id: string;
+  group: string;
+  dashboard: string;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type UpdateGroupDashboardMutation = {
+  __typename: "GroupDashboard";
+  id: string;
+  group: string;
+  dashboard: string;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type DeleteGroupDashboardMutation = {
+  __typename: "GroupDashboard";
+  id: string;
+  group: string;
+  dashboard: string;
+  _version: number;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -393,16 +701,16 @@ export type DeleteUserPreferencesMutation = {
 export type CreateUserSessionMutation = {
   __typename: "UserSession";
   id: string;
-  fingerprint: string | null;
-  client: string | null;
+  fingerprint?: string | null;
+  client?: string | null;
   open: boolean;
   group: string;
-  owner: string | null;
-  ttl: number | null;
-  createdAt: string | null;
-  sessionId: string | null;
+  owner?: string | null;
+  ttl?: number | null;
+  createdAt?: string | null;
+  sessionId?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   updatedAt: string;
 };
@@ -410,16 +718,16 @@ export type CreateUserSessionMutation = {
 export type UpdateUserSessionMutation = {
   __typename: "UserSession";
   id: string;
-  fingerprint: string | null;
-  client: string | null;
+  fingerprint?: string | null;
+  client?: string | null;
   open: boolean;
   group: string;
-  owner: string | null;
-  ttl: number | null;
-  createdAt: string | null;
-  sessionId: string | null;
+  owner?: string | null;
+  ttl?: number | null;
+  createdAt?: string | null;
+  sessionId?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   updatedAt: string;
 };
@@ -427,16 +735,16 @@ export type UpdateUserSessionMutation = {
 export type DeleteUserSessionMutation = {
   __typename: "UserSession";
   id: string;
-  fingerprint: string | null;
-  client: string | null;
+  fingerprint?: string | null;
+  client?: string | null;
   open: boolean;
   group: string;
-  owner: string | null;
-  ttl: number | null;
-  createdAt: string | null;
-  sessionId: string | null;
+  owner?: string | null;
+  ttl?: number | null;
+  createdAt?: string | null;
+  sessionId?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   updatedAt: string;
 };
@@ -445,9 +753,9 @@ export type CreateGroupPreferencesMutation = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  prefs: string | null;
+  prefs?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -457,9 +765,9 @@ export type UpdateGroupPreferencesMutation = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  prefs: string | null;
+  prefs?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -469,9 +777,9 @@ export type DeleteGroupPreferencesMutation = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  prefs: string | null;
+  prefs?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -483,10 +791,10 @@ export type CreateGroupTweetIgnoreMutation = {
   url: string;
   ignoredBy: string;
   tweetId: string;
-  ownerGroups: Array<string | null> | null;
+  ownerGroups?: Array<string | null> | null;
   scope: string;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -498,10 +806,10 @@ export type UpdateGroupTweetIgnoreMutation = {
   url: string;
   ignoredBy: string;
   tweetId: string;
-  ownerGroups: Array<string | null> | null;
+  ownerGroups?: Array<string | null> | null;
   scope: string;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -513,10 +821,10 @@ export type DeleteGroupTweetIgnoreMutation = {
   url: string;
   ignoredBy: string;
   tweetId: string;
-  ownerGroups: Array<string | null> | null;
+  ownerGroups?: Array<string | null> | null;
   scope: string;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -528,10 +836,10 @@ export type CreateGroupTweetAnnotationsMutation = {
   url: string;
   annotatedBy: string;
   tweetId: string;
-  ownerGroups: Array<string | null> | null;
-  annotations: string | null;
+  ownerGroups?: Array<string | null> | null;
+  annotations?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -543,10 +851,10 @@ export type UpdateGroupTweetAnnotationsMutation = {
   url: string;
   annotatedBy: string;
   tweetId: string;
-  ownerGroups: Array<string | null> | null;
-  annotations: string | null;
+  ownerGroups?: Array<string | null> | null;
+  annotations?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -558,10 +866,10 @@ export type DeleteGroupTweetAnnotationsMutation = {
   url: string;
   annotatedBy: string;
   tweetId: string;
-  ownerGroups: Array<string | null> | null;
-  annotations: string | null;
+  ownerGroups?: Array<string | null> | null;
+  annotations?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -572,10 +880,10 @@ export type CreateGroupTwitterUserIgnoreMutation = {
   id: string;
   twitterScreenName: string;
   ignoredBy: string;
-  ownerGroups: Array<string | null> | null;
+  ownerGroups?: Array<string | null> | null;
   scope: string;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -586,10 +894,10 @@ export type UpdateGroupTwitterUserIgnoreMutation = {
   id: string;
   twitterScreenName: string;
   ignoredBy: string;
-  ownerGroups: Array<string | null> | null;
+  ownerGroups?: Array<string | null> | null;
   scope: string;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -600,10 +908,10 @@ export type DeleteGroupTwitterUserIgnoreMutation = {
   id: string;
   twitterScreenName: string;
   ignoredBy: string;
-  ownerGroups: Array<string | null> | null;
+  ownerGroups?: Array<string | null> | null;
   scope: string;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -612,10 +920,10 @@ export type DeleteGroupTwitterUserIgnoreMutation = {
 export type GetUserPreferencesQuery = {
   __typename: "UserPreferences";
   id: string;
-  owner: string | null;
-  prefs: string | null;
+  owner?: string | null;
+  prefs?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -623,106 +931,198 @@ export type GetUserPreferencesQuery = {
 
 export type ListUserPreferencessQuery = {
   __typename: "ModelUserPreferencesConnection";
-  items: Array<{
+  items?: Array<{
     __typename: "UserPreferences";
     id: string;
-    owner: string | null;
-    prefs: string | null;
+    owner?: string | null;
+    prefs?: string | null;
     _version: number;
-    _deleted: boolean | null;
+    _deleted?: boolean | null;
     _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
-  nextToken: string | null;
-  startedAt: number | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
 };
 
 export type SyncUserPreferencesQuery = {
   __typename: "ModelUserPreferencesConnection";
-  items: Array<{
+  items?: Array<{
     __typename: "UserPreferences";
     id: string;
-    owner: string | null;
-    prefs: string | null;
+    owner?: string | null;
+    prefs?: string | null;
     _version: number;
-    _deleted: boolean | null;
+    _deleted?: boolean | null;
     _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
-  nextToken: string | null;
-  startedAt: number | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
+};
+
+export type GetUserDashboardQuery = {
+  __typename: "UserDashboard";
+  id: string;
+  owner?: string | null;
+  dashboard: string;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ListUserDashboardsQuery = {
+  __typename: "ModelUserDashboardConnection";
+  items?: Array<{
+    __typename: "UserDashboard";
+    id: string;
+    owner?: string | null;
+    dashboard: string;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
+    createdAt: string;
+    updatedAt: string;
+  } | null> | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
+};
+
+export type SyncUserDashboardsQuery = {
+  __typename: "ModelUserDashboardConnection";
+  items?: Array<{
+    __typename: "UserDashboard";
+    id: string;
+    owner?: string | null;
+    dashboard: string;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
+    createdAt: string;
+    updatedAt: string;
+  } | null> | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
+};
+
+export type GetGroupDashboardQuery = {
+  __typename: "GroupDashboard";
+  id: string;
+  group: string;
+  dashboard: string;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ListGroupDashboardsQuery = {
+  __typename: "ModelGroupDashboardConnection";
+  items?: Array<{
+    __typename: "GroupDashboard";
+    id: string;
+    group: string;
+    dashboard: string;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
+    createdAt: string;
+    updatedAt: string;
+  } | null> | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
+};
+
+export type SyncGroupDashboardsQuery = {
+  __typename: "ModelGroupDashboardConnection";
+  items?: Array<{
+    __typename: "GroupDashboard";
+    id: string;
+    group: string;
+    dashboard: string;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
+    createdAt: string;
+    updatedAt: string;
+  } | null> | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
 };
 
 export type GetUserSessionQuery = {
   __typename: "UserSession";
   id: string;
-  fingerprint: string | null;
-  client: string | null;
+  fingerprint?: string | null;
+  client?: string | null;
   open: boolean;
   group: string;
-  owner: string | null;
-  ttl: number | null;
-  createdAt: string | null;
-  sessionId: string | null;
+  owner?: string | null;
+  ttl?: number | null;
+  createdAt?: string | null;
+  sessionId?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   updatedAt: string;
 };
 
 export type ListUserSessionsQuery = {
   __typename: "ModelUserSessionConnection";
-  items: Array<{
+  items?: Array<{
     __typename: "UserSession";
     id: string;
-    fingerprint: string | null;
-    client: string | null;
+    fingerprint?: string | null;
+    client?: string | null;
     open: boolean;
     group: string;
-    owner: string | null;
-    ttl: number | null;
-    createdAt: string | null;
-    sessionId: string | null;
+    owner?: string | null;
+    ttl?: number | null;
+    createdAt?: string | null;
+    sessionId?: string | null;
     _version: number;
-    _deleted: boolean | null;
+    _deleted?: boolean | null;
     _lastChangedAt: number;
     updatedAt: string;
   } | null> | null;
-  nextToken: string | null;
-  startedAt: number | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
 };
 
 export type SyncUserSessionsQuery = {
   __typename: "ModelUserSessionConnection";
-  items: Array<{
+  items?: Array<{
     __typename: "UserSession";
     id: string;
-    fingerprint: string | null;
-    client: string | null;
+    fingerprint?: string | null;
+    client?: string | null;
     open: boolean;
     group: string;
-    owner: string | null;
-    ttl: number | null;
-    createdAt: string | null;
-    sessionId: string | null;
+    owner?: string | null;
+    ttl?: number | null;
+    createdAt?: string | null;
+    sessionId?: string | null;
     _version: number;
-    _deleted: boolean | null;
+    _deleted?: boolean | null;
     _lastChangedAt: number;
     updatedAt: string;
   } | null> | null;
-  nextToken: string | null;
-  startedAt: number | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
 };
 
 export type GetGroupPreferencesQuery = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  prefs: string | null;
+  prefs?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -730,36 +1130,36 @@ export type GetGroupPreferencesQuery = {
 
 export type ListGroupPreferencessQuery = {
   __typename: "ModelGroupPreferencesConnection";
-  items: Array<{
+  items?: Array<{
     __typename: "GroupPreferences";
     id: string;
     group: string;
-    prefs: string | null;
+    prefs?: string | null;
     _version: number;
-    _deleted: boolean | null;
+    _deleted?: boolean | null;
     _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
-  nextToken: string | null;
-  startedAt: number | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
 };
 
 export type SyncGroupPreferencesQuery = {
   __typename: "ModelGroupPreferencesConnection";
-  items: Array<{
+  items?: Array<{
     __typename: "GroupPreferences";
     id: string;
     group: string;
-    prefs: string | null;
+    prefs?: string | null;
     _version: number;
-    _deleted: boolean | null;
+    _deleted?: boolean | null;
     _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
-  nextToken: string | null;
-  startedAt: number | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
 };
 
 export type GetGroupTweetIgnoreQuery = {
@@ -768,10 +1168,10 @@ export type GetGroupTweetIgnoreQuery = {
   url: string;
   ignoredBy: string;
   tweetId: string;
-  ownerGroups: Array<string | null> | null;
+  ownerGroups?: Array<string | null> | null;
   scope: string;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -779,42 +1179,42 @@ export type GetGroupTweetIgnoreQuery = {
 
 export type ListGroupTweetIgnoresQuery = {
   __typename: "ModelGroupTweetIgnoreConnection";
-  items: Array<{
+  items?: Array<{
     __typename: "GroupTweetIgnore";
     id: string;
     url: string;
     ignoredBy: string;
     tweetId: string;
-    ownerGroups: Array<string | null> | null;
+    ownerGroups?: Array<string | null> | null;
     scope: string;
     _version: number;
-    _deleted: boolean | null;
+    _deleted?: boolean | null;
     _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
-  nextToken: string | null;
-  startedAt: number | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
 };
 
 export type SyncGroupTweetIgnoresQuery = {
   __typename: "ModelGroupTweetIgnoreConnection";
-  items: Array<{
+  items?: Array<{
     __typename: "GroupTweetIgnore";
     id: string;
     url: string;
     ignoredBy: string;
     tweetId: string;
-    ownerGroups: Array<string | null> | null;
+    ownerGroups?: Array<string | null> | null;
     scope: string;
     _version: number;
-    _deleted: boolean | null;
+    _deleted?: boolean | null;
     _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
-  nextToken: string | null;
-  startedAt: number | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
 };
 
 export type GetGroupTweetAnnotationsQuery = {
@@ -823,10 +1223,10 @@ export type GetGroupTweetAnnotationsQuery = {
   url: string;
   annotatedBy: string;
   tweetId: string;
-  ownerGroups: Array<string | null> | null;
-  annotations: string | null;
+  ownerGroups?: Array<string | null> | null;
+  annotations?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -834,42 +1234,42 @@ export type GetGroupTweetAnnotationsQuery = {
 
 export type ListGroupTweetAnnotationssQuery = {
   __typename: "ModelGroupTweetAnnotationsConnection";
-  items: Array<{
+  items?: Array<{
     __typename: "GroupTweetAnnotations";
     id: string;
     url: string;
     annotatedBy: string;
     tweetId: string;
-    ownerGroups: Array<string | null> | null;
-    annotations: string | null;
+    ownerGroups?: Array<string | null> | null;
+    annotations?: string | null;
     _version: number;
-    _deleted: boolean | null;
+    _deleted?: boolean | null;
     _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
-  nextToken: string | null;
-  startedAt: number | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
 };
 
 export type SyncGroupTweetAnnotationsQuery = {
   __typename: "ModelGroupTweetAnnotationsConnection";
-  items: Array<{
+  items?: Array<{
     __typename: "GroupTweetAnnotations";
     id: string;
     url: string;
     annotatedBy: string;
     tweetId: string;
-    ownerGroups: Array<string | null> | null;
-    annotations: string | null;
+    ownerGroups?: Array<string | null> | null;
+    annotations?: string | null;
     _version: number;
-    _deleted: boolean | null;
+    _deleted?: boolean | null;
     _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
-  nextToken: string | null;
-  startedAt: number | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
 };
 
 export type GetGroupTwitterUserIgnoreQuery = {
@@ -877,10 +1277,10 @@ export type GetGroupTwitterUserIgnoreQuery = {
   id: string;
   twitterScreenName: string;
   ignoredBy: string;
-  ownerGroups: Array<string | null> | null;
+  ownerGroups?: Array<string | null> | null;
   scope: string;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -888,49 +1288,49 @@ export type GetGroupTwitterUserIgnoreQuery = {
 
 export type ListGroupTwitterUserIgnoresQuery = {
   __typename: "ModelGroupTwitterUserIgnoreConnection";
-  items: Array<{
+  items?: Array<{
     __typename: "GroupTwitterUserIgnore";
     id: string;
     twitterScreenName: string;
     ignoredBy: string;
-    ownerGroups: Array<string | null> | null;
+    ownerGroups?: Array<string | null> | null;
     scope: string;
     _version: number;
-    _deleted: boolean | null;
+    _deleted?: boolean | null;
     _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
-  nextToken: string | null;
-  startedAt: number | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
 };
 
 export type SyncGroupTwitterUserIgnoresQuery = {
   __typename: "ModelGroupTwitterUserIgnoreConnection";
-  items: Array<{
+  items?: Array<{
     __typename: "GroupTwitterUserIgnore";
     id: string;
     twitterScreenName: string;
     ignoredBy: string;
-    ownerGroups: Array<string | null> | null;
+    ownerGroups?: Array<string | null> | null;
     scope: string;
     _version: number;
-    _deleted: boolean | null;
+    _deleted?: boolean | null;
     _lastChangedAt: number;
     createdAt: string;
     updatedAt: string;
   } | null> | null;
-  nextToken: string | null;
-  startedAt: number | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
 };
 
 export type OnCreateUserPreferencesSubscription = {
   __typename: "UserPreferences";
   id: string;
-  owner: string | null;
-  prefs: string | null;
+  owner?: string | null;
+  prefs?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -939,10 +1339,10 @@ export type OnCreateUserPreferencesSubscription = {
 export type OnUpdateUserPreferencesSubscription = {
   __typename: "UserPreferences";
   id: string;
-  owner: string | null;
-  prefs: string | null;
+  owner?: string | null;
+  prefs?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -951,10 +1351,82 @@ export type OnUpdateUserPreferencesSubscription = {
 export type OnDeleteUserPreferencesSubscription = {
   __typename: "UserPreferences";
   id: string;
-  owner: string | null;
-  prefs: string | null;
+  owner?: string | null;
+  prefs?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OnCreateUserDashboardSubscription = {
+  __typename: "UserDashboard";
+  id: string;
+  owner?: string | null;
+  dashboard: string;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OnUpdateUserDashboardSubscription = {
+  __typename: "UserDashboard";
+  id: string;
+  owner?: string | null;
+  dashboard: string;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OnDeleteUserDashboardSubscription = {
+  __typename: "UserDashboard";
+  id: string;
+  owner?: string | null;
+  dashboard: string;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OnCreateGroupDashboardSubscription = {
+  __typename: "GroupDashboard";
+  id: string;
+  group: string;
+  dashboard: string;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OnUpdateGroupDashboardSubscription = {
+  __typename: "GroupDashboard";
+  id: string;
+  group: string;
+  dashboard: string;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type OnDeleteGroupDashboardSubscription = {
+  __typename: "GroupDashboard";
+  id: string;
+  group: string;
+  dashboard: string;
+  _version: number;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -963,16 +1435,16 @@ export type OnDeleteUserPreferencesSubscription = {
 export type OnCreateUserSessionSubscription = {
   __typename: "UserSession";
   id: string;
-  fingerprint: string | null;
-  client: string | null;
+  fingerprint?: string | null;
+  client?: string | null;
   open: boolean;
   group: string;
-  owner: string | null;
-  ttl: number | null;
-  createdAt: string | null;
-  sessionId: string | null;
+  owner?: string | null;
+  ttl?: number | null;
+  createdAt?: string | null;
+  sessionId?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   updatedAt: string;
 };
@@ -980,16 +1452,16 @@ export type OnCreateUserSessionSubscription = {
 export type OnUpdateUserSessionSubscription = {
   __typename: "UserSession";
   id: string;
-  fingerprint: string | null;
-  client: string | null;
+  fingerprint?: string | null;
+  client?: string | null;
   open: boolean;
   group: string;
-  owner: string | null;
-  ttl: number | null;
-  createdAt: string | null;
-  sessionId: string | null;
+  owner?: string | null;
+  ttl?: number | null;
+  createdAt?: string | null;
+  sessionId?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   updatedAt: string;
 };
@@ -997,16 +1469,16 @@ export type OnUpdateUserSessionSubscription = {
 export type OnDeleteUserSessionSubscription = {
   __typename: "UserSession";
   id: string;
-  fingerprint: string | null;
-  client: string | null;
+  fingerprint?: string | null;
+  client?: string | null;
   open: boolean;
   group: string;
-  owner: string | null;
-  ttl: number | null;
-  createdAt: string | null;
-  sessionId: string | null;
+  owner?: string | null;
+  ttl?: number | null;
+  createdAt?: string | null;
+  sessionId?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   updatedAt: string;
 };
@@ -1015,9 +1487,9 @@ export type OnCreateGroupPreferencesSubscription = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  prefs: string | null;
+  prefs?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -1027,9 +1499,9 @@ export type OnUpdateGroupPreferencesSubscription = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  prefs: string | null;
+  prefs?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -1039,9 +1511,9 @@ export type OnDeleteGroupPreferencesSubscription = {
   __typename: "GroupPreferences";
   id: string;
   group: string;
-  prefs: string | null;
+  prefs?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -1053,10 +1525,10 @@ export type OnCreateGroupTweetIgnoreSubscription = {
   url: string;
   ignoredBy: string;
   tweetId: string;
-  ownerGroups: Array<string | null> | null;
+  ownerGroups?: Array<string | null> | null;
   scope: string;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -1068,10 +1540,10 @@ export type OnUpdateGroupTweetIgnoreSubscription = {
   url: string;
   ignoredBy: string;
   tweetId: string;
-  ownerGroups: Array<string | null> | null;
+  ownerGroups?: Array<string | null> | null;
   scope: string;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -1083,10 +1555,10 @@ export type OnDeleteGroupTweetIgnoreSubscription = {
   url: string;
   ignoredBy: string;
   tweetId: string;
-  ownerGroups: Array<string | null> | null;
+  ownerGroups?: Array<string | null> | null;
   scope: string;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -1098,10 +1570,10 @@ export type OnCreateGroupTweetAnnotationsSubscription = {
   url: string;
   annotatedBy: string;
   tweetId: string;
-  ownerGroups: Array<string | null> | null;
-  annotations: string | null;
+  ownerGroups?: Array<string | null> | null;
+  annotations?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -1113,10 +1585,10 @@ export type OnUpdateGroupTweetAnnotationsSubscription = {
   url: string;
   annotatedBy: string;
   tweetId: string;
-  ownerGroups: Array<string | null> | null;
-  annotations: string | null;
+  ownerGroups?: Array<string | null> | null;
+  annotations?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -1128,10 +1600,10 @@ export type OnDeleteGroupTweetAnnotationsSubscription = {
   url: string;
   annotatedBy: string;
   tweetId: string;
-  ownerGroups: Array<string | null> | null;
-  annotations: string | null;
+  ownerGroups?: Array<string | null> | null;
+  annotations?: string | null;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -1142,10 +1614,10 @@ export type OnCreateGroupTwitterUserIgnoreSubscription = {
   id: string;
   twitterScreenName: string;
   ignoredBy: string;
-  ownerGroups: Array<string | null> | null;
+  ownerGroups?: Array<string | null> | null;
   scope: string;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -1156,10 +1628,10 @@ export type OnUpdateGroupTwitterUserIgnoreSubscription = {
   id: string;
   twitterScreenName: string;
   ignoredBy: string;
-  ownerGroups: Array<string | null> | null;
+  ownerGroups?: Array<string | null> | null;
   scope: string;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -1170,10 +1642,10 @@ export type OnDeleteGroupTwitterUserIgnoreSubscription = {
   id: string;
   twitterScreenName: string;
   ignoredBy: string;
-  ownerGroups: Array<string | null> | null;
+  ownerGroups?: Array<string | null> | null;
   scope: string;
   _version: number;
-  _deleted: boolean | null;
+  _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
   updatedAt: string;
@@ -1266,6 +1738,174 @@ export class APIService {
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
     return <DeleteUserPreferencesMutation>response.data.deleteUserPreferences;
+  }
+  async CreateUserDashboard(
+    input: CreateUserDashboardInput,
+    condition?: ModelUserDashboardConditionInput
+  ): Promise<CreateUserDashboardMutation> {
+    const statement = `mutation CreateUserDashboard($input: CreateUserDashboardInput!, $condition: ModelUserDashboardConditionInput) {
+        createUserDashboard(input: $input, condition: $condition) {
+          __typename
+          id
+          owner
+          dashboard
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <CreateUserDashboardMutation>response.data.createUserDashboard;
+  }
+  async UpdateUserDashboard(
+    input: UpdateUserDashboardInput,
+    condition?: ModelUserDashboardConditionInput
+  ): Promise<UpdateUserDashboardMutation> {
+    const statement = `mutation UpdateUserDashboard($input: UpdateUserDashboardInput!, $condition: ModelUserDashboardConditionInput) {
+        updateUserDashboard(input: $input, condition: $condition) {
+          __typename
+          id
+          owner
+          dashboard
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <UpdateUserDashboardMutation>response.data.updateUserDashboard;
+  }
+  async DeleteUserDashboard(
+    input: DeleteUserDashboardInput,
+    condition?: ModelUserDashboardConditionInput
+  ): Promise<DeleteUserDashboardMutation> {
+    const statement = `mutation DeleteUserDashboard($input: DeleteUserDashboardInput!, $condition: ModelUserDashboardConditionInput) {
+        deleteUserDashboard(input: $input, condition: $condition) {
+          __typename
+          id
+          owner
+          dashboard
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <DeleteUserDashboardMutation>response.data.deleteUserDashboard;
+  }
+  async CreateGroupDashboard(
+    input: CreateGroupDashboardInput,
+    condition?: ModelGroupDashboardConditionInput
+  ): Promise<CreateGroupDashboardMutation> {
+    const statement = `mutation CreateGroupDashboard($input: CreateGroupDashboardInput!, $condition: ModelGroupDashboardConditionInput) {
+        createGroupDashboard(input: $input, condition: $condition) {
+          __typename
+          id
+          group
+          dashboard
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <CreateGroupDashboardMutation>response.data.createGroupDashboard;
+  }
+  async UpdateGroupDashboard(
+    input: UpdateGroupDashboardInput,
+    condition?: ModelGroupDashboardConditionInput
+  ): Promise<UpdateGroupDashboardMutation> {
+    const statement = `mutation UpdateGroupDashboard($input: UpdateGroupDashboardInput!, $condition: ModelGroupDashboardConditionInput) {
+        updateGroupDashboard(input: $input, condition: $condition) {
+          __typename
+          id
+          group
+          dashboard
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <UpdateGroupDashboardMutation>response.data.updateGroupDashboard;
+  }
+  async DeleteGroupDashboard(
+    input: DeleteGroupDashboardInput,
+    condition?: ModelGroupDashboardConditionInput
+  ): Promise<DeleteGroupDashboardMutation> {
+    const statement = `mutation DeleteGroupDashboard($input: DeleteGroupDashboardInput!, $condition: ModelGroupDashboardConditionInput) {
+        deleteGroupDashboard(input: $input, condition: $condition) {
+          __typename
+          id
+          group
+          dashboard
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <DeleteGroupDashboardMutation>response.data.deleteGroupDashboard;
   }
   async CreateUserSession(
     input: CreateUserSessionInput,
@@ -1839,6 +2479,210 @@ export class APIService {
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
     return <SyncUserPreferencesQuery>response.data.syncUserPreferences;
+  }
+  async GetUserDashboard(id: string): Promise<GetUserDashboardQuery> {
+    const statement = `query GetUserDashboard($id: ID!) {
+        getUserDashboard(id: $id) {
+          __typename
+          id
+          owner
+          dashboard
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      id
+    };
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <GetUserDashboardQuery>response.data.getUserDashboard;
+  }
+  async ListUserDashboards(
+    filter?: ModelUserDashboardFilterInput,
+    limit?: number,
+    nextToken?: string
+  ): Promise<ListUserDashboardsQuery> {
+    const statement = `query ListUserDashboards($filter: ModelUserDashboardFilterInput, $limit: Int, $nextToken: String) {
+        listUserDashboards(filter: $filter, limit: $limit, nextToken: $nextToken) {
+          __typename
+          items {
+            __typename
+            id
+            owner
+            dashboard
+            _version
+            _deleted
+            _lastChangedAt
+            createdAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {};
+    if (filter) {
+      gqlAPIServiceArguments.filter = filter;
+    }
+    if (limit) {
+      gqlAPIServiceArguments.limit = limit;
+    }
+    if (nextToken) {
+      gqlAPIServiceArguments.nextToken = nextToken;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <ListUserDashboardsQuery>response.data.listUserDashboards;
+  }
+  async SyncUserDashboards(
+    filter?: ModelUserDashboardFilterInput,
+    limit?: number,
+    nextToken?: string,
+    lastSync?: number
+  ): Promise<SyncUserDashboardsQuery> {
+    const statement = `query SyncUserDashboards($filter: ModelUserDashboardFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
+        syncUserDashboards(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
+          __typename
+          items {
+            __typename
+            id
+            owner
+            dashboard
+            _version
+            _deleted
+            _lastChangedAt
+            createdAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {};
+    if (filter) {
+      gqlAPIServiceArguments.filter = filter;
+    }
+    if (limit) {
+      gqlAPIServiceArguments.limit = limit;
+    }
+    if (nextToken) {
+      gqlAPIServiceArguments.nextToken = nextToken;
+    }
+    if (lastSync) {
+      gqlAPIServiceArguments.lastSync = lastSync;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <SyncUserDashboardsQuery>response.data.syncUserDashboards;
+  }
+  async GetGroupDashboard(id: string): Promise<GetGroupDashboardQuery> {
+    const statement = `query GetGroupDashboard($id: ID!) {
+        getGroupDashboard(id: $id) {
+          __typename
+          id
+          group
+          dashboard
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      id
+    };
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <GetGroupDashboardQuery>response.data.getGroupDashboard;
+  }
+  async ListGroupDashboards(
+    filter?: ModelGroupDashboardFilterInput,
+    limit?: number,
+    nextToken?: string
+  ): Promise<ListGroupDashboardsQuery> {
+    const statement = `query ListGroupDashboards($filter: ModelGroupDashboardFilterInput, $limit: Int, $nextToken: String) {
+        listGroupDashboards(filter: $filter, limit: $limit, nextToken: $nextToken) {
+          __typename
+          items {
+            __typename
+            id
+            group
+            dashboard
+            _version
+            _deleted
+            _lastChangedAt
+            createdAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {};
+    if (filter) {
+      gqlAPIServiceArguments.filter = filter;
+    }
+    if (limit) {
+      gqlAPIServiceArguments.limit = limit;
+    }
+    if (nextToken) {
+      gqlAPIServiceArguments.nextToken = nextToken;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <ListGroupDashboardsQuery>response.data.listGroupDashboards;
+  }
+  async SyncGroupDashboards(
+    filter?: ModelGroupDashboardFilterInput,
+    limit?: number,
+    nextToken?: string,
+    lastSync?: number
+  ): Promise<SyncGroupDashboardsQuery> {
+    const statement = `query SyncGroupDashboards($filter: ModelGroupDashboardFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
+        syncGroupDashboards(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
+          __typename
+          items {
+            __typename
+            id
+            group
+            dashboard
+            _version
+            _deleted
+            _lastChangedAt
+            createdAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {};
+    if (filter) {
+      gqlAPIServiceArguments.filter = filter;
+    }
+    if (limit) {
+      gqlAPIServiceArguments.limit = limit;
+    }
+    if (nextToken) {
+      gqlAPIServiceArguments.nextToken = nextToken;
+    }
+    if (lastSync) {
+      gqlAPIServiceArguments.lastSync = lastSync;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <SyncGroupDashboardsQuery>response.data.syncGroupDashboards;
   }
   async GetUserSession(id: string): Promise<GetUserSessionQuery> {
     const statement = `query GetUserSession($id: ID!) {
@@ -2464,6 +3308,126 @@ export class APIService {
       }`
     )
   ) as Observable<SubscriptionResponse<OnDeleteUserPreferencesSubscription>>;
+
+  OnCreateUserDashboardListener: Observable<
+    SubscriptionResponse<OnCreateUserDashboardSubscription>
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnCreateUserDashboard($owner: String) {
+        onCreateUserDashboard(owner: $owner) {
+          __typename
+          id
+          owner
+          dashboard
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<SubscriptionResponse<OnCreateUserDashboardSubscription>>;
+
+  OnUpdateUserDashboardListener: Observable<
+    SubscriptionResponse<OnUpdateUserDashboardSubscription>
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnUpdateUserDashboard($owner: String) {
+        onUpdateUserDashboard(owner: $owner) {
+          __typename
+          id
+          owner
+          dashboard
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<SubscriptionResponse<OnUpdateUserDashboardSubscription>>;
+
+  OnDeleteUserDashboardListener: Observable<
+    SubscriptionResponse<OnDeleteUserDashboardSubscription>
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnDeleteUserDashboard($owner: String) {
+        onDeleteUserDashboard(owner: $owner) {
+          __typename
+          id
+          owner
+          dashboard
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<SubscriptionResponse<OnDeleteUserDashboardSubscription>>;
+
+  OnCreateGroupDashboardListener: Observable<
+    SubscriptionResponse<OnCreateGroupDashboardSubscription>
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnCreateGroupDashboard {
+        onCreateGroupDashboard {
+          __typename
+          id
+          group
+          dashboard
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<SubscriptionResponse<OnCreateGroupDashboardSubscription>>;
+
+  OnUpdateGroupDashboardListener: Observable<
+    SubscriptionResponse<OnUpdateGroupDashboardSubscription>
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnUpdateGroupDashboard {
+        onUpdateGroupDashboard {
+          __typename
+          id
+          group
+          dashboard
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<SubscriptionResponse<OnUpdateGroupDashboardSubscription>>;
+
+  OnDeleteGroupDashboardListener: Observable<
+    SubscriptionResponse<OnDeleteGroupDashboardSubscription>
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnDeleteGroupDashboard {
+        onDeleteGroupDashboard {
+          __typename
+          id
+          group
+          dashboard
+          _version
+          _deleted
+          _lastChangedAt
+          createdAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<SubscriptionResponse<OnDeleteGroupDashboardSubscription>>;
 
   OnCreateUserSessionListener: Observable<
     SubscriptionResponse<OnCreateUserSessionSubscription>
