@@ -53,7 +53,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
         textSearch?: string;
     } = {
         regions:  [],
-        from:     new Date().getTime() - (90 * 24 * 60 * 60 * 1000),
+        from:     new Date().getTime() - (365.24 * 24 * 60 * 60 * 1000),
         to:       new Date().getTime(),
         dateStep: 7 * 24 * 60 * 60 * 1000
     };
@@ -65,6 +65,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     // }
     @Input()
     public showForm: boolean = true;
+    @Input() connect = false;
     private interval: number;
 
     constructor(metadata: MetadataService, zone: NgZone, router: Router, route: ActivatedRoute,

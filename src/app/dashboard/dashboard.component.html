@@ -35,6 +35,7 @@
                                                         [state]="card.state"
                                                         (changed)="saveCard(i,$event)"
                                                         [type]="card.variant || 'line'"
+                                                        [connect]="true"
                                                         regionFilter="true" textFilter="true"></app-twitter-timeseries>
                             </ng-container>
                             <ng-container *ngSwitchCase="'timeseries-total'">
