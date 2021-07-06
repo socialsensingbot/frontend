@@ -6,8 +6,14 @@ const defaultDashboard: Dashboard = {
         pages:      [{
             title: "First Page",
             cards: [
-                {title: "Count By Text and Region", cols: 2, rows: 2, type: "timeseries-text-and-region", state: {}},
-                {title: "Total Count", cols: 1, rows: 1, type: "timeseries-total", state: {}},
+                {title:    "Count By Text and Region",
+                    cols:  2,
+                    rows:  2,
+                    type:  "timeseries-text-and-region",
+                    state: {},
+                    id:    1
+                },
+                {title: "Total Count", cols: 1, rows: 1, type: "timeseries-total", state: {}, id: 2},
                 // {title: "Exceedence by Date", cols: 1, rows: 1, type: "timeseries-exceed", state: {}},
                 // {title: "Exceedence by Region", cols: 2, rows: 1, type: "timeseries-exceed-region", state: {}},
             ]
@@ -40,7 +46,7 @@ export const environment = {
     availableDataSets:    ["*"],
     cacheProcessedTweets: false,
 
-    impact:                              {
+    impact: {
         //The ability to tag tweets with an impact annotation
         levels: [
             {title: "1 – Minimal", value: "minimal", color: "#43A047"},
@@ -49,7 +55,7 @@ export const environment = {
             {title: "4 - Severe", value: "severe", color: "#F4511E"}
         ]
     },
-    source:                              {
+    source: {
         //The ability to tag tweets with a source
         types: [
             {title: "River", value: "river", color: "#43A047"},
