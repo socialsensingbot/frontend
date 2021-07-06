@@ -73,8 +73,8 @@ export const schema = {
                 "dashboard": {
                     "name": "dashboard",
                     "isArray": false,
-                    "type": "AWSJSON",
-                    "isRequired": false,
+                    "type": "String",
+                    "isRequired": true,
                     "attributes": []
                 }
             },
@@ -126,8 +126,8 @@ export const schema = {
                 "dashboard": {
                     "name": "dashboard",
                     "isArray": false,
-                    "type": "AWSJSON",
-                    "isRequired": false,
+                    "type": "String",
+                    "isRequired": true,
                     "attributes": []
                 }
             },
@@ -530,5 +530,5 @@ export const schema = {
     },
     "enums": {},
     "nonModels": {},
-    "version": "4a8f4e5aa4e0adb917373d4834d521c9"
+    "version": "a97ceb23cf56821e3feff6cd8658e02e"
 };

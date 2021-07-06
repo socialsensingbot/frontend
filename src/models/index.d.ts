@@ -15,7 +15,7 @@ export declare class UserPreferences {
 export declare class UserDashboard {
   readonly id: string;
   readonly owner?: string;
-  readonly dashboard?: string;
+  readonly dashboard: string;
   constructor(init: ModelInit<UserDashboard>);
   static copyOf(source: UserDashboard, mutator: (draft: MutableModel<UserDashboard>) => MutableModel<UserDashboard> | void): UserDashboard;
 }
@@ -23,7 +23,7 @@ export declare class UserDashboard {
 export declare class GroupDashboard {
   readonly id: string;
   readonly group: string;
-  readonly dashboard?: string;
+  readonly dashboard: string;
   constructor(init: ModelInit<GroupDashboard>);
   static copyOf(source: GroupDashboard, mutator: (draft: MutableModel<GroupDashboard>) => MutableModel<GroupDashboard> | void): GroupDashboard;
 }
