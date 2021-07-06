@@ -49,6 +49,8 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     public animated = false;
     @Input()
     public scrollBar = true;
+    @Input() connect = false;
+
     private scrollBarSeries: LineSeries;
     private _ready: boolean;
     private seriesMap: { [key: string]: LineSeries | ColumnSeries } = {};
@@ -180,7 +182,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
             series.data = mappedData;
             series.dataFields.valueY = this.yField;
             series.dataFields.dateX = this.xField;
-            series.strokeWidth = 2;
+            series.strokeWidth = 3;
             series.minBulletDistance = 10;
             // series.stroke = series.fill = am4core.color("#9000FF", 0.5);
 
@@ -189,8 +191,8 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
             series.tooltip.background.cornerRadius = 20;
             series.tooltip.background.fillOpacity = 0.5;
             series.tooltip.label.padding(12, 12, 12, 12);
-            series.tensionX = 0.95;
-            series.connect = false;
+            series.tensionX = this.connect ? 0.9 : 0.95;
+            series.connect = this.connect;
         } else {
             series = this.chart.series.push(new am4charts.ColumnSeries());
             series.data = mappedData;
