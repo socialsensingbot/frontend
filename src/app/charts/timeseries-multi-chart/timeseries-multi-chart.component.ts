@@ -50,12 +50,11 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     @Input()
     public scrollBar = true;
     @Input() connect = false;
-
+    @Input() zeroFillMissingDates = true;
     private scrollBarSeries: LineSeries;
     private _ready: boolean;
     private seriesMap: { [key: string]: LineSeries | ColumnSeries } = {};
     private dateSpacing = 24 * 60 * 60 * 1000;
-    @Input() zeroFillMissingDates= true;
 
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
@@ -135,10 +134,10 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
             const result = [];
             let lastRowDate = null;
             for (const row of mappedData) {
-                const rowDate = new Date(row[this.xField]).getTime();
+                const rowDate = Math.round(new Date(row[this.xField]).getTime() / this.dateSpacing) * this.dateSpacing;
                 if (lastRowDate !== null) {
                     if (rowDate > lastRowDate + this.dateSpacing) {
-                        for (let fillDate = lastRowDate; fillDate < rowDate; fillDate += this.dateSpacing) {
+                        for (let fillDate = lastRowDate + this.dateSpacing; fillDate < rowDate; fillDate += this.dateSpacing) {
                             const fillRow = {};
                             fillRow[this.xField] = new Date(fillDate);
                             fillRow[this.yField] = 0;
