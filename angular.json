@@ -104,6 +104,14 @@
                   "with": "src/environments/environment.demo.ts"
                 }
               ]
+            },
+            "pwsdemo": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.pwsdemo.ts"
+                }
+              ]
             }
           }
         },
