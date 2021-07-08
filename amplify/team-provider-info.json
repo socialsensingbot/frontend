@@ -17,7 +17,14 @@
         "userPoolGroups": {}
       },
       "function": {
-        "S3Triggerb3a090e2": {}
+        "S3Triggerb3a090e2": {
+          "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
+          "s3Key": "amplify-builds/S3Triggerb3a090e2-754e48743050344b787a-build.zip"
+        },
+        "query": {
+          "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
+          "s3Key": "amplify-builds/query-724d45527a497a6a2f44-build.zip"
+        }
       },
       "hosting": {
         "amplifyhosting": {
@@ -106,7 +113,7 @@
         },
         "query": {
           "deploymentBucketName": "amplify-socialsensing-pwsdemo-155623-deployment",
-          "s3Key": "amplify-builds/query-454e544f7a2b32716953-build.zip"
+          "s3Key": "amplify-builds/query-724d45527a497a6a2f44-build.zip"
         }
       },
       "hosting": {
