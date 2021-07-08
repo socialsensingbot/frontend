@@ -101,12 +101,14 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
         this.filteredRegions = this.regionControl.valueChanges.pipe(
             startWith(null),
             map((region: string | null) => region ? this._filter(region) : this.allRegions.slice()));
+        this.searchControl.setValue(this.data.state.textSearch);
         this.searchControl.valueChanges.subscribe(value => {this.textChanged();});
 
     }
 
     public clearTextSearch() {
         this.data.state.textSearch = "";
+        this.searchControl.setValue(this.data.state.textSearch);
         this.data.component.updateGraph(this.data.state);
     }
 
