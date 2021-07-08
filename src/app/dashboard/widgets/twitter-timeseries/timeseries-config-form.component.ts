@@ -54,7 +54,7 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
                 this.regions.splice(index, 1);
             }
             this.updateRegions();
-            this.data.component.markChanged();
+            this.data.component.updateGraph(this.data.state);
         } catch (e) {
             console.error(e);
         }
@@ -85,7 +85,7 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
 
         this.regionControl.setValue(null);
         this.updateRegions();
-        this.data.component.markChanged();
+        this.data.component.updateGraph(this.data.state);
     }
 
     public ngOnDestroy(): void {
