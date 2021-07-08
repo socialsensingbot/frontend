@@ -98,12 +98,12 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                     }
                     count++;
                 }
+                this.initChart();
                 this.createSeries();
 
                 // this.trend.data = this._data;
 
             } else {
-
                 // this.trend.data = [];
             }
         }
@@ -159,14 +159,18 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     }
 
     private initChart() {
+        if (this.chart) {
+            this.chart.dispose();
+        }
+        this.seriesMap = {};
         this.chart = am4core.create(this.chartRef.nativeElement, am4charts.XYChart);
         this.chart.paddingRight = 20;
 
 
         this.chart.data = [];
         this.chart.legend = new am4charts.Legend();
-        this.chart.legend.maxHeight = 120;
-        this.chart.legend.scrollable = true;
+        // this.chart.legend.maxHeight = 120;
+        this.chart.legend.scrollable = false;
 
         // Create axes
         const dateAxis = this.chart.xAxes.push(new am4charts.DateAxis());
@@ -236,8 +240,10 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
             // series.stacked = true;
             // series.sequencedInterpolation = true;
         }
+        this.valueAxis.zoom({start: 0, end: 1}, false, true);
 
         series.name = mappedKey;
+        console.info("Added series " + series.name);
         this.seriesMap[mappedKey] = series;
         if (this.scrollBar) {
             // @ts-ignore
@@ -280,6 +286,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
 
     private createSeries() {
         if (this.chart) {
+
             console.log("Data for TMC", this.data);
             const mappedData = {};
             const totals = {};
@@ -341,7 +348,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
 
 
             // this.chart.cursor.snapToSeries = lastSeries;
-            this.valueAxis.zoom({start: 0, end: 1});
+
         }
     }
 }

@@ -107,7 +107,12 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
 
     public clearTextSearch() {
         this.data.state.textSearch = "";
-        this.data.component.markChanged();
+        this.data.component.updateGraph(this.data.state);
+    }
+
+    public textChanged($event) {
+        this.data.state.textSearch = this.searchControl.value;
+        this.data.component.updateGraph(this.data.state);
     }
 
     private updateRegions() {
