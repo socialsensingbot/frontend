@@ -40,7 +40,7 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
     count_by_date_for_regions_and_fulltext: (params: any) => {
         let fullText = "";
         if (typeof params.textSearch !== "undefined" && params.textSearch.length > 0) {
-            fullText = " and MATCH (source_text) AGAINST(? IN NATURAL LANGUAGE MODE) ";
+            fullText = " and MATCH (source_text) AGAINST(? IN BOOLEAN MODE) ";
         }
         if( !params.regions || (params.regions.includes("*") || params.regions.length === 0)) {
             return {
