@@ -51,11 +51,14 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     public scrollBar = true;
     @Input() connect = false;
     @Input() zeroFillMissingDates = true;
+    @Input() seriesList: string[] = [];
     private scrollBarSeries: LineSeries;
     private _ready: boolean;
     private seriesMap: { [key: string]: LineSeries | ColumnSeries } = {};
     private dateSpacing = 24 * 60 * 60 * 1000;
     private valueAxis: ValueAxis;
+    private _minDate: Date;
+    private _maxDate: Date;
 
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
@@ -85,7 +88,22 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     @Input()
     public set data(value: any[]) {
         this._data = value;
+
         if (this._ready) {
+            this._minDate = null;
+            this._maxDate = null;
+            for (const item of this._data) {
+                const date = new Date(item[this.xField]);
+                console.log(date);
+                if (this._minDate === null || date.getTime() < this._minDate.getTime()) {
+                    this._minDate = date;
+                }
+                if (this._maxDate === null || date.getTime() > this._maxDate.getTime()) {
+                    this._maxDate = date;
+                }
+            }
+            console.log("MIN_DATE", this._minDate);
+            console.log("MAX_DATE", this._maxDate);
             if (this._data && this._data.length !== 0) {
 
                 let count = 0;
@@ -322,12 +340,23 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
             // this.createScrollBarSeries(totalRows);
 
             let lastSeries;
-            for (const key in mappedData) {
-                if (mappedData.hasOwnProperty(key)) {
-                    const data = mappedData[key].sort(
+            for (const requiredSeries of this.seriesList) {
+                if (mappedData.hasOwnProperty(requiredSeries)) {
+                    const data = mappedData[requiredSeries].sort(
                         (a, b) => new Date(a[this.xField]).getTime() - new Date(b[this.xField]).getTime());
                     console.log("Sorted series (by " + this.xField + ")", data);
-                    lastSeries = this.createSeriesFromMappedData(key, data);
+                    lastSeries = this.createSeriesFromMappedData(requiredSeries, data);
+                } else {
+                    if (this.zeroFillMissingDates) {
+                        const dummyMin = {};
+                        dummyMin[this.xField] = this._minDate;
+                        dummyMin[this.yField] = 0;
+                        const dummyMax = {};
+                        dummyMax[this.xField] = this._maxDate;
+                        dummyMax[this.yField] = 0;
+                        mappedData[requiredSeries] = [dummyMin, dummyMax]
+                        this.createSeriesFromMappedData(requiredSeries, mappedData[requiredSeries]);
+                    }
                 }
             }
 
