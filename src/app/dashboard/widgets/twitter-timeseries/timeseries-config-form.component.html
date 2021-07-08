@@ -3,8 +3,8 @@
         <mat-label>Filter by Text</mat-label>
         <mat-icon matPrefix>search</mat-icon>
         <input #textSearchInput [formControl]="searchControl" matInput placeholder="Text search, e.g. coastal"
-               (change)="data.component.updateGraph(data.state)"
-               [(ngModel)]="data.state.textSearch">
+               (change)="textChanged($event)"
+               [value]="data.state.textSearch">
         <button mat-button mat-icon-button matSuffix (click)="clearTextSearch()" *ngIf="data.state.textSearch">
             <mat-icon>close</mat-icon>
         </button>
