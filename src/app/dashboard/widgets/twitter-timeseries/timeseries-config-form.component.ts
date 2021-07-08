@@ -101,7 +101,7 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
         this.filteredRegions = this.regionControl.valueChanges.pipe(
             startWith(null),
             map((region: string | null) => region ? this._filter(region) : this.allRegions.slice()));
-        this.searchControl.valueChanges.subscribe(value => {this.data.component.markChanged();});
+        this.searchControl.valueChanges.subscribe(value => {this.textChanged();});
 
     }
 
@@ -110,7 +110,7 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
         this.data.component.updateGraph(this.data.state);
     }
 
-    public textChanged($event) {
+    public textChanged() {
         this.data.state.textSearch = this.searchControl.value;
         this.data.component.updateGraph(this.data.state);
     }

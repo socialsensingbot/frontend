@@ -106,15 +106,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
         if (!this.textFilter && !this.regionFilter) {
             this.restQueryName = "count_by_date_for_all_regions";
         }
-        this.interval = window.setInterval(() => {
-            this._zone.run(() => {
-                if (this._changed) {
-                    this._changed = false;
-                    this.updateGraph(this.state);
-                    this.emitChange();
-                }
-            });
-        }, 200);
+
 
     }
 
@@ -135,6 +127,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
         console.log("Graph update from state", state);
         this.query = {...this.query, regions: state.regions, textSearch: state.textSearch};
         this._changed = true;
+        this.emitChange();
     }
 
 

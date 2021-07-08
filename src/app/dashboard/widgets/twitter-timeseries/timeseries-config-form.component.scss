@@ -1,0 +1,33 @@
+.text-search {
+    min-width: 200px;
+    max-width: 400px;
+    margin-right: 48px;
+
+}
+
+.region-chooser {
+    min-width: 300px;
+    max-width: 600px;
+}
+
+form.ttc-form > * {
+    margin-bottom: 0px !important;
+}
+
+::ng-deep {
+
+
+    div.mat-chip-list-wrapper {
+        max-height: 78px;
+        overflow: auto;
+
+        .mat-chip {
+            flex: 0 0 auto;
+        }
+    }
+
+    .mat-chip-list {
+        margin-left: 20px;
+    }
+
+}
