@@ -13,7 +13,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import * as am4core from "@amcharts/amcharts4/core";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 import * as am4charts from "@amcharts/amcharts4/charts";
-import {ColumnSeries, LineSeries, XYChart} from "@amcharts/amcharts4/charts";
+import {ColumnSeries, LineSeries, ValueAxis, XYChart} from "@amcharts/amcharts4/charts";
 import jt_theme from "../../theme/jt.theme";
 
 @Component({
@@ -55,6 +55,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     private _ready: boolean;
     private seriesMap: { [key: string]: LineSeries | ColumnSeries } = {};
     private dateSpacing = 24 * 60 * 60 * 1000;
+    private valueAxis: ValueAxis;
 
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
@@ -174,10 +175,10 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
         // dateAxis.title.fontWeight = "bold";
         dateAxis.title.opacity = 0.5;
 
-        const valueAxis = this.chart.yAxes.push(new am4charts.ValueAxis());
-        valueAxis.title.text = this.yLabel;
+        this.valueAxis = this.chart.yAxes.push(new am4charts.ValueAxis());
+        this.valueAxis.title.text = this.yLabel;
         // valueAxis.title.fontWeight = "bold";
-        valueAxis.title.opacity = 0.5;
+        this.valueAxis.title.opacity = 0.5;
         //
         //
         // this.trend = this.chart.series.push(new am4charts.LineSeries());
@@ -340,6 +341,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
 
 
             // this.chart.cursor.snapToSeries = lastSeries;
+            this.valueAxis.zoom({start: 0, end: 1});
         }
     }
 }
