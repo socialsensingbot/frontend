@@ -169,8 +169,8 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
 
         this.chart.data = [];
         this.chart.legend = new am4charts.Legend();
-        // this.chart.legend.maxHeight = 120;
-        this.chart.legend.scrollable = false;
+        this.chart.legend.maxHeight = 120;
+        this.chart.legend.scrollable = true;
 
         // Create axes
         const dateAxis = this.chart.xAxes.push(new am4charts.DateAxis());
