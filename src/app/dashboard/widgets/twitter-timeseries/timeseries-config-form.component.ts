@@ -44,6 +44,7 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
 
     public clearRegions() {
         this.regions = [];
+        this.data.state.regions = [];
         this.data.component.updateGraph(this.data.state);
     }
 
