@@ -157,8 +157,8 @@ export class DashboardService {
         await this.persist();
     }
 
-    public async addGraph(type: string, title: string, cols: number, rows: number, state: any,
-                          variant?: string) {
+    public async addCard(type: string, title: string, cols: number, rows: number, state: any,
+                         variant?: string) {
         this.dashboard.devices[0].pages[0].cards.push({
                                                           title,
                                                           cols,
@@ -169,5 +169,14 @@ export class DashboardService {
                                                           id: uuidv4()
                                                       });
         await this.persist();
+    }
+
+    public removeCard(toRemove: DashboardCard) {
+        for (const device of this.dashboard.devices) {
+            for (const page of device.pages) {
+                page.cards = page.cards.filter(i => i.id !== toRemove.id);
+            }
+        }
+        this.persist();
     }
 }
