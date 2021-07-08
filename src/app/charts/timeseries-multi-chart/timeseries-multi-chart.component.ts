@@ -90,22 +90,22 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
         this._data = value;
 
         if (this._ready) {
-            this._minDate = null;
-            this._maxDate = null;
-            for (const item of this._data) {
-                const date = new Date(item[this.xField]);
-                console.log(date);
-                if (this._minDate === null || date.getTime() < this._minDate.getTime()) {
-                    this._minDate = date;
-                }
-                if (this._maxDate === null || date.getTime() > this._maxDate.getTime()) {
-                    this._maxDate = date;
-                }
-            }
-            console.log("MIN_DATE", this._minDate);
-            console.log("MAX_DATE", this._maxDate);
-            if (this._data && this._data.length !== 0) {
 
+            if (this._data && this._data.length !== 0) {
+                this._minDate = null;
+                this._maxDate = null;
+                for (const item of this._data) {
+                    const date = new Date(item[this.xField]);
+                    console.log(date);
+                    if (this._minDate === null || date.getTime() < this._minDate.getTime()) {
+                        this._minDate = date;
+                    }
+                    if (this._maxDate === null || date.getTime() > this._maxDate.getTime()) {
+                        this._maxDate = date;
+                    }
+                }
+                console.log("MIN_DATE", this._minDate);
+                console.log("MAX_DATE", this._maxDate);
                 let count = 0;
                 for (const item of this._data) {
                     if (this.rollingAvg || count % this.avgLength === 0) {

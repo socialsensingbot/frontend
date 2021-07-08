@@ -3,9 +3,9 @@ import {BreakpointObserver} from "@angular/cdk/layout";
 import {DashboardCard, DashboardService} from "../pref/dashboard.service";
 
 @Component({
-               selector:    "app-dashboard",
+               selector: "app-dashboard",
                templateUrl: "./dashboard.component.html",
-               styleUrls:   ["./dashboard.component.scss"]
+               styleUrls: ["./dashboard.component.scss"]
            })
 export class DashboardComponent implements OnInit {
 
@@ -22,6 +22,16 @@ export class DashboardComponent implements OnInit {
     //     })
     // );
     public deviceIndex: number;
+    public readonly = false;
+    public types = [{
+        title: "Text and Region Count",
+        type:  "timeseries-text-and-region",
+        rows:  2,
+        cols:  2,
+        state: {textSearch: "", regions: []}
+    }];
+    public newWidgetTitle = "New Graph";
+    public newWidgetType = this.types[0];
     private maxCols = 2;
     private minCols = 1;
     private maxRows = 2;
@@ -72,6 +82,21 @@ export class DashboardComponent implements OnInit {
     public hide(card: DashboardCard) {
         card.hidden = true;
         this.dash.persist();
+    }
+
+    public addCard() {
+        this.dash.addCard(this.newWidgetType.type, this.newWidgetTitle, this.newWidgetType.cols,
+                          this.newWidgetType.rows, this.newWidgetType.state);
+        this.initDashboard();
+    }
+
+    public debug(card: DashboardCard) {
+        console.log(card);
+    }
+
+    public remove(card: DashboardCard) {
+        this.dash.removeCard(card);
+        this.initDashboard();
     }
 
     private initDashboard() {

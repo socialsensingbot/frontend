@@ -67,7 +67,7 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
         this.regionInput.nativeElement.value = "";
         this.regionControl.setValue(null);
         this.updateRegions();
-        this.data.component.markChanged();
+        this.data.component.updateGraph(this.data.state);
     }
 
     public add(event: MatChipInputEvent): void {
