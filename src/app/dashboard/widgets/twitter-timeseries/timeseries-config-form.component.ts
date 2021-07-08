@@ -39,12 +39,12 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
 
     public selectAllRegions() {
         this.regions = [...this.allRegions];
-        this.data.component.markChanged();
+        this.data.component.updateGraph(this.data.state);
     }
 
     public clearRegions() {
         this.regions = [];
-        this.data.component.markChanged();
+        this.data.component.updateGraph(this.data.state);
     }
 
     remove(selectedTopic: MetadataKeyValue): void {
