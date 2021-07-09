@@ -12,6 +12,7 @@
         <mat-label>Filter by Region</mat-label>
         <mat-chip-list #chipList aria-label="Topic selection">
             <mat-chip
+                    [class]="'region-level-'+region.level"
                     *ngFor="let region of regions"
                     [selectable]="true"
                     [removable]="data.component.removable"
