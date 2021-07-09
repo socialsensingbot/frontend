@@ -2,7 +2,7 @@
 <button mat-button (click)="showDashboard()">Open Dashboard</button>
 
 <div class="graph-wrapper">
-    <app-twitter-timeseries [height]="500" [mappingColumns]="['region_1']"
+    <app-twitter-timeseries [height]="500" [mappingColumns]="['region']"
                             [state]="{'regions':regionList}"
                             [type]="'bar'" [showForm]="false"
                             [scrollBar]="false"
@@ -10,7 +10,7 @@
 </div>
 
 <ng-template #expandedCountGraph>
-    <app-twitter-timeseries [height]="600" [mappingColumns]="['region_1']"
+    <app-twitter-timeseries [height]="800" [mappingColumns]="['region']"
                             [state]="{'regions':regionList}"
                             [type]="'bar'"
                             regionFilter="true" textFilter="true"></app-twitter-timeseries>
@@ -33,7 +33,7 @@
                                 [state]="{'regions':regionList}"
                                 [mappingColumns]="['region']"
 
-                                [height]="500"></app-twitter-timeseries>
+                                [height]="800"></app-twitter-timeseries>
     </ng-template>
     <button mat-button (click)="expandExceedenceGraph()">Expand</button>
     <button mat-button

@@ -24,7 +24,7 @@ export class MapGraphSidebarComponent implements OnInit {
 
     public expandCountGraph() {
         const dialogRef = this.dialog.open(this.expandedCountGraph, {
-            width: "800px"
+            width: "80vw"
         });
 
         dialogRef.afterClosed().subscribe(() => {
@@ -34,7 +34,7 @@ export class MapGraphSidebarComponent implements OnInit {
 
     public expandExceedenceGraph() {
         const dialogRef = this.dialog.open(this.expandedExceedenceGraph, {
-            width: "800px"
+            width: "80vw"
         });
 
         dialogRef.afterClosed().subscribe(() => {
