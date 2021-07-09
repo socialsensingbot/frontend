@@ -14,6 +14,19 @@ form.ttc-form > * {
     margin-bottom: 0px !important;
 }
 
+.region-level-0 {
+    background-color: hsl(216, 30%, 50%);
+    color: white !important;
+}
+.region-level-1 {
+    background-color: hsl(216, 50%, 50%);
+    color:white !important;
+}
+.region-level-2 {
+    background-color: hsl(216, 70%, 50%);
+    color: white !important;
+}
+
 ::ng-deep {
 
 
@@ -23,6 +36,8 @@ form.ttc-form > * {
 
         .mat-chip {
             flex: 0 0 auto;
+
+
         }
     }
 
