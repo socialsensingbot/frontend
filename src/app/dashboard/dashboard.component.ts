@@ -21,7 +21,6 @@ export class DashboardComponent implements OnInit {
     //         return this._dash.dashboard.devices.filter((i => i.deviceType === "all"))[0].pages[0].cards;
     //     })
     // );
-    public deviceIndex: number;
     public readonly = false;
     public types = [{
         title: "Text and Region Count",
@@ -50,7 +49,7 @@ export class DashboardComponent implements OnInit {
     }
 
     public saveCard(index: number, data: any) {
-        this.dash.dashboard.devices[this.deviceIndex].pages[0].cards[index].state = data;
+        this.dash.dashboard.boards[0].pages[0].cards[index].state = data;
         this.dash.persist();
     }
 
@@ -100,13 +99,6 @@ export class DashboardComponent implements OnInit {
     }
 
     private initDashboard() {
-        this.deviceIndex = 0;
-        for (let i = 0; i < this.dash.dashboard.devices.length; i++) {
-            if (this.dash.dashboard.devices[i].deviceType === "all") {
-                this.deviceIndex = i;
-
-            }
-        }
-        this.cards = this.dash.dashboard.devices[this.deviceIndex].pages[0].cards;
+        this.cards = this.dash.dashboard.boards[0].pages[0].cards;
     }
 }
