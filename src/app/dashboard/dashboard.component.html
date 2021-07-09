@@ -33,7 +33,7 @@
                     <mat-card-content class="dashboard-card-content">
                         <ng-container [ngSwitch]="card.type">
                             <ng-container *ngSwitchCase="'timeseries-text-and-region'">
-                                <app-twitter-timeseries [height]="card.rows*500" [mappingColumns]="['region_1']"
+                                <app-twitter-timeseries [height]="card.rows*500" [mappingColumns]="['region']"
                                                         [state]="card.state"
                                                         (changed)="saveCard(i,$event)"
                                                         [type]="card.variant || 'line'"

@@ -1,0 +1,188 @@
+id,title,aggregate_level
+aberdeen city,Aberdeen City,0
+aberdeenshire,Aberdeenshire,0
+angus,Angus,0
+antrim,Antrim,0
+argyll and bute,Argyll and Bute,0
+armagh,Armagh,0
+bath and ne somerset,Bath and Ne Somerset,0
+bedfordshire,Bedfordshire,0
+blackburn with darwen,Blackburn With Darwen,0
+blackpool,Blackpool,0
+blaenau gwent,Blaenau Gwent,0
+bournemouth,Bournemouth,0
+bracknell forest,Bracknell Forest,0
+bridgend,Bridgend,0
+brighton and hove,Brighton and Hove,0
+"bristol, city of","Bristol, City Of",0
+buckinghamshire,Buckinghamshire,0
+caerphilly,Caerphilly,0
+cambridgeshire,Cambridgeshire,0
+cardiff,Cardiff,0
+carlow,Carlow,0
+carmarthenshire,Carmarthenshire,0
+cavan,Cavan,0
+ceredigion,Ceredigion,0
+cheshire,Cheshire,0
+city of edinburgh,City Of Edinburgh,0
+clackmannanshire,Clackmannanshire,0
+clare,Clare,0
+conwy,Conwy,0
+cork,Cork,0
+cornwall and isles of scilly,Cornwall and Isles Of Scilly,0
+cumbria,Cumbria,0
+darlington,Darlington,0
+denbighshire,Denbighshire,0
+derbyshire,Derbyshire,0
+devon,Devon,0
+donegal,Donegal,0
+dorset,Dorset,0
+down,Down,0
+dublin,Dublin,0
+dumfries and galloway,Dumfries and Galloway,0
+dundee city,Dundee City,0
+durham,Durham,0
+east ayrshire,East Ayrshire,0
+east dunbartonshire,East Dunbartonshire,0
+east lothian,East Lothian,0
+east renfrewshire,East Renfrewshire,0
+east riding of yorkshire,East Riding Of Yorkshire,0
+east sussex,East Sussex,0
+essex,Essex,0
+falkirk,Falkirk,0
+fermanagh,Fermanagh,0
+fife,Fife,0
+flintshire,Flintshire,0
+galway,Galway,0
+glasgow city,Glasgow City,0
+gloucestershire,Gloucestershire,0
+greater london,Greater London,0
+greater manchester,Greater Manchester,0
+gwynedd,Gwynedd,0
+halton,Halton,0
+hampshire,Hampshire,0
+hartlepool,Hartlepool,0
+herefordshire,Herefordshire,0
+hertfordshire,Hertfordshire,0
+highland,Highland,0
+inverclyde,Inverclyde,0
+isle of anglesey,Isle Of Anglesey,0
+isle of man,Isle Of Man,0
+isle of wight,Isle Of Wight,0
+kent,Kent,0
+kerry,Kerry,0
+kildare,Kildare,0
+kilkenny,Kilkenny,0
+"kingston upon hull, city of","Kingston Upon Hull, City Of",0
+lancashire,Lancashire,0
+laois,Laois,0
+leicestershire,Leicestershire,0
+leitrim,Leitrim,0
+limerick,Limerick,0
+lincolnshire,Lincolnshire,0
+londonderry,Londonderry,0
+longford,Longford,0
+louth,Louth,0
+luton,Luton,0
+mayo,Mayo,0
+meath,Meath,0
+medway,Medway,0
+merseyside,Merseyside,0
+merthyr tydfil,Merthyr Tydfil,0
+middlesbrough,Middlesbrough,0
+midlothian,Midlothian,0
+milton keynes,Milton Keynes,0
+monaghan,Monaghan,0
+monmouthshire,Monmouthshire,0
+moray,Moray,0
+na h-eileanan siar,Na H Eileanan Siar,0
+neath port talbot,Neath Port Talbot,0
+newport,Newport,0
+norfolk,Norfolk,0
+north ayrshire,North Ayrshire,0
+north east lincolnshire,North East Lincolnshire,0
+north lanarkshire,North Lanarkshire,0
+north lincolnshire,North Lincolnshire,0
+north somerset,North Somerset,0
+north yorkshire,North Yorkshire,0
+northamptonshire,Northamptonshire,0
+northumberland,Northumberland,0
+nottinghamshire,Nottinghamshire,0
+offaly,Offaly,0
+orkney islands,Orkney Islands,0
+oxfordshire,Oxfordshire,0
+pembrokeshire,Pembrokeshire,0
+perth and kinross,Perth and Kinross,0
+peterborough,Peterborough,0
+plymouth,Plymouth,0
+poole,Poole,0
+portsmouth,Portsmouth,0
+powys,Powys,0
+reading,Reading,0
+redcar and cleveland,Redcar and Cleveland,0
+renfrewshire,Renfrewshire,0
+"rhondda, cynon, taff","Rhondda, Cynon, Taff",0
+roscommon,Roscommon,0
+rutland,Rutland,0
+scottish borders,Scottish Borders,0
+shetland islands,Shetland Islands,0
+shropshire,Shropshire,0
+sligo,Sligo,0
+slough,Slough,0
+somerset,Somerset,0
+south ayrshire,South Ayrshire,0
+south gloucestershire,South Gloucestershire,0
+south lanarkshire,South Lanarkshire,0
+south yorkshire,South Yorkshire,0
+southampton,Southampton,0
+southend-on-sea,Southend On Sea,0
+staffordshire,Staffordshire,0
+stirling,Stirling,0
+stockton-on-tees,Stockton On Tees,0
+suffolk,Suffolk,0
+surrey,Surrey,0
+swansea,Swansea,0
+swindon,Swindon,0
+telford and wrekin,Telford and Wrekin,0
+the vale of glamorgan,The Vale Of Glamorgan,0
+thurrock,Thurrock,0
+tipperary,Tipperary,0
+torbay,Torbay,0
+torfaen,Torfaen,0
+tyne and wear,Tyne and Wear,0
+tyrone,Tyrone,0
+warrington,Warrington,0
+warwickshire,Warwickshire,0
+waterford,Waterford,0
+west berkshire,West Berkshire,0
+west dunbartonshire,West Dunbartonshire,0
+west lothian,West Lothian,0
+west midlands,West Midlands,0
+west sussex,West Sussex,0
+west yorkshire,West Yorkshire,0
+westmeath,Westmeath,0
+wexford,Wexford,0
+wicklow,Wicklow,0
+wiltshire,Wiltshire,0
+windsor and maidenhead,Windsor and Maidenhead,0
+wokingham,Wokingham,0
+worcestershire,Worcestershire,0
+wrexham,Wrexham,0
+york,York,0
+"west midlands - region",West Midlands (Region),1
+"east of england",East of England,1
+"south east england",South East England,1
+"east midlands",East Midlands,1
+"north west england",North West England,1
+"north east england",North East England,1
+"yorkshire and the humber",Yorkshire and the Humber,1
+"south west england",South West England,1
+"london","London",1
+"republic of ireland", "Ireland",1
+"northern ireland","Northern Ireland",1
+"scotland","Scotland",1
+"wales","Wales",1
+"isle of man - country","Isle of Man (Country)",2
+"england","England",2
+"uk","United Kingdom",3
+"gb","Great Britain",3
