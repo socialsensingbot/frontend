@@ -26,13 +26,13 @@ export interface DashboardPage {
     cards: DashboardCard[];
 }
 
-export interface DashboardDeviceDefinition {
+export interface DashboardBoardDefinition {
     deviceType: string;
     pages: DashboardPage[];
 }
 
 export interface Dashboard {
-    devices: DashboardDeviceDefinition[];
+    boards: DashboardBoardDefinition[];
 }
 
 @Injectable({
@@ -159,7 +159,7 @@ export class DashboardService {
 
     public async addCard(type: string, title: string, cols: number, rows: number, state: any,
                          variant?: string) {
-        this.dashboard.devices[0].pages[0].cards.push({
+        this.dashboard.boards[0].pages[0].cards.push({
                                                           title,
                                                           cols,
                                                           rows,
@@ -172,7 +172,7 @@ export class DashboardService {
     }
 
     public removeCard(toRemove: DashboardCard) {
-        for (const device of this.dashboard.devices) {
+        for (const device of this.dashboard.boards) {
             for (const page of device.pages) {
                 page.cards = page.cards.filter(i => i.id !== toRemove.id);
             }

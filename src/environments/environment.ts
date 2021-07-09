@@ -14,7 +14,7 @@ import "zone.js/dist/zone-error"; // Included with Angular CLI.
 import {v4 as uuidv4} from "uuid";
 
 const defaultDashboard: Dashboard = {
-    devices: [{
+    boards: [{
         deviceType: "all",
         pages:      [{
             title: "First Page",

@@ -1,7 +1,7 @@
 import {Dashboard} from "../app/pref/dashboard.service";
 
 const defaultDashboard: Dashboard = {
-    devices: [{
+    boards: [{
         deviceType: "all",
         pages:      [{
             title: "First Page",
