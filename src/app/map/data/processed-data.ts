@@ -7,6 +7,7 @@ import {
 } from "../types";
 import {Logger} from "@aws-amplify/core";
 import {RegionMetadata} from "./map-data.service";
+import {environment} from "../../../environments/environment";
 
 const log = new Logger("processed-data");
 
