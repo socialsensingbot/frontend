@@ -55,15 +55,19 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                                                                      dateFromMillis(params.to)];
             return {
                 sql: `select *
-                      from (SELECT count(*)              as count,
-                                   source_date           as date,
-                                   'all'                 as region,
-                                   1/(1-percent_rank() OVER w) as exceedence
+                      from (SELECT count(*)                                                             as count,
+                                   source_date                                                          as date,
+                                   'all'                                                                as region,
+                                   rank() over w,
+                                   100.0 - 100.0 * (rank() OVER w
+                                       ) /
+                                           (select count(*)
+                                            from (select * from text_by_region group by source_date) x) as exceedence
                             FROM text_by_region
                             WHERE source = ?
                               and hazard = ? ${fullText}
                             group by source_date
-                                WINDOW w AS (ORDER BY COUNT (source_date))
+                                WINDOW w AS (ORDER BY COUNT (source_date) desc)
                             order by source_date) x
                       where date between ? and ? `,
                 values
@@ -77,10 +81,13 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                                                                      dateFromMillis(params.to)];
             return {
                 sql: `select *
-                      from (SELECT count(source_date)    as count,
-                                   source_date           as date,
-                                   parent                as region,
-                                   1/(1-percent_rank() OVER w) as exceedence
+                      from (SELECT count(source_date)                                                   as count,
+                                   source_date                                                          as date,
+                                   parent                                                               as region,
+                                   rank() over w,
+                                   100.0 - 100.0 * (rank() OVER w
+                                       ) / (select count(*)
+                                            from (select * from text_by_region group by source_date) x) as exceedence
                             FROM text_by_region tbr,
                                  ref_region_groups as rrg
                             WHERE tbr.source = ?
@@ -89,7 +96,7 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                               and rrg.parent in (?)
                                 ${fullText}
                             group by source_date, rrg.parent
-                                WINDOW w AS (ORDER BY COUNT (source_date))
+                                WINDOW w AS (ORDER BY COUNT (source_date) desc)
                             order by source_date) x
                       where date between ? and ?`,
                 values
