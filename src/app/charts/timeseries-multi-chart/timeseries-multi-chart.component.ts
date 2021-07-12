@@ -38,11 +38,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     @Output() ready = new EventEmitter<boolean>();
     chart: XYChart;
     @Input()
-    yField = "count";
-    @Input()
     xField = "date";
-    @Input()
-    yLabel: string;
     @Input()
     public mappingColumns = [];
     @Input()
@@ -63,6 +59,33 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
 
+    }
+
+    private _yField = "count";
+
+    public get yField(): string {
+        return this._yField;
+    }
+
+    @Input()
+    public set yField(value: string) {
+        this._yField = value;
+        //refresh
+        this.data = this._data;
+    }
+
+    private _yLabel: string;
+
+    public get yLabel(): string {
+        return this._yLabel;
+    }
+
+    @Input()
+    public set yLabel(value: string) {
+        this._yLabel = value;
+        if (this.valueAxis) {
+            this.valueAxis.title.text = this.yLabel;
+        }
     }
 
     private _type = "line";
@@ -111,7 +134,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                     if (this.rollingAvg || count % this.avgLength === 0) {
                         if (count >= this.avgLength) {
                             const slice = this._data.slice(count - this.avgLength, count - 1);
-                            item.trend = slice.map(i => i[this.yField]).reduce((p, c) => p + c, 0) / this.avgLength;
+                            item.trend = slice.map(i => i[this._yField]).reduce((p, c) => p + c, 0) / this.avgLength;
                         }
                     }
                     count++;
@@ -159,7 +182,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                         for (let fillDate = lastRowDate + this.dateSpacing; fillDate < rowDate; fillDate += this.dateSpacing) {
                             const fillRow = {};
                             fillRow[this.xField] = new Date(fillDate);
-                            fillRow[this.yField] = 0;
+                            fillRow[this._yField] = 0;
                             result.push(fillRow);
                         }
                     }
@@ -198,7 +221,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
         dateAxis.title.opacity = 0.5;
 
         this.valueAxis = this.chart.yAxes.push(new am4charts.ValueAxis());
-        this.valueAxis.title.text = this.yLabel;
+        this.valueAxis.title.text = this._yLabel;
         // valueAxis.title.fontWeight = "bold";
         this.valueAxis.title.opacity = 0.5;
         //
@@ -232,7 +255,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
         if (this._type === "line") {
             series = this.chart.series.push(new am4charts.LineSeries());
             series.data = this.zeroFill(mappedData);
-            series.dataFields.valueY = this.yField;
+            series.dataFields.valueY = this._yField;
             series.dataFields.dateX = this.xField;
             series.strokeWidth = 3;
             series.minBulletDistance = 10;
@@ -248,7 +271,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
         } else {
             series = this.chart.series.push(new am4charts.ColumnSeries());
             series.data = mappedData;
-            series.dataFields.valueY = this.yField;
+            series.dataFields.valueY = this._yField;
             series.dataFields.dateX = this.xField;
             series.tooltipText = {mappedKey} + " {valueY}";
             series.tooltip.pointerOrientation = "vertical";
@@ -314,9 +337,9 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                     if (typeof mappedKey !== "undefined" && mappedKey !== null && mappedKey.length > 0) {
                         const totalValue = totals[row[this.xField]];
                         if (typeof totalValue === "undefined") {
-                            totals[row[this.xField]] = +(row[this.yField]);
+                            totals[row[this.xField]] = +(row[this._yField]);
                         } else {
-                            totals[row[this.xField]] += row[this.yField];
+                            totals[row[this.xField]] += row[this._yField];
                         }
                         if (mappedData[mappedKey]) {
                             mappedData[mappedKey].push(row);
@@ -350,10 +373,10 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                     if (this.zeroFillMissingDates) {
                         const dummyMin = {};
                         dummyMin[this.xField] = this._minDate;
-                        dummyMin[this.yField] = 0;
+                        dummyMin[this._yField] = 0;
                         const dummyMax = {};
                         dummyMax[this.xField] = this._maxDate;
-                        dummyMax[this.yField] = 0;
+                        dummyMax[this._yField] = 0;
                         mappedData[requiredSeries] = [dummyMin, dummyMax]
                         this.createSeriesFromMappedData(requiredSeries, mappedData[requiredSeries]);
                     }
