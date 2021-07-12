@@ -85,7 +85,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
         this.markChanged();
     }
 
-    private _state: any = {};
+    private _state: any = {"eoc":"count"};
 
     public get state(): any {
         return this._state;
@@ -100,14 +100,6 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
 
     async ngOnInit() {
         this._interval = this.startChangeTimer();
-        if (!this.textFilter) {
-            this.restQueryName = "count_by_date_for_regions";
-        }
-        if (!this.textFilter && !this.regionFilter) {
-            this.restQueryName = "count_by_date_for_all_regions";
-        }
-
-
     }
 
     public emitChange() {

@@ -8,6 +8,10 @@
         </button>
 
     </mat-form-field>
+    <mat-button-toggle-group name="eoc" class="eoc" aria-label="Exceedence or Count" [(ngModel)]="data.state.eoc">
+        <mat-button-toggle value="exceedence">Exceedence</mat-button-toggle>
+        <mat-button-toggle value="count">Count</mat-button-toggle>
+    </mat-button-toggle-group>
     <mat-form-field *ngIf="data.component.regionFilter"  class="region-chooser" appearance="fill">
         <mat-label>Filter by Region</mat-label>
         <mat-chip-list #chipList aria-label="Topic selection">

@@ -28,6 +28,7 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
     @Input()
     public data: { state: any, component: TwitterTimeseriesComponent };
 
+
     constructor(public metadata: MetadataService, public zone: NgZone, public router: Router,
                 public route: ActivatedRoute,
                 private _api: HistoricalDataService,

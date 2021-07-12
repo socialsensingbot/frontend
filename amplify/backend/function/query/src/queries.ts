@@ -49,32 +49,50 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
             fullText = " and MATCH (source_text) AGAINST(? IN BOOLEAN MODE) ";
         }
         if (!params.regions || (params.regions.includes("*") || params.regions.length === 0)) {
+            const values = fullText ? [params.source, params.hazard, params.textSearch, dateFromMillis(params.from),
+                                       dateFromMillis(params.to)] : [params.source, params.hazard,
+                                                                     dateFromMillis(params.from),
+                                                                     dateFromMillis(params.to)];
             return {
-                sql: `SELECT count(*) as count, source_date as date, 'all' as region
-                      FROM text_by_region
-                      WHERE source = ?
-                        and hazard = ?
-                        and source_date between ? and ? ${fullText}
-                      group by source_date
-                      order by source_date`,
-                values: [params.source, params.hazard, dateFromMillis(params.from), dateFromMillis(params.to),
-                         params.textSearch]
+                sql: `select *
+                      from (SELECT count(*)              as count,
+                                   source_date           as date,
+                                   'all'                 as region,
+                                   1/(1-percent_rank() OVER w) as exceedence
+                            FROM text_by_region
+                            WHERE source = ?
+                              and hazard = ? ${fullText}
+                            group by source_date
+                                WINDOW w AS (ORDER BY COUNT (source_date))
+                            order by source_date) x
+                      where date between ? and ? `,
+                values
             };
         } else {
+            const values = fullText ? [params.source, params.hazard,
+                                       params.regions, params.textSearch, dateFromMillis(params.from),
+                                       dateFromMillis(params.to)] : [params.source, params.hazard,
+                                                                     params.regions,
+                                                                     dateFromMillis(params.from),
+                                                                     dateFromMillis(params.to)];
             return {
-                sql: `SELECT count(*) as count, source_date as date, parent as region
-                      FROM text_by_region tbr,
-                           ref_region_groups as rrg
-                      WHERE tbr.source = ?
-                        and tbr.hazard = ?
-                        and tbr.region_1 = rrg.region
-                        and tbr.source_date between ? and ?
-                        and rrg.parent in (?)
-                          ${fullText}
-                      group by source_date, rrg.parent
-                      order by source_date`,
-                values: [params.source, params.hazard, dateFromMillis(params.from), dateFromMillis(params.to),
-                         params.regions, params.textSearch]
+                sql: `select *
+                      from (SELECT count(source_date)    as count,
+                                   source_date           as date,
+                                   parent                as region,
+                                   1/(1-percent_rank() OVER w) as exceedence
+                            FROM text_by_region tbr,
+                                 ref_region_groups as rrg
+                            WHERE tbr.source = ?
+                              and tbr.hazard = ?
+                              and tbr.region_1 = rrg.region
+                              and rrg.parent in (?)
+                                ${fullText}
+                            group by source_date, rrg.parent
+                                WINDOW w AS (ORDER BY COUNT (source_date))
+                            order by source_date) x
+                      where date between ? and ?`,
+                values
             };
 
         }
