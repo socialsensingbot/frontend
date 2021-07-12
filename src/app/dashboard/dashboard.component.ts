@@ -3,9 +3,9 @@ import {BreakpointObserver} from "@angular/cdk/layout";
 import {DashboardCard, DashboardService} from "../pref/dashboard.service";
 
 @Component({
-               selector:    "app-dashboard",
+               selector: "app-dashboard",
                templateUrl: "./dashboard.component.html",
-               styleUrls:   ["./dashboard.component.scss"]
+               styleUrls: ["./dashboard.component.scss"]
            })
 export class DashboardComponent implements OnInit {
 
@@ -21,7 +21,16 @@ export class DashboardComponent implements OnInit {
     //         return this._dash.dashboard.devices.filter((i => i.deviceType === "all"))[0].pages[0].cards;
     //     })
     // );
-    public deviceIndex: number;
+    public readonly = false;
+    public types = [{
+        title: "Text and Region Count",
+        type:  "timeseries-text-and-region",
+        rows:  2,
+        cols:  2,
+        state: {textSearch: "", regions: []}
+    }];
+    public newWidgetTitle = "New Graph";
+    public newWidgetType = this.types[0];
     private maxCols = 2;
     private minCols = 1;
     private maxRows = 2;
@@ -40,7 +49,7 @@ export class DashboardComponent implements OnInit {
     }
 
     public saveCard(index: number, data: any) {
-        this.dash.dashboard.devices[this.deviceIndex].pages[0].cards[index].state = data;
+        this.dash.dashboard.boards[0].pages[0].cards[index].state = data;
         this.dash.persist();
     }
 
@@ -74,14 +83,22 @@ export class DashboardComponent implements OnInit {
         this.dash.persist();
     }
 
-    private initDashboard() {
-        this.deviceIndex = 0;
-        for (let i = 0; i < this.dash.dashboard.devices.length; i++) {
-            if (this.dash.dashboard.devices[i].deviceType === "all") {
-                this.deviceIndex = i;
+    public addCard() {
+        this.dash.addCard(this.newWidgetType.type, this.newWidgetTitle, this.newWidgetType.cols,
+                          this.newWidgetType.rows, this.newWidgetType.state);
+        this.initDashboard();
+    }
 
-            }
-        }
-        this.cards = this.dash.dashboard.devices[this.deviceIndex].pages[0].cards;
+    public debug(card: DashboardCard) {
+        console.log(card);
+    }
+
+    public remove(card: DashboardCard) {
+        this.dash.removeCard(card);
+        this.initDashboard();
+    }
+
+    private initDashboard() {
+        this.cards = this.dash.dashboard.boards[0].pages[0].cards;
     }
 }

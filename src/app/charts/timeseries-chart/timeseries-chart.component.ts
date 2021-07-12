@@ -49,6 +49,8 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
     @Input()
     public scrollBar = true;
 
+    @Input() connect = false;
+
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
 
@@ -169,7 +171,7 @@ export class TimeSeriesChartComponent implements OnInit, AfterViewInit {
                 series.strokeWidth = 2;
                 series.minBulletDistance = 10;
                 series.stroke = series.fill = am4core.color("#9000FF", 0.5);
-                series.connect = false;
+                series.connect = this.connect;
                 series.tooltipText = "{valueY}";
                 series.tooltip.pointerOrientation = "vertical";
                 series.tooltip.background.cornerRadius = 20;

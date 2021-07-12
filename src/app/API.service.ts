@@ -89,7 +89,7 @@ export type DeleteUserPreferencesInput = {
 export type CreateUserDashboardInput = {
   id?: string | null;
   owner?: string | null;
-  dashboard?: string | null;
+  dashboard: string;
   _version?: number | null;
 };
 
@@ -104,7 +104,7 @@ export type UserDashboard = {
   __typename: "UserDashboard";
   id?: string;
   owner?: string | null;
-  dashboard?: string | null;
+  dashboard?: string;
   _version?: number;
   _deleted?: boolean | null;
   _lastChangedAt?: number;
@@ -127,7 +127,7 @@ export type DeleteUserDashboardInput = {
 export type CreateGroupDashboardInput = {
   id?: string | null;
   group: string;
-  dashboard?: string | null;
+  dashboard: string;
   _version?: number | null;
 };
 
@@ -143,7 +143,7 @@ export type GroupDashboard = {
   __typename: "GroupDashboard";
   id?: string;
   group?: string;
-  dashboard?: string | null;
+  dashboard?: string;
   _version?: number;
   _deleted?: boolean | null;
   _lastChangedAt?: number;
@@ -630,7 +630,7 @@ export type CreateUserDashboardMutation = {
   __typename: "UserDashboard";
   id: string;
   owner?: string | null;
-  dashboard?: string | null;
+  dashboard: string;
   _version: number;
   _deleted?: boolean | null;
   _lastChangedAt: number;
@@ -642,7 +642,7 @@ export type UpdateUserDashboardMutation = {
   __typename: "UserDashboard";
   id: string;
   owner?: string | null;
-  dashboard?: string | null;
+  dashboard: string;
   _version: number;
   _deleted?: boolean | null;
   _lastChangedAt: number;
@@ -654,7 +654,7 @@ export type DeleteUserDashboardMutation = {
   __typename: "UserDashboard";
   id: string;
   owner?: string | null;
-  dashboard?: string | null;
+  dashboard: string;
   _version: number;
   _deleted?: boolean | null;
   _lastChangedAt: number;
@@ -666,7 +666,7 @@ export type CreateGroupDashboardMutation = {
   __typename: "GroupDashboard";
   id: string;
   group: string;
-  dashboard?: string | null;
+  dashboard: string;
   _version: number;
   _deleted?: boolean | null;
   _lastChangedAt: number;
@@ -678,7 +678,7 @@ export type UpdateGroupDashboardMutation = {
   __typename: "GroupDashboard";
   id: string;
   group: string;
-  dashboard?: string | null;
+  dashboard: string;
   _version: number;
   _deleted?: boolean | null;
   _lastChangedAt: number;
@@ -690,7 +690,7 @@ export type DeleteGroupDashboardMutation = {
   __typename: "GroupDashboard";
   id: string;
   group: string;
-  dashboard?: string | null;
+  dashboard: string;
   _version: number;
   _deleted?: boolean | null;
   _lastChangedAt: number;
@@ -967,7 +967,7 @@ export type GetUserDashboardQuery = {
   __typename: "UserDashboard";
   id: string;
   owner?: string | null;
-  dashboard?: string | null;
+  dashboard: string;
   _version: number;
   _deleted?: boolean | null;
   _lastChangedAt: number;
@@ -981,7 +981,7 @@ export type ListUserDashboardsQuery = {
     __typename: "UserDashboard";
     id: string;
     owner?: string | null;
-    dashboard?: string | null;
+    dashboard: string;
     _version: number;
     _deleted?: boolean | null;
     _lastChangedAt: number;
@@ -998,7 +998,7 @@ export type SyncUserDashboardsQuery = {
     __typename: "UserDashboard";
     id: string;
     owner?: string | null;
-    dashboard?: string | null;
+    dashboard: string;
     _version: number;
     _deleted?: boolean | null;
     _lastChangedAt: number;
@@ -1013,7 +1013,7 @@ export type GetGroupDashboardQuery = {
   __typename: "GroupDashboard";
   id: string;
   group: string;
-  dashboard?: string | null;
+  dashboard: string;
   _version: number;
   _deleted?: boolean | null;
   _lastChangedAt: number;
@@ -1027,7 +1027,7 @@ export type ListGroupDashboardsQuery = {
     __typename: "GroupDashboard";
     id: string;
     group: string;
-    dashboard?: string | null;
+    dashboard: string;
     _version: number;
     _deleted?: boolean | null;
     _lastChangedAt: number;
@@ -1044,7 +1044,7 @@ export type SyncGroupDashboardsQuery = {
     __typename: "GroupDashboard";
     id: string;
     group: string;
-    dashboard?: string | null;
+    dashboard: string;
     _version: number;
     _deleted?: boolean | null;
     _lastChangedAt: number;
@@ -1364,7 +1364,7 @@ export type OnCreateUserDashboardSubscription = {
   __typename: "UserDashboard";
   id: string;
   owner?: string | null;
-  dashboard?: string | null;
+  dashboard: string;
   _version: number;
   _deleted?: boolean | null;
   _lastChangedAt: number;
@@ -1376,7 +1376,7 @@ export type OnUpdateUserDashboardSubscription = {
   __typename: "UserDashboard";
   id: string;
   owner?: string | null;
-  dashboard?: string | null;
+  dashboard: string;
   _version: number;
   _deleted?: boolean | null;
   _lastChangedAt: number;
@@ -1388,7 +1388,7 @@ export type OnDeleteUserDashboardSubscription = {
   __typename: "UserDashboard";
   id: string;
   owner?: string | null;
-  dashboard?: string | null;
+  dashboard: string;
   _version: number;
   _deleted?: boolean | null;
   _lastChangedAt: number;
@@ -1400,7 +1400,7 @@ export type OnCreateGroupDashboardSubscription = {
   __typename: "GroupDashboard";
   id: string;
   group: string;
-  dashboard?: string | null;
+  dashboard: string;
   _version: number;
   _deleted?: boolean | null;
   _lastChangedAt: number;
@@ -1412,7 +1412,7 @@ export type OnUpdateGroupDashboardSubscription = {
   __typename: "GroupDashboard";
   id: string;
   group: string;
-  dashboard?: string | null;
+  dashboard: string;
   _version: number;
   _deleted?: boolean | null;
   _lastChangedAt: number;
@@ -1424,7 +1424,7 @@ export type OnDeleteGroupDashboardSubscription = {
   __typename: "GroupDashboard";
   id: string;
   group: string;
-  dashboard?: string | null;
+  dashboard: string;
   _version: number;
   _deleted?: boolean | null;
   _lastChangedAt: number;

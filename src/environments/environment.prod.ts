@@ -1,13 +1,19 @@
 import {Dashboard} from "../app/pref/dashboard.service";
 
 const defaultDashboard: Dashboard = {
-    devices: [{
+    boards: [{
         deviceType: "all",
         pages:      [{
             title: "First Page",
             cards: [
-                {title: "Count By Text and Region", cols: 2, rows: 2, type: "timeseries-text-and-region", state: {}},
-                {title: "Total Count", cols: 1, rows: 1, type: "timeseries-total", state: {}},
+                {title:    "Count By Text and Region",
+                    cols:  2,
+                    rows:  2,
+                    type:  "timeseries-text-and-region",
+                    state: {},
+                    id:    1
+                },
+                {title: "Total Count", cols: 1, rows: 1, type: "timeseries-total", state: {}, id: 2},
                 // {title: "Exceedence by Date", cols: 1, rows: 1, type: "timeseries-exceed", state: {}},
                 // {title: "Exceedence by Region", cols: 2, rows: 1, type: "timeseries-exceed-region", state: {}},
             ]
@@ -40,7 +46,7 @@ export const environment = {
     availableDataSets:    ["*"],
     cacheProcessedTweets: false,
 
-    impact:                              {
+    impact: {
         //The ability to tag tweets with an impact annotation
         levels: [
             {title: "1 – Minimal", value: "minimal", color: "#43A047"},
@@ -49,7 +55,7 @@ export const environment = {
             {title: "4 - Severe", value: "severe", color: "#F4511E"}
         ]
     },
-    source:                              {
+    source: {
         //The ability to tag tweets with a source
         types: [
             {title: "River", value: "river", color: "#43A047"},
@@ -68,5 +74,6 @@ export const environment = {
     mapTileUrlTemplate:      "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
     blinkRateInMilliseconds: 1000,
     defaultDashboard,
+    newExceedenceCalc: false
 
 };

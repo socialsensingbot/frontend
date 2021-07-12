@@ -18,7 +18,7 @@
 </ng-template>
 <button mat-button (click)="expandCountGraph()">Expand</button>
 <button mat-button
-        (click)="this.dash.addGraph('timeseries-text-and-region', 'Count for Selected Regions', 1,1,{'regions':regionList});showDashboard()">Add to
+        (click)="this.dash.addCard('timeseries-text-and-region', 'Count for Selected Regions', 1,1,{'regions':regionList});showDashboard()">Add to
     Dashboard</button>
 <div class="graph-wrapper">
 <app-twitter-timeseries yField="exceedence" regionFilter="true" yLabel="Exceedence" [showForm]="false"
@@ -37,7 +37,7 @@
     </ng-template>
     <button mat-button (click)="expandExceedenceGraph()">Expand</button>
     <button mat-button
-            (click)="this.dash.addGraph('timeseries-exceed-region', 'Count for Selected Regions',
+            (click)="this.dash.addCard('timeseries-exceed-region', 'Count for Selected Regions',
             1,1,{'regions':regionList});showDashboard()">Add to
         Dashboard</button>
 </div>

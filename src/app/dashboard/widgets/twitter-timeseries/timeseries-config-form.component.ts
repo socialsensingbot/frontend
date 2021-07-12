@@ -28,6 +28,7 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
     @Input()
     public data: { state: any, component: TwitterTimeseriesComponent };
 
+
     constructor(public metadata: MetadataService, public zone: NgZone, public router: Router,
                 public route: ActivatedRoute,
                 private _api: HistoricalDataService,
@@ -39,12 +40,13 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
 
     public selectAllRegions() {
         this.regions = [...this.allRegions];
-        this.data.component.markChanged();
+        this.data.component.updateGraph(this.data.state);
     }
 
     public clearRegions() {
         this.regions = [];
-        this.data.component.markChanged();
+        this.data.state.regions = [];
+        this.data.component.updateGraph(this.data.state);
     }
 
     remove(selectedTopic: MetadataKeyValue): void {
@@ -54,7 +56,7 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
                 this.regions.splice(index, 1);
             }
             this.updateRegions();
-            this.data.component.markChanged();
+            this.data.component.updateGraph(this.data.state);
         } catch (e) {
             console.error(e);
         }
@@ -66,7 +68,7 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
         this.regionInput.nativeElement.value = "";
         this.regionControl.setValue(null);
         this.updateRegions();
-        this.data.component.markChanged();
+        this.data.component.updateGraph(this.data.state);
     }
 
     public add(event: MatChipInputEvent): void {
@@ -85,7 +87,7 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
 
         this.regionControl.setValue(null);
         this.updateRegions();
-        this.data.component.markChanged();
+        this.data.component.updateGraph(this.data.state);
     }
 
     public ngOnDestroy(): void {
@@ -100,13 +102,20 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
         this.filteredRegions = this.regionControl.valueChanges.pipe(
             startWith(null),
             map((region: string | null) => region ? this._filter(region) : this.allRegions.slice()));
-        this.searchControl.valueChanges.subscribe(value => {this.data.component.markChanged();});
+        this.searchControl.setValue(this.data.state.textSearch);
+        this.searchControl.valueChanges.subscribe(value => {this.textChanged();});
 
     }
 
     public clearTextSearch() {
         this.data.state.textSearch = "";
-        this.data.component.markChanged();
+        this.searchControl.setValue(this.data.state.textSearch);
+        this.data.component.updateGraph(this.data.state);
+    }
+
+    public textChanged() {
+        this.data.state.textSearch = this.searchControl.value;
+        this.data.component.updateGraph(this.data.state);
     }
 
     private updateRegions() {

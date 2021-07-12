@@ -19,24 +19,22 @@ const defaultDashboard: Dashboard = {
         pages:      [{
             title: "First Page",
             cards: [
-                {title:    "Count By Text and Region",
+                {
+                    title: "Count By Text and Region",
                     cols:  2,
                     rows:  2,
                     type:  "timeseries-text-and-region",
                     state: {},
                     id:    uuidv4()
-                },
-                {title: "Total Count", cols: 1, rows: 1, type: "timeseries-total", state: {}, id: uuidv4()},
-                // {title: "Exceedence by Date", cols: 1, rows: 1, type: "timeseries-exceed", state: {}},
-                // {title: "Exceedence by Region", cols: 2, rows: 1, type: "timeseries-exceed-region", state: {}},
+                }
             ]
         }]
     }]
 };
 export const environment = {
-    name:             "dev",
-    lamdaEnvironment: "dev",
-    version:          "dev",
+    name:             "pwsdemo",
+    lamdaEnvironment: "pwsdemo",
+    version:          "pwsdemo",
     demo:             false,
     production:       false,
     hmr:              false,
@@ -70,7 +68,7 @@ export const environment = {
             {title: "Coastal", value: "coastal", color: "#F4511E"}
         ]
     },
-    features:                            ["impact", "source"],
+    features:                            ["impact", "source", "dashboard"],
     showErrors:                          false,
     showLoadingMessages:                 true,
     mostRecentDateIsNow:                 true,

@@ -14,7 +14,10 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
     count_by_date_for_regions:              (params: any) => {
         if (!params.regions || (params.regions.includes("*") || params.regions.length === 0)) {
             return {
-                sql: `SELECT sum(message_count) as count, aggregate_date as date, avg(exceedence) as exceedence, 'all' as region
+                sql: `SELECT sum(message_count) as count,
+                             aggregate_date     as date,
+                             avg(exceedence)    as exceedence,
+                             'all'              as region
                       FROM aggregate_counts_by_region
                       WHERE source = ?
                         and hazard = ?
@@ -25,14 +28,17 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
             };
         } else {
             return {
+                // todo - broken see next query
                 sql: `SELECT message_count as count, aggregate_date as date, exceedence, region
                       FROM aggregate_counts_by_region
                       WHERE source = ?
                         and hazard = ?
                         and aggregate_date between ? and ?
-                        and region in (?)
+
+                        and region in (select region from ref_region_groups where parent in (?) or region in (?))
                       order by aggregate_date`,
                 values: [params.source, params.hazard, dateFromMillis(params.from), dateFromMillis(params.to),
+                         params.regions,
                          params.regions]
             };
         }
@@ -40,33 +46,60 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
     count_by_date_for_regions_and_fulltext: (params: any) => {
         let fullText = "";
         if (typeof params.textSearch !== "undefined" && params.textSearch.length > 0) {
-            fullText = " and MATCH (source_text) AGAINST(? IN NATURAL LANGUAGE MODE) ";
+            fullText = " and MATCH (source_text) AGAINST(? IN BOOLEAN MODE) ";
         }
-        if( !params.regions || (params.regions.includes("*") || params.regions.length === 0)) {
+        if (!params.regions || (params.regions.includes("*") || params.regions.length === 0)) {
+            const values = fullText ? [params.source, params.hazard, params.textSearch, dateFromMillis(params.from),
+                                       dateFromMillis(params.to)] : [params.source, params.hazard,
+                                                                     dateFromMillis(params.from),
+                                                                     dateFromMillis(params.to)];
             return {
-                sql: `SELECT count(*) as count, source_date as date, 'all' as region_1, '' as region_2, '' as region_3
-                      FROM text_by_region
-                      WHERE source = ?
-                        and hazard = ?
-                        and source_date between ? and ? ${fullText}
-                      group by source_date
-                      order by source_date`,
-                values: [params.source, params.hazard, dateFromMillis(params.from), dateFromMillis(params.to),
-                         params.textSearch]
+                sql: `select *
+                      from (SELECT count(*)                                                             as count,
+                                   source_date                                                          as date,
+                                   'all'                                                                as region,
+                                   rank() over w,
+                                   100.0 - 100.0 * (rank() OVER w
+                                       ) /
+                                           (select count(*)
+                                            from (select * from text_by_region group by source_date) x) as exceedence
+                            FROM text_by_region
+                            WHERE source = ?
+                              and hazard = ? ${fullText}
+                            group by source_date
+                                WINDOW w AS (ORDER BY COUNT (source_date) desc)
+                            order by source_date) x
+                      where date between ? and ? `,
+                values
             };
         } else {
+            const values = fullText ? [params.source, params.hazard,
+                                       params.regions, params.textSearch, dateFromMillis(params.from),
+                                       dateFromMillis(params.to)] : [params.source, params.hazard,
+                                                                     params.regions,
+                                                                     dateFromMillis(params.from),
+                                                                     dateFromMillis(params.to)];
             return {
-                sql: `SELECT count(*) as count, source_date as date, region_1, region_2, region_3
-                      FROM text_by_region
-                      WHERE source = ?
-                        and hazard = ?
-                        and source_date between ? and ?
-                        and region_1 in (?)
-                          ${fullText}
-                      group by source_date, region_1, region_2, region_3
-                      order by source_date`,
-                values: [params.source, params.hazard, dateFromMillis(params.from), dateFromMillis(params.to),
-                         params.regions, params.textSearch]
+                sql: `select *
+                      from (SELECT count(source_date)                                                   as count,
+                                   source_date                                                          as date,
+                                   parent                                                               as region,
+                                   rank() over w,
+                                   100.0 - 100.0 * (rank() OVER w
+                                       ) / (select count(*)
+                                            from (select * from text_by_region group by source_date) x) as exceedence
+                            FROM text_by_region tbr,
+                                 ref_region_groups as rrg
+                            WHERE tbr.source = ?
+                              and tbr.hazard = ?
+                              and tbr.region_1 = rrg.region
+                              and rrg.parent in (?)
+                                ${fullText}
+                            group by source_date, rrg.parent
+                                WINDOW w AS (ORDER BY COUNT (source_date) desc)
+                            order by source_date) x
+                      where date between ? and ?`,
+                values
             };
 
         }
@@ -74,7 +107,10 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
     count_by_date_for_all_regions:          (params: any) => {
 
         return {
-            sql: `SELECT sum(message_count) as count, aggregate_date as date, avg(exceedence) as exceedence, 'all' as region
+            sql: `SELECT sum(message_count) as count,
+                         aggregate_date     as date,
+                         avg(exceedence)    as exceedence,
+                         'all'              as region
                   FROM aggregate_counts_by_region
                   WHERE source = ?
                     and hazard = ?

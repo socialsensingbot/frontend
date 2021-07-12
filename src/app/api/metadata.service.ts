@@ -8,6 +8,7 @@ import {HistoricalDataService} from "./historical-data.service";
 export interface MetadataKeyValue {
     text: string;
     value: string;
+    level?: number;
 }
 
 export interface JobTitle {
@@ -32,7 +33,7 @@ export class MetadataService {
         // this.nuts2 =  _api.callAPI("refdata",  {name:"nuts2"});
         // this.nuts3 =  _api.callAPI("refdata",  {name:"nuts3"});
         // this.topics =  _api.callAPI("refdata",  {name:"topic"});
-        this.regions = _api.callAPI("refdata", {name: "regions1"});
+        this.regions = _api.callAPI("refdata", {name: "regions"});
     }
 
 }

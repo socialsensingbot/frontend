@@ -2,19 +2,21 @@
     <mat-form-field *ngIf="data.component.textFilter" class="text-search" appearance="fill">
         <mat-label>Filter by Text</mat-label>
         <mat-icon matPrefix>search</mat-icon>
-        <input #textSearchInput [formControl]="searchControl" matInput placeholder="Text search, e.g. coastal"
-               (ngModelChange)="data.component.markChanged();"
-               (change)="data.component.updateGraph(data.state)"
-               [(ngModel)]="data.state.textSearch">
+        <input #textSearchInput [formControl]="searchControl" matInput placeholder="Text search, e.g. coastal">
         <button mat-button mat-icon-button matSuffix (click)="clearTextSearch()" *ngIf="data.state.textSearch">
             <mat-icon>close</mat-icon>
         </button>
 
     </mat-form-field>
+    <mat-button-toggle-group name="eoc" class="eoc" aria-label="Exceedence or Count" [(ngModel)]="data.state.eoc">
+        <mat-button-toggle value="exceedence">Exceedence</mat-button-toggle>
+        <mat-button-toggle value="count">Count</mat-button-toggle>
+    </mat-button-toggle-group>
     <mat-form-field *ngIf="data.component.regionFilter"  class="region-chooser" appearance="fill">
         <mat-label>Filter by Region</mat-label>
         <mat-chip-list #chipList aria-label="Topic selection">
             <mat-chip
+                    [class]="'region-level-'+region.level"
                     *ngFor="let region of regions"
                     [selectable]="true"
                     [removable]="data.component.removable"
@@ -26,7 +28,6 @@
             <input
                     placeholder="Add regions ..."
                     #regionInput
-                    (change)="data.component.updateGraph(data.state)"
                     [formControl]="regionControl"
                     [matAutocomplete]="auto"
                     [matChipInputFor]="chipList"

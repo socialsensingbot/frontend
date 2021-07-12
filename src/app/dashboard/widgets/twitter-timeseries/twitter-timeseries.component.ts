@@ -53,7 +53,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
         textSearch?: string;
     } = {
         regions:  [],
-        from:     new Date().getTime() - (90 * 24 * 60 * 60 * 1000),
+        from:     new Date().getTime() - (365.24 * 24 * 60 * 60 * 1000),
         to:       new Date().getTime(),
         dateStep: 7 * 24 * 60 * 60 * 1000
     };
@@ -65,6 +65,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     // }
     @Input()
     public showForm: boolean = true;
+    @Input() connect = false;
     private interval: number;
 
     constructor(metadata: MetadataService, zone: NgZone, router: Router, route: ActivatedRoute,
@@ -84,7 +85,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
         this.markChanged();
     }
 
-    private _state: any = {};
+    private _state: any = {"eoc":"count"};
 
     public get state(): any {
         return this._state;
@@ -99,22 +100,6 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
 
     async ngOnInit() {
         this._interval = this.startChangeTimer();
-        if (!this.textFilter) {
-            this.restQueryName = "count_by_date_for_regions";
-        }
-        if (!this.textFilter && !this.regionFilter) {
-            this.restQueryName = "count_by_date_for_all_regions";
-        }
-        this.interval = window.setInterval(() => {
-            this._zone.run(() => {
-                if (this._changed) {
-                    this._changed = false;
-                    this.updateGraph(this.state);
-                    this.emitChange();
-                }
-            });
-        }, 200);
-
     }
 
     public emitChange() {
@@ -134,6 +119,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
         console.log("Graph update from state", state);
         this.query = {...this.query, regions: state.regions, textSearch: state.textSearch};
         this._changed = true;
+        this.emitChange();
     }
 
 
