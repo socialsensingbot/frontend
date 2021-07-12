@@ -58,11 +58,8 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                       from (SELECT count(*)                                                             as count,
                                    source_date                                                          as date,
                                    'all'                                                                as region,
-                                   rank() over w,
-                                   100.0 - 100.0 * (rank() OVER w
-                                       ) /
-                                           (select count(*)
-                                            from (select * from text_by_region group by source_date) x) as exceedence
+                                   (select count(*) from (select * from text_by_region group by source_date) x)  / (rank() OVER w) 
+                                           as exceedence
                             FROM text_by_region
                             WHERE source = ?
                               and hazard = ? ${fullText}
@@ -84,10 +81,8 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                       from (SELECT count(source_date)                                                   as count,
                                    source_date                                                          as date,
                                    parent                                                               as region,
-                                   rank() over w,
-                                   100.0 - 100.0 * (rank() OVER w
-                                       ) / (select count(*)
-                                            from (select * from text_by_region group by source_date) x) as exceedence
+                                   (select count(*) from (select * from text_by_region group by source_date) x)  / (rank() OVER w)
+                                       as exceedence
                             FROM text_by_region tbr,
                                  ref_region_groups as rrg
                             WHERE tbr.source = ?
