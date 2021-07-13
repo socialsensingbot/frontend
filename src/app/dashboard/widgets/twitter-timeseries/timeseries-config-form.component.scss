@@ -12,7 +12,8 @@
 
 .eoc {
     margin-right: 48px;
-    width: 160px;
+    min-width: 160px;
+    max-width: 176px;
 }
 
 form.ttc-form > * {
