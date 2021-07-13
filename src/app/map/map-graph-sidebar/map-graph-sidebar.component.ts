@@ -24,7 +24,11 @@ export class MapGraphSidebarComponent implements OnInit {
 
     public expandCountGraph() {
         const dialogRef = this.dialog.open(this.expandedCountGraph, {
-            width: "800px"
+            width:  "80vw",
+            height: "80vh",
+            minWidth: "800px",
+            minHeight: "800px",
+            maxHeight: "1024px"
         });
 
         dialogRef.afterClosed().subscribe(() => {
@@ -34,7 +38,11 @@ export class MapGraphSidebarComponent implements OnInit {
 
     public expandExceedenceGraph() {
         const dialogRef = this.dialog.open(this.expandedExceedenceGraph, {
-            width: "800px"
+            width:  "80vw",
+            height: "80vh",
+            minWidth: "800px",
+            minHeight: "800px",
+            maxHeight: "1024px"
         });
 
         dialogRef.afterClosed().subscribe(() => {
@@ -43,6 +51,6 @@ export class MapGraphSidebarComponent implements OnInit {
     }
 
     public showDashboard() {
-        window.open("/dashboard","___dashboard___");
+        window.open("/dashboard", "___dashboard___");
     }
 }
