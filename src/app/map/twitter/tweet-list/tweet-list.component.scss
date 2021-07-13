@@ -9,6 +9,8 @@
   font-size: 16px;
   margin: 0;
   padding: 0;
+  position: relative;
+  max-height: calc(100vh - 228px);
 
 
   .app-tweet-paged {
