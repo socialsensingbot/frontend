@@ -24,8 +24,8 @@ import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
 import {UIExecutionService, UIState} from "../services/uiexecution.service";
 import {ColorCodeService} from "./services/color-code.service";
-import {MapDataService} from "./data/map-data.service";
-import {ProcessedPolygonData} from "./data/processed-data";
+import {MapDataService, MapDataServiceInt} from "./data/map-data.service";
+import {MapStatisticsInterface} from "./data/processed-data";
 import {Tweet} from "./twitter/tweet";
 import {getOS, toTitleCase} from "../common";
 import {RegionSelection} from "./region-selection";
@@ -70,6 +70,7 @@ export class MapComponent implements OnInit, OnDestroy {
     public liveUpdating: boolean = false;
     //     //                             this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
     public blinkOn = true;
+    public data: MapDataServiceInt;
     // The Map & Map Layers
     private _statsLayer: LayerGroup = layerGroup();
     private _countyLayer: LayerGroup = layerGroup(); // dummy layers to fool layer control
@@ -131,7 +132,7 @@ export class MapComponent implements OnInit, OnDestroy {
      * A subscription to the UI execution state.
      */
     private _stateSub: Subscription;
-    private DEFAULT_LAYER_GROUP: string = "flood-group";
+    private DEFAULT_LAYER_GROUP = "flood-group";
     private _blinkTimer: Subscription;
 
     constructor(private _router: Router,
@@ -143,13 +144,14 @@ export class MapComponent implements OnInit, OnDestroy {
                 private _http: HttpClient,
                 private _exec: UIExecutionService,
                 private _color: ColorCodeService,
-                public data: MapDataService,
+                _data: MapDataService,
                 public pref: PreferenceService,
                 private readonly cache: NgForageCache,
                 public dash: DashboardService,
     ) {
         // save the query parameter observable
         this._searchParams = this.route.queryParams;
+        this.data = _data;
 
 
     }
@@ -316,7 +318,7 @@ export class MapComponent implements OnInit, OnDestroy {
         // schedulers execution.
 
         this._exec.start();
-        //Avoids race condition with access to this.pref.combined
+        // Avoids race condition with access to this.pref.combined
         await this.pref.waitUntilReady();
         this._stateSub = this._exec.state.subscribe((state: UIState) => {
             if (state === "ready") {
@@ -980,10 +982,10 @@ export class MapComponent implements OnInit, OnDestroy {
             for (const feature of features) {
                 const featureProperties: Properties = feature.properties;
                 const place = featureProperties.name;
-                const tweetRegionInfo: ProcessedPolygonData = this.data.regionData(regionType);
-                if (tweetRegionInfo.hasPlace(place)) {
-                    featureProperties.count = tweetRegionInfo.countForPlace(place);
-                    featureProperties.stats = tweetRegionInfo.exceedanceForPlace(place);
+                const mapStats: MapStatisticsInterface = this.data.regionData(regionType);
+                if (mapStats.hasPlace(place)) {
+                    featureProperties.count = mapStats.countForPlace(place);
+                    featureProperties.stats = mapStats.exceedanceForPlace(place);
                 } else {
                     log.verbose("No data for " + place);
                     featureProperties.count = 0;

@@ -140,7 +140,19 @@ export class ProcessedPolygonData {
   }
 }
 
-export class ProcessedData {
+export interface MapStatisticsForGeographicLayoutInterface {
+    tweets(activePolyLayerShortName: string, name: string): Tweet[];
+
+    regionNames(activePolyLayerShortName: string): Set<string>;
+
+    layer(activePolyLayerShortName: string): MapStatisticsInterface;
+
+    regionData(regionType: string): MapStatisticsInterface;
+
+    populate(processedData: MapStatisticsForGeographicLayout, layers: string[]): MapStatisticsForGeographicLayoutInterface;
+}
+
+export class MapStatisticsForGeographicLayout implements MapStatisticsForGeographicLayoutInterface {
 
 
   data: { [regionType: string]: ProcessedPolygonData } = {};
