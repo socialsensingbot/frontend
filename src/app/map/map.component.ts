@@ -24,8 +24,8 @@ import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
 import {UIExecutionService, UIState} from "../services/uiexecution.service";
 import {ColorCodeService} from "./services/color-code.service";
-import {MapDataService} from "./data/map-data.service";
-import {ProcessedPolygonData} from "./data/processed-data";
+import {MapDataService, MapDataServiceInt} from "./data/map-data.service";
+import {MapStatisticsInterface} from "./data/processed-data";
 import {Tweet} from "./twitter/tweet";
 import {getOS, toTitleCase} from "../common";
 import {RegionSelection} from "./region-selection";
@@ -34,6 +34,7 @@ import {NgForageCache} from "ngforage";
 import {environment} from "../../environments/environment";
 import Auth from "@aws-amplify/auth";
 import {FormControl} from "@angular/forms";
+import {DashboardService} from "../pref/dashboard.service";
 
 
 const log = new Logger("map");
@@ -67,6 +68,9 @@ export class MapComponent implements OnInit, OnDestroy {
     // }
     public appToolbarExpanded: boolean;
     public liveUpdating: boolean = false;
+    //     //                             this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
+    public blinkOn = true;
+    public data: MapDataServiceInt;
     // The Map & Map Layers
     private _statsLayer: LayerGroup = layerGroup();
     private _countyLayer: LayerGroup = layerGroup(); // dummy layers to fool layer control
@@ -128,6 +132,7 @@ export class MapComponent implements OnInit, OnDestroy {
      * A subscription to the UI execution state.
      */
     private _stateSub: Subscription;
+    private DEFAULT_LAYER_GROUP = "flood-group";
     private _blinkTimer: Subscription;
 
     constructor(private _router: Router,
@@ -139,14 +144,30 @@ export class MapComponent implements OnInit, OnDestroy {
                 private _http: HttpClient,
                 private _exec: UIExecutionService,
                 private _color: ColorCodeService,
-                public data: MapDataService,
+                _data: MapDataService,
                 public pref: PreferenceService,
                 private readonly cache: NgForageCache,
+                public dash: DashboardService,
     ) {
         // save the query parameter observable
         this._searchParams = this.route.queryParams;
+        this.data = _data;
 
 
+    }
+
+    private _activeLayerGroup: string = this.DEFAULT_LAYER_GROUP;
+
+    public get activeLayerGroup(): string {
+        return this._activeLayerGroup;
+    }
+
+    public set activeLayerGroup(value: string) {
+        this._activeLayerGroup = value;
+        this._twitterIsStale = true;
+        this.data.switchLayerGroup(value);
+        this.ready = false;
+        this.load();
     }
 
     private _dataset: string;
@@ -297,7 +318,8 @@ export class MapComponent implements OnInit, OnDestroy {
         // schedulers execution.
 
         this._exec.start();
-
+        // Avoids race condition with access to this.pref.combined
+        await this.pref.waitUntilReady();
         this._stateSub = this._exec.state.subscribe((state: UIState) => {
             if (state === "ready") {
                 this.ready = true;
@@ -329,7 +351,7 @@ export class MapComponent implements OnInit, OnDestroy {
         });
 
         this._blinkTimer = timer(0, this.pref.combined.blinkRateInMilliseconds).subscribe(async () => {
-            this.blinkOn= !this.blinkOn;
+            this.blinkOn = !this.blinkOn;
         });
         this._auth.state.subscribe((event: string) => {
             if (event === AuthService.SIGN_IN) {
@@ -369,7 +391,7 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this._routerStateChangeSub) {
             this._routerStateChangeSub.unsubscribe();
         }
-        if(this._blinkTimer) {
+        if (this._blinkTimer) {
             this._blinkTimer.unsubscribe();
         }
 
@@ -442,6 +464,10 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
 
+    // public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
+    //     // this.data.downloadAggregate(aggregrationSetId, id,
+    //     //                             this.activePolyLayerShortName,
+
     /**
      * Triggered when the user has finished sliding the slider.
      */
@@ -453,12 +479,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
     }
-
-    // public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
-    //     // this.data.downloadAggregate(aggregrationSetId, id,
-    //     //                             this.activePolyLayerShortName,
-    //     //                             this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
-    public blinkOn= true;
 
     public downloadTweetsAsCSV() {
         if (this.data.hasCountryAggregates()) {
@@ -527,7 +547,17 @@ export class MapComponent implements OnInit, OnDestroy {
         log.debug("updateMapFromQueryParams()");
         log.debug("Params:", params);
         const {
-            lng, lat, zoom, active_number, active_polygon, selected, min_time, max_time, min_offset, max_offset
+            lng,
+            lat,
+            zoom,
+            active_number,
+            active_polygon,
+            selected,
+            min_time,
+            max_time,
+            min_offset,
+            max_offset,
+            layer_group
         } = params;
         this._newParams = params;
         this._absoluteTime = this.data.lastEntryDate().getTime();
@@ -558,6 +588,9 @@ export class MapComponent implements OnInit, OnDestroy {
         } else {
             this._dateMax = this._absoluteTime;
             this.sliderOptions = {...this.sliderOptions, startMax: 0};
+        }
+        if (typeof layer_group !== "undefined") {
+            this._activeLayerGroup = layer_group;
         }
 
         this.checkForLiveUpdating();
@@ -605,6 +638,7 @@ export class MapComponent implements OnInit, OnDestroy {
      * @param map the leaflet.js Map
      */
     private async init(map: Map) {
+        this.dash.init();
         if (this.route.snapshot.queryParamMap.has("__clear_cache__")) {
             this.cache.clear();
         }
@@ -619,6 +653,12 @@ export class MapComponent implements OnInit, OnDestroy {
         }
         await this.data.init();
         await this.data.switchDataSet(this.dataset);
+        if (this.route.snapshot.queryParamMap.has("layer_group")) {
+            this._activeLayerGroup = this.route.snapshot.queryParamMap.get("layer_group");
+        } else {
+            this._activeLayerGroup = this.data.dataSetMetdata.defaultLayerGroup;
+        }
+        await this.data.switchLayerGroup(this.activeLayerGroup);
         await this.data.loadStats();
         await this.data.loadAggregations();
         if (this.data.hasCountryAggregates()) {
@@ -942,10 +982,10 @@ export class MapComponent implements OnInit, OnDestroy {
             for (const feature of features) {
                 const featureProperties: Properties = feature.properties;
                 const place = featureProperties.name;
-                const tweetRegionInfo: ProcessedPolygonData = this.data.regionData(regionType);
-                if (tweetRegionInfo.hasPlace(place)) {
-                    featureProperties.count = tweetRegionInfo.countForPlace(place);
-                    featureProperties.stats = tweetRegionInfo.exceedanceForPlace(place);
+                const mapStats: MapStatisticsInterface = this.data.regionData(regionType);
+                if (mapStats.hasPlace(place)) {
+                    featureProperties.count = mapStats.countForPlace(place);
+                    featureProperties.stats = mapStats.exceedanceForPlace(place);
                 } else {
                     log.verbose("No data for " + place);
                     featureProperties.count = 0;
@@ -966,6 +1006,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
                                             this._exec.changeState("data-refresh");
                                             console.log("Start Max", this.data.offset(this._dateMax));
+
                                             await this.data.update(this._dateMin, this._dateMax);
                                             this.clearMapFeatures();
                                             this.updateRegionData();
