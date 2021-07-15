@@ -13,7 +13,7 @@ const log = new Logger("map-graph-sidebar");
 export class MapGraphSidebarComponent implements OnInit {
     @Input() selection: RegionSelection;
     @ViewChild("expandedCountGraph") expandedCountGraph: TemplateRef<any>;
-    @ViewChild("expandedExceedenceGraph") expandedExceedenceGraph: TemplateRef<any>;
+    @ViewChild("expandedExceedanceGraph") expandedExceedanceGraph: TemplateRef<any>;
 
     public regionList: string[] = [];
 
@@ -38,8 +38,8 @@ export class MapGraphSidebarComponent implements OnInit {
         });
     }
 
-    public expandExceedenceGraph() {
-        const dialogRef = this.dialog.open(this.expandedExceedenceGraph, {
+    public expandExceedanceGraph() {
+        const dialogRef = this.dialog.open(this.expandedExceedanceGraph, {
             width:  "80vw",
             height: "80vh",
             minWidth: "800px",

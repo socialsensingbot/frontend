@@ -45,6 +45,10 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
     },
     count_by_date_for_regions_and_fulltext: (params: any) => {
         let fullText = "";
+        const exceedance = " (select count(*) from (select * from text_by_region group by source_date) x)  / (rank()" +
+            " OVER w) as exceedence,"
+            + "(select count(*) from (select * from text_by_region group by source_date) x)/ (rank() OVER w) as exceedance,"
+            + "1.0 / (percent_rank()  OVER w) as inv_percent ";
         if (typeof params.textSearch !== "undefined" && params.textSearch.length > 0) {
             fullText = " and MATCH (source_text) AGAINST(? IN BOOLEAN MODE) ";
         }
@@ -55,11 +59,10 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                                                                      dateFromMillis(params.to)];
             return {
                 sql: `select *
-                      from (SELECT count(*)                                                             as count,
-                                   source_date                                                          as date,
-                                   'all'                                                                as region,
-                                   (select count(*) from (select * from text_by_region group by source_date) x)  / (rank() OVER w) 
-                                           as exceedence
+                      from (SELECT count(*)    as count,
+                                   source_date as date,
+                                   'all'       as region,
+                                   ${exceedance}
                             FROM text_by_region
                             WHERE source = ?
                               and hazard = ? ${fullText}
@@ -78,11 +81,10 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                                                                      dateFromMillis(params.to)];
             return {
                 sql: `select *
-                      from (SELECT count(source_date)                                                   as count,
-                                   source_date                                                          as date,
-                                   parent                                                               as region,
-                                   (select count(*) from (select * from text_by_region group by source_date) x)  / (rank() OVER w)
-                                       as exceedence
+                      from (SELECT count(source_date) as count,
+                                   source_date        as date,
+                                   parent             as region,
+                                   ${exceedance}
                             FROM text_by_region tbr,
                                  ref_region_groups as rrg
                             WHERE tbr.source = ?

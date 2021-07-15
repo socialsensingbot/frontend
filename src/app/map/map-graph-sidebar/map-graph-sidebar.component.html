@@ -21,21 +21,21 @@
         (click)="this.dash.addCard('timeseries-text-and-region', 'Count for Selected Regions', 1,1,{'regions':regionList});showDashboard()">Add to
     Dashboard</button>
 <div class="graph-wrapper">
-<app-twitter-timeseries yField="exceedence" regionFilter="true" yLabel="Exceedence" [showForm]="false"
+<app-twitter-timeseries yField="exceedence" regionFilter="true" yLabel="Exceedance" [showForm]="false"
                         [type]="'bar'"
                         [state]="{'regions':regionList,'eoc':'exceedence'}"
                         [mappingColumns]="['region']"
                         [scrollBar]="false"
                         [height]="500"></app-twitter-timeseries>
-    <ng-template #expandedExceedenceGraph>
-        <app-twitter-timeseries yField="exceedence" regionFilter="true" yLabel="Exceedence"
+    <ng-template #expandedExceedanceGraph>
+        <app-twitter-timeseries yField="exceedence" regionFilter="true" yLabel="Exceedance"
                                 [type]="'bar'"
                                 [state]="{'regions':regionList,'eoc':'exceedence'}"
                                 [mappingColumns]="['region']"
 
                                 [height]="900"></app-twitter-timeseries>
     </ng-template>
-    <button mat-button (click)="expandExceedenceGraph()">Expand</button>
+    <button mat-button (click)="expandExceedanceGraph()">Expand</button>
     <button mat-button
             (click)="this.dash.addCard('timeseries-exceed-region', 'Count for Selected Regions',
             1,1,{'regions':regionList});showDashboard()">Add to
