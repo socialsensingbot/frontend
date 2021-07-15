@@ -134,6 +134,7 @@ export class MapComponent implements OnInit, OnDestroy {
     private _stateSub: Subscription;
     private DEFAULT_LAYER_GROUP = "flood-group";
     private _blinkTimer: Subscription;
+    private _inFeature: boolean;
 
     constructor(private _router: Router,
                 private route: ActivatedRoute,
@@ -638,6 +639,13 @@ export class MapComponent implements OnInit, OnDestroy {
      * @param map the leaflet.js Map
      */
     private async init(map: Map) {
+        map.addEventListener("click", event => {
+            this._zone.run(args => {
+                if (!this._inFeature) {
+                    this.clearSelectedRegions();
+                }
+            });
+        });
         this.dash.init();
         if (this.route.snapshot.queryParamMap.has("__clear_cache__")) {
             this.cache.clear();
@@ -744,6 +752,12 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
 
+    private async clearSelectedRegions() {
+        await this.updateSearch({selected: []});
+        this._selectedFeatureNames = [];
+        await this.resetLayers(true);
+    }
+
     /**
      * When the user places their mouse over a feature (region) this is called.
      */
@@ -764,6 +778,8 @@ export class MapComponent implements OnInit, OnDestroy {
                 text = text + `<div>Exceedance: ${exceedanceProbability}</div>`;
             }
         }
+
+        this._inFeature = true;
 
         e.target.bindTooltip(text).openTooltip();
     }
@@ -854,6 +870,8 @@ export class MapComponent implements OnInit, OnDestroy {
         } else {
             this.unhighlight(e.target);
         }
+
+        this._inFeature = false;
     }
 
     /**
