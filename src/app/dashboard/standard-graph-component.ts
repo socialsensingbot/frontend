@@ -5,8 +5,11 @@
 import {NgZone} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import {MetadataService} from "../api/metadata.service";
-import {HistoricalDataService} from "../api/historical-data.service";
 
+import {Logger} from "@aws-amplify/core";
+import {RESTDataAPIService} from "../api/rest-api.service";
+
+const log = new Logger("graph-component");
 
 export abstract class StandardGraphComponent {
     results: any = [];
@@ -25,7 +28,7 @@ export abstract class StandardGraphComponent {
     protected hazard = "flood";
 
     constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
-                protected _route: ActivatedRoute, protected _api: HistoricalDataService,
+                protected _route: ActivatedRoute, protected _api: RESTDataAPIService,
                 protected restQueryName: string,
                 protected dateRange = true) {
         this._route.queryParams.subscribe(async params => {
@@ -80,7 +83,7 @@ export abstract class StandardGraphComponent {
                         }
 
                     } else {
-                        console.log("Already updating");
+                        log.debug("Already updating");
                     }
                 }
             });
@@ -105,7 +108,7 @@ export abstract class StandardGraphComponent {
             this.error = false;
             this.results = this.queryTransform(serverResults);
         } catch (e) {
-            console.error(e);
+            log.error(e);
             this.error = true;
             this.noData = false;
         } finally {

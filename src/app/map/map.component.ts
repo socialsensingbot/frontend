@@ -134,6 +134,7 @@ export class MapComponent implements OnInit, OnDestroy {
     private _stateSub: Subscription;
     private DEFAULT_LAYER_GROUP = "flood-group";
     private _blinkTimer: Subscription;
+    private _inFeature: boolean;
 
     constructor(private _router: Router,
                 private route: ActivatedRoute,
@@ -435,7 +436,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
         } catch (e) {
             this._exec.changeState("data-load-failed");
-            console.error(e);
+            log.error(e);
             this._notify.error(e);
         } finally {
         }
@@ -511,7 +512,7 @@ export class MapComponent implements OnInit, OnDestroy {
         // log.info("selectedCountriesText()");
         // log.info(countries.value);
         if (!this.countries.value || this.countries.value.length === 0) {
-            console.log("None");
+            log.debug("None");
             return "Download none";
         } else {
             const countryCount = this.countries.value.length;
@@ -638,6 +639,13 @@ export class MapComponent implements OnInit, OnDestroy {
      * @param map the leaflet.js Map
      */
     private async init(map: Map) {
+        map.addEventListener("click", event => {
+            this._zone.run(args => {
+                if (!this._inFeature) {
+                    this.clearSelectedRegions();
+                }
+            });
+        });
         this.dash.init();
         if (this.route.snapshot.queryParamMap.has("__clear_cache__")) {
             this.cache.clear();
@@ -744,6 +752,12 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
 
+    private async clearSelectedRegions() {
+        await this.updateSearch({selected: []});
+        this._selectedFeatureNames = [];
+        await this.resetLayers(true);
+    }
+
     /**
      * When the user places their mouse over a feature (region) this is called.
      */
@@ -765,6 +779,8 @@ export class MapComponent implements OnInit, OnDestroy {
             }
         }
 
+        this._inFeature = true;
+
         e.target.bindTooltip(text).openTooltip();
     }
 
@@ -776,9 +792,9 @@ export class MapComponent implements OnInit, OnDestroy {
                             stroke:      true,
                             weight,
                             color:       "#B1205F",
-                            opacity:     1,
+                            opacity:     0.7,
                             dashArray:   "",
-                            fillOpacity: count > 0 ? 1.0 : 0.1,
+                            fillOpacity: count > 0 ? 0.5 : 0.1,
                         });
 
         if (!Browser.ie && !Browser.opera && !Browser.edge) {
@@ -854,6 +870,8 @@ export class MapComponent implements OnInit, OnDestroy {
         } else {
             this.unhighlight(e.target);
         }
+
+        this._inFeature = false;
     }
 
     /**
@@ -1005,7 +1023,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                         try {
 
                                             this._exec.changeState("data-refresh");
-                                            console.log("Start Max", this.data.offset(this._dateMax));
+                                            log.debug("Start Max", this.data.offset(this._dateMax));
 
                                             await this.data.update(this._dateMin, this._dateMax);
                                             this.clearMapFeatures();
@@ -1101,6 +1119,25 @@ export class MapComponent implements OnInit, OnDestroy {
             // this.selectedRegion.toggle(this._clicked.target.feature.properties.name,this._clicked.target.feature.geometry);
             this.updateTwitterPanel();
         }, "", false, true, true);
+    }
+
+    public timeSliderPreset(mins: number) {
+            log.debug("timeSliderPreset()");
+            this._absoluteTime = this.data.lastEntryDate().getTime();
+            this._dateMin = Math.max(this._dateMin,
+                                     this._absoluteTime - ((this.data.entryCount() - mins - 1 ) * ONE_MINUTE_IN_MILLIS));
+            this._dateMax = Math.max(this._dateMax,
+                                     this._absoluteTime - ((this.data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
+
+            this.sliderOptions = {
+                max:      0,
+                min:      -this.data.entryCount() + 1,
+                startMin: -mins,
+                startMax: 0
+            };
+            this.checkForLiveUpdating();
+
+
     }
 }
 

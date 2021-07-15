@@ -1,12 +1,14 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from "@angular/core";
 import {MatDialog} from "@angular/material/dialog";
 import {HelpDialogComponent} from "./help-dialog.component";
 import {DomSanitizer} from "@angular/platform-browser";
+import {Logger} from "@aws-amplify/core";
+const log = new Logger("help-button");
 
 @Component({
-             selector:  'help-button',
-             template:  '<button mat-button class="help-button"><mat-icon class="help-button-icon" (click)="openDialog()">help</mat-icon></button>',
-             styleUrls: ['./help-button.component.scss']
+             selector:  "help-button",
+             template:  "<button mat-button class=\"help-button\"><mat-icon class=\"help-button-icon\" (click)=\"openDialog()\">help</mat-icon></button>",
+             styleUrls: ["./help-button.component.scss"]
            })
 export class HelpButtonComponent implements OnInit {
 
@@ -28,12 +30,12 @@ export class HelpButtonComponent implements OnInit {
     const dialogRef = this.dialog.open(HelpDialogComponent, {
       width: "80%", height: "80%",
       data:  {
-        page: this.sanitizer.bypassSecurityTrustResourceUrl('https://socialsensing.com/help-and-support')
+        page: this.sanitizer.bypassSecurityTrustResourceUrl("https://socialsensing.com/help-and-support")
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`);
+      log.debug(`Dialog result: ${result}`);
     });
   }
 

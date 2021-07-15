@@ -8,8 +8,9 @@ import {MatAutocomplete, MatAutocompleteSelectedEvent} from "@angular/material/a
 import {map, startWith} from "rxjs/operators";
 import {MatChipInputEvent} from "@angular/material/chips";
 import {ActivatedRoute, Router} from "@angular/router";
-import {HistoricalDataService} from "../../../api/historical-data.service";
-
+import {Logger} from "@aws-amplify/core";
+import {RESTDataAPIService} from "../../../api/rest-api.service";
+const log = new Logger("timeseries-config");
 @Component({
                selector:    "app-timeseries-config-form",
                styleUrls:   ["./timeseries-config-form.component.scss"],
@@ -31,7 +32,7 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
 
     constructor(public metadata: MetadataService, public zone: NgZone, public router: Router,
                 public route: ActivatedRoute,
-                private _api: HistoricalDataService,
+                private _api: RESTDataAPIService,
     ) {}
 
     onNoClick(): void {
@@ -58,12 +59,12 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
             this.updateRegions();
             this.data.component.updateGraph(this.data.state);
         } catch (e) {
-            console.error(e);
+            log.error(e);
         }
     }
 
     selected(event: MatAutocompleteSelectedEvent): void {
-        console.log("Event value", event.option.value);
+        log.debug("Event value", event.option.value);
         this.regions.push(this.allRegions.find(region => region.value === event.option.value.value.trim()));
         this.regionInput.nativeElement.value = "";
         this.regionControl.setValue(null);
@@ -74,7 +75,7 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
     public add(event: MatChipInputEvent): void {
         const input = event.input;
         const value = event.value;
-        console.log(value);
+        log.debug(value);
         // Add our topic
         if ((value || "").trim()) {
             this.regions.push(this.allRegions.find(topic => topic.value === value.trim()));
@@ -127,10 +128,10 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
     private _filter(topic: any): MetadataKeyValue[] {
         if (topic && !topic.value) {
             const filterValue = topic.toLowerCase();
-            console.log("Topic string value is ", topic);
+            log.debug("Topic string value is ", topic);
             return this.allRegions.filter(t => t.value.toLowerCase().indexOf(filterValue) === 0);
         } else {
-            console.log("Topic selected", topic);
+            log.debug("Topic selected", topic);
             return topic;
         }
     }

@@ -204,8 +204,8 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
         if (this.timeKeyedData) {
             // this.sliderOptions.ticksArray = [];
             this.sliderOptions.stepsArray = [];
-            // console.log(this.timeKeyedData[0]);
-            // console.log(this.timeKeyedData[0].substring(10, 12));
+            // log.debug(this.timeKeyedData[0]);
+            // log.debug(this.timeKeyedData[0].substring(10, 12));
             for (let step = this.sliderOptions.floor + (+this.timeKeyedData[0].substring(10, 12));
                  step < this.sliderOptions.ceil;
                  step = step + 60) {
@@ -216,7 +216,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
                 // this.sliderOptions.ticksArray.push(this.sliderOptions.ceil);
                 this.sliderOptions.stepsArray.push({value: this.sliderOptions.ceil});
             }
-            // console.log(this.sliderOptions.stepsArray);
+            // log.debug(this.sliderOptions.stepsArray);
         }
     }
 }

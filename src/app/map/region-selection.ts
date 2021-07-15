@@ -1,6 +1,10 @@
 import {Feature} from "./types";
 import {toTitleCase} from "../common";
 import {EventEmitter} from "@angular/core";
+import {Logger} from "@aws-amplify/core";
+
+
+const log = new Logger("region-selection");
 
 export class Region {
 
@@ -111,7 +115,7 @@ export class RegionSelection {
                         maxY = point[1];
                     }
                 }
-                console.log(
+                log.debug(
                     `Bounding box of ${JSON.stringify(
                         r.geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`);
                 regionName = `(${minX},${minY}),(${maxX},${maxY})`;

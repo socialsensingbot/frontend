@@ -8,18 +8,20 @@ import {
   OnInit,
   Output,
   ViewChild
-} from '@angular/core';
+} from "@angular/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import {PieChart} from "@amcharts/amcharts4/charts";
 import {ActivatedRoute, Router} from "@angular/router";
 import * as am4core from "@amcharts/amcharts4/core";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 import jt_theme from "../../theme/jt.theme";
+import {Logger} from "@aws-amplify/core";
+const log = new Logger("pie-chart");
 
 @Component({
-             selector:    'app-pie-chart',
-             templateUrl: './pie-chart.component.html',
-             styleUrls:   ['./pie-chart.component.scss']
+             selector:    "app-pie-chart",
+             templateUrl: "./pie-chart.component.html",
+             styleUrls:   ["./pie-chart.component.scss"]
            })
 export class PieChartComponent implements OnInit, AfterViewInit {
 
@@ -58,7 +60,7 @@ export class PieChartComponent implements OnInit, AfterViewInit {
   public set data(value: any) {
     this._data = value;
     if (this._chart) {
-      console.log("Pie chart data ", value)
+      log.debug("Pie chart data ", value);
       this._chart.data = value;
 
     }
@@ -76,7 +78,7 @@ export class PieChartComponent implements OnInit, AfterViewInit {
       this._chart = am4core.create(this.chartRef.nativeElement, am4charts.PieChart);
       this._chart.data = [];
       // Add and configure Series
-      let pieSeries = this._chart.series.push(new am4charts.PieSeries());
+      const pieSeries = this._chart.series.push(new am4charts.PieSeries());
       pieSeries.dataFields.value = this.valueField;
       pieSeries.dataFields.category = this.categoryField;
       pieSeries.slices.template.stroke = am4core.color("#FFFFFF");
@@ -88,7 +90,7 @@ export class PieChartComponent implements OnInit, AfterViewInit {
       pieSeries.hiddenState.properties.startAngle = -90;
 
       this._chart.hiddenState.properties.radius = am4core.percent(0);
-      console.log("Pie chart ready");
+      log.debug("Pie chart ready");
     });
     this.ready.emit(true);
   }
