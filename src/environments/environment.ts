@@ -19,7 +19,8 @@ const defaultDashboard: Dashboard = {
         pages:      [{
             title: "First Page",
             cards: [
-                {title:    "Count By Text and Region",
+                {
+                    title: "Count By Text and Region",
                     cols:  2,
                     rows:  2,
                     type:  "timeseries-text-and-region",
@@ -52,7 +53,7 @@ export const environment = {
         password: ""
     },
 
-    impact:                              {
+    impact:   {
         // The ability to tag tweets with an impact annotation
         levels: [
             {title: "1 – Minimal", value: "minimal", color: "#43A047"},
@@ -61,7 +62,7 @@ export const environment = {
             {title: "4 - Severe", value: "severe", color: "#F4511E"}
         ]
     },
-    source:                              {
+    source:   {
         // The ability to tag tweets with a source
         types: [
             {title: "River", value: "river", color: "#43A047"},
@@ -70,7 +71,7 @@ export const environment = {
             {title: "Coastal", value: "coastal", color: "#F4511E"}
         ]
     },
-    features:                            ["impact", "source"],
+    features: ["impact", "source", "map", "dashboard"],
 
     showErrors:                          false,
     showLoadingMessages:                 true,

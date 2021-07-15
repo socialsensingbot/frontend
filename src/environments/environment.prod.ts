@@ -65,7 +65,7 @@ export const environment = {
         ]
     },
 
-    features:                            ["impact", "source"],
+    features: ["impact", "source", "map"],
     mostRecentDateIsNow:                 true,
     continuousUpdateThresholdInMinutes:  90,
     animateOnTimeSliderChange:           false,
