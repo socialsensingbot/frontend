@@ -8,22 +8,24 @@ import * as Lambda from "aws-sdk/clients/lambda";
 import {environment} from "../../environments/environment";
 import {NotificationService} from "../services/notification.service"; // npm install aws-sdk
 import {API} from "@aws-amplify/api";
+import {Logger} from "@aws-amplify/core";
 
 const useLambda = false;
 
 const retryPeriod = 60000;
+const log = new Logger("rest-api-service");
 
 @Injectable({
                 providedIn: "root"
             })
-export class HistoricalDataService {
+export class RESTDataAPIService {
 
     constructor(private _notify: NotificationService, private _ngZone: NgZone) { }
 
     public async callAPI(functionName: string, payload: any): Promise<any> {
 
         if (useLambda) {
-            console.log("Calling " + functionName, payload);
+            log.debug("Calling " + functionName, payload);
             return Auth.currentCredentials()
                        .then(credentials => {
                            const lambda = new Lambda({
@@ -37,10 +39,10 @@ export class HistoricalDataService {
                                                                                       }, (err, data) => {
                                if (err) {
                                    this._notify.show("Error communicating with server");
-                                   console.error(err);
+                                   log.error(err);
                                    reject(err);
                                } else {
-                                   console.log(data);
+                                   log.debug(data);
                                    resolve(JSON.parse(data.Payload.toString()));
                                }
 
@@ -56,7 +58,7 @@ export class HistoricalDataService {
                     },
 
                 }).catch(e => {
-                    console.error(e);
+                    log.error(e);
                     this._notify.show("No response from the server, maybe a network problem or a slow query.",
                                       "Retrying ...", retryPeriod);
                     return new Promise<any>((resolve, reject) => {

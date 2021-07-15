@@ -84,7 +84,7 @@ export class AppComponent {
         payload: {event, data},
       } = capsule;
 
-      console.log("DataStore event", event, data);
+      log.debug("DataStore event", event, data);
 
       if (event === "outboxStatus") {
         this.dataStoreSynced = data.isEmpty;
@@ -116,20 +116,20 @@ export class AppComponent {
           try {
             await this._session.open(userInfo);
           } catch (e) {
-            console.error(
+            log.error(
               "There was a problem with creating your session, please ask an administrator to look into this.",
               e);
-            console.error(user);
+            log.error(user);
             this._rollbar.error(
               "There was a problem with creating your session, please ask an administrator to look into this.", e);
           }
           try {
             await this._annotation.init(userInfo);
           } catch (e) {
-            console.error(
+            log.error(
               "There was a problem with the annotation service, please ask an administrator to look into this.",
               e);
-            console.error(user);
+            log.error(user);
             this._rollbar.error(
               "There was a problem with creating the annotation service, " +
               "please ask an administrator to look into this.",

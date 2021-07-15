@@ -12,8 +12,11 @@ import {
 import {StandardGraphComponent} from "../../standard-graph-component";
 import {MetadataService} from "../../../api/metadata.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {HistoricalDataService} from "../../../api/historical-data.service";
 import {MatDialog} from "@angular/material/dialog";
+import {RESTDataAPIService} from "../../../api/rest-api.service";
+import {Logger} from "@aws-amplify/core";
+
+const log = new Logger("twitter-timeseries");
 
 @Component({
                selector:    "app-twitter-timeseries",
@@ -69,7 +72,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     private interval: number;
 
     constructor(metadata: MetadataService, zone: NgZone, router: Router, route: ActivatedRoute,
-                _api: HistoricalDataService, public dialog: MatDialog) {
+                _api: RESTDataAPIService, public dialog: MatDialog) {
         super(metadata, zone, router, route, _api, "count_by_date_for_regions_and_fulltext", false);
     }
 
@@ -85,7 +88,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
         this.markChanged();
     }
 
-    private _state: any = {"eoc":"count"};
+    private _state: any = {"eoc": "count"};
 
     public get state(): any {
         return this._state;
@@ -116,7 +119,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     }
 
     public async updateGraph(state: any) {
-        console.log("Graph update from state", state);
+        log.debug("Graph update from state", state);
         this.query = {...this.query, regions: state.regions, textSearch: state.textSearch};
         this._changed = true;
         this.emitChange();
@@ -130,7 +133,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
     //     });
     //
     //     dialogRef.afterClosed().subscribe(result => {
-    //         console.log("The dialog was closed");
+    //         log.debug("The dialog was closed");
     //         this.updateGraph(this.state);
     //     });
 

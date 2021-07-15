@@ -173,7 +173,7 @@ export class SessionService {
    */
   private async listenForNewServerSessions(userInfo, sessionToken: string) {
     return await DataStore.observe(UserSession, q => q.group("eq", this._pref.groups[0]).open("eq", true)).subscribe(msg => {
-      console.log(msg.model, msg.opType, msg.element);
+      log.debug(msg.model, msg.opType, msg.element);
       if (msg.element.owner === userInfo.username && msg.element.open === true) {
         log.info(`New session detected for ${msg.element.owner}.`);
         const sub = msg.element;

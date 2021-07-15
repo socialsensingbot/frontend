@@ -435,7 +435,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
         } catch (e) {
             this._exec.changeState("data-load-failed");
-            console.error(e);
+            log.error(e);
             this._notify.error(e);
         } finally {
         }
@@ -511,7 +511,7 @@ export class MapComponent implements OnInit, OnDestroy {
         // log.info("selectedCountriesText()");
         // log.info(countries.value);
         if (!this.countries.value || this.countries.value.length === 0) {
-            console.log("None");
+            log.debug("None");
             return "Download none";
         } else {
             const countryCount = this.countries.value.length;
@@ -1005,7 +1005,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                         try {
 
                                             this._exec.changeState("data-refresh");
-                                            console.log("Start Max", this.data.offset(this._dateMax));
+                                            log.debug("Start Max", this.data.offset(this._dateMax));
 
                                             await this.data.update(this._dateMin, this._dateMax);
                                             this.clearMapFeatures();

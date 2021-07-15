@@ -2,6 +2,8 @@ import {Component, Input, OnInit, TemplateRef, ViewChild} from "@angular/core";
 import {RegionSelection} from "../region-selection";
 import {MatDialog} from "@angular/material/dialog";
 import {DashboardService} from "../../pref/dashboard.service";
+import {Logger} from "@aws-amplify/core";
+const log = new Logger("map-graph-sidebar");
 
 @Component({
                selector:    "app-map-graph-sidebar",
@@ -32,7 +34,7 @@ export class MapGraphSidebarComponent implements OnInit {
         });
 
         dialogRef.afterClosed().subscribe(() => {
-            console.log("The dialog was closed");
+            log.debug("The dialog was closed");
         });
     }
 
@@ -46,7 +48,7 @@ export class MapGraphSidebarComponent implements OnInit {
         });
 
         dialogRef.afterClosed().subscribe(() => {
-            console.log("The dialog was closed");
+            log.debug("The dialog was closed");
         });
     }
 
