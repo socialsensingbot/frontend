@@ -24,6 +24,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/ref_data/region-groups/Sheet 1-Table 1.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/ref_data/region-groups/Sheet 2-Table 1.csv">
           <value>
             <Attribute>
@@ -32,20 +39,6 @@
           </value>
         </entry>
         <entry key="/ref_data/region-groups/Sheet 3-Table 1.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/ref_data/region_grouping.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/ref_data/region_grouping.csv/region-groupings.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
