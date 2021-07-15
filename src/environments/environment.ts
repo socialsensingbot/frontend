@@ -71,6 +71,7 @@ export const environment = {
         ]
     },
     features:                            ["impact", "source"],
+
     showErrors:                          false,
     showLoadingMessages:                 true,
     mostRecentDateIsNow:                 true,

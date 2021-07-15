@@ -438,4 +438,8 @@ export class PreferenceService {
         await DataStore.delete(GroupTweetIgnore,
                                q => q.tweetId("eq", tweet.id).ownerGroups("contains", this._groups[0]));
     }
+
+    public featureSupported(feature:string):boolean {
+        return this.combined.features.includes(feature);
+    }
 }

@@ -1,74 +1,83 @@
 <div class="content" role="main">
 
-  <mat-menu x-position="before" #menu="matMenu">
-     <button mat-menu-item routerLink="/">
-       <mat-icon>home</mat-icon>
-       Home
-     </button>
-<!--     <button mat-menu-item routerLink="/map">-->
-<!--       <mat-icon>map</mat-icon>-->
-<!--       Map-->
-<!--     </button>-->
-     <button mat-menu-item routerLink="/login" *ngIf="!isAuthenticated">
-       <mat-icon>power_settings_new</mat-icon>
-       Login
-     </button>
-     <button mat-menu-item *ngIf="isAuthenticated" (click)="logout()">
-       <mat-icon>exit_to_app</mat-icon>
-       Logout
-     </button>
-   </mat-menu>
+    <mat-menu x-position="before" #menu="matMenu">
+        <button mat-menu-item routerLink="/">
+            <mat-icon>home</mat-icon>
+            Home
+        </button>
+        <!--     <button mat-menu-item routerLink="/map">-->
+        <!--       <mat-icon>map</mat-icon>-->
+        <!--       Map-->
+        <!--     </button>-->
+        <button mat-menu-item routerLink="/dashboard" *ngIf="isAuthenticated && pref.ready &&
+     pref.featureSupported('dashboard')">
+            <!--       <mat-icon>power_settings_new</mat-icon>-->
+            Dashboard
+        </button>
+        <button mat-menu-item routerLink="/login" *ngIf="!isAuthenticated">
+            <mat-icon>power_settings_new</mat-icon>
+            Login
+        </button>
+        <button mat-menu-item *ngIf="isAuthenticated" (click)="logout()">
+            <mat-icon>exit_to_app</mat-icon>
+            Logout
+        </button>
+    </mat-menu>
 
-  <div class="content-inner">
-    <router-outlet></router-outlet>
-  </div>
+    <div class="content-inner">
+        <router-outlet></router-outlet>
+    </div>
 
-  <mat-toolbar  *ngIf="pref.ready" [color]="pref.combined.toolbarColor" class="expanded-toolbar">
+    <mat-toolbar *ngIf="pref.ready" [color]="pref.combined.toolbarColor" class="expanded-toolbar">
     <span>
       <button class="logo-button" mat-button routerLink="/"><img src="/assets/icon-white/Icon24@2x.png"/> SOCIAL SENSING</button>
-      <!--      <button mat-button routerLink="/"><mat-icon>home</mat-icon></button>-->
+        <!--      <button mat-button routerLink="/"><mat-icon>home</mat-icon></button>-->
     </span>
-    <span *ngIf="isDev">(development)</span>
-    <span class="menu-spacer">&nbsp;</span>
-    <div id="login" fxLayout="row" fxShow="false" fxShow.gt-sm>
-      <button mat-button routerLink="/auth/signin" *ngIf="!isAuthenticated">
-        <mat-icon>power_settings_new</mat-icon>
-        Login
-      </button>
-      <help-button></help-button>
-      <button id="logout" mat-button *ngIf="isAuthenticated" (click)="logout()">
-        <mat-icon>exit_to_app</mat-icon>
-        Logout
-      </button>
+        <span *ngIf="isDev">(development)</span>
+        <span class="menu-spacer">&nbsp;</span>
+        <div id="login" fxLayout="row" fxShow="false" fxShow.gt-sm>
+            <button mat-button routerLink="/dashboard" *ngIf="isAuthenticated && pref.featureSupported('dashboard')">
+                <!--       <mat-icon>power_settings_new</mat-icon>-->
+                Dashboard
+            </button>
+            <button mat-button routerLink="/auth/signin" *ngIf="!isAuthenticated">
+                <mat-icon>power_settings_new</mat-icon>
+                Login
+            </button>
+            <help-button></help-button>
+            <button id="logout" mat-button *ngIf="isAuthenticated" (click)="logout()">
+                <mat-icon>exit_to_app</mat-icon>
+                Logout
+            </button>
 
 
-      <!--      <button mat-button *ngIf="isAuthenticated" routerLink="/map">-->
-      <!--        <mat-icon>map</mat-icon>-->
-      <!--        Map-->
-      <!--      </button>-->
-      <!--      <button id="signup" mat-button routerLink="/auth/signup" *ngIf="isSignup">-->
-      <!--        Signup (Dev Only)-->
-      <!--      </button>-->
+            <!--      <button mat-button *ngIf="isAuthenticated" routerLink="/map">-->
+            <!--        <mat-icon>map</mat-icon>-->
+            <!--        Map-->
+            <!--      </button>-->
+            <!--      <button id="signup" mat-button routerLink="/auth/signup" *ngIf="isSignup">-->
+            <!--        Signup (Dev Only)-->
+            <!--      </button>-->
 
-    </div>
-    <!--    <button mat-button [mat-menu-trigger-for]="menu" fxHide="false" fxHide.gt-sm>-->
-    <!--      <mat-icon>menu</mat-icon>-->
-    <!--    </button>-->
-  </mat-toolbar>
-  <!--  <mat-card>-->
-  <!--    <mat-card-content>-->
-  <!--      <form>-->
-  <!--        <div class="amplify-block">-->
-  <!--        <amplify-authenticator [usernameAttributes]="usernameAttributes"></amplify-authenticator>-->
-  <!--        </div>-->
-  <!--      </form>-->
-  <!--    </mat-card-content>-->
-  <!--  </mat-card>-->
+        </div>
+        <!--    <button mat-button [mat-menu-trigger-for]="menu" fxHide="false" fxHide.gt-sm>-->
+        <!--      <mat-icon>menu</mat-icon>-->
+        <!--    </button>-->
+    </mat-toolbar>
+    <!--  <mat-card>-->
+    <!--    <mat-card-content>-->
+    <!--      <form>-->
+    <!--        <div class="amplify-block">-->
+    <!--        <amplify-authenticator [usernameAttributes]="usernameAttributes"></amplify-authenticator>-->
+    <!--        </div>-->
+    <!--      </form>-->
+    <!--    </mat-card-content>-->
+    <!--  </mat-card>-->
 
 
-  <!-- Footer -->
-  <footer>
-  </footer>
+    <!-- Footer -->
+    <footer>
+    </footer>
 
 
 </div>
