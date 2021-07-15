@@ -138,7 +138,7 @@ export class DashboardService {
 
         const userDash = await DataStore.query(UserDashboard, q => q.owner("eq", username));
         if (userDash.length !== 1) {
-            console.log("Number of dashboards for user was " + userDash.length);
+            log.debug("Number of dashboards for user was " + userDash.length);
         }
         const saved = DataStore.save(UserDashboard.copyOf(userDash[0], m => {
             m.dashboard = JSON.stringify(this.dashboard);
