@@ -74,7 +74,7 @@
     "@types/jquery": "^3.5.5",
     "@types/node": "^14.17.3",
     "codelyzer": "^6.0.2",
-    "cypress": "^7.5.0",
+    "cypress": "^7.7.0",
     "cypress-graphql-mock": "^0.5.0-alpha.4",
     "cypress-intellij-reporter": "0.0.6",
     "ini": "^2.0.0",
