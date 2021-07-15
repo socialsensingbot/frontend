@@ -234,7 +234,7 @@ export class MapComponent implements OnInit, OnDestroy {
                     }
                 }
             }
-            this.scheduleResetLayers();
+            this.scheduleResetLayers(false);
         }
     }
 
@@ -531,10 +531,10 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    private scheduleResetLayers() {
+    private scheduleResetLayers(clearSelected= true) {
         return this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
             this.activity = true;
-            this.resetLayers(true);
+            this.resetLayers(clearSelected);
             this.activity = false;
         }, "", false, true, true);
     }
