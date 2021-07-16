@@ -10,6 +10,7 @@ import {MatChipInputEvent} from "@angular/material/chips";
 import {ActivatedRoute, Router} from "@angular/router";
 import {Logger} from "@aws-amplify/core";
 import {RESTDataAPIService} from "../../../api/rest-api.service";
+import {PreferenceService} from "../../../pref/preference.service";
 const log = new Logger("timeseries-config");
 @Component({
                selector:    "app-timeseries-config-form",
@@ -31,7 +32,7 @@ export class TimeseriesConfigFormComponent implements OnInit, OnDestroy {
 
 
     constructor(public metadata: MetadataService, public zone: NgZone, public router: Router,
-                public route: ActivatedRoute,
+                public route: ActivatedRoute, public pref: PreferenceService,
                 private _api: RESTDataAPIService,
     ) {}
 
