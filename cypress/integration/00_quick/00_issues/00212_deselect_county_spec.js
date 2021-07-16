@@ -1,7 +1,7 @@
 import {MAP_URL} from "../../../support";
 
 const zoomDuration = 1000;
-describe('08 URL State (county): ', function () {
+describe('#212 Deselect by clicking on non-region: ', function () {
   beforeEach(() => {
     cy.stubLiveJson("live-old");
   })
