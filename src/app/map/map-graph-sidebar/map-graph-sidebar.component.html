@@ -1,5 +1,5 @@
 <div class="stats-panel"><br/>
-<button mat-button (click)="showDashboard()">Open Dashboard</button>
+<button *ngIf="this.pref.featureSupported('dashboard')" mat-button (click)="showDashboard()">Open Dashboard</button>
 
 <div class="graph-wrapper">
     <app-twitter-timeseries [height]="500" [mappingColumns]="['region']"
@@ -17,8 +17,9 @@
 
 </ng-template>
 <button mat-button (click)="expandCountGraph()">Expand</button>
-<button mat-button
-        (click)="this.dash.addCard('timeseries-text-and-region', 'Count for Selected Regions', 1,1,{'regions':regionList});showDashboard()">Add to
+<button mat-button *ngIf="this.pref.featureSupported('dashboard')"
+        (click)="this.dash.addCard('timeseries-text-and-region', 'Count for Selected Regions',
+        2,2,{'regions':regionList});showDashboard()">Add to
     Dashboard</button>
 <div class="graph-wrapper">
 <app-twitter-timeseries yField="exceedance" regionFilter="true" yLabel="Exceedance" [showForm]="false"
@@ -36,9 +37,9 @@
                                 [height]="900"></app-twitter-timeseries>
     </ng-template>
     <button mat-button (click)="expandExceedanceGraph()">Expand</button>
-    <button mat-button
-            (click)="this.dash.addCard('timeseries-exceed-region', 'Count for Selected Regions',
-            1,1,{'regions':regionList});showDashboard()">Add to
+    <button mat-button *ngIf="this.pref.featureSupported('dashboard')"
+            (click)="this.dash.addCard('timeseries-text-and-region', 'Exceedance for Selected Regions',
+            2,2,{'regions':regionList,eoc:'exceedance'});showDashboard()">Add to
         Dashboard</button>
 </div>
 </div>

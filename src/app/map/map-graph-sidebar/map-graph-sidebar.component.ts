@@ -3,6 +3,7 @@ import {RegionSelection} from "../region-selection";
 import {MatDialog} from "@angular/material/dialog";
 import {DashboardService} from "../../pref/dashboard.service";
 import {Logger} from "@aws-amplify/core";
+import {PreferenceService} from "../../pref/preference.service";
 const log = new Logger("map-graph-sidebar");
 
 @Component({
@@ -17,7 +18,7 @@ export class MapGraphSidebarComponent implements OnInit {
 
     public regionList: string[] = [];
 
-    constructor(public dialog: MatDialog, public dash: DashboardService) { }
+    constructor(public dialog: MatDialog, public dash: DashboardService, public pref:PreferenceService) { }
 
     ngOnInit(): void {
         this.regionList = this.selection.regionNames();
