@@ -1,6 +1,6 @@
 <form class="ttc-form" (keydown.enter)="$event.preventDefault()">
     <mat-button-toggle-group name="eoc" class="eoc" aria-label="Exceedance or Count" [(ngModel)]="data.state.eoc">
-        <mat-button-toggle value="exceedence">Exceedance</mat-button-toggle>
+        <mat-button-toggle value="exceedance">Exceedance</mat-button-toggle>
         <mat-button-toggle value="count">Count</mat-button-toggle>
     </mat-button-toggle-group>
     <mat-form-field *ngIf="data.component.textFilter" class="text-search" >

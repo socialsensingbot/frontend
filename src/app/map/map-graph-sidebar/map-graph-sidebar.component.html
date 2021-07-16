@@ -21,16 +21,16 @@
         (click)="this.dash.addCard('timeseries-text-and-region', 'Count for Selected Regions', 1,1,{'regions':regionList});showDashboard()">Add to
     Dashboard</button>
 <div class="graph-wrapper">
-<app-twitter-timeseries yField="exceedence" regionFilter="true" yLabel="Exceedance" [showForm]="false"
+<app-twitter-timeseries yField="exceedance" regionFilter="true" yLabel="Exceedance" [showForm]="false"
                         [type]="'bar'"
-                        [state]="{'regions':regionList,'eoc':'exceedence'}"
+                        [state]="{'regions':regionList,'eoc':'exceedance'}"
                         [mappingColumns]="['region']"
                         [scrollBar]="false"
                         [height]="500"></app-twitter-timeseries>
     <ng-template #expandedExceedanceGraph>
-        <app-twitter-timeseries yField="exceedence" regionFilter="true" yLabel="Exceedance"
+        <app-twitter-timeseries yField="exceedance" regionFilter="true" yLabel="Exceedance"
                                 [type]="'bar'"
-                                [state]="{'regions':regionList,'eoc':'exceedence'}"
+                                [state]="{'regions':regionList,'eoc':'exceedance'}"
                                 [mappingColumns]="['region']"
 
                                 [height]="900"></app-twitter-timeseries>
