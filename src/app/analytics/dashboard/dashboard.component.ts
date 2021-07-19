@@ -1,6 +1,6 @@
 import {Component, OnInit} from "@angular/core";
 import {BreakpointObserver} from "@angular/cdk/layout";
-import {DashboardCard, DashboardService} from "../pref/dashboard.service";
+import {DashboardCard, DashboardService} from "../../pref/dashboard.service";
 import {Logger} from "@aws-amplify/core";
 const log = new Logger("dashboard-component");
 

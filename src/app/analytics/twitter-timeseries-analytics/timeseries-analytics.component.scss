@@ -1,0 +1,38 @@
+div.timeseries-chart-spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    position: absolute;
+}
+
+.dct-containing {
+    margin-right:2em;
+}
+.dct-containing-term {
+    font-weight: bolder;
+}
+
+
+.app-analytics-spinner {
+    top: 50vh;
+    bottom: 50vh;
+    left: 50vw;
+    right: 50vw;
+    padding-left: -100%;
+    padding-top: -100%;
+    position: fixed;
+    z-index: 20000;
+    opacity: 0.4;
+}
+
+.app-analytics-progress {
+    top: 0;
+    left: 0;
+    right: 0;
+    //margin-left: -100%;
+    //margin-top: -100%;
+    position: absolute;
+    z-index: 1000;
+}
+

@@ -1,0 +1,38 @@
+<mat-button-toggle-group  name="eoc" class="eoc"
+                          aria-label="Exceedance or Count" [(ngModel)]="state.eoc">
+    <mat-button-toggle value="exceedance">Exceedance</mat-button-toggle>
+    <mat-button-toggle value="count">Count</mat-button-toggle>
+</mat-button-toggle-group>
+<app-timeseries-multi-query-chart (ready)="updateGraph(query)"
+                            [updating]="updating"
+                            [error]="error"
+                            [noData]="noData"
+                            [xField]="xField"
+                            [yField]="state.eoc || 'count'"
+                            [yLabel]="state.eoc === 'exceedance' ? 'Days Exceeded' : 'Count'"
+                            [data]="queryMap"
+                            [seriesList]="(state.regions && state.regions.length) > 0 ?  state.regions : ['all']"
+                            [height]="600"
+                            [mappingColumns]="['region']"
+                            [type]="type"
+                            [connect]="connect"
+                            [animated]="animated"
+                            [scrollBar]="scrollBar"
+                            class="twitter-timeseries-chart">
+
+</app-timeseries-multi-query-chart>
+
+<div *ngFor="let query of state.queries" >
+    <app-timeseries-analytics-form (changed)=" updateGraph(this.state);"
+            [data]="query"></app-timeseries-analytics-form>
+</div>
+   <div >
+       <app-timeseries-analytics-form
+               [data]="newQuery"></app-timeseries-analytics-form>
+       <button mat-button (click)="addQuery()">Add Query</button>
+   </div>
+
+
+<mat-progress-bar *ngIf="updating && ready" class="app-analytics-progress" mode="indeterminate"
+                  [color]="pref.combined.toolbarColor"></mat-progress-bar>
+<!--<mat-spinner *ngIf="!ready" class="app-analytics-spinner"></mat-spinner>-->
