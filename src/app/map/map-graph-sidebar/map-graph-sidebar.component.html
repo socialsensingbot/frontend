@@ -1,7 +1,8 @@
 <div class="stats-panel"><br/>
+    Historical statistics summary will be coming in the next release.
 <button *ngIf="this.pref.featureSupported('dashboard')" mat-button (click)="showDashboard()">Open Dashboard</button>
 
-<div class="graph-wrapper">
+<div class="graph-wrapper" *ngIf="this.pref.featureSupported('dashboard')">
     <app-twitter-timeseries [height]="500" [mappingColumns]="['region']"
                             [state]="{'regions':regionList,'eoc':'count'}"
                             [type]="'line'" [showForm]="false"
