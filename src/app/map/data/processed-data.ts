@@ -109,7 +109,7 @@ export class MapStatistics implements MapStatisticsInterface {
 
     private getStatsIdx(place: string, val: number, stats: Stats): number {
 
-        if (environment.newExceedenceCalc) {
+        if (environment.newExceedanceCalc) {
             const keys = Object.keys(stats[this._region.id][place]);
             const len = keys.length;
             keys.sort();

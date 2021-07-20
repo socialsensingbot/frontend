@@ -1,0 +1,74 @@
+div.timeseries-chart-spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    position: absolute;
+}
+
+.dct-containing {
+    margin-right:2em;
+}
+.dct-containing-term {
+    font-weight: bolder;
+}
+
+
+.app-analytics-spinner {
+    top: 50vh;
+    bottom: 50vh;
+    left: 50vw;
+    right: 50vw;
+    padding-left: -100%;
+    padding-top: -100%;
+    position: fixed;
+    z-index: 20000;
+    opacity: 0.4;
+}
+
+.app-analytics-progress {
+    top: 0;
+    left: 0;
+    right: 0;
+    //margin-left: -100%;
+    //margin-top: -100%;
+    position: absolute;
+    z-index: 1000;
+}
+
+.app-query-builder-surround {
+    margin: 16px;
+    margin-top:32px;
+}
+
+.app-timeseries-graph-surround {
+    margin: 16px;
+    margin-top:32px;
+}
+
+
+.app-toolbar-separator {
+    display: flex;
+    min-width: 1em;
+}
+
+.app-toolbar-expanding-separator {
+    display: flex;
+    flex-grow: 10;
+    min-width: 1em;
+    max-width: 100%;
+}
+
+.app-toolbar-btn {
+    display: flex;
+}
+
+.app-timeseries-toolbar {
+    display: flex;
+    //flex-direction: row;
+    justify-content: left;
+    font-size: 14px;
+    //overflow: visible;
+    background-color: white;
+    box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.3);
+}

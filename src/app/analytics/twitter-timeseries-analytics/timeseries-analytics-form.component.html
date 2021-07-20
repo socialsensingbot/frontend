@@ -1,29 +1,26 @@
 <form class="ttc-form" (keydown.enter)="$event.preventDefault()">
-    <mat-button-toggle-group name="eoc" class="eoc" aria-label="Exceedence or Count" [(ngModel)]="data.state.eoc">
-        <mat-button-toggle value="exceedence">Exceedence</mat-button-toggle>
-        <mat-button-toggle value="count">Count</mat-button-toggle>
-    </mat-button-toggle-group>
-    <mat-form-field *ngIf="data.component.textFilter" class="text-search" >
+
+    <mat-form-field  class="text-search" appearance="fill" >
         <mat-label>Filter by Text</mat-label>
         <mat-icon matPrefix>search</mat-icon>
         <input #textSearchInput [formControl]="searchControl" matInput placeholder="Text search, e.g. coastal">
-        <button mat-button mat-icon-button matSuffix (click)="clearTextSearch()" *ngIf="data.state.textSearch">
+        <button mat-button mat-icon-button matSuffix (click)="clearTextSearch()" *ngIf="data.textSearch">
             <mat-icon>close</mat-icon>
         </button>
 
     </mat-form-field>
-    <mat-form-field *ngIf="data.component.regionFilter" class="region-chooser" >
+    <mat-form-field class="region-chooser" appearance="fill">
         <mat-label>Filter by Region</mat-label>
         <mat-chip-list #chipList aria-label="Topic selection">
             <mat-chip
                     [class]="'region-level-'+region.level"
                     *ngFor="let region of regions"
                     [selectable]="true"
-                    [removable]="data.component.removable"
+                    [removable]="true"
                     [value]="region"
                     (removed)="remove(region)">
                 {{region.text}}
-                <mat-icon matChipRemove *ngIf="data.component.removable">cancel</mat-icon>
+                <mat-icon matChipRemove >cancel</mat-icon>
             </mat-chip>
             <input
                     placeholder="Add regions ..."

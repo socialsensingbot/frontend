@@ -1,0 +1,59 @@
+<mat-toolbar class="app-timeseries-toolbar">
+    <ng-container *ngIf="ready">
+        <mat-toolbar-row>
+            <mat-button-toggle-group name="eoc" class="eoc"
+                                     aria-label="Exceedance or Count" [(ngModel)]="state.eoc"
+                                     (valueChange)="eocChanged()">
+                <mat-button-toggle value="exceedance">Exceedance</mat-button-toggle>
+                <mat-button-toggle value="count">Count</mat-button-toggle>
+            </mat-button-toggle-group>
+
+            <div class="app-toolbar-separator"></div>
+
+            <div class="app-toolbar-expanding-separator"></div>
+            <button mat-icon-button  aria-label="Expand or shrink toolbar">
+                <mat-icon matTooltip="Expand toolbar" *ngIf="!appToolbarExpanded"
+                          (click)="appToolbarExpanded=true">arrow_drop_down
+                </mat-icon>
+                <mat-icon matTooltip="Shrink toolbar" *ngIf="appToolbarExpanded"
+                          (click)="appToolbarExpanded=false">arrow_drop_up</mat-icon>
+            </button>
+        </mat-toolbar-row>
+        <mat-toolbar-row *ngIf="appToolbarExpanded">
+
+            <div class="app-toolbar-separator"></div>
+
+        </mat-toolbar-row>
+    </ng-container>
+</mat-toolbar>
+<div class="app-timeseries-graph-surround">
+<app-timeseries-multi-query-chart
+                                  [updating]="updating"
+                                  [error]="error"
+                                  [noData]="noData"
+                                  [seriesCollection]="seriesCollection"
+                                  [height]="600"
+                                  [type]="type"
+                                  [connect]="connect"
+                                  [animated]="animated"
+                                  [scrollBar]="scrollBar"
+                                  class="twitter-timeseries-chart">
+
+</app-timeseries-multi-query-chart>
+</div>
+<div class="app-query-builder-surround">
+<mat-card *ngFor="let query of state.queries">
+    <app-timeseries-analytics-form (changed)="updateGraph(query);"
+                                   [data]="query"></app-timeseries-analytics-form>
+</mat-card>
+<mat-card>
+    <app-timeseries-analytics-form #newQueryForm
+            (changed)="updateGraph(newQuery);"
+            [data]="newQuery"></app-timeseries-analytics-form>
+    <button mat-button (click)="addQuery();newQueryForm.clear()">Add Series</button>
+</mat-card>
+</div>
+
+<mat-progress-bar *ngIf="updating && ready" class="app-analytics-progress" mode="indeterminate"
+                  [color]="pref.combined.toolbarColor"></mat-progress-bar>
+<!--<mat-spinner *ngIf="!ready" class="app-analytics-spinner"></mat-spinner>-->

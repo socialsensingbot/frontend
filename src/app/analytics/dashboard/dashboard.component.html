@@ -48,14 +48,14 @@
                                         [height]="card.rows*500"></app-twitter-timeseries>
                             </ng-container>
                             <ng-container *ngSwitchCase="'timeseries-exceed'">
-                                <app-twitter-timeseries yField="exceedence" yLabel="Exceedence"
+                                <app-twitter-timeseries yField="exceedance" yLabel="Exceedance"
                                                         [type]="card.variant || 'bar'"
                                                         [state]="card.state"
                                                         (changed)="saveCard(i,$event)"
                                                         [height]="card.rows*500"></app-twitter-timeseries>
                             </ng-container>
                             <ng-container *ngSwitchCase="'timeseries-exceed-region'">
-                                <app-twitter-timeseries yField="exceedence" regionFilter="true" yLabel="Exceedence"
+                                <app-twitter-timeseries yField="exceedance" regionFilter="true" yLabel="Exceedance"
                                                         [type]="card.variant || 'bar'"
                                                         [state]="card.state"
                                                         (changed)="saveCard(i,$event)"

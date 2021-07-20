@@ -26,7 +26,7 @@ export const environment = {
     name:             "production",
     lamdaEnvironment: "prod",
     demo:             false,
-    version:          "2.0",
+    version: "2.1",
     // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
     timezone:             "UTC",
     locale:               "en-GB",
@@ -74,6 +74,6 @@ export const environment = {
     mapTileUrlTemplate:      "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
     blinkRateInMilliseconds: 1000,
     defaultDashboard,
-    newExceedenceCalc: false
+    newExceedanceCalc: false
 
 };
