@@ -4,8 +4,19 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {RESTDataAPIService} from "../../api/rest-api.service";
 import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../pref/preference.service";
+import {TimeseriesCollectionModel, TimeseriesModel} from "../timeseries";
+import {v4 as uuidv4} from "uuid";
 
 const log = new Logger("twitter-timeseries");
+
+export interface TimeseriesRESTQuery {
+    dateStep?: number;
+    to?: number;
+    from?: number;
+    location?: string;
+    regions: string[];
+    textSearch?: string;
+}
 
 @Component({
                selector:    "app-timeseries-analytics",
@@ -32,19 +43,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     noData: boolean;
     error: boolean;
     public scrollBar = true;
-    public query: {
-        dateStep?: number;
-        to?: number;
-        from?: number;
-        location?: string;
-        regions: string[];
-        textSearch?: string;
-    } = {
-        regions:  [],
-        from:     new Date().getTime() - (365.24 * 24 * 60 * 60 * 1000),
-        to:       new Date().getTime(),
-        dateStep: 7 * 24 * 60 * 60 * 1000
-    };
+
     public changed = new EventEmitter();
     public removable = true;
     public mappingColumns: string[] = [];
@@ -53,17 +52,30 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     //     });
     public activity: boolean;
     public newQuery: any = {};
+    public seriesCollection: TimeseriesCollectionModel;
+    //         this.updateGraph(this.state);
+    public appToolbarExpanded = false;
     protected _interval: number;
     protected _changed: boolean;
     protected _storeQueryInURL: boolean;
+
+    /*
+                                [xField]="xField"
+                            [yField]="state.eoc || 'count'"
+                            [yLabel]="state.eoc === 'exceedance' ? 'Days Exceeded' : 'Count'"
+                            [seriesList]="(state.regions && state.regions.length) > 0 ?  state.regions : ['all']"
+
+     */
     private interval: number;
-    public queryMap: { [label: string]: any[] } = {};
 
     constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService) {
 
+        this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
+        this.resetNewQuery();
+        this.updateGraph(this.newQuery);
+        this.ready = true;
     }
-
 
     private _type = "line";
 
@@ -86,7 +98,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     @Input()
     public set state(value: any) {
         this._state = value;
-        this.query = {...this.query, ...value};
         this.markChanged();
     }
 
@@ -107,11 +118,12 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         window.clearInterval(this._interval);
     }
 
-    public async updateGraph(state: any) {
-        log.debug("Graph update from state", state);
-        this.query = {...this.query, regions: state.regions, textSearch: state.textSearch};
+    public async updateGraph(query: any) {
+        log.debug("Graph update from query", query);
         this._changed = true;
         this.emitChange();
+        this.seriesCollection.updateTimeseries(
+            new TimeseriesModel(this.toLabel(query), await this.executeQuery(query), query.__series_id));
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
@@ -126,26 +138,37 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     //
     //     dialogRef.afterClosed().subscribe(result => {
     //         log.debug("The dialog was closed");
-    //         this.updateGraph(this.state);
 
     public async addQuery() {
-        if (this.state.queries) {
-            this.state.queries.push(this.newQuery);
-        } else {
-            this.state.queries = [this.newQuery];
+        const query = JSON.parse(JSON.stringify(this.newQuery));
+        this.resetNewQuery();
+        if (!this.state.queries) {
+            this.state.queries = [];
         }
+        log.info("Adding query ", query);
+        this.state.queries.push(query);
 
+        this.seriesCollection.updateTimeseries(
+            new TimeseriesModel(this.toLabel(query), await this.executeQuery(query),
+                                query.__series_id));
 
-        this.queryMap[this.toLabel(this.newQuery)] = await this.executeQuery(this.newQuery);
     }
 
+    public refreshGraph() {
+
+    }
+
+    public eocChanged() {
+        this.seriesCollection.yLabel = this.state.eoc === "exceedance" ? "Exceedance" : "Count";
+        this.seriesCollection.yField = this.state.eoc === "exceedance" ? "exceedance" : "count";
+        this.seriesCollection.yAxisHasChanged();
+    }
 
     protected async executeQuery(query: any): Promise<any[]> {
         if (this._storeQueryInURL) {
-            await this._router.navigate([], {queryParams: this.query});
+            await this._router.navigate([], {queryParams: query});
         }
-        this.ready = false;
-        this._changed = false;
+
         this.updating = true;
         try {
             const serverResults = await this._api.callAPI("query", {
@@ -174,11 +197,39 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         return from;
     }
 
-    private toLabel(query: any):string {
-        let label = query.textSearch;
-        for (const region of query.regions) {
-            label = region + "-" + label;
+    private resetNewQuery() {
+
+        this.newQuery = {
+            __series_id: uuidv4(),
+            regions:     [],
+            textSearch:  "",
+            from:        new Date().getTime() - (365.24 * 24 * 60 * 60 * 1000),
+            to:          new Date().getTime(),
+            dateStep:    7 * 24 * 60 * 60 * 1000
+        };
+    }
+
+    private toLabel(query: TimeseriesRESTQuery): string {
+        if (query.textSearch.length === 0 && query.regions.length === 0) {
+            return "all";
         }
+        let label = query.textSearch;
+        if (query.regions.length < 4) {
+            for (const region of query.regions) {
+                if (label.length !== 0) {
+                    label = region + " - " + label;
+                } else {
+                    label = region;
+                }
+            }
+        } else {
+            if (label.length !== 0) {
+                label = query.regions.length + " regions - " + label;
+            } else {
+                label = query.regions.length + " regions";
+            }
+        }
+
         return label;
     }
 }
