@@ -16,8 +16,10 @@ import * as am4charts from "@amcharts/amcharts4/charts";
 import {ColumnSeries, LineSeries, ValueAxis, XYChart} from "@amcharts/amcharts4/charts";
 import jt_theme from "../../../theme/jt.theme";
 import {Logger} from "@aws-amplify/core";
+import {TimeseriesCollectionModel} from "../../timeseries";
 
 const log = new Logger("app-timeseries-multi-query-chart");
+
 
 @Component({
                selector:    "app-timeseries-multi-query-chart",
@@ -25,10 +27,6 @@ const log = new Logger("app-timeseries-multi-query-chart");
                styleUrls:   ["./time-series-multiple-query-chart.component.scss"]
            })
 export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewInit {
-    @Input()
-    avgLength = 14;
-    @Input()
-    rollingAvg = false;
     @ViewChild("chart") chartRef: ElementRef;
     @Input()
     public updating: boolean;
@@ -41,55 +39,21 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
     @Output() ready = new EventEmitter<boolean>();
     chart: XYChart;
     @Input()
-    xField = "date";
-    @Input()
-    public mappingColumns = [];
-    @Input()
     public animated = false;
     @Input()
     public scrollBar = true;
     @Input() connect = false;
-    @Input() zeroFillMissingDates = true;
-    @Input() seriesList: string[] = [];
+
     private scrollBarSeries: LineSeries;
     private _ready: boolean;
     private seriesMap: { [key: string]: LineSeries | ColumnSeries } = {};
-    private dateSpacing = 24 * 60 * 60 * 1000;
     private valueAxis: ValueAxis;
-    private _minDate: Date;
-    private _maxDate: Date;
 
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
 
     }
 
-    private _yField = "count";
-
-    public get yField(): string {
-        return this._yField;
-    }
-
-    @Input()
-    public set yField(value: string) {
-        this._yField = value;
-        //refresh
-        this.data = this._data;
-    }
-
-    private _yLabel: string;
-
-    public get yLabel(): string {
-        return this._yLabel;
-    }
-
-    @Input()
-    public set yLabel(value: string) {
-        this._yLabel = value;
-        if (this.valueAxis) {
-            this.valueAxis.title.text = this.yLabel;
-        }
-    }
 
     private _type = "line";
 
@@ -102,57 +66,17 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
         this._type = value;
     }
 
-    private _data: any;
+    private _seriesCollection: TimeseriesCollectionModel;
 
-    public get data(): any[] {
-        return this._data;
+    public get seriesCollection(): TimeseriesCollectionModel {
+        return this._seriesCollection;
     }
 
     @Input()
-    public set data(value: any[]) {
-        this._data = value;
-
-        if (this._ready) {
-            this.initChart();
-
-            if (this._data && this._data.length !== 0) {
-                this._minDate = null;
-                this._maxDate = null;
-                for (const dataSeriesLabel in this._data) {
-
-                    for (const item of this._data[dataSeriesLabel]) {
-                        const date = new Date(item[this.xField]);
-                        log.debug(date);
-                        if (this._minDate === null || date.getTime() < this._minDate.getTime()) {
-                            this._minDate = date;
-                        }
-                        if (this._maxDate === null || date.getTime() > this._maxDate.getTime()) {
-                            this._maxDate = date;
-                        }
-                    }
-                    log.debug("MIN_DATE", this._minDate);
-                    log.debug("MAX_DATE", this._maxDate);
-                    let count = 0;
-                    for (const item of this._data[dataSeriesLabel]) {
-                        if (this.rollingAvg || count % this.avgLength === 0) {
-                            if (count >= this.avgLength) {
-                                const slice = this._data.slice(count - this.avgLength, count - 1);
-                                item.trend = slice.map(i => i[this._yField])
-                                                  .reduce((p, c) => p + c, 0) / this.avgLength;
-                            }
-                        }
-                        count++;
-                    }
-                    this.createSeriesFromData(dataSeriesLabel, this._data[dataSeriesLabel]);
-                }
-
-                // this.trend.data = this._data;
-
-            } else {
-                // this.trend.data = [];
-            }
-        }
+    public set seriesCollection(timeseriesCollection: TimeseriesCollectionModel) {
+        this._seriesCollection = timeseriesCollection;
     }
+
 
     ngAfterViewInit(): void {
 
@@ -167,41 +91,47 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
             this.initChart();
 
         });
+
+        this.valueAxis.title.text = this.seriesCollection.yLabel;
+
+        this._seriesCollection.foreachSeries((label, data, id) => {
+            this.createSeriesFromData(label, data, id);
+        });
+
+        this._seriesCollection.seriesAdded.subscribe(series => {
+            this.createSeriesFromData(series.label, series.data, series.id);
+        });
+
+        this._seriesCollection.seriesUpdated.subscribe(series => {
+            this.createSeriesFromData(series.label, series.data, series.id);
+        });
+
+        this._seriesCollection.seriesRemoved.subscribe(series => {
+            this.chart.series.removeValue(this.seriesMap[series]);
+            if (this.scrollBar) {
+                // @ts-ignore
+                this.chart.scrollbarX.series.removeValue(this.seriesMap[series]);
+            }
+            delete this.seriesMap[series];
+        });
+
+        this._seriesCollection.yAxisChanged.subscribe(() => {
+            this.initChart();
+            this.valueAxis.title.text = this._seriesCollection.yLabel;
+            this._seriesCollection.foreachSeries((label, data, id) => {
+                this.createSeriesFromData(label, data, id);
+            });
+        });
+
         this.ready.emit(true);
         this._ready = true;
     }
+
 
     ngOnInit(): void {
 
     }
 
-    public zeroFill(mappedData: any[]) {
-        if (this.zeroFillMissingDates) {
-            const result = [];
-            let lastRowDate = null;
-            for (const row of mappedData) {
-                const rowDate = Math.round(new Date(row[this.xField]).getTime() / this.dateSpacing) * this.dateSpacing;
-                if (lastRowDate !== null) {
-                    if (rowDate > lastRowDate + this.dateSpacing) {
-                        for (let fillDate = lastRowDate + this.dateSpacing; fillDate < rowDate; fillDate += this.dateSpacing) {
-                            const fillRow = {};
-                            fillRow[this.xField] = new Date(fillDate);
-                            fillRow[this._yField] = 0;
-                            result.push(fillRow);
-                        }
-                    }
-                }
-                result.push(row);
-                lastRowDate = rowDate;
-            }
-            log.debug("Before ZERO FILL ", mappedData);
-            log.debug("After ZERO FILL ", result);
-            return result;
-        } else {
-            return mappedData;
-        }
-
-    }
 
     private initChart() {
         if (this.chart) {
@@ -225,7 +155,7 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
         dateAxis.title.opacity = 0.5;
 
         this.valueAxis = this.chart.yAxes.push(new am4charts.ValueAxis());
-        this.valueAxis.title.text = this._yLabel;
+        this.valueAxis.title.text = this._seriesCollection.yLabel;
         // valueAxis.title.fontWeight = "bold";
         this.valueAxis.title.opacity = 0.5;
         //
@@ -248,19 +178,20 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
         this.chart.responsive.enabled = true;
     }
 
-    private createSeriesFromData(label, seriesData: any[]) {
-        if (typeof this.seriesMap[label] !== "undefined") {
-            this.seriesMap[label].data = this.zeroFill(seriesData);
-            this.seriesMap[label].validateData();
-            return this.seriesMap[label];
+    private createSeriesFromData(label, seriesData: any[], id: string) {
+        if (typeof this.seriesMap[id] !== "undefined") {
+            this.seriesMap[id].data = seriesData;
+            this.seriesMap[id].name = label;
+            this.seriesMap[id].validateData();
+            return this.seriesMap[id];
         }
         // Create series
         let series: LineSeries | ColumnSeries;
         if (this._type === "line") {
             series = this.chart.series.push(new am4charts.LineSeries());
-            series.data = this.zeroFill(seriesData);
-            series.dataFields.valueY = this._yField;
-            series.dataFields.dateX = this.xField;
+            series.data = seriesData;
+            series.dataFields.valueY = this.seriesCollection.yField;
+            series.dataFields.dateX = this.seriesCollection.xField;
             series.strokeWidth = 3;
             series.minBulletDistance = 10;
             // series.stroke = series.fill = am4core.color("#9000FF", 0.5);
@@ -275,8 +206,8 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
         } else {
             series = this.chart.series.push(new am4charts.ColumnSeries());
             series.data = seriesData;
-            series.dataFields.valueY = this._yField;
-            series.dataFields.dateX = this.xField;
+            series.dataFields.valueY = this.seriesCollection.yField;
+            series.dataFields.dateX = this.seriesCollection.xField;
             series.tooltipText = {mappedKey: label} + " {valueY}";
             series.tooltip.pointerOrientation = "vertical";
             series.tooltip.background.cornerRadius = 20;
@@ -289,7 +220,7 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
 
         series.name = label;
         log.info("Added series " + series.name);
-        this.seriesMap[label] = series;
+        this.seriesMap[id] = series;
         if (this.scrollBar) {
             // @ts-ignore
             this.chart.scrollbarX.series.push(series);
@@ -307,7 +238,7 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
             this.scrollBarSeries.dataFields.valueY = "total";
             // This hides the series from the main chart
             this.scrollBarSeries.hiddenInLegend = true;
-            this.scrollBarSeries.dataFields.dateX = this.xField;
+            this.scrollBarSeries.dataFields.dateX = this.seriesCollection.xField;
             this.scrollBarSeries.strokeWidth = 2;
             this.scrollBarSeries.minBulletDistance = 10;
             this.scrollBarSeries.name = "total";
@@ -329,83 +260,5 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
         }
     }
 
-    // //
-    // // private createSeries() {
-    // //     if (this.chart) {
-    // //
-    // //         log.debug("Data for TMC", this.data);
-    // //         const mappedData = {};
-    // //         const totals = {};
-    // //         for (const row of this.data) {
-    // //             for (const mappingColumn of this.mappingColumns) {
-    // //                 const mappedKey = row[mappingColumn];
-    // //                 if (typeof mappedKey !== "undefined" && mappedKey !== null && mappedKey.length > 0) {
-    // //                     const totalValue = totals[row[this.xField]];
-    // //                     if (typeof totalValue === "undefined") {
-    // //                         totals[row[this.xField]] = +(row[this._yField]);
-    // //                     } else {
-    // //                         totals[row[this.xField]] += row[this._yField];
-    // //                     }
-    // //                     if (mappedData[mappedKey]) {
-    // //                         mappedData[mappedKey].push(row);
-    // //                     } else {
-    // //                         mappedData[mappedKey] = [row];
-    // //                     }
-    // //                 }
-    // //             }
-    // //         }
-    // //         log.debug("Totals", totals);
-    // //         const totalRows = [];
-    // //         for (const key in totals) {
-    // //             if (totals.hasOwnProperty(key)) {
-    // //                 const row: any = {};
-    // //                 row[this.xField] = key;
-    // //                 row.total = totals[key];
-    // //                 totalRows.push(row);
-    // //             }
-    // //         }
-    // //         log.debug("Sum series", totalRows);
-    // //         // this.createScrollBarSeries(totalRows);
-    // //
-    // //         let lastSeries;
-    // //         for (const requiredSeries of this.seriesList) {
-    // //             if (mappedData.hasOwnProperty(requiredSeries)) {
-    // //                 const data = mappedData[requiredSeries].sort(
-    // //                     (a, b) => new Date(a[this.xField]).getTime() - new Date(b[this.xField]).getTime());
-    // //                 log.debug("Sorted series (by " + this.xField + ")", data);
-    // //                 lastSeries = this.createSeriesFromData(requiredSeries, data);
-    // //             } else {
-    // //                 if (this.zeroFillMissingDates) {
-    // //                     const dummyMin = {};
-    // //                     dummyMin[this.xField] = this._minDate;
-    // //                     dummyMin[this._yField] = 0;
-    // //                     const dummyMax = {};
-    // //                     dummyMax[this.xField] = this._maxDate;
-    // //                     dummyMax[this._yField] = 0;
-    // //                     mappedData[requiredSeries] = [dummyMin, dummyMax]
-    // //                     this.createSeriesFromData(requiredSeries, mappedData[requiredSeries]);
-    // //                 }
-    // //             }
-    // //         }
-    // //
-    // //         // Clean up old series
-    // //         for (const key in this.seriesMap) {
-    // //             if (this.seriesMap.hasOwnProperty(key)) {
-    // //                 if (typeof mappedData[key] === "undefined") {
-    // //                     this.chart.series.removeValue(this.seriesMap[key]);
-    // //                     if (this.scrollBar) {
-    // //
-    // //                         // @ts-ignore
-    // //                         this.chart.scrollbarX.series.removeValue(this.seriesMap[key]);
-    // //                     }
-    // //                     delete this.seriesMap[key];
-    // //                 }
-    // //             }
-    // //         }
-    // //
-    // //
-    // //         // this.chart.cursor.snapToSeries = lastSeries;
-    // //
-    // //     }
-    // }
+
 }

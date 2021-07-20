@@ -27,11 +27,10 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
     @ViewChild("regionInput") regionInput: ElementRef<HTMLInputElement>;
     @ViewChild("auto") matAutocomplete: MatAutocomplete;
     public searchControl = new FormControl();
-
-    @Input()
-    public data: { textSearch: string, regions: string[] };
     @Output()
     public changed = new EventEmitter<any>();
+    @Input()
+    public data: { textSearch: string, regions: string[] } = {textSearch: "", regions: []};
 
     constructor(public metadata: MetadataService, public zone: NgZone, public router: Router,
                 public route: ActivatedRoute, public pref: PreferenceService,
@@ -49,8 +48,10 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
 
     public clearRegions() {
         this.regions = [];
-        this.data.regions = [];
-        this.changed.emit(this.data);
+        if (this.data) {
+            this.data.regions = [];
+            this.changed.emit(this.data);
+        }
     }
 
     remove(selectedTopic: MetadataKeyValue): void {
@@ -112,15 +113,24 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
     }
 
     public clearTextSearch() {
-        this.data.textSearch = "";
-        this.searchControl.setValue(this.data.textSearch);
-        this.changed.emit(this.data);
-
+        if (this.data) {
+            this.data.textSearch = "";
+            this.searchControl.setValue(this.data.textSearch);
+            this.changed.emit(this.data);
+        }
     }
 
     public textChanged() {
-        this.data.textSearch = this.searchControl.value;
-        this.changed.emit(this.data);
+        if (this.data) {
+            log.debug("Text Changed");
+            this.data.textSearch = this.searchControl.value;
+            this.changed.emit(this.data);
+        }
+    }
+
+    public clear() {
+        this.clearTextSearch();
+        this.clearRegions();
     }
 
     private updateRegions() {
@@ -129,14 +139,14 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
         }
     }
 
-    private _filter(topic: any): MetadataKeyValue[] {
-        if (topic && !topic.value) {
-            const filterValue = topic.toLowerCase();
-            log.debug("Topic string value is ", topic);
+    private _filter(region: any): MetadataKeyValue[] {
+        if (region && !region.value) {
+            const filterValue = region.toLowerCase();
+            log.debug("Topic string value is ", region);
             return this.allRegions.filter(t => t.value.toLowerCase().indexOf(filterValue) === 0);
         } else {
-            log.debug("Topic selected", topic);
-            return topic;
+            log.debug("Topic selected", region);
+            return region;
         }
     }
 }
