@@ -16,6 +16,7 @@ export interface TimeseriesRESTQuery {
     location?: string;
     regions: string[];
     textSearch?: string;
+    __series_id: string;
 }
 
 @Component({
@@ -51,7 +52,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     public connect = false;
     //     });
     public activity: boolean;
-    public newQuery: any = {};
+    public newQuery: TimeseriesRESTQuery;
     public seriesCollection: TimeseriesCollectionModel;
     //         this.updateGraph(this.state);
     public appToolbarExpanded = false;
@@ -71,8 +72,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService) {
 
-        this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
         this.resetNewQuery();
+        this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
         this.updateGraph(this.newQuery);
         this.ready = true;
     }
@@ -89,7 +90,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.markChanged();
     }
 
-    private _state: any = {eoc: "count"};
+    private _state: { eoc: "count" | "exceedance", queries: TimeseriesRESTQuery[] } = {eoc: "count", queries: []};
 
     public get state(): any {
         return this._state;
@@ -118,7 +119,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         window.clearInterval(this._interval);
     }
 
-    public async updateGraph(query: any) {
+    public async updateGraph(query: TimeseriesRESTQuery) {
         log.debug("Graph update from query", query);
         this._changed = true;
         this.emitChange();
@@ -140,7 +141,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     //         log.debug("The dialog was closed");
 
     public async addQuery() {
-        const query = JSON.parse(JSON.stringify(this.newQuery));
+        const query: TimeseriesRESTQuery = JSON.parse(JSON.stringify(this.newQuery));
         this.resetNewQuery();
         if (!this.state.queries) {
             this.state.queries = [];
@@ -164,7 +165,12 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.seriesCollection.yAxisHasChanged();
     }
 
-    protected async executeQuery(query: any): Promise<any[]> {
+    public removeQuery(query: TimeseriesRESTQuery) {
+        this.state.queries = this.state.queries.filter(i => i.__series_id !== query.__series_id);
+        this.seriesCollection.removeTimeseries(query.__series_id);
+    }
+
+    protected async executeQuery(query: TimeseriesRESTQuery): Promise<any[]> {
         if (this._storeQueryInURL) {
             await this._router.navigate([], {queryParams: query});
         }

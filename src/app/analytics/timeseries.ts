@@ -37,9 +37,9 @@ export class TimeseriesCollectionModel {
         this.seriesAdded.emit(this._addSeries(series));
     }
 
-    public removeTimeseries(series: TimeseriesModel) {
-        this.map.delete(series.id);
-        this.seriesRemoved.emit(series.id);
+    public removeTimeseries(id: string) {
+        this.map.delete(id);
+        this.seriesRemoved.emit(id);
     }
 
     public zeroFill(mappedData: any[]) {
