@@ -41,6 +41,11 @@
                 <!--       <mat-icon>power_settings_new</mat-icon>-->
                 Dashboard
             </button>
+            <button mat-button routerLink="/analytics/time"
+                    queryParamsHandling="merge" *ngIf="isAuthenticated && pref.featureSupported('analytics')">
+                <!--       <mat-icon>power_settings_new</mat-icon>-->
+                Analytics
+            </button>
             <button mat-button queryParamsHandling="merge" routerLink="/map" *ngIf="isAuthenticated &&
             pref.featureSupported('dashboard')  && pref.featureSupported('map')">
                 <!--       <mat-icon>power_settings_new</mat-icon>-->

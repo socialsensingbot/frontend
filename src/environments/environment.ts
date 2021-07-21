@@ -71,7 +71,7 @@ export const environment = {
             {title: "Coastal", value: "coastal", color: "#F4511E"}
         ]
     },
-    features: ["impact", "source", "map"],
+    features: ["impact", "source", "map", "dashboard", "analytics"],
 
     showErrors:                          false,
     showLoadingMessages:                 true,

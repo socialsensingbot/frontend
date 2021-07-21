@@ -270,6 +270,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
 
+    public saveGraph() {
+        window.alert("Not Yet Implemented");
+    }
 }
 
 
