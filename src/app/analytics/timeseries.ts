@@ -10,12 +10,14 @@ export class TimeseriesModel {
     }
 }
 
-export class TimeseriesCollectionModel {
+export type GraphType = "line" | "bar";
 
+export class TimeseriesCollectionModel {
     public seriesAdded: EventEmitter<TimeseriesModel> = new EventEmitter<TimeseriesModel>();
     public seriesRemoved: EventEmitter<string> = new EventEmitter<string>();
     public seriesUpdated: EventEmitter<TimeseriesModel> = new EventEmitter<TimeseriesModel>();
     public yAxisChanged: EventEmitter<void> = new EventEmitter<void>();
+    public graphTypeChanged: EventEmitter<GraphType> = new EventEmitter<GraphType>();
     private map: Map<string, TimeseriesModel> = new Map<string, TimeseriesModel>();
     private _minDate: Date = null;
     private _maxDate: Date = null;
@@ -27,11 +29,21 @@ export class TimeseriesCollectionModel {
                 public rollingAvg: boolean = false,
                 public avgLength = 14,
                 public zeroFillMissingDates = true,
-                public dateSpacing = 24 * 60 * 60 * 1000) {
+                public dateSpacing = 24 * 60 * 60 * 1000,
+                private _graphType: GraphType = "line") {
 
 
     }
 
+
+    public get graphType(): GraphType {
+        return this._graphType;
+    }
+
+    public set graphType(value: "bar" | "line") {
+        this._graphType = value;
+        this.graphTypeChanged.emit(value);
+    }
 
     public addTimeseries(series: TimeseriesModel) {
         this.seriesAdded.emit(this._addSeries(series));
@@ -83,11 +95,14 @@ export class TimeseriesCollectionModel {
         this.seriesUpdated.emit(this._addSeries(timeseriesModel));
     }
 
+    public yAxisHasChanged() {
+        this.yAxisChanged.emit();
+    }
+
     private _addSeries(series: TimeseriesModel) {
         const data = this.zeroFill(series.data);
         for (const item of data) {
             const date = new Date(item[this.xField]);
-            log.debug(date);
             if (this._minDate === null || date.getTime() < this._minDate.getTime()) {
                 this._minDate = date;
             }
@@ -111,10 +126,6 @@ export class TimeseriesCollectionModel {
         const result = new TimeseriesModel(series.label, data, series.id);
         this.map.set(series.id, result);
         return result;
-    }
-
-    public yAxisHasChanged() {
-        this.yAxisChanged.emit();
     }
 }
 
