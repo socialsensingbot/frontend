@@ -15,7 +15,10 @@
                 <mat-button-toggle value="bar">Bar</mat-button-toggle>
             </mat-button-toggle-group>
             <div class="app-toolbar-expanding-separator"></div>
-            <button mat-raised-button color="warn"
+            <button mat-flat-button color="primary"
+                    (click)="saveGraph();">Save</button>
+            <div class="app-toolbar-separator"></div>
+            <button mat-flat-button color="warn"
                     (click)="newQueryForm.clear();removeAllQueries();">Clear</button>
             <div class="app-toolbar-separator"></div>
             <button mat-icon-button aria-label="Expand or shrink toolbar">
