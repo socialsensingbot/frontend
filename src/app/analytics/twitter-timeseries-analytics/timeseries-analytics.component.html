@@ -15,6 +15,9 @@
                 <mat-button-toggle value="bar">Bar</mat-button-toggle>
             </mat-button-toggle-group>
             <div class="app-toolbar-expanding-separator"></div>
+            <button mat-raised-button color="warn"
+                    (click)="newQueryForm.clear();removeAllQueries();">Clear</button>
+            <div class="app-toolbar-separator"></div>
             <button mat-icon-button aria-label="Expand or shrink toolbar">
                 <mat-icon matTooltip="Expand toolbar" *ngIf="!appToolbarExpanded"
                           (click)="appToolbarExpanded=true">arrow_drop_down
@@ -45,6 +48,7 @@
 
     </app-timeseries-multi-query-chart>
 </div>
+
 <div class="app-query-builder-surround">
     <mat-card>
         <mat-card-content>

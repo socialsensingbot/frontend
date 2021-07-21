@@ -65,7 +65,7 @@ export class UIExecutionService {
     private _executionTimer: Subscription;
     private _pause: boolean;
     private _state: AppState = "init";
-    private _uistate: UIState = "init";
+    public uistate: UIState = "init";
     private dedupMap: Map<any, ExecutionTask> = new Map<any, ExecutionTask>();
     private lastUIActivity: number = 0;
     private _uiInactiveTimer: Subscription;
@@ -76,8 +76,8 @@ export class UIExecutionService {
         await Auth.currentAuthenticatedUser();
         this._uiInactiveTimer = timer(0, 100).subscribe(() => {
             if (this.lastUIActivity < Date.now() - inactivityInMilliseconds) {
-                this._uistate = "inactive";
-                this.uiStateChange.emit(this._uistate);
+                this.uistate = "inactive";
+                this.uiStateChange.emit(this.uistate);
             }
         });
         this._executionTimer = timer(0, 100).subscribe(() => {
@@ -87,7 +87,7 @@ export class UIExecutionService {
                 const task = snapshot.shift();
 
                 if ((task.waitForStates === null || task.waitForStates.indexOf(
-                    this._state) >= 0) && (task.waitForUIState === null || this._uistate === task.waitForUIState)) {
+                    this._state) >= 0) && (task.waitForUIState === null || this.uistate === task.waitForUIState)) {
                     log.info("Executing " + task.name);
                     task.execute();
                     if (task.dedup !== null) {
@@ -98,11 +98,11 @@ export class UIExecutionService {
                         this._queue.push(task);
                         log.debug(
                             `RESCHEDULED out of sequence task ${task.name} on execution queue,
-              state ${this._state} needs to be one of ${task.waitForStates} and ${this._uistate} must be ${task.waitForUIState}.`);
+              state ${this._state} needs to be one of ${task.waitForStates} and ${this.uistate} must be ${task.waitForUIState}.`);
                         return;
                     } else {
                         const message = `Skipped out of sequence task ${task.name} on execution queue,
-             state ${this._state} should be one of ${task.waitForStates} and ${this._uistate} must be ${task.waitForUIState}.`;
+             state ${this._state} should be one of ${task.waitForStates} and ${this.uistate} must be ${task.waitForUIState}.`;
                         if (task.silentFailure) {
                             log.debug(message);
                         } else {
@@ -133,8 +133,8 @@ export class UIExecutionService {
 
     public uiActivity() {
         this.lastUIActivity = Date.now();
-        this._uistate = "active";
-        this.uiStateChange.emit(this._uistate);
+        this.uistate = "active";
+        this.uiStateChange.emit(this.uistate);
     }
 
     public queue(name: string, waitForStates: AppState[] | null, task: () => any, dedup: any = null,
