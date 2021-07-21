@@ -6,6 +6,7 @@ import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {TimeseriesCollectionModel, TimeseriesModel} from "../timeseries";
 import {v4 as uuidv4} from "uuid";
+import {UIExecutionService} from "../../services/uiexecution.service";
 
 const log = new Logger("twitter-timeseries");
 
@@ -18,6 +19,8 @@ export interface TimeseriesRESTQuery {
     textSearch?: string;
     __series_id: string;
 }
+
+type TimeseriesAnalyticsComponentState = { eoc: "count" | "exceedance", lob: "line" | "bar", queries: TimeseriesRESTQuery[] };
 
 @Component({
                selector:    "app-timeseries-analytics",
@@ -70,7 +73,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     private interval: number;
 
     constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
-                protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService) {
+                protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
+                public exec: UIExecutionService) {
 
         this.resetNewQuery();
         this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
@@ -90,7 +94,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.markChanged();
     }
 
-    private _state: { eoc: "count" | "exceedance", queries: TimeseriesRESTQuery[] } = {eoc: "count", queries: []};
+    private _state: TimeseriesAnalyticsComponentState = {eoc: "count", lob: "line", queries: []};
 
     public get state(): any {
         return this._state;
@@ -103,6 +107,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     async ngOnInit() {
+
 
     }
 
@@ -120,11 +125,20 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     public async updateGraph(query: TimeseriesRESTQuery) {
-        log.debug("Graph update from query", query);
-        this._changed = true;
-        this.emitChange();
-        this.seriesCollection.updateTimeseries(
-            new TimeseriesModel(this.toLabel(query), await this.executeQuery(query), query.__series_id));
+        this.exec.uiActivity();
+        this.exec.queue("update-timeseries-graph", null,
+                        async () => {
+                            log.debug("Graph update from query", query);
+                            this._changed = true;
+                            this.emitChange();
+                            if (query.textSearch.length > 0 || query.regions.length > 0 || this.state.queries.length === 0) {
+                                this.seriesCollection.updateTimeseries(
+                                    new TimeseriesModel(this.toLabel(query), await this.executeQuery(query),
+                                                        query.__series_id));
+                            }
+                        }, query.__series_id, false, true, true, "inactive"
+        );
+
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
@@ -147,7 +161,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             this.state.queries = [];
         }
         log.info("Adding query ", query);
-        this.state.queries.push(query);
+        this.state.queries.unshift(query);
 
         this.seriesCollection.updateTimeseries(
             new TimeseriesModel(this.toLabel(query), await this.executeQuery(query),
@@ -160,6 +174,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     public eocChanged() {
+        this.exec.uiActivity();
         this.seriesCollection.yLabel = this.state.eoc === "exceedance" ? "Exceedance" : "Count";
         this.seriesCollection.yField = this.state.eoc === "exceedance" ? "exceedance" : "count";
         this.seriesCollection.yAxisHasChanged();
@@ -168,6 +183,11 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     public removeQuery(query: TimeseriesRESTQuery) {
         this.state.queries = this.state.queries.filter(i => i.__series_id !== query.__series_id);
         this.seriesCollection.removeTimeseries(query.__series_id);
+    }
+
+    public graphTypeChanged(type: "bar" | "line") {
+        this.exec.uiActivity();
+        this.seriesCollection.graphType = type;
     }
 
     protected async executeQuery(query: TimeseriesRESTQuery): Promise<any[]> {

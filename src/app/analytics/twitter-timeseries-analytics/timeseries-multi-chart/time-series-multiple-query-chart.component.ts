@@ -16,7 +16,7 @@ import * as am4charts from "@amcharts/amcharts4/charts";
 import {ColumnSeries, LineSeries, ValueAxis, XYChart} from "@amcharts/amcharts4/charts";
 import jt_theme from "../../../theme/jt.theme";
 import {Logger} from "@aws-amplify/core";
-import {TimeseriesCollectionModel} from "../../timeseries";
+import {GraphType, TimeseriesCollectionModel} from "../../timeseries";
 
 const log = new Logger("app-timeseries-multi-query-chart");
 
@@ -55,14 +55,13 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
     }
 
 
-    private _type = "line";
+    private _type: GraphType = "line";
 
-    public get type(): string {
+    public get type(): GraphType {
         return this._type;
     }
 
-    @Input()
-    public set type(value: string) {
+    public set type(value: GraphType) {
         this._type = value;
     }
 
@@ -80,6 +79,7 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
 
     ngAfterViewInit(): void {
 
+        this.type = this._seriesCollection.graphType;
         this._zone.runOutsideAngular(() => {
             /* Chart code */
             // Themes begin
@@ -118,6 +118,14 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
         this._seriesCollection.yAxisChanged.subscribe(() => {
             this.initChart();
             this.valueAxis.title.text = this._seriesCollection.yLabel;
+            this._seriesCollection.foreachSeries((label, data, id) => {
+                this.createSeriesFromData(label, data, id);
+            });
+        });
+
+        this._seriesCollection.graphTypeChanged.subscribe(() => {
+            this.type = this._seriesCollection.graphType;
+            this.initChart();
             this._seriesCollection.foreachSeries((label, data, id) => {
                 this.createSeriesFromData(label, data, id);
             });
