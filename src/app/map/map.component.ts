@@ -22,7 +22,7 @@ import {
 } from "./types";
 import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
-import {UIExecutionService, UIState} from "../services/uiexecution.service";
+import {UIExecutionService, AppState} from "../services/uiexecution.service";
 import {ColorCodeService} from "./services/color-code.service";
 import {MapDataService, MapDataServiceInt} from "./data/map-data.service";
 import {MapStatisticsInterface} from "./data/processed-data";
@@ -318,10 +318,10 @@ export class MapComponent implements OnInit, OnDestroy {
         // of a flag and queued events. The throttling is acheived by the the periodicity of the
         // schedulers execution.
 
-        this._exec.start();
+
         // Avoids race condition with access to this.pref.combined
         await this.pref.waitUntilReady();
-        this._stateSub = this._exec.state.subscribe((state: UIState) => {
+        this._stateSub = this._exec.state.subscribe((state: AppState) => {
             if (state === "ready") {
                 this.ready = true;
             }
