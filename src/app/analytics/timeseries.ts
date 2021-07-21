@@ -18,6 +18,7 @@ export class TimeseriesCollectionModel {
     public seriesUpdated: EventEmitter<TimeseriesModel> = new EventEmitter<TimeseriesModel>();
     public yAxisChanged: EventEmitter<void> = new EventEmitter<void>();
     public graphTypeChanged: EventEmitter<GraphType> = new EventEmitter<GraphType>();
+    public cleared: EventEmitter<void> = new EventEmitter<void>();
     private map: Map<string, TimeseriesModel> = new Map<string, TimeseriesModel>();
     private _minDate: Date = null;
     private _maxDate: Date = null;
@@ -126,6 +127,11 @@ export class TimeseriesCollectionModel {
         const result = new TimeseriesModel(series.label, data, series.id);
         this.map.set(series.id, result);
         return result;
+    }
+
+    public clear() {
+        this.map.clear();
+        this.cleared.emit();
     }
 }
 

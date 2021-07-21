@@ -178,11 +178,21 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.seriesCollection.yLabel = this.state.eoc === "exceedance" ? "Exceedance" : "Count";
         this.seriesCollection.yField = this.state.eoc === "exceedance" ? "exceedance" : "count";
         this.seriesCollection.yAxisHasChanged();
+        this.exec.uiActivity();
     }
 
     public removeQuery(query: TimeseriesRESTQuery) {
         this.state.queries = this.state.queries.filter(i => i.__series_id !== query.__series_id);
         this.seriesCollection.removeTimeseries(query.__series_id);
+        this.exec.uiActivity();
+    }
+
+    public removeAllQueries() {
+        this.state.queries = [];
+        this.resetNewQuery();
+        this.seriesCollection.clear();
+        this.exec.uiActivity();
+        this.updateGraph(this.newQuery);
     }
 
     public graphTypeChanged(type: "bar" | "line") {
@@ -258,6 +268,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
         return label;
     }
+
+
 }
 
 

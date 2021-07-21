@@ -131,6 +131,11 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
             });
         });
 
+        this._seriesCollection.cleared.subscribe(() => {
+            this.initChart();
+            this.seriesMap = {};
+        });
+
         this.ready.emit(true);
         this._ready = true;
     }
