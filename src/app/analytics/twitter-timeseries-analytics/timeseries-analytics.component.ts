@@ -11,6 +11,8 @@ import {StateHistoryService} from "../../services/state-history.service";
 import {StateHistory} from "../../../models";
 import {SaveGraphDialogComponent} from "./save-graph-dialog/save-graph-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
+import {TimeseriesAnalyticsFormComponent} from "./timeseries-analytics-form.component";
+import {NotificationService} from "src/app/services/notification.service";
 
 const log = new Logger("twitter-timeseries");
 
@@ -80,6 +82,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     private graphId: string;
 
     constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
+                public notify: NotificationService,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
                 public exec: UIExecutionService, public history: StateHistoryService, public dialog: MatDialog) {
         this.resetNewQuery();
@@ -184,40 +187,45 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
 
-    saveGraph(): void {
+    async saveGraph(): Promise<void> {
+        if (!this.graphId) {
+            const dialogData = {
+                dialogTitle: "Save Timeseries Graph",
+                state:       this.state,
+                type:        this.stateHistoryType,
+                title:       this.title || ""
+            };
+            const dialogRef = this.dialog.open(SaveGraphDialogComponent, {
+                width: "500px",
+                data:  dialogData
+            });
 
-        const dialogData = {
-            dialogTitle: "Save Timeseries Graph",
-            state:       this.state,
-            type:        this.stateHistoryType,
-            title:       this.title || ""
-        };
-        const dialogRef = this.dialog.open(SaveGraphDialogComponent, {
-            width: "500px",
-            data:  dialogData
-        });
+            dialogRef.afterClosed().subscribe(async result => {
+                if (result !== null) {
+                    this.savedQueries = await this.history.listByOwner();
 
-        dialogRef.afterClosed().subscribe(async result => {
-            if (result !== null) {
-                this.savedQueries = await this.history.listByOwner();
-                if (!this.graphId) {
                     const savedGraph = await this.history.create(dialogData.type, dialogData.title, dialogData.state);
                     this.graphId = savedGraph.id;
                     this.title = dialogData.title;
                     this.updateSavedQueries();
-                } else {
-                    await this.history.update(this.graphId, dialogData.title, dialogData.state);
-                    this.updateSavedQueries();
+
                 }
-            }
-        });
+            });
+        } else {
+            this.updating = true;
+            await this.history.update(this.graphId, this.title, this.state);
+            this.updateSavedQueries();
+            this.notify.show("Saved graph '" + this.title + "'", "Great!", 4);
+            this.updating = false;
+        }
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
     }
 
-    public async addQuery() {
+    public async addQuery(newQueryForm: TimeseriesAnalyticsFormComponent) {
         const query: TimeseriesRESTQuery = JSON.parse(JSON.stringify(this.newQuery));
+        newQueryForm.clearForm();
         if (!this.state.queries) {
             this.state.queries = [];
         }
@@ -226,7 +234,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
         await this.updateGraph(query, true);
         this.resetNewQuery();
-
     }
 
     public refreshGraph() {
@@ -267,10 +274,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         }
     }
 
-    private navigateToRoot() {
-        this._router.navigate(["/analytics/time"], {queryParamsHandling: "merge"});
-    }
-
     protected async executeQuery(query: TimeseriesRESTQuery): Promise<any[]> {
         if (this._storeQueryInURL) {
             await this._router.navigate([], {queryParams: query});
@@ -302,6 +305,10 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     protected queryTransform(from: any[]): any[] {
         return from;
+    }
+
+    private navigateToRoot() {
+        this._router.navigate(["/analytics/time"], {queryParamsHandling: "merge"});
     }
 
     private resetNewQuery() {

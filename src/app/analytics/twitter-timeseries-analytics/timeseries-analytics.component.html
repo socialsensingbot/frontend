@@ -68,7 +68,7 @@
                                            [data]="newQuery"></app-timeseries-analytics-form>
         </mat-card-content>
         <mat-card-actions>
-            <button mat-raised-button color="primary" (click)="addQuery();newQueryForm.clearForm()">Add</button>
+            <button mat-raised-button color="primary" (click)="addQuery(newQueryForm);">Add</button>
         </mat-card-actions>
     </mat-card>
     <mat-card *ngFor="let query of state.queries">
