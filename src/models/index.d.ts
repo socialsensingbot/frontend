@@ -28,6 +28,18 @@ export declare class GroupDashboard {
   static copyOf(source: GroupDashboard, mutator: (draft: MutableModel<GroupDashboard>) => MutableModel<GroupDashboard> | void): GroupDashboard;
 }
 
+export declare class StateHistory {
+  readonly id: string;
+  readonly type: string;
+  readonly title: string;
+  readonly state: string;
+  readonly group?: string;
+  readonly owner?: string;
+  readonly createdAt?: string;
+  constructor(init: ModelInit<StateHistory>);
+  static copyOf(source: StateHistory, mutator: (draft: MutableModel<StateHistory>) => MutableModel<StateHistory> | void): StateHistory;
+}
+
 export declare class UserSession {
   readonly id: string;
   readonly fingerprint?: string;

@@ -4,10 +4,13 @@ import { schema } from './schema';
 
 
 
-const { UserPreferences, UserSession, GroupPreferences, GroupTweetIgnore, GroupTweetAnnotations, GroupTwitterUserIgnore } = initSchema(schema);
+const { UserPreferences, UserDashboard, GroupDashboard, StateHistory, UserSession, GroupPreferences, GroupTweetIgnore, GroupTweetAnnotations, GroupTwitterUserIgnore } = initSchema(schema);
 
 export {
   UserPreferences,
+  UserDashboard,
+  GroupDashboard,
+  StateHistory,
   UserSession,
   GroupPreferences,
   GroupTweetIgnore,
