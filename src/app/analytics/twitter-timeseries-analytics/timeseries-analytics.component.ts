@@ -78,7 +78,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
         this.resetNewQuery();
         this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
-        this.updateGraph(this.newQuery);
+        this.updateGraph(this.newQuery, true);
         this.ready = true;
     }
 
@@ -124,19 +124,22 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         window.clearInterval(this._interval);
     }
 
-    public async updateGraph(query: TimeseriesRESTQuery) {
-        this.exec.uiActivity();
-        this.exec.queue("update-timeseries-graph", null,
-                        async () => {
-                            log.debug("Graph update from query", query);
-                            this._changed = true;
-                            this.emitChange();
-                            if (query.textSearch.length > 0 || query.regions.length > 0 || this.state.queries.length === 0) {
-                                this.seriesCollection.updateTimeseries(
-                                    new TimeseriesModel(this.toLabel(query), await this.executeQuery(query),
-                                                        query.__series_id));
-                            }
-                        }, query.__series_id, false, true, true, "inactive"
+    public async updateGraph(q: TimeseriesRESTQuery, force) {
+        // Immutable copy
+        const query = JSON.parse(JSON.stringify(q));
+        await this.exec.queue("update-timeseries-graph", null,
+                              async () => {
+                                  log.debug("Graph update from query ", query);
+                                  this._changed = true;
+                                  this.emitChange();
+                                  if (query.textSearch.length > 0 || query.regions.length > 0 || force) {
+                                      this.seriesCollection.updateTimeseries(
+                                          new TimeseriesModel(this.toLabel(query), await this.executeQuery(query),
+                                                              query.__series_id));
+                                  } else {
+                                      log.debug("Skipped time series update, force=" + force);
+                                  }
+                              }, query.__series_id + "-" + force, false, true, true, "inactive"
         );
 
     }
@@ -156,16 +159,14 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     public async addQuery() {
         const query: TimeseriesRESTQuery = JSON.parse(JSON.stringify(this.newQuery));
-        this.resetNewQuery();
         if (!this.state.queries) {
             this.state.queries = [];
         }
         log.info("Adding query ", query);
         this.state.queries.unshift(query);
 
-        this.seriesCollection.updateTimeseries(
-            new TimeseriesModel(this.toLabel(query), await this.executeQuery(query),
-                                query.__series_id));
+        await this.updateGraph(query, true);
+        this.resetNewQuery();
 
     }
 
@@ -187,17 +188,21 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.exec.uiActivity();
     }
 
-    public removeAllQueries() {
-        this.state.queries = [];
+    public async removeAllQueries() {
         this.resetNewQuery();
+        this.state.queries = [];
         this.seriesCollection.clear();
+        await this.updateGraph(this.newQuery, true);
         this.exec.uiActivity();
-        this.updateGraph(this.newQuery);
     }
 
     public graphTypeChanged(type: "bar" | "line") {
         this.exec.uiActivity();
         this.seriesCollection.graphType = type;
+    }
+
+    public saveGraph() {
+        window.alert("Not Yet Implemented");
     }
 
     protected async executeQuery(query: TimeseriesRESTQuery): Promise<any[]> {
@@ -267,11 +272,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         }
 
         return label;
-    }
-
-
-    public saveGraph() {
-        window.alert("Not Yet Implemented");
     }
 }
 
