@@ -89,7 +89,7 @@
     savedQueries"> {{
         savedQuery.title }}
         <button mat-button mat-icon-button matSuffix
-                (click)="history.delete(savedQuery.id); updateSavedQueries()">
+                (click)="deleteSavedQuery(savedQuery.id); updateSavedQueries()">
             <mat-icon>close</mat-icon>
         </button>
     </a>

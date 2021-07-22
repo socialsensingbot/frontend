@@ -43,11 +43,10 @@ export class StateHistoryService {
     }
 
 
-    public async get(id: string): Promise<StateHistory> {
+    public async get(id: string): Promise<StateHistory|null> {
         const results = await DataStore.query(StateHistory, q => q.id("eq", id));
         if (results.length === 0) {
-            console.error("No such history ", id);
-            throw Error("No such state history " + id);
+           return null;
         } else {
             console.log(results);
             return results[0];
