@@ -11,6 +11,7 @@ import {StateHistoryService} from "../../services/state-history.service";
 import {StateHistory} from "../../../models";
 import {SaveGraphDialogComponent} from "./save-graph-dialog/save-graph-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
+import {TimeseriesAnalyticsFormComponent} from "./timeseries-analytics-form.component";
 
 const log = new Logger("twitter-timeseries");
 
@@ -184,39 +185,40 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
 
-    saveGraph(): void {
+    async saveGraph(): Promise<void> {
+        if (!this.graphId) {
+            const dialogData = {
+                dialogTitle: "Save Timeseries Graph",
+                state:       this.state,
+                type:        this.stateHistoryType,
+                title:       this.title || ""
+            };
+            const dialogRef = this.dialog.open(SaveGraphDialogComponent, {
+                width: "500px",
+                data:  dialogData
+            });
 
-        const dialogData = {
-            dialogTitle: "Save Timeseries Graph",
-            state:       this.state,
-            type:        this.stateHistoryType,
-            title:       this.title || ""
-        };
-        const dialogRef = this.dialog.open(SaveGraphDialogComponent, {
-            width: "500px",
-            data:  dialogData
-        });
+            dialogRef.afterClosed().subscribe(async result => {
+                if (result !== null) {
+                    this.savedQueries = await this.history.listByOwner();
 
-        dialogRef.afterClosed().subscribe(async result => {
-            if (result !== null) {
-                this.savedQueries = await this.history.listByOwner();
-                if (!this.graphId) {
                     const savedGraph = await this.history.create(dialogData.type, dialogData.title, dialogData.state);
                     this.graphId = savedGraph.id;
                     this.title = dialogData.title;
                     this.updateSavedQueries();
-                } else {
-                    await this.history.update(this.graphId, dialogData.title, dialogData.state);
-                    this.updateSavedQueries();
+
                 }
-            }
-        });
+            });
+        } else {
+            await this.history.update(this.graphId, this.title, this.state);
+            this.updateSavedQueries();
+        }
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
     }
 
-    public async addQuery() {
+    public async addQuery(newQueryForm: TimeseriesAnalyticsFormComponent) {
         const query: TimeseriesRESTQuery = JSON.parse(JSON.stringify(this.newQuery));
         if (!this.state.queries) {
             this.state.queries = [];
@@ -225,8 +227,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.state.queries.unshift(query);
 
         await this.updateGraph(query, true);
+        newQueryForm.clearForm();
         this.resetNewQuery();
-
     }
 
     public refreshGraph() {
@@ -267,10 +269,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         }
     }
 
-    private navigateToRoot() {
-        this._router.navigate(["/analytics/time"], {queryParamsHandling: "merge"});
-    }
-
     protected async executeQuery(query: TimeseriesRESTQuery): Promise<any[]> {
         if (this._storeQueryInURL) {
             await this._router.navigate([], {queryParams: query});
@@ -302,6 +300,10 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     protected queryTransform(from: any[]): any[] {
         return from;
+    }
+
+    private navigateToRoot() {
+        this._router.navigate(["/analytics/time"], {queryParamsHandling: "merge"});
     }
 
     private resetNewQuery() {
