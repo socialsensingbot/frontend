@@ -19,7 +19,7 @@
                     (click)="saveGraph();">Save</button>
             <div class="app-toolbar-separator"></div>
             <button mat-flat-button color="warn"
-                    (click)="newQueryForm.clear();removeAllQueries();">Clear</button>
+                    (click)="newQueryForm.clearForm();removeAllQueries();">Clear</button>
             <div class="app-toolbar-separator"></div>
             <button mat-icon-button aria-label="Expand or shrink toolbar">
                 <mat-icon matTooltip="Expand toolbar" *ngIf="!appToolbarExpanded"
@@ -52,20 +52,21 @@
     </app-timeseries-multi-query-chart>
 </div>
 
+{{state.queries.length}} {{seriesCollection.size}}
 <div class="app-query-builder-surround">
     <mat-card>
         <mat-card-content>
             <app-timeseries-analytics-form #newQueryForm
-                                           (changed)="updateGraph(newQuery);"
+                                           (changed)="updateGraph(newQuery,state.queries.length === 0);"
                                            [data]="newQuery"></app-timeseries-analytics-form>
         </mat-card-content>
         <mat-card-actions>
-            <button mat-raised-button color="primary" (click)="addQuery();newQueryForm.clear()">Add</button>
+            <button mat-raised-button color="primary" (click)="addQuery();newQueryForm.clearForm()">Add</button>
         </mat-card-actions>
     </mat-card>
     <mat-card *ngFor="let query of state.queries">
         <mat-card-content>
-            <app-timeseries-analytics-form (changed)="updateGraph(query);"
+            <app-timeseries-analytics-form (changed)="updateGraph(query, true);"
                                            [data]="query"></app-timeseries-analytics-form>
         </mat-card-content>
         <mat-card-actions>

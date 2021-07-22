@@ -24,7 +24,7 @@ class ExecutionTask {
 
     public execute() {
         try {
-            log.info("Executing " + this.name);
+            log.info("ExecutionTask: executing " + this.name + "(" + this.dedup + ")");
             this._resolve(this._task());
         } catch (e) {
             log.error("ERROR Executing " + this.name);
@@ -61,11 +61,11 @@ export class UIExecutionService {
 
     public state = new EventEmitter<AppState>();
     public uiStateChange = new EventEmitter<UIState>();
+    public uistate: UIState = "init";
     private _queue: ExecutionTask[] = [];
     private _executionTimer: Subscription;
     private _pause: boolean;
     private _state: AppState = "init";
-    public uistate: UIState = "init";
     private dedupMap: Map<any, ExecutionTask> = new Map<any, ExecutionTask>();
     private lastUIActivity: number = 0;
     private _uiInactiveTimer: Subscription;
@@ -88,7 +88,7 @@ export class UIExecutionService {
 
                 if ((task.waitForStates === null || task.waitForStates.indexOf(
                     this._state) >= 0) && (task.waitForUIState === null || this.uistate === task.waitForUIState)) {
-                    log.info("Executing " + task.name);
+                    log.info("Executing " + task.name + "(" + task.dedup + ")");
                     task.execute();
                     if (task.dedup !== null) {
                         this.dedupMap.delete(task.dedup);
