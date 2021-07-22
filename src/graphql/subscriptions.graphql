@@ -107,6 +107,51 @@ subscription OnDeleteGroupDashboard {
     updatedAt
   }
 }
+subscription OnCreateStateHistory {
+  onCreateStateHistory {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+subscription OnUpdateStateHistory {
+  onUpdateStateHistory {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+subscription OnDeleteStateHistory {
+  onDeleteStateHistory {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
 subscription OnCreateUserSession {
   onCreateUserSession {
     id

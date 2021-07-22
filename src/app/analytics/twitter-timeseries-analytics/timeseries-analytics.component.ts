@@ -7,6 +7,10 @@ import {PreferenceService} from "../../pref/preference.service";
 import {TimeseriesCollectionModel, TimeseriesModel} from "../timeseries";
 import {v4 as uuidv4} from "uuid";
 import {UIExecutionService} from "../../services/uiexecution.service";
+import {StateHistoryService} from "../../services/state-history.service";
+import {StateHistory} from "../../../models";
+import {SaveGraphDialogComponent} from "./save-graph-dialog/save-graph-dialog.component";
+import {MatDialog} from "@angular/material/dialog";
 
 const log = new Logger("twitter-timeseries");
 
@@ -39,7 +43,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     public xField = "date";
     public yField = "count";
     public animated = false;
-
+    stateHistoryType = "timeseries-graph";
 
     ready: boolean;
 
@@ -59,10 +63,12 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     public seriesCollection: TimeseriesCollectionModel;
     //         this.updateGraph(this.state);
     public appToolbarExpanded = false;
+    //         log.debug("The dialog was closed");
+    public savedQueries: StateHistory[] = [];
+    public title = "";
     protected _interval: number;
     protected _changed: boolean;
     protected _storeQueryInURL: boolean;
-
     /*
                                 [xField]="xField"
                             [yField]="state.eoc || 'count'"
@@ -71,15 +77,16 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
      */
     private interval: number;
+    private graphId: string;
 
     constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
-                public exec: UIExecutionService) {
-
+                public exec: UIExecutionService, public history: StateHistoryService, public dialog: MatDialog) {
         this.resetNewQuery();
         this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
-        this.updateGraph(this.newQuery, true);
+        this.updateSavedQueries();
         this.ready = true;
+
     }
 
     private _type = "line";
@@ -106,8 +113,29 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.markChanged();
     }
 
-    async ngOnInit() {
+    public updateSavedQueries() {
+        this.history.listByOwner().then(i => this.savedQueries = i);
+    }
 
+    async ngOnInit() {
+        this._route.params.subscribe(async params => {
+            if (params.id) {
+                this.graphId = params.id;
+                const savedGraph = await this.history.get(params.id);
+                this.title = savedGraph.title;
+                this.state = JSON.parse(savedGraph.state);
+                this.resetNewQuery();
+                this.seriesCollection.clear();
+                for (const query of this.state.queries) {
+                    await this.updateGraph(query, true);
+                }
+                this.exec.uiActivity();
+                this.ready = true;
+            } else {
+                await this.clear();
+                this.ready = true;
+            }
+        });
 
     }
 
@@ -133,9 +161,14 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                                   this._changed = true;
                                   this.emitChange();
                                   if (query.textSearch.length > 0 || query.regions.length > 0 || force) {
-                                      this.seriesCollection.updateTimeseries(
-                                          new TimeseriesModel(this.toLabel(query), await this.executeQuery(query),
-                                                              query.__series_id));
+                                      const queryResult = await this.executeQuery(query);
+                                      if (queryResult && queryResult.length > 0) {
+                                          this.seriesCollection.updateTimeseries(
+                                              new TimeseriesModel(this.toLabel(query), queryResult,
+                                                                  query.__series_id));
+                                      } else {
+                                          log.warn(queryResult);
+                                      }
                                   } else {
                                       log.debug("Skipped time series update, force=" + force);
                                   }
@@ -144,18 +177,38 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
-    public ngOnChanges(changes: SimpleChanges): void {
+
+    saveGraph(): void {
+
+        const dialogData = {
+            dialogTitle: "Save Timeseries Graph",
+            state:       this.state,
+            type:        this.stateHistoryType,
+            title:       this.title || ""
+        };
+        const dialogRef = this.dialog.open(SaveGraphDialogComponent, {
+            width: "500px",
+            data:  dialogData
+        });
+
+        dialogRef.afterClosed().subscribe(async result => {
+            if (result !== null) {
+                this.savedQueries = await this.history.listByOwner();
+                if (!this.graphId) {
+                    const savedGraph = await this.history.create(dialogData.type, dialogData.title, dialogData.state);
+                    this.graphId = savedGraph.id;
+                    this.title = dialogData.title;
+                    this.updateSavedQueries();
+                } else {
+                    await this.history.update(this.graphId, dialogData.title, dialogData.state);
+                    this.updateSavedQueries();
+                }
+            }
+        });
     }
 
-
-    // openDialog(): void {
-    //     const dialogRef = this.dialog.open(TimeseriesConfigFormComponent, {
-    //         width: "500px",
-    //         data:  {state: this.state, component: this}
-    //     });
-    //
-    //     dialogRef.afterClosed().subscribe(result => {
-    //         log.debug("The dialog was closed");
+    public ngOnChanges(changes: SimpleChanges): void {
+    }
 
     public async addQuery() {
         const query: TimeseriesRESTQuery = JSON.parse(JSON.stringify(this.newQuery));
@@ -188,7 +241,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.exec.uiActivity();
     }
 
-    public async removeAllQueries() {
+    public async clear() {
         this.resetNewQuery();
         this.state.queries = [];
         this.seriesCollection.clear();
@@ -201,9 +254,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.seriesCollection.graphType = type;
     }
 
-    public saveGraph() {
-        window.alert("Not Yet Implemented");
-    }
 
     protected async executeQuery(query: TimeseriesRESTQuery): Promise<any[]> {
         if (this._storeQueryInURL) {
@@ -274,5 +324,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         return label;
     }
 }
+
 
 

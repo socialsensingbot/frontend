@@ -173,6 +173,73 @@ query SyncGroupDashboards(
     startedAt
   }
 }
+query GetStateHistory($id: ID!) {
+  getStateHistory(id: $id) {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+query ListStateHistorys(
+  $filter: ModelStateHistoryFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listStateHistorys(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      type
+      title
+      state
+      group
+      owner
+      createdAt
+      _version
+      _deleted
+      _lastChangedAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query SyncStateHistories(
+  $filter: ModelStateHistoryFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncStateHistories(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      type
+      title
+      state
+      group
+      owner
+      createdAt
+      _version
+      _deleted
+      _lastChangedAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
 query GetUserSession($id: ID!) {
   getUserSession(id: $id) {
     id
