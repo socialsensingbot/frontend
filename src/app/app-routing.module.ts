@@ -41,7 +41,8 @@ const routes: Routes = [
     {
         path:     "analytics", component: AnalyticsComponent, canActivate: [AuthGuard],
         children: [
-            {path: "time", component: TimeseriesAnalyticsComponent, canActivate: [AuthGuard]}
+            {path: "time", component: TimeseriesAnalyticsComponent, canActivate: [AuthGuard]},
+            {path: "time/:id", component: TimeseriesAnalyticsComponent, canActivate: [AuthGuard]}
         ]
     },
     {path: "dashboard", component: DashboardComponent, canActivate: [AuthGuard]},
@@ -50,7 +51,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-              imports: [RouterModule.forRoot(routes, {relativeLinkResolution: 'legacy'})],
+              imports: [RouterModule.forRoot(routes, {relativeLinkResolution: "legacy"})],
               exports: [RouterModule]
           })
 export class AppRoutingModule {

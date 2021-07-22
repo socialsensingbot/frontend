@@ -163,6 +163,60 @@ export type DeleteGroupDashboardInput = {
   _version?: number | null;
 };
 
+export type CreateStateHistoryInput = {
+  id?: string | null;
+  type: string;
+  title: string;
+  state: string;
+  group?: string | null;
+  owner?: string | null;
+  createdAt?: string | null;
+  _version?: number | null;
+};
+
+export type ModelStateHistoryConditionInput = {
+  type?: ModelStringInput | null;
+  title?: ModelStringInput | null;
+  state?: ModelStringInput | null;
+  group?: ModelStringInput | null;
+  owner?: ModelStringInput | null;
+  createdAt?: ModelStringInput | null;
+  and?: Array<ModelStateHistoryConditionInput | null> | null;
+  or?: Array<ModelStateHistoryConditionInput | null> | null;
+  not?: ModelStateHistoryConditionInput | null;
+};
+
+export type StateHistory = {
+  __typename: "StateHistory";
+  id?: string;
+  type?: string;
+  title?: string;
+  state?: string;
+  group?: string | null;
+  owner?: string | null;
+  createdAt?: string | null;
+  _version?: number;
+  _deleted?: boolean | null;
+  _lastChangedAt?: number;
+  updatedAt?: string;
+};
+
+export type UpdateStateHistoryInput = {
+  id: string;
+  type?: string | null;
+  title?: string | null;
+  state?: string | null;
+  group?: string | null;
+  owner?: string | null;
+  createdAt?: string | null;
+  _version?: number | null;
+};
+
+export type DeleteStateHistoryInput = {
+  id: string;
+  _version?: number | null;
+};
+
 export type CreateUserSessionInput = {
   id?: string | null;
   fingerprint?: string | null;
@@ -496,6 +550,26 @@ export type ModelGroupDashboardConnection = {
   startedAt?: number | null;
 };
 
+export type ModelStateHistoryFilterInput = {
+  id?: ModelIDInput | null;
+  type?: ModelStringInput | null;
+  title?: ModelStringInput | null;
+  state?: ModelStringInput | null;
+  group?: ModelStringInput | null;
+  owner?: ModelStringInput | null;
+  createdAt?: ModelStringInput | null;
+  and?: Array<ModelStateHistoryFilterInput | null> | null;
+  or?: Array<ModelStateHistoryFilterInput | null> | null;
+  not?: ModelStateHistoryFilterInput | null;
+};
+
+export type ModelStateHistoryConnection = {
+  __typename: "ModelStateHistoryConnection";
+  items?: Array<StateHistory | null> | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
+};
+
 export type ModelUserSessionFilterInput = {
   id?: ModelIDInput | null;
   fingerprint?: ModelStringInput | null;
@@ -695,6 +769,51 @@ export type DeleteGroupDashboardMutation = {
   _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateStateHistoryMutation = {
+  __typename: "StateHistory";
+  id: string;
+  type: string;
+  title: string;
+  state: string;
+  group?: string | null;
+  owner?: string | null;
+  createdAt?: string | null;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  updatedAt: string;
+};
+
+export type UpdateStateHistoryMutation = {
+  __typename: "StateHistory";
+  id: string;
+  type: string;
+  title: string;
+  state: string;
+  group?: string | null;
+  owner?: string | null;
+  createdAt?: string | null;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  updatedAt: string;
+};
+
+export type DeleteStateHistoryMutation = {
+  __typename: "StateHistory";
+  id: string;
+  type: string;
+  title: string;
+  state: string;
+  group?: string | null;
+  owner?: string | null;
+  createdAt?: string | null;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
   updatedAt: string;
 };
 
@@ -1049,6 +1168,61 @@ export type SyncGroupDashboardsQuery = {
     _deleted?: boolean | null;
     _lastChangedAt: number;
     createdAt: string;
+    updatedAt: string;
+  } | null> | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
+};
+
+export type GetStateHistoryQuery = {
+  __typename: "StateHistory";
+  id: string;
+  type: string;
+  title: string;
+  state: string;
+  group?: string | null;
+  owner?: string | null;
+  createdAt?: string | null;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  updatedAt: string;
+};
+
+export type ListStateHistorysQuery = {
+  __typename: "ModelStateHistoryConnection";
+  items?: Array<{
+    __typename: "StateHistory";
+    id: string;
+    type: string;
+    title: string;
+    state: string;
+    group?: string | null;
+    owner?: string | null;
+    createdAt?: string | null;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
+    updatedAt: string;
+  } | null> | null;
+  nextToken?: string | null;
+  startedAt?: number | null;
+};
+
+export type SyncStateHistoriesQuery = {
+  __typename: "ModelStateHistoryConnection";
+  items?: Array<{
+    __typename: "StateHistory";
+    id: string;
+    type: string;
+    title: string;
+    state: string;
+    group?: string | null;
+    owner?: string | null;
+    createdAt?: string | null;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
     updatedAt: string;
   } | null> | null;
   nextToken?: string | null;
@@ -1429,6 +1603,51 @@ export type OnDeleteGroupDashboardSubscription = {
   _deleted?: boolean | null;
   _lastChangedAt: number;
   createdAt: string;
+  updatedAt: string;
+};
+
+export type OnCreateStateHistorySubscription = {
+  __typename: "StateHistory";
+  id: string;
+  type: string;
+  title: string;
+  state: string;
+  group?: string | null;
+  owner?: string | null;
+  createdAt?: string | null;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  updatedAt: string;
+};
+
+export type OnUpdateStateHistorySubscription = {
+  __typename: "StateHistory";
+  id: string;
+  type: string;
+  title: string;
+  state: string;
+  group?: string | null;
+  owner?: string | null;
+  createdAt?: string | null;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
+  updatedAt: string;
+};
+
+export type OnDeleteStateHistorySubscription = {
+  __typename: "StateHistory";
+  id: string;
+  type: string;
+  title: string;
+  state: string;
+  group?: string | null;
+  owner?: string | null;
+  createdAt?: string | null;
+  _version: number;
+  _deleted?: boolean | null;
+  _lastChangedAt: number;
   updatedAt: string;
 };
 
@@ -1906,6 +2125,99 @@ export class APIService {
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
     return <DeleteGroupDashboardMutation>response.data.deleteGroupDashboard;
+  }
+  async CreateStateHistory(
+    input: CreateStateHistoryInput,
+    condition?: ModelStateHistoryConditionInput
+  ): Promise<CreateStateHistoryMutation> {
+    const statement = `mutation CreateStateHistory($input: CreateStateHistoryInput!, $condition: ModelStateHistoryConditionInput) {
+        createStateHistory(input: $input, condition: $condition) {
+          __typename
+          id
+          type
+          title
+          state
+          group
+          owner
+          createdAt
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <CreateStateHistoryMutation>response.data.createStateHistory;
+  }
+  async UpdateStateHistory(
+    input: UpdateStateHistoryInput,
+    condition?: ModelStateHistoryConditionInput
+  ): Promise<UpdateStateHistoryMutation> {
+    const statement = `mutation UpdateStateHistory($input: UpdateStateHistoryInput!, $condition: ModelStateHistoryConditionInput) {
+        updateStateHistory(input: $input, condition: $condition) {
+          __typename
+          id
+          type
+          title
+          state
+          group
+          owner
+          createdAt
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <UpdateStateHistoryMutation>response.data.updateStateHistory;
+  }
+  async DeleteStateHistory(
+    input: DeleteStateHistoryInput,
+    condition?: ModelStateHistoryConditionInput
+  ): Promise<DeleteStateHistoryMutation> {
+    const statement = `mutation DeleteStateHistory($input: DeleteStateHistoryInput!, $condition: ModelStateHistoryConditionInput) {
+        deleteStateHistory(input: $input, condition: $condition) {
+          __typename
+          id
+          type
+          title
+          state
+          group
+          owner
+          createdAt
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      input
+    };
+    if (condition) {
+      gqlAPIServiceArguments.condition = condition;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <DeleteStateHistoryMutation>response.data.deleteStateHistory;
   }
   async CreateUserSession(
     input: CreateUserSessionInput,
@@ -2684,6 +2996,117 @@ export class APIService {
     )) as any;
     return <SyncGroupDashboardsQuery>response.data.syncGroupDashboards;
   }
+  async GetStateHistory(id: string): Promise<GetStateHistoryQuery> {
+    const statement = `query GetStateHistory($id: ID!) {
+        getStateHistory(id: $id) {
+          __typename
+          id
+          type
+          title
+          state
+          group
+          owner
+          createdAt
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {
+      id
+    };
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <GetStateHistoryQuery>response.data.getStateHistory;
+  }
+  async ListStateHistorys(
+    filter?: ModelStateHistoryFilterInput,
+    limit?: number,
+    nextToken?: string
+  ): Promise<ListStateHistorysQuery> {
+    const statement = `query ListStateHistorys($filter: ModelStateHistoryFilterInput, $limit: Int, $nextToken: String) {
+        listStateHistorys(filter: $filter, limit: $limit, nextToken: $nextToken) {
+          __typename
+          items {
+            __typename
+            id
+            type
+            title
+            state
+            group
+            owner
+            createdAt
+            _version
+            _deleted
+            _lastChangedAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {};
+    if (filter) {
+      gqlAPIServiceArguments.filter = filter;
+    }
+    if (limit) {
+      gqlAPIServiceArguments.limit = limit;
+    }
+    if (nextToken) {
+      gqlAPIServiceArguments.nextToken = nextToken;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <ListStateHistorysQuery>response.data.listStateHistorys;
+  }
+  async SyncStateHistories(
+    filter?: ModelStateHistoryFilterInput,
+    limit?: number,
+    nextToken?: string,
+    lastSync?: number
+  ): Promise<SyncStateHistoriesQuery> {
+    const statement = `query SyncStateHistories($filter: ModelStateHistoryFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
+        syncStateHistories(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
+          __typename
+          items {
+            __typename
+            id
+            type
+            title
+            state
+            group
+            owner
+            createdAt
+            _version
+            _deleted
+            _lastChangedAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+    const gqlAPIServiceArguments: any = {};
+    if (filter) {
+      gqlAPIServiceArguments.filter = filter;
+    }
+    if (limit) {
+      gqlAPIServiceArguments.limit = limit;
+    }
+    if (nextToken) {
+      gqlAPIServiceArguments.nextToken = nextToken;
+    }
+    if (lastSync) {
+      gqlAPIServiceArguments.lastSync = lastSync;
+    }
+    const response = (await API.graphql(
+      graphqlOperation(statement, gqlAPIServiceArguments)
+    )) as any;
+    return <SyncStateHistoriesQuery>response.data.syncStateHistories;
+  }
   async GetUserSession(id: string): Promise<GetUserSessionQuery> {
     const statement = `query GetUserSession($id: ID!) {
         getUserSession(id: $id) {
@@ -3428,6 +3851,75 @@ export class APIService {
       }`
     )
   ) as Observable<SubscriptionResponse<OnDeleteGroupDashboardSubscription>>;
+
+  OnCreateStateHistoryListener: Observable<
+    SubscriptionResponse<OnCreateStateHistorySubscription>
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnCreateStateHistory {
+        onCreateStateHistory {
+          __typename
+          id
+          type
+          title
+          state
+          group
+          owner
+          createdAt
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<SubscriptionResponse<OnCreateStateHistorySubscription>>;
+
+  OnUpdateStateHistoryListener: Observable<
+    SubscriptionResponse<OnUpdateStateHistorySubscription>
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnUpdateStateHistory {
+        onUpdateStateHistory {
+          __typename
+          id
+          type
+          title
+          state
+          group
+          owner
+          createdAt
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<SubscriptionResponse<OnUpdateStateHistorySubscription>>;
+
+  OnDeleteStateHistoryListener: Observable<
+    SubscriptionResponse<OnDeleteStateHistorySubscription>
+  > = API.graphql(
+    graphqlOperation(
+      `subscription OnDeleteStateHistory {
+        onDeleteStateHistory {
+          __typename
+          id
+          type
+          title
+          state
+          group
+          owner
+          createdAt
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
+        }
+      }`
+    )
+  ) as Observable<SubscriptionResponse<OnDeleteStateHistorySubscription>>;
 
   OnCreateUserSessionListener: Observable<
     SubscriptionResponse<OnCreateUserSessionSubscription>

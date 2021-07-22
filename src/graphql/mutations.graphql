@@ -134,6 +134,60 @@ mutation DeleteGroupDashboard(
     updatedAt
   }
 }
+mutation CreateStateHistory(
+  $input: CreateStateHistoryInput!
+  $condition: ModelStateHistoryConditionInput
+) {
+  createStateHistory(input: $input, condition: $condition) {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+mutation UpdateStateHistory(
+  $input: UpdateStateHistoryInput!
+  $condition: ModelStateHistoryConditionInput
+) {
+  updateStateHistory(input: $input, condition: $condition) {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+mutation DeleteStateHistory(
+  $input: DeleteStateHistoryInput!
+  $condition: ModelStateHistoryConditionInput
+) {
+  deleteStateHistory(input: $input, condition: $condition) {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
 mutation CreateUserSession(
   $input: CreateUserSessionInput!
   $condition: ModelUserSessionConditionInput

@@ -46,6 +46,10 @@ export class TimeseriesCollectionModel {
         this.graphTypeChanged.emit(value);
     }
 
+    public get size(): number {
+        return this.map.size;
+    }
+
     public addTimeseries(series: TimeseriesModel) {
         this.seriesAdded.emit(this._addSeries(series));
     }
@@ -100,6 +104,11 @@ export class TimeseriesCollectionModel {
         this.yAxisChanged.emit();
     }
 
+    public clear() {
+        this.map.clear();
+        this.cleared.emit();
+    }
+
     private _addSeries(series: TimeseriesModel) {
         const data = this.zeroFill(series.data);
         for (const item of data) {
@@ -127,11 +136,6 @@ export class TimeseriesCollectionModel {
         const result = new TimeseriesModel(series.label, data, series.id);
         this.map.set(series.id, result);
         return result;
-    }
-
-    public clear() {
-        this.map.clear();
-        this.cleared.emit();
     }
 }
 

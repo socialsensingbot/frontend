@@ -128,9 +128,11 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
         }
     }
 
-    public clear() {
-        this.clearTextSearch();
-        this.clearRegions();
+    public clearForm() {
+
+        this.searchControl.setValue(this.data.textSearch);
+        this.regions = [];
+
     }
 
     private updateRegions() {
