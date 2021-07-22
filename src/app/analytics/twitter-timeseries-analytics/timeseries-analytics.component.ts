@@ -122,17 +122,23 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             if (params.id) {
                 this.graphId = params.id;
                 const savedGraph = await this.history.get(params.id);
-                this.title = savedGraph.title;
-                this.state = JSON.parse(savedGraph.state);
-                this.resetNewQuery();
-                this.seriesCollection.clear();
-                for (const query of this.state.queries) {
-                    await this.updateGraph(query, true);
+                if (savedGraph !== null) {
+                    this.title = savedGraph.title;
+                    this.state = JSON.parse(savedGraph.state);
+                    this.resetNewQuery();
+                    this.seriesCollection.clear();
+                    for (const query of this.state.queries) {
+                        await this.updateGraph(query, true);
+                    }
+                    this.exec.uiActivity();
+                    this.ready = true;
+                } else {
+                    this.navigateToRoot();
                 }
-                this.exec.uiActivity();
-                this.ready = true;
             } else {
                 await this.clear();
+                this.graphId = null;
+                this.title = "";
                 this.ready = true;
             }
         });
@@ -254,6 +260,16 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.seriesCollection.graphType = type;
     }
 
+    public async deleteSavedQuery(id: string) {
+        await this.history.delete(id);
+        if (id === this.graphId) {
+            this.navigateToRoot();
+        }
+    }
+
+    private navigateToRoot() {
+        this._router.navigate(["/analytics/time"], {queryParamsHandling: "merge"});
+    }
 
     protected async executeQuery(query: TimeseriesRESTQuery): Promise<any[]> {
         if (this._storeQueryInURL) {
