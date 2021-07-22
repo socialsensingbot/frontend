@@ -210,8 +210,10 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 }
             });
         } else {
+            this.updating= true;
             await this.history.update(this.graphId, this.title, this.state);
             this.updateSavedQueries();
+            this.updating= false;
         }
     }
 
@@ -220,6 +222,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     public async addQuery(newQueryForm: TimeseriesAnalyticsFormComponent) {
         const query: TimeseriesRESTQuery = JSON.parse(JSON.stringify(this.newQuery));
+        newQueryForm.clearForm();
         if (!this.state.queries) {
             this.state.queries = [];
         }
@@ -227,7 +230,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.state.queries.unshift(query);
 
         await this.updateGraph(query, true);
-        newQueryForm.clearForm();
         this.resetNewQuery();
     }
 
