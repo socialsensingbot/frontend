@@ -83,6 +83,7 @@
 
 </div>
 
+<div class="app-saved-queries-surround">
 <h3>Saved Queries</h3>
 <mat-nav-list>
     <a mat-list-item [routerLink]="'/analytics/time/'+savedQuery.id" *ngFor="let savedQuery of
@@ -96,6 +97,7 @@
 
 
 </mat-nav-list>
+</div>
 <mat-progress-bar *ngIf="updating && ready" class="app-analytics-progress" mode="indeterminate"
                   [color]="pref.combined.toolbarColor"></mat-progress-bar>
 <!--<mat-spinner *ngIf="!ready" class="app-analytics-spinner"></mat-spinner>-->
