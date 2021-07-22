@@ -12,6 +12,7 @@ import {StateHistory} from "../../../models";
 import {SaveGraphDialogComponent} from "./save-graph-dialog/save-graph-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {TimeseriesAnalyticsFormComponent} from "./timeseries-analytics-form.component";
+import {NotificationService} from "src/app/services/notification.service";
 
 const log = new Logger("twitter-timeseries");
 
@@ -81,6 +82,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     private graphId: string;
 
     constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
+                public notify: NotificationService,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
                 public exec: UIExecutionService, public history: StateHistoryService, public dialog: MatDialog) {
         this.resetNewQuery();
@@ -210,10 +212,11 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 }
             });
         } else {
-            this.updating= true;
+            this.updating = true;
             await this.history.update(this.graphId, this.title, this.state);
             this.updateSavedQueries();
-            this.updating= false;
+            this.notify.show("Saved graph '" + this.title + "'", "Great!", 4);
+            this.updating = false;
         }
     }
 
