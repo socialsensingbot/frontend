@@ -1,5 +1,5 @@
 import {NgModule} from "@angular/core";
-import {Routes, RouterModule} from "@angular/router";
+import {RouterModule, Routes} from "@angular/router";
 import {AuthComponent} from "./auth/auth.component";
 import {MapComponent} from "./map/map.component";
 import {SignInComponent} from "./auth/sign-in/sign-in.component";
@@ -9,41 +9,50 @@ import {AuthGuard} from "./auth/auth.guard";
 import {UnauthGuard} from "./auth/unauth.guard";
 import {HomeComponent} from "./home/home.component";
 import {NewPassComponent} from "./auth/new-pass/new-pass.component";
-import {DashboardComponent} from "./dashboard/dashboard.component";
+import {DashboardComponent} from "./analytics/dashboard/dashboard.component";
+import {AnalyticsComponent} from "./analytics/analytics.component";
+import {TimeseriesAnalyticsComponent} from "./analytics/twitter-timeseries-analytics/timeseries-analytics.component";
 
 const routes: Routes = [
-  {
-    path: "auth", component: AuthComponent, children: [
-      {
-        path:        "signin",
-        component:   SignInComponent,
-        canActivate: [UnauthGuard]
-      },
-      {
-        path:      "newpass",
-        component: NewPassComponent
-      },
-      {
-        path:        "signup",
-        component:   SignUpComponent,
-        canActivate: [UnauthGuard]
-      },
-      {
-        path:        "confirm",
-        component:   ConfirmCodeComponent,
-        canActivate: [UnauthGuard]
-      }
-    ]
-  },
-  {path: "map", component: MapComponent, canActivate: [AuthGuard]},
-  {path: "dashboard", component: DashboardComponent, canActivate: [AuthGuard]},
-  {path: "map/:dataset", component: MapComponent, canActivate: [AuthGuard]},
-  {path: "", component: HomeComponent, canActivate: [AuthGuard]}
+    {
+        path: "auth", component: AuthComponent, children: [
+            {
+                path:        "signin",
+                component:   SignInComponent,
+                canActivate: [UnauthGuard]
+            },
+            {
+                path:      "newpass",
+                component: NewPassComponent
+            },
+            {
+                path:        "signup",
+                component:   SignUpComponent,
+                canActivate: [UnauthGuard]
+            },
+            {
+                path:        "confirm",
+                component:   ConfirmCodeComponent,
+                canActivate: [UnauthGuard]
+            }
+        ]
+    },
+    {path: "map", component: MapComponent, canActivate: [AuthGuard]},
+    {
+        path:     "analytics", component: AnalyticsComponent, canActivate: [AuthGuard],
+        children: [
+            {path: "time", component: TimeseriesAnalyticsComponent, canActivate: [AuthGuard]},
+            {path: "time/:id", component: TimeseriesAnalyticsComponent, canActivate: [AuthGuard]}
+        ]
+    },
+    {path: "dashboard", component: DashboardComponent, canActivate: [AuthGuard]},
+    {path: "map/:dataset", component: MapComponent, canActivate: [AuthGuard]},
+    {path: "", component: HomeComponent, canActivate: [AuthGuard]}
 ];
 
 @NgModule({
-            imports: [RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' })],
-            exports: [RouterModule]
+              imports: [RouterModule.forRoot(routes, {relativeLinkResolution: "legacy"})],
+              exports: [RouterModule]
           })
 export class AppRoutingModule {
 }

@@ -26,7 +26,7 @@ export const environment = {
     name:             "production",
     lamdaEnvironment: "prod",
     demo:             false,
-    version:          "2.0",
+    version: "2.1",
     // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
     timezone:             "UTC",
     locale:               "en-GB",
@@ -65,7 +65,7 @@ export const environment = {
         ]
     },
 
-    features: ["impact", "source", "map"],
+    features: ["impact", "source", "map", "dashboard", "analytics"],
     mostRecentDateIsNow:                 true,
     continuousUpdateThresholdInMinutes:  90,
     animateOnTimeSliderChange:           false,

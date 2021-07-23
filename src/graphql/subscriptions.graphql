@@ -107,6 +107,51 @@ subscription OnDeleteGroupDashboard {
     updatedAt
   }
 }
+subscription OnCreateSavedGraph {
+  onCreateSavedGraph {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+subscription OnUpdateSavedGraph {
+  onUpdateSavedGraph {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+subscription OnDeleteSavedGraph {
+  onDeleteSavedGraph {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
 subscription OnCreateUserSession {
   onCreateUserSession {
     id
