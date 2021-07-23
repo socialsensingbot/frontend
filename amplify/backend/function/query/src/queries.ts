@@ -28,13 +28,13 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
             return {
                 sql: `select *
                       from (SELECT count(*)    as count,
-                                   source_date as date,
+                                   DATE(source_date) as date,
                                    'all'       as region,
                                    ${exceedance}
                             FROM live_text
                             WHERE source = ?
                               and hazard = ? ${fullText}
-                            group by source_date
+                            group by DATE(source_date)
                                 WINDOW w AS (ORDER BY COUNT (source_date) desc)
                             order by source_date) x
                       where date between ? and ? `,
@@ -50,7 +50,7 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
             return {
                 sql: `select *
                       from (SELECT count(source_date) as count,
-                                   source_date        as date,
+                                   DATE(source_date)        as date,
                                    parent             as region,
                                    ${exceedance}
                             FROM live_text live,
@@ -60,7 +60,7 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                               and live.region_1 = rrg.region
                               and rrg.parent in (?)
                                 ${fullText}
-                            group by source_date, rrg.parent
+                            group by DATE(source_date), rrg.parent
                                 WINDOW w AS (ORDER BY COUNT (source_date) desc)
                             order by source_date) x
                       where date between ? and ?`,
