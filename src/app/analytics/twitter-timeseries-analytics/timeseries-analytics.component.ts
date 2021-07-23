@@ -16,11 +16,9 @@ import {SavedGraphService} from "../../services/saved-graph.service";
 import {SavedGraph} from "../../../models";
 import {SaveGraphDialogComponent} from "./save-graph-dialog/save-graph-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
-import {TimeseriesAnalyticsFormComponent} from "./timeseries-analytics-form.component";
 import {NotificationService} from "src/app/services/notification.service";
 
 const log = new Logger("timeseries-ac");
-
 
 
 @Component({
@@ -51,7 +49,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     public showForm = true;
     public connect = false;
     public activity: boolean;
-    public newQuery: TimeseriesRESTQuery;
     public seriesCollection: TimeseriesCollectionModel;
     public appToolbarExpanded = false;
     public savedGraphs: SavedGraph[] = [];
@@ -66,7 +63,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 public notify: NotificationService,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
                 public exec: UIExecutionService, public saves: SavedGraphService, public dialog: MatDialog) {
-        this.resetNewQuery();
         this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
         this.updateSavedGraphs();
         this.ready = true;
@@ -84,7 +80,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this._type = value;
     }
 
-    private _state: TimeseriesAnalyticsComponentState = {eoc: "count", lob: "line", queries: []};
+    private _state: TimeseriesAnalyticsComponentState = this.defaultState();
 
     public get state(): any {
         return this._state;
@@ -107,7 +103,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 if (savedGraph !== null) {
                     this.title = savedGraph.title;
                     this.state = JSON.parse(savedGraph.state);
-                    this.resetNewQuery();
+                    console.log("Loaded saved graph with state ", this.state);
                     this.seriesCollection.clear();
                     for (const query of this.state.queries) {
                         await this.updateGraph(query, true);
@@ -132,7 +128,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.changed.emit(this.state);
     }
 
-
     public ngOnDestroy(): void {
         window.clearInterval(this._interval);
     }
@@ -140,36 +135,33 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     public async updateGraph(q: TimeseriesRESTQuery, force) {
         // Immutable copy
         const query = JSON.parse(JSON.stringify(q));
+        this.updating = true;
         await this.exec.queue("update-timeseries-graph", null,
                               async () => {
                                   log.debug("Graph update from query ", query);
                                   this._changed = true;
                                   this.emitChange();
                                   if (query.textSearch.length > 0 || query.regions.length > 0 || force) {
-                                      const queryResult = await this.executeQuery(query);
-                                      if (queryResult && queryResult.length > 0) {
-                                          this.seriesCollection.updateTimeseries(
-                                              new TimeseriesModel(this.toLabel(query), queryResult,
-                                                                  query.__series_id));
-                                      } else {
-                                          log.warn(queryResult);
-                                      }
+                                      await this._updateGraphInternal(query);
                                   } else {
                                       log.debug("Skipped time series update, force=" + force);
                                   }
+                                  this.updating = false;
+
                               }, query.__series_id + "-" + force, false, true, true, "inactive"
         );
 
     }
 
+    async saveGraph(duplicate= false): Promise<void> {
+        if (!this.graphId || duplicate) {
 
-    async saveGraph(): Promise<void> {
-        if (!this.graphId) {
+            const title = duplicate ? "" : (this.title || "");
             const dialogData = {
                 dialogTitle: "Save Timeseries Graph",
                 state:       this.state,
                 type:        this._savedGraphType,
-                title:       this.title || ""
+                title
             };
             const dialogRef = this.dialog.open(SaveGraphDialogComponent, {
                 width: "500px",
@@ -180,10 +172,11 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 if (result !== null) {
                     this.savedGraphs = await this.saves.listByOwner();
 
-                    const savedGraph = await this.saves.create(dialogData.type, dialogData.title, dialogData.state);
+                    const savedGraph = await this.saves.create(dialogData.type, dialogData.title, this.state);
                     this.graphId = savedGraph.id;
                     this.title = dialogData.title;
                     this.updateSavedGraphs();
+                    this._router.navigate(["/analytics/time/" + this.graphId], {queryParamsHandling: "preserve"});
 
                 }
             });
@@ -199,17 +192,18 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     public ngOnChanges(changes: SimpleChanges): void {
     }
 
-    public async addQuery(newQueryForm: TimeseriesAnalyticsFormComponent) {
-        const query: TimeseriesRESTQuery = JSON.parse(JSON.stringify(this.newQuery));
-        newQueryForm.clearForm();
+    public async addQuery(query: TimeseriesRESTQuery) {
+        await this._updateGraphInternal(query);
+
         if (!this.state.queries) {
             this.state.queries = [];
         }
-        log.info("Adding query ", query);
-        this.state.queries.unshift(query);
 
-        await this.updateGraph(query, true);
-        this.resetNewQuery();
+        const newQuery = this.newQuery();
+        log.info("Adding query ", newQuery);
+        this.state.queries.unshift(newQuery);
+
+        await this.updateGraph(newQuery, false);
     }
 
     public refreshGraph() {
@@ -231,10 +225,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     public async clear() {
-        this.resetNewQuery();
-        this.state.queries = [];
+        this.state.queries = [this.newQuery()];
+        this._updateGraphInternal(this.state.queries[0]);
         this.seriesCollection.clear();
-        await this.updateGraph(this.newQuery, true);
         this.exec.uiActivity();
     }
 
@@ -283,13 +276,23 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         return from;
     }
 
-    private navigateToRoot() {
-        this._router.navigate(["/analytics/time"], {queryParamsHandling: "merge"});
+    private defaultState(): TimeseriesAnalyticsComponentState {
+        return {eoc: "count", lob: "line", queries: [this.newQuery()]};
     }
 
-    private resetNewQuery() {
+    private async _updateGraphInternal(query) {
+        const queryResult = await this.executeQuery(query);
+        if (queryResult && queryResult.length > 0) {
+            this.seriesCollection.updateTimeseries(
+                new TimeseriesModel(this.toLabel(query), queryResult,
+                                    query.__series_id));
+        } else {
+            log.warn(queryResult);
+        }
+    }
 
-        this.newQuery = {
+    private newQuery(): TimeseriesRESTQuery {
+        return {
             __series_id: uuidv4(),
             regions:     [],
             textSearch:  "",
@@ -298,6 +301,11 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             dateStep:    7 * 24 * 60 * 60 * 1000
         };
     }
+
+    private navigateToRoot() {
+        this._router.navigate(["/analytics/time"], {queryParamsHandling: "merge"});
+    }
+
 
     private toLabel(query: TimeseriesRESTQuery): string {
         if (query.textSearch.length === 0 && query.regions.length === 0) {

@@ -14,7 +14,7 @@ export interface TimeseriesRESTQuery {
     location?: string;
     regions: string[];
     textSearch?: string;
-    __series_id: string;
+    __series_id?: string;
 }
 
 
