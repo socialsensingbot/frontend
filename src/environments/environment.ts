@@ -72,6 +72,7 @@ export const environment = {
         ]
     },
     features: ["impact", "source", "map", "dashboard", "analytics"],
+    // features: ["impact", "source", "map", "dashboard", "analytics"],
 
     showErrors:                          false,
     showLoadingMessages:                 true,

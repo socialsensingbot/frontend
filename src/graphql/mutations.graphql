@@ -134,11 +134,11 @@ mutation DeleteGroupDashboard(
     updatedAt
   }
 }
-mutation CreateStateHistory(
-  $input: CreateStateHistoryInput!
-  $condition: ModelStateHistoryConditionInput
+mutation CreateSavedGraph(
+  $input: CreateSavedGraphInput!
+  $condition: ModelSavedGraphConditionInput
 ) {
-  createStateHistory(input: $input, condition: $condition) {
+  createSavedGraph(input: $input, condition: $condition) {
     id
     type
     title
@@ -152,11 +152,11 @@ mutation CreateStateHistory(
     updatedAt
   }
 }
-mutation UpdateStateHistory(
-  $input: UpdateStateHistoryInput!
-  $condition: ModelStateHistoryConditionInput
+mutation UpdateSavedGraph(
+  $input: UpdateSavedGraphInput!
+  $condition: ModelSavedGraphConditionInput
 ) {
-  updateStateHistory(input: $input, condition: $condition) {
+  updateSavedGraph(input: $input, condition: $condition) {
     id
     type
     title
@@ -170,11 +170,11 @@ mutation UpdateStateHistory(
     updatedAt
   }
 }
-mutation DeleteStateHistory(
-  $input: DeleteStateHistoryInput!
-  $condition: ModelStateHistoryConditionInput
+mutation DeleteSavedGraph(
+  $input: DeleteSavedGraphInput!
+  $condition: ModelSavedGraphConditionInput
 ) {
-  deleteStateHistory(input: $input, condition: $condition) {
+  deleteSavedGraph(input: $input, condition: $condition) {
     id
     type
     title

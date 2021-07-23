@@ -27,7 +27,7 @@ const options = {
     host:     "database.cxsscwdzsrae.eu-west-2.rds.amazonaws.com",
     user:     "admin",
     password: "4dRV2eh9t68Akfj",
-    database: "historical",
+    database: "socialsensing",
     charset:  "utf8mb4",
     // multipleStatements: true,
     // connectTimeout: 15000,

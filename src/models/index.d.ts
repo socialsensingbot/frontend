@@ -28,7 +28,7 @@ export declare class GroupDashboard {
   static copyOf(source: GroupDashboard, mutator: (draft: MutableModel<GroupDashboard>) => MutableModel<GroupDashboard> | void): GroupDashboard;
 }
 
-export declare class StateHistory {
+export declare class SavedGraph {
   readonly id: string;
   readonly type: string;
   readonly title: string;
@@ -36,8 +36,8 @@ export declare class StateHistory {
   readonly group?: string;
   readonly owner?: string;
   readonly createdAt?: string;
-  constructor(init: ModelInit<StateHistory>);
-  static copyOf(source: StateHistory, mutator: (draft: MutableModel<StateHistory>) => MutableModel<StateHistory> | void): StateHistory;
+  constructor(init: ModelInit<SavedGraph>);
+  static copyOf(source: SavedGraph, mutator: (draft: MutableModel<SavedGraph>) => MutableModel<SavedGraph> | void): SavedGraph;
 }
 
 export declare class UserSession {
