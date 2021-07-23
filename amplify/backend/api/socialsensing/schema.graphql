@@ -27,7 +27,7 @@ type GroupDashboard
   dashboard: String!
 }
 
-type StateHistory
+type SavedGraph
 @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
 @auth(rules: [{allow: private}]) {
 id: ID!

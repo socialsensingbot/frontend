@@ -156,8 +156,8 @@ export const schema = {
                 }
             ]
         },
-        "StateHistory": {
-            "name": "StateHistory",
+        "SavedGraph": {
+            "name": "SavedGraph",
             "fields": {
                 "id": {
                     "name": "id",
@@ -210,7 +210,7 @@ export const schema = {
                 }
             },
             "syncable": true,
-            "pluralName": "StateHistories",
+            "pluralName": "SavedGraphs",
             "attributes": [
                 {
                     "type": "model",
@@ -613,5 +613,5 @@ export const schema = {
     },
     "enums": {},
     "nonModels": {},
-    "version": "573233aabc6515ff6cc13fabb1adc94c"
+    "version": "4124e32fdededbb2f35b280699712cef"
 };

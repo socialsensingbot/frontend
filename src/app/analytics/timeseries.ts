@@ -4,6 +4,20 @@ import {v4 as uuidv4} from "uuid";
 
 const log = new Logger("timeseries");
 
+export type TimeseriesAnalyticsComponentState = { eoc: "count" | "exceedance", lob: "line" | "bar", queries: TimeseriesRESTQuery[] };
+
+
+export interface TimeseriesRESTQuery {
+    dateStep?: number;
+    to?: number;
+    from?: number;
+    location?: string;
+    regions: string[];
+    textSearch?: string;
+    __series_id: string;
+}
+
+
 export class TimeseriesModel {
 
     constructor(public label: string, public data: any[], public id = uuidv4()) {

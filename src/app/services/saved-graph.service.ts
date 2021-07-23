@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {Logger} from "@aws-amplify/core";
 import {NotificationService} from "./notification.service";
 import {DataStore} from "@aws-amplify/datastore";
-import {StateHistory} from "../../models";
+import {SavedGraph} from "../../models";
 import {PreferenceService} from "../pref/preference.service";
 
 const log = new Logger("state-history-service");
@@ -10,8 +10,8 @@ const log = new Logger("state-history-service");
 @Injectable({
                 providedIn: "root"
             })
-export class StateHistoryService {
-
+export class SavedGraphService {
+ 
 
     constructor(private _notify: NotificationService, private _prefs: PreferenceService) {
 
@@ -24,8 +24,8 @@ export class StateHistoryService {
     }
 
     public async create(type: string, title: string, state: any, forOwner = true,
-                        forGroup = false): Promise<StateHistory> {
-        return await DataStore.save(new StateHistory({
+                        forGroup = false): Promise<SavedGraph> {
+        return await DataStore.save(new SavedGraph({
                                                          type,
                                                          title,
                                                          state: JSON.stringify(state),
@@ -34,17 +34,17 @@ export class StateHistoryService {
                                                      }));
     }
 
-    public async update(id: string, title: string, state: any): Promise<StateHistory> {
-        const stateHistory = await this.get(id);
-        return await DataStore.save(StateHistory.copyOf(stateHistory, m => {
+    public async update(id: string, title: string, state: any): Promise<SavedGraph> {
+        const savedGraph = await this.get(id);
+        return await DataStore.save(SavedGraph.copyOf(savedGraph, m => {
             m.title = title;
             m.state = JSON.stringify(state);
         }));
     }
 
 
-    public async get(id: string): Promise<StateHistory|null> {
-        const results = await DataStore.query(StateHistory, q => q.id("eq", id));
+    public async get(id: string): Promise<SavedGraph|null> {
+        const results = await DataStore.query(SavedGraph, q => q.id("eq", id));
         if (results.length === 0) {
            return null;
         } else {
@@ -53,8 +53,8 @@ export class StateHistoryService {
         }
     }
 
-    public async delete(id: string): Promise<StateHistory> {
-        const results = await DataStore.delete(StateHistory, q => q.id("eq", id));
+    public async delete(id: string): Promise<SavedGraph> {
+        const results = await DataStore.delete(SavedGraph, q => q.id("eq", id));
         if (results.length === 0) {
             throw Error("No such state history " + id);
         } else {
@@ -62,13 +62,13 @@ export class StateHistoryService {
         }
     }
 
-    public async listByOwner(): Promise<StateHistory[]> {
+    public async listByOwner(): Promise<SavedGraph[]> {
         const username = await this._prefs.username;
-        return await DataStore.query(StateHistory, q => q.owner("eq", username));
+        return await DataStore.query(SavedGraph, q => q.owner("eq", username));
     }
 
-    public async listByGroup(): Promise<StateHistory[]> {
-        return await DataStore.query(StateHistory, q => q.group("eq", this._groups[0]));
+    public async listByGroup(): Promise<SavedGraph[]> {
+        return await DataStore.query(SavedGraph, q => q.group("eq", this._groups[0]));
     }
 
 

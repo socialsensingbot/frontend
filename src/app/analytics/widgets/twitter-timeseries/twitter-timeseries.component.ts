@@ -73,7 +73,7 @@ export class TwitterTimeseriesComponent extends StandardGraphComponent implement
 
     constructor(metadata: MetadataService, zone: NgZone, router: Router, route: ActivatedRoute,
                 _api: RESTDataAPIService, public dialog: MatDialog) {
-        super(metadata, zone, router, route, _api, "count_by_date_for_regions_and_fulltext", false);
+        super(metadata, zone, router, route, _api, "time", false);
     }
 
     private _type = "line";

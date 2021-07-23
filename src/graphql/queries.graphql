@@ -173,8 +173,8 @@ query SyncGroupDashboards(
     startedAt
   }
 }
-query GetStateHistory($id: ID!) {
-  getStateHistory(id: $id) {
+query GetSavedGraph($id: ID!) {
+  getSavedGraph(id: $id) {
     id
     type
     title
@@ -188,12 +188,12 @@ query GetStateHistory($id: ID!) {
     updatedAt
   }
 }
-query ListStateHistorys(
-  $filter: ModelStateHistoryFilterInput
+query ListSavedGraphs(
+  $filter: ModelSavedGraphFilterInput
   $limit: Int
   $nextToken: String
 ) {
-  listStateHistorys(filter: $filter, limit: $limit, nextToken: $nextToken) {
+  listSavedGraphs(filter: $filter, limit: $limit, nextToken: $nextToken) {
     items {
       id
       type
@@ -211,13 +211,13 @@ query ListStateHistorys(
     startedAt
   }
 }
-query SyncStateHistories(
-  $filter: ModelStateHistoryFilterInput
+query SyncSavedGraphs(
+  $filter: ModelSavedGraphFilterInput
   $limit: Int
   $nextToken: String
   $lastSync: AWSTimestamp
 ) {
-  syncStateHistories(
+  syncSavedGraphs(
     filter: $filter
     limit: $limit
     nextToken: $nextToken

@@ -4,29 +4,24 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {RESTDataAPIService} from "../../api/rest-api.service";
 import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../pref/preference.service";
-import {TimeseriesCollectionModel, TimeseriesModel} from "../timeseries";
+import {
+    TimeseriesAnalyticsComponentState,
+    TimeseriesCollectionModel,
+    TimeseriesModel,
+    TimeseriesRESTQuery
+} from "../timeseries";
 import {v4 as uuidv4} from "uuid";
 import {UIExecutionService} from "../../services/uiexecution.service";
-import {StateHistoryService} from "../../services/state-history.service";
-import {StateHistory} from "../../../models";
+import {SavedGraphService} from "../../services/saved-graph.service";
+import {SavedGraph} from "../../../models";
 import {SaveGraphDialogComponent} from "./save-graph-dialog/save-graph-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {TimeseriesAnalyticsFormComponent} from "./timeseries-analytics-form.component";
 import {NotificationService} from "src/app/services/notification.service";
 
-const log = new Logger("twitter-timeseries");
+const log = new Logger("timeseries-ac");
 
-export interface TimeseriesRESTQuery {
-    dateStep?: number;
-    to?: number;
-    from?: number;
-    location?: string;
-    regions: string[];
-    textSearch?: string;
-    __series_id: string;
-}
 
-type TimeseriesAnalyticsComponentState = { eoc: "count" | "exceedance", lob: "line" | "bar", queries: TimeseriesRESTQuery[] };
 
 @Component({
                selector:    "app-timeseries-analytics",
@@ -45,49 +40,35 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     public xField = "date";
     public yField = "count";
     public animated = false;
-    stateHistoryType = "timeseries-graph";
-
-    ready: boolean;
-
-    updating = false;
-    noData: boolean;
-    error: boolean;
+    public ready: boolean;
+    public updating = false;
+    public noData: boolean;
+    public error: boolean;
     public scrollBar = true;
-
     public changed = new EventEmitter();
     public removable = true;
     public mappingColumns: string[] = [];
     public showForm = true;
     public connect = false;
-    //     });
     public activity: boolean;
     public newQuery: TimeseriesRESTQuery;
     public seriesCollection: TimeseriesCollectionModel;
-    //         this.updateGraph(this.state);
     public appToolbarExpanded = false;
-    //         log.debug("The dialog was closed");
-    public savedQueries: StateHistory[] = [];
+    public savedGraphs: SavedGraph[] = [];
     public title = "";
-    protected _interval: number;
-    protected _changed: boolean;
-    protected _storeQueryInURL: boolean;
-    /*
-                                [xField]="xField"
-                            [yField]="state.eoc || 'count'"
-                            [yLabel]="state.eoc === 'exceedance' ? 'Days Exceeded' : 'Count'"
-                            [seriesList]="(state.regions && state.regions.length) > 0 ?  state.regions : ['all']"
-
-     */
-    private interval: number;
-    private graphId: string;
+    public graphId: string;
+    private _savedGraphType = "timeseries-graph";
+    private _interval: number;
+    private _changed: boolean;
+    private _storeQueryInURL: boolean;
 
     constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
                 public notify: NotificationService,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
-                public exec: UIExecutionService, public history: StateHistoryService, public dialog: MatDialog) {
+                public exec: UIExecutionService, public saves: SavedGraphService, public dialog: MatDialog) {
         this.resetNewQuery();
         this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
-        this.updateSavedQueries();
+        this.updateSavedGraphs();
         this.ready = true;
 
     }
@@ -101,7 +82,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     @Input()
     public set type(value: string) {
         this._type = value;
-        this.markChanged();
     }
 
     private _state: TimeseriesAnalyticsComponentState = {eoc: "count", lob: "line", queries: []};
@@ -113,18 +93,17 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     @Input()
     public set state(value: any) {
         this._state = value;
-        this.markChanged();
     }
 
-    public updateSavedQueries() {
-        this.history.listByOwner().then(i => this.savedQueries = i);
+    public updateSavedGraphs() {
+        this.saves.listByOwner().then(i => this.savedGraphs = i);
     }
 
     async ngOnInit() {
         this._route.params.subscribe(async params => {
             if (params.id) {
                 this.graphId = params.id;
-                const savedGraph = await this.history.get(params.id);
+                const savedGraph = await this.saves.get(params.id);
                 if (savedGraph !== null) {
                     this.title = savedGraph.title;
                     this.state = JSON.parse(savedGraph.state);
@@ -153,9 +132,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.changed.emit(this.state);
     }
 
-    public markChanged() {
-        this._changed = true;
-    }
 
     public ngOnDestroy(): void {
         window.clearInterval(this._interval);
@@ -192,7 +168,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             const dialogData = {
                 dialogTitle: "Save Timeseries Graph",
                 state:       this.state,
-                type:        this.stateHistoryType,
+                type:        this._savedGraphType,
                 title:       this.title || ""
             };
             const dialogRef = this.dialog.open(SaveGraphDialogComponent, {
@@ -202,19 +178,19 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
             dialogRef.afterClosed().subscribe(async result => {
                 if (result !== null) {
-                    this.savedQueries = await this.history.listByOwner();
+                    this.savedGraphs = await this.saves.listByOwner();
 
-                    const savedGraph = await this.history.create(dialogData.type, dialogData.title, dialogData.state);
+                    const savedGraph = await this.saves.create(dialogData.type, dialogData.title, dialogData.state);
                     this.graphId = savedGraph.id;
                     this.title = dialogData.title;
-                    this.updateSavedQueries();
+                    this.updateSavedGraphs();
 
                 }
             });
         } else {
             this.updating = true;
-            await this.history.update(this.graphId, this.title, this.state);
-            this.updateSavedQueries();
+            await this.saves.update(this.graphId, this.title, this.state);
+            this.updateSavedGraphs();
             this.notify.show("Saved graph '" + this.title + "'", "Great!", 4);
             this.updating = false;
         }
@@ -267,8 +243,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.seriesCollection.graphType = type;
     }
 
-    public async deleteSavedQuery(id: string) {
-        await this.history.delete(id);
+    public async deleteSavedGraph(id: string) {
+        await this.saves.delete(id);
         if (id === this.graphId) {
             this.navigateToRoot();
         }
@@ -283,7 +259,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         try {
             const serverResults = await this._api.callAPI("query", {
                 ...query,
-                name:   "count_by_date_for_regions_and_fulltext",
+                name:   "time",
                 source: this.source,
                 hazard: this.hazard
             });
