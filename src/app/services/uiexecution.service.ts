@@ -76,8 +76,11 @@ export class UIExecutionService {
         await Auth.currentAuthenticatedUser();
         this._uiInactiveTimer = timer(0, 100).subscribe(() => {
             if (this.lastUIActivity < Date.now() - inactivityInMilliseconds) {
+                // console.log("inactive");
                 this.uistate = "inactive";
                 this.uiStateChange.emit(this.uistate);
+            } else {
+                // console.log("active");
             }
         });
         this._executionTimer = timer(0, 100).subscribe(() => {
