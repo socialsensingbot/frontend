@@ -46,7 +46,7 @@ import { AnalyticsComponent } from "./analytics/analytics.component";
 import {TimeseriesAnalyticsComponent} from "./analytics/time/timeseries-analytics.component";
 import {TimeseriesAnalyticsFormComponent} from "./analytics/time/timeseries-analytics-form.component";
 import {TimeSeriesMultipleQueryChartComponent} from "./analytics/time/timeseries-multi-chart/time-series-multiple-query-chart.component";
-import { SaveGraphDialogComponent } from "./analytics/time/save-graph-dialog/save-graph-dialog.component";
+import { NameGraphDialogComponent } from "./analytics/time/name-graph-dialog/name-graph-dialog.component";
 import {TimeseriesWidgetComponent} from "./analytics/widgets/twitter-timeseries/timeseries-widget.component";
 
 @NgModule({
@@ -82,7 +82,7 @@ import {TimeseriesWidgetComponent} from "./analytics/widgets/twitter-timeseries/
                   TimeseriesAnalyticsComponent,
                   TimeseriesAnalyticsFormComponent,
                   TimeSeriesMultipleQueryChartComponent,
-                  SaveGraphDialogComponent,
+                  NameGraphDialogComponent,
                   TimeseriesWidgetComponent
               ],
               imports:         [

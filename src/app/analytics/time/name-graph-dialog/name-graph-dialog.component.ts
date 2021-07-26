@@ -2,11 +2,11 @@ import {Component, Inject, OnInit} from "@angular/core";
 import {MAT_DIALOG_DATA} from "@angular/material/dialog";
 
 @Component({
-  selector: "app-save-graph-dialog",
-  templateUrl: "./save-graph-dialog.component.html",
-  styleUrls: ["./save-graph-dialog.component.scss"]
+  selector:    "app-name-graph-dialog",
+  templateUrl: "./name-graph-dialog.component.html",
+  styleUrls:   ["./name-graph-dialog.component.scss"]
 })
-export class SaveGraphDialogComponent implements OnInit {
+export class NameGraphDialogComponent implements OnInit {
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any) { }
 

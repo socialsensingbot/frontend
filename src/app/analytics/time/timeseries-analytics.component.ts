@@ -14,7 +14,7 @@ import {v4 as uuidv4} from "uuid";
 import {UIExecutionService} from "../../services/uiexecution.service";
 import {SavedGraphService} from "../../services/saved-graph.service";
 import {SavedGraph} from "../../../models";
-import {SaveGraphDialogComponent} from "./save-graph-dialog/save-graph-dialog.component";
+import {NameGraphDialogComponent} from "./name-graph-dialog/name-graph-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {NotificationService} from "src/app/services/notification.service";
 import {toLabel} from "../graph";
@@ -175,11 +175,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
       const title = duplicate ? "" : (this.title || "");
       const dialogData = {
         dialogTitle: "Save Timeseries Graph",
-        state:       this.state,
-        type:        this._savedGraphType,
         title
       };
-      const dialogRef = this.dialog.open(SaveGraphDialogComponent, {
+      const dialogRef = this.dialog.open(NameGraphDialogComponent, {
         width: "500px",
         data:  dialogData
       });
@@ -188,7 +186,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         if (result !== null) {
           this.savedGraphs = await this.saves.listByOwner();
 
-          const savedGraph = await this.saves.create(dialogData.type, dialogData.title, this.state);
+          const savedGraph = await this.saves.create( this._savedGraphType, dialogData.title, this.state);
           this.graphId = savedGraph.id;
           this.title = dialogData.title;
           this.updateSavedGraphs();
@@ -268,8 +266,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     try {
       const payload = {
         ...query,
-        from: nowRoundedToHour() - (365.24 * dayInMillis),
-        to:   nowRoundedToHour(),
+        from:   nowRoundedToHour() - (365.24 * dayInMillis),
+        to:     nowRoundedToHour(),
         name:   "time",
         source: this.source,
         hazard: this.hazard
@@ -330,9 +328,25 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
   }
 
   public async addToDashboard() {
-    await this.dash.addCard("timeseries", this.title,
-                            1, 1, this.state);
-    this.showDashboard();
+
+    const dialogData = {
+      dialogTitle: "Add to Dashboard",
+      title:       (this.title || "")
+    };
+    const dialogRef = this.dialog.open(NameGraphDialogComponent, {
+      width: "500px",
+      data:  dialogData
+    });
+
+    dialogRef.afterClosed().subscribe(async result => {
+      if (result !== null) {
+        await this.dash.addCard("timeseries", dialogData.title,
+                                1, 1, this.state);
+        this.showDashboard();
+      }
+    });
+
+
   }
 }
 
