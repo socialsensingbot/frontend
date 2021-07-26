@@ -31,8 +31,7 @@
             </button>
           <div class="app-toolbar-separator"></div>
           <button mat-stroked-button *ngIf="this.pref.featureSupported('dashboard')"
-                                         (click)="this.dash.addCard('timeseries', this.title,
-            1,1,state);showDashboard()">Add to
+                                         (click)="addToDashboard()">Add to
           Dashboard
         </button>
             <div class="app-toolbar-separator"></div>

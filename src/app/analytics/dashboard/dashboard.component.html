@@ -33,7 +33,7 @@
           <mat-card-content class="dashboard-card-content">
             <ng-container [ngSwitch]="card.type">
               <ng-container *ngSwitchCase="'timeseries'">
-                <app-widget-timeseries [height]="card.rows*400"
+                <app-widget-timeseries [height]="card.rows*400" [id]="card.id"
                                        [state]="card.state"></app-widget-timeseries>
               </ng-container>
               <ng-container *ngSwitchCase="'blank'"><h3>This card is intentionally blank</h3>

@@ -1,6 +1,7 @@
 import {EventEmitter} from "@angular/core";
 import {Logger} from "@aws-amplify/core";
 import {v4 as uuidv4} from "uuid";
+import {dayInMillis} from "../common";
 
 const log = new Logger("timeseries");
 
@@ -54,7 +55,7 @@ export class TimeseriesCollectionModel {
               public rollingAvg: boolean = false,
               public avgLength = 14,
               public zeroFillMissingDates = true,
-              public dateSpacing = 24 * 60 * 60 * 1000,
+              public dateSpacing = dayInMillis,
               private _graphType: GraphType = "line") {
 
 

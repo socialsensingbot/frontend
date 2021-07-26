@@ -19,6 +19,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {NotificationService} from "src/app/services/notification.service";
 import {toLabel} from "../graph";
 import {DashboardService} from "../../pref/dashboard.service";
+import {dayInMillis, nowRoundedToHour} from "../../common";
 
 const log = new Logger("timeseries-ac");
 
@@ -265,12 +266,16 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     this.updating = true;
     try {
-      const serverResults = await this._api.callAPI("query", {
+      const payload = {
         ...query,
+        from: nowRoundedToHour() - (365.24 * dayInMillis),
+        to:   nowRoundedToHour(),
         name:   "time",
         source: this.source,
         hazard: this.hazard
-      });
+      };
+      delete payload.__series_id;
+      const serverResults = await this._api.callAPI("query", payload);
       this.error = false;
       return this.queryTransform(serverResults);
     } catch (e) {
@@ -309,9 +314,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
       __series_id: uuidv4(),
       regions:     [],
       textSearch:  "",
-      from:        new Date().getTime() - (365.24 * 24 * 60 * 60 * 1000),
-      to:          new Date().getTime(),
-      dateStep:    7 * 24 * 60 * 60 * 1000
+      from:        nowRoundedToHour() - (365.24 * dayInMillis),
+      to:          nowRoundedToHour(),
+      dateStep:    7 * dayInMillis
     };
   }
 
@@ -322,6 +327,12 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
   public showDashboard() {
     this._router.navigate(["/dashboard"]);
+  }
+
+  public async addToDashboard() {
+    await this.dash.addCard("timeseries", this.title,
+                            1, 1, this.state);
+    this.showDashboard();
   }
 }
 

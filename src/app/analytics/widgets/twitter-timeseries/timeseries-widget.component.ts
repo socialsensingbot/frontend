@@ -13,6 +13,7 @@ import {
 import {UIExecutionService} from "../../../services/uiexecution.service";
 import {NotificationService} from "src/app/services/notification.service";
 import {toLabel} from "../../graph";
+import {dayInMillis, nowRoundedToHour} from "../../../common";
 
 const log = new Logger("timeseries-ac");
 
@@ -23,6 +24,8 @@ const log = new Logger("timeseries-ac");
              styleUrls:   ["./timeseries-widget.component.scss"]
            })
 export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
+  @Input()
+  private id: string;
 
   @Input()
   public set state(value: TimeseriesAnalyticsComponentState) {
@@ -74,37 +77,41 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
 
   public async updateGraph(q: TimeseriesRESTQuery, force) {
     // Immutable copy
-    const query = JSON.parse(JSON.stringify(q));
-    this.updating = true;
+    const query: TimeseriesRESTQuery = JSON.parse(JSON.stringify(q));
+
     await this.exec.queue("update-timeseries-graph", null,
                           async () => {
-                            log.debug("Graph update from query ", query);
+                            try {
+                              log.debug("Graph update from query ", query);
 
-                            this.emitChange();
-                            if (query.textSearch.length > 0 || query.regions.length > 0 || force) {
-                              const queryResult = await this.executeQuery(query);
-                              if (queryResult && queryResult.length > 0) {
-                                this.seriesCollection.updateTimeseries(
-                                  new TimeseriesModel(toLabel(query), queryResult,
-                                                      query.__series_id));
+                              this.emitChange();
+                              if (query.textSearch.length > 0 || query.regions.length > 0 || force) {
+                                const queryResult = await this.executeQuery(query);
+                                if (queryResult && queryResult.length > 0) {
+                                  this.seriesCollection.updateTimeseries(
+                                    new TimeseriesModel(toLabel(query), queryResult,
+                                                        query.__series_id));
+                                } else {
+                                  log.warn(queryResult);
+                                }
                               } else {
-                                log.warn(queryResult);
+                                log.debug("Skipped time series update, force=" + force);
                               }
-                            } else {
-                              log.debug("Skipped time series update, force=" + force);
+                            } finally {
+                              this.updating = false;
                             }
-                            this.updating = false;
 
-                          }, query.__series_id + "-" + force, false, true, true, "inactive"
+                          }, this.id + "-"+ query.__series_id + "-" + force, false, true, true, "inactive"
     );
 
   }
 
 
-  public ngOnChanges(changes: SimpleChanges): void {
-    if (this._state && !this.ready) {
+  public async ngOnChanges(changes: SimpleChanges) {
+    if (this._state !== null) {
       this.title = this._state.title || "";
       console.log("Loaded saved graph with state ", this._state);
+      this.updating = true;
       this.seriesCollection = new TimeseriesCollectionModel("date",
                                                             this._state.eoc,
                                                             this._state.eoc === "exceedance" ? "Exceedance" : "Count",
@@ -112,11 +119,11 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
                                                             this._state.rollingAverage || false,
                                                             this._state.avgLength || 14,
                                                             true,
-                                                            this._state.dateSpacing || 24 * 60 * 60 * 1000,
+                                                            this._state.dateSpacing || dayInMillis,
                                                             this._state.lob
       );
       for (const query of this._state.queries) {
-        this.updateGraph(query, true);
+        await this.updateGraph(query, true);
       }
       this.ready = true;
     }
@@ -126,14 +133,16 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
   protected async executeQuery(query: TimeseriesRESTQuery): Promise<any[]> {
     this.updating = true;
     try {
-      const serverResults = await this._api.callAPI("query", {
-        from: new Date().getTime() - (365.24 * 24 * 60 * 60 * 1000),
-        to:   new Date().getTime(),
+      const payload = {
         ...query,
+        from:   nowRoundedToHour() - (365.24 * dayInMillis),
+        to:     nowRoundedToHour(),
         name:   "time",
         source: this.source,
         hazard: this.hazard
-      });
+      };
+      delete payload.__series_id;
+      const serverResults = await this._api.callAPI("query", payload);
       this.error = false;
       return this.queryTransform(serverResults);
     } catch (e) {
