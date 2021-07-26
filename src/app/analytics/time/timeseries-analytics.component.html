@@ -29,6 +29,12 @@
                     routerLink="/analytics/time"
                    >New
             </button>
+          <div class="app-toolbar-separator"></div>
+          <button mat-stroked-button *ngIf="this.pref.featureSupported('dashboard')"
+                                         (click)="this.dash.addCard('timeseries', this.title,
+            1,1,state);showDashboard()">Add to
+          Dashboard
+        </button>
             <div class="app-toolbar-separator"></div>
             <button mat-icon-button aria-label="Expand or shrink toolbar">
                 <mat-icon matTooltip="Expand toolbar" *ngIf="!appToolbarExpanded"
@@ -55,7 +61,6 @@
     <app-timeseries-multi-query-chart
             [updating]="updating"
             [error]="error"
-            [noData]="noData"
             [seriesCollection]="seriesCollection"
             [height]="600"
             [connect]="connect"

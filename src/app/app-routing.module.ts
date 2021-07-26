@@ -11,7 +11,7 @@ import {HomeComponent} from "./home/home.component";
 import {NewPassComponent} from "./auth/new-pass/new-pass.component";
 import {DashboardComponent} from "./analytics/dashboard/dashboard.component";
 import {AnalyticsComponent} from "./analytics/analytics.component";
-import {TimeseriesAnalyticsComponent} from "./analytics/twitter-timeseries-analytics/timeseries-analytics.component";
+import {TimeseriesAnalyticsComponent} from "./analytics/time/timeseries-analytics.component";
 
 const routes: Routes = [
     {
