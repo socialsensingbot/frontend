@@ -14,6 +14,7 @@ import {UIExecutionService} from "../../../services/uiexecution.service";
 import {NotificationService} from "src/app/services/notification.service";
 import {toLabel} from "../../graph";
 import {dayInMillis, nowRoundedToHour} from "../../../common";
+import {v4 as uuidv4} from "uuid";
 
 const log = new Logger("timeseries-ac");
 
@@ -29,8 +30,30 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input()
   public set state(value: TimeseriesAnalyticsComponentState) {
-    this._state = value;
-
+    if (JSON.stringify(value) !== JSON.stringify(this._state)) {
+      this._state = value;
+      this.title = this._state.title || "";
+      console.log("Loaded saved graph with state ", this._state);
+      this.updating = true;
+      if (!this.seriesCollection) {
+        this.seriesCollection = new TimeseriesCollectionModel("date",
+                                                              this._state.eoc,
+                                                              this._state.eoc === "exceedance" ? "Exceedance" : "Count",
+                                                              "Date",
+                                                              this._state.rollingAverage || false,
+                                                              this._state.avgLength || 14,
+                                                              true,
+                                                              this._state.dateSpacing || dayInMillis,
+                                                              this._state.lob || "line"
+        );
+      } else {
+        this.seriesCollection.clear();
+      }
+      for (const query of this._state.queries) {
+        this.updateGraph(query, true);
+      }
+      this.ready = true;
+    }
   }
 
   @Input()
@@ -43,9 +66,6 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
   public error: boolean;
   public scrollBar = true;
   public changed = new EventEmitter();
-  public removable = true;
-  public mappingColumns: string[] = [];
-  public showForm = true;
   public connect = false;
   public activity: boolean;
   public seriesCollection: TimeseriesCollectionModel;
@@ -101,32 +121,15 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
                               this.updating = false;
                             }
 
-                          }, this.id + "-"+ query.__series_id + "-" + force, false, true, true, "inactive"
+                          }, this.id + "-" + (query.__series_id || uuidv4()) + "-" + force, false, true, true,
+                          "inactive"
     );
 
   }
 
 
   public async ngOnChanges(changes: SimpleChanges) {
-    if (this._state !== null) {
-      this.title = this._state.title || "";
-      console.log("Loaded saved graph with state ", this._state);
-      this.updating = true;
-      this.seriesCollection = new TimeseriesCollectionModel("date",
-                                                            this._state.eoc,
-                                                            this._state.eoc === "exceedance" ? "Exceedance" : "Count",
-                                                            "Date",
-                                                            this._state.rollingAverage || false,
-                                                            this._state.avgLength || 14,
-                                                            true,
-                                                            this._state.dateSpacing || dayInMillis,
-                                                            this._state.lob
-      );
-      for (const query of this._state.queries) {
-        await this.updateGraph(query, true);
-      }
-      this.ready = true;
-    }
+
   }
 
 

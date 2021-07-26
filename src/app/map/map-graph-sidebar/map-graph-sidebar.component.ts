@@ -6,6 +6,7 @@ import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {EOC, TimeseriesAnalyticsComponentState} from "../../analytics/timeseries";
 import {Router} from "@angular/router";
+import {v4 as uuidv4} from "uuid";
 
 const log = new Logger("map-graph-sidebar");
 
@@ -41,8 +42,8 @@ export class MapGraphSidebarComponent implements OnInit {
 
   public graphStateForRegions(eoc: EOC): TimeseriesAnalyticsComponentState {
     const state: TimeseriesAnalyticsComponentState = {queries: [], eoc, lob: "line"};
-    for (const region of this.regionList) {
-      state.queries.push({textSearch: "", regions: [region]});
+    for (const region of this.selection.regionNames()) {
+      state.queries.push({textSearch: "", regions: [region], __series_id: region});
     }
     return state;
   }

@@ -1,55 +1,51 @@
 <mat-toolbar class="app-timeseries-toolbar">
-    <ng-container *ngIf="ready">
-        <mat-toolbar-row>
-            <mat-button-toggle-group name="eoc" class="eoc"
-                                     aria-label="Exceedance or Count" [(ngModel)]="state.eoc"
-                                     (valueChange)="eocChanged()">
-                <mat-button-toggle value="exceedance">Exceedance</mat-button-toggle>
-                <mat-button-toggle value="count">Count</mat-button-toggle>
-            </mat-button-toggle-group>
+  <ng-container *ngIf="ready">
+    <mat-toolbar-row>
+      <mat-button-toggle-group name="eoc" class="eoc"
+                               aria-label="Exceedance or Count" [(ngModel)]="state.eoc"
+                               (valueChange)="eocChanged()">
+        <mat-button-toggle value="exceedance">Exceedance</mat-button-toggle>
+        <mat-button-toggle value="count">Count</mat-button-toggle>
+      </mat-button-toggle-group>
 
-            <div class="app-toolbar-separator"></div>
-            <mat-button-toggle-group name="lob" class="lob" (valueChange)="graphTypeChanged(state.lob)"
-                                     aria-label="Line or Bar" [(ngModel)]="state.lob">
-                <mat-button-toggle value="line">Line</mat-button-toggle>
-                <mat-button-toggle value="bar">Bar</mat-button-toggle>
-            </mat-button-toggle-group>
-            <div class="app-toolbar-expanding-separator"></div>
-            <button mat-stroked-button color="primary"
-                    (click)="saveGraph();">Save
-            </button>
-            <ng-container *ngIf="this.graphId" >
-                <div class="app-toolbar-separator"></div>
-                <button mat-stroked-button
-                        (click)="saveGraph(true);">Duplicate
-                </button>
-            </ng-container>
-            <div class="app-toolbar-separator"></div>
-            <button mat-stroked-button color="warn"
-                    routerLink="/analytics/time"
-                   >New
-            </button>
-          <div class="app-toolbar-separator"></div>
-          <button mat-stroked-button *ngIf="this.pref.featureSupported('dashboard')"
-                                         (click)="addToDashboard()">Add to
-          Dashboard
+      <div class="app-toolbar-separator"></div>
+      <mat-button-toggle-group name="lob" class="lob" (valueChange)="graphTypeChanged(state.lob)"
+                               aria-label="Line or Bar" [(ngModel)]="state.lob">
+        <mat-button-toggle value="line">Line</mat-button-toggle>
+        <mat-button-toggle value="bar">Bar</mat-button-toggle>
+      </mat-button-toggle-group>
+      <div class="app-toolbar-expanding-separator"></div>
+      <button mat-stroked-button color="primary" (click)="saveGraph();">Save</button>
+      <div class="app-toolbar-separator"></div>
+      <button mat-stroked-button color="warn" routerLink="/analytics/time">New</button>
+      <ng-container *ngIf="this.graphId">
+        <div class="app-toolbar-separator"></div>
+        <button mat-stroked-button
+                (click)="saveGraph(true);">Duplicate
         </button>
-            <div class="app-toolbar-separator"></div>
-            <button mat-icon-button aria-label="Expand or shrink toolbar">
-                <mat-icon matTooltip="Expand toolbar" *ngIf="!appToolbarExpanded"
-                          (click)="appToolbarExpanded=true">arrow_drop_down
-                </mat-icon>
-                <mat-icon matTooltip="Shrink toolbar" *ngIf="appToolbarExpanded"
-                          (click)="appToolbarExpanded=false">arrow_drop_up
-                </mat-icon>
-            </button>
-        </mat-toolbar-row>
-        <mat-toolbar-row *ngIf="appToolbarExpanded">
+      </ng-container>
 
-            <div class="app-toolbar-separator"></div>
+      <div class="app-toolbar-separator"></div>
+      <button mat-stroked-button *ngIf="this.pref.featureSupported('dashboard')"
+              (click)="addToDashboard()">Add to
+        Dashboard
+      </button>
+      <div class="app-toolbar-separator"></div>
+      <button mat-icon-button aria-label="Expand or shrink toolbar">
+        <mat-icon matTooltip="Expand toolbar" *ngIf="!appToolbarExpanded"
+                  (click)="appToolbarExpanded=true">arrow_drop_down
+        </mat-icon>
+        <mat-icon matTooltip="Shrink toolbar" *ngIf="appToolbarExpanded"
+                  (click)="appToolbarExpanded=false">arrow_drop_up
+        </mat-icon>
+      </button>
+    </mat-toolbar-row>
+    <mat-toolbar-row *ngIf="appToolbarExpanded">
 
-        </mat-toolbar-row>
-    </ng-container>
+      <div class="app-toolbar-separator"></div>
+
+    </mat-toolbar-row>
+  </ng-container>
 </mat-toolbar>
 
 <div class="app-timeseries-graph-surround">
@@ -57,50 +53,50 @@
     <h2>{{title}}</h2>
     <br/>
         </span>
-    <app-timeseries-multi-query-chart
-            [updating]="updating"
-            [error]="error"
-            [seriesCollection]="seriesCollection"
-            [height]="600"
-            [connect]="connect"
-            [animated]="animated"
-            [scrollBar]="scrollBar"
-            class="twitter-timeseries-chart">
+  <app-timeseries-multi-query-chart
+    [updating]="updating"
+    [error]="error"
+    [seriesCollection]="seriesCollection"
+    [height]="600"
+    [connect]="connect"
+    [animated]="animated"
+    [scrollBar]="scrollBar"
+    class="twitter-timeseries-chart">
 
-    </app-timeseries-multi-query-chart>
+  </app-timeseries-multi-query-chart>
 </div>
 
 <div class="app-query-builder-surround">
 
-    <mat-card *ngFor="let query of state.queries; index as i">
-        <mat-card-content>
-            <app-timeseries-analytics-form #form (changed)="updateGraph(query, i > 0);exec.uiActivity();"
-                                           [data]="query"></app-timeseries-analytics-form>
-        </mat-card-content>
-        <mat-card-actions>
-            <button *ngIf="i === 0" mat-raised-button color="primary" (click)="addQuery(query);">Add
-            </button>
-            <button *ngIf="i > 0"mat-raised-button color="warn" (click)="removeQuery(query)">Remove</button>
-        </mat-card-actions>
-    </mat-card>
+  <mat-card *ngFor="let query of state.queries; index as i">
+    <mat-card-content>
+      <app-timeseries-analytics-form #form (changed)="updateGraph(query, i > 0);exec.uiActivity();"
+                                     [data]="query"></app-timeseries-analytics-form>
+    </mat-card-content>
+    <mat-card-actions>
+      <button *ngIf="i === 0" mat-raised-button color="primary" (click)="addQuery(query);">Add
+      </button>
+      <button *ngIf="i > 0" mat-raised-button color="warn" (click)="removeQuery(query)">Remove</button>
+    </mat-card-actions>
+  </mat-card>
 
 </div>
 
 <div class="app-saved-queries-surround">
-<h3>Saved Queries</h3>
-<mat-nav-list>
+  <h3>Saved Queries</h3>
+  <mat-nav-list>
     <a mat-list-item [routerLink]="'/analytics/time/'+savedGraph.id" *ngFor="let savedGraph of
     savedGraphs"> {{
-        savedGraph.title }}
-<!--        - {{savedGraph.state}}-->
-        <button mat-button mat-icon-button matSuffix
-                (click)="deleteSavedGraph(savedGraph.id); updateSavedGraphs()">
-            <mat-icon>close</mat-icon>
-        </button>
+      savedGraph.title }}
+      <!--        - {{savedGraph.state}}-->
+      <button mat-button mat-icon-button matSuffix
+              (click)="deleteSavedGraph(savedGraph.id); updateSavedGraphs()">
+        <mat-icon>close</mat-icon>
+      </button>
     </a>
 
 
-</mat-nav-list>
+  </mat-nav-list>
 </div>
 <mat-progress-bar *ngIf="updating && ready" class="app-analytics-progress" mode="indeterminate"
                   [color]="pref.combined.toolbarColor"></mat-progress-bar>
