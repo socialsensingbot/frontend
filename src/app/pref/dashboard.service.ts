@@ -155,6 +155,7 @@ export class DashboardService {
 
   public async addCard(type: string, title: string, cols: number, rows: number, state: any,
                        variant?: string) {
+    await this.waitUntilReady();
     this.dashboard.boards[0].pages[0].cards.push({
                                                    title,
                                                    cols,
