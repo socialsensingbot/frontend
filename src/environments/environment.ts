@@ -19,15 +19,15 @@ const defaultDashboard: Dashboard = {
         pages:      [{
             title: "First Page",
             cards: [
-                {
-                    title: "Count By Text and Region",
-                    cols:  2,
-                    rows:  2,
-                    type:  "timeseries-text-and-region",
-                    state: {},
-                    id:    uuidv4()
-                },
-                {title: "Total Count", cols: 1, rows: 1, type: "timeseries-total", state: {}, id: uuidv4()},
+                // {
+                //     title: "Count By Text and Region",
+                //     cols:  2,
+                //     rows:  2,
+                //     type:  "timeseries-text-and-region",
+                //     state: {},
+                //     id:    uuidv4()
+                // },
+                // {title: "Total Count", cols: 1, rows: 1, type: "timeseries-total", state: {}, id: uuidv4()},
                 // {title: "Exceedence by Date", cols: 1, rows: 1, type: "timeseries-exceed", state: {}},
                 // {title: "Exceedence by Region", cols: 2, rows: 1, type: "timeseries-exceed-region", state: {}},
             ]
@@ -71,6 +71,7 @@ export const environment = {
             {title: "Coastal", value: "coastal", color: "#F4511E"}
         ]
     },
+    // features: ["impact", "source", "map"],
     features: ["impact", "source", "map", "dashboard", "analytics"],
 
     showErrors:                          false,

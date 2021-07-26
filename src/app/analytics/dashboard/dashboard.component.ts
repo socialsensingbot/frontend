@@ -25,8 +25,8 @@ export class DashboardComponent implements OnInit {
     // );
     public readonly = false;
     public types = [{
-        title: "Text and Region Count",
-        type:  "timeseries-text-and-region",
+        title: "Timeseries",
+        type:  "timeseries",
         rows:  2,
         cols:  2,
         state: {textSearch: "", regions: []}

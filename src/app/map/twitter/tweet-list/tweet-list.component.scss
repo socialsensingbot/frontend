@@ -26,8 +26,8 @@
     align-items: flex-start;
     //border: 1px solid blue;
     position: relative;
-    max-width: $tweetWidth + $tweetMargin;
-    min-width: $tweetWidth + $tweetMargin;
+    max-width: $drawer-width - 64px;
+    min-width: $drawer-width - 64px;
     //background-color: #eee;
     transform: scaleY(1);
     transform-origin: top;
@@ -48,7 +48,7 @@
 
     .app-tweet-item-menu {
       position: absolute;
-      left: ($tweetWidth + $tweetMargin +14px);
+      left: ($drawer-width - 48px);
       top: 0px;
       z-index: 10;
       opacity: 0.0;
@@ -131,9 +131,9 @@
           padding-right: 16px;
           padding-left: 16px;
           padding-bottom: 16px;
-          max-width: $tweetWidth - 16px;
-          min-width: $tweetWidth - 16px;
-          width: $tweetWidth - 16px;
+          max-width: $drawer-width - 64px;
+          min-width: $drawer-width - 64px;
+          width: $drawer-width - 64px;
           background: white !important;
         }
 
@@ -155,12 +155,13 @@
     opacity: 1.0;
     margin: 16px;
     display: block;
-    max-width: $tweetWidth;
-    width: 100%;
+    min-width: $drawer-width - 64px;
+    max-width: $drawer-width - 64px;
+    width: $drawer-width - 64px;
   }
 
   .app-tweet-item-card-surround {
-    margin: $tweetMargin;
+    margin: 16px;
     width: 100%;
 
     mat-spinner {
@@ -226,7 +227,7 @@
 
 .app-tweet-load-spinner {
   position: absolute;
-  left: $tweetAndMargin/2;
+  left: ($drawer-width)/2 - 16px;
   top: 32px;
   opacity: 0.2;
   z-index: 10;

@@ -107,8 +107,8 @@ subscription OnDeleteGroupDashboard {
     updatedAt
   }
 }
-subscription OnCreateStateHistory {
-  onCreateStateHistory {
+subscription OnCreateSavedGraph {
+  onCreateSavedGraph {
     id
     type
     title
@@ -122,8 +122,8 @@ subscription OnCreateStateHistory {
     updatedAt
   }
 }
-subscription OnUpdateStateHistory {
-  onUpdateStateHistory {
+subscription OnUpdateSavedGraph {
+  onUpdateSavedGraph {
     id
     type
     title
@@ -137,8 +137,8 @@ subscription OnUpdateStateHistory {
     updatedAt
   }
 }
-subscription OnDeleteStateHistory {
-  onDeleteStateHistory {
+subscription OnDeleteSavedGraph {
+  onDeleteSavedGraph {
     id
     type
     title

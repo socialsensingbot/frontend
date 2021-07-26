@@ -163,7 +163,7 @@ export type DeleteGroupDashboardInput = {
   _version?: number | null;
 };
 
-export type CreateStateHistoryInput = {
+export type CreateSavedGraphInput = {
   id?: string | null;
   type: string;
   title: string;
@@ -174,20 +174,20 @@ export type CreateStateHistoryInput = {
   _version?: number | null;
 };
 
-export type ModelStateHistoryConditionInput = {
+export type ModelSavedGraphConditionInput = {
   type?: ModelStringInput | null;
   title?: ModelStringInput | null;
   state?: ModelStringInput | null;
   group?: ModelStringInput | null;
   owner?: ModelStringInput | null;
   createdAt?: ModelStringInput | null;
-  and?: Array<ModelStateHistoryConditionInput | null> | null;
-  or?: Array<ModelStateHistoryConditionInput | null> | null;
-  not?: ModelStateHistoryConditionInput | null;
+  and?: Array<ModelSavedGraphConditionInput | null> | null;
+  or?: Array<ModelSavedGraphConditionInput | null> | null;
+  not?: ModelSavedGraphConditionInput | null;
 };
 
-export type StateHistory = {
-  __typename: "StateHistory";
+export type SavedGraph = {
+  __typename: "SavedGraph";
   id?: string;
   type?: string;
   title?: string;
@@ -201,7 +201,7 @@ export type StateHistory = {
   updatedAt?: string;
 };
 
-export type UpdateStateHistoryInput = {
+export type UpdateSavedGraphInput = {
   id: string;
   type?: string | null;
   title?: string | null;
@@ -212,7 +212,7 @@ export type UpdateStateHistoryInput = {
   _version?: number | null;
 };
 
-export type DeleteStateHistoryInput = {
+export type DeleteSavedGraphInput = {
   id: string;
   _version?: number | null;
 };
@@ -550,7 +550,7 @@ export type ModelGroupDashboardConnection = {
   startedAt?: number | null;
 };
 
-export type ModelStateHistoryFilterInput = {
+export type ModelSavedGraphFilterInput = {
   id?: ModelIDInput | null;
   type?: ModelStringInput | null;
   title?: ModelStringInput | null;
@@ -558,14 +558,14 @@ export type ModelStateHistoryFilterInput = {
   group?: ModelStringInput | null;
   owner?: ModelStringInput | null;
   createdAt?: ModelStringInput | null;
-  and?: Array<ModelStateHistoryFilterInput | null> | null;
-  or?: Array<ModelStateHistoryFilterInput | null> | null;
-  not?: ModelStateHistoryFilterInput | null;
+  and?: Array<ModelSavedGraphFilterInput | null> | null;
+  or?: Array<ModelSavedGraphFilterInput | null> | null;
+  not?: ModelSavedGraphFilterInput | null;
 };
 
-export type ModelStateHistoryConnection = {
-  __typename: "ModelStateHistoryConnection";
-  items?: Array<StateHistory | null> | null;
+export type ModelSavedGraphConnection = {
+  __typename: "ModelSavedGraphConnection";
+  items?: Array<SavedGraph | null> | null;
   nextToken?: string | null;
   startedAt?: number | null;
 };
@@ -772,8 +772,8 @@ export type DeleteGroupDashboardMutation = {
   updatedAt: string;
 };
 
-export type CreateStateHistoryMutation = {
-  __typename: "StateHistory";
+export type CreateSavedGraphMutation = {
+  __typename: "SavedGraph";
   id: string;
   type: string;
   title: string;
@@ -787,8 +787,8 @@ export type CreateStateHistoryMutation = {
   updatedAt: string;
 };
 
-export type UpdateStateHistoryMutation = {
-  __typename: "StateHistory";
+export type UpdateSavedGraphMutation = {
+  __typename: "SavedGraph";
   id: string;
   type: string;
   title: string;
@@ -802,8 +802,8 @@ export type UpdateStateHistoryMutation = {
   updatedAt: string;
 };
 
-export type DeleteStateHistoryMutation = {
-  __typename: "StateHistory";
+export type DeleteSavedGraphMutation = {
+  __typename: "SavedGraph";
   id: string;
   type: string;
   title: string;
@@ -1174,8 +1174,8 @@ export type SyncGroupDashboardsQuery = {
   startedAt?: number | null;
 };
 
-export type GetStateHistoryQuery = {
-  __typename: "StateHistory";
+export type GetSavedGraphQuery = {
+  __typename: "SavedGraph";
   id: string;
   type: string;
   title: string;
@@ -1189,10 +1189,10 @@ export type GetStateHistoryQuery = {
   updatedAt: string;
 };
 
-export type ListStateHistorysQuery = {
-  __typename: "ModelStateHistoryConnection";
+export type ListSavedGraphsQuery = {
+  __typename: "ModelSavedGraphConnection";
   items?: Array<{
-    __typename: "StateHistory";
+    __typename: "SavedGraph";
     id: string;
     type: string;
     title: string;
@@ -1209,10 +1209,10 @@ export type ListStateHistorysQuery = {
   startedAt?: number | null;
 };
 
-export type SyncStateHistoriesQuery = {
-  __typename: "ModelStateHistoryConnection";
+export type SyncSavedGraphsQuery = {
+  __typename: "ModelSavedGraphConnection";
   items?: Array<{
-    __typename: "StateHistory";
+    __typename: "SavedGraph";
     id: string;
     type: string;
     title: string;
@@ -1606,8 +1606,8 @@ export type OnDeleteGroupDashboardSubscription = {
   updatedAt: string;
 };
 
-export type OnCreateStateHistorySubscription = {
-  __typename: "StateHistory";
+export type OnCreateSavedGraphSubscription = {
+  __typename: "SavedGraph";
   id: string;
   type: string;
   title: string;
@@ -1621,8 +1621,8 @@ export type OnCreateStateHistorySubscription = {
   updatedAt: string;
 };
 
-export type OnUpdateStateHistorySubscription = {
-  __typename: "StateHistory";
+export type OnUpdateSavedGraphSubscription = {
+  __typename: "SavedGraph";
   id: string;
   type: string;
   title: string;
@@ -1636,8 +1636,8 @@ export type OnUpdateStateHistorySubscription = {
   updatedAt: string;
 };
 
-export type OnDeleteStateHistorySubscription = {
-  __typename: "StateHistory";
+export type OnDeleteSavedGraphSubscription = {
+  __typename: "SavedGraph";
   id: string;
   type: string;
   title: string;
@@ -2126,12 +2126,12 @@ export class APIService {
     )) as any;
     return <DeleteGroupDashboardMutation>response.data.deleteGroupDashboard;
   }
-  async CreateStateHistory(
-    input: CreateStateHistoryInput,
-    condition?: ModelStateHistoryConditionInput
-  ): Promise<CreateStateHistoryMutation> {
-    const statement = `mutation CreateStateHistory($input: CreateStateHistoryInput!, $condition: ModelStateHistoryConditionInput) {
-        createStateHistory(input: $input, condition: $condition) {
+  async CreateSavedGraph(
+    input: CreateSavedGraphInput,
+    condition?: ModelSavedGraphConditionInput
+  ): Promise<CreateSavedGraphMutation> {
+    const statement = `mutation CreateSavedGraph($input: CreateSavedGraphInput!, $condition: ModelSavedGraphConditionInput) {
+        createSavedGraph(input: $input, condition: $condition) {
           __typename
           id
           type
@@ -2155,14 +2155,14 @@ export class APIService {
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
-    return <CreateStateHistoryMutation>response.data.createStateHistory;
+    return <CreateSavedGraphMutation>response.data.createSavedGraph;
   }
-  async UpdateStateHistory(
-    input: UpdateStateHistoryInput,
-    condition?: ModelStateHistoryConditionInput
-  ): Promise<UpdateStateHistoryMutation> {
-    const statement = `mutation UpdateStateHistory($input: UpdateStateHistoryInput!, $condition: ModelStateHistoryConditionInput) {
-        updateStateHistory(input: $input, condition: $condition) {
+  async UpdateSavedGraph(
+    input: UpdateSavedGraphInput,
+    condition?: ModelSavedGraphConditionInput
+  ): Promise<UpdateSavedGraphMutation> {
+    const statement = `mutation UpdateSavedGraph($input: UpdateSavedGraphInput!, $condition: ModelSavedGraphConditionInput) {
+        updateSavedGraph(input: $input, condition: $condition) {
           __typename
           id
           type
@@ -2186,14 +2186,14 @@ export class APIService {
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
-    return <UpdateStateHistoryMutation>response.data.updateStateHistory;
+    return <UpdateSavedGraphMutation>response.data.updateSavedGraph;
   }
-  async DeleteStateHistory(
-    input: DeleteStateHistoryInput,
-    condition?: ModelStateHistoryConditionInput
-  ): Promise<DeleteStateHistoryMutation> {
-    const statement = `mutation DeleteStateHistory($input: DeleteStateHistoryInput!, $condition: ModelStateHistoryConditionInput) {
-        deleteStateHistory(input: $input, condition: $condition) {
+  async DeleteSavedGraph(
+    input: DeleteSavedGraphInput,
+    condition?: ModelSavedGraphConditionInput
+  ): Promise<DeleteSavedGraphMutation> {
+    const statement = `mutation DeleteSavedGraph($input: DeleteSavedGraphInput!, $condition: ModelSavedGraphConditionInput) {
+        deleteSavedGraph(input: $input, condition: $condition) {
           __typename
           id
           type
@@ -2217,7 +2217,7 @@ export class APIService {
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
-    return <DeleteStateHistoryMutation>response.data.deleteStateHistory;
+    return <DeleteSavedGraphMutation>response.data.deleteSavedGraph;
   }
   async CreateUserSession(
     input: CreateUserSessionInput,
@@ -2996,9 +2996,9 @@ export class APIService {
     )) as any;
     return <SyncGroupDashboardsQuery>response.data.syncGroupDashboards;
   }
-  async GetStateHistory(id: string): Promise<GetStateHistoryQuery> {
-    const statement = `query GetStateHistory($id: ID!) {
-        getStateHistory(id: $id) {
+  async GetSavedGraph(id: string): Promise<GetSavedGraphQuery> {
+    const statement = `query GetSavedGraph($id: ID!) {
+        getSavedGraph(id: $id) {
           __typename
           id
           type
@@ -3019,15 +3019,15 @@ export class APIService {
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
-    return <GetStateHistoryQuery>response.data.getStateHistory;
+    return <GetSavedGraphQuery>response.data.getSavedGraph;
   }
-  async ListStateHistorys(
-    filter?: ModelStateHistoryFilterInput,
+  async ListSavedGraphs(
+    filter?: ModelSavedGraphFilterInput,
     limit?: number,
     nextToken?: string
-  ): Promise<ListStateHistorysQuery> {
-    const statement = `query ListStateHistorys($filter: ModelStateHistoryFilterInput, $limit: Int, $nextToken: String) {
-        listStateHistorys(filter: $filter, limit: $limit, nextToken: $nextToken) {
+  ): Promise<ListSavedGraphsQuery> {
+    const statement = `query ListSavedGraphs($filter: ModelSavedGraphFilterInput, $limit: Int, $nextToken: String) {
+        listSavedGraphs(filter: $filter, limit: $limit, nextToken: $nextToken) {
           __typename
           items {
             __typename
@@ -3060,16 +3060,16 @@ export class APIService {
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
-    return <ListStateHistorysQuery>response.data.listStateHistorys;
+    return <ListSavedGraphsQuery>response.data.listSavedGraphs;
   }
-  async SyncStateHistories(
-    filter?: ModelStateHistoryFilterInput,
+  async SyncSavedGraphs(
+    filter?: ModelSavedGraphFilterInput,
     limit?: number,
     nextToken?: string,
     lastSync?: number
-  ): Promise<SyncStateHistoriesQuery> {
-    const statement = `query SyncStateHistories($filter: ModelStateHistoryFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
-        syncStateHistories(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
+  ): Promise<SyncSavedGraphsQuery> {
+    const statement = `query SyncSavedGraphs($filter: ModelSavedGraphFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
+        syncSavedGraphs(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
           __typename
           items {
             __typename
@@ -3105,7 +3105,7 @@ export class APIService {
     const response = (await API.graphql(
       graphqlOperation(statement, gqlAPIServiceArguments)
     )) as any;
-    return <SyncStateHistoriesQuery>response.data.syncStateHistories;
+    return <SyncSavedGraphsQuery>response.data.syncSavedGraphs;
   }
   async GetUserSession(id: string): Promise<GetUserSessionQuery> {
     const statement = `query GetUserSession($id: ID!) {
@@ -3852,12 +3852,12 @@ export class APIService {
     )
   ) as Observable<SubscriptionResponse<OnDeleteGroupDashboardSubscription>>;
 
-  OnCreateStateHistoryListener: Observable<
-    SubscriptionResponse<OnCreateStateHistorySubscription>
+  OnCreateSavedGraphListener: Observable<
+    SubscriptionResponse<OnCreateSavedGraphSubscription>
   > = API.graphql(
     graphqlOperation(
-      `subscription OnCreateStateHistory {
-        onCreateStateHistory {
+      `subscription OnCreateSavedGraph {
+        onCreateSavedGraph {
           __typename
           id
           type
@@ -3873,14 +3873,14 @@ export class APIService {
         }
       }`
     )
-  ) as Observable<SubscriptionResponse<OnCreateStateHistorySubscription>>;
+  ) as Observable<SubscriptionResponse<OnCreateSavedGraphSubscription>>;
 
-  OnUpdateStateHistoryListener: Observable<
-    SubscriptionResponse<OnUpdateStateHistorySubscription>
+  OnUpdateSavedGraphListener: Observable<
+    SubscriptionResponse<OnUpdateSavedGraphSubscription>
   > = API.graphql(
     graphqlOperation(
-      `subscription OnUpdateStateHistory {
-        onUpdateStateHistory {
+      `subscription OnUpdateSavedGraph {
+        onUpdateSavedGraph {
           __typename
           id
           type
@@ -3896,14 +3896,14 @@ export class APIService {
         }
       }`
     )
-  ) as Observable<SubscriptionResponse<OnUpdateStateHistorySubscription>>;
+  ) as Observable<SubscriptionResponse<OnUpdateSavedGraphSubscription>>;
 
-  OnDeleteStateHistoryListener: Observable<
-    SubscriptionResponse<OnDeleteStateHistorySubscription>
+  OnDeleteSavedGraphListener: Observable<
+    SubscriptionResponse<OnDeleteSavedGraphSubscription>
   > = API.graphql(
     graphqlOperation(
-      `subscription OnDeleteStateHistory {
-        onDeleteStateHistory {
+      `subscription OnDeleteSavedGraph {
+        onDeleteSavedGraph {
           __typename
           id
           type
@@ -3919,7 +3919,7 @@ export class APIService {
         }
       }`
     )
-  ) as Observable<SubscriptionResponse<OnDeleteStateHistorySubscription>>;
+  ) as Observable<SubscriptionResponse<OnDeleteSavedGraphSubscription>>;
 
   OnCreateUserSessionListener: Observable<
     SubscriptionResponse<OnCreateUserSessionSubscription>
