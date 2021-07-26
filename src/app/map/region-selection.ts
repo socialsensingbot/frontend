@@ -140,4 +140,11 @@ export class RegionSelection {
       return regions.length + " Regions";
     }
   }
+
+  public asId() {
+    const regions = this.regionNames();
+    return regions.join("-");
+
+
+  }
 }

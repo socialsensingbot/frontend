@@ -68,7 +68,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
               public dash: DashboardService) {
     this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
     this.updateSavedGraphs();
-    this.dash.waitUntilReady().then(() => {this.ready = true;});
+    this.pref.waitUntilReady().then(() => this.dash.waitUntilReady().then(() => {this.ready = true;}));
 
   }
 
@@ -112,7 +112,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             await this.updateGraph(query, true);
           }
           this.exec.uiActivity();
-          this.ready = true;
         } else {
           this.navigateToRoot();
         }
@@ -120,7 +119,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         await this.clear();
         this.graphId = null;
         this.title = "";
-        this.ready = true;
         let doUpdate = false;
         const queryParams = this._route.snapshot.queryParams;
         if (typeof queryParams.textSearch !== "undefined") {
@@ -128,7 +126,16 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
           doUpdate = true;
         }
         if (typeof queryParams.region !== "undefined") {
-          this.state.queries[0].regions = Array.isArray(queryParams.region) ? queryParams.region : [queryParams.region];
+          if (Array.isArray(queryParams.region)) {
+            for (const region of queryParams.region) {
+              const newQuery = this.newQuery();
+              newQuery.regions.push(region);
+              this.state.queries.unshift(newQuery);
+              await this.updateGraph(newQuery, true);
+            }
+          } else {
+            this.state.queries[0].regions = [queryParams.region];
+          }
           doUpdate = true;
         }
         if (doUpdate) {
@@ -285,7 +292,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
 
-    this.ready = true;
   }
 
   protected queryTransform(from: any[]): any[] {
