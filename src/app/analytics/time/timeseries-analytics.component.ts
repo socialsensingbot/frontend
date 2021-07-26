@@ -68,7 +68,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
               public dash: DashboardService) {
     this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
     this.updateSavedGraphs();
-    this.ready = true;
+    this.dash.waitUntilReady().then(() => {this.ready = true;});
 
   }
 
@@ -186,7 +186,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         if (result !== null) {
           this.savedGraphs = await this.saves.listByOwner();
 
-          const savedGraph = await this.saves.create( this._savedGraphType, dialogData.title, this.state);
+          const savedGraph = await this.saves.create(this._savedGraphType, dialogData.title, this.state);
           this.graphId = savedGraph.id;
           this.title = dialogData.title;
           this.updateSavedGraphs();
