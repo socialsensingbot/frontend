@@ -24,6 +24,8 @@ const log = new Logger("timeseries-ac");
              styleUrls:   ["./timeseries-widget.component.scss"]
            })
 export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
+  @Input()
+  private id: string;
 
   @Input()
   public set state(value: TimeseriesAnalyticsComponentState) {
@@ -75,8 +77,8 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
 
   public async updateGraph(q: TimeseriesRESTQuery, force) {
     // Immutable copy
-    const query = JSON.parse(JSON.stringify(q));
-    this.updating = true;
+    const query: TimeseriesRESTQuery = JSON.parse(JSON.stringify(q));
+
     await this.exec.queue("update-timeseries-graph", null,
                           async () => {
                             try {
@@ -99,16 +101,17 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
                               this.updating = false;
                             }
 
-                          }, query.__series_id + "-" + force, false, true, true, "inactive"
+                          }, this.id + "-"+ query.__series_id + "-" + force, false, true, true, "inactive"
     );
 
   }
 
 
-  public ngOnChanges(changes: SimpleChanges): void {
-    if (this._state && !this.ready) {
+  public async ngOnChanges(changes: SimpleChanges) {
+    if (this._state !== null) {
       this.title = this._state.title || "";
       console.log("Loaded saved graph with state ", this._state);
+      this.updating = true;
       this.seriesCollection = new TimeseriesCollectionModel("date",
                                                             this._state.eoc,
                                                             this._state.eoc === "exceedance" ? "Exceedance" : "Count",
@@ -120,7 +123,7 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
                                                             this._state.lob
       );
       for (const query of this._state.queries) {
-        this.updateGraph(query, true);
+        await this.updateGraph(query, true);
       }
       this.ready = true;
     }
