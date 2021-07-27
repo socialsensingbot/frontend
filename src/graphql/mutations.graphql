@@ -134,6 +134,60 @@ mutation DeleteGroupDashboard(
     updatedAt
   }
 }
+mutation CreateSavedGraph(
+  $input: CreateSavedGraphInput!
+  $condition: ModelSavedGraphConditionInput
+) {
+  createSavedGraph(input: $input, condition: $condition) {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+mutation UpdateSavedGraph(
+  $input: UpdateSavedGraphInput!
+  $condition: ModelSavedGraphConditionInput
+) {
+  updateSavedGraph(input: $input, condition: $condition) {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+mutation DeleteSavedGraph(
+  $input: DeleteSavedGraphInput!
+  $condition: ModelSavedGraphConditionInput
+) {
+  deleteSavedGraph(input: $input, condition: $condition) {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
 mutation CreateUserSession(
   $input: CreateUserSessionInput!
   $condition: ModelUserSessionConditionInput

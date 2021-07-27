@@ -33,17 +33,21 @@ import {HelpDialogComponent} from "./help/help-dialog.component";
 import {TweetListComponent} from "./map/twitter/tweet-list/tweet-list.component";
 import {RollbarErrorHandler, rollbarFactory, RollbarService} from "./error";
 import {SafeHtmlPipe} from "./safe.pipe";
-import {DashboardComponent} from "./dashboard/dashboard.component";
+import {DashboardComponent} from "./analytics/dashboard/dashboard.component";
 import {TimeSeriesChartComponent} from "./charts/timeseries-chart/timeseries-chart.component";
 import {BarChartComponent} from "./charts/bar-chart/bar-chart.component";
 import {PieChartComponent} from "./charts/pie-chart/pie-chart.component";
-import {TwitterTimeseriesComponent} from "./dashboard/widgets/twitter-timeseries/twitter-timeseries.component";
 import {AmplifyUIAngularModule} from "@aws-amplify/ui-angular";
 import {TweetCopyDialogComponent} from "./map/twitter/tweet-list/tweet-copy-dialog/tweet-copy-dialog.component";
 import {StripHtmlPipe} from "./strip.pipe";
-import {TimeseriesConfigFormComponent} from "./dashboard/widgets/twitter-timeseries/timeseries-config-form.component";
 import {TimeSeriesMultiChartComponent} from "./charts/timeseries-multi-chart/timeseries-multi-chart.component";
-import { MapGraphSidebarComponent } from './map/map-graph-sidebar/map-graph-sidebar.component';
+import { MapGraphSidebarComponent } from "./map/map-graph-sidebar/map-graph-sidebar.component";
+import { AnalyticsComponent } from "./analytics/analytics.component";
+import {TimeseriesAnalyticsComponent} from "./analytics/time/timeseries-analytics.component";
+import {TimeseriesAnalyticsFormComponent} from "./analytics/time/timeseries-analytics-form.component";
+import {TimeSeriesMultipleQueryChartComponent} from "./analytics/time/timeseries-multi-chart/time-series-multiple-query-chart.component";
+import { NameGraphDialogComponent } from "./analytics/time/name-graph-dialog/name-graph-dialog.component";
+import {TimeseriesWidgetComponent} from "./analytics/widgets/twitter-timeseries/timeseries-widget.component";
 
 @NgModule({
               declarations:    [
@@ -72,9 +76,14 @@ import { MapGraphSidebarComponent } from './map/map-graph-sidebar/map-graph-side
                   TimeSeriesChartComponent,
                   BarChartComponent,
                   PieChartComponent,
-                  TwitterTimeseriesComponent, TimeseriesConfigFormComponent,
                   TimeSeriesMultiChartComponent,
-                  MapGraphSidebarComponent
+                  MapGraphSidebarComponent,
+                  AnalyticsComponent,
+                  TimeseriesAnalyticsComponent,
+                  TimeseriesAnalyticsFormComponent,
+                  TimeSeriesMultipleQueryChartComponent,
+                  NameGraphDialogComponent,
+                  TimeseriesWidgetComponent
               ],
               imports:         [
                   BrowserModule,
@@ -107,7 +116,7 @@ import { MapGraphSidebarComponent } from './map/map-graph-sidebar/map-graph-side
               ],
               bootstrap:       [AppComponent],
               entryComponents: [CountryCodeSelectComponent, HelpDialogComponent]
-          },)
+          }, )
 export class AppModule {
     public constructor(ngfConfig: NgForageConfig) {
         ngfConfig.configure({});

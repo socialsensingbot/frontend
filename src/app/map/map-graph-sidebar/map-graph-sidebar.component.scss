@@ -1,6 +1,10 @@
 .graph-wrapper {
     margin: 12px;
     margin-top:24px;
-    max-height: 380px;
     max-width:460px;
+}
+
+
+.stats-panel {
+    height: calc(100vh - 114px);
 }

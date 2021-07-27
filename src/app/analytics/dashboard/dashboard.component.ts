@@ -1,6 +1,8 @@
 import {Component, OnInit} from "@angular/core";
 import {BreakpointObserver} from "@angular/cdk/layout";
-import {DashboardCard, DashboardService} from "../pref/dashboard.service";
+import {DashboardCard, DashboardService} from "../../pref/dashboard.service";
+import {Logger} from "@aws-amplify/core";
+const log = new Logger("dashboard-component");
 
 @Component({
                selector: "app-dashboard",
@@ -23,8 +25,8 @@ export class DashboardComponent implements OnInit {
     // );
     public readonly = false;
     public types = [{
-        title: "Text and Region Count",
-        type:  "timeseries-text-and-region",
+        title: "Timeseries",
+        type:  "timeseries",
         rows:  2,
         cols:  2,
         state: {textSearch: "", regions: []}
@@ -44,7 +46,7 @@ export class DashboardComponent implements OnInit {
         await this.dash.init();
         await this.dash.waitUntilReady();
         this.ready = true;
-        console.log("Dashboard ready with ", this.dash.dashboard);
+        log.debug("Dashboard ready with ", this.dash.dashboard);
         this.initDashboard();
     }
 
@@ -90,7 +92,7 @@ export class DashboardComponent implements OnInit {
     }
 
     public debug(card: DashboardCard) {
-        console.log(card);
+        log.debug(card);
     }
 
     public remove(card: DashboardCard) {

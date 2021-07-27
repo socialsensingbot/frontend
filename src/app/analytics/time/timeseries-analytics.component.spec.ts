@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TwitterTimeseriesComponent } from './twitter-timeseries.component';
+import { TimeseriesAnalyticsComponent } from './timeseries-analytics.component';
 
 describe('TwitterTimeseriesComponent', () => {
-  let component: TwitterTimeseriesComponent;
-  let fixture: ComponentFixture<TwitterTimeseriesComponent>;
+  let component: TimeseriesAnalyticsComponent;
+  let fixture: ComponentFixture<TimeseriesAnalyticsComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TwitterTimeseriesComponent ]
+      declarations: [TimeseriesAnalyticsComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TwitterTimeseriesComponent);
+    fixture = TestBed.createComponent(TimeseriesAnalyticsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,0 +1,20 @@
+<div class="app-timeseries-graph-surround">
+    <span *ngIf="title.length >0">
+    <h2>{{title}}</h2>
+    <br/>
+        </span>
+    <app-timeseries-multi-query-chart *ngIf="ready"
+            [updating]="updating"
+            [error]="error"
+            [seriesCollection]="seriesCollection"
+            [height]="height-50"
+            [connect]="connect"
+            [animated]="animated"
+            [scrollBar]="scrollBar"
+            class="twitter-timeseries-chart">
+
+    </app-timeseries-multi-query-chart>
+</div>
+<mat-progress-bar *ngIf="updating && ready" class="app-analytics-progress" mode="indeterminate"
+                  [color]="pref.combined.toolbarColor"></mat-progress-bar>
+<!--<mat-spinner *ngIf="!ready" class="app-analytics-spinner"></mat-spinner>-->

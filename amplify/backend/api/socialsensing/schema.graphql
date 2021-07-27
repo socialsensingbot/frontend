@@ -27,6 +27,29 @@ type GroupDashboard
   dashboard: String!
 }
 
+type SavedGraph
+@model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
+@auth(rules: [{allow: private}]) {
+id: ID!
+type:String!
+title: String!
+state: String!
+group: String
+owner: String
+createdAt: AWSDateTime
+}
+
+type TextAutocomplete
+@model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
+@auth(rules: [{allow: private}]) {
+  id: ID!
+  type:String!
+  text: String!
+  group: String
+  owner: String
+  createdAt: AWSDateTime
+}
+
 
 
 type UserSession

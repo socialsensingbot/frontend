@@ -1,13 +1,19 @@
 .text-search {
     min-width: 200px;
-    max-width: 400px;
+    max-width: calc(50% - 48px);
     margin-right: 48px;
 
 }
 
 .region-chooser {
     min-width: 300px;
-    max-width: 600px;
+    max-width: calc(50% - 48px);
+}
+
+.eoc {
+    margin-right: 48px;
+    min-width: 160px;
+    max-width: 176px;
 }
 
 form.ttc-form > * {

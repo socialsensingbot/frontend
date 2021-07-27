@@ -1,8 +1,11 @@
 <mat-sidenav-container class="map-outer"  [ngClass]="blinkOn ? 'blink-on' : 'blink-off'">
     <mat-sidenav class="app-tweet-drawer" #sidenav [(opened)]="tweetsVisible" disableClose mode="side">
-        <button mat-icon-button class="draw-close-button" aria-label="Close" (click)="sidenav.toggle()">
+        <button mat-icon-button class="app-draw-close-button" aria-label="Close" (click)="sidenav.toggle()">
             <mat-icon>close</mat-icon>
         </button>
+
+        <div class="drawer-main-tabs">
+
 
         <mat-tab-group mat-align-tabs="center">
             <mat-tab label="Twitter">
@@ -16,7 +19,7 @@
                 </ng-template>
             </mat-tab>
         </mat-tab-group>
-
+        </div>
     </mat-sidenav>
 
 
@@ -49,6 +52,20 @@
                                            [options]="sliderOptions"></date-range-slider>
                     </div>
                     <div class="app-date-slider-live" *ngIf="liveUpdating">live</div>
+                    <div class="app-toolbar-separator"></div>
+                    <mat-form-field>
+                        <mat-select (selectionChange)="timeSliderPreset(+ $event.value)"
+                                    class="map-number-layer-select">
+                            <mat-option value="60">One Hour</mat-option>
+                            <mat-option value="120">Two Hours</mat-option>
+                            <mat-option value="180">Three Hours</mat-option>
+                            <mat-option value="720">12 Hours</mat-option>
+                            <mat-option value="1440">24 Hours</mat-option>
+                            <mat-option value="2880">2 Days</mat-option>
+                            <mat-option value="4320">3 Days</mat-option>
+                            <mat-option value="5760">4 Days</mat-option>
+                        </mat-select>
+                    </mat-form-field>
                     <div class="app-toolbar-expanding-separator"></div>
                     <button mat-icon-button  aria-label="Expand or shrink toolbar">
                         <mat-icon matTooltip="Expand toolbar" *ngIf="!appToolbarExpanded"
@@ -83,7 +100,7 @@
                             <mat-option value="count">Tweet Count</mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <mat-form-field>
+                    <mat-form-field *ngIf="data.dataSetMetdata.layerGroups.length > 1">
                         <mat-select [(value)]="activeLayerGroup" class="map-number-layer-select">
                             <mat-option *ngFor="let layerGroup of data.dataSetMetdata.layerGroups"
                                         [value]="layerGroup.id">{{layerGroup.title}}</mat-option>

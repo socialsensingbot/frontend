@@ -28,6 +28,29 @@ export declare class GroupDashboard {
   static copyOf(source: GroupDashboard, mutator: (draft: MutableModel<GroupDashboard>) => MutableModel<GroupDashboard> | void): GroupDashboard;
 }
 
+export declare class SavedGraph {
+  readonly id: string;
+  readonly type: string;
+  readonly title: string;
+  readonly state: string;
+  readonly group?: string;
+  readonly owner?: string;
+  readonly createdAt?: string;
+  constructor(init: ModelInit<SavedGraph>);
+  static copyOf(source: SavedGraph, mutator: (draft: MutableModel<SavedGraph>) => MutableModel<SavedGraph> | void): SavedGraph;
+}
+
+export declare class TextAutocomplete {
+  readonly id: string;
+  readonly type: string;
+  readonly text: string;
+  readonly group?: string;
+  readonly owner?: string;
+  readonly createdAt?: string;
+  constructor(init: ModelInit<TextAutocomplete>);
+  static copyOf(source: TextAutocomplete, mutator: (draft: MutableModel<TextAutocomplete>) => MutableModel<TextAutocomplete> | void): TextAutocomplete;
+}
+
 export declare class UserSession {
   readonly id: string;
   readonly fingerprint?: string;

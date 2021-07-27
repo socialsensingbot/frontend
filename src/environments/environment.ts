@@ -14,25 +14,15 @@ import "zone.js/dist/zone-error"; // Included with Angular CLI.
 import {v4 as uuidv4} from "uuid";
 
 const defaultDashboard: Dashboard = {
-    boards: [{
-        deviceType: "all",
-        pages:      [{
-            title: "First Page",
-            cards: [
-                {title:    "Count By Text and Region",
-                    cols:  2,
-                    rows:  2,
-                    type:  "timeseries-text-and-region",
-                    state: {},
-                    id:    uuidv4()
-                },
-                {title: "Total Count", cols: 1, rows: 1, type: "timeseries-total", state: {}, id: uuidv4()},
-                // {title: "Exceedence by Date", cols: 1, rows: 1, type: "timeseries-exceed", state: {}},
-                // {title: "Exceedence by Region", cols: 2, rows: 1, type: "timeseries-exceed-region", state: {}},
-            ]
-        }]
+  boards: [{
+    deviceType: "all",
+    pages:      [{
+      title: "First Page",
+      cards: []
     }]
+  }]
 };
+
 export const environment = {
     name:             "dev",
     lamdaEnvironment: "dev",
@@ -52,7 +42,7 @@ export const environment = {
         password: ""
     },
 
-    impact:                              {
+    impact:   {
         // The ability to tag tweets with an impact annotation
         levels: [
             {title: "1 – Minimal", value: "minimal", color: "#43A047"},
@@ -61,7 +51,7 @@ export const environment = {
             {title: "4 - Severe", value: "severe", color: "#F4511E"}
         ]
     },
-    source:                              {
+    source:   {
         // The ability to tag tweets with a source
         types: [
             {title: "River", value: "river", color: "#43A047"},
@@ -70,7 +60,9 @@ export const environment = {
             {title: "Coastal", value: "coastal", color: "#F4511E"}
         ]
     },
-    features:                            ["impact", "source"],
+    // features: ["impact", "source", "map"],
+    features: ["impact", "source", "map", "dashboard", "analytics"],
+
     showErrors:                          false,
     showLoadingMessages:                 true,
     mostRecentDateIsNow:                 true,
@@ -85,6 +77,8 @@ export const environment = {
     defaultDashboard:                    defaultDashboard,
     blinkRateInMilliseconds:             1000,
     // mapTileUrlTemplate:   "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"
+    newExceedanceCalc: false,
+    shareTextAutocompleteInGroup: true,
 
 };
 

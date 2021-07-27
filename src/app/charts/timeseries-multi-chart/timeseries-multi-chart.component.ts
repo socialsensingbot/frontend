@@ -15,6 +15,8 @@ import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import {ColumnSeries, LineSeries, ValueAxis, XYChart} from "@amcharts/amcharts4/charts";
 import jt_theme from "../../theme/jt.theme";
+import {Logger} from "@aws-amplify/core";
+const log = new Logger("timeseries-multi-chart");
 
 @Component({
                selector:    "app-timeseries-multi-chart",
@@ -38,11 +40,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     @Output() ready = new EventEmitter<boolean>();
     chart: XYChart;
     @Input()
-    yField = "count";
-    @Input()
     xField = "date";
-    @Input()
-    yLabel: string;
     @Input()
     public mappingColumns = [];
     @Input()
@@ -63,6 +61,33 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
 
+    }
+
+    private _yField = "count";
+
+    public get yField(): string {
+        return this._yField;
+    }
+
+    @Input()
+    public set yField(value: string) {
+        this._yField = value;
+        //refresh
+        this.data = this._data;
+    }
+
+    private _yLabel: string;
+
+    public get yLabel(): string {
+        return this._yLabel;
+    }
+
+    @Input()
+    public set yLabel(value: string) {
+        this._yLabel = value;
+        if (this.valueAxis) {
+            this.valueAxis.title.text = this.yLabel;
+        }
     }
 
     private _type = "line";
@@ -96,7 +121,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                 this._maxDate = null;
                 for (const item of this._data) {
                     const date = new Date(item[this.xField]);
-                    console.log(date);
+                    log.debug(date);
                     if (this._minDate === null || date.getTime() < this._minDate.getTime()) {
                         this._minDate = date;
                     }
@@ -104,14 +129,14 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                         this._maxDate = date;
                     }
                 }
-                console.log("MIN_DATE", this._minDate);
-                console.log("MAX_DATE", this._maxDate);
+                log.debug("MIN_DATE", this._minDate);
+                log.debug("MAX_DATE", this._maxDate);
                 let count = 0;
                 for (const item of this._data) {
                     if (this.rollingAvg || count % this.avgLength === 0) {
                         if (count >= this.avgLength) {
                             const slice = this._data.slice(count - this.avgLength, count - 1);
-                            item.trend = slice.map(i => i[this.yField]).reduce((p, c) => p + c, 0) / this.avgLength;
+                            item.trend = slice.map(i => i[this._yField]).reduce((p, c) => p + c, 0) / this.avgLength;
                         }
                     }
                     count++;
@@ -159,7 +184,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                         for (let fillDate = lastRowDate + this.dateSpacing; fillDate < rowDate; fillDate += this.dateSpacing) {
                             const fillRow = {};
                             fillRow[this.xField] = new Date(fillDate);
-                            fillRow[this.yField] = 0;
+                            fillRow[this._yField] = 0;
                             result.push(fillRow);
                         }
                     }
@@ -167,8 +192,8 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                 result.push(row);
                 lastRowDate = rowDate;
             }
-            console.log("Before ZERO FILL ", mappedData);
-            console.log("After ZERO FILL ", result);
+            log.debug("Before ZERO FILL ", mappedData);
+            log.debug("After ZERO FILL ", result);
             return result;
         } else {
             return mappedData;
@@ -198,7 +223,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
         dateAxis.title.opacity = 0.5;
 
         this.valueAxis = this.chart.yAxes.push(new am4charts.ValueAxis());
-        this.valueAxis.title.text = this.yLabel;
+        this.valueAxis.title.text = this._yLabel;
         // valueAxis.title.fontWeight = "bold";
         this.valueAxis.title.opacity = 0.5;
         //
@@ -232,7 +257,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
         if (this._type === "line") {
             series = this.chart.series.push(new am4charts.LineSeries());
             series.data = this.zeroFill(mappedData);
-            series.dataFields.valueY = this.yField;
+            series.dataFields.valueY = this._yField;
             series.dataFields.dateX = this.xField;
             series.strokeWidth = 3;
             series.minBulletDistance = 10;
@@ -248,7 +273,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
         } else {
             series = this.chart.series.push(new am4charts.ColumnSeries());
             series.data = mappedData;
-            series.dataFields.valueY = this.yField;
+            series.dataFields.valueY = this._yField;
             series.dataFields.dateX = this.xField;
             series.tooltipText = {mappedKey} + " {valueY}";
             series.tooltip.pointerOrientation = "vertical";
@@ -261,7 +286,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
         this.valueAxis.zoom({start: 0, end: 1}, false, true);
 
         series.name = mappedKey;
-        console.info("Added series " + series.name);
+        log.info("Added series " + series.name);
         this.seriesMap[mappedKey] = series;
         if (this.scrollBar) {
             // @ts-ignore
@@ -305,7 +330,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     private createSeries() {
         if (this.chart) {
 
-            console.log("Data for TMC", this.data);
+            log.debug("Data for TMC", this.data);
             const mappedData = {};
             const totals = {};
             for (const row of this.data) {
@@ -314,9 +339,9 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                     if (typeof mappedKey !== "undefined" && mappedKey !== null && mappedKey.length > 0) {
                         const totalValue = totals[row[this.xField]];
                         if (typeof totalValue === "undefined") {
-                            totals[row[this.xField]] = +(row[this.yField]);
+                            totals[row[this.xField]] = +(row[this._yField]);
                         } else {
-                            totals[row[this.xField]] += row[this.yField];
+                            totals[row[this.xField]] += row[this._yField];
                         }
                         if (mappedData[mappedKey]) {
                             mappedData[mappedKey].push(row);
@@ -326,7 +351,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                     }
                 }
             }
-            console.log("Totals", totals);
+            log.debug("Totals", totals);
             const totalRows = [];
             for (const key in totals) {
                 if (totals.hasOwnProperty(key)) {
@@ -336,7 +361,7 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                     totalRows.push(row);
                 }
             }
-            console.log("Sum series", totalRows);
+            log.debug("Sum series", totalRows);
             // this.createScrollBarSeries(totalRows);
 
             let lastSeries;
@@ -344,16 +369,16 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
                 if (mappedData.hasOwnProperty(requiredSeries)) {
                     const data = mappedData[requiredSeries].sort(
                         (a, b) => new Date(a[this.xField]).getTime() - new Date(b[this.xField]).getTime());
-                    console.log("Sorted series (by " + this.xField + ")", data);
+                    log.debug("Sorted series (by " + this.xField + ")", data);
                     lastSeries = this.createSeriesFromMappedData(requiredSeries, data);
                 } else {
                     if (this.zeroFillMissingDates) {
                         const dummyMin = {};
                         dummyMin[this.xField] = this._minDate;
-                        dummyMin[this.yField] = 0;
+                        dummyMin[this._yField] = 0;
                         const dummyMax = {};
                         dummyMax[this.xField] = this._maxDate;
-                        dummyMax[this.yField] = 0;
+                        dummyMax[this._yField] = 0;
                         mappedData[requiredSeries] = [dummyMin, dummyMax]
                         this.createSeriesFromMappedData(requiredSeries, mappedData[requiredSeries]);
                     }
