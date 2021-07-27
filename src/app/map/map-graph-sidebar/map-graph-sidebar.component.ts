@@ -32,6 +32,7 @@ export class MapGraphSidebarComponent implements OnInit {
     this._router.navigate(["/analytics/time"], {queryParams: {region: this.regionList, eoc: "count"}});
   }
 
+
   public expandExceedanceGraph() {
     this._router.navigate(["/analytics/time"], {queryParams: {region: this.regionList, eoc: "exceedance"}});
   }

@@ -19,7 +19,6 @@
                               [state]="graphStateForRegions('exceedance')"
       ></app-widget-timeseries>
 
-
         <button mat-button (click)="expandExceedanceGraph()">Open in Analytics</button>
         <button mat-button *ngIf="this.pref.featureSupported('dashboard')"
                 (click)="this.dash.addCard('timeseries', 'Exceedance for '+regionText(),
@@ -27,5 +26,6 @@
             Dashboard
         </button>
     </div>
+
 </div>
 
