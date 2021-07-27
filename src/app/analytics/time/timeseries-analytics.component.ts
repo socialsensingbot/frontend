@@ -5,7 +5,7 @@ import {RESTDataAPIService} from "../../api/rest-api.service";
 import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {
-  TimeseriesAnalyticsComponentState,
+  TimeseriesAnalyticsComponentState, timeSeriesAutocompleteType,
   TimeseriesCollectionModel,
   TimeseriesModel,
   TimeseriesRESTQuery
@@ -20,6 +20,7 @@ import {NotificationService} from "src/app/services/notification.service";
 import {toLabel} from "../graph";
 import {DashboardService} from "../../pref/dashboard.service";
 import {dayInMillis, nowRoundedToHour} from "../../common";
+import {TextAutoCompleteService} from "../../services/text-autocomplete.service";
 
 const log = new Logger("timeseries-ac");
 
@@ -65,7 +66,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
               public notify: NotificationService,
               protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
               public exec: UIExecutionService, public saves: SavedGraphService, public dialog: MatDialog,
-              public dash: DashboardService) {
+              public dash: DashboardService, public auto: TextAutoCompleteService) {
     this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
     this.updateSavedGraphs();
     this.pref.waitUntilReady().then(() => this.dash.waitUntilReady().then(() => {this.ready = true;}));
@@ -165,6 +166,10 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                             this._changed = true;
                             this.emitChange();
                             if (query.textSearch.length > 0 || query.regions.length > 0 || force) {
+                              if (query.textSearch.length > 3) {
+                                // noinspection ES6MissingAwait
+                                this.auto.create(timeSeriesAutocompleteType, query.textSearch, true, true);
+                              }
                               await this._updateGraphInternal(query);
                             } else {
                               log.debug("Skipped time series update, force=" + force);

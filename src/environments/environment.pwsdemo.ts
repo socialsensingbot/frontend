@@ -19,14 +19,6 @@ const defaultDashboard: Dashboard = {
         pages:      [{
             title: "First Page",
             cards: [
-                {
-                    title: "Count By Text and Region",
-                    cols:  2,
-                    rows:  2,
-                    type:  "timeseries-text-and-region",
-                    state: {},
-                    id:    uuidv4()
-                }
             ]
         }]
     }]
