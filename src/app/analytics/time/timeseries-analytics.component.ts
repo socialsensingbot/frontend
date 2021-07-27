@@ -168,7 +168,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                             if (query.textSearch.length > 0 || query.regions.length > 0 || force) {
                               if (query.textSearch.length > 3) {
                                 // noinspection ES6MissingAwait
-                                this.auto.create(timeSeriesAutocompleteType, query.textSearch, true, true);
+                                this.auto.create(timeSeriesAutocompleteType, query.textSearch, true, this.pref.combined.shareTextAutocompleteInGroup);
                               }
                               await this._updateGraphInternal(query);
                             } else {
