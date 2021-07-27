@@ -53,7 +53,11 @@
         "userPoolGroups": {}
       },
       "function": {
-        "S3Triggerb3a090e2": {}
+        "S3Triggerb3a090e2": {
+          "deploymentBucketName": "amplify-socialsensing-prod-224245-deployment",
+          "s3Key": "amplify-builds/S3Triggerb3a090e2-754e48743050344b787a-build.zip"
+        },
+        "query": {}
       },
       "hosting": {
         "amplifyhosting": {
