@@ -14,26 +14,15 @@ import "zone.js/dist/zone-error"; // Included with Angular CLI.
 import {v4 as uuidv4} from "uuid";
 
 const defaultDashboard: Dashboard = {
-    boards: [{
-        deviceType: "all",
-        pages:      [{
-            title: "First Page",
-            cards: [
-                {
-                    title: "Count By Text and Region",
-                    cols:  2,
-                    rows:  2,
-                    type:  "timeseries-text-and-region",
-                    state: {},
-                    id:    uuidv4()
-                },
-                {title: "Total Count", cols: 1, rows: 1, type: "timeseries-total", state: {}, id: uuidv4()},
-                // {title: "Exceedence by Date", cols: 1, rows: 1, type: "timeseries-exceed", state: {}},
-                // {title: "Exceedence by Region", cols: 2, rows: 1, type: "timeseries-exceed-region", state: {}},
-            ]
-        }]
+  boards: [{
+    deviceType: "all",
+    pages:      [{
+      title: "First Page",
+      cards: []
     }]
+  }]
 };
+
 export const environment = {
     name:             "dev",
     lamdaEnvironment: "dev",
