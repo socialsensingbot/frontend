@@ -22,6 +22,7 @@ const defaultDashboard: Dashboard = {
     }]
   }]
 };
+
 export const environment = {
   name:             "pwsdemo",
   lamdaEnvironment: "pwsdemo",
