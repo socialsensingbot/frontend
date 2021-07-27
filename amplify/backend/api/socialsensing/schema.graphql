@@ -11,6 +11,35 @@ type UserPreferences @model @auth(rules: [{allow: owner,  operations: [create, u
   prefs: AWSJSON
 }
 
+type UserDashboard @model @auth(rules: [{allow: owner,  operations: [create, update, delete, read]}]) {
+  id: ID!
+  owner: String
+  #  ignoreTweets: [TweetIgnore] @connection(name: "UserTweetIgnores")
+  #  ignorePeople: [TwitterUserIgnore] @connection(name: "UserTwitterUserIgnores")
+  dashboard: String!
+}
+
+type GroupDashboard
+@model
+@auth(rules: [{allow: private}]) {
+  id: ID!
+  group: String!
+  dashboard: String!
+}
+
+type SavedGraph
+@model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
+@auth(rules: [{allow: private}]) {
+id: ID!
+type:String!
+title: String!
+state: String!
+group: String
+owner: String
+createdAt: AWSDateTime
+}
+
+
 type UserSession
 @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
 @auth(rules: [{allow: private}]) {

@@ -57,6 +57,189 @@ query SyncUserPreferences(
     startedAt
   }
 }
+query GetUserDashboard($id: ID!) {
+  getUserDashboard(id: $id) {
+    id
+    owner
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+query ListUserDashboards(
+  $filter: ModelUserDashboardFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listUserDashboards(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      owner
+      dashboard
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query SyncUserDashboards(
+  $filter: ModelUserDashboardFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncUserDashboards(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      owner
+      dashboard
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query GetGroupDashboard($id: ID!) {
+  getGroupDashboard(id: $id) {
+    id
+    group
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+query ListGroupDashboards(
+  $filter: ModelGroupDashboardFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listGroupDashboards(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      group
+      dashboard
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query SyncGroupDashboards(
+  $filter: ModelGroupDashboardFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncGroupDashboards(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      group
+      dashboard
+      _version
+      _deleted
+      _lastChangedAt
+      createdAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query GetSavedGraph($id: ID!) {
+  getSavedGraph(id: $id) {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+query ListSavedGraphs(
+  $filter: ModelSavedGraphFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listSavedGraphs(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      type
+      title
+      state
+      group
+      owner
+      createdAt
+      _version
+      _deleted
+      _lastChangedAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query SyncSavedGraphs(
+  $filter: ModelSavedGraphFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncSavedGraphs(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      type
+      title
+      state
+      group
+      owner
+      createdAt
+      _version
+      _deleted
+      _lastChangedAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
 query GetUserSession($id: ID!) {
   getUserSession(id: $id) {
     id

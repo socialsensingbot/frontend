@@ -3,7 +3,7 @@ import {Geometry, PolygonData, RegionData, TimeSlice} from "../types";
 import {Logger} from "@aws-amplify/core";
 import {HttpClient} from "@angular/common/http";
 import {UIExecutionService} from "../../services/uiexecution.service";
-import {ProcessedData, ProcessedPolygonData} from "./processed-data";
+import {MapStatisticsForGeographicLayout, MapStatistics} from "./processed-data";
 import {CSVExportTweet, Tweet} from "../twitter/tweet";
 import {NotificationService} from "../../services/notification.service";
 import {NgForage, NgForageCache} from "ngforage";
@@ -111,10 +111,66 @@ interface RegionTweetMap {
     [region: string]: number;
 }
 
+export interface MapDataServiceInt {
+    timeKeyUpdate: EventEmitter<any>;
+    aggregations: { [aggregationName: string]: AggregationData };
+    polygonData: {
+        [regionName: string]: geojson.GeoJsonObject
+    };
+    serviceMetadata: ServiceMetadata;
+    dataSetMetdata: DataSetMetadata;
+
+    update(_dateMin: number, _dateMax: number);
+
+    offset(_dateMin: number): number;
+
+    loadStats(): Promise<any>;
+
+    loadAggregations(): Promise<any>;
+
+    init(): Promise<any>;
+
+    load(first: boolean): Promise<any>;
+
+    tweets(activePolyLayerShortName: string, names: string[]):
+        Tweet[];
+
+    recentTweets(activePolyLayerShortName: string): RegionTweetMap;
+
+    entryCount(): number;
+
+    lastEntryDate(): Date;
+
+    entryDate(offset: number): Date;
+
+    regionData(regionType: string): MapStatistics;
+
+    places(regionType: string): Set<string>;
+
+    switchDataSet(dataset: string): Promise<void>;
+
+    switchLayerGroup(group: string): Promise<void>;
+
+    regionTypes(): string[];
+
+    hasCountryAggregates(): boolean;
+
+    exportRegionForCSV(polygonDatum: PolygonData, region: string, regionGrouping: string,
+                       exportedTweets: CSVExportTweet[]): Promise<void>;
+
+    getCurrentLayer(): LayerMetadata;
+
+
+    download(regionGrouping: string, polygonDatum: PolygonData): Promise<void>;
+
+    downloadAggregate(aggregrationSetId: string, selectedAggregates: string[], regionGrouping: string,
+                      polygonDatum: PolygonData): Promise<void>;
+}
+
 @Injectable({
                 providedIn: "root"
             })
-export class MapDataService {
+export class MapDataService implements MapDataServiceInt {
     public polygonData: {
         [regionName: string]: geojson.GeoJsonObject
     } = {};
@@ -125,10 +181,10 @@ export class MapDataService {
     /**
      * This is the semi static stats data which is loaded from assets/data.
      */
-    public stats: { [regionName: string]: any } = {};
+    private _stats: { [regionName: string]: any } = {};
     public aggregations: { [aggregationName: string]: AggregationData } = {};
     public reverseTimeKeys: any; // The times in the input JSON
-    public dataset: string;
+    private _dataset: string;
     public dataSetMetdata: DataSetMetadata;
     public serviceMetadata: ServiceMetadata;
     public availableDataSets: DataSetCoreMetadata[];
@@ -142,9 +198,10 @@ export class MapDataService {
      *
      * @see _rawTwitterData for the unprocessed data.
      */
-    private _twitterData: ProcessedData = null;
+    private _twitterData: MapStatisticsForGeographicLayout = null;
     private _updating: boolean;
     private initialized: boolean;
+    private layerGroup: string;
 
     constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
                 private _notify: NotificationService, private readonly cache: NgForageCache,
@@ -189,17 +246,17 @@ export class MapDataService {
             // Note the use of a random time to make sure that we don't refresh all datasets at once!!
             const cacheDuration = ONE_DAY * (7.0 + 7.0 * Math.random());
             promises["stats:" + regionGroup.id] = (this.loadFromS3(
-                this.dataset + "/regions/" + regionGroup.id + "/" + this.getCurrentLayer().id + "-stats.json", version,
+                this._dataset + "/regions/" + regionGroup.id + "/" + this.getCurrentLayer().id + "-stats.json", version,
                 cacheDuration));
             promises["features:" + regionGroup.id] = (this.loadFromS3(
-                this.dataset + "/regions/" + regionGroup.id + "/features.json", version, cacheDuration,
+                this._dataset + "/regions/" + regionGroup.id + "/features.json", version, cacheDuration,
             ));
         }
         for (const regionGroup of this.dataSetMetdata.regionGroups) {
             if (this._pref.combined.showLoadingMessages) {
                 this._notify.show("Loading '" + regionGroup.title + "' statistics...", "OK", 60);
             }
-            this.stats[regionGroup.id] = (await promises["stats:" + regionGroup.id]) as RegionData<any, any, any>;
+            this._stats[regionGroup.id] = (await promises["stats:" + regionGroup.id]) as RegionData<any, any, any>;
             if (this._pref.combined.showLoadingMessages) {
                 this._notify.show("Loading '" + regionGroup.title + "' geography ...", "OK", 60);
             }
@@ -225,7 +282,7 @@ export class MapDataService {
             // Note the use of a random time to make sure that we don't refresh all datasets at once!!
             const cacheDuration = ONE_DAY * (7.0 + 7.0 * Math.random());
             promises["agg:" + agg] = (this.loadFromS3(
-                this.dataset + "/aggregations/" + agg + ".json", version,
+                this._dataset + "/aggregations/" + agg + ".json", version,
                 cacheDuration));
         }
         for (const agg of this.dataSetMetdata.regionAggregations) {
@@ -237,7 +294,7 @@ export class MapDataService {
     /**
      * Loads the live data from S3 storage securely.
      */
-    public async loadLiveData(): Promise<TimeSlice[]> {
+    private async loadLiveData(): Promise<TimeSlice[]> {
         log.debug("loadLiveData()");
         // TODO :- use the defaultLayerGroup to select a layergroup and then load the layers into seperate layer
         //  datastructures and return those instead.
@@ -277,11 +334,11 @@ export class MapDataService {
     }
 
     public recentTweets(activePolyLayerShortName: string): RegionTweetMap {
-        const twitterData = new ProcessedData(this.offset(
+        const twitterData = new MapStatisticsForGeographicLayout(this.offset(
             this.lastEntryDate().getTime() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000),
-                                              this.offset(this.lastEntryDate().getTime()), this.reverseTimeKeys,
-                                              this._rawTwitterData,
-                                              this.stats, this.dataSetMetdata.regionGroups).layer(
+                                                                 this.offset(this.lastEntryDate().getTime()), this.reverseTimeKeys,
+                                                                 this._rawTwitterData,
+                                                                 this._stats, this.dataSetMetdata.regionGroups).layer(
             activePolyLayerShortName);
         log.debug(`Recent Tweets Twitter Data for ${activePolyLayerShortName}`, twitterData);
         const tweets: RegionTweetMap = {};
@@ -298,7 +355,7 @@ export class MapDataService {
     /**
      * @returns reverse sorted time keys from the data
      */
-    public getTimes() {
+    private getTimes() {
         const timeKeys = Object.keys(this._rawTwitterData);
         timeKeys.sort();
         timeKeys.reverse();
@@ -361,20 +418,20 @@ export class MapDataService {
         }
     }
 
-    public parseTimeKey(tstring) {
+    private parseTimeKey(tstring) {
         return new Date(Date.UTC(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
                                  tstring.substring(8, 10), tstring.substring(10, 12), 0, 0));
     }
 
-    public regionData(regionType: string): ProcessedPolygonData {
+    public regionData(regionType: string): MapStatistics {
         return this._twitterData.regionData(regionType);
     }
 
     public places(regionType: string): Set<string> {
-        return this._twitterData.regionData(regionType).places();
+        return this.regionData(regionType).places();
     }
 
-    offset(dateInMillis: number):
+    public offset(dateInMillis: number):
         number {
         const dateFull = new Date(dateInMillis);
         const ye = dateFull.getFullYear();
@@ -462,11 +519,15 @@ export class MapDataService {
         if (!this.initialized) {
             this._notify.error("Map Data Service not Initialized");
         }
-        this.dataset = dataset;
-        this.dataSetMetdata = await this.loadFromS3(this.dataset + "/metadata.json",
+        this._dataset = dataset;
+        this.dataSetMetdata = await this.loadFromS3(this._dataset + "/metadata.json",
                                                     environment.version + ":" + this.serviceMetadata.version,
                                                     10 * 1000) as DataSetMetadata;
         this._notify.dismiss();
+    }
+
+    public async switchLayerGroup(group: string) {
+        this.layerGroup = group;
     }
 
     public regionTypes() {
@@ -477,8 +538,8 @@ export class MapDataService {
         return this.dataSetMetdata.regionAggregations.length > 0;
     }
 
-    private async exportRegionForCSV(polygonDatum: PolygonData, region: string, regionGrouping: string,
-                                     exportedTweets: CSVExportTweet[]) {
+    public async exportRegionForCSV(polygonDatum: PolygonData, region: string, regionGrouping: string,
+                                    exportedTweets: CSVExportTweet[]) {
         let geometry;
         for (const feature of polygonDatum.features) {
             if (feature.id === region) {
@@ -497,8 +558,20 @@ export class MapDataService {
         }
     }
 
-    private getCurrentLayer() {
-        return this.dataSetMetdata.layers[0];
+    public getCurrentLayer(): LayerMetadata {
+        const currentLayerId = this.currentLayerId();
+        return this.dataSetMetdata.layers.filter(i => i.id === currentLayerId)[0];
+    }
+
+    private currentLayerId(): string {
+        let layerGroupMetadata = this.dataSetMetdata.layerGroups.filter(i => i.id === this.layerGroup);
+        if (typeof layerGroupMetadata === "undefined" || layerGroupMetadata.length === 0) {
+            log.error("Unrecognized layer group " + this.layerGroup + " not in " + JSON.stringify(
+                this.dataSetMetdata.layerGroups) + " using default value.");
+            layerGroupMetadata = this.dataSetMetdata.layerGroups.filter(
+                i => i.id === this.dataSetMetdata.defaultLayerGroup);
+        }
+        return layerGroupMetadata[0].layers[0];
     }
 
     private async loadFromS3(name: string, version: string = environment.version, cacheDuration = ONE_DAY,
@@ -530,22 +603,22 @@ export class MapDataService {
      */
     private async updateTweetsData(_dateMin, _dateMax) {
         const key = this.createKey(_dateMin, _dateMax);
-        const cacheValue: CachedItem<ProcessedData> = await this.cache.getCached(key);
+        const cacheValue: CachedItem<MapStatisticsForGeographicLayout> = await this.cache.getCached(key);
         if (environment.cacheProcessedTweets && cacheValue != null && !cacheValue.expired && cacheValue.hasData && cacheValue.data) {
             log.info("Retrieved tweet data from cache.", cacheValue.data);
             log.debug(cacheValue);
-            this._twitterData = new ProcessedData().populate(cacheValue.data, this.regionTypes());
+            this._twitterData = new MapStatisticsForGeographicLayout().populate(cacheValue.data, this.regionTypes());
             log.debug(this._twitterData);
         } else {
             log.info("Tweet data not in cache.");
-            this._twitterData = new ProcessedData(_dateMin, _dateMax, this.reverseTimeKeys, this._rawTwitterData,
-                                                  this.stats, this.dataSetMetdata.regionGroups);
+            this._twitterData = new MapStatisticsForGeographicLayout(_dateMin, _dateMax, this.reverseTimeKeys, this._rawTwitterData,
+                                                                     this._stats, this.dataSetMetdata.regionGroups);
             this.cache.setCached(key, this._twitterData, ONE_DAY);
         }
     }
 
     private createKey(_dateMin, _dateMax) {
-        const key = `${environment.version}:${this.serviceMetadata.version}:${this.dataSetMetdata.version};${this.dataset}${_dateMin}:${_dateMax}:${this.reverseTimeKeys}`;
+        const key = `${environment.version}:${this.serviceMetadata.version}:${this.dataSetMetdata.version};${this._dataset}${_dateMin}:${_dateMax}:${this.reverseTimeKeys}`;
         return key;
     }
 

@@ -11,6 +11,7 @@ import {RollbarService} from "./error";
 import {DataStore} from "@aws-amplify/datastore";
 import Auth from "@aws-amplify/auth";
 import {AnnotationService} from "./pref/annotation.service";
+import {UIExecutionService} from "./services/uiexecution.service";
 
 
 const log = new Logger("app");
@@ -45,7 +46,7 @@ export class AppComponent {
               private _notify: NotificationService,
               private _session: SessionService,
               private _annotation: AnnotationService,
-              @Inject(RollbarService) private _rollbar: Rollbar) {
+              @Inject(RollbarService) private _rollbar: Rollbar, private _exec:UIExecutionService) {
 
     Auth.currentAuthenticatedUser({bypassCache: true})
         .then(user => this.isAuthenticated = (user != null))
@@ -84,7 +85,7 @@ export class AppComponent {
         payload: {event, data},
       } = capsule;
 
-      console.log("DataStore event", event, data);
+      log.debug("DataStore event", event, data);
 
       if (event === "outboxStatus") {
         this.dataStoreSynced = data.isEmpty;
@@ -116,25 +117,26 @@ export class AppComponent {
           try {
             await this._session.open(userInfo);
           } catch (e) {
-            console.error(
+            log.error(
               "There was a problem with creating your session, please ask an administrator to look into this.",
               e);
-            console.error(user);
+            log.error(user);
             this._rollbar.error(
               "There was a problem with creating your session, please ask an administrator to look into this.", e);
           }
           try {
             await this._annotation.init(userInfo);
           } catch (e) {
-            console.error(
+            log.error(
               "There was a problem with the annotation service, please ask an administrator to look into this.",
               e);
-            console.error(user);
+            log.error(user);
             this._rollbar.error(
               "There was a problem with creating the annotation service, " +
               "please ask an administrator to look into this.",
               e);
           }
+          this._exec.start();
           log.info("Locale detected: " + getLang());
           log.info("Locale in use: " + this._pref.combined.locale);
           log.info("Timezone detected: " + Intl.DateTimeFormat().resolvedOptions().timeZone);
@@ -172,11 +174,11 @@ export class AppComponent {
       }
     });
     try {
-      if (this.pref.combined.showLoadingMessages) {
+      if (environment.showLoadingMessages) {
         this._notify.show("Syncing data with the server ...", "OK", 300);
       }
       await DataStore.start();
-      if (this.pref.combined.showLoadingMessages) {
+      if (environment.showLoadingMessages) {
         this._notify.show("Data synced with the server ...", "OK", 10);
       }
     } catch (e) {
@@ -213,6 +215,7 @@ export class AppComponent {
               .then(i => this._router.navigate(["/"], {queryParamsHandling: "merge"}))
               .catch(err => log.error(err));
     log.info("Performed sign out.");
+    this._exec.stop();
     this.initiateLogout = false;
   }
 

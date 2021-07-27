@@ -398,7 +398,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
     public copy(tweet: Tweet, $event: MouseEvent) {
         const dialogRef = this._dialog.open(TweetCopyDialogComponent, {data: {tweet}});
         dialogRef.afterClosed().subscribe(result => {
-            console.log(`Dialog result: ${result}`);
+            log.debug(`Dialog result: ${result}`);
         });
     }
 

@@ -35,6 +35,123 @@ subscription OnDeleteUserPreferences($owner: String) {
     updatedAt
   }
 }
+subscription OnCreateUserDashboard($owner: String) {
+  onCreateUserDashboard(owner: $owner) {
+    id
+    owner
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+subscription OnUpdateUserDashboard($owner: String) {
+  onUpdateUserDashboard(owner: $owner) {
+    id
+    owner
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+subscription OnDeleteUserDashboard($owner: String) {
+  onDeleteUserDashboard(owner: $owner) {
+    id
+    owner
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+subscription OnCreateGroupDashboard {
+  onCreateGroupDashboard {
+    id
+    group
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+subscription OnUpdateGroupDashboard {
+  onUpdateGroupDashboard {
+    id
+    group
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+subscription OnDeleteGroupDashboard {
+  onDeleteGroupDashboard {
+    id
+    group
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+subscription OnCreateSavedGraph {
+  onCreateSavedGraph {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+subscription OnUpdateSavedGraph {
+  onUpdateSavedGraph {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+subscription OnDeleteSavedGraph {
+  onDeleteSavedGraph {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
 subscription OnCreateUserSession {
   onCreateUserSession {
     id

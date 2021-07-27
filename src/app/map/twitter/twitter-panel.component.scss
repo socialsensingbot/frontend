@@ -4,34 +4,22 @@ $tweetHeaderOffset: 16px;
 
 
 ::ng-deep {
-  .mat-tab-body-wrapper, .mat-tab-group {
-    height: 100%;
-    max-height: 100%;
-    min-height: 100%;
-    display: block;
+  .app-tweet-table {
+    .mat-tab-body-wrapper {
+    }
+
+    .mat-tab-body.mat-tab-body-active {
+      overflow: hidden !important;
+      background-color: #f4f4f4;
+    }
+
   }
-
-  .mat-tab-body.mat-tab-body-active {
-    overflow: hidden !important;
-    background-color: #f4f4f4;
-  }
-
-
 }
 
 .app-tweet-outer {
-  display: block;
-  height: 100%;
-  max-height: 100%;
-  min-height: 100%;
-  font-size: 16px;
-  overflow: hidden;
-  width: $drawer-width - 2px;
-  max-width: $drawer-width - 2px;
-  min-width: $drawer-width - 2px;
-  margin: 0;
-  padding: 0;
-
+ overflow: hidden;
+  height:100%;
+  min-height:100%;
   .app-tweet-area-loading-spinner {
     margin: 2em auto;
     margin-top: 24px;
@@ -39,20 +27,16 @@ $tweetHeaderOffset: 16px;
     opacity: 0.3;
   }
 
-  .mat-tab-body {
-    overflow-x: visible;
-    position: relative;
 
-  }
 
 
   .app-tweet-table {
     display: block;
-    height: calc(100vh - 188px);
     position: relative;
     overflow: visible;
-    margin-top: 8px;
-
+    //height: calc(100% - 48px);
+    //margin-top: 8px;
+    //border: 1px solid blue;
 
     .app-tweet-paged {
       display: flex;

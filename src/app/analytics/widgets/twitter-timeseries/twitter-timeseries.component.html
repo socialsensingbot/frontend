@@ -1,0 +1,45 @@
+<div class="dashboard-card-toolbar">
+<!--    <span class='dct-containing' *ngIf="textFilter && query.textSearch">Containing '<span-->
+<!--            class='dct-containing-term'>{{query.textSearch}}</span>'-->
+<!--    </span>&nbsp;-->
+    <ng-container *ngIf="(textFilter || regionFilter) && showForm" >    <app-timeseries-config-form
+            [data]="{state:state,component:this}"></app-timeseries-config-form>
+    </ng-container>
+
+</div>
+
+<ng-container *ngIf="regionFilter">
+    <app-timeseries-multi-chart (ready)="updateGraph(query)"
+                                [updating]="updating"
+                                [error]="error"
+                                [noData]="noData"
+                                [xField]="xField"
+                                [yField]="state.eoc || 'count'"
+                                [yLabel]="state.eoc === 'exceedance' ? 'Days Exceeded' : 'Count'"
+                                [data]="results"
+                                [seriesList]="(state.regions && state.regions.length) > 0 ?  state.regions : ['all']"
+                                [height]="height-200"
+                                [mappingColumns]="mappingColumns"
+                                [type]="type"
+                                [connect]="connect"
+                                [animated]="animated"
+                                [scrollBar]="scrollBar"
+                                class="twitter-timeseries-chart"
+    ></app-timeseries-multi-chart>
+</ng-container>
+<ng-container *ngIf="!regionFilter">
+    <app-timeseries-chart (ready)="updateGraph(query)"
+                          [updating]="updating"
+                          [error]="error"
+                          [noData]="noData"
+                          [yField]="state.eoc || 'count'"
+                          [yLabel]="state.eoc === 'exceedance' ? 'Days Exceeded' : 'Count'"
+                          [data]="results"
+                          [height]="height-120"
+                          [type]="type"
+                          [connect]="connect"
+                          [animated]="animated"
+                          [scrollBar]="scrollBar"
+                          class="twitter-timeseries-chart"
+    ></app-timeseries-chart>
+</ng-container>

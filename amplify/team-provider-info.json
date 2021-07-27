@@ -9,7 +9,8 @@
       "UnauthRoleName": "amplify-socialsensing-dev-183906-unauthRole",
       "StackName": "amplify-socialsensing-dev-183906",
       "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-dev-183906/6da31140-62fe-11ea-a0c9-060e4e394d84",
-      "AmplifyAppId": "dtmxl3q3i7oix"
+      "AmplifyAppId": "dtmxl3q3i7oix",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-socialsensing-dev-183906-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
     },
     "categories": {
       "auth": {
@@ -17,7 +18,14 @@
         "userPoolGroups": {}
       },
       "function": {
-        "S3Triggerb3a090e2": {}
+        "S3Triggerb3a090e2": {
+          "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
+          "s3Key": "amplify-builds/S3Triggerb3a090e2-754e48743050344b787a-build.zip"
+        },
+        "query": {
+          "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
+          "s3Key": "amplify-builds/query-41736f76444c6e6a6e64-build.zip"
+        }
       },
       "hosting": {
         "amplifyhosting": {
@@ -73,6 +81,41 @@
       },
       "function": {
         "S3Triggerb3a090e2": {}
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "dtmxl3q3i7oix",
+          "type": "cicd"
+        }
+      }
+    }
+  },
+  "pwsdemo": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-socialsensing-pwsdemo-155623-authRole",
+      "UnauthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-pwsdemo-155623-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-pwsdemo-155623-authRole",
+      "Region": "eu-west-2",
+      "DeploymentBucketName": "amplify-socialsensing-pwsdemo-155623-deployment",
+      "UnauthRoleName": "amplify-socialsensing-pwsdemo-155623-unauthRole",
+      "StackName": "amplify-socialsensing-pwsdemo-155623",
+      "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-pwsdemo-155623/54ff9df0-de6a-11eb-8cee-0618b2a83ab4",
+      "AmplifyAppId": "dtmxl3q3i7oix"
+    },
+    "categories": {
+      "auth": {
+        "socialsensingf07a871c": {},
+        "userPoolGroups": {}
+      },
+      "function": {
+        "S3Triggerb3a090e2": {
+          "deploymentBucketName": "amplify-socialsensing-pwsdemo-155623-deployment",
+          "s3Key": "amplify-builds/S3Triggerb3a090e2-754e48743050344b787a-build.zip"
+        },
+        "query": {
+          "deploymentBucketName": "amplify-socialsensing-pwsdemo-155623-deployment",
+          "s3Key": "amplify-builds/query-6d786a326e4e74635a70-build.zip"
+        }
       },
       "hosting": {
         "amplifyhosting": {
