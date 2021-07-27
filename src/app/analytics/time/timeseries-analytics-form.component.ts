@@ -10,6 +10,8 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {Logger} from "@aws-amplify/core";
 import {RESTDataAPIService} from "../../api/rest-api.service";
 import {PreferenceService} from "../../pref/preference.service";
+import {TextAutoCompleteService} from "../../services/text-autocomplete.service";
+import {timeSeriesAutocompleteType} from "../timeseries";
 
 const log = new Logger("timeseries-config");
 
@@ -49,10 +51,11 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
   @Output()
   public changed = new EventEmitter<any>();
   private _data: { textSearch: string, regions: string[] } = {textSearch: "", regions: []};
+  public filteredAutocomplete: string[];
 
   constructor(public metadata: MetadataService, public zone: NgZone, public router: Router,
               public route: ActivatedRoute, public pref: PreferenceService,
-              private _api: RESTDataAPIService,
+              private _api: RESTDataAPIService, public auto: TextAutoCompleteService
   ) {
 
     this.metadata.regions.then(i => this.allRegions = i);
@@ -128,10 +131,17 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
     this.filteredRegions = this.regionControl.valueChanges.pipe(
       startWith(null),
       map((region: string | null) => region ? this._filter(region) : this.allRegions.slice()));
+    await this.searchControl.valueChanges.subscribe(async value => {
+      const filterValue = value.toLowerCase();
+      this.filteredAutocomplete = (await this.auto.listByOwnerOrGroup(timeSeriesAutocompleteType, filterValue)).map(
+        i => i.text);
+    });
+
     this.searchControl.setValue(this._data.textSearch);
-    this.searchControl.valueChanges.subscribe(value => {this.textChanged();});
+    this.searchControl.valueChanges.subscribe(value => {this.textChanged(); });
 
   }
+
 
   public clearTextSearch() {
     if (this._data) {

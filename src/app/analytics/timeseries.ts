@@ -5,9 +5,11 @@ import {dayInMillis} from "../common";
 
 const log = new Logger("timeseries");
 
+export const timeSeriesAutocompleteType = "graph-text-search";
+
 export type  EOC = "count" | "exceedance";
 
-export interface TimeseriesAnalyticsComponentState  {
+export interface TimeseriesAnalyticsComponentState {
   title?: string;
   dateSpacing?: number;
   avgLength?: number;
