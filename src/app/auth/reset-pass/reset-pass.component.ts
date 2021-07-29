@@ -22,7 +22,7 @@ export class ResetPassComponent implements OnInit {
   buttonColor = environment.toolbarColor;
   changePassForm: FormGroup = new FormGroup({
                                               email:    new FormControl("", [Validators.email, Validators.required]),
-                                              code:     new FormControl("", [Validators.pattern(/\d{4,}/),
+                                              code:     new FormControl("", [Validators.pattern(/\d{6,}/),
                                                                              Validators.required]),
                                               password: new FormControl("", [Validators.required, Validators.min(8)]),
                                               confirm:  new FormControl("", [Validators.required, Validators.min(8),
@@ -75,10 +75,10 @@ export class ResetPassComponent implements OnInit {
 
   getCodeInputError() {
     if (this.codeInput.hasError("required")) {
-      return "Please supply the code from the email we sent.";
+      return "Please supply the code from the email we sent you.";
     }
     if (this.codeInput.hasError("pattern")) {
-      return "Invalid code, please supply the code from the email we sent.";
+      return "Invalid code, please supply the numeric code from the email we sent you.";
     }
   }
 
