@@ -100,7 +100,7 @@
                             <mat-option value="count">Tweet Count</mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <mat-form-field>
+                    <mat-form-field *ngIf="data.dataSetMetdata.layerGroups.length > 1">
                         <mat-select [(value)]="activeLayerGroup" class="map-number-layer-select">
                             <mat-option *ngFor="let layerGroup of data.dataSetMetdata.layerGroups"
                                         [value]="layerGroup.id">{{layerGroup.title}}</mat-option>

@@ -20,14 +20,15 @@ export class TextAutoCompleteService {
 
   public async create(type: string, text: string, forOwner = true,
                       forGroup = false): Promise<TextAutocomplete> {
-    const results = await DataStore.query(TextAutocomplete, q => q.text("eq", text));
+    const owner = forOwner ? await this._prefs.username : null;
+    const group = forGroup ? this._prefs.groups[0] : null;
+    const results = await DataStore.query(TextAutocomplete,
+                                          q => q.or(r => r.owner("eq", owner).group("eq", group))
+                                                .text("eq", text)
+                                                .type("eq", type)
+    );
     if (results.length === 0) {
-      return await DataStore.save(new TextAutocomplete({
-                                                         type,
-                                                         text,
-                                                         owner: forOwner ? await this._prefs.username : null,
-                                                         group: forOwner ? this._prefs.groups[0] : null
-                                                       }));
+      return await DataStore.save(new TextAutocomplete({type, text, owner, group}));
     } else {
       return results[0];
     }

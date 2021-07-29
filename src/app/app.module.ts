@@ -48,6 +48,8 @@ import {TimeseriesAnalyticsFormComponent} from "./analytics/time/timeseries-anal
 import {TimeSeriesMultipleQueryChartComponent} from "./analytics/time/timeseries-multi-chart/time-series-multiple-query-chart.component";
 import { NameGraphDialogComponent } from "./analytics/time/name-graph-dialog/name-graph-dialog.component";
 import {TimeseriesWidgetComponent} from "./analytics/widgets/twitter-timeseries/timeseries-widget.component";
+import {ForgotPassComponent} from "./auth/forgot-pass/forgot-pass.component";
+import {ResetPassComponent} from "./auth/reset-pass/reset-pass.component";
 
 @NgModule({
               declarations:    [
@@ -83,7 +85,9 @@ import {TimeseriesWidgetComponent} from "./analytics/widgets/twitter-timeseries/
                   TimeseriesAnalyticsFormComponent,
                   TimeSeriesMultipleQueryChartComponent,
                   NameGraphDialogComponent,
-                  TimeseriesWidgetComponent
+                  TimeseriesWidgetComponent,
+                    ForgotPassComponent,
+                  ResetPassComponent
               ],
               imports:         [
                   BrowserModule,
