@@ -10,8 +10,7 @@ import {Logger} from "@aws-amplify/core";
 const log = new Logger("forgot-pass");
 
 /**
- * The New Password Component exists for when a user is forced by Cognito to change their
- * password. Primarily that is to allow the user to change the Admin set temporary password.
+ * The Forgot Password Component exists for when a user has forgotten their password.
  */
 @Component({
              selector:    "app-forgot-pass",
@@ -61,8 +60,14 @@ export class ForgotPassComponent implements OnInit {
       log.debug("completed forgot password");
       // window.location.replace(this._route.snapshot.queryParams._return);
       this.message = "An email has been sent to you with a code for resetting your password.";
-      this._router.navigate(["/auth/resetpass"], {queryParamsHandling: "merge", queryParams: {username:this.emailInput.value}});
-    }).catch(e => log.error(e));
+      this._router.navigate(["/auth/resetpass"],
+                            {queryParamsHandling: "merge", queryParams: {username: this.emailInput.value}});
+    }).catch(e => {
+      log.error(e);
+      if (e.hasOwnProperty("message")) {
+        this._notification.show(e.message);
+      }
+    });
   }
 
 

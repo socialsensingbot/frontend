@@ -5,6 +5,7 @@
 
     <form [formGroup]="changePassForm">
       <h2>{{message}}</h2>
+      <h3>An email has been sent to you with a code for resetting your password."</h3>
       <mat-form-field>
         <input matInput placeholder="Email" type="email" formControlName="email" autocomplete="email" required>
         <mat-hint *ngIf="!emailInput.value">Enter your email address</mat-hint>

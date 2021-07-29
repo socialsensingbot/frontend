@@ -10,8 +10,8 @@ import {Logger} from "@aws-amplify/core";
 const log = new Logger("reset-pass");
 
 /**
- * The New Password Component exists for when a user is forced by Cognito to change their
- * password. Primarily that is to allow the user to change the Admin set temporary password.
+ * The Reset Password Component exists for when a user has requested Cognito to reset their
+ * password.
  */
 @Component({
              selector:    "app-reset-pass",
@@ -108,6 +108,12 @@ export class ResetPassComponent implements OnInit {
       } else {
         this._router.navigate(["/"]);
       }
-    }).catch(e => log.error(e));
+    }).catch(e => {
+      log.error(e);
+      if (e.hasOwnProperty("message")) {
+        this._notification.show(e.message);
+      }
+    });
+
   }
 }
