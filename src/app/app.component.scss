@@ -52,3 +52,14 @@
   display: inline-block;
   width: 100%;
 }
+
+
+.app-loading-progress {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    //margin-left: -100%;
+    //margin-top: -100%;
+    position: absolute;
+    z-index: 1000;
+}

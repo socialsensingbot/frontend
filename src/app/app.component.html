@@ -1,4 +1,4 @@
-<div class="content" role="main">
+<div class="content" role="main" *ngIf="pref.ready" >
 
     <mat-menu x-position="before" #menu="matMenu">
         <button mat-menu-item routerLink="/">
@@ -92,3 +92,5 @@
 
 
 </div>
+<mat-progress-bar *ngIf="loading.progressPercentage > 0" class="app-loading-progress" mode="determinate" value="loading.progressPercentage"
+                  [color]="pref.combined.toolbarColor"></mat-progress-bar>

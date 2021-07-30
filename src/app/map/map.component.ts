@@ -35,6 +35,7 @@ import {environment} from "../../environments/environment";
 import Auth from "@aws-amplify/auth";
 import {FormControl} from "@angular/forms";
 import {DashboardService} from "../pref/dashboard.service";
+import {LoadingProgressService} from "../services/loading-progress.service";
 
 
 const log = new Logger("map");
@@ -149,6 +150,7 @@ export class MapComponent implements OnInit, OnDestroy {
                 public pref: PreferenceService,
                 private readonly cache: NgForageCache,
                 public dash: DashboardService,
+                public loading: LoadingProgressService
     ) {
         // save the query parameter observable
         this._searchParams = this.route.queryParams;
@@ -697,8 +699,7 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this.pref.combined.showLoadingMessages) {
             this._notify.show("Loading application ...", "OK", 60);
         }
-        $("#loading-div").css("opacity", 0.0);
-        setTimeout(() => $("#loading-div").remove(), 1000);
+        this.loading.loaded();
         this.checkForLiveUpdating();
         this._searchParams.subscribe(async params => {
 
@@ -1140,4 +1141,3 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
 }
-

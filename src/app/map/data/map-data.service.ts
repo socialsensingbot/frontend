@@ -15,6 +15,7 @@ import * as geojson from "geojson";
 import {environment} from "../../../environments/environment";
 import Storage from "@aws-amplify/storage";
 import {AnnotationService} from "../../pref/annotation.service";
+import {LoadingProgressService} from "../../services/loading-progress.service";
 
 
 const log = new Logger("map-data");
@@ -207,7 +208,8 @@ export class MapDataService implements MapDataServiceInt {
                 private _notify: NotificationService, private readonly cache: NgForageCache,
                 private readonly ngf: NgForage,
                 private _pref: PreferenceService,
-                private _annotation: AnnotationService
+                private _annotation: AnnotationService,
+                private _loading: LoadingProgressService
     ) {
 
     }
@@ -240,7 +242,7 @@ export class MapDataService implements MapDataServiceInt {
         const version = environment.version + ":" + this.dataSetMetdata.version;
         const promises = {};
         if (this._pref.combined.showLoadingMessages) {
-            this._notify.show("Loading reference data ...", "OK", 60);
+            this._loading.progress("Loading reference data ...", 4);
         }
         for (const regionGroup of this.dataSetMetdata.regionGroups) {
             // Note the use of a random time to make sure that we don't refresh all datasets at once!!
@@ -254,11 +256,11 @@ export class MapDataService implements MapDataServiceInt {
         }
         for (const regionGroup of this.dataSetMetdata.regionGroups) {
             if (this._pref.combined.showLoadingMessages) {
-                this._notify.show("Loading '" + regionGroup.title + "' statistics...", "OK", 60);
+                this._loading.progress("Loading '" + regionGroup.title + "' statistics...", 5);
             }
             this._stats[regionGroup.id] = (await promises["stats:" + regionGroup.id]) as RegionData<any, any, any>;
             if (this._pref.combined.showLoadingMessages) {
-                this._notify.show("Loading '" + regionGroup.title + "' geography ...", "OK", 60);
+                this._loading.progress("Loading '" + regionGroup.title + "' geography ...", 6);
             }
             this.polygonData[regionGroup.id] = (await promises["features:" + regionGroup.id]) as geojson.GeoJsonObject;
         }
@@ -273,7 +275,7 @@ export class MapDataService implements MapDataServiceInt {
         const version = environment.version + ":" + this.dataSetMetdata.version;
         const promises = {};
         if (this._pref.combined.showLoadingMessages) {
-            this._notify.show("Loading aggregation data ...", "OK", 60);
+            this._loading.progress("Loading aggregation data ...", 7);
         }
         if (typeof this.dataSetMetdata.regionAggregations === "undefined") {
             this.dataSetMetdata.regionAggregations = [];
@@ -585,7 +587,7 @@ export class MapDataService implements MapDataServiceInt {
         } else {
             log.info(`${name} not in cache.`);
             if (loadingMessage !== null && this._pref.combined.showLoadingMessages) {
-                this._notify.show(loadingMessage, "OK", 60);
+                this._loading.progress(loadingMessage);
             }
             const url = await Storage.get(name);
             const jsonData = await this._http.get(url.toString(), {observe: "body", responseType: "json"})
