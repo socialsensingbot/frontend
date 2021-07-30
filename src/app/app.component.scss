@@ -52,3 +52,30 @@
   display: inline-block;
   width: 100%;
 }
+
+
+.app-loading-progress {
+    top: 64px;
+    left: 0;
+    right: 0;
+    //margin-left: -100%;
+    //margin-top: -100%;
+    position: absolute;
+    z-index: 1000;
+    width:100%;
+}
+
+.app-loading-spinner {
+
+        top: 50vh;
+        bottom: 50vh;
+        left: 50vw;
+        right: 50vw;
+        padding-left: -100%;
+        padding-top: -100%;
+        position: absolute;
+        z-index: 100;
+        opacity: 0.8;
+
+
+}

@@ -47,9 +47,11 @@ export class PreferenceService {
         };
         setTimeout(loop, 50);
     });
+    public environment: any;
 
     constructor(private _notify: NotificationService) {
         this._combined = {...environment};
+        this.environment = environment;
     }
 
     private _combined: any;
@@ -439,7 +441,7 @@ export class PreferenceService {
                                q => q.tweetId("eq", tweet.id).ownerGroups("contains", this._groups[0]));
     }
 
-    public featureSupported(feature:string):boolean {
+    public featureSupported(feature: string): boolean {
         return this.combined.features.includes(feature);
     }
 }

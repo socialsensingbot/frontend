@@ -28,7 +28,7 @@
         <router-outlet></router-outlet>
     </div>
 
-    <mat-toolbar *ngIf="pref.ready" [color]="pref.combined.toolbarColor" class="expanded-toolbar">
+    <mat-toolbar [color]="pref.environment.toolbarColor" class="expanded-toolbar">
     <span>
       <button class="logo-button" mat-button routerLink="/"><img src="/assets/icon-white/Icon24@2x.png"/> SOCIAL SENSING</button>
         <!--      <button mat-button routerLink="/"><mat-icon>home</mat-icon></button>-->
@@ -37,16 +37,16 @@
         <span class="menu-spacer">&nbsp;</span>
         <div id="login" fxLayout="row" fxShow="false" fxShow.gt-sm>
             <button mat-button routerLink="/dashboard"
-                    queryParamsHandling="merge" *ngIf="isAuthenticated && pref.featureSupported('dashboard')">
+                    queryParamsHandling="merge" *ngIf="isAuthenticated && pref.ready && pref.featureSupported('dashboard')">
                 <!--       <mat-icon>power_settings_new</mat-icon>-->
                 Dashboard
             </button>
             <button mat-button routerLink="/analytics/time"
-                    queryParamsHandling="merge" *ngIf="isAuthenticated && pref.featureSupported('analytics')">
+                    queryParamsHandling="merge" *ngIf="isAuthenticated && pref.ready &&pref.featureSupported('analytics')">
                 <!--       <mat-icon>power_settings_new</mat-icon>-->
                 Analytics
             </button>
-            <button mat-button queryParamsHandling="merge" routerLink="/map" *ngIf="isAuthenticated &&
+            <button mat-button queryParamsHandling="merge" routerLink="/map" *ngIf="isAuthenticated && pref.ready &&
             pref.featureSupported('dashboard')  && pref.featureSupported('map')">
                 <!--       <mat-icon>power_settings_new</mat-icon>-->
                 Map
@@ -92,3 +92,6 @@
 
 
 </div>
+<mat-progress-bar *ngIf="loading.progressPercentage > 0" class="app-loading-progress" mode="determinate" [value]="loading.progressPercentage*100"></mat-progress-bar>
+
+<mat-spinner *ngIf="loading.progressPercentage > 0" mode="determinate" [value]="loading.progressPercentage*100" class="app-loading-spinner"></mat-spinner>

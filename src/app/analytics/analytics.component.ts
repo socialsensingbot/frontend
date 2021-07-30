@@ -1,6 +1,7 @@
 import {Component, OnInit} from "@angular/core";
 import {PreferenceService} from "../pref/preference.service";
 import {DashboardService} from "../pref/dashboard.service";
+import {LoadingProgressService} from "../services/loading-progress.service";
 
 @Component({
              selector:    "app-analytics",
@@ -12,13 +13,13 @@ export class AnalyticsComponent implements OnInit {
   public activity: boolean;
   public sidebarVisible = true;
 
-  constructor(public pref: PreferenceService, public dash: DashboardService) { }
+  constructor(public pref: PreferenceService, public dash: DashboardService,
+              public loading: LoadingProgressService) { }
 
   async ngOnInit() {
     this.ready = true;
-    $("#loading-div").css("opacity", 0.0);
-    setTimeout(() => $("#loading-div").remove(), 1000);
     await this.dash.init();
+    this.loading.loaded();
   }
 
 }
