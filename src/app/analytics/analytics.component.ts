@@ -18,8 +18,8 @@ export class AnalyticsComponent implements OnInit {
 
   async ngOnInit() {
     this.ready = true;
-    this.loading.loaded();
     await this.dash.init();
+    this.loading.loaded();
   }
 
 }

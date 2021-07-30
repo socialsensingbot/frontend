@@ -46,12 +46,12 @@ export class DashboardComponent implements OnInit {
     }
 
     public async ngOnInit() {
-        this.loading.loaded();
         await this.dash.init();
         await this.dash.waitUntilReady();
         this.ready = true;
         log.debug("Dashboard ready with ", this.dash.dashboard);
         this.initDashboard();
+        this.loading.loaded();
     }
 
     public saveCard(index: number, data: any) {

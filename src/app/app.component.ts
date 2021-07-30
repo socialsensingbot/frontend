@@ -40,32 +40,34 @@ export class AppComponent {
     private dataStoreListener: any;
     private initiateLogout: boolean;
     private dataStoreSynced: boolean;
+    public ready = false;
 
     constructor(public auth: AuthService,
                 public pref: PreferenceService,
-                private _router: Router, private _pref: PreferenceService,
+                private _router: Router,
                 private _notify: NotificationService,
                 private _session: SessionService,
                 private _annotation: AnnotationService,
                 @Inject(RollbarService) private _rollbar: Rollbar, private _exec: UIExecutionService,
                 public loading: LoadingProgressService) {
 
+        loading.progress("Starting Application", 1);
         Auth.currentAuthenticatedUser({bypassCache: true})
             .then(user => this.isAuthenticated = (user != null))
             .then(user => this.auth.loggedIn = (user != null))
             .then(() => this.checkSession())
             .catch(err => log.debug(err));
-        auth.state.subscribe((event: string) => {
+        auth.state.subscribe(async (event: string) => {
             if (event === AuthService.SIGN_IN) {
                 this.isAuthenticated = true;
                 this.isSignup = false;
-                this.checkSession();
+                await this.checkSession();
             }
             if (event === AuthService.SIGN_OUT) {
                 this.user = undefined;
                 this.isAuthenticated = false;
                 this.isSignup = !environment.production;
-                this._pref.clear();
+                this.pref.clear();
             }
         });
 
@@ -74,6 +76,7 @@ export class AppComponent {
     }
 
     async checkSession() {
+
         log.debug("checkSession()");
         if (!this.isAuthenticated) {
             log.debug("Not authenticated");
@@ -92,20 +95,21 @@ export class AppComponent {
             if (event === "outboxStatus") {
                 this.dataStoreSynced = data.isEmpty;
                 if (data.isEmpty && this.initiateLogout) {
-                    this.loading.progress("Synced", 1);
+                    this.loading.progress("Synced", 2);
 
                     setTimeout(() => this.doLogout(), 500);
                 }
 
             }
             if (event === "ready" && !this.initiateLogout) {
-                this.loading.progress("Synced data with the server ...", 1);
+                this.loading.progress("Synced data with the server ...", 2);
 
                 const user = await Auth.currentAuthenticatedUser();
                 const userInfo = await Auth.currentUserInfo();
                 if (userInfo) {
                     try {
-                        await this._pref.init(userInfo);
+                        await this.pref.init(userInfo);
+                        this.ready = true;
                     } catch (e) {
                         this._rollbar.error(e);
                         log.error(e);
@@ -140,9 +144,9 @@ export class AppComponent {
                     }
                     this._exec.start();
                     log.info("Locale detected: " + getLang());
-                    log.info("Locale in use: " + this._pref.combined.locale);
+                    log.info("Locale in use: " + this.pref.combined.locale);
                     log.info("Timezone detected: " + Intl.DateTimeFormat().resolvedOptions().timeZone);
-                    log.info("Timezone in use: " + this._pref.combined.timezone);
+                    log.info("Timezone in use: " + this.pref.combined.timezone);
                     // Start the DataStore, this kicks-off the sync process.
                     this._rollbar.configure(
                         {
@@ -154,12 +158,12 @@ export class AppComponent {
                                 person: {
                                     id:       userInfo.username,
                                     username: userInfo.username,
-                                    groups:   this._pref.groups
+                                    groups:   this.pref.groups
                                 },
                                 // environment: environment.name,
                                 environment_info: environment,
                                 prefs:            {
-                                    group: this._pref.combined
+                                    group: this.pref.combined
                                 }
                             }
                         }
@@ -177,11 +181,11 @@ export class AppComponent {
         });
         try {
             if (environment.showLoadingMessages) {
-                this.loading.progress("Syncing data with the server ...", 2);
+                this.loading.progress("Syncing data with the server ...", 3);
             }
             await DataStore.start();
             if (environment.showLoadingMessages) {
-                this.loading.progress("Data synced with the server ...", 3);
+                this.loading.progress("Data synced with the server ...", 4);
             }
         } catch (e) {
             log.error(e);
@@ -197,7 +201,7 @@ export class AppComponent {
             this.initiateLogout = true;
             // failsafe
             setTimeout(() => this.doLogout(), 5000);
-            this.loading.progress("Syncing data before logout.", 0);
+            this.loading.progress("Syncing data before logout.", 1);
         } else {
             await this.doLogout();
         }
@@ -211,10 +215,14 @@ export class AppComponent {
         }
         this.isAuthenticated = false;
         log.info("Clearing data store.");
+        this.loading.progress("Removing data ...", 2);
         await DataStore.clear();
         log.info("Performing sign out.");
+        this.loading.progress("Signing out...", 3);
+
         await Auth.signOut()
-                  .then(i => this._router.navigate(["/"], {queryParamsHandling: "merge"}))
+                  .then(() => this.loading.progress("Signed out...", 0))
+                  .then(() => this._router.navigate(["/"], {queryParamsHandling: "merge"}))
                   .catch(err => log.error(err));
         log.info("Performed sign out.");
         this._exec.stop();

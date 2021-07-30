@@ -7,7 +7,7 @@ const log = new Logger("loading");
             })
 export class LoadingProgressService {
 
-    private maxStages = 10;
+    private maxStages = 8;
     private currentStage = 0;
 
     public get progressPercentage(): number {
@@ -26,8 +26,9 @@ export class LoadingProgressService {
     }
 
     public loaded(): void {
+        log.info("Finished loading");
+        this.currentStage = 0;
         $("#loading-div").css("opacity", 0.0);
         setTimeout(() => $("#loading-div").remove(), 1000);
-        this.currentStage = 0;
     }
 }

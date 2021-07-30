@@ -242,7 +242,7 @@ export class MapDataService implements MapDataServiceInt {
         const version = environment.version + ":" + this.dataSetMetdata.version;
         const promises = {};
         if (this._pref.combined.showLoadingMessages) {
-            this._loading.progress("Loading reference data ...", 4);
+            this._loading.progress("Loading reference data ...", 5);
         }
         for (const regionGroup of this.dataSetMetdata.regionGroups) {
             // Note the use of a random time to make sure that we don't refresh all datasets at once!!
@@ -256,11 +256,11 @@ export class MapDataService implements MapDataServiceInt {
         }
         for (const regionGroup of this.dataSetMetdata.regionGroups) {
             if (this._pref.combined.showLoadingMessages) {
-                this._loading.progress("Loading '" + regionGroup.title + "' statistics...", 5);
+                this._loading.progress("Loading '" + regionGroup.title + "' statistics...", 6);
             }
             this._stats[regionGroup.id] = (await promises["stats:" + regionGroup.id]) as RegionData<any, any, any>;
             if (this._pref.combined.showLoadingMessages) {
-                this._loading.progress("Loading '" + regionGroup.title + "' geography ...", 6);
+                this._loading.progress("Loading '" + regionGroup.title + "' geography ...", 7);
             }
             this.polygonData[regionGroup.id] = (await promises["features:" + regionGroup.id]) as geojson.GeoJsonObject;
         }
