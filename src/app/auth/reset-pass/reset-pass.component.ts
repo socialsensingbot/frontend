@@ -14,106 +14,115 @@ const log = new Logger("reset-pass");
  * password.
  */
 @Component({
-             selector:    "app-reset-pass",
-             templateUrl: "./reset-pass.component.html",
-             styleUrls:   ["./reset-pass.component.scss"]
+               selector:    "app-reset-pass",
+               templateUrl: "./reset-pass.component.html",
+               styleUrls:   ["./reset-pass.component.scss"]
            })
 export class ResetPassComponent implements OnInit {
-  buttonColor = environment.toolbarColor;
-  changePassForm: FormGroup = new FormGroup({
-                                              email:    new FormControl("", [Validators.email, Validators.required]),
-                                              code:     new FormControl("", [Validators.pattern(/\d{6,}/),
-                                                                             Validators.required]),
-                                              password: new FormControl("", [Validators.required, Validators.min(8)]),
-                                              confirm:  new FormControl("", [Validators.required, Validators.min(8),
-                                                                             control => {
-                                                                               const errors: ValidationErrors = {};
-                                                                               if (this && this.changePassForm && this.passwordInput.value !== control.value) {
-                                                                                 errors.different = "Password and confirmation are not the same.";
-                                                                               }
-                                                                               return errors;
-                                                                             }])
-                                            });
+    buttonColor = environment.toolbarColor;
+    changePassForm: FormGroup = new FormGroup({
+                                                  email:    new FormControl("", [Validators.email, Validators.required]),
+                                                  code:     new FormControl("", [Validators.pattern(/[0-9]{6,}/),
+                                                                                 Validators.required]),
+                                                  password: new FormControl("", [Validators.required, Validators.min(8)]),
+                                                  confirm:  new FormControl("", [Validators.required, Validators.min(8),
+                                                                                 control => {
+                                                                                     const errors: ValidationErrors = {};
+                                                                                     if (this && this.changePassForm && this.passwordInput.value !== control.value) {
+                                                                                         errors.different = "Password and confirmation are not the same.";
+                                                                                     }
+                                                                                     return errors;
+                                                                                 }])
+                                              });
 
-  hide = true;
-  message = "Reset Password";
+    hide = true;
+    message = "Reset Password";
 
-  get passwordInput() { return this.changePassForm.get("password"); }
-
-  get emailInput() { return this.changePassForm.get("email"); }
-
-  get codeInput() { return this.changePassForm.get("code"); }
-
-  get confirmInput() { return this.changePassForm.get("confirm"); }
-
-  constructor(
-    public auth: AuthService,
-    private _notification: NotificationService,
-    private _router: Router,
-    private _route: ActivatedRoute) {
-
-    if (_route.snapshot.queryParams.username) {
-      this.emailInput.setValue(_route.snapshot.queryParams.username);
+    get passwordInput() {
+        return this.changePassForm.get("password");
     }
 
-    // this.message = _router.getCurrentNavigation().extras.state.message;
-  }
-
-  ngOnInit(): void {
-    $("#loading-div").remove();
-  }
-
-
-  getEmailInputError() {
-    if (this.emailInput.hasError("email")) {
-      return "Please enter a valid email address.";
+    get emailInput() {
+        return this.changePassForm.get("email");
     }
-    if (this.emailInput.hasError("required")) {
-      return "Your username (email) is required.";
+
+    get codeInput() {
+        return this.changePassForm.get("code");
     }
-  }
 
-  getCodeInputError() {
-    if (this.codeInput.hasError("required")) {
-      return "Please supply the code from the email we sent you.";
+    get confirmInput() {
+        return this.changePassForm.get("confirm");
     }
-    if (this.codeInput.hasError("pattern")) {
-      return "Invalid code, please supply the numeric code from the email we sent you.";
+
+    constructor(
+        public auth: AuthService,
+        private _notification: NotificationService,
+        private _router: Router,
+        private _route: ActivatedRoute) {
+
+        if (_route.snapshot.queryParams.username) {
+            this.emailInput.setValue(_route.snapshot.queryParams.username);
+        }
+
+        // this.message = _router.getCurrentNavigation().extras.state.message;
     }
-  }
 
-
-  getPasswordError() {
-    if (this.passwordInput.hasError("required")) {
-      return "Please supply a password.";
+    ngOnInit(): void {
+        $("#loading-div").remove();
     }
-  }
 
 
-  getConfirmPasswordError() {
-    if (this.confirmInput.hasError("required")) {
-      return "Please confirm password.";
+    getEmailInputError() {
+        if (this.emailInput.hasError("email")) {
+            return "Please enter a valid email address.";
+        }
+        if (this.emailInput.hasError("required")) {
+            return "Your username (email) is required.";
+        }
     }
-    if (this.confirmInput.hasError("different")) {
-      return "Password and confirmation do not match";
+
+    getCodeInputError() {
+        if (this.codeInput.hasError("required")) {
+            return "Please supply the code from the email we sent you.";
+        }
+        if (this.codeInput.hasError("pattern")) {
+            this.codeInput.setValue(this.codeInput.value.replace(/[^0-9]+/g, ""), {emit: false});
+            return "Invalid code, please supply the numeric code from the email we sent you.";
+        }
     }
-  }
 
 
-  public resetPass() {
-    return this.auth.resetPassword(this.emailInput.value, this.codeInput.value, this.passwordInput.value).then(() => {
-      log.debug("completed new password");
-      if (this._route.snapshot.queryParams._return) {
-        window.location.replace(this._route.snapshot.queryParams._return);
-      } else {
-        this._router.navigate(["/"]);
-      }
-    }).catch(e => {
-      log.error(e);
-      if (e.hasOwnProperty("message")) {
-        this._notification.show(e.message);
-      }
-    });
+    getPasswordError() {
+        if (this.passwordInput.hasError("required")) {
+            return "Please supply a password.";
+        }
+    }
 
-  }
+
+    getConfirmPasswordError() {
+        if (this.confirmInput.hasError("required")) {
+            return "Please confirm password.";
+        }
+        if (this.confirmInput.hasError("different")) {
+            return "Password and confirmation do not match";
+        }
+    }
+
+
+    public resetPass() {
+        return this.auth.resetPassword(this.emailInput.value, this.codeInput.value, this.passwordInput.value).then(() => {
+            log.debug("completed new password");
+            if (this._route.snapshot.queryParams._return) {
+                window.location.replace(this._route.snapshot.queryParams._return);
+            } else {
+                this._router.navigate(["/"]);
+            }
+        }).catch(e => {
+            log.error(e);
+            if (e.hasOwnProperty("message")) {
+                this._notification.show(e.message);
+            }
+        });
+
+    }
 }
