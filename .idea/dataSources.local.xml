@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="dataSourceStorageLocal" created-in="IU-212.4746.92">
+    <data-source name="Social Sensing MySQL" uuid="0d3edb57-3f28-442d-be19-b08f01293afb">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="MYSQL" exact-version="0" />
+      <schema-mapping />
+    </data-source>
+    <data-source name="Dev" uuid="954c44d0-17c9-4ec9-9053-f68eb285974f">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="MYSQL" exact-version="0" />
+      <schema-mapping />
+    </data-source>
+    <data-source name="Prod" uuid="cef8371c-cf35-41b4-95ff-a227b09783f8">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="MYSQL" exact-version="0" />
+      <schema-mapping />
+    </data-source>
+    <data-source name="PWS Demo" uuid="fe2a17e7-ca25-4572-ba25-5641bf27407d">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="MYSQL" exact-version="0" />
+      <schema-mapping />
+    </data-source>
+  </component>
+</project>
