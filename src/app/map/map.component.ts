@@ -1118,22 +1118,15 @@ export class MapComponent implements OnInit, OnDestroy {
         }, "", false, true, true);
     }
 
-    public timeSliderPreset(mins: number) {
-            log.debug("timeSliderPreset()");
-            this._absoluteTime = this.data.lastEntryDate().getTime();
-            this._dateMin = Math.max(this._dateMin,
-                                     this._absoluteTime - ((this.data.entryCount() - mins - 1 ) * ONE_MINUTE_IN_MILLIS));
-            this._dateMax = Math.max(this._dateMax,
-                                     this._absoluteTime - ((this.data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
-
-            this.sliderOptions = {
-                max:      0,
-                min:      -this.data.entryCount() + 1,
-                startMin: -mins,
-                startMax: 0
-            };
-            this.checkForLiveUpdating();
-
-
+    public async timeSliderPreset(mins: number) {
+        log.debug("timeSliderPreset()");
+        await this.sliderChange({lower: -mins, upper: 0});
+        this.sliderOptions = {
+            max:      0,
+            min:      -this.data.entryCount() + 1,
+            startMin: -mins,
+            startMax: 0
+        };
+        this._sliderIsStale = true;
     }
 }
