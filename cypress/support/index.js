@@ -15,6 +15,7 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
+import 'cypress-plugin-snapshots/commands';
 
 // require('cypress-plugin-retries');
 
@@ -22,6 +23,8 @@ import './commands'
 //     win.indexedDB.deleteDatabase("ngForage");
 // });
 export const MAP_URL = "http://localhost:4200/map/uk-flood-2018"
+export const ANALYTICS_URL = "http://localhost:4200/analytics"
+export const DASHBOARD_URL = "http://localhost:4200/dashboard"
 
 
 // https://github.com/cypress-io/cypress/issues/8525

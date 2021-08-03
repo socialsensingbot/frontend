@@ -46,6 +46,7 @@
     "@types/leaflet": "^1.7.2",
     "@types/zen-observable": "^0.8.2",
     "aws-sdk": "^2.929.0",
+    "cypress-plugin-snapshots": "^1.4.4",
     "date-fns": "^2.22.1",
     "export-to-csv": "^0.2.1",
     "fingerprintjs2": "^2.1.4",

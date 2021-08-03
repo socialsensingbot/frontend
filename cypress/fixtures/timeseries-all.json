@@ -1,0 +1,2543 @@
+[
+  {
+    "count": 15,
+    "date": "2020-08-03T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.0686,
+    "inv_percent": 1.068685376661743
+  },
+  {
+    "count": 210,
+    "date": "2020-08-04T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 8.9383,
+    "inv_percent": 8.987577639751553
+  },
+  {
+    "count": 106,
+    "date": "2020-08-05T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.3746,
+    "inv_percent": 4.384848484848485
+  },
+  {
+    "count": 51,
+    "date": "2020-08-06T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.4837,
+    "inv_percent": 2.486254295532646
+  },
+  {
+    "count": 34,
+    "date": "2020-08-07T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7988,
+    "inv_percent": 1.7997512437810943
+  },
+  {
+    "count": 22,
+    "date": "2020-08-08T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.2657,
+    "inv_percent": 1.2659667541557307
+  },
+  {
+    "count": 36,
+    "date": "2020-08-09T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.8928,
+    "inv_percent": 1.893979057591623
+  },
+  {
+    "count": 142,
+    "date": "2020-08-10T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.7233,
+    "inv_percent": 5.742063492063492
+  },
+  {
+    "count": 169,
+    "date": "2020-08-11T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 6.8952,
+    "inv_percent": 6.923444976076555
+  },
+  {
+    "count": 1363,
+    "date": "2020-08-12T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 111.3846,
+    "inv_percent": 120.58333333333333
+  },
+  {
+    "count": 593,
+    "date": "2020-08-13T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 30.8085,
+    "inv_percent": 31.456521739130434
+  },
+  {
+    "count": 172,
+    "date": "2020-08-14T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 7.1683,
+    "inv_percent": 7.199004975124377
+  },
+  {
+    "count": 231,
+    "date": "2020-08-15T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 10.2695,
+    "inv_percent": 10.335714285714285
+  },
+  {
+    "count": 304,
+    "date": "2020-08-16T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 13.6604,
+    "inv_percent": 13.780952380952382
+  },
+  {
+    "count": 387,
+    "date": "2020-08-17T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 17.0353,
+    "inv_percent": 17.226190476190474
+  },
+  {
+    "count": 185,
+    "date": "2020-08-18T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 7.956,
+    "inv_percent": 7.9944751381215475
+  },
+  {
+    "count": 175,
+    "date": "2020-08-19T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 7.204,
+    "inv_percent": 7.235
+  },
+  {
+    "count": 184,
+    "date": "2020-08-20T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 7.8696,
+    "inv_percent": 7.907103825136613
+  },
+  {
+    "count": 84,
+    "date": "2020-08-21T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.62,
+    "inv_percent": 3.6265664160401005
+  },
+  {
+    "count": 44,
+    "date": "2020-08-22T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.2243,
+    "inv_percent": 2.226153846153846
+  },
+  {
+    "count": 47,
+    "date": "2020-08-23T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.3094,
+    "inv_percent": 2.3115015974440896
+  },
+  {
+    "count": 104,
+    "date": "2020-08-24T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.2967,
+    "inv_percent": 4.306547619047619
+  },
+  {
+    "count": 471,
+    "date": "2020-08-25T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 21.9394,
+    "inv_percent": 22.261538461538464
+  },
+  {
+    "count": 145,
+    "date": "2020-08-26T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.8623,
+    "inv_percent": 5.882113821138211
+  },
+  {
+    "count": 592,
+    "date": "2020-08-27T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 30.1667,
+    "inv_percent": 30.78723404255319
+  },
+  {
+    "count": 250,
+    "date": "2020-08-28T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 11.0534,
+    "inv_percent": 11.130769230769232
+  },
+  {
+    "count": 44,
+    "date": "2020-08-29T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.2243,
+    "inv_percent": 2.226153846153846
+  },
+  {
+    "count": 24,
+    "date": "2020-08-30T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3533,
+    "inv_percent": 1.3536014967259122
+  },
+  {
+    "count": 29,
+    "date": "2020-08-31T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5421,
+    "inv_percent": 1.5426439232409381
+  },
+  {
+    "count": 24,
+    "date": "2020-09-01T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3533,
+    "inv_percent": 1.3536014967259122
+  },
+  {
+    "count": 165,
+    "date": "2020-09-02T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 6.7349,
+    "inv_percent": 6.761682242990655
+  },
+  {
+    "count": 34,
+    "date": "2020-09-03T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7988,
+    "inv_percent": 1.7997512437810943
+  },
+  {
+    "count": 34,
+    "date": "2020-09-04T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7988,
+    "inv_percent": 1.7997512437810943
+  },
+  {
+    "count": 21,
+    "date": "2020-09-05T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.2344,
+    "inv_percent": 1.234641638225256
+  },
+  {
+    "count": 17,
+    "date": "2020-09-06T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1156,
+    "inv_percent": 1.1156515034695451
+  },
+  {
+    "count": 19,
+    "date": "2020-09-07T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1677,
+    "inv_percent": 1.1678773204196933
+  },
+  {
+    "count": 22,
+    "date": "2020-09-08T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.2657,
+    "inv_percent": 1.2659667541557307
+  },
+  {
+    "count": 28,
+    "date": "2020-09-09T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5068,
+    "inv_percent": 1.5072916666666667
+  },
+  {
+    "count": 17,
+    "date": "2020-09-10T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1156,
+    "inv_percent": 1.1156515034695451
+  },
+  {
+    "count": 38,
+    "date": "2020-09-11T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.9836,
+    "inv_percent": 1.9849108367626886
+  },
+  {
+    "count": 25,
+    "date": "2020-09-12T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3843,
+    "inv_percent": 1.384688995215311
+  },
+  {
+    "count": 48,
+    "date": "2020-09-13T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.3506,
+    "inv_percent": 2.3528455284552843
+  },
+  {
+    "count": 34,
+    "date": "2020-09-14T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7988,
+    "inv_percent": 1.7997512437810943
+  },
+  {
+    "count": 18,
+    "date": "2020-09-15T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1402,
+    "inv_percent": 1.14026792750197
+  },
+  {
+    "count": 41,
+    "date": "2020-09-16T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.0986,
+    "inv_percent": 2.100145137880987
+  },
+  {
+    "count": 43,
+    "date": "2020-09-17T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.1906,
+    "inv_percent": 2.1924242424242424
+  },
+  {
+    "count": 27,
+    "date": "2020-09-18T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.4538,
+    "inv_percent": 1.4542713567839196
+  },
+  {
+    "count": 21,
+    "date": "2020-09-19T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.2344,
+    "inv_percent": 1.234641638225256
+  },
+  {
+    "count": 22,
+    "date": "2020-09-20T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.2657,
+    "inv_percent": 1.2659667541557307
+  },
+  {
+    "count": 31,
+    "date": "2020-09-21T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.6325,
+    "inv_percent": 1.6331828442437923
+  },
+  {
+    "count": 21,
+    "date": "2020-09-22T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.2344,
+    "inv_percent": 1.234641638225256
+  },
+  {
+    "count": 38,
+    "date": "2020-09-23T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.9836,
+    "inv_percent": 1.9849108367626886
+  },
+  {
+    "count": 41,
+    "date": "2020-09-24T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.0986,
+    "inv_percent": 2.100145137880987
+  },
+  {
+    "count": 71,
+    "date": "2020-09-25T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.094,
+    "inv_percent": 3.0985010706638114
+  },
+  {
+    "count": 33,
+    "date": "2020-09-26T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7259,
+    "inv_percent": 1.7267303102625298
+  },
+  {
+    "count": 20,
+    "date": "2020-09-27T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1967,
+    "inv_percent": 1.1968569065343257
+  },
+  {
+    "count": 48,
+    "date": "2020-09-28T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.3506,
+    "inv_percent": 2.3528455284552843
+  },
+  {
+    "count": 32,
+    "date": "2020-09-29T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.6818,
+    "inv_percent": 1.6825581395348836
+  },
+  {
+    "count": 63,
+    "date": "2020-09-30T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.856,
+    "inv_percent": 2.859683794466403
+  },
+  {
+    "count": 62,
+    "date": "2020-10-01T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.8226,
+    "inv_percent": 2.826171875
+  },
+  {
+    "count": 182,
+    "date": "2020-10-02T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 7.7849,
+    "inv_percent": 7.821621621621622
+  },
+  {
+    "count": 369,
+    "date": "2020-10-03T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 16.4545,
+    "inv_percent": 16.632183908045977
+  },
+  {
+    "count": 456,
+    "date": "2020-10-04T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 21.2941,
+    "inv_percent": 21.597014925373134
+  },
+  {
+    "count": 241,
+    "date": "2020-10-05T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 10.5693,
+    "inv_percent": 10.63970588235294
+  },
+  {
+    "count": 240,
+    "date": "2020-10-06T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 10.4928,
+    "inv_percent": 10.562043795620438
+  },
+  {
+    "count": 76,
+    "date": "2020-10-07T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.3135,
+    "inv_percent": 3.3188073394495414
+  },
+  {
+    "count": 130,
+    "date": "2020-10-08T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.2464,
+    "inv_percent": 5.261818181818182
+  },
+  {
+    "count": 40,
+    "date": "2020-10-09T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.0568,
+    "inv_percent": 2.058321479374111
+  },
+  {
+    "count": 54,
+    "date": "2020-10-10T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.5996,
+    "inv_percent": 2.602517985611511
+  },
+  {
+    "count": 18,
+    "date": "2020-10-11T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1402,
+    "inv_percent": 1.14026792750197
+  },
+  {
+    "count": 33,
+    "date": "2020-10-12T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7259,
+    "inv_percent": 1.7267303102625298
+  },
+  {
+    "count": 33,
+    "date": "2020-10-13T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7259,
+    "inv_percent": 1.7267303102625298
+  },
+  {
+    "count": 34,
+    "date": "2020-10-14T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7988,
+    "inv_percent": 1.7997512437810943
+  },
+  {
+    "count": 28,
+    "date": "2020-10-15T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5068,
+    "inv_percent": 1.5072916666666667
+  },
+  {
+    "count": 29,
+    "date": "2020-10-16T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5421,
+    "inv_percent": 1.5426439232409381
+  },
+  {
+    "count": 26,
+    "date": "2020-10-17T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.4168,
+    "inv_percent": 1.417238001958864
+  },
+  {
+    "count": 23,
+    "date": "2020-10-18T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3104,
+    "inv_percent": 1.3106884057971013
+  },
+  {
+    "count": 74,
+    "date": "2020-10-19T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.2321,
+    "inv_percent": 3.237136465324385
+  },
+  {
+    "count": 229,
+    "date": "2020-10-20T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 10.0556,
+    "inv_percent": 10.118881118881118
+  },
+  {
+    "count": 89,
+    "date": "2020-10-21T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.8206,
+    "inv_percent": 3.8280423280423284
+  },
+  {
+    "count": 157,
+    "date": "2020-10-22T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 6.4071,
+    "inv_percent": 6.431111111111111
+  },
+  {
+    "count": 35,
+    "date": "2020-10-23T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.8422,
+    "inv_percent": 1.843312101910828
+  },
+  {
+    "count": 99,
+    "date": "2020-10-24T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.102,
+    "inv_percent": 4.110795454545455
+  },
+  {
+    "count": 78,
+    "date": "2020-10-25T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.3674,
+    "inv_percent": 3.372960372960373
+  },
+  {
+    "count": 109,
+    "date": "2020-10-26T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.4691,
+    "inv_percent": 4.479876160990712
+  },
+  {
+    "count": 52,
+    "date": "2020-10-27T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.5359,
+    "inv_percent": 2.5385964912280703
+  },
+  {
+    "count": 51,
+    "date": "2020-10-28T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.4837,
+    "inv_percent": 2.486254295532646
+  },
+  {
+    "count": 135,
+    "date": "2020-10-29T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.4642,
+    "inv_percent": 5.481060606060606
+  },
+  {
+    "count": 92,
+    "date": "2020-10-30T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.9241,
+    "inv_percent": 3.932065217391304
+  },
+  {
+    "count": 121,
+    "date": "2020-10-31T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.942,
+    "inv_percent": 4.955479452054795
+  },
+  {
+    "count": 117,
+    "date": "2020-11-01T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.8106,
+    "inv_percent": 4.823333333333333
+  },
+  {
+    "count": 328,
+    "date": "2020-11-02T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 14.48,
+    "inv_percent": 14.616161616161616
+  },
+  {
+    "count": 126,
+    "date": "2020-11-03T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.0807,
+    "inv_percent": 5.095070422535211
+  },
+  {
+    "count": 60,
+    "date": "2020-11-04T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.7634,
+    "inv_percent": 2.7667304015296366
+  },
+  {
+    "count": 42,
+    "date": "2020-11-05T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.1516,
+    "inv_percent": 2.1532738095238093
+  },
+  {
+    "count": 31,
+    "date": "2020-11-06T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.6325,
+    "inv_percent": 1.6331828442437923
+  },
+  {
+    "count": 19,
+    "date": "2020-11-07T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1677,
+    "inv_percent": 1.1678773204196933
+  },
+  {
+    "count": 24,
+    "date": "2020-11-08T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3533,
+    "inv_percent": 1.3536014967259122
+  },
+  {
+    "count": 34,
+    "date": "2020-11-09T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7988,
+    "inv_percent": 1.7997512437810943
+  },
+  {
+    "count": 41,
+    "date": "2020-11-10T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.0986,
+    "inv_percent": 2.100145137880987
+  },
+  {
+    "count": 129,
+    "date": "2020-11-11T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.19,
+    "inv_percent": 5.205035971223022
+  },
+  {
+    "count": 50,
+    "date": "2020-11-12T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.4377,
+    "inv_percent": 2.440134907251265
+  },
+  {
+    "count": 40,
+    "date": "2020-11-13T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.0568,
+    "inv_percent": 2.058321479374111
+  },
+  {
+    "count": 160,
+    "date": "2020-11-14T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 6.552,
+    "inv_percent": 6.577272727272728
+  },
+  {
+    "count": 279,
+    "date": "2020-11-15T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 12.1681,
+    "inv_percent": 12.262711864406779
+  },
+  {
+    "count": 80,
+    "date": "2020-11-16T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.4476,
+    "inv_percent": 3.4534606205250595
+  },
+  {
+    "count": 57,
+    "date": "2020-11-17T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.6667,
+    "inv_percent": 2.669741697416974
+  },
+  {
+    "count": 75,
+    "date": "2020-11-18T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.2909,
+    "inv_percent": 3.296127562642369
+  },
+  {
+    "count": 59,
+    "date": "2020-11-19T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.7218,
+    "inv_percent": 2.725047080979284
+  },
+  {
+    "count": 41,
+    "date": "2020-11-20T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.0986,
+    "inv_percent": 2.100145137880987
+  },
+  {
+    "count": 23,
+    "date": "2020-11-21T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3104,
+    "inv_percent": 1.3106884057971013
+  },
+  {
+    "count": 20,
+    "date": "2020-11-22T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1967,
+    "inv_percent": 1.1968569065343257
+  },
+  {
+    "count": 28,
+    "date": "2020-11-23T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5068,
+    "inv_percent": 1.5072916666666667
+  },
+  {
+    "count": 46,
+    "date": "2020-11-24T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.2767,
+    "inv_percent": 2.278740157480315
+  },
+  {
+    "count": 34,
+    "date": "2020-11-25T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7988,
+    "inv_percent": 1.7997512437810943
+  },
+  {
+    "count": 18,
+    "date": "2020-11-26T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1402,
+    "inv_percent": 1.14026792750197
+  },
+  {
+    "count": 41,
+    "date": "2020-11-27T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.0986,
+    "inv_percent": 2.100145137880987
+  },
+  {
+    "count": 37,
+    "date": "2020-11-28T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.9436,
+    "inv_percent": 1.9448924731182795
+  },
+  {
+    "count": 27,
+    "date": "2020-11-29T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.4538,
+    "inv_percent": 1.4542713567839196
+  },
+  {
+    "count": 45,
+    "date": "2020-11-30T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.245,
+    "inv_percent": 2.2468944099378882
+  },
+  {
+    "count": 15,
+    "date": "2020-12-01T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.0686,
+    "inv_percent": 1.068685376661743
+  },
+  {
+    "count": 22,
+    "date": "2020-12-02T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.2657,
+    "inv_percent": 1.2659667541557307
+  },
+  {
+    "count": 101,
+    "date": "2020-12-03T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.1609,
+    "inv_percent": 4.170028818443804
+  },
+  {
+    "count": 276,
+    "date": "2020-12-04T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 12.0667,
+    "inv_percent": 12.159663865546218
+  },
+  {
+    "count": 225,
+    "date": "2020-12-05T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 9.9178,
+    "inv_percent": 9.979310344827587
+  },
+  {
+    "count": 48,
+    "date": "2020-12-06T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.3506,
+    "inv_percent": 2.3528455284552843
+  },
+  {
+    "count": 72,
+    "date": "2020-12-07T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.141,
+    "inv_percent": 3.145652173913043
+  },
+  {
+    "count": 133,
+    "date": "2020-12-08T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.3829,
+    "inv_percent": 5.399253731343284
+  },
+  {
+    "count": 49,
+    "date": "2020-12-09T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.3934,
+    "inv_percent": 2.3956953642384105
+  },
+  {
+    "count": 35,
+    "date": "2020-12-10T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.8422,
+    "inv_percent": 1.843312101910828
+  },
+  {
+    "count": 91,
+    "date": "2020-12-11T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.8717,
+    "inv_percent": 3.879356568364611
+  },
+  {
+    "count": 40,
+    "date": "2020-12-12T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.0568,
+    "inv_percent": 2.058321479374111
+  },
+  {
+    "count": 104,
+    "date": "2020-12-13T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.2967,
+    "inv_percent": 4.306547619047619
+  },
+  {
+    "count": 123,
+    "date": "2020-12-14T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.0278,
+    "inv_percent": 5.041811846689896
+  },
+  {
+    "count": 88,
+    "date": "2020-12-15T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.7807,
+    "inv_percent": 3.787958115183246
+  },
+  {
+    "count": 154,
+    "date": "2020-12-16T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 6.1356,
+    "inv_percent": 6.157446808510638
+  },
+  {
+    "count": 50,
+    "date": "2020-12-17T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.4377,
+    "inv_percent": 2.440134907251265
+  },
+  {
+    "count": 134,
+    "date": "2020-12-18T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.4436,
+    "inv_percent": 5.460377358490566
+  },
+  {
+    "count": 198,
+    "date": "2020-12-19T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 8.5176,
+    "inv_percent": 8.562130177514792
+  },
+  {
+    "count": 145,
+    "date": "2020-12-20T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.8623,
+    "inv_percent": 5.882113821138211
+  },
+  {
+    "count": 121,
+    "date": "2020-12-21T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.942,
+    "inv_percent": 4.955479452054795
+  },
+  {
+    "count": 65,
+    "date": "2020-12-22T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.9076,
+    "inv_percent": 2.9114688128772634
+  },
+  {
+    "count": 939,
+    "date": "2020-12-23T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 62.9565,
+    "inv_percent": 65.77272727272728
+  },
+  {
+    "count": 907,
+    "date": "2020-12-24T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 60.3333,
+    "inv_percent": 62.91304347826087
+  },
+  {
+    "count": 182,
+    "date": "2020-12-25T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 7.7849,
+    "inv_percent": 7.821621621621622
+  },
+  {
+    "count": 283,
+    "date": "2020-12-26T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 12.5913,
+    "inv_percent": 12.69298245614035
+  },
+  {
+    "count": 478,
+    "date": "2020-12-27T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 22.2769,
+    "inv_percent": 22.609375
+  },
+  {
+    "count": 207,
+    "date": "2020-12-28T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 8.8293,
+    "inv_percent": 8.877300613496931
+  },
+  {
+    "count": 158,
+    "date": "2020-12-29T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 6.4356,
+    "inv_percent": 6.459821428571428
+  },
+  {
+    "count": 107,
+    "date": "2020-12-30T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.4146,
+    "inv_percent": 4.425076452599389
+  },
+  {
+    "count": 54,
+    "date": "2020-12-31T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.5996,
+    "inv_percent": 2.602517985611511
+  },
+  {
+    "count": 37,
+    "date": "2021-01-01T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.9436,
+    "inv_percent": 1.9448924731182795
+  },
+  {
+    "count": 31,
+    "date": "2021-01-02T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.6325,
+    "inv_percent": 1.6331828442437923
+  },
+  {
+    "count": 34,
+    "date": "2021-01-03T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7988,
+    "inv_percent": 1.7997512437810943
+  },
+  {
+    "count": 46,
+    "date": "2021-01-04T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.2767,
+    "inv_percent": 2.278740157480315
+  },
+  {
+    "count": 35,
+    "date": "2021-01-05T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.8422,
+    "inv_percent": 1.843312101910828
+  },
+  {
+    "count": 37,
+    "date": "2021-01-06T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.9436,
+    "inv_percent": 1.9448924731182795
+  },
+  {
+    "count": 32,
+    "date": "2021-01-07T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.6818,
+    "inv_percent": 1.6825581395348836
+  },
+  {
+    "count": 54,
+    "date": "2021-01-08T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.5996,
+    "inv_percent": 2.602517985611511
+  },
+  {
+    "count": 31,
+    "date": "2021-01-09T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.6325,
+    "inv_percent": 1.6331828442437923
+  },
+  {
+    "count": 24,
+    "date": "2021-01-10T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3533,
+    "inv_percent": 1.3536014967259122
+  },
+  {
+    "count": 36,
+    "date": "2021-01-11T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.8928,
+    "inv_percent": 1.893979057591623
+  },
+  {
+    "count": 36,
+    "date": "2021-01-12T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.8928,
+    "inv_percent": 1.893979057591623
+  },
+  {
+    "count": 36,
+    "date": "2021-01-13T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.8928,
+    "inv_percent": 1.893979057591623
+  },
+  {
+    "count": 661,
+    "date": "2021-01-14T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 37.1282,
+    "inv_percent": 38.078947368421055
+  },
+  {
+    "count": 167,
+    "date": "2021-01-15T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 6.8626,
+    "inv_percent": 6.890476190476191
+  },
+  {
+    "count": 143,
+    "date": "2021-01-16T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.7689,
+    "inv_percent": 5.788
+  },
+  {
+    "count": 82,
+    "date": "2021-01-17T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.5146,
+    "inv_percent": 3.520681265206813
+  },
+  {
+    "count": 141,
+    "date": "2021-01-18T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.6563,
+    "inv_percent": 5.674509803921568
+  },
+  {
+    "count": 584,
+    "date": "2021-01-19T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 28.96,
+    "inv_percent": 29.53061224489796
+  },
+  {
+    "count": 1850,
+    "date": "2021-01-20T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 181,
+    "inv_percent": 206.7142857142857
+  },
+  {
+    "count": 1744,
+    "date": "2021-01-21T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 160.8889,
+    "inv_percent": 180.875
+  },
+  {
+    "count": 619,
+    "date": "2021-01-22T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 32.1778,
+    "inv_percent": 32.88636363636364
+  },
+  {
+    "count": 302,
+    "date": "2021-01-23T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 13.5327,
+    "inv_percent": 13.650943396226415
+  },
+  {
+    "count": 151,
+    "date": "2021-01-24T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.9835,
+    "inv_percent": 6.004149377593361
+  },
+  {
+    "count": 120,
+    "date": "2021-01-25T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.8591,
+    "inv_percent": 4.872053872053872
+  },
+  {
+    "count": 99,
+    "date": "2021-01-26T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.102,
+    "inv_percent": 4.110795454545455
+  },
+  {
+    "count": 105,
+    "date": "2021-01-27T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.3224,
+    "inv_percent": 4.332335329341317
+  },
+  {
+    "count": 403,
+    "date": "2021-01-28T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 17.8765,
+    "inv_percent": 18.0875
+  },
+  {
+    "count": 242,
+    "date": "2021-01-29T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 10.7259,
+    "inv_percent": 10.798507462686567
+  },
+  {
+    "count": 333,
+    "date": "2021-01-30T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 14.7755,
+    "inv_percent": 14.917525773195877
+  },
+  {
+    "count": 201,
+    "date": "2021-01-31T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 8.568,
+    "inv_percent": 8.613095238095237
+  },
+  {
+    "count": 182,
+    "date": "2021-02-01T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 7.7849,
+    "inv_percent": 7.821621621621622
+  },
+  {
+    "count": 217,
+    "date": "2021-02-02T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 9.3419,
+    "inv_percent": 9.396103896103897
+  },
+  {
+    "count": 270,
+    "date": "2021-02-03T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 11.4921,
+    "inv_percent": 11.576
+  },
+  {
+    "count": 188,
+    "date": "2021-02-04T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 8.0444,
+    "inv_percent": 8.083798882681565
+  },
+  {
+    "count": 242,
+    "date": "2021-02-05T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 10.7259,
+    "inv_percent": 10.798507462686567
+  },
+  {
+    "count": 297,
+    "date": "2021-02-06T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 13.1636,
+    "inv_percent": 13.275229357798166
+  },
+  {
+    "count": 172,
+    "date": "2021-02-07T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 7.1683,
+    "inv_percent": 7.199004975124377
+  },
+  {
+    "count": 92,
+    "date": "2021-02-08T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.9241,
+    "inv_percent": 3.932065217391304
+  },
+  {
+    "count": 74,
+    "date": "2021-02-09T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.2321,
+    "inv_percent": 3.237136465324385
+  },
+  {
+    "count": 50,
+    "date": "2021-02-10T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.4377,
+    "inv_percent": 2.440134907251265
+  },
+  {
+    "count": 53,
+    "date": "2021-02-11T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.5628,
+    "inv_percent": 2.5656028368794326
+  },
+  {
+    "count": 62,
+    "date": "2021-02-12T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.8226,
+    "inv_percent": 2.826171875
+  },
+  {
+    "count": 73,
+    "date": "2021-02-13T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.1894,
+    "inv_percent": 3.1942604856512142
+  },
+  {
+    "count": 90,
+    "date": "2021-02-14T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.8511,
+    "inv_percent": 3.8586666666666667
+  },
+  {
+    "count": 35,
+    "date": "2021-02-15T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.8422,
+    "inv_percent": 1.843312101910828
+  },
+  {
+    "count": 44,
+    "date": "2021-02-16T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.2243,
+    "inv_percent": 2.226153846153846
+  },
+  {
+    "count": 64,
+    "date": "2021-02-17T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.873,
+    "inv_percent": 2.8767395626242545
+  },
+  {
+    "count": 49,
+    "date": "2021-02-18T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.3934,
+    "inv_percent": 2.3956953642384105
+  },
+  {
+    "count": 121,
+    "date": "2021-02-19T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.942,
+    "inv_percent": 4.955479452054795
+  },
+  {
+    "count": 220,
+    "date": "2021-02-20T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 9.6533,
+    "inv_percent": 9.711409395973154
+  },
+  {
+    "count": 116,
+    "date": "2021-02-21T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.732,
+    "inv_percent": 4.744262295081967
+  },
+  {
+    "count": 113,
+    "date": "2021-02-22T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.5823,
+    "inv_percent": 4.593650793650793
+  },
+  {
+    "count": 243,
+    "date": "2021-02-23T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 10.806,
+    "inv_percent": 10.879699248120302
+  },
+  {
+    "count": 111,
+    "date": "2021-02-24T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.5392,
+    "inv_percent": 4.550314465408805
+  },
+  {
+    "count": 5,
+    "date": "2021-02-25T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.0028,
+    "inv_percent": 1.0027720027720028
+  },
+  {
+    "count": 38,
+    "date": "2021-02-27T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.9836,
+    "inv_percent": 1.9849108367626886
+  },
+  {
+    "count": 1,
+    "date": "2021-03-01T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1,
+    "inv_percent": 1
+  },
+  {
+    "count": 23,
+    "date": "2021-03-03T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3104,
+    "inv_percent": 1.3106884057971013
+  },
+  {
+    "count": 24,
+    "date": "2021-03-04T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3533,
+    "inv_percent": 1.3536014967259122
+  },
+  {
+    "count": 20,
+    "date": "2021-03-05T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1967,
+    "inv_percent": 1.1968569065343257
+  },
+  {
+    "count": 30,
+    "date": "2021-03-06T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5877,
+    "inv_percent": 1.588364434687157
+  },
+  {
+    "count": 18,
+    "date": "2021-03-07T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1402,
+    "inv_percent": 1.14026792750197
+  },
+  {
+    "count": 27,
+    "date": "2021-03-08T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.4538,
+    "inv_percent": 1.4542713567839196
+  },
+  {
+    "count": 19,
+    "date": "2021-03-09T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1677,
+    "inv_percent": 1.1678773204196933
+  },
+  {
+    "count": 75,
+    "date": "2021-03-10T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.2909,
+    "inv_percent": 3.296127562642369
+  },
+  {
+    "count": 65,
+    "date": "2021-03-11T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.9076,
+    "inv_percent": 2.9114688128772634
+  },
+  {
+    "count": 33,
+    "date": "2021-03-12T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7259,
+    "inv_percent": 1.7267303102625298
+  },
+  {
+    "count": 31,
+    "date": "2021-03-13T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.6325,
+    "inv_percent": 1.6331828442437923
+  },
+  {
+    "count": 22,
+    "date": "2021-03-14T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.2657,
+    "inv_percent": 1.2659667541557307
+  },
+  {
+    "count": 20,
+    "date": "2021-03-15T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1967,
+    "inv_percent": 1.1968569065343257
+  },
+  {
+    "count": 23,
+    "date": "2021-03-16T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3104,
+    "inv_percent": 1.3106884057971013
+  },
+  {
+    "count": 22,
+    "date": "2021-03-17T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.2657,
+    "inv_percent": 1.2659667541557307
+  },
+  {
+    "count": 34,
+    "date": "2021-03-18T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7988,
+    "inv_percent": 1.7997512437810943
+  },
+  {
+    "count": 23,
+    "date": "2021-03-19T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3104,
+    "inv_percent": 1.3106884057971013
+  },
+  {
+    "count": 25,
+    "date": "2021-03-20T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3843,
+    "inv_percent": 1.384688995215311
+  },
+  {
+    "count": 28,
+    "date": "2021-03-21T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5068,
+    "inv_percent": 1.5072916666666667
+  },
+  {
+    "count": 35,
+    "date": "2021-03-22T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.8422,
+    "inv_percent": 1.843312101910828
+  },
+  {
+    "count": 34,
+    "date": "2021-03-23T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7988,
+    "inv_percent": 1.7997512437810943
+  },
+  {
+    "count": 26,
+    "date": "2021-03-24T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.4168,
+    "inv_percent": 1.417238001958864
+  },
+  {
+    "count": 20,
+    "date": "2021-03-25T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1967,
+    "inv_percent": 1.1968569065343257
+  },
+  {
+    "count": 51,
+    "date": "2021-03-26T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.4837,
+    "inv_percent": 2.486254295532646
+  },
+  {
+    "count": 33,
+    "date": "2021-03-27T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7259,
+    "inv_percent": 1.7267303102625298
+  },
+  {
+    "count": 83,
+    "date": "2021-03-28T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.5753,
+    "inv_percent": 3.581683168316832
+  },
+  {
+    "count": 86,
+    "date": "2021-03-29T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.6939,
+    "inv_percent": 3.7007672634271103
+  },
+  {
+    "count": 28,
+    "date": "2021-03-30T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5068,
+    "inv_percent": 1.5072916666666667
+  },
+  {
+    "count": 42,
+    "date": "2021-03-31T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.1516,
+    "inv_percent": 2.1532738095238093
+  },
+  {
+    "count": 25,
+    "date": "2021-04-01T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3843,
+    "inv_percent": 1.384688995215311
+  },
+  {
+    "count": 21,
+    "date": "2021-04-02T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.2344,
+    "inv_percent": 1.234641638225256
+  },
+  {
+    "count": 29,
+    "date": "2021-04-03T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5421,
+    "inv_percent": 1.5426439232409381
+  },
+  {
+    "count": 24,
+    "date": "2021-04-04T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3533,
+    "inv_percent": 1.3536014967259122
+  },
+  {
+    "count": 32,
+    "date": "2021-04-05T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.6818,
+    "inv_percent": 1.6825581395348836
+  },
+  {
+    "count": 20,
+    "date": "2021-04-06T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1967,
+    "inv_percent": 1.1968569065343257
+  },
+  {
+    "count": 32,
+    "date": "2021-04-07T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.6818,
+    "inv_percent": 1.6825581395348836
+  },
+  {
+    "count": 37,
+    "date": "2021-04-08T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.9436,
+    "inv_percent": 1.9448924731182795
+  },
+  {
+    "count": 37,
+    "date": "2021-04-09T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.9436,
+    "inv_percent": 1.9448924731182795
+  },
+  {
+    "count": 28,
+    "date": "2021-04-10T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5068,
+    "inv_percent": 1.5072916666666667
+  },
+  {
+    "count": 35,
+    "date": "2021-04-11T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.8422,
+    "inv_percent": 1.843312101910828
+  },
+  {
+    "count": 28,
+    "date": "2021-04-12T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5068,
+    "inv_percent": 1.5072916666666667
+  },
+  {
+    "count": 23,
+    "date": "2021-04-13T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3104,
+    "inv_percent": 1.3106884057971013
+  },
+  {
+    "count": 38,
+    "date": "2021-04-14T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.9836,
+    "inv_percent": 1.9849108367626886
+  },
+  {
+    "count": 28,
+    "date": "2021-04-15T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5068,
+    "inv_percent": 1.5072916666666667
+  },
+  {
+    "count": 13,
+    "date": "2021-04-16T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.047,
+    "inv_percent": 1.0470332850940667
+  },
+  {
+    "count": 20,
+    "date": "2021-04-17T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1967,
+    "inv_percent": 1.1968569065343257
+  },
+  {
+    "count": 23,
+    "date": "2021-04-18T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3104,
+    "inv_percent": 1.3106884057971013
+  },
+  {
+    "count": 16,
+    "date": "2021-04-19T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.0912,
+    "inv_percent": 1.0912518853695323
+  },
+  {
+    "count": 23,
+    "date": "2021-04-20T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3104,
+    "inv_percent": 1.3106884057971013
+  },
+  {
+    "count": 23,
+    "date": "2021-04-21T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3104,
+    "inv_percent": 1.3106884057971013
+  },
+  {
+    "count": 13,
+    "date": "2021-04-22T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.047,
+    "inv_percent": 1.0470332850940667
+  },
+  {
+    "count": 19,
+    "date": "2021-04-23T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1677,
+    "inv_percent": 1.1678773204196933
+  },
+  {
+    "count": 19,
+    "date": "2021-04-24T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1677,
+    "inv_percent": 1.1678773204196933
+  },
+  {
+    "count": 11,
+    "date": "2021-04-25T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.0248,
+    "inv_percent": 1.0247875354107647
+  },
+  {
+    "count": 22,
+    "date": "2021-04-26T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.2657,
+    "inv_percent": 1.2659667541557307
+  },
+  {
+    "count": 16,
+    "date": "2021-04-27T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.0912,
+    "inv_percent": 1.0912518853695323
+  },
+  {
+    "count": 28,
+    "date": "2021-04-28T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5068,
+    "inv_percent": 1.5072916666666667
+  },
+  {
+    "count": 27,
+    "date": "2021-04-29T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.4538,
+    "inv_percent": 1.4542713567839196
+  },
+  {
+    "count": 27,
+    "date": "2021-04-30T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.4538,
+    "inv_percent": 1.4542713567839196
+  },
+  {
+    "count": 18,
+    "date": "2021-05-01T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1402,
+    "inv_percent": 1.14026792750197
+  },
+  {
+    "count": 21,
+    "date": "2021-05-02T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.2344,
+    "inv_percent": 1.234641638225256
+  },
+  {
+    "count": 62,
+    "date": "2021-05-03T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.8226,
+    "inv_percent": 2.826171875
+  },
+  {
+    "count": 34,
+    "date": "2021-05-04T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7988,
+    "inv_percent": 1.7997512437810943
+  },
+  {
+    "count": 35,
+    "date": "2021-05-05T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.8422,
+    "inv_percent": 1.843312101910828
+  },
+  {
+    "count": 31,
+    "date": "2021-05-06T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.6325,
+    "inv_percent": 1.6331828442437923
+  },
+  {
+    "count": 23,
+    "date": "2021-05-07T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3104,
+    "inv_percent": 1.3106884057971013
+  },
+  {
+    "count": 74,
+    "date": "2021-05-08T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.2321,
+    "inv_percent": 3.237136465324385
+  },
+  {
+    "count": 18,
+    "date": "2021-05-09T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1402,
+    "inv_percent": 1.14026792750197
+  },
+  {
+    "count": 32,
+    "date": "2021-05-10T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.6818,
+    "inv_percent": 1.6825581395348836
+  },
+  {
+    "count": 68,
+    "date": "2021-05-11T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.9917,
+    "inv_percent": 2.9958592132505175
+  },
+  {
+    "count": 51,
+    "date": "2021-05-12T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.4837,
+    "inv_percent": 2.486254295532646
+  },
+  {
+    "count": 44,
+    "date": "2021-05-13T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.2243,
+    "inv_percent": 2.226153846153846
+  },
+  {
+    "count": 31,
+    "date": "2021-05-14T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.6325,
+    "inv_percent": 1.6331828442437923
+  },
+  {
+    "count": 34,
+    "date": "2021-05-15T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.7988,
+    "inv_percent": 1.7997512437810943
+  },
+  {
+    "count": 115,
+    "date": "2021-05-16T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.7013,
+    "inv_percent": 4.713355048859935
+  },
+  {
+    "count": 146,
+    "date": "2021-05-17T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.8862,
+    "inv_percent": 5.906122448979592
+  },
+  {
+    "count": 69,
+    "date": "2021-05-18T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.0356,
+    "inv_percent": 3.0399159663865545
+  },
+  {
+    "count": 30,
+    "date": "2021-05-19T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5877,
+    "inv_percent": 1.588364434687157
+  },
+  {
+    "count": 49,
+    "date": "2021-05-20T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.3934,
+    "inv_percent": 2.3956953642384105
+  },
+  {
+    "count": 75,
+    "date": "2021-05-21T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.2909,
+    "inv_percent": 3.296127562642369
+  },
+  {
+    "count": 24,
+    "date": "2021-05-22T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3533,
+    "inv_percent": 1.3536014967259122
+  },
+  {
+    "count": 37,
+    "date": "2021-05-23T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.9436,
+    "inv_percent": 1.9448924731182795
+  },
+  {
+    "count": 64,
+    "date": "2021-05-24T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.873,
+    "inv_percent": 2.8767395626242545
+  },
+  {
+    "count": 31,
+    "date": "2021-05-25T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.6325,
+    "inv_percent": 1.6331828442437923
+  },
+  {
+    "count": 26,
+    "date": "2021-05-26T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.4168,
+    "inv_percent": 1.417238001958864
+  },
+  {
+    "count": 10,
+    "date": "2021-05-27T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.0176,
+    "inv_percent": 1.0175808720112518
+  },
+  {
+    "count": 17,
+    "date": "2021-05-28T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1156,
+    "inv_percent": 1.1156515034695451
+  },
+  {
+    "count": 29,
+    "date": "2021-05-29T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5421,
+    "inv_percent": 1.5426439232409381
+  },
+  {
+    "count": 18,
+    "date": "2021-05-30T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1402,
+    "inv_percent": 1.14026792750197
+  },
+  {
+    "count": 19,
+    "date": "2021-05-31T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1677,
+    "inv_percent": 1.1678773204196933
+  },
+  {
+    "count": 12,
+    "date": "2021-06-01T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.0343,
+    "inv_percent": 1.0343102215868478
+  },
+  {
+    "count": 19,
+    "date": "2021-06-02T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1677,
+    "inv_percent": 1.1678773204196933
+  },
+  {
+    "count": 22,
+    "date": "2021-06-03T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.2657,
+    "inv_percent": 1.2659667541557307
+  },
+  {
+    "count": 16,
+    "date": "2021-06-04T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.0912,
+    "inv_percent": 1.0912518853695323
+  },
+  {
+    "count": 19,
+    "date": "2021-06-05T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1677,
+    "inv_percent": 1.1678773204196933
+  },
+  {
+    "count": 11,
+    "date": "2021-06-06T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.0248,
+    "inv_percent": 1.0247875354107647
+  },
+  {
+    "count": 22,
+    "date": "2021-06-07T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.2657,
+    "inv_percent": 1.2659667541557307
+  },
+  {
+    "count": 19,
+    "date": "2021-06-08T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1677,
+    "inv_percent": 1.1678773204196933
+  },
+  {
+    "count": 19,
+    "date": "2021-06-09T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1677,
+    "inv_percent": 1.1678773204196933
+  },
+  {
+    "count": 21,
+    "date": "2021-06-10T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.2344,
+    "inv_percent": 1.234641638225256
+  },
+  {
+    "count": 20,
+    "date": "2021-06-11T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1967,
+    "inv_percent": 1.1968569065343257
+  },
+  {
+    "count": 13,
+    "date": "2021-06-12T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.047,
+    "inv_percent": 1.0470332850940667
+  },
+  {
+    "count": 25,
+    "date": "2021-06-13T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.3843,
+    "inv_percent": 1.384688995215311
+  },
+  {
+    "count": 30,
+    "date": "2021-06-14T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5877,
+    "inv_percent": 1.588364434687157
+  },
+  {
+    "count": 30,
+    "date": "2021-06-15T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5877,
+    "inv_percent": 1.588364434687157
+  },
+  {
+    "count": 52,
+    "date": "2021-06-16T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.5359,
+    "inv_percent": 2.5385964912280703
+  },
+  {
+    "count": 75,
+    "date": "2021-06-17T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.2909,
+    "inv_percent": 3.296127562642369
+  },
+  {
+    "count": 370,
+    "date": "2021-06-18T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 16.6437,
+    "inv_percent": 16.825581395348838
+  },
+  {
+    "count": 67,
+    "date": "2021-06-19T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.9672,
+    "inv_percent": 2.971252566735113
+  },
+  {
+    "count": 37,
+    "date": "2021-06-20T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.9436,
+    "inv_percent": 1.9448924731182795
+  },
+  {
+    "count": 30,
+    "date": "2021-06-21T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5877,
+    "inv_percent": 1.588364434687157
+  },
+  {
+    "count": 29,
+    "date": "2021-06-22T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5421,
+    "inv_percent": 1.5426439232409381
+  },
+  {
+    "count": 20,
+    "date": "2021-06-23T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.1967,
+    "inv_percent": 1.1968569065343257
+  },
+  {
+    "count": 26,
+    "date": "2021-06-24T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.4168,
+    "inv_percent": 1.417238001958864
+  },
+  {
+    "count": 193,
+    "date": "2021-06-25T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 8.2273,
+    "inv_percent": 8.268571428571429
+  },
+  {
+    "count": 167,
+    "date": "2021-06-26T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 6.8626,
+    "inv_percent": 6.890476190476191
+  },
+  {
+    "count": 93,
+    "date": "2021-06-27T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.9671,
+    "inv_percent": 3.975274725274725
+  },
+  {
+    "count": 154,
+    "date": "2021-06-28T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 6.1356,
+    "inv_percent": 6.157446808510638
+  },
+  {
+    "count": 97,
+    "date": "2021-06-29T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.0447,
+    "inv_percent": 4.053221288515406
+  },
+  {
+    "count": 39,
+    "date": "2021-06-30T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.0055,
+    "inv_percent": 2.0069348127600555
+  },
+  {
+    "count": 60,
+    "date": "2021-07-01T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.7634,
+    "inv_percent": 2.7667304015296366
+  },
+  {
+    "count": 112,
+    "date": "2021-07-02T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.5678,
+    "inv_percent": 4.579113924050633
+  },
+  {
+    "count": 214,
+    "date": "2021-07-03T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 8.9938,
+    "inv_percent": 9.04375
+  },
+  {
+    "count": 828,
+    "date": "2021-07-04T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 49.931,
+    "inv_percent": 51.67857142857142
+  },
+  {
+    "count": 564,
+    "date": "2021-07-05T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 26.8148,
+    "inv_percent": 27.30188679245283
+  },
+  {
+    "count": 358,
+    "date": "2021-07-06T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 16.0889,
+    "inv_percent": 16.258426966292134
+  },
+  {
+    "count": 196,
+    "date": "2021-07-07T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 8.4186,
+    "inv_percent": 8.461988304093568
+  },
+  {
+    "count": 42,
+    "date": "2021-07-08T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.1516,
+    "inv_percent": 2.1532738095238093
+  },
+  {
+    "count": 196,
+    "date": "2021-07-09T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 8.4186,
+    "inv_percent": 8.461988304093568
+  },
+  {
+    "count": 77,
+    "date": "2021-07-10T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.3364,
+    "inv_percent": 3.3418013856812934
+  },
+  {
+    "count": 63,
+    "date": "2021-07-11T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.856,
+    "inv_percent": 2.859683794466403
+  },
+  {
+    "count": 1147,
+    "date": "2021-07-12T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 96.5333,
+    "inv_percent": 103.35714285714285
+  },
+  {
+    "count": 765,
+    "date": "2021-07-13T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 43.8788,
+    "inv_percent": 45.21875
+  },
+  {
+    "count": 126,
+    "date": "2021-07-14T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.0807,
+    "inv_percent": 5.095070422535211
+  },
+  {
+    "count": 115,
+    "date": "2021-07-15T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.7013,
+    "inv_percent": 4.713355048859935
+  },
+  {
+    "count": 87,
+    "date": "2021-07-16T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.7416,
+    "inv_percent": 3.7487046632124357
+  },
+  {
+    "count": 52,
+    "date": "2021-07-17T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 2.5359,
+    "inv_percent": 2.5385964912280703
+  },
+  {
+    "count": 36,
+    "date": "2021-07-18T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.8928,
+    "inv_percent": 1.893979057591623
+  },
+  {
+    "count": 69,
+    "date": "2021-07-19T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.0356,
+    "inv_percent": 3.0399159663865545
+  },
+  {
+    "count": 171,
+    "date": "2021-07-20T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 7.0291,
+    "inv_percent": 7.058536585365853
+  },
+  {
+    "count": 95,
+    "date": "2021-07-21T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.0222,
+    "inv_percent": 4.030640668523676
+  },
+  {
+    "count": 122,
+    "date": "2021-07-22T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.9931,
+    "inv_percent": 5.006920415224914
+  },
+  {
+    "count": 115,
+    "date": "2021-07-23T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 4.7013,
+    "inv_percent": 4.713355048859935
+  },
+  {
+    "count": 87,
+    "date": "2021-07-24T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.7416,
+    "inv_percent": 3.7487046632124357
+  },
+  {
+    "count": 2095,
+    "date": "2021-07-25T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 241.3333,
+    "inv_percent": 289.4
+  },
+  {
+    "count": 1119,
+    "date": "2021-07-26T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 80.4444,
+    "inv_percent": 85.11764705882352
+  },
+  {
+    "count": 542,
+    "date": "2021-07-27T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 25.4035,
+    "inv_percent": 25.83928571428571
+  },
+  {
+    "count": 532,
+    "date": "2021-07-28T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 24.5424,
+    "inv_percent": 24.948275862068964
+  },
+  {
+    "count": 137,
+    "date": "2021-07-29T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.5692,
+    "inv_percent": 5.586872586872587
+  },
+  {
+    "count": 163,
+    "date": "2021-07-30T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 6.6728,
+    "inv_percent": 6.699074074074074
+  },
+  {
+    "count": 71,
+    "date": "2021-07-31T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.094,
+    "inv_percent": 3.0985010706638114
+  },
+  {
+    "count": 81,
+    "date": "2021-08-01T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 3.4808,
+    "inv_percent": 3.4867469879518076
+  },
+  {
+    "count": 130,
+    "date": "2021-08-02T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 5.2464,
+    "inv_percent": 5.261818181818182
+  },
+  {
+    "count": 30,
+    "date": "2021-08-03T00:00:00.000Z",
+    "region": "all",
+    "exceedance": 1.5877,
+    "inv_percent": 1.588364434687157
+  }
+]
