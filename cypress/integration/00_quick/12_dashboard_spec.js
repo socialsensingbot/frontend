@@ -1,4 +1,4 @@
-import {ANALYTICS_URL, DASHBOARD_URL} from "../../support";
+import {ANALYTICS_URL, DASHBOARD_URL, MAP_URL} from "../../support";
 import {v4 as uuidv4} from "uuid";
 
 const zoomDuration = 1000;
@@ -63,5 +63,32 @@ describe('11 Analytics: ', function () {
             cy.wait(1000);
             cy.get("app-dashboard > div > mat-grid-list > div > mat-grid-tile:last-child > figure > mat-card .dashboard-card-title" ).should("not.contain.text",title);
         });
+
+
+        it.only('Export from Map Stats', () => {
+            let url = MAP_URL+"?active_number=stats&active_polygon=county&selected=greater%20london";
+            cy.visit(url);
+            cy.login();
+            cy.visitAndWait(url);
+            cy.twitterPanelHeader("Greater London");
+            cy.get("#loading-div", {timeout: 60000}).should("not.exist");
+            cy.get("#mat-tab-label-0-1 > div").click();
+            cy.get('.app-stats-panel-count-add-to-dashboard').click();
+            cy.wait(1000);
+            const title=uuidv4();
+            cy.wait(1000);
+            cy.url({timeout: 30000}).should("not.be", url);
+            // snapshot('app-timeseries-multi-query-chart', "dashboard-export-from-analytics-1");
+            cy.get("app-dashboard > div > mat-grid-list > div > mat-grid-tile:last-child > figure > mat-card .dashboard-card-title" ).should("contain.text","Count for Greater London");
+            cy.wait(1000);
+            cy.get("app-dashboard > div > mat-grid-list > div > mat-grid-tile:last-child > figure > mat-card .dashboard-card-menu-btn").click();
+            cy.wait(1000);
+            cy.get('.dashboard-card-menu-item-remove').click();
+            cy.wait(1000);
+            cy.get("app-dashboard > div > mat-grid-list > div > mat-grid-tile:last-child > figure > mat-card .dashboard-card-title" ).should("not.contain.text",title);
+        });
+
+
+
     });
 });
