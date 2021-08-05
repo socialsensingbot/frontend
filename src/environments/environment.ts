@@ -79,6 +79,6 @@ export const environment = {
     // mapTileUrlTemplate:   "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"
     newExceedanceCalc: false,
     shareTextAutocompleteInGroup: true,
+    useRestMapData: true,
 
 };
-

@@ -65,6 +65,7 @@ export const environment = {
   defaultDashboard,
   newExceedanceCalc:            false,
   shareTextAutocompleteInGroup: true,
+    useRestMapData: true,
 
 
 };

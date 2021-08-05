@@ -36,11 +36,9 @@ class ExecutionTask {
 export type AppState =
     "init"
     | "map-init"
-    | "data-loaded"
     | "ready"
     | "no-params"
-    | "data-refresh"
-    | "data-load-failed";
+    | "data-refresh";
 export type UIState = "init" | "active" | "inactive";
 
 export const DUPLICATE_REASON = "duplicate";

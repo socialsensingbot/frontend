@@ -24,8 +24,6 @@ import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
 import {UIExecutionService, AppState} from "../services/uiexecution.service";
 import {ColorCodeService} from "./services/color-code.service";
-import {MapDataService, MapDataServiceInt} from "./data/map-data.service";
-import {MapStatisticsInterface} from "./data/processed-data";
 import {Tweet} from "./twitter/tweet";
 import {getOS, toTitleCase} from "../common";
 import {RegionSelection} from "./region-selection";
@@ -36,6 +34,8 @@ import Auth from "@aws-amplify/auth";
 import {FormControl} from "@angular/forms";
 import {DashboardService} from "../pref/dashboard.service";
 import {LoadingProgressService} from "../services/loading-progress.service";
+import {ONE_DAY} from "./data/map-data";
+import {RESTMapDataService} from "./data/rest-map-data.service";
 
 
 const log = new Logger("map");
@@ -68,15 +68,14 @@ export class MapComponent implements OnInit, OnDestroy {
     public selectedCountries: string[] = [];
     // }
     public appToolbarExpanded: boolean;
-    public liveUpdating: boolean = false;
+    public liveUpdating = false;
     //     //                             this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
     public blinkOn = true;
-    public data: MapDataServiceInt;
     // The Map & Map Layers
     private _statsLayer: LayerGroup = layerGroup();
     private _countyLayer: LayerGroup = layerGroup(); // dummy layers to fool layer control
     public options: any = {
-        layers: [
+        regions: [
             tileLayer(
                 // tslint:disable-next-line:max-line-length
                 environment.mapTileUrlTemplate,
@@ -146,7 +145,7 @@ export class MapComponent implements OnInit, OnDestroy {
                 private _http: HttpClient,
                 private _exec: UIExecutionService,
                 private _color: ColorCodeService,
-                _data: MapDataService,
+                public data: RESTMapDataService,
                 public pref: PreferenceService,
                 private readonly cache: NgForageCache,
                 public dash: DashboardService,
@@ -154,7 +153,6 @@ export class MapComponent implements OnInit, OnDestroy {
     ) {
         // save the query parameter observable
         this._searchParams = this.route.queryParams;
-        this.data = _data;
 
 
     }
@@ -168,7 +166,6 @@ export class MapComponent implements OnInit, OnDestroy {
     public set activeLayerGroup(value: string) {
         this._activeLayerGroup = value;
         this._twitterIsStale = true;
-        this.data.switchLayerGroup(value);
         this.ready = false;
         this.load();
     }
@@ -189,8 +186,10 @@ export class MapComponent implements OnInit, OnDestroy {
             const oldLocation = this.data.dataSetMetdata.location;
             this.data.switchDataSet(value).then(async () => {
                 this.hideTweets();
-                await this.data.loadStats();
-                await this.data.loadAggregations();
+                if (this._activePolyLayerShortName) {
+                    await this.data.loadGeography(this._activePolyLayerShortName);
+                    await this.data.loadAggregations();
+                }
                 log.debug(`Old location ${oldLocation} new location ${this.data.dataSetMetdata.location}`);
                 if (this.data.dataSetMetdata.location !== oldLocation) {
                     this.selection.clear();
@@ -422,22 +421,16 @@ export class MapComponent implements OnInit, OnDestroy {
             await this.data.load(first);
 
             if (first) {
-                await this._exec.queue("Update Slider", ["data-loaded"],
-                                       async () => {
-                                           await this.updateSliderFromData();
-                                       });
-
                 this._exec.changeState("no-params");
+                await this.updateSliderFromData();
             } else {
                 await this.updateLayers("Data Load", clearSelected);
-                await this._exec.queue("Update Slider", ["ready", "data-refresh"],
-                                       () => {this.updateSliderFromData(); }, null, true, true, true);
+                await this.updateSliderFromData();
             }
 
             this._twitterIsStale = true;
 
         } catch (e) {
-            this._exec.changeState("data-load-failed");
             log.error(e);
             this._notify.error(e);
         } finally {
@@ -455,8 +448,8 @@ export class MapComponent implements OnInit, OnDestroy {
         // tslint:disable-next-line:prefer-const
         let {lower, upper} = range;
         log.debug("sliderChange(" + lower + "->" + upper + ")");
-        this._dateMax = this.data.entryDate(upper).getTime();
-        this._dateMin = this.data.entryDate(lower).getTime();
+        this._dateMax = upper;
+        this._dateMin = lower;
         this.sliderOptions.startMin = lower;
         this.sliderOptions.startMax = upper;
 
@@ -487,10 +480,11 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this.data.hasCountryAggregates()) {
             this.data.downloadAggregate("countries", this.selectedCountries,
                                         this.activePolyLayerShortName,
-                                        this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
+                                        this.data.regionGeography[this.activePolyLayerShortName] as PolygonData, this._dateMin,
+                                        this._dateMax);
         } else {
-            this.data.download(this.activePolyLayerShortName,
-                               this.data.polygonData[this.activePolyLayerShortName] as PolygonData);
+            this.data.download(this.data.regionGeography[this.activePolyLayerShortName] as PolygonData, this.activePolyLayerShortName,
+                               this._dateMin, this._dateMax);
         }
     }
 
@@ -533,8 +527,8 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    private scheduleResetLayers(clearSelected= true) {
-        return this._exec.queue("Reset Layers", ["ready", "data-loaded"], () => {
+    private scheduleResetLayers(clearSelected = true) {
+        return this._exec.queue("Reset Layers", ["ready"], () => {
             this.activity = true;
             this.resetLayers(clearSelected);
             this.activity = false;
@@ -564,17 +558,14 @@ export class MapComponent implements OnInit, OnDestroy {
         } = params;
         this._newParams = params;
         this._absoluteTime = this.data.lastEntryDate().getTime();
-        this.sliderOptions.min = -this.data.entryCount() + 1;
+        this.sliderOptions.min = -this.data.minDate();
         // These handle the date slider min_time & max_time values
         if (typeof min_time !== "undefined") {
             this._dateMin = +min_time;
             this.sliderOptions = {
                 ...this.sliderOptions,
-                startMin: this.data.offset(this._dateMin)
+                startMin: this._dateMin
             };
-        } else if (typeof min_offset !== "undefined") {
-            this._dateMin = min_offset * ONE_MINUTE_IN_MILLIS + this._absoluteTime;
-            this.sliderOptions = {...this.sliderOptions, startMin: min_offset};
         } else {
             this._dateMin = (-24 * 60 + 1) * ONE_MINUTE_IN_MILLIS + this._absoluteTime;
             this.sliderOptions = {...this.sliderOptions, startMin: (-24 * 60 + 1)};
@@ -583,14 +574,11 @@ export class MapComponent implements OnInit, OnDestroy {
             this._dateMax = +max_time;
             this.sliderOptions = {
                 ...this.sliderOptions,
-                startMax: this.data.offset(this._dateMax)
+                startMax: this._dateMax
             };
-        } else if (typeof max_offset !== "undefined") {
-            this._dateMax = max_offset * ONE_MINUTE_IN_MILLIS + this._absoluteTime;
-            this.sliderOptions = {...this.sliderOptions, startMax: max_offset};
         } else {
             this._dateMax = this._absoluteTime;
-            this.sliderOptions = {...this.sliderOptions, startMax: 0};
+            this.sliderOptions = {...this.sliderOptions, startMax: this.data.now()};
         }
         if (typeof layer_group !== "undefined") {
             this._activeLayerGroup = layer_group;
@@ -668,8 +656,14 @@ export class MapComponent implements OnInit, OnDestroy {
         } else {
             this._activeLayerGroup = this.data.dataSetMetdata.defaultLayerGroup;
         }
-        await this.data.switchLayerGroup(this.activeLayerGroup);
-        await this.data.loadStats();
+        if (this.route.snapshot.queryParamMap.has("active_polygon")) {
+            this._activePolyLayerShortName = this.route.snapshot.queryParamMap.get("active_polygon");
+        } else {
+            this._activePolyLayerShortName = this.data.dataSetMetdata.defaultRegionType;
+        }
+        if (this._activePolyLayerShortName) {
+            await this.data.loadGeography(this._activePolyLayerShortName);
+        }
         await this.data.loadAggregations();
         if (this.data.hasCountryAggregates()) {
             this.data.aggregations.countries.aggregates.forEach(i => this.selectedCountries.push(i.id));
@@ -820,7 +814,7 @@ export class MapComponent implements OnInit, OnDestroy {
     /**
      * Update the Twitter panel by updating the properties it reacts to.
      */
-    private updateTwitterPanel() {
+    private async updateTwitterPanel() {
         log.debug("updateTwitterPanel()");
         const features = this.selection.features();
         if (features.length === 1) {
@@ -830,7 +824,8 @@ export class MapComponent implements OnInit, OnDestroy {
             if (feature.properties.count > 0) {
                 log.debug("Count > 0");
                 log.debug(`this.activePolyLayerShortName=${this.activePolyLayerShortName}`);
-                this.tweets = this.data.tweets(this.activePolyLayerShortName, this.selection.regionNames());
+                this.tweets = await this.data.tweets(this.activePolyLayerShortName, this.selection.regionNames(), this._dateMin,
+                                                     this._dateMax);
                 log.debug(this.tweets);
                 this.twitterPanelHeader = true;
                 this.showTwitterTimeline = true;
@@ -848,7 +843,7 @@ export class MapComponent implements OnInit, OnDestroy {
             this.hideTweets();
         } else {
             log.debug(features.length + " features");
-            this.tweets = this.data.tweets(this.activePolyLayerShortName, this.selection.regionNames());
+            this.tweets = await this.data.tweets(this.activePolyLayerShortName, this.selection.regionNames(), this._dateMin, this._dateMax);
             log.debug(this.tweets);
             this.twitterPanelHeader = true;
             this.showTwitterTimeline = true;
@@ -956,7 +951,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
                 };
                 this._geojson[shortNumberLayerName] = new GeoJSON(
-                    this.data.polygonData[this.activePolyLayerShortName] as geojson.GeoJsonObject, {
+                    this.data.regionGeography[this.activePolyLayerShortName] as geojson.GeoJsonObject, {
                         style:         styleFunc,
                         onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
                     }).addTo(curLayerGroup);
@@ -975,7 +970,7 @@ export class MapComponent implements OnInit, OnDestroy {
      */
     private clearMapFeatures() {
         for (const regionType of this.data.regionTypes()) { // counties, coarse, fine
-            const features = (this.data.polygonData[regionType] as PolygonData).features;
+            const features = (this.data.regionGeography[regionType] as PolygonData).features;
             for (const feature of features) {
                 const properties = feature.properties;
                 const place = properties.name;
@@ -990,19 +985,19 @@ export class MapComponent implements OnInit, OnDestroy {
     /**
      * Updates the data stored in the polygon data of the leaflet layers.
      */
-    private updateRegionData() {
+    private async updateRegionData() {
         for (const regionType of this.data.regionTypes()) { // counties, coarse, fine
-            const regionData: PolygonData = (this.data.polygonData)[regionType] as PolygonData;
+            const regionData: PolygonData = (this.data.regionGeography)[regionType] as PolygonData;
             const features: Feature[] = regionData.features;
             for (const feature of features) {
                 const featureProperties: Properties = feature.properties;
-                const place = featureProperties.name;
-                const mapStats: MapStatisticsInterface = this.data.regionData(regionType);
-                if (mapStats.hasPlace(place)) {
-                    featureProperties.count = mapStats.countForPlace(place);
-                    featureProperties.stats = mapStats.exceedanceForPlace(place);
+                const region = featureProperties.name;
+                const mapStats = await this.data.regionStats(regionType, region, this._dateMin, this._dateMax);
+                if (mapStats !== null) {
+                    featureProperties.count = mapStats.count;
+                    featureProperties.stats = mapStats.exceedance;
                 } else {
-                    log.verbose("No data for " + place);
+                    log.verbose("No data for " + region);
                     featureProperties.count = 0;
                     featureProperties.stats = 0;
                 }
@@ -1012,7 +1007,7 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     private async updateLayers(reason: string = "", clearSelected = false) {
-        return this._exec.queue("Update Layers: " + reason, ["ready", "data-loaded", "data-refresh"], async () => {
+        return this._exec.queue("Update Layers: " + reason, ["ready"], async () => {
                                     // Mark as stale to trigger a refresh
                                     if (!this._updating) {
                                         this.activity = true;
@@ -1020,9 +1015,6 @@ export class MapComponent implements OnInit, OnDestroy {
                                         try {
 
                                             this._exec.changeState("data-refresh");
-                                            log.debug("Start Max", this.data.offset(this._dateMax));
-
-                                            await this.data.update(this._dateMin, this._dateMax);
                                             this.clearMapFeatures();
                                             this.updateRegionData();
                                             this.resetLayers(clearSelected);
@@ -1078,16 +1070,14 @@ export class MapComponent implements OnInit, OnDestroy {
     private async updateSliderFromData() {
         log.debug("updateSliderFromData()");
         this._absoluteTime = this.data.lastEntryDate().getTime();
-        this._dateMin = Math.max(this._dateMin,
-                                 this._absoluteTime - ((this.data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
-        this._dateMax = Math.max(this._dateMax,
-                                 this._absoluteTime - ((this.data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
+        this._dateMin = this.data.minDate() - ONE_DAY;
+        this._dateMax = this.data.now();
 
         this.sliderOptions = {
             max:      0,
-            min:      -this.data.entryCount() + 1,
-            startMin: this.data.offset(this._dateMin),
-            startMax: this.data.offset(this._dateMax)
+            min:      this.data.minDate(),
+            startMin: this._dateMin,
+            startMax: this._dateMax
         };
         this.checkForLiveUpdating();
 
@@ -1123,7 +1113,7 @@ export class MapComponent implements OnInit, OnDestroy {
         await this.sliderChange({lower: -mins, upper: 0});
         this.sliderOptions = {
             max:      0,
-            min:      -this.data.entryCount() + 1,
+            min:      this.data.minDate(),
             startMin: -mins,
             startMax: 0
         };

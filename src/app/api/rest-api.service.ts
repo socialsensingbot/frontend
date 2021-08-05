@@ -20,7 +20,8 @@ const log = new Logger("rest-api-service");
             })
 export class RESTDataAPIService {
 
-    constructor(private _notify: NotificationService, private _ngZone: NgZone) { }
+    constructor(private _notify: NotificationService, private _ngZone: NgZone) {
+    }
 
     public async callAPI(functionName: string, payload: any): Promise<any> {
 
@@ -51,42 +52,49 @@ export class RESTDataAPIService {
         } else {
             const path = "/" + functionName + "/" + payload.name;
             if (functionName === "query") {
-                return API.post("query", path, {
-                    body:    payload,
+
+            } else {
+                return API.get("query", path, {
                     headers: {
                         Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
-                    },
-
-                }).catch(e => {
-                    log.error(e);
-                    this._notify.show("No response from the server, maybe a network problem or a slow query.",
-                                      "Retrying ...", retryPeriod);
-                    return new Promise<any>((resolve, reject) => {
-                        setTimeout(async () => {
-                            API.post("query", path, {
-                                body:    payload,
-                                headers: {
-                                    Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
-                                },
-                            }).then(data => this._ngZone.run(() => {
-                                this._notify.show("Problem resolved", "Good", 2000);
-                                resolve(data);
-                            }))
-                               .catch(e => {
-                                   this._notify.show("Error running" + " query, please check your network connection");
-                                   reject(e);
-                               });
-                        }, retryPeriod);
-                    });
+                    }
                 });
-            } else {
-                return API.get("query", path, {headers: {
-                        Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
-                    }});
             }
         }
+    }
 
+
+    public async callMapAPI(path: string, payload: any): Promise<any> {
+        return API.post("query", "/map/" + path, {
+            body:    payload,
+            headers: {
+                Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+            },
+
+        }).catch(e => {
+            log.error(e);
+            this._notify.show("No response from the server, maybe a network problem or a slow query.",
+                              "Retrying ...", retryPeriod);
+            return new Promise<any>((resolve, reject) => {
+                setTimeout(async () => {
+                    API.post("query", "/map/" + path, {
+                        body:    payload,
+                        headers: {
+                            Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+                        },
+                    }).then(data => this._ngZone.run(() => {
+                        this._notify.show("Problem resolved", "Good", 2000);
+                        resolve(data);
+                    }))
+                       .catch(e2 => {
+                           this._notify.show("Error running" + " query, please check your network connection");
+                           reject(e2);
+                       });
+                }, retryPeriod);
+            });
+        });
 
     }
+
 
 }

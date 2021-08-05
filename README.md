@@ -160,7 +160,7 @@ For each dataset there is a **metadata.json** file in the top level of it's fold
       "layers": ["flood-twitter", "snow-twitter"]
     }
   ],
-  "regionGroups": [
+  "regionTypes": [
     {
       "id": "county",
       "title": "Local Authority",
@@ -196,13 +196,13 @@ The **layers** are basically the raw data within the dataset, they have an **id*
 
 The **layerGroups** organise these layers into a single visual representation. Each layer group can contain a single layer or a grouping of layers. (As of 1.4 this is ignored and the first layer is used for the dataset, will be supported in future releases).
 
-The **regionGroups** decide how to split up the map into regions for this dataset. They contain an **id** used to find the sub folder with the region metadata in. A **title** used for dropdowns and a **key** which is the key within the json datafiles to use (please try and keep this the same as **id**).
+The **regionTypes** decide how to split up the map into regions for this dataset. They contain an **id** used to find the sub folder with the region metadata in. A **title** used for dropdowns and a **key** which is the key within the json datafiles to use (please try and keep this the same as **id**).
 
 The **defaultLayerGroup** should be shown by default (not used yet, as of 1.4).
 
 The **start** position is where the map should start from for this dataset and the zoom level.
 
-Inside the region subfolder you'll find all the regions (see **regionGroups.id**) and within those region subfolders are :-
+Inside the region subfolder you'll find all the regions (see **regionTypes.id**) and within those region subfolders are :-
  
    - features.json - the [GeoJSON](https://geojson.org/) of the region
    - xxx-stats.json (where xxx is the id of each layer) previous statistics files used to compare the current data with.   
@@ -662,48 +662,3 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 [The Application]: #the-application
 [Preferences]: #preferences
 [Datasets]: #datasets
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

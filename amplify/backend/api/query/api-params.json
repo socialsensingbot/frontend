@@ -29,6 +29,28 @@
                 ]
             },
             "policyResourceName": "/query/*"
+        },
+        {
+            "name": "/map/{map}",
+            "lambdaFunction": "query",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/GET"
+                ]
+            },
+            "policyResourceName": "/map/*"
+        },
+        {
+            "name": "/map/metadata",
+            "lambdaFunction": "query",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/GET"
+                ]
+            },
+            "policyResourceName": "/map/metadata"
         }
     ],
     "resourceName": "query",
@@ -39,7 +61,7 @@
         }
     ],
     "privacy": {
-        "auth": 2,
+        "auth": 4,
         "unauth": 0,
         "authRoleName": "amplify-socialsensing-dev-183906-authRole",
         "unAuthRoleName": "amplify-socialsensing-dev-183906-unauthRole"
@@ -54,5 +76,5 @@
             ]
         }
     ],
-    "uuid": "8012b8b2"
+    "uuid": "beafe625"
 }

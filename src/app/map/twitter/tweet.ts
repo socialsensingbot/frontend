@@ -1,4 +1,5 @@
 import {environment} from "../../../environments/environment";
+import {TweetInterface} from "../data/map-data";
 
 export class CSVExportTweet {
   constructor(public region: string, public impact: string = "", public source: string = "", public id: string, public date: string, public url: string, public text: string) {
@@ -7,11 +8,12 @@ export class CSVExportTweet {
 
 }
 
+
 /**
  * This class encapsulates the data and functionality for the in memory representation of a tweet.
  * The class is lazily initialized on various data accesses as the full construction of this object includes some CPU intensive tasks.
  */
-export class Tweet {
+export class Tweet implements TweetInterface {
   private _init: boolean;
 
   /**
@@ -28,77 +30,77 @@ export class Tweet {
 
   private _date: Date;
 
-  public get date(): Date {
-    this.lazyInit();
-    return this._date;
-  }
+    public get date(): Date {
+        this.lazyInit();
+        return this._date;
+    }
 
-  private _year: string;
+    private _year: string;
 
-  public get year(): string {
-    this.lazyInit();
-    return this._year;
-  }
+    public get year(): string {
+        this.lazyInit();
+        return this._year;
+    }
 
-  private _month: string;
+    private _month: string;
 
-  public get month(): string {
-    this.lazyInit();
-    return this._month;
-  }
+    public get month(): string {
+        this.lazyInit();
+        return this._month;
+    }
 
-  private _day: string;
+    private _day: string;
 
-  public get day(): string {
-    this.lazyInit();
-    return this._day;
-  }
+    public get day(): string {
+        this.lazyInit();
+        return this._day;
+    }
 
-  private _hour: string;
+    private _hour: string;
 
-  public get hour(): string {
-    this.lazyInit();
-    return this._hour;
-  }
+    public get hour(): string {
+        this.lazyInit();
+        return this._hour;
+    }
 
-  private _sender: string;
+    private _sender: string;
 
-  public get sender(): string {
-    this.lazyInit();
-    return this._sender;
-  }
+    public get sender(): string {
+        this.lazyInit();
+        return this._sender;
+    }
 
-  private _url: string;
+    private _url: string;
 
-  public get url(): string {
-    this.lazyInit();
-    return this._url;
-  }
+    public get url(): string {
+        this.lazyInit();
+        return this._url;
+    }
 
-  private _valid: boolean;
+    private _valid: boolean;
 
-  public get valid(): boolean {
-    this.lazyInit();
-    return this._valid;
-  }
+    public get valid(): boolean {
+        this.lazyInit();
+        return this._valid;
+    }
 
-  public get id(): string {
-    return this._id;
-  }
+    public get id(): string {
+        return this._id;
+    }
 
-  get html(): string {
-    return this._html;
-  }
+    public get html(): string {
+        return this._html;
+    }
 
-  get poly(): string {
-    return this._poly;
-  }
+    public get poly(): string {
+        return this._poly;
+    }
 
-  get place(): string {
-    return this._place;
-  }
+    public get place(): string {
+        return this._place;
+    }
 
-  /**
+    /**
    * Populate this tweet from data from a Tweet like structure.
    * Primarily used to copy a deserialized Tweet which is not a
    * class but a Tweet like class.
@@ -186,5 +188,3 @@ export class Tweet {
     }
   }
 }
-
-
