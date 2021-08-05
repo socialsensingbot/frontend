@@ -87,11 +87,12 @@ function runQuery(name: string, req, res, data, transform: (i: any) => any = i =
     }
 }
 
-const cache = (res, key: string, value: () => Promise<any>) => {
+const cache = (res, key: string, value: () => Promise<any>, options: { aggresive?: boolean } = {aggresive: true}) => {
     if (queryCache.has(key)) {
         console.log("Returned from cache " + key);
         res.setHeader("X-SocialSensing-CachedQuery", "true");
         res.setHeader("X-SocialSensing-CachedQuery-TTL", queryCache.getTtl(key));
+        res.setHeader("X-SocialSensing-CachedQuery-Expires-In", queryCache.getTtl(key) - Date.now());
         res.json(queryCache.get(key));
         return;
     } else {
@@ -99,7 +100,7 @@ const cache = (res, key: string, value: () => Promise<any>) => {
 
         res.setHeader("X-SocialSensing-CachedQuery", "false");
         value().then(result => {
-            queryCache.set(key, result);
+            queryCache.set(key, result, options.aggresive ? 24 * 60 * 60 : 60 * 60);
             res.json(result);
         }).catch(e => handleError(res, e));
     }
@@ -256,23 +257,23 @@ app.post("/map/:map/metadata", async (req, res) => {
         console.log("map=", map);
         return {
 
-                     id:       map.id,
-                     title:    map.title,
-                     version:  map.version,
-                     location: map.location,
-                     // hazards:           hazards.map(i => i.hazard),
-                     layers,
-                     layerGroups,
-                     regionTypes,
-                     regionAggregations,
-                     defaultLayerGroup: map.default_layer_group,
-                     defaultRegionType: map.default_region_type,
-                     start:             {
-                         lat:  map.start_lat,
-                         lng:  map.start_lng,
-                         zoom: map.start_zoom
-                     }
-                 } as MapMetadata;
+            id:       map.id,
+            title:    map.title,
+            version:  map.version,
+            location: map.location,
+            // hazards:           hazards.map(i => i.hazard),
+            layers,
+            layerGroups,
+            regionTypes,
+            regionAggregations,
+            defaultLayerGroup: map.default_layer_group,
+            defaultRegionType: map.default_region_type,
+            start:             {
+                lat:  map.start_lat,
+                lng:  map.start_lng,
+                zoom: map.start_zoom
+            }
+        } as MapMetadata;
 
     });
 
