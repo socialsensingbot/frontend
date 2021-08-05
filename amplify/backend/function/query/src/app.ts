@@ -87,12 +87,14 @@ function runQuery(name: string, req, res, data, transform: (i: any) => any = i =
     }
 }
 
-const cache = (res, key: string, value: () => Promise<any>, options: { aggresive?: boolean } = {aggresive: true}) => {
+const cache = (res, key: string, value: () => Promise<any>, options: { aggresive?: boolean } = {aggresive: false}) => {
+    res.setHeader("X-SocialSensing-CachedQuery-Key", key);
     if (queryCache.has(key)) {
         console.log("Returned from cache " + key);
-        res.setHeader("X-SocialSensing-CachedQuery", "true");
-        res.setHeader("X-SocialSensing-CachedQuery-TTL", queryCache.getTtl(key));
-        res.setHeader("X-SocialSensing-CachedQuery-Expires-In", queryCache.getTtl(key) - Date.now());
+        res.setHeader("X-SocialSensing-CachedQuery-Key", key);
+        res.setHeader("X-SocialSensing-CachedQuery-Expires-At", queryCache.getTtl(key));
+        res.setHeader("X-SocialSensing-CachedQuery-Expires-In-Minutes", (queryCache.getTtl(key) - Date.now()) / (60 * 1000));
+        res.setHeader("X-SocialSensing-CachedQuery-Expires-In-Hours", (queryCache.getTtl(key) - Date.now()) / (60 * 60 * 1000));
         res.json(queryCache.get(key));
         return;
     } else {
@@ -302,7 +304,7 @@ app.post("/map/:map/region-type/:regionType/geography", async (req, res) => {
             regionGeoMap[row.region] = JSON.parse(row.geo);
         }
         return regionGeoMap;
-    });
+    }, {aggresive: true});
 });
 
 app.post("/map/:map/aggregations", async (req, res) => {
@@ -358,7 +360,7 @@ app.post("/map/:map/aggregations", async (req, res) => {
         }
 
         return aggroMap;
-    });
+    }, {aggresive: true});
 });
 
 app.post("/map/:map/region-type/:regionType/recent-tweets", async (req, res) => {
