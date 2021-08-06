@@ -6,21 +6,21 @@
   <mat-grid-list cols="2" rowHeight="500px">
     <ng-container *ngFor="let card of cards; let i=index ">
       <mat-grid-tile *ngIf="!card.hidden" [colspan]="card.cols" [rowspan]="card.rows">
-        <mat-card class="dashboard-card  dashboard-card-{{card.cols}}x{{card.rows}}
+        <mat-card class="dashboard-card  dashboard-card-{{card.cols}}x{{card.rows}} dasboard-card-number-{{i}}
                     dashboard-card-cols-{{card.cols}} dashboard-card-rows-{{card.rows}}">
           <mat-card-header>
             <mat-card-title>
-              {{card.title}}
-              <button mat-icon-button class="more-button" [matMenuTriggerFor]="menu"
+                <span class="dashboard-card-number-{{i}}-title dashboard-card-title">{{card.title}}</span>
+              <button mat-icon-button class="more-button dasboard-card-number-{{i}}-menu-btn dashboard-card-menu-btn" [matMenuTriggerFor]="menu"
                       aria-label="Toggle menu">
                 <mat-icon>more_vert</mat-icon>
               </button>
               <mat-menu #menu="matMenu" xPosition="before">
-                <button mat-menu-item (click)="expand(card)">Expand</button>
-                <button mat-menu-item (click)="shrink(card)">Shrink</button>
-                <button mat-menu-item (click)="hide(card)">Hide</button>
-                <button mat-menu-item (click)="debug(card)">Debug</button>
-                <button mat-menu-item (click)="remove(card)">Remove</button>
+                <button mat-menu-item class="dashboard-card-menu-item-expand" (click)="expand(card)">Expand</button>
+                <button mat-menu-item class="dashboard-card-menu-item-shrink" (click)="shrink(card)">Shrink</button>
+                <button mat-menu-item class="dashboard-card-menu-item-hide" (click)="hide(card)">Hide</button>
+                <button mat-menu-item class="dashboard-card-menu-item-debug"  (click)="debug(card)">Debug</button>
+                <button mat-menu-item class="dashboard-card-menu-item-remove" (click)="remove(card)">Remove</button>
                 <!--                                <button *ngIf="card.variant !== 'bar'" mat-menu-item-->
                 <!--                                        (click)="card.variant='bar'">Switch to Bar-->
                 <!--                                </button>-->

@@ -1,5 +1,5 @@
 import {Injectable, NgZone, OnDestroy, OnInit} from '@angular/core';
-import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
+import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {Subscription} from 'rxjs';
 import {environment} from "../../environments/environment";
 import {Logger} from "@aws-amplify/core";
@@ -68,7 +68,11 @@ export class NotificationService implements OnDestroy {
     } else {
       log.error(e);
       log.error(e);
-      return this.toast.open(`ERROR: ${e.toString()} (this message will not appear in production)`, "got it", {
+      let msg = JSON.stringify(e);
+      if (e.hasOwnProperty("message")) {
+        msg = e.message;
+      }
+      return this.toast.open(`ERROR: ${msg} (this message will not appear in production)`, "got it", {
         duration:   30000,
         politeness: "assertive",
       });

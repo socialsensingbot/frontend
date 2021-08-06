@@ -1,0 +1,25 @@
+<div class="change-pass-outer">
+  <mat-card>
+
+    <mat-card-content>
+
+      <h2>{{message}}</h2>
+      <form [formGroup]="signinForm">
+        <mat-form-field>
+          <input matInput placeholder="Email" type="email" formControlName="email" autocomplete="email" required>
+          <mat-hint *ngIf="!emailInput.value">Enter your email address</mat-hint>
+          <mat-error *ngIf="!emailInput.valid">
+            {{getEmailInputError()}}
+          </mat-error>
+        </mat-form-field>
+        <button mat-raised-button color="{{buttonColor}}" (click)="forgotPass()" [disabled]="!signinForm.valid">Reset
+          Password
+        </button>
+        <!--  <p style="text-align:center;">or</p>-->
+        <!--  <button mat-raised-button color="primary" (click)="signInWithFacebook()">Sign In with Facebook</button><br/><br/>-->
+        <!--  <button mat-raised-button color="primary" (click)="signInWithGoogle()">Sign In with Google</button>-->
+        <!--  <p>Don't have an account? <a routerLink="/auth/signup">Sign up</a></p>-->
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

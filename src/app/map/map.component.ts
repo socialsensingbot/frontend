@@ -35,6 +35,7 @@ import {environment} from "../../environments/environment";
 import Auth from "@aws-amplify/auth";
 import {FormControl} from "@angular/forms";
 import {DashboardService} from "../pref/dashboard.service";
+import {LoadingProgressService} from "../services/loading-progress.service";
 
 
 const log = new Logger("map");
@@ -149,6 +150,7 @@ export class MapComponent implements OnInit, OnDestroy {
                 public pref: PreferenceService,
                 private readonly cache: NgForageCache,
                 public dash: DashboardService,
+                public loading: LoadingProgressService
     ) {
         // save the query parameter observable
         this._searchParams = this.route.queryParams;
@@ -694,11 +696,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
         this._exec.changeState("map-init");
         await this.load(true);
-        if (this.pref.combined.showLoadingMessages) {
-            this._notify.show("Loading application ...", "OK", 60);
-        }
-        $("#loading-div").css("opacity", 0.0);
-        setTimeout(() => $("#loading-div").remove(), 1000);
+        this.loading.loaded();
         this.checkForLiveUpdating();
         this._searchParams.subscribe(async params => {
 
@@ -730,8 +728,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
                                          });
                                      this._notify.dismiss();
-                                     $("#loading-div").css("opacity", 0.0);
-                                     setTimeout(() => $("#loading-div").remove(), 1000);
+                                     this.loading.loaded();
                                      this.activity = false;
                                  });
             } else {
@@ -1121,23 +1118,15 @@ export class MapComponent implements OnInit, OnDestroy {
         }, "", false, true, true);
     }
 
-    public timeSliderPreset(mins: number) {
-            log.debug("timeSliderPreset()");
-            this._absoluteTime = this.data.lastEntryDate().getTime();
-            this._dateMin = Math.max(this._dateMin,
-                                     this._absoluteTime - ((this.data.entryCount() - mins - 1 ) * ONE_MINUTE_IN_MILLIS));
-            this._dateMax = Math.max(this._dateMax,
-                                     this._absoluteTime - ((this.data.entryCount() - 1) * ONE_MINUTE_IN_MILLIS));
-
-            this.sliderOptions = {
-                max:      0,
-                min:      -this.data.entryCount() + 1,
-                startMin: -mins,
-                startMax: 0
-            };
-            this.checkForLiveUpdating();
-
-
+    public async timeSliderPreset(mins: number) {
+        log.debug("timeSliderPreset()");
+        await this.sliderChange({lower: -mins, upper: 0});
+        this.sliderOptions = {
+            max:      0,
+            min:      -this.data.entryCount() + 1,
+            startMin: -mins,
+            startMax: 0
+        };
+        this._sliderIsStale = true;
     }
 }
-
