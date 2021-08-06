@@ -3,9 +3,7 @@ import * as bodyParser from "body-parser";
 import {queries} from "./queries";
 import {QueryMetadataSets} from "./metdata";
 import * as NodeCache from "node-cache";
-import {TypeCast} from "mysql";
-import {AggregationData, AggregationMap, AggregationRegion, MapMetadata, RegionGeography, ServiceMetadata} from "./map-data";
-import {Language} from "@amcharts/amcharts4/core";
+import {AggregationMap, MapMetadata, RegionGeography, ServiceMetadata} from "./map-data";
 
 const awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
 
@@ -58,35 +56,6 @@ app.get("/query/:name", async (req, res) => {
     return res.status(405).json({error: "GET is not supported for queries, use POST instead."});
 });
 
-function runQuery(name: string, req, res, data, transform: (i: any) => any = i => i): void {
-    const key = name + ":" + JSON.stringify(data);
-    if (!queryMap) {
-        queryMap = queries;
-    }
-    console.log(queryMap[req.params.name]);
-    res.setHeader("X-SocialSensing-CachedQuery-Key", key);
-    if (queryCache.has(key)) {
-        console.log("Returned from cache " + key);
-        res.setHeader("X-SocialSensing-CachedQuery", "true");
-        res.setHeader("X-SocialSensing-CachedQuery-TTL", queryCache.getTtl(key));
-        res.json(queryCache.get(key));
-        return;
-    } else {
-        console.log("Retrieving query for " + key);
-        connection.query((queryMap[name])(data),
-                         (results, error) => {
-                             if (error) {
-                                 res.json({error: error.message, details: JSON.stringify(error)});
-                             } else {
-                                 res.setHeader("X-SocialSensing-CachedQuery", "false");
-                                 queryCache.set(key, results);
-                                 console.log("Added to cache " + key);
-                                 res.json(transform(results));
-                             }
-                         });
-    }
-}
-
 const cache = (res, key: string, value: () => Promise<any>, options: { aggresive?: boolean } = {aggresive: false}) => {
     res.setHeader("X-SocialSensing-CachedQuery-Key", key);
     if (queryCache.has(key)) {
@@ -109,7 +78,32 @@ const cache = (res, key: string, value: () => Promise<any>, options: { aggresive
 };
 
 app.post("/query/:name", async (req, res) => {
-    runQuery(req.params.name, req, res, req.body);
+    const key = req.params.name + ":" + JSON.stringify(req.body);
+    if (!queryMap) {
+        queryMap = queries;
+    }
+    console.log(queryMap[req.params.name]);
+    res.setHeader("X-SocialSensing-CachedQuery-Key", key);
+    if (queryCache.has(key)) {
+        console.log("Returned from cache " + key);
+        res.setHeader("X-SocialSensing-CachedQuery", "true");
+        res.setHeader("X-SocialSensing-CachedQuery-TTL", queryCache.getTtl(key));
+        res.json(queryCache.get(key));
+
+    } else {
+        console.log("Retrieving query for " + key);
+        connection.query((queryMap[req.params.name])(req.body),
+                         (error, results) => {
+                             if (error) {
+                                 handleError(res, error);
+                             } else {
+                                 res.setHeader("X-SocialSensing-CachedQuery", "false");
+                                 queryCache.set(key, results);
+                                 console.log("Added to cache " + key);
+                                 res.json(results);
+                             }
+                         });
+    }
 });
 
 app.get("/refdata/:name", (req, res) => {
@@ -282,8 +276,7 @@ app.post("/map/:map/metadata", async (req, res) => {
 });
 
 app.post("/map/:map/region-type/:regionType/tweets-for-regions", async (req, res) => {
-    runQuery("region-type-tweets-for-regions", req, res,
-             {map: req.params.map, regionType: req.params.regionType, regions: req.body.regions});
+
 });
 
 app.post("/map/:map/region-type/:regionType/geography", async (req, res) => {
@@ -364,70 +357,22 @@ app.post("/map/:map/aggregations", async (req, res) => {
 });
 
 app.post("/map/:map/region-type/:regionType/recent-tweets", async (req, res) => {
-    runQuery("region-type-recent-tweets", req, res, {map: req.params.map, regionType: req.params.regionType});
+
 });
 
 app.post("/map/:map/region-type/:regionType/regions", async (req, res) => {
-    runQuery("region-type-regions", req, res, {map: req.params.map, regionType: req.params.regionType});
+
 });
 
 app.post("/map/:map/region-type/:regionType/regions-with-data", async (req, res) => {
-    runQuery("region-type-regions-with-data", req, res, {map: req.params.map, regionType: req.params.regionType});
+
 });
 
 
 app.post("/map/:map/region-type/:regionType/region/:region/stats", async (req, res) => {
-    runQuery("region-type-regions", req, res, {map: req.params.map, regionType: req.params.regionType});
+
 });
 
-
-// app.get('/query/:name/*', function(req, res) {
-//   // Add your code here
-//   res.json({success: 'get call succeed!', url: req.url});
-// });
-//
-//
-// /****************************
-// * Example post method *
-// ****************************/
-
-// app.post('/query/:name', function(req, res) {
-//   // Add your code here
-//   res.json({success: 'post call succeed!', url: req.url, body: req.body})
-// });
-
-// app.post('/query/:name/*', function(req, res) {
-//   // Add your code here
-//   res.json({success: 'post call succeed!', url: req.url, body: req.body})
-// });
-//
-// /****************************
-// * Example put method *
-// ****************************/
-//
-// app.put('/query/:name', function(req, res) {
-//   // Add your code here
-//   res.json({success: 'put call succeed!', url: req.url, body: req.body})
-// });
-//
-// app.put('/query/:name/*', function(req, res) {
-//   // Add your code here
-//   res.json({success: 'put call succeed!', url: req.url, body: req.body})
-// });
-//
-// /****************************
-// * Example delete method *
-// ****************************/
-//
-// app.delete('/query/:name', function(req, res) {
-//   // Add your code here
-//   res.json({success: 'delete call succeed!', url: req.url});
-// });
-//
-// app.delete('/query/:name/*', function(req, res) {
-//   // Add your code here
-//   res.json({success: 'delete call succeed!', url: req.url});
-// });
 
 app.listen(3000, () => {
     console.log("App started");
