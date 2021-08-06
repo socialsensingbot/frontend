@@ -28,7 +28,7 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                       from (SELECT count(*)    as count,
                                    source_date as date,
                                    'all'       as region,
-                                   1.0 / (cume_dist() OVER w)  as exceedance, 
+                                   1.0 / (cume_dist() OVER w)  as exceedance
                             FROM live_text
                             WHERE source = ?
                               and hazard = ? ${fullText}
@@ -51,7 +51,7 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                       from (SELECT count(source_date) as count,
                                    source_date        as date,
                                    parent             as region,
-                                   1.0 / (cume_dist() OVER w)  as exceedance, 
+                                   1.0 / (cume_dist() OVER w)  as exceedance
                             FROM live_text live,
                                  ref_region_groups as rrg
                             WHERE live.source = ?
