@@ -5,7 +5,7 @@ import "@angular/compiler";
 import {AppModule} from "./app/app.module";
 import {environment} from "./environments/environment";
 import Amplify, {Logger} from "@aws-amplify/core";
-
+import "regenerator-runtime/runtime";
 
 
 const log = new Logger("main");

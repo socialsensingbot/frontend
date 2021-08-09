@@ -17,7 +17,7 @@
       <div class="app-toolbar-expanding-separator"></div>
       <button mat-stroked-button class="app-analytics-timeseries-toolbar-save" color="primary" (click)="saveGraph();">Save</button>
       <div class="app-toolbar-separator"></div>
-      <button mat-stroked-button color="warn" routerLink="/analytics/time" class="app-analytics-timeseries-toolbar-new">New</button>
+      <button mat-stroked-button color="warn" routerLink="/analytics/time" [queryParams]="{__clear_ui__:true}" class="app-analytics-timeseries-toolbar-new">New</button>
       <ng-container *ngIf="this.graphId">
         <div class="app-toolbar-separator"></div>
         <button mat-stroked-button
