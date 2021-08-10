@@ -37,8 +37,8 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
      * @see https://angular-slider.github.io/ng5-slider
      */
     public sliderOptions: Options = {
-        floor:      0,
-        ceil:       0,
+        floor:      Date.now(),
+        ceil:       Date.now(),
         showTicks:  false,
         ticksArray: [],
         stepsArray: [],
@@ -48,16 +48,18 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
         outputEventsInterval: 100,
         touchEventsInterval:  100,
         ticksTooltip:         (value: number): string => {
-            if (value === 0) {
-                return "now";
-            }
             return this.cleanDate(value, 0, "");
         },
         translate:            (value: number, label: LabelType): string => {
+            log.debug("translate value " + value + " for " + label);
 
-            if (value === 0 && this._pref.combined.mostRecentDateIsNow) {
+            if (value === this.sliderOptions.ceil && this._pref.combined.mostRecentDateIsNow) {
                 return `<span class="slider-date-time slider-date-time-max"><span class='slider-time'></span> <span class='slider-date'>now</span></span>`;
 
+            }
+            if (Number.isNaN(value)) {
+                log.error("NaN value for " + label);
+                return "NaN";
             }
             switch (label) {
                 case LabelType.Low:
@@ -94,7 +96,6 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
             log.debug("Undefined lower value");
         }
         this._lowerValue = value;
-        this.ready = true;
     }
 
     private _upperValue = 0;
@@ -130,10 +131,24 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
      */
     @Input()
     public set options(value: DateRangeSliderOptions) {
+        log.debug("Options: " + JSON.stringify(value));
         this._options = value;
         this._lowerValue = value.startMin;
         this._upperValue = value.startMax;
+        if (value.min <= 0) {
+            throw new Error("Min value must be positive");
+        }
+        if (value.max <= 0) {
+            throw new Error("Max value must be positive");
+        }
+        if (value.startMin < 0) {
+            throw new Error("Lower value must be positive");
+        }
+        if (value.startMax < 0) {
+            throw new Error("Upper value must be positive");
+        }
         this.sliderOptions = {...this.sliderOptions, ceil: value.max, floor: value.min};
+        this.ready = true;
         this.updateTicks();
     }
 
@@ -151,6 +166,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     }
 
     cleanDate(value, add, label): string {
+        log.debug("cleanDate(" + value + ")");
         const date = new Date(value);
         const ye = new Intl.DateTimeFormat(environment.locale,
                                            {year: "2-digit", timeZone: environment.timezone}).format(
@@ -170,23 +186,32 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     }
 
     public changeEvent($event: ChangeContext) {
-        this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
+        log.debug("changeEvent()");
+        if (this.ready) {
+            this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
+        }
     }
 
     public onEndEvent($event: ChangeContext) {
-        this.onEnd.emit(new DateRange(this._lowerValue, this._upperValue));
+        log.debug("onEndEvent()");
+        if (this.ready) {
+            this.onEnd.emit(new DateRange(this._lowerValue, this._upperValue));
+        }
     }
 
     private updateTicks() {
-
-        this.sliderOptions.stepsArray = [];
-        for (let step = this.sliderOptions.floor;
-             step < this.sliderOptions.ceil;
-             step = step + 60) {
-            this.sliderOptions.stepsArray.push({value: step});
-        }
-        if (this.sliderOptions.stepsArray[this.sliderOptions.stepsArray.length - 1].value !== this.sliderOptions.ceil) {
-            this.sliderOptions.stepsArray.push({value: this.sliderOptions.ceil});
+        log.debug("updateTicks()");
+        if (this.ready && this.sliderOptions.floor < this.sliderOptions.ceil) {
+            this.sliderOptions.stepsArray = [];
+            for (let step = this.sliderOptions.floor;
+                 step < this.sliderOptions.ceil;
+                 step = step + 60 * 60 * 1000) {
+                console.log(step);
+                this.sliderOptions.stepsArray.push({value: step});
+            }
+            if (this.sliderOptions.stepsArray[this.sliderOptions.stepsArray.length - 1].value !== this.sliderOptions.ceil) {
+                this.sliderOptions.stepsArray.push({value: this.sliderOptions.ceil});
+            }
         }
 
     }

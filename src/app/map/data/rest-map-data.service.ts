@@ -18,11 +18,12 @@ import {
     MapCoreMetadata,
     MapMetadata,
     ONE_DAY,
-    RegionGeography, RegionStats,
+    RegionGeography, RegionStats, RegionStatsMap,
     RegionTweeCount,
     ServiceMetadata
 } from "./map-data";
 import {RESTDataAPIService} from "../../api/rest-api.service";
+import {FeatureCollection} from "@amcharts/amcharts4-geodata/.internal/Geodata";
 
 
 const log = new Logger("map-data");
@@ -45,6 +46,7 @@ export class RESTMapDataService {
      * @see _rawTwitterData for the unprocessed data.
      */
     private initialized: boolean;
+    public regionGeographyGeoJSON: geojson.FeatureCollection;
 
 
     constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
@@ -59,7 +61,7 @@ export class RESTMapDataService {
     }
 
     public async init(): Promise<ServiceMetadata> {
-        this.serviceMetadata = await this._api.callMapAPI("metadata", {}) as ServiceMetadata;
+        this.serviceMetadata = await this._api.callMapAPIWithCache("metadata", {}, 60 * 60) as ServiceMetadata;
 
         await this._pref.waitUntilReady();
         const available = this._pref.combined.availableDataSets;
@@ -77,11 +79,20 @@ export class RESTMapDataService {
     /**
      * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
      */
-    public async loadGeography(regionType: string): Promise<RegionGeography> {
+    public async loadGeography(regionType: string): Promise<geojson.FeatureCollection> {
         log.debug("Loading Geography");
-        this.regionGeography = await this._api.callMapAPI(
-            this._mapId + "/region-type/" + regionType + "/geography", {}) as RegionGeography;
-        return this.regionGeography;
+        this.regionGeography = await this._api.callMapAPIWithCache(
+            this._mapId + "/region-type/" + regionType + "/geography", {}, 24 * 60 * 60) as RegionGeography;
+        const features = [];
+        for (const region in this.regionGeography) {
+            if (this.regionGeography.hasOwnProperty(region)) {
+                features.push({id: region, type: "Feature", properties: {name: region, count: 0}, geometry: this.regionGeography[region]});
+            }
+        }
+
+        this.regionGeographyGeoJSON = {type: "FeatureCollection", features};
+
+        return this.regionGeographyGeoJSON;
     }
 
     /**
@@ -89,7 +100,7 @@ export class RESTMapDataService {
      */
     public async loadAggregations(): Promise<AggregationMap> {
         log.debug("Loading Aggregations");
-        this.aggregations = await this._api.callMapAPI(this._mapId + "/aggregations", {}) as AggregationMap;
+        this.aggregations = await this._api.callMapAPIWithCache(this._mapId + "/aggregations", {}, 24 * 60 * 60) as AggregationMap;
         return this.aggregations;
     }
 
@@ -99,9 +110,8 @@ export class RESTMapDataService {
 
     public async tweets(regionType: string, regions: string[], startDate,
                         endDate): Promise<Tweet[]> {
-        return await this._api.callMapAPI(this._mapId + "/region-type/" + regionType + "/tweets-for-regions", {
-            hazards: [],
-            sources: [],
+        return await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/text-for-regions", {
+            layerGroup: this.dataSetMetdata.defaultLayerGroup,
             regions,
             startDate,
             endDate
@@ -115,11 +125,10 @@ export class RESTMapDataService {
 
     public async recentTweets(regionType: string): Promise<RegionTweeCount> {
 
-        return await this._api.callMapAPI(this._mapId + "/region-type/" + regionType + "/recent-tweets", {
-            hazards:   [],
-            sources:   [],
-            startDate: this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000,
-            endDate:   this.now()
+        return await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/recent-text-count", {
+            layerGroup: this.dataSetMetdata.defaultLayerGroup,
+            startDate:  this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000,
+            endDate:    this.now()
 
         }) as Promise<RegionTweeCount>;
     }
@@ -131,7 +140,8 @@ export class RESTMapDataService {
 
 
     public async places(regionType: string): Promise<Set<string>> {
-        return new Set<string>(await this._api.callMapAPI(this._mapId + "/region-type/" + regionType + "/regions", {}) as string[]);
+        return new Set<string>(
+            await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/regions", {}, 24 * 60 * 60) as string[]);
     }
 
 
@@ -200,11 +210,11 @@ export class RESTMapDataService {
             this._notify.error("Map Data Service not Initialized");
         }
         this._mapId = dataset;
-        this.dataSetMetdata = (await this._api.callMapAPI(this._mapId + "/metadata", {
+        this.dataSetMetdata = (await this._api.callMapAPIWithCache(this._mapId + "/metadata", {
             startDate: this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000,
             endDate:   this.now()
 
-        })) as MapMetadata;
+        }, 3600)) as MapMetadata;
         return this.dataSetMetdata;
 
     }
@@ -238,7 +248,6 @@ export class RESTMapDataService {
         }
     }
 
-    g
 
     private async downloadRegion(regionType: string, region: string,
                                  geometry: Geometry, startDate: number, endDate: number): Promise<CSVExportTweet[]> {
@@ -294,22 +303,27 @@ export class RESTMapDataService {
     }
 
     public async regionStats(regionType: string, region: string, startDate: number, endDate: number): Promise<RegionStats> {
-        return await this._api.callMapAPI(this._mapId + "/region-type/" + regionType + "/region/" + region + "/stats", {
-            hazards: [],
-            sources: [],
+        const statsMap = await this.getRegionStatsMap(regionType, startDate, endDate);
+        if (statsMap.hasOwnProperty((region))) {
+            return statsMap[region];
+        } else {
+            return null;
+        }
+
+
+    }
+
+    private async getRegionStatsMap(regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {
+        const statsMap = await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/stats", {
+            layerGroup: this.dataSetMetdata.defaultLayerGroup,
             startDate,
             endDate
 
-        }) as Promise<RegionStats>;
+        }, 60) as RegionStatsMap;
+        return statsMap;
     }
 
     private async regionNamesWithData(regionType: string, startDate: number, endDate: number): Promise<string[]> {
-        return await this._api.callMapAPI(this._mapId + "/region-type/" + regionType + "/regions-with-data", {
-            hazards: [],
-            sources: [],
-            startDate,
-            endDate
-
-        }) as Promise<string[]>;
+        return Object.keys(this.getRegionStatsMap(regionType, startDate, endDate));
     }
 }

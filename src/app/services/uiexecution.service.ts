@@ -68,7 +68,8 @@ export class UIExecutionService {
     private lastUIActivity: number = 0;
     private _uiInactiveTimer: Subscription;
 
-    constructor(private _notify: NotificationService, @Inject(RollbarService) private _rollbar: Rollbar) { }
+    constructor(private _notify: NotificationService, @Inject(RollbarService) private _rollbar: Rollbar) {
+    }
 
     public async start() {
         await Auth.currentAuthenticatedUser();
@@ -86,7 +87,7 @@ export class UIExecutionService {
             this._queue = [];
             while (snapshot.length > 0 && !this._pause) {
                 const task = snapshot.shift();
-
+                log.debug("Execution Queue", this._queue );
                 if ((task.waitForStates === null || task.waitForStates.indexOf(
                     this._state) >= 0) && (task.waitForUIState === null || this.uistate === task.waitForUIState)) {
                     log.info("Executing " + task.name + "(" + task.dedup + ")");

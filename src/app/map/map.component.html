@@ -87,14 +87,14 @@
                     </ng-container>
                     <div class="app-toolbar-separator"></div>
                     <mat-form-field>
-                        <mat-select [(value)]="activePolyLayerShortName" class="map-polygon-layer-select">
+                        <mat-select [(value)]="activeRegionType" class="map-polygon-layer-select">
                             <mat-option *ngFor="let regionGrouping of data.dataSetMetdata.regionTypes"
                                         [value]="regionGrouping.id">{{regionGrouping.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>
                     <div class="app-toolbar-separator"></div>
                     <mat-form-field>
-                        <mat-select [(value)]="activeNumberLayerShortName" class="map-number-layer-select">
+                        <mat-select [(value)]="activeStatistic" class="map-number-layer-select">
                             <mat-option value="stats">Exceedance</mat-option>
                             <mat-option value="count">Tweet Count</mat-option>
                         </mat-select>
@@ -134,7 +134,7 @@
             </div>
         </div>
 
-        <map-legend *ngIf="ready" class="legend" [activeNumber]="activeNumberLayerShortName"></map-legend>
+        <map-legend *ngIf="ready" class="legend" [activeNumber]="activeStatistic"></map-legend>
 
 
         <mat-progress-bar *ngIf="activity && ready" class="map-progress" mode="indeterminate"

@@ -116,6 +116,7 @@ export class ExceedanceMap {
 
 export interface RegionGeography {
     [regionName: string]: geojson.GeoJsonObject;
+
 }
 
 export interface AggregationMap {[aggregationName: string]: AggregationData}
@@ -123,4 +124,8 @@ export interface AggregationMap {[aggregationName: string]: AggregationData}
 export interface RegionStats {
     count: number;
     exceedance: number;
+}
+
+export interface RegionStatsMap {
+    [regionName: string]: RegionStats;
 }

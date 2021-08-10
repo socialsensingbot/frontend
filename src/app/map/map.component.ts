@@ -1,6 +1,6 @@
 import {Component, NgZone, OnDestroy, OnInit} from "@angular/core";
 import {Logger} from "@aws-amplify/core";
-import {Browser, GeoJSON, latLng, LayerGroup, layerGroup, LeafletMouseEvent, Map, tileLayer} from "leaflet";
+import {Browser, GeoJSON, latLng, Layer, LayerGroup, layerGroup, LeafletMouseEvent, Map, tileLayer} from "leaflet";
 import "jquery-ui/ui/widgets/slider.js";
 import {ActivatedRoute, NavigationStart, Params, Router} from "@angular/router";
 import * as rxjs from "rxjs";
@@ -17,7 +17,6 @@ import {
     numberLayerShortNames,
     PolygonData,
     PolyLayers,
-    Properties,
     STATS
 } from "./types";
 import {AuthService} from "../auth/auth.service";
@@ -34,7 +33,7 @@ import Auth from "@aws-amplify/auth";
 import {FormControl} from "@angular/forms";
 import {DashboardService} from "../pref/dashboard.service";
 import {LoadingProgressService} from "../services/loading-progress.service";
-import {ONE_DAY} from "./data/map-data";
+import {ONE_DAY, RegionGeography} from "./data/map-data";
 import {RESTMapDataService} from "./data/rest-map-data.service";
 
 
@@ -55,10 +54,10 @@ export class MapComponent implements OnInit, OnDestroy {
     public activity = false;
     public ready = false;
     public sliderOptions: DateRangeSliderOptions = {
-        max:      0,
-        min:      -24 * 60 + 1,
-        startMin: -24 * 60 + 1,
-        startMax: 0
+        max:      Date.now(),
+        min:      Date.now() - 7 * ONE_DAY,
+        startMin: Date.now() - ONE_DAY,
+        startMax: Date.now()
     };
     public selection = new RegionSelection();
     public showTwitterTimeline: boolean;
@@ -75,7 +74,7 @@ export class MapComponent implements OnInit, OnDestroy {
     private _statsLayer: LayerGroup = layerGroup();
     private _countyLayer: LayerGroup = layerGroup(); // dummy layers to fool layer control
     public options: any = {
-        regions: [
+        layers: [
             tileLayer(
                 // tslint:disable-next-line:max-line-length
                 environment.mapTileUrlTemplate,
@@ -164,6 +163,7 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     public set activeLayerGroup(value: string) {
+        log.debug("set activeLayerGroup");
         this._activeLayerGroup = value;
         this._twitterIsStale = true;
         this.ready = false;
@@ -177,6 +177,7 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     public set dataset(value: string) {
+        log.debug("set dataset");
         if (value && value !== this._dataset) {
             this.activity = true;
             this._updating = true;
@@ -186,8 +187,8 @@ export class MapComponent implements OnInit, OnDestroy {
             const oldLocation = this.data.dataSetMetdata.location;
             this.data.switchDataSet(value).then(async () => {
                 this.hideTweets();
-                if (this._activePolyLayerShortName) {
-                    await this.data.loadGeography(this._activePolyLayerShortName);
+                if (this._activeRegionType) {
+                    await this.data.loadGeography(this._activeRegionType);
                     await this.data.loadAggregations();
                 }
                 log.debug(`Old location ${oldLocation} new location ${this.data.dataSetMetdata.location}`);
@@ -210,16 +211,17 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    private _activeNumberLayerShortName: NumberLayerShortName;
+    private _activeStatistic: NumberLayerShortName;
 
-    public get activeNumberLayerShortName(): NumberLayerShortName {
-        return this._activeNumberLayerShortName;
+    public get activeStatistic(): NumberLayerShortName {
+        return this._activeStatistic;
     }
 
-    public set activeNumberLayerShortName(value: NumberLayerShortName) {
-        if (this._activeNumberLayerShortName !== value) {
-            this._activeNumberLayerShortName = value;
-            this.updateSearch({active_number: this._activeNumberLayerShortName});
+    public set activeStatistic(value: NumberLayerShortName) {
+        log.debug("set activeStatistic");
+        if (this._activeStatistic !== value) {
+            this._activeStatistic = value;
+            this.updateSearch({active_number: this._activeStatistic});
             if (this._map) {
                 for (const layer in this._numberLayers) {
                     if (layer !== value) {
@@ -239,17 +241,17 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    private _activePolyLayerShortName: string;
+    private _activeRegionType: string;
 
-    public get activePolyLayerShortName(): string {
-        return this._activePolyLayerShortName;
+    public get activeRegionType(): string {
+        return this._activeRegionType;
     }
 
-    public set activePolyLayerShortName(value: string) {
-        log.debug("New baselayer " + value);
+    public set activeRegionType(value: string) {
+        log.debug("activeRegionType(" + value + ")");
 
-        if (this.activePolyLayerShortName !== value) {
-            if (!this.activePolyLayerShortName) {
+        if (this.activeRegionType !== value) {
+            if (!this.activeRegionType) {
                 this.updateSearch({active_polygon: value});
             } else {
                 log.debug("Removing selected region(s) as we have changed region type");
@@ -270,7 +272,7 @@ export class MapComponent implements OnInit, OnDestroy {
                     }
                 }
             }
-            this._activePolyLayerShortName = value;
+            this._activeRegionType = value;
             this.scheduleResetLayers();
         }
 
@@ -324,6 +326,7 @@ export class MapComponent implements OnInit, OnDestroy {
         await this.pref.waitUntilReady();
         this._stateSub = this._exec.state.subscribe((state: AppState) => {
             if (state === "ready") {
+                log.debug("Setting this to be ready");
                 this.ready = true;
             }
         });
@@ -332,6 +335,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this._twitterUpdateTimer = timer(0, 1000).subscribe(async () => {
             if (!twitterUpdateInProgress) {
                 if (this._twitterIsStale) {
+                    log.debug("Twitter is stale");
                     twitterUpdateInProgress = true;
                     this._twitterIsStale = false;
                     await this.updateTwitter();
@@ -344,6 +348,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this._sliderUpdateTimer = timer(0, 100).subscribe(async () => {
             if (!sliderUpdateInProgress) {
                 if (this._sliderIsStale) {
+                    log.debug("Slider is stale");
                     sliderUpdateInProgress = true;
                     this._sliderIsStale = false;
                     await this.updateFromSlider();
@@ -371,7 +376,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                              }
                                          });
 
-
+        log.debug("Initialized");
     }
 
     /**
@@ -396,6 +401,7 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this._blinkTimer) {
             this._blinkTimer.unsubscribe();
         }
+        log.debug("Destroyed");
 
     }
 
@@ -403,6 +409,7 @@ export class MapComponent implements OnInit, OnDestroy {
      * Read the live.json data file and process contents.
      */
     async load(first: boolean = false, clearSelected = false) {
+        log.debug("load(" + first + "," + clearSelected + ")");
         if (!first && this._updating) {
             log.info("UI is busy so skipping load");
             setTimeout(() => {
@@ -425,7 +432,10 @@ export class MapComponent implements OnInit, OnDestroy {
                 await this.updateSliderFromData();
             } else {
                 await this.updateLayers("Data Load", clearSelected);
-                await this.updateSliderFromData();
+                await this._exec.queue("Update Slider", ["ready"],
+                                       () => {
+                                           this.updateSliderFromData();
+                                       }, null, true, true, true);
             }
 
             this._twitterIsStale = true;
@@ -477,18 +487,20 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     public downloadTweetsAsCSV() {
+        log.debug("downloadTweetsAsCSV()");
         if (this.data.hasCountryAggregates()) {
             this.data.downloadAggregate("countries", this.selectedCountries,
-                                        this.activePolyLayerShortName,
-                                        this.data.regionGeography[this.activePolyLayerShortName] as PolygonData, this._dateMin,
+                                        this.activeRegionType,
+                                        this.data.regionGeography[this.activeRegionType] as PolygonData, this._dateMin,
                                         this._dateMax);
         } else {
-            this.data.download(this.data.regionGeography[this.activePolyLayerShortName] as PolygonData, this.activePolyLayerShortName,
+            this.data.download(this.data.regionGeography[this.activeRegionType] as PolygonData, this.activeRegionType,
                                this._dateMin, this._dateMax);
         }
     }
 
     public zoomIn() {
+        log.debug("zoomIn()");
         if (this._map.getZoom() < 18) {
             this._map.setZoom(this._map.getZoom() + 1);
         } else {
@@ -497,6 +509,7 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     public zoomOut() {
+        log.debug("zoomOut()");
         if (this._map.getZoom() > 2) {
             this._map.setZoom(this._map.getZoom() - 1);
         } else {
@@ -505,7 +518,7 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     public selectedCountriesText() {
-        // log.info("selectedCountriesText()");
+        log.debug("selectedCountriesText()");
         // log.info(countries.value);
         if (!this.countries.value || this.countries.value.length === 0) {
             log.debug("None");
@@ -528,6 +541,7 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     private scheduleResetLayers(clearSelected = true) {
+        log.debug("scheduleResetLayers()");
         return this._exec.queue("Reset Layers", ["ready"], () => {
             this.activity = true;
             this.resetLayers(clearSelected);
@@ -558,28 +572,23 @@ export class MapComponent implements OnInit, OnDestroy {
         } = params;
         this._newParams = params;
         this._absoluteTime = this.data.lastEntryDate().getTime();
-        this.sliderOptions.min = -this.data.minDate();
+        this.sliderOptions.min = this.data.minDate();
         // These handle the date slider min_time & max_time values
         if (typeof min_time !== "undefined") {
             this._dateMin = +min_time;
-            this.sliderOptions = {
-                ...this.sliderOptions,
-                startMin: this._dateMin
-            };
         } else {
-            this._dateMin = (-24 * 60 + 1) * ONE_MINUTE_IN_MILLIS + this._absoluteTime;
-            this.sliderOptions = {...this.sliderOptions, startMin: (-24 * 60 + 1)};
+            this._dateMin = Date.now() - (ONE_DAY);
         }
+        this.sliderOptions = {
+            ...this.sliderOptions,
+            startMin: this._dateMin
+        };
         if (typeof max_time !== "undefined") {
             this._dateMax = +max_time;
-            this.sliderOptions = {
-                ...this.sliderOptions,
-                startMax: this._dateMax
-            };
         } else {
-            this._dateMax = this._absoluteTime;
-            this.sliderOptions = {...this.sliderOptions, startMax: this.data.now()};
+            this._dateMax = this.data.now();
         }
+        this.sliderOptions = {...this.sliderOptions, startMax:  this._dateMax };
         if (typeof layer_group !== "undefined") {
             this._activeLayerGroup = layer_group;
         }
@@ -604,11 +613,11 @@ export class MapComponent implements OnInit, OnDestroy {
         }
 
         // This handles a change to the active_number value
-        this.activeNumberLayerShortName = typeof active_number !== "undefined" ? active_number : STATS;
+        this.activeStatistic = typeof active_number !== "undefined" ? active_number : STATS;
 
 
         // This handles a change to the active_polygon value
-        this.activePolyLayerShortName = typeof active_polygon !== "undefined" ? active_polygon : COUNTY;
+        this.activeRegionType = typeof active_polygon !== "undefined" ? active_polygon : COUNTY;
 
 
         // If a polygon (region) is selected update Twitter panel.
@@ -620,6 +629,7 @@ export class MapComponent implements OnInit, OnDestroy {
             }
         }
 
+        log.debug("updateMapFromQueryParams() finished");
         return undefined;
     }
 
@@ -657,16 +667,16 @@ export class MapComponent implements OnInit, OnDestroy {
             this._activeLayerGroup = this.data.dataSetMetdata.defaultLayerGroup;
         }
         if (this.route.snapshot.queryParamMap.has("active_polygon")) {
-            this._activePolyLayerShortName = this.route.snapshot.queryParamMap.get("active_polygon");
+            this._activeRegionType = this.route.snapshot.queryParamMap.get("active_polygon");
         } else {
-            this._activePolyLayerShortName = this.data.dataSetMetdata.defaultRegionType;
+            this._activeRegionType = this.data.dataSetMetdata.defaultRegionType;
         }
-        if (this._activePolyLayerShortName) {
-            await this.data.loadGeography(this._activePolyLayerShortName);
+        if (this._activeRegionType) {
+            await this.data.loadGeography(this._activeRegionType);
         }
         await this.data.loadAggregations();
         if (this.data.hasCountryAggregates()) {
-            this.data.aggregations.countries.aggregates.forEach(i => this.selectedCountries.push(i.id));
+            this.data.aggregations["uk-countries"].aggregates.forEach(i => this.selectedCountries.push(i.id));
         }
         const {zoom, lng, lat} = {
             ...this.data.serviceMetadata.start,
@@ -712,9 +722,10 @@ export class MapComponent implements OnInit, OnDestroy {
                                      });
 
                                      this._exec.changeState("ready");
-                                     await this.updateLayers("From Parameters");
+                                     this.updateLayers("From Parameters");
+                                     log.debug("Queued layer update");
                                      // Schedule periodic data loads from the server
-                                     this._loadTimer = timer(ONE_MINUTE_IN_MILLIS, ONE_MINUTE_IN_MILLIS)
+                                     this._loadTimer = timer(0, ONE_MINUTE_IN_MILLIS)
                                          .subscribe(async () => {
                                              this.activity = true;
                                              await this.load();
@@ -724,6 +735,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                      this._notify.dismiss();
                                      this.loading.loaded();
                                      this.activity = false;
+                                     log.debug("Initial Search Parameters lambda completed");
                                  });
             } else {
                 if (this._popState) {
@@ -739,11 +751,13 @@ export class MapComponent implements OnInit, OnDestroy {
             }
 
         });
-
+        log.debug("Init completed successfully");
 
     }
 
     private async clearSelectedRegions() {
+        log.debug("clearSelectedRegions()");
+
         await this.updateSearch({selected: []});
         this._selectedFeatureNames = [];
         await this.resetLayers(true);
@@ -753,7 +767,6 @@ export class MapComponent implements OnInit, OnDestroy {
      * When the user places their mouse over a feature (region) this is called.
      */
     private featureEntered(e: LeafletMouseEvent) {
-        log.debug("featureEntered()");
         const feature = e.target.feature;
         const exceedanceProbability: number = Math.round(feature.properties.stats * 100) / 100;
         const region: string = toTitleCase(feature.properties.name);
@@ -823,8 +836,8 @@ export class MapComponent implements OnInit, OnDestroy {
             log.debug("updateTwitterPanel()", feature);
             if (feature.properties.count > 0) {
                 log.debug("Count > 0");
-                log.debug(`this.activePolyLayerShortName=${this.activePolyLayerShortName}`);
-                this.tweets = await this.data.tweets(this.activePolyLayerShortName, this.selection.regionNames(), this._dateMin,
+                log.debug(`this.activePolyLayerShortName=${this.activeRegionType}`);
+                this.tweets = await this.data.tweets(this.activeRegionType, this.selection.regionNames(), this._dateMin,
                                                      this._dateMax);
                 log.debug(this.tweets);
                 this.twitterPanelHeader = true;
@@ -843,7 +856,7 @@ export class MapComponent implements OnInit, OnDestroy {
             this.hideTweets();
         } else {
             log.debug(features.length + " features");
-            this.tweets = await this.data.tweets(this.activePolyLayerShortName, this.selection.regionNames(), this._dateMin, this._dateMax);
+            this.tweets = await this.data.tweets(this.activeRegionType, this.selection.regionNames(), this._dateMin, this._dateMax);
             log.debug(this.tweets);
             this.twitterPanelHeader = true;
             this.showTwitterTimeline = true;
@@ -856,7 +869,7 @@ export class MapComponent implements OnInit, OnDestroy {
      * Mouse out event.
      */
     private featureLeft(e: LeafletMouseEvent) {
-        log.debug("featureLeft(" + this._activeNumberLayerShortName + ")");
+        log.debug("featureLeft(" + this._activeStatistic + ")");
         if (this.selection.isSelected(e.target.feature)) {
             this.highlight(e.target);
         } else {
@@ -875,7 +888,7 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this.isMultiSelect(e)) {
             this.selection.toggle(e.target.feature);
         } else {
-            this._geojson[this.activeNumberLayerShortName].resetStyle(e.propagatedFrom);
+            this._geojson[this.activeStatistic].resetStyle(e.propagatedFrom);
             this.selection.selectOnly(e.target.feature);
         }
         this.updateSearch({selected: this.selection.regionNames()});
@@ -936,7 +949,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
                 // noinspection JSUnfilteredForInLoop
                 const shortNumberLayerName = key;
-                const regionTweetMap = this.data.recentTweets(this.activePolyLayerShortName);
+                const regionTweetMap = this.data.recentTweets(this.activeRegionType);
                 log.debug("Region Tweet Map", regionTweetMap);
 
                 const styleFunc = (feature: geojson.Feature) => {
@@ -951,7 +964,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
                 };
                 this._geojson[shortNumberLayerName] = new GeoJSON(
-                    this.data.regionGeography[this.activePolyLayerShortName] as geojson.GeoJsonObject, {
+                    this.data.regionGeographyGeoJSON as geojson.GeoJsonObject, {
                         style:         styleFunc,
                         onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
                     }).addTo(curLayerGroup);
@@ -968,13 +981,13 @@ export class MapComponent implements OnInit, OnDestroy {
     /**
      * Clears and iialises feature data on the map.
      */
-    private clearMapFeatures() {
+    private async clearMapFeatures() {
         for (const regionType of this.data.regionTypes()) { // counties, coarse, fine
-            const features = (this.data.regionGeography[regionType] as PolygonData).features;
+            const features = this.data.regionGeographyGeoJSON.features;
             for (const feature of features) {
                 const properties = feature.properties;
                 const place = properties.name;
-                if (place in this.data.places(regionType)) {
+                if (place in await this.data.places(regionType)) {
                     properties.count = 0;
                     properties.stats = 0;
                 }
@@ -986,39 +999,39 @@ export class MapComponent implements OnInit, OnDestroy {
      * Updates the data stored in the polygon data of the leaflet layers.
      */
     private async updateRegionData() {
-        for (const regionType of this.data.regionTypes()) { // counties, coarse, fine
-            const regionData: PolygonData = (this.data.regionGeography)[regionType] as PolygonData;
-            const features: Feature[] = regionData.features;
-            for (const feature of features) {
-                const featureProperties: Properties = feature.properties;
-                const region = featureProperties.name;
-                const mapStats = await this.data.regionStats(regionType, region, this._dateMin, this._dateMax);
-                if (mapStats !== null) {
-                    featureProperties.count = mapStats.count;
-                    featureProperties.stats = mapStats.exceedance;
-                } else {
-                    log.verbose("No data for " + region);
-                    featureProperties.count = 0;
-                    featureProperties.stats = 0;
-                }
+        const regionData = this.data.regionGeographyGeoJSON;
+        const features = regionData.features;
+        for (const feature of features) {
+            const featureProperties = feature.properties;
+            const region = featureProperties.name;
+            const mapStats = await this.data.regionStats(this.activeRegionType, region, this._dateMin, this._dateMax);
+            if (mapStats !== null) {
+                featureProperties.count = mapStats.count;
+                featureProperties.stats = mapStats.exceedance;
+            } else {
+                log.verbose("No data for " + region);
+                featureProperties.count = 0;
+                featureProperties.stats = 0;
             }
-
         }
+
+
     }
 
     private async updateLayers(reason: string = "", clearSelected = false) {
+        log.debug("updateLayers()");
         return this._exec.queue("Update Layers: " + reason, ["ready"], async () => {
                                     // Mark as stale to trigger a refresh
+                                    log.debug("updateLayers() lambda");
                                     if (!this._updating) {
                                         this.activity = true;
                                         this._updating = true;
                                         try {
 
-                                            this._exec.changeState("data-refresh");
-                                            this.clearMapFeatures();
-                                            this.updateRegionData();
-                                            this.resetLayers(clearSelected);
-                                            this.updateTwitterPanel();
+                                            await this.clearMapFeatures();
+                                            await this.updateRegionData();
+                                            await this.resetLayers(clearSelected);
+                                            await this.updateTwitterPanel();
                                         } finally {
                                             this.activity = false;
                                             this._updating = false;
@@ -1032,7 +1045,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                         log.debug("Update in progress so skipping this update");
                                     }
                                 }
-            , reason, true, true);
+            , reason, false, true);
     }
 
     /**
@@ -1057,6 +1070,7 @@ export class MapComponent implements OnInit, OnDestroy {
      * This is called if this._sliderIsStale === true;
      */
     private async updateFromSlider() {
+        log.debug("updateFromSlider()");
         this.liveUpdating = this.sliderOptions.startMax > -this.pref.combined.continuousUpdateThresholdInMinutes;
 
         this.checkForLiveUpdating();
@@ -1070,20 +1084,18 @@ export class MapComponent implements OnInit, OnDestroy {
     private async updateSliderFromData() {
         log.debug("updateSliderFromData()");
         this._absoluteTime = this.data.lastEntryDate().getTime();
-        this._dateMin = this.data.minDate() - ONE_DAY;
-        this._dateMax = this.data.now();
 
         this.sliderOptions = {
-            max:      0,
-            min:      this.data.minDate(),
-            startMin: this._dateMin,
-            startMax: this._dateMax
+            ...this.sliderOptions,
+            max:      this.data.now(),
+            min:      this.data.minDate() - 60 * 1000,
         };
         this.checkForLiveUpdating();
 
     }
 
     private checkForLiveUpdating() {
+        log.debug("checkForLiveUpdating()");
         if (this.sliderOptions.startMax > -this.pref.combined.continuousUpdateThresholdInMinutes) {
             this.liveUpdating = true;
         } else {
@@ -1092,7 +1104,7 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this.liveUpdating) {
             log.debug("LIVE UPDATES ON");
             this._dateMax = this._absoluteTime;
-            this.sliderOptions.startMax = 0;
+            this.sliderOptions.startMax = this.data.now();
         }
     }
 
@@ -1110,12 +1122,12 @@ export class MapComponent implements OnInit, OnDestroy {
 
     public async timeSliderPreset(mins: number) {
         log.debug("timeSliderPreset()");
-        await this.sliderChange({lower: -mins, upper: 0});
+        await this.sliderChange({lower: this.data.now() - mins * ONE_MINUTE_IN_MILLIS, upper: this.data.now()});
         this.sliderOptions = {
-            max:      0,
+            max:      this.data.now(),
             min:      this.data.minDate(),
-            startMin: -mins,
-            startMax: 0
+            startMin: this.data.now() - mins * ONE_MINUTE_IN_MILLIS,
+            startMax: this.data.now()
         };
         this._sliderIsStale = true;
     }
