@@ -324,7 +324,6 @@ app.post("/map/:map/aggregations", async (req, res) => {
             const aggregations = await sql({
                                                // language=MySQL
                                                sql: `select distinct ram.region_aggregation_id as region_aggregation_id,
-                                                                     ram.region_type           as region_type,
                                                                      ra.title                  as title
                                                      from ref_map_region_aggregation_mappings ram,
                                                           ref_map_region_aggregations ra
@@ -350,10 +349,11 @@ app.post("/map/:map/aggregations", async (req, res) => {
                 }
 
                 aggroMap[aggType.region_aggregation_type_id].aggregates.push(
-                    {id: agg.region_agregation_id, title: agg.title, regionTypeMap: mappingsMap});
+                    {id: agg.region_aggregation_id, title: agg.title, regionTypeMap: mappingsMap});
             }
 
         }
+
 
         return aggroMap;
     }, {duration: 24 * 60 * 60});
@@ -384,7 +384,7 @@ app.post("/map/:map/region-type/:regionType/recent-text-count", async (req, res)
                                });
         const result = {};
         for (const row of rows) {
-            result[row.region] = row.count;
+            result["" + row.region] = row.count;
         }
         return result;
 
@@ -499,8 +499,9 @@ app.post("/map/:map/region-type/:regionType/stats", async (req, res) => {
                                                    regions.region                  as region
                                             from (select distinct region from live_text_regions where region_type = ?) as regions
                                            `,
-                                   values: [periodLengthInSeconds, req.body.layerGroup,  req.params.regionType, targetPeriod,
-                                            periodLengthInSeconds, req.body.layerGroup,  req.params.regionType, targetPeriod, req.params.regionType
+                                   values: [periodLengthInSeconds, req.body.layerGroup, req.params.regionType, targetPeriod,
+                                            periodLengthInSeconds, req.body.layerGroup, req.params.regionType, targetPeriod,
+                                            req.params.regionType
                                    ]
                                });
 
@@ -508,7 +509,7 @@ app.post("/map/:map/region-type/:regionType/stats", async (req, res) => {
             console.info("Fetching row ", row);
 
             if (rows.length !== 0) {
-                result[row.region] = {count: row.count, exceedance: row.exceedance};
+                result["" + row.region] = {count: row.count, exceedance: row.exceedance};
             }
 
 

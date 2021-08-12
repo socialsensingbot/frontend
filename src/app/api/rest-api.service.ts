@@ -66,13 +66,17 @@ export class RESTDataAPIService {
 
 
     public async callMapAPIWithCache(path: string, payload: any, cacheForSeconds: number = -1): Promise<any> {
+        log.debug("callMapAPIWithCache()");
         const key = "rest:map/" + path + ":" + JSON.stringify(payload);
         const cachedItem = await this.cache.getCached(key);
         if (cacheForSeconds > 0 && cachedItem && cachedItem.hasData && !cachedItem.expired) {
             // tslint:disable-next-line:no-console
+            log.debug("Value for " + key + "in cache");
+            // log.debug("Value for " + key + " was " + JSON.stringify(cachedItem.data));
             console.debug("Return cached item", JSON.stringify(cachedItem));
             return cachedItem.data;
         } else {
+            log.debug("Value for " + key + " not in cache");
             return API.post("query", "/map/" + path, {
                 body:    payload,
                 headers: {
@@ -86,6 +90,8 @@ export class RESTDataAPIService {
                     if (cacheForSeconds > 0) {
                         this.cache.setCached(key, data, cacheForSeconds * 1000);
                     }
+                } else {
+                    console.debug("Returning undefined item", data);
                 }
                 return data;
             }).catch(e => {

@@ -29,13 +29,17 @@ import {FeatureCollection} from "@amcharts/amcharts4-geodata/.internal/Geodata";
 const log = new Logger("map-data");
 
 
+const roundToHour = (timestamp: number): any => {
+    return Math.round(timestamp / (60 * 60 * 1000)) * 60 * 60 * 1000;
+};
+
 @Injectable({
                 providedIn: "root"
             })
 export class RESTMapDataService {
     public regionGeography: RegionGeography = {};
     public aggregations: AggregationMap = {};
-    public dataSetMetdata: MapMetadata;
+    public mapMetadata: MapMetadata;
     public serviceMetadata: ServiceMetadata;
 
     private _mapId: string;
@@ -46,7 +50,8 @@ export class RESTMapDataService {
      * @see _rawTwitterData for the unprocessed data.
      */
     private initialized: boolean;
-    public regionGeographyGeoJSON: geojson.FeatureCollection;
+    private _regionGeographyGeoJSON: geojson.FeatureCollection;
+    public ready = false;
 
 
     constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
@@ -60,9 +65,12 @@ export class RESTMapDataService {
 
     }
 
-    public async init(): Promise<ServiceMetadata> {
+    public async init(mapId: string): Promise<ServiceMetadata> {
+        this.initialized = true;
         this.serviceMetadata = await this._api.callMapAPIWithCache("metadata", {}, 60 * 60) as ServiceMetadata;
-
+        await this.switchDataSet(mapId);
+        this.aggregations = await this._api.callMapAPIWithCache(this._mapId + "/aggregations", {}, 24 * 60 * 60) as AggregationMap;
+        log.debug("Aggregations", this.aggregations);
         await this._pref.waitUntilReady();
         const available = this._pref.combined.availableDataSets;
         if (available && available.length > 0 && available[0] !== "*") {
@@ -71,8 +79,9 @@ export class RESTMapDataService {
         } else {
             this.availableDataSets = this.serviceMetadata.maps;
         }
-        this.initialized = true;
+
         this._notify.dismiss();
+        this.ready = true;
         return this.serviceMetadata;
     }
 
@@ -86,24 +95,15 @@ export class RESTMapDataService {
         const features = [];
         for (const region in this.regionGeography) {
             if (this.regionGeography.hasOwnProperty(region)) {
-                features.push({id: region, type: "Feature", properties: {name: region, count: 0}, geometry: this.regionGeography[region]});
+                features.push(
+                    {id: "" + region, type: "Feature", properties: {name: region, count: 0}, geometry: this.regionGeography[region]});
             }
         }
 
-        this.regionGeographyGeoJSON = {type: "FeatureCollection", features};
+        this._regionGeographyGeoJSON = {type: "FeatureCollection", features};
 
-        return this.regionGeographyGeoJSON;
+        return this._regionGeographyGeoJSON;
     }
-
-    /**
-     * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
-     */
-    public async loadAggregations(): Promise<AggregationMap> {
-        log.debug("Loading Aggregations");
-        this.aggregations = await this._api.callMapAPIWithCache(this._mapId + "/aggregations", {}, 24 * 60 * 60) as AggregationMap;
-        return this.aggregations;
-    }
-
 
     public async load(first: boolean) {
     }
@@ -111,10 +111,10 @@ export class RESTMapDataService {
     public async tweets(regionType: string, regions: string[], startDate,
                         endDate): Promise<Tweet[]> {
         return await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/text-for-regions", {
-            layerGroup: this.dataSetMetdata.defaultLayerGroup,
+            layerGroup: this.mapMetadata.defaultLayerGroup,
             regions,
-            startDate,
-            endDate
+            startDate:  roundToHour(startDate),
+            endDate:    roundToHour(endDate)
 
         }) as Promise<Tweet[]>;
     }
@@ -126,9 +126,9 @@ export class RESTMapDataService {
     public async recentTweets(regionType: string): Promise<RegionTweeCount> {
 
         return await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/recent-text-count", {
-            layerGroup: this.dataSetMetdata.defaultLayerGroup,
+            layerGroup: this.mapMetadata.defaultLayerGroup,
             startDate:  this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000,
-            endDate:    this.now()
+            endDate:    roundToHour(this.now())
 
         }) as Promise<RegionTweeCount>;
     }
@@ -210,22 +210,18 @@ export class RESTMapDataService {
             this._notify.error("Map Data Service not Initialized");
         }
         this._mapId = dataset;
-        this.dataSetMetdata = (await this._api.callMapAPIWithCache(this._mapId + "/metadata", {
-            startDate: this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000,
-            endDate:   this.now()
-
-        }, 3600)) as MapMetadata;
-        return this.dataSetMetdata;
+        this.mapMetadata = (await this._api.callMapAPIWithCache(this._mapId + "/metadata", {}, 3600)) as MapMetadata;
+        return this.mapMetadata;
 
     }
 
 
     public regionTypes() {
-        return this.dataSetMetdata.regionTypes.map(i => i.id);
+        return this.mapMetadata.regionTypes.map(i => i.id);
     }
 
     public hasCountryAggregates() {
-        return this.dataSetMetdata.regionAggregations.length > 0;
+        return this.mapMetadata.regionAggregations.length > 0;
     }
 
     public async exportRegionForCSV(polygonDatum: PolygonData, regionType: string, region: string,
@@ -304,8 +300,8 @@ export class RESTMapDataService {
 
     public async regionStats(regionType: string, region: string, startDate: number, endDate: number): Promise<RegionStats> {
         const statsMap = await this.getRegionStatsMap(regionType, startDate, endDate);
-        if (statsMap.hasOwnProperty((region))) {
-            return statsMap[region];
+        if (statsMap.hasOwnProperty(("" + region))) {
+            return statsMap["" + region];
         } else {
             return null;
         }
@@ -315,9 +311,9 @@ export class RESTMapDataService {
 
     private async getRegionStatsMap(regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {
         const statsMap = await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/stats", {
-            layerGroup: this.dataSetMetdata.defaultLayerGroup,
-            startDate,
-            endDate
+            layerGroup: this.mapMetadata.defaultLayerGroup,
+            startDate:  roundToHour(startDate),
+            endDate:    roundToHour(endDate)
 
         }, 60) as RegionStatsMap;
         return statsMap;
@@ -325,5 +321,9 @@ export class RESTMapDataService {
 
     private async regionNamesWithData(regionType: string, startDate: number, endDate: number): Promise<string[]> {
         return Object.keys(this.getRegionStatsMap(regionType, startDate, endDate));
+    }
+
+    public async geoJsonGeographyFor(regionType: string): Promise<FeatureCollection> {
+        return await this.loadGeography(regionType) as FeatureCollection;
     }
 }

@@ -63,7 +63,6 @@ export class MapComponent implements OnInit, OnDestroy {
     public showTwitterTimeline: boolean;
     _routerStateChangeSub: Subscription;
     _popState: boolean;
-    public countries: FormControl = new FormControl();
     public selectedCountries: string[] = [];
     // }
     public appToolbarExpanded: boolean;
@@ -134,6 +133,7 @@ export class MapComponent implements OnInit, OnDestroy {
     private DEFAULT_LAYER_GROUP = "flood-group";
     private _blinkTimer: Subscription;
     private _inFeature: boolean;
+    public selectedCountriesTextValue: string = "";
 
     constructor(private _router: Router,
                 private route: ActivatedRoute,
@@ -184,19 +184,18 @@ export class MapComponent implements OnInit, OnDestroy {
             this.ready = false;
             this._dataset = value;
             this._router.navigate(["/map", value], {queryParams: this._newParams, queryParamsHandling: "merge"});
-            const oldLocation = this.data.dataSetMetdata.location;
+            const oldLocation = this.data.mapMetadata.location;
             this.data.switchDataSet(value).then(async () => {
                 this.hideTweets();
                 if (this._activeRegionType) {
                     await this.data.loadGeography(this._activeRegionType);
-                    await this.data.loadAggregations();
                 }
-                log.debug(`Old location ${oldLocation} new location ${this.data.dataSetMetdata.location}`);
-                if (this.data.dataSetMetdata.location !== oldLocation) {
+                log.debug(`Old location ${oldLocation} new location ${this.data.mapMetadata.location}`);
+                if (this.data.mapMetadata.location !== oldLocation) {
                     this.selection.clear();
                     const {zoom, lng, lat} = {
                         ...this.data.serviceMetadata.start,
-                        ...this.data.dataSetMetdata.start,
+                        ...this.data.mapMetadata.start,
                     };
                     this.updateSearch({zoom, lng, lat, selected: null});
                     this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 6000});
@@ -517,24 +516,24 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    public selectedCountriesText() {
+    public calculateSelectedCountriesText() {
         log.debug("selectedCountriesText()");
         // log.info(countries.value);
-        if (!this.countries.value || this.countries.value.length === 0) {
+        if (!this.selectedCountries || this.selectedCountries.length === 0) {
             log.debug("None");
-            return "Download none";
+            this.selectedCountriesTextValue = "Download none";
         } else {
-            const countryCount = this.countries.value.length;
-            const countryData = this.data.aggregations.countries.aggregates;
+            const countryCount = this.selectedCountries.length;
+            const countryData = this.data.aggregations["uk-countries"].aggregates;
             if (countryData.length === countryCount) {
-                return "Download all";
+                this.selectedCountriesTextValue = "Download all";
             } else {
                 if (countryCount === 1) {
                     const countryTitle = countryData.filter(
-                        i => i.id === this.countries.value[0])[0].title;
-                    return `Download ${countryTitle}`;
+                        i => i.id === this.selectedCountries[0])[0].title;
+                    this.selectedCountriesTextValue = `Download ${countryTitle}`;
                 } else {
-                    return `Download ${countryCount} countries`;
+                    this.selectedCountriesTextValue = `Download ${countryCount} countries`;
                 }
             }
         }
@@ -588,7 +587,7 @@ export class MapComponent implements OnInit, OnDestroy {
         } else {
             this._dateMax = this.data.now();
         }
-        this.sliderOptions = {...this.sliderOptions, startMax:  this._dateMax };
+        this.sliderOptions = {...this.sliderOptions, startMax: this._dateMax};
         if (typeof layer_group !== "undefined") {
             this._activeLayerGroup = layer_group;
         }
@@ -659,28 +658,26 @@ export class MapComponent implements OnInit, OnDestroy {
         } else {
             this._dataset = this.pref.combined.defaultDataSet;
         }
-        await this.data.init();
-        await this.data.switchDataSet(this.dataset);
+        await this.data.init(this.dataset);
         if (this.route.snapshot.queryParamMap.has("layer_group")) {
             this._activeLayerGroup = this.route.snapshot.queryParamMap.get("layer_group");
         } else {
-            this._activeLayerGroup = this.data.dataSetMetdata.defaultLayerGroup;
+            this._activeLayerGroup = this.data.mapMetadata.defaultLayerGroup;
         }
         if (this.route.snapshot.queryParamMap.has("active_polygon")) {
             this._activeRegionType = this.route.snapshot.queryParamMap.get("active_polygon");
         } else {
-            this._activeRegionType = this.data.dataSetMetdata.defaultRegionType;
+            this._activeRegionType = this.data.mapMetadata.defaultRegionType;
         }
         if (this._activeRegionType) {
             await this.data.loadGeography(this._activeRegionType);
         }
-        await this.data.loadAggregations();
         if (this.data.hasCountryAggregates()) {
             this.data.aggregations["uk-countries"].aggregates.forEach(i => this.selectedCountries.push(i.id));
         }
         const {zoom, lng, lat} = {
             ...this.data.serviceMetadata.start,
-            ...this.data.dataSetMetdata.start,
+            ...this.data.mapMetadata.start,
             ...this.route.snapshot.queryParams,
             ...this._newParams
         };
@@ -937,7 +934,8 @@ export class MapComponent implements OnInit, OnDestroy {
      *
      * @param clearSelected clears the selected polygon
      */
-    private resetLayers(clearSelected) {
+    private async resetLayers(clearSelected) {
+        const geography: PolygonData = await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData;
         log.debug("resetLayers(" + clearSelected + ")");
         // this.hideTweets();
         for (const key of numberLayerShortNames) {
@@ -949,13 +947,14 @@ export class MapComponent implements OnInit, OnDestroy {
 
                 // noinspection JSUnfilteredForInLoop
                 const shortNumberLayerName = key;
-                const regionTweetMap = this.data.recentTweets(this.activeRegionType);
+                const regionTweetMap = await this.data.recentTweets(this.activeRegionType);
                 log.debug("Region Tweet Map", regionTweetMap);
 
                 const styleFunc = (feature: geojson.Feature) => {
 
                     const style = this._color.colorFunctions[shortNumberLayerName].getFeatureStyle(
                         feature);
+                    console.log("Style ", style, feature.properties);
                     if (this.liveUpdating && regionTweetMap[feature.properties.name]) {
                         log.debug(`Adding new tweet style for ${feature.properties.name}`);
                         style.className = style.className + " leaflet-new-tweet";
@@ -963,8 +962,10 @@ export class MapComponent implements OnInit, OnDestroy {
                     return style;
 
                 };
+                await this.updateRegionData(geography);
+
                 this._geojson[shortNumberLayerName] = new GeoJSON(
-                    this.data.regionGeographyGeoJSON as geojson.GeoJsonObject, {
+                    geography as geojson.GeoJsonObject, {
                         style:         styleFunc,
                         onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
                     }).addTo(curLayerGroup);
@@ -982,24 +983,13 @@ export class MapComponent implements OnInit, OnDestroy {
      * Clears and iialises feature data on the map.
      */
     private async clearMapFeatures() {
-        for (const regionType of this.data.regionTypes()) { // counties, coarse, fine
-            const features = this.data.regionGeographyGeoJSON.features;
-            for (const feature of features) {
-                const properties = feature.properties;
-                const place = properties.name;
-                if (place in await this.data.places(regionType)) {
-                    properties.count = 0;
-                    properties.stats = 0;
-                }
-            }
-        }
+
     }
 
     /**
      * Updates the data stored in the polygon data of the leaflet layers.
      */
-    private async updateRegionData() {
-        const regionData = this.data.regionGeographyGeoJSON;
+    private async updateRegionData(regionData: PolygonData) {
         const features = regionData.features;
         for (const feature of features) {
             const featureProperties = feature.properties;
@@ -1009,13 +999,11 @@ export class MapComponent implements OnInit, OnDestroy {
                 featureProperties.count = mapStats.count;
                 featureProperties.stats = mapStats.exceedance;
             } else {
-                log.verbose("No data for " + region);
+                log.debug("No data for " + region);
                 featureProperties.count = 0;
                 featureProperties.stats = 0;
             }
         }
-
-
     }
 
     private async updateLayers(reason: string = "", clearSelected = false) {
@@ -1029,7 +1017,6 @@ export class MapComponent implements OnInit, OnDestroy {
                                         try {
 
                                             await this.clearMapFeatures();
-                                            await this.updateRegionData();
                                             await this.resetLayers(clearSelected);
                                             await this.updateTwitterPanel();
                                         } finally {
@@ -1087,8 +1074,8 @@ export class MapComponent implements OnInit, OnDestroy {
 
         this.sliderOptions = {
             ...this.sliderOptions,
-            max:      this.data.now(),
-            min:      this.data.minDate() - 60 * 1000,
+            max: this.data.now(),
+            min: this.data.minDate() - 60 * 1000,
         };
         this.checkForLiveUpdating();
 

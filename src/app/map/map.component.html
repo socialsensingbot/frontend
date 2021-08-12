@@ -87,9 +87,9 @@
                     </ng-container>
                     <div class="app-toolbar-separator"></div>
                     <mat-form-field>
-                        <mat-select [(value)]="activeRegionType" class="map-polygon-layer-select">
-                            <mat-option *ngFor="let regionGrouping of data.dataSetMetdata.regionTypes"
-                                        [value]="regionGrouping.id">{{regionGrouping.title}}</mat-option>
+                        <mat-select *ngIf="data.mapMetadata.regionTypes" [(ngModel)]="activeRegionType" class="map-polygon-layer-select">
+                            <mat-option *ngFor="let regionType of data.mapMetadata.regionTypes"
+                                        [value]="regionType.id">{{regionType.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>
                     <div class="app-toolbar-separator"></div>
@@ -99,9 +99,9 @@
                             <mat-option value="count">Tweet Count</mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <mat-form-field *ngIf="data.dataSetMetdata.layerGroups.length > 1">
+                    <mat-form-field *ngIf="data.mapMetadata.layerGroups.length > 1">
                         <mat-select [(value)]="activeLayerGroup" class="map-number-layer-select">
-                            <mat-option *ngFor="let layerGroup of data.dataSetMetdata.layerGroups"
+                            <mat-option *ngFor="let layerGroup of data.mapMetadata.layerGroups"
                                         [value]="layerGroup.id">{{layerGroup.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>
@@ -112,13 +112,13 @@
                             (click)="downloadTweetsAsCSV()">
                         <mat-icon matTooltip="Download all Tweets as a CSV file.">cloud_download</mat-icon>
                     </button>
-                    <mat-form-field *ngIf="data.hasCountryAggregates()">
+                    <mat-form-field *ngIf="data.ready">
                         <!--                    <mat-label>Countries</mat-label>-->
-                        <mat-select [formControl]="countries" multiple [(ngModel)]="selectedCountries">
+                        <mat-select  multiple [(ngModel)]="selectedCountries" (valueChange)="calculateSelectedCountriesText()">
                             <mat-select-trigger>
-                                <span class="country-additional-selection">{{selectedCountriesText()}}</span>
+                                <span class="country-additional-selection">{{selectedCountriesTextValue}}</span>
                             </mat-select-trigger>
-                            <mat-option *ngFor="let agg of data.aggregations['countries'].aggregates"
+                            <mat-option *ngFor="let agg of data.aggregations['uk-countries'].aggregates"
                                         [value]="agg.id">{{agg.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>
