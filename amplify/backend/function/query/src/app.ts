@@ -279,7 +279,40 @@ app.post("/map/:map/metadata", async (req, res) => {
 });
 
 app.post("/map/:map/region-type/:regionType/text-for-regions", async (req, res) => {
+    cache(res, req.path, async () => {
 
+        return (await sql({
+                              // language=MySQL
+                              sql:    `select t.source_json            as json,
+                                              t.source_html            as html,
+                                              t.source_timestamp       as timestam,
+                                              t.source_id              as id,
+                                              ST_AsGeoJSON(t.location) as location,
+                                              tr.region                as region
+                                       FROM live_text t,
+                                            live_text_regions tr,
+                                            ref_map_layer_groups_mapping lgm,
+                                            ref_map_layers l
+                                       WHERE t.source = l.source
+                                         and t.hazard = l.hazard
+                                         and l.id = lgm.layer_id
+                                         and tr.source = t.source
+                                         and tr.source_id = t.source_id
+                                         and tr.region_type = ?
+                                         and tr.region in (?)
+                                         and lgm.layer_group_id = ?
+                                         and t.source_date between ? and ?
+                                      `,
+                              values: [req.params.regionType, req.body.regions, req.body.layerGroup,
+                                       dateFromMillis(req.body.startDate),
+                                       dateFromMillis(req.body.endDate)]
+                          })).map(i => {
+            i.json = JSON.parse(i.json);
+            return i;
+        });
+
+
+    }, {duration: 60});
 });
 
 app.post("/map/:map/region-type/:regionType/geography", async (req, res) => {
@@ -376,7 +409,7 @@ app.post("/map/:map/region-type/:regionType/recent-text-count", async (req, res)
                                               and tr.source_id = t.source_id
                                               and tr.region_type = ?
                                               and lgm.layer_group_id = ?
-                                              and t.source_date between ? and ?
+                                              and t.source_timestamp between ? and ?
                                             group by tr.region
                                            `,
                                    values: [req.params.regionType, req.body.layerGroup, dateFromMillis(req.body.startDate),

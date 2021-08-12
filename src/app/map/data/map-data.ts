@@ -1,21 +1,5 @@
 import * as geojson from "geojson";
 
-export interface TweetInterface {
-
-    readonly date: Date;
-    readonly year: string;
-    readonly month: string;
-    readonly day: string;
-    readonly hour: string;
-    readonly sender: string;
-    readonly url: string;
-    readonly valid: boolean;
-    readonly id: string;
-    readonly html: string;
-    readonly poly: string;
-    readonly place: string;
-}
-
 
 export interface RegionMetadata {
     id: string;
@@ -102,7 +86,7 @@ export interface RegionTweeCount {
 
 
 export class TweetMap {
-    [index: string]: TweetInterface[];
+    [index: string]: any[];
 }
 
 export class CountMap {

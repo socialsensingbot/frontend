@@ -110,13 +110,18 @@ export class RESTMapDataService {
 
     public async tweets(regionType: string, regions: string[], startDate,
                         endDate): Promise<Tweet[]> {
-        return await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/text-for-regions", {
+        const rawResult = await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/text-for-regions", {
             layerGroup: this.mapMetadata.defaultLayerGroup,
             regions,
             startDate:  roundToHour(startDate),
             endDate:    roundToHour(endDate)
 
-        }) as Promise<Tweet[]>;
+        });
+        const result: Tweet[] = [];
+        for (const tweet of rawResult) {
+            result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, tweet.timestamp, tweet.region));
+        }
+        return result;
     }
 
     public now(): number {
@@ -128,7 +133,7 @@ export class RESTMapDataService {
         return await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/recent-text-count", {
             layerGroup: this.mapMetadata.defaultLayerGroup,
             startDate:  this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000,
-            endDate:    roundToHour(this.now())
+            endDate:    this.now()
 
         }) as Promise<RegionTweeCount>;
     }
