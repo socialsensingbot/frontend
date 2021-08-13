@@ -143,7 +143,9 @@ const sql = async (options: {
                 console.error(error);
                 reject(error);
             } else {
-                console.log(options.sql, options.values, results);
+                let s: string = JSON.stringify(results);
+                console.log(options.sql, options.values, s.substring(0, s.length > 1000 ? 1000 : s.length));
+                console.log("Returned " + results.length + " rows");
                 resolve(results);
             }
         });
@@ -279,33 +281,36 @@ app.post("/map/:map/metadata", async (req, res) => {
 });
 
 app.post("/map/:map/region-type/:regionType/text-for-regions", async (req, res) => {
-    cache(res, req.path, async () => {
+    const start = Math.floor(req.body.startDate / 1000);
+    const end = Math.floor(req.body.endDate / 1000);
+    const periodLengthInSeconds: number = end - start;
+    console.debug("Period Length in Seconds: " + periodLengthInSeconds);
+    console.debug("StartDate: " + new Date(req.body.startDate));
+    console.debug("EndDate: " + new Date(req.body.endDate));
+    console.debug("Start: " + new Date(start * 1000));
+    console.debug("End: " + new Date(end * 1000));
+
+    cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
 
         return (await sql({
                               // language=MySQL
-                              sql:    `select t.source_json            as json,
-                                              t.source_html            as html,
-                                              t.source_timestamp       as timestam,
-                                              t.source_id              as id,
-                                              ST_AsGeoJSON(t.location) as location,
-                                              tr.region                as region
-                                       FROM live_text t,
-                                            live_text_regions tr,
-                                            ref_map_layer_groups_mapping lgm,
-                                            ref_map_layers l
-                                       WHERE t.source = l.source
-                                         and t.hazard = l.hazard
-                                         and l.id = lgm.layer_id
-                                         and tr.source = t.source
-                                         and tr.source_id = t.source_id
-                                         and tr.region_type = ?
-                                         and tr.region in (?)
-                                         and lgm.layer_group_id = ?
-                                         and t.source_date between ? and ?
-                                      `,
+                              sql: `select t.source_json            as json,
+                                           t.source_html            as html,
+                                           t.source_timestamp       as timestamp,
+                                           t.source_id              as id,
+                                           ST_AsGeoJSON(t.location) as location,
+                                           v.region                 as region
+                                    FROM live_text t,
+                                         view_live_regions_and_layers v
+                                    WHERE t.source = v.source
+                                      and t.source_id = v.source_id
+                                      and v.region_type = ?
+                                      and v.region in (?)
+                                      and v.layer_group_id = ?
+                                      and floor((? - unix_timestamp(t.source_timestamp)) / ?) = 0
+                                    order by t.source_timestamp desc    `,
                               values: [req.params.regionType, req.body.regions, req.body.layerGroup,
-                                       dateFromMillis(req.body.startDate),
-                                       dateFromMillis(req.body.endDate)]
+                                       end, periodLengthInSeconds]
                           })).map(i => {
             i.json = JSON.parse(i.json);
             return i;
@@ -412,8 +417,8 @@ app.post("/map/:map/region-type/:regionType/recent-text-count", async (req, res)
                                               and t.source_timestamp between ? and ?
                                             group by tr.region
                                            `,
-                                   values: [req.params.regionType, req.body.layerGroup, dateFromMillis(req.body.startDate),
-                                            dateFromMillis(req.body.endDate)]
+                                   values: [req.params.regionType, req.body.layerGroup, new Date(req.body.startDate),
+                                            new Date(req.body.endDate)]
                                });
         const result = {};
         for (const row of rows) {
@@ -474,34 +479,9 @@ app.post("/map/:map/region-type/:regionType/regions", async (req, res) => {
 
 app.post("/map/:map/region-type/:regionType/stats", async (req, res) => {
 
-    cache(res, req.path + ":" + req.body.layerGroup + ":" + Math.round(req.body.startDate / (60 * 1000)) + ":" + Math.round(
-        req.body.endDate / (60 * 1000)), async () => {
+    cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
         const result = {};
 
-        // language=MySQL
-        const aggregateSQL = (column) => `select ${column}
-                                          from (SELECT count(*)                                       as count,
-                                                       round(unix_timestamp(source_timestamp) / ?, 0) as period,
-                                                       cume_dist() OVER w * 100.0                     as exceedance
-                                                FROM live_text t,
-                                                     live_text_regions tr,
-                                                     ref_map_layer_groups_mapping lgm,
-                                                     ref_map_layers l
-                                                WHERE t.source = l.source
-                                                  and t.hazard = l.hazard
-                                                  and l.id = lgm.layer_id
-                                                  and lgm.layer_group_id = ?
-                                                  and tr.source = t.source
-                                                  and tr.source_id = t.source_id
-                                                  and tr.region_type = ?
-                                                  and tr.region = regions.region
-                                                group by period
-                                                    WINDOW w AS (ORDER BY COUNT(period) desc))
-                                                   as x
-                                          where period = ?`;
-
-        const periodLengthInSeconds: number = Math.round((req.body.endDate - req.body.startDate) / 1000);
-        const targetPeriod: number = Math.round(Math.round(req.body.startDate / 1000) / periodLengthInSeconds);
         //
         // const testValues = await sql({
         //                            // language=MySQL
@@ -522,18 +502,42 @@ app.post("/map/:map/region-type/:regionType/stats", async (req, res) => {
         //                            values: [periodLengthInSeconds, req.body.layerGroup]
         //                        });
 
+        const start = Math.floor(req.body.startDate / 1000);
+        const end = Math.floor(req.body.endDate / 1000);
+        const periodLengthInSeconds: number = end - start;
         console.debug("Period Length in Seconds: " + periodLengthInSeconds);
-        console.debug("Target period: " + targetPeriod);
+        console.debug("StartDate: " + new Date(req.body.startDate));
+        console.debug("EndDate: " + new Date(req.body.endDate));
+        console.debug("Start: " + new Date(start * 1000));
+        console.debug("End: " + new Date(end * 1000));
+
         // console.log("Test Values: ", testValues);
         const rows = await sql({
                                    // language=MySQL
-                                   sql:    `select (${aggregateSQL("exceedance")}) as exceedance,
-                                                   (${aggregateSQL("count")})      as count,
-                                                   regions.region                  as region
-                                            from (select distinct region from live_text_regions where region_type = ?) as regions
+                                   sql:    `select (select exceedance
+                                                    from (SELECT count(*)                                          as count,
+                                                                 floor((? - unix_timestamp(v.source_timestamp)) / ?) as period,
+                                                                 cume_dist() OVER w * 100.0                        as exceedance
+                                                          FROM view_live_regions_and_layers v
+                                                          WHERE v.layer_group_id = ?
+                                                            and v.region_type = ?
+                                                            and v.region = regions.region
+                                                          group by period
+                                                              WINDOW w AS (ORDER BY COUNT(period) desc))
+                                                             as x
+                                                    where period = 0) as exceedance,
+                                                   (SELECT count(*) as count
+                                                    FROM view_live_regions_and_layers v
+                                                    WHERE v.layer_group_id = ?
+                                                      and v.region_type = ?
+                                                      and v.region = regions.region
+                                                      and floor((? - unix_timestamp(v.source_timestamp)) / ?) = 0
+                                                   )                  as count,
+                                                   regions.region     as region
+                                            from (select distinct region_id as region from ref_map_regions where region_type_id = ?) as regions
                                            `,
-                                   values: [periodLengthInSeconds, req.body.layerGroup, req.params.regionType, targetPeriod,
-                                            periodLengthInSeconds, req.body.layerGroup, req.params.regionType, targetPeriod,
+                                   values: [end, periodLengthInSeconds, req.body.layerGroup, req.params.regionType,
+                                            req.body.layerGroup, req.params.regionType, end, periodLengthInSeconds,
                                             req.params.regionType
                                    ]
                                });
@@ -541,16 +545,12 @@ app.post("/map/:map/region-type/:regionType/stats", async (req, res) => {
         for (const row of rows) {
             console.info("Fetching row ", row);
 
-            if (rows.length !== 0) {
-                result["" + row.region] = {count: row.count, exceedance: row.exceedance};
-            }
-
-
+            result["" + row.region] = {count: row.count, exceedance: row.exceedance};
         }
 
         return result;
 
-    }, {duration: 60});
+    }, {duration: 50 * 60});
 
 });
 

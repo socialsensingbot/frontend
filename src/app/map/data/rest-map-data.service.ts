@@ -8,7 +8,7 @@ import {NotificationService} from "../../services/notification.service";
 import {NgForage, NgForageCache} from "ngforage";
 import {ExportToCsv} from "export-to-csv";
 import {PreferenceService} from "../../pref/preference.service";
-import {readableTimestamp, toTitleCase} from "../../common";
+import {readableTimestamp, roundToHour, roundToMinute, toTitleCase} from "../../common";
 import * as geojson from "geojson";
 import {AnnotationService} from "../../pref/annotation.service";
 import {LoadingProgressService} from "../../services/loading-progress.service";
@@ -28,10 +28,6 @@ import {FeatureCollection} from "@amcharts/amcharts4-geodata/.internal/Geodata";
 
 const log = new Logger("map-data");
 
-
-const roundToHour = (timestamp: number): any => {
-    return Math.round(timestamp / (60 * 60 * 1000)) * 60 * 60 * 1000;
-};
 
 @Injectable({
                 providedIn: "root"
@@ -110,16 +106,19 @@ export class RESTMapDataService {
 
     public async tweets(regionType: string, regions: string[], startDate,
                         endDate): Promise<Tweet[]> {
+
+        log.debug("requesting tweets for regions " + regions);
         const rawResult = await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/text-for-regions", {
             layerGroup: this.mapMetadata.defaultLayerGroup,
             regions,
             startDate:  roundToHour(startDate),
-            endDate:    roundToHour(endDate)
+            endDate:    roundToMinute(endDate)
 
-        });
+        }, 0);
+        log.debug(rawResult.length + " tweets back from server");
         const result: Tweet[] = [];
         for (const tweet of rawResult) {
-            result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, tweet.timestamp, tweet.region));
+            result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region));
         }
         return result;
     }
