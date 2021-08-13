@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
 var awsServerlessExpress = require("aws-serverless-express");
 var server = awsServerlessExpress.createServer(require("./app"));

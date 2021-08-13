@@ -24,7 +24,7 @@ import {HttpClient} from "@angular/common/http";
 import {UIExecutionService, AppState} from "../services/uiexecution.service";
 import {ColorCodeService} from "./services/color-code.service";
 import {Tweet} from "./twitter/tweet";
-import {getOS, toTitleCase} from "../common";
+import {getOS, roundToHour, roundToMinute, toTitleCase} from "../common";
 import {RegionSelection} from "./region-selection";
 import {PreferenceService} from "../pref/preference.service";
 import {NgForageCache} from "ngforage";
@@ -1109,12 +1109,12 @@ export class MapComponent implements OnInit, OnDestroy {
 
     public async timeSliderPreset(mins: number) {
         log.debug("timeSliderPreset()");
-        await this.sliderChange({lower: this.data.now() - mins * ONE_MINUTE_IN_MILLIS, upper: this.data.now()});
+        await this.sliderChange({lower: roundToHour(this.data.now() - mins * ONE_MINUTE_IN_MILLIS), upper: roundToMinute(this.data.now())});
         this.sliderOptions = {
-            max:      this.data.now(),
-            min:      this.data.minDate(),
-            startMin: this.data.now() - mins * ONE_MINUTE_IN_MILLIS,
-            startMax: this.data.now()
+            max:      roundToMinute(this.data.now()),
+            min:      roundToHour(this.data.minDate()),
+            startMin:  roundToHour(this.data.now() - mins * ONE_MINUTE_IN_MILLIS),
+            startMax: roundToMinute(this.data.now())
         };
         this._sliderIsStale = true;
     }
