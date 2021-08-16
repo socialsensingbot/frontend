@@ -123,24 +123,20 @@ export class RESTMapDataService {
         return result;
     }
 
-    public now(): number {
-        return Date.now();
+    public async now(): Promise<number> {
+        return await this._api.callMapAPIWithCache(this._mapId + "/now", {}, 60) as Promise<number>;
     }
 
     public async recentTweets(regionType: string): Promise<RegionTweeCount> {
 
         return await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/recent-text-count", {
             layerGroup: this.mapMetadata.defaultLayerGroup,
-            startDate:  this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000,
-            endDate:    this.now()
+            startDate:  await this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000,
+            endDate:    await this.now()
 
         }) as Promise<RegionTweeCount>;
     }
 
-
-    public lastEntryDate(): Date {
-        return new Date(this.now());
-    }
 
 
     public async places(regionType: string): Promise<Set<string>> {
@@ -298,8 +294,8 @@ export class RESTMapDataService {
 
     }
 
-    public minDate(): number {
-        return this.now() - 4 * ONE_DAY;
+    public async minDate(): Promise<number> {
+        return await this.now() - 4 * ONE_DAY;
     }
 
     public async regionStats(regionType: string, region: string, startDate: number, endDate: number): Promise<RegionStats> {

@@ -133,7 +133,7 @@ export class MapComponent implements OnInit, OnDestroy {
     private DEFAULT_LAYER_GROUP = "flood-group";
     private _blinkTimer: Subscription;
     private _inFeature: boolean;
-    public selectedCountriesTextValue: string = "";
+    public selectedCountriesTextValue = "";
 
     constructor(private _router: Router,
                 private route: ActivatedRoute,
@@ -553,7 +553,7 @@ export class MapComponent implements OnInit, OnDestroy {
      *
      * @param params the new value for the query parameters.
      */
-    private updateMapFromQueryParams(params: Params) {
+    private async updateMapFromQueryParams(params: Params) {
         log.debug("updateMapFromQueryParams()");
         log.debug("Params:", params);
         const {
@@ -570,13 +570,13 @@ export class MapComponent implements OnInit, OnDestroy {
             layer_group
         } = params;
         this._newParams = params;
-        this._absoluteTime = this.data.lastEntryDate().getTime();
-        this.sliderOptions.min = this.data.minDate();
+        this._absoluteTime = await this.data.now();
+        this.sliderOptions.min = await this.data.minDate();
         // These handle the date slider min_time & max_time values
         if (typeof min_time !== "undefined") {
             this._dateMin = +min_time;
         } else {
-            this._dateMin = Date.now() - (ONE_DAY);
+            this._dateMin = await this.data.now() - (ONE_DAY);
         }
         this.sliderOptions = {
             ...this.sliderOptions,
@@ -585,7 +585,7 @@ export class MapComponent implements OnInit, OnDestroy {
         if (typeof max_time !== "undefined") {
             this._dateMax = +max_time;
         } else {
-            this._dateMax = this.data.now();
+            this._dateMax = await this.data.now();
         }
         this.sliderOptions = {...this.sliderOptions, startMax: this._dateMax};
         if (typeof layer_group !== "undefined") {
@@ -1070,18 +1070,18 @@ export class MapComponent implements OnInit, OnDestroy {
      */
     private async updateSliderFromData() {
         log.debug("updateSliderFromData()");
-        this._absoluteTime = this.data.lastEntryDate().getTime();
+        this._absoluteTime = (await this.data.now());
 
         this.sliderOptions = {
             ...this.sliderOptions,
-            max: this.data.now(),
-            min: this.data.minDate() - 60 * 1000,
+            max: await this.data.now(),
+            min: await this.data.minDate() - 60 * 1000,
         };
         this.checkForLiveUpdating();
 
     }
 
-    private checkForLiveUpdating() {
+    private async checkForLiveUpdating() {
         log.debug("checkForLiveUpdating()");
         if (this.sliderOptions.startMax > -this.pref.combined.continuousUpdateThresholdInMinutes) {
             this.liveUpdating = true;
@@ -1091,7 +1091,7 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this.liveUpdating) {
             log.debug("LIVE UPDATES ON");
             this._dateMax = this._absoluteTime;
-            this.sliderOptions.startMax = this.data.now();
+            this.sliderOptions.startMax = await this.data.now();
         }
     }
 
@@ -1109,12 +1109,13 @@ export class MapComponent implements OnInit, OnDestroy {
 
     public async timeSliderPreset(mins: number) {
         log.debug("timeSliderPreset()");
-        await this.sliderChange({lower: roundToHour(this.data.now() - mins * ONE_MINUTE_IN_MILLIS), upper: roundToMinute(this.data.now())});
+        const now: number = await this.data.now();
+        await this.sliderChange({lower: roundToHour(now - mins * ONE_MINUTE_IN_MILLIS), upper: roundToMinute(now)});
         this.sliderOptions = {
-            max:      roundToMinute(this.data.now()),
-            min:      roundToHour(this.data.minDate()),
-            startMin:  roundToHour(this.data.now() - mins * ONE_MINUTE_IN_MILLIS),
-            startMax: roundToMinute(this.data.now())
+            max:      roundToMinute(now),
+            min:      roundToHour(await this.data.minDate()),
+            startMin:  roundToHour(now - mins * ONE_MINUTE_IN_MILLIS),
+            startMax: roundToMinute(now)
         };
         this._sliderIsStale = true;
     }

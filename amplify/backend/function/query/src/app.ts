@@ -193,6 +193,17 @@ async function getMap(mapId: string): Promise<any> {
                       }))[0];
 }
 
+const maps = sql({
+                     // language=MySQL
+                     sql: `select *
+                           from ref_map_metadata`, values: []
+                 }).then(rows => {
+    const allMaps = {};
+    rows.forEach(map => allMaps[map.id] = map);
+    return allMaps;
+});
+
+
 app.post("/map/:map/metadata", async (req, res) => {
     cache(res, req.path, async () => {
 
@@ -282,11 +293,13 @@ app.post("/map/:map/metadata", async (req, res) => {
 
 app.post("/map/:map/region-type/:regionType/text-for-regions", async (req, res) => {
     const start = Math.floor(req.body.startDate / 1000);
-    const end = Math.floor(req.body.endDate / 1000);
+    const lastDate: Date = (await maps)[req.params.map].last_date;
+    const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
+    const end = Math.floor(endDate / 1000);
     const periodLengthInSeconds: number = end - start;
     console.debug("Period Length in Seconds: " + periodLengthInSeconds);
     console.debug("StartDate: " + new Date(req.body.startDate));
-    console.debug("EndDate: " + new Date(req.body.endDate));
+    console.debug("EndDate: " + new Date(endDate));
     console.debug("Start: " + new Date(start * 1000));
     console.debug("End: " + new Date(end * 1000));
 
@@ -398,6 +411,8 @@ app.post("/map/:map/aggregations", async (req, res) => {
 });
 
 app.post("/map/:map/region-type/:regionType/recent-text-count", async (req, res) => {
+    const lastDate: Date = (await maps)[req.params.map].last_date;
+    const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
 
     cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
         const rows = await sql({
@@ -418,7 +433,7 @@ app.post("/map/:map/region-type/:regionType/recent-text-count", async (req, res)
                                             group by tr.region
                                            `,
                                    values: [req.params.regionType, req.body.layerGroup, new Date(req.body.startDate),
-                                            new Date(req.body.endDate)]
+                                            new Date(endDate)]
                                });
         const result = {};
         for (const row of rows) {
@@ -429,6 +444,13 @@ app.post("/map/:map/region-type/:regionType/recent-text-count", async (req, res)
     }, {duration: 60});
 
 
+});
+
+
+app.post("/map/:map/now", async (req, res) => {
+    const lastDate: Date = (await maps)[req.params.map].last_date;
+    const endDate: number = lastDate == null ? Date.now() : lastDate.getTime();
+    res.json(endDate);
 });
 
 app.post("/map/:map/region-type/:regionType/regions", async (req, res) => {
@@ -501,13 +523,14 @@ app.post("/map/:map/region-type/:regionType/stats", async (req, res) => {
         //
         //                            values: [periodLengthInSeconds, req.body.layerGroup]
         //                        });
-
+        const lastDate: Date = (await maps)[req.params.map].last_date;
+        const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
         const start = Math.floor(req.body.startDate / 1000);
-        const end = Math.floor(req.body.endDate / 1000);
+        const end = Math.floor(endDate / 1000);
         const periodLengthInSeconds: number = end - start;
         console.debug("Period Length in Seconds: " + periodLengthInSeconds);
         console.debug("StartDate: " + new Date(req.body.startDate));
-        console.debug("EndDate: " + new Date(req.body.endDate));
+        console.debug("EndDate: " + new Date(endDate));
         console.debug("Start: " + new Date(start * 1000));
         console.debug("End: " + new Date(end * 1000));
 
@@ -515,9 +538,9 @@ app.post("/map/:map/region-type/:regionType/stats", async (req, res) => {
         const rows = await sql({
                                    // language=MySQL
                                    sql:    `select (select exceedance
-                                                    from (SELECT count(*)                                          as count,
+                                                    from (SELECT count(*)                                            as count,
                                                                  floor((? - unix_timestamp(v.source_timestamp)) / ?) as period,
-                                                                 cume_dist() OVER w * 100.0                        as exceedance
+                                                                 cume_dist() OVER w * 100.0                          as exceedance
                                                           FROM view_live_regions_and_layers v
                                                           WHERE v.layer_group_id = ?
                                                             and v.region_type = ?

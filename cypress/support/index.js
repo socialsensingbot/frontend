@@ -22,7 +22,7 @@ import 'cypress-plugin-snapshots/commands';
 // Cypress.on("window:before:load", win => {
 //     win.indexedDB.deleteDatabase("ngForage");
 // });
-export const MAP_URL = "http://localhost:4200/map/uk-flood-2018"
+export const MAP_URL = "http://localhost:4200/map/uk-flood-test"
 export const ANALYTICS_URL = "http://localhost:4200/analytics"
 export const DASHBOARD_URL = "http://localhost:4200/dashboard"
 
