@@ -115,6 +115,7 @@ app.get("/refdata/:name", (req, res) => {
     }
     metadata[req.params.name].then(results => res.json(results))
                              .catch(error => {
+                                 console.error(error);
                                  metadata = null;
                                  return res.json({error: error.message, details: JSON.stringify(error)});
                              });
@@ -129,6 +130,7 @@ app.get("/refdata/:name", (req, res) => {
     metadata[req.params.name].then(results => res.json(results))
                              .catch(error => {
                                  metadata = null;
+                                 console.error(error);
                                  return res.json({error: error.message, details: JSON.stringify(error)});
                              });
 });

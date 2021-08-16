@@ -47,6 +47,7 @@ describe('11 Analytics: ', function () {
             cy.get('#mat-input-0').type("everywhere");
             cy.get('#mat-chip-list-input-0').type("Greater L");
             cy.wait(4000);
+            cy.get(".mat-option-text").should("contain.text","Greater London");
             cy.get(".mat-option-text").click();
             cy.get('.mat-chip').should("contain.text","Greater London")
             cy.get('.mat-card-actions > .mat-focus-indicator > .mat-button-wrapper').click();
@@ -78,7 +79,7 @@ describe('11 Analytics: ', function () {
         });
 
 
-        it.only('Import from Map Stats', () => {
+        it('Import from Map Stats', () => {
             let url = MAP_URL+"?active_number=stats&active_polygon=county&selected=greater%20london";
             cy.visit(url);
             cy.login();

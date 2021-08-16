@@ -145,7 +145,7 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
         hazard: this.hazard
       };
       delete payload.__series_id;
-      const serverResults = await this._api.callAPI("query", payload);
+      const serverResults = await this._api.callQueryAPI("query", payload);
       this.error = false;
       return this.queryTransform(serverResults);
     } catch (e) {
@@ -164,6 +164,3 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
     return from;
   }
 }
-
-
-

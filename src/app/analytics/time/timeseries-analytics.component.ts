@@ -103,10 +103,10 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     async ngOnInit() {
         this._route.queryParams.subscribe(async queryParams => {
-            if(queryParams.__clear_ui__) {
+            if (queryParams.__clear_ui__) {
                 await this.clear();
+                this._router.navigate([], {});
             }
-            this._router.navigate([],{});
         });
         this._route.params.subscribe(async params => {
             if (params.id) {
@@ -294,7 +294,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 hazard: this.hazard
             };
             delete payload.__series_id;
-            const serverResults = await this._api.callAPI("query", payload);
+            const serverResults = await this._api.callQueryAPI("query", payload);
+            log.debug("Server result was ", serverResults);
             this.error = false;
             return this.queryTransform(serverResults);
         } catch (e) {

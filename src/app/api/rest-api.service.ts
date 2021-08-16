@@ -24,7 +24,7 @@ export class RESTDataAPIService {
     constructor(private _notify: NotificationService, private _ngZone: NgZone, private readonly cache: NgForageCache,) {
     }
 
-    public async callAPI(functionName: string, payload: any): Promise<any> {
+    public async callQueryAPI(functionName: string, payload: any, cacheForSeconds: number = 60): Promise<any> {
 
         if (useLambda) {
             log.debug("Calling " + functionName, payload);
@@ -53,7 +53,18 @@ export class RESTDataAPIService {
         } else {
             const path = "/" + functionName + "/" + payload.name;
             if (functionName === "query") {
-
+                const key = "rest:query/" + path + ":" + JSON.stringify(payload);
+                const cachedItem = await this.cache.getCached(key);
+                if (cacheForSeconds > 0 && cachedItem && cachedItem.hasData && !cachedItem.expired) {
+                    // tslint:disable-next-line:no-console
+                    log.debug("Value for " + key + "in cache");
+                    // log.debug("Value for " + key + " was " + JSON.stringify(cachedItem.data));
+                    console.debug("Return cached item", JSON.stringify(cachedItem));
+                    return cachedItem.data;
+                } else {
+                    log.debug("Value for " + key + " not in cache");
+                    return await this.callAPIInternal(path, payload, cacheForSeconds, key);
+                }
             } else {
                 return API.get("query", path, {
                     headers: {
@@ -77,52 +88,55 @@ export class RESTDataAPIService {
             return cachedItem.data;
         } else {
             log.debug("Value for " + key + " not in cache");
-            return API.post("query", "/map/" + path, {
-                body:    payload,
-                headers: {
-                    Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
-                },
-
-            }).then(data => {
-                if (typeof data !== "undefined") {
-                    // tslint:disable-next-line:no-console
-                    console.debug("Returning uncached item", data);
-                    if (cacheForSeconds > 0) {
-                        this.cache.setCached(key, data, cacheForSeconds * 1000);
-                    }
-                } else {
-                    console.debug("Returning undefined item", data);
-                }
-                return data;
-            }).catch(e => {
-                log.error(e);
-                this._notify.show("No response from the server, maybe a network problem or a slow query.",
-                                  "Retrying ...", retryPeriod);
-                return new Promise<any>((resolve, reject) => {
-                    setTimeout(async () => {
-                        API.post("query", "/map/" + path, {
-                            body:    payload,
-                            headers: {
-                                Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
-                            },
-                        }).then(data => this._ngZone.run(() => {
-                            this._notify.show("Problem resolved", "Good", 2000);
-                            // tslint:disable-next-line:no-console
-                            console.debug("Returning uncached item", data);
-                            if (cacheForSeconds > 0) {
-                                this.cache.setCached(key, data, cacheForSeconds * 1000);
-                            }
-                            resolve(data);
-                        }))
-                           .catch(e2 => {
-                               this._notify.show("Error running" + " query, please check your network connection");
-                               reject(e2);
-                           });
-                    }, retryPeriod);
-                });
-            });
+            return await this.callAPIInternal("/map/" + path, payload, cacheForSeconds, key);
         }
     }
 
 
+    private async callAPIInternal(fullPath: string, payload: any, cacheForSeconds: number, key: string): Promise<Promise<any>> {
+        return API.post("query", fullPath, {
+            body:    payload,
+            headers: {
+                Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+            },
+
+        }).then(data => {
+            if (typeof data !== "undefined") {
+                // tslint:disable-next-line:no-console
+                console.debug("Returning uncached item", data);
+                if (cacheForSeconds > 0) {
+                    this.cache.setCached(key, data, cacheForSeconds * 1000);
+                }
+            } else {
+                console.debug("Returning undefined item", data);
+            }
+            return data;
+        }).catch(e => {
+            log.error(e);
+            this._notify.show("No response from the server, maybe a network problem or a slow query.",
+                              "Retrying ...", retryPeriod);
+            return new Promise<any>((resolve, reject) => {
+                setTimeout(async () => {
+                    API.post("query", fullPath, {
+                        body:    payload,
+                        headers: {
+                            Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+                        },
+                    }).then(data => this._ngZone.run(() => {
+                        this._notify.show("Problem resolved", "Good", 2000);
+                        // tslint:disable-next-line:no-console
+                        console.debug("Returning uncached item", data);
+                        if (cacheForSeconds > 0) {
+                            this.cache.setCached(key, data, cacheForSeconds * 1000);
+                        }
+                        resolve(data);
+                    }))
+                       .catch(e2 => {
+                           this._notify.show("Error running" + " query, please check your network connection");
+                           reject(e2);
+                       });
+                }, retryPeriod);
+            });
+        });
+    }
 }
