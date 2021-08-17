@@ -1,7 +1,7 @@
-import {MAP_URL} from "../../../support";
+import {LONDON_TWEET, MAP_URL} from "../../../support";
 
 const sourceOptions = "body .tweet-list-item-menu-source";
-const twitterIdClass = ".app-twitter-id-1427408666253275139";
+const twitterIdClass = LONDON_TWEET;
 const url = MAP_URL + "?selected=greater%20london&max_offset=0&min_offset=-1439";
 
 let clickSourceMenu = function () {

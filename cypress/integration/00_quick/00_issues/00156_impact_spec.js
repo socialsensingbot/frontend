@@ -1,6 +1,6 @@
-import {MAP_URL} from "../../../support";
+import {LONDON_TWEET, MAP_URL} from "../../../support";
 
-const twitterIdClass = ".app-twitter-id-1427408666253275139";
+const twitterIdClass = LONDON_TWEET;
 const impactOption = "body .tweet-list-item-menu-impact";
 const url = MAP_URL + "?selected=greater%20london&max_offset=0&min_offset=-1439";
 

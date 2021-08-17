@@ -27,6 +27,8 @@ export const ANALYTICS_URL = "http://localhost:4200/analytics"
 export const DASHBOARD_URL = "http://localhost:4200/dashboard"
 export const MIN_DATE_MILLIS= 1628784000000;
 export const MAX_DATE_MILLIS= 1629158400000;
+export const LONDON_URL = MAP_URL + "?selected=greater%20london&zoom=5&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=stats&active_polygon=county";
+export const LONDON_TWEET= ".app-twitter-id-1427408666253275139";
 
 // https://github.com/cypress-io/cypress/issues/8525
 afterEach(() => {

@@ -583,9 +583,9 @@ export class MapComponent implements OnInit, OnDestroy {
         this.sliderOptions.min = await this.data.minDate();
         // These handle the date slider min_time & max_time values
         if (typeof min_time !== "undefined") {
-            this._dateMin = +min_time;
+            this._dateMin = roundToHour(+min_time);
         } else {
-            this._dateMin = await this.data.now() - (ONE_DAY);
+            this._dateMin = roundToHour(await this.data.now() - (ONE_DAY));
         }
         this.sliderOptions = {
             ...this.sliderOptions,
@@ -707,14 +707,14 @@ export class MapComponent implements OnInit, OnDestroy {
         this._exec.changeState("map-init");
         await this.load(true);
         this.loading.loaded();
-        this.checkForLiveUpdating();
+        await this.checkForLiveUpdating();
         this._searchParams.subscribe(async params => {
 
             if (!this._params) {
                 this._params = true;
                 this._exec.queue("Initial Search Params", ["no-params"],
                                  async () => {
-                                     this.updateMapFromQueryParams(params);
+                                     await this.updateMapFromQueryParams(params);
 
                                      // Listeners to push map state into URL
                                      map.addEventListener("dragend", () => {
@@ -728,7 +728,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                      });
 
                                      this._exec.changeState("ready");
-                                     this.updateLayers("From Parameters");
+                                     await this.updateLayers("From Parameters");
                                      log.debug("Queued layer update");
                                      // Schedule periodic data loads from the server
                                      this._loadTimer = timer(0, ONE_MINUTE_IN_MILLIS)
@@ -1099,8 +1099,8 @@ export class MapComponent implements OnInit, OnDestroy {
         }
         if (this.liveUpdating) {
             log.debug("LIVE UPDATES ON");
-            this._dateMax = this._absoluteTime;
-            this.sliderOptions.startMax = await this.data.now();
+            this._dateMax = roundToMinute(await this.data.now());
+            this.sliderOptions.startMax = roundToMinute(await this.data.now());
         }
     }
 
