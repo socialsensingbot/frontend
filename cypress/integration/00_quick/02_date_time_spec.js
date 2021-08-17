@@ -11,12 +11,12 @@ describe('02 Date time: ', function () {
 
         describe('select county and date range', () => {
             console.debug("Tests https://github.com/socialsensingbot/frontend/issues/67");
-            const url = MAP_URL + "?selected=scottish%20borders&zoom=5&max_time=1628812800000&min_time=1628726400000&active_number=stats&active_polygon=county";
+            const url = MAP_URL + "?selected=scottish%20borders&zoom=5&max_time=1629131100000&min_time=1628784000000&active_number=stats&active_polygon=county";
             it('with no tweets', () => {
                 cy.visitAndWait(url);
                 cy.get(".slider-date-time", {timeout: 20000});
-                cy.get(".slider-date-time-min .slider-date").should("contain.text", "12-Aug-21");
-                cy.get(".slider-date-time-min .slider-time").should("contain.text", "01 am");
+                cy.get(".slider-date-time-min .slider-date").should("contain.text", "13-Aug-21");
+                cy.get(".slider-date-time-min .slider-time").should("contain.text", "00 pm");
                 cy.get(".slider-date-time-max .slider-date").should("contain.text", "now");
                 cy.get(".slider-date-time-max .slider-time").should("contain.text", "");
                 cy.get(".app-tweet-drawer", {timeout: 60000}).should("be.visible");

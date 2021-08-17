@@ -109,6 +109,7 @@ app.post("/query/:name", async (req, res) => {
     }
 });
 
+// General Reference Data Queries
 app.get("/refdata/:name", (req, res) => {
     if (!metadata) {
         metadata = new QueryMetadataSets(connection);

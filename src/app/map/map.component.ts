@@ -47,6 +47,15 @@ const ONE_MINUTE_IN_MILLIS = 60000;
                styleUrls:   ["./map.component.scss"]
            })
 export class MapComponent implements OnInit, OnDestroy {
+    public set selectedFeatureNames(value: string[]) {
+        this._selectedFeatureNames = value;
+        this.updateSearch({selected: value});
+    }
+
+    public get selectedFeatureNames(): string[] {
+        return this._selectedFeatureNames;
+    }
+
     // The UI state fields
     public tweets: Tweet[] = null;
     public tweetsVisible = false;
@@ -248,14 +257,14 @@ export class MapComponent implements OnInit, OnDestroy {
 
     public set activeRegionType(value: string) {
         log.debug("activeRegionType(" + value + ")");
+        if (!this.activeRegionType) {
+            this.updateSearch({active_polygon: value});
+        } else {
+            log.debug("Removing selected region(s) as we have changed region type");
+            this.updateSearch({active_polygon: value, selected: null});
+        }
 
         if (this.activeRegionType !== value) {
-            if (!this.activeRegionType) {
-                this.updateSearch({active_polygon: value});
-            } else {
-                log.debug("Removing selected region(s) as we have changed region type");
-                this.updateSearch({active_polygon: value, selected: null});
-            }
             if (this._map) {
                 for (const layer in this._polyLayers) {
                     if (layer !== value) {
@@ -583,9 +592,9 @@ export class MapComponent implements OnInit, OnDestroy {
             startMin: this._dateMin
         };
         if (typeof max_time !== "undefined") {
-            this._dateMax = +max_time;
+            this._dateMax = roundToMinute(Math.min(+max_time, await this.data.now()));
         } else {
-            this._dateMax = await this.data.now();
+            this._dateMax = roundToMinute(await this.data.now());
         }
         this.sliderOptions = {...this.sliderOptions, startMax: this._dateMax};
         if (typeof layer_group !== "undefined") {
@@ -622,9 +631,9 @@ export class MapComponent implements OnInit, OnDestroy {
         // If a polygon (region) is selected update Twitter panel.
         if (typeof selected !== "undefined") {
             if (Array.isArray(selected)) {
-                this._selectedFeatureNames = selected;
+                this.selectedFeatureNames = selected;
             } else {
-                this._selectedFeatureNames = [selected];
+                this.selectedFeatureNames = [selected];
             }
         }
 
@@ -756,7 +765,7 @@ export class MapComponent implements OnInit, OnDestroy {
         log.debug("clearSelectedRegions()");
 
         await this.updateSearch({selected: []});
-        this._selectedFeatureNames = [];
+        this.selectedFeatureNames = [];
         await this.resetLayers(true);
     }
 
@@ -889,7 +898,7 @@ export class MapComponent implements OnInit, OnDestroy {
             this.selection.selectOnly(e.target.feature);
         }
         this.updateSearch({selected: this.selection.regionNames()});
-        this._selectedFeatureNames = this.selection.regionNames();
+        this.selectedFeatureNames = this.selection.regionNames();
         this.updateTwitterPanel();
         if (this.selection.isSelected(e.target.feature)) {
             this.highlight(e.target, 3);
@@ -1114,7 +1123,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this.sliderOptions = {
             max:      roundToMinute(now),
             min:      roundToHour(await this.data.minDate()),
-            startMin:  roundToHour(now - mins * ONE_MINUTE_IN_MILLIS),
+            startMin: roundToHour(now - mins * ONE_MINUTE_IN_MILLIS),
             startMax: roundToMinute(now)
         };
         this._sliderIsStale = true;

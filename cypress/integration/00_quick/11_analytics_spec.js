@@ -51,7 +51,7 @@ describe('11 Analytics: ', function () {
             cy.get(".mat-option-text").click();
             cy.get('.mat-chip').should("contain.text","Greater London")
             cy.get('.mat-card-actions > .mat-focus-indicator > .mat-button-wrapper').click();
-            cy.wait(1000);
+            cy.wait(3000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-criteria-1");
             cy.wait(1000);
             cy.get(':nth-child(1) > .mat-card-content > app-timeseries-analytics-form > .ttc-form > .text-search').type("everywhere");
@@ -60,7 +60,7 @@ describe('11 Analytics: ', function () {
             cy.get(".mat-option-text").click();
             cy.get('.mat-chip').should("contain.text","Cardiff")
             cy.get(':nth-child(1) > .mat-card-actions > .mat-focus-indicator > .mat-button-wrapper').click();
-            cy.wait(1000);
+            cy.wait(3000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-criteria-2");
             cy.get('.mat-toolbar-row > .mat-primary > .mat-button-wrapper').click();
             cy.wait(1000);
@@ -91,7 +91,7 @@ describe('11 Analytics: ', function () {
             cy.wait(1000);
             cy.url().should("contain",ANALYTICS_URL + "/time");
             cy.get('.mat-chip').should("contain.text","Greater London");
-            cy.wait(1000);
+            cy.wait(3000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-imported-from-map-1");
 
         });

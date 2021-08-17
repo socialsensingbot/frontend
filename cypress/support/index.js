@@ -25,7 +25,8 @@ import 'cypress-plugin-snapshots/commands';
 export const MAP_URL = "http://localhost:4200/map/uk-flood-test"
 export const ANALYTICS_URL = "http://localhost:4200/analytics"
 export const DASHBOARD_URL = "http://localhost:4200/dashboard"
-
+export const MIN_DATE_MILLIS= 1628784000000;
+export const MAX_DATE_MILLIS= 1629158400000;
 
 // https://github.com/cypress-io/cypress/issues/8525
 afterEach(() => {

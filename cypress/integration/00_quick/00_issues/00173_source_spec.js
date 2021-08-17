@@ -1,8 +1,8 @@
 import {MAP_URL} from "../../../support";
 
-const twitterIdClass = ".app-twitter-id-1051568984070479874";
 const sourceOptions = "body .tweet-list-item-menu-source";
-const url = MAP_URL + "?selected=carmarthenshire&max_offset=0&min_offset=-1439";
+const twitterIdClass = ".app-twitter-id-1427408666253275139";
+const url = MAP_URL + "?selected=greater%20london&max_offset=0&min_offset=-1439";
 
 let clickSourceMenu = function () {
   cy.get(twitterIdClass + " .mat-icon", {timeout: 60000}).click({force: true});
