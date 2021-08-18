@@ -3,7 +3,6 @@ import {MAP_URL} from "../../support";
 const zoomDuration = 1000;
 describe('08 URL State (county): ', function () {
   beforeEach(() => {
-    cy.stubLiveJson("live-old");
   })
   describe('select county', () => {
     const url = MAP_URL + "?selected=powys";

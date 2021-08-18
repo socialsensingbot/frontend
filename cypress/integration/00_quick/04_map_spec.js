@@ -55,9 +55,11 @@ describe('04: Map: ', function () {
             cy.get(legendEntry).should("be.visible");
             cy.get(legendEntry).get("i").should("have.attr", "style").should("contain", countFirstLegendColour)
             cy.get(legendEntry).should("have.text", countFirstLegendVal);
-            cy.get("mat-sidenav button.draw-close-button", {timeout: 30000}).click();
 
-            cy.get('mat-select.map-number-layer-select').click().get('mat-option').contains('Exceedance').click();
+            cy.get(".app-map-expand-toolbar-btn").should("be.visible").click();
+            cy.wait(1000);
+            cy.get('#mat-select-value-3').click({multiple: true})
+            cy.get('#mat-option-7 > .mat-option-text').contains('Exceedance').click();
 
             cy.get(legendEntry).get("i").should("have.attr", "style").should("contain", statsFirstLegendColour)
             cy.get(legendEntry).should("have.text", statsFirstLegendVal);
@@ -70,8 +72,8 @@ describe('04: Map: ', function () {
         it('can be closed', () => {
             cy.visitAndWait(url);
             cy.twitterPanelVisible();
-            cy.get("mat-sidenav button.draw-close-button", {timeout: 30000}).should("be.visible");
-            cy.get("mat-sidenav button.draw-close-button", {timeout: 30000}).click();
+            cy.get(".app-draw-close-button > .mat-button-wrapper > .mat-icon", {timeout: 30000}).should("be.visible");
+            cy.get(".app-draw-close-button > .mat-button-wrapper > .mat-icon", {timeout: 30000}).click();
             cy.twitterPanelNotVisible();
             cy.logout();
         });

@@ -3,7 +3,6 @@ import {MAP_URL} from "../../support";
 const zoomDuration = 1000;
 describe('05 URL State (polygon): ', function () {
   beforeEach(() => {
-    cy.stubLiveJson("live-old");
   })
 
   describe('select polygon type', () => {
