@@ -2,8 +2,6 @@ import {MAP_URL} from "../../support";
 
 const zoomDuration = 1000;
 describe('05 URL State (polygon): ', function () {
-  beforeEach(() => {
-  })
 
   describe('select polygon type', () => {
     const url = MAP_URL + "?active_polygon=coarse&selected=123";

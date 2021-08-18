@@ -2,9 +2,6 @@ import {MAP_URL} from "../../support";
 
 const zoomDuration = 1000;
 describe('05 URL State (polygon): ', function () {
-  beforeEach(() => {
-    cy.stubLiveJson("live-old");
-  })
 
   describe('select polygon type and count stats', () => {
     const url = MAP_URL + "?active_polygon=coarse&selected=123&active_number=count";

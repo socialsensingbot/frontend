@@ -2,10 +2,6 @@ import {MAP_URL, MAX_DATE_MILLIS, MIN_DATE_MILLIS} from "../../support";
 
 const zoomDuration = 1000;
 describe('06 URL State (zoom): ', function () {
-    beforeEach(() => {
-        cy.stubLiveJson("live-old");
-    })
-
 
     describe('select zoom', () => {
         const url = MAP_URL + "?max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=stats&active_polygon=county";

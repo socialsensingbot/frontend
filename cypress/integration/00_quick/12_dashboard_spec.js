@@ -17,9 +17,6 @@ function snapshot(query = 'app-timeseries-multi-query-chart', name = "analytics-
 }
 
 describe('11 Analytics: ', function () {
-    beforeEach(() => {
-        cy.stubLiveJson("live-old");
-    })
 
     describe("Test Timeseries Graph", () => {
         const url = DASHBOARD_URL ;
