@@ -29,9 +29,9 @@ const LONG_TIMEOUT = 60000;
 const VERY_LONG_TIMEOUT = 120000;
 const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
 const multipleKey = Cypress.platform === "darwin" ? "{command}" : "{ctrl}";
-export const markAsIgnoredMenu = "body .mat-menu-item.tweet-menu-ignore-tweet";
-export const markAsUnignoredMenu = "body .mat-menu-item.tweet-menu-unignore-tweet";
-export const markAsMenu = "body .mat-menu-item.tweet-list-item-menu-mark-as";
+export const markAsIgnoredMenu = ".tweet-menu-ignore-tweet";
+export const markAsUnignoredMenu = ".tweet-menu-unignore-tweet";
+export const markAsMenu = ".tweet-list-item-menu-mark-as";
 
 
 const noLoadingDiv = () => {
@@ -120,7 +120,7 @@ Cypress.Commands.add("tweetCountTotal", (sum) => {
     cy.get("#mat-tab-label-1-0 > .mat-tab-label-content", {timeout: 30000}).then(header => {
         const headerParts = header.text().trim().split(" ");
         const visibleCount = +headerParts[0];
-        cy.get("#mat-tab-label-1-0 > .mat-tab-label-content", {timeout: 30000})
+        cy.get("#mat-tab-label-1-1 > .mat-tab-label-content", {timeout: 30000})
             .then(title => {
                       const hiddenCount = +title.text().trimLeft().split(" ")[0];
                       expect(hiddenCount + visibleCount).equals(sum);
@@ -131,10 +131,11 @@ Cypress.Commands.add("tweetCountTotal", (sum) => {
 });
 
 Cypress.Commands.add("withTweetCounts", (callback) => {
-    cy.get(".mat-tab-label:nth-child(1)").then(header => {
+    cy.wait(4000);
+    cy.get("#mat-tab-label-1-0 > .mat-tab-label-content").then(header => {
         const headerParts = header.text().trim().split(" ");
         const visibleCount = +headerParts[0];
-        cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000})
+        cy.get("#mat-tab-label-1-1 > .mat-tab-label-content", {timeout: 30000})
             .then(title => {
                       const hiddenCount = +title.text().trimLeft().split(" ")[0];
                       callback(visibleCount, hiddenCount);
@@ -146,13 +147,13 @@ Cypress.Commands.add("withTweetCounts", (callback) => {
 
 
 Cypress.Commands.add("tweetCount", (vis, hid) => {
-    cy.get(".mat-tab-label:nth-child(1)").then(header => {
+    cy.get("#mat-tab-label-1-0 > .mat-tab-label-content").then(header => {
         const headerParts = header.text().trim().split(" ");
         const visibleCount = +headerParts[0];
         const totalCount = vis + hid;
         cy.get(".app-tweet-outer").find('.atr-visible').its('length').should('eq', vis);
 
-        cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000}).click()
+        cy.get("#mat-tab-label-1-1 > .mat-tab-label-content", {timeout: 30000}).click()
             .then(title => {
                       const hiddenCount = +title.text().trimLeft().split(" ")[0];
                       cy.get(".app-tweet-outer").find('.atr-hidden').its('length').should('eq', hid);
@@ -165,12 +166,13 @@ Cypress.Commands.add("tweetCount", (vis, hid) => {
 
 
 Cypress.Commands.add("clickTweetTab", (index) => {
-    cy.get(`.mat-tab-label:nth-child(${index})`, {timeout: 30000}).click({force: true});
+    cy.get(`#mat-tab-label-1-${index-1} > .mat-tab-label-content`, {timeout: 30000}).click({force: true});
 });
 
 Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
+    cy.wait(1000);
     cy.get(tweetSelector + " .mat-icon", {timeout: 10000})
-    cy.get(tweetSelector + " .mat-icon").trigger("click", {force: true});
+    cy.get(tweetSelector + " .mat-icon ").click();
     cy.wait(1000);
     cy.get(markAsMenu, {timeout: LONG_TIMEOUT}).click();
     cy.wait(1000);
@@ -179,8 +181,9 @@ Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
 });
 
 Cypress.Commands.add("unignoreTweet", (tweetSelector) => {
-    cy.get(tweetSelector + " .mat-icon", {timeout: 10000})
-    cy.get(tweetSelector + " .mat-icon").trigger("click", {force: true});
+    cy.wait(1000);
+    cy.get(tweetSelector + " .mat-icon", {timeout: 10000});
+    cy.get(tweetSelector + " .mat-icon").click();
     cy.wait(1000);
     cy.get(markAsMenu, {timeout: LONG_TIMEOUT}).click();
     cy.wait(1000);

@@ -467,9 +467,9 @@ export class MapComponent implements OnInit, OnDestroy {
         let {lower, upper} = range;
         log.debug("sliderChange(" + lower + "->" + upper + ")");
         this._dateMax = upper;
-        this._dateMin = lower;
-        this.sliderOptions.startMin = lower;
-        this.sliderOptions.startMax = upper;
+        this._dateMin = roundToHour(Math.max(this.sliderOptions.min, lower));
+        this.sliderOptions.startMin = this._dateMin;
+        this.sliderOptions.startMax = this._dateMax;
 
         this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
         if (this.pref.combined.animateOnTimeSliderChange) {
@@ -583,7 +583,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this.sliderOptions.min = await this.data.minDate();
         // These handle the date slider min_time & max_time values
         if (typeof min_time !== "undefined") {
-            this._dateMin = roundToHour(+min_time);
+            this._dateMin = roundToHour(Math.max(+min_time, this.sliderOptions.min));
         } else {
             this._dateMin = roundToHour(await this.data.now() - (ONE_DAY));
         }

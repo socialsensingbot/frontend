@@ -25,33 +25,34 @@ import 'cypress-plugin-snapshots/commands';
 export const MAP_URL = "http://localhost:4200/map/uk-flood-test"
 export const ANALYTICS_URL = "http://localhost:4200/analytics"
 export const DASHBOARD_URL = "http://localhost:4200/dashboard"
-export const MIN_DATE_MILLIS= 1628784000000;
-export const MAX_DATE_MILLIS= 1629158400000;
+export const MIN_DATE_MILLIS = 1628784000000;
+export const MAX_DATE_MILLIS = 1629158400000;
+export const ONE_DAY_MILLIS = 24 * 60 * 60 * 1000;
 export const LONDON_URL = MAP_URL + "?selected=greater%20london&zoom=5&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=stats&active_polygon=county";
-export const LONDON_TWEET= ".app-twitter-id-1427408666253275139";
+export const LONDON_TWEET = ".app-twitter-id-1427408666253275139";
 
 // https://github.com/cypress-io/cypress/issues/8525
 afterEach(() => {
-  cy.window().then(win => {
-    // window.gc is enabled with --js-flags=--expose-gc chrome flag
-    if (typeof win.gc === 'function') {
-      // run gc multiple times in an attempt to force a major GC between tests
-      win.gc();
-      win.gc();
-      win.gc();
-      win.gc();
-      win.gc();
-    }
-  });
+    cy.window().then(win => {
+        // window.gc is enabled with --js-flags=--expose-gc chrome flag
+        if (typeof win.gc === 'function') {
+            // run gc multiple times in an attempt to force a major GC between tests
+            win.gc();
+            win.gc();
+            win.gc();
+            win.gc();
+            win.gc();
+        }
+    });
 });
 
-Cypress.on('uncaught:exception', (err, runnable,promise) => {
-  // returning false here prevents Cypress from
-  // failing the test
-  console.error(err);
-  console.error(promise);
-  if (err && err.message) {
-    console.error(err.message);
-  }
-  return false;
+Cypress.on('uncaught:exception', (err, runnable, promise) => {
+    // returning false here prevents Cypress from
+    // failing the test
+    console.error(err);
+    console.error(promise);
+    if (err && err.message) {
+        console.error(err.message);
+    }
+    return false;
 })
