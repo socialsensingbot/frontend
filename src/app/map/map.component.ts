@@ -494,16 +494,18 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
 
-    public downloadTweetsAsCSV() {
+    public async  downloadTweetsAsCSV() {
         log.debug("downloadTweetsAsCSV()");
+        log.debug(this.data.regionGeography);
+        log.debug(this.activeRegionType);
         if (this.data.hasCountryAggregates()) {
-            this.data.downloadAggregate("uk-countries", this.selectedCountries,
-                                        this.activeRegionType,
-                                        this.data.regionGeography[this.activeRegionType] as PolygonData, this._dateMin,
-                                        this._dateMax);
+            await this.data.downloadAggregate("uk-countries", this.selectedCountries,
+                                              this.activeRegionType,
+                                              await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData, this._dateMin,
+                                              this._dateMax);
         } else {
-            this.data.download(this.data.regionGeography[this.activeRegionType] as PolygonData, this.activeRegionType,
-                               this._dateMin, this._dateMax);
+            await this.data.download(await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData, this.activeRegionType,
+                                     this._dateMin, this._dateMax);
         }
     }
 

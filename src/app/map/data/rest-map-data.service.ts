@@ -196,13 +196,19 @@ export class RESTMapDataService {
             .aggregates
             .filter(i => selectedAggregates.includes(i.id))
             .flatMap(x => x.regionTypeMap[regionType]);
-        for (const region of await this.regionNamesWithData(regionType, startDate, endDate)) {
+        const regions: string[] = await this.regionNamesWithData(regionType, startDate, endDate);
+        log.debug("Regions: ",regions);
+        // TODO: This is a very slow way of downloading the tweet data, needs to be done on the server or completely in SQL
+        // See https://github.com/socialsensingbot/frontend/issues/281
+        for (const region of regions) {
+            console.log(region, layerAggregationList);
             if (layerAggregationList.includes(region)) {
                 await this.exportRegionForCSV(polygonDatum, regionType, region, exportedTweets, startDate, endDate);
 
             }
         }
         const csvExporter = new ExportToCsv(options);
+        log.debug(exportedTweets);
         csvExporter.generateCsv(exportedTweets);
 
 
@@ -323,7 +329,7 @@ export class RESTMapDataService {
     }
 
     private async regionNamesWithData(regionType: string, startDate: number, endDate: number): Promise<string[]> {
-        return Object.keys(this.getRegionStatsMap(regionType, startDate, endDate));
+        return Object.keys(await this.getRegionStatsMap(regionType, startDate, endDate));
     }
 
     public async geoJsonGeographyFor(regionType: string): Promise<FeatureCollection> {
