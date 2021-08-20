@@ -138,7 +138,6 @@ export class RESTMapDataService {
     }
 
 
-
     public async places(regionType: string): Promise<Set<string>> {
         return new Set<string>(
             await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/regions", {}, 24 * 60 * 60) as string[]);
@@ -171,6 +170,11 @@ export class RESTMapDataService {
 
     public async downloadAggregate(aggregrationSetId: string, selectedAggregates: string[], regionType: string,
                                    polygonDatum: PolygonData, startDate: number, endDate: number) {
+        log.debug(
+            "downloadAggregate(aggregrationSetId=" + aggregrationSetId +
+            ", selectedAggregates=" + selectedAggregates +
+            ", regionType=" + regionType + ", polygonDatum=" + polygonDatum +
+            ", startDate=" + startDate + ", endDate=" + endDate + ")");
         const exportedTweets: CSVExportTweet[] = [];
         const options = {
             fieldSeparator:   ",",
@@ -185,8 +189,7 @@ export class RESTMapDataService {
             filename:         `${aggregrationSetId}-tweet-export-${selectedAggregates.join("-")}-${readableTimestamp()}`
             // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
         };
-        if (selectedAggregates.length === this.aggregations[aggregrationSetId]
-            .aggregates.length) {
+        if (selectedAggregates.length === this.aggregations[aggregrationSetId].aggregates.length) {
             options.filename = `${aggregrationSetId}-tweet-export-all-${readableTimestamp()}`;
         }
         const layerAggregationList = this.aggregations[aggregrationSetId]
@@ -295,7 +298,7 @@ export class RESTMapDataService {
     }
 
     public async minDate(): Promise<number> {
-        return  roundToHour(await this.now() - 4 * ONE_DAY);
+        return roundToHour(await this.now() - 4 * ONE_DAY);
     }
 
     public async regionStats(regionType: string, region: string, startDate: number, endDate: number): Promise<RegionStats> {

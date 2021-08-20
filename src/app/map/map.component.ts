@@ -497,7 +497,7 @@ export class MapComponent implements OnInit, OnDestroy {
     public downloadTweetsAsCSV() {
         log.debug("downloadTweetsAsCSV()");
         if (this.data.hasCountryAggregates()) {
-            this.data.downloadAggregate("countries", this.selectedCountries,
+            this.data.downloadAggregate("uk-countries", this.selectedCountries,
                                         this.activeRegionType,
                                         this.data.regionGeography[this.activeRegionType] as PolygonData, this._dateMin,
                                         this._dateMax);
