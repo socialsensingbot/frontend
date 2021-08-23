@@ -1,5 +1,5 @@
 import {Injectable, NgZone} from "@angular/core";
-import {Geometry, PolygonData} from "../types";
+import {PolygonData} from "../types";
 import {Logger} from "@aws-amplify/core";
 import {HttpClient} from "@angular/common/http";
 import {UIExecutionService} from "../../services/uiexecution.service";
@@ -146,7 +146,6 @@ export class RESTMapDataService {
 
 
     public async download(polygonDatum: PolygonData, regionType: string, startDate: number, endDate: number): Promise<void> {
-        const exportedTweets: CSVExportTweet[] = [];
         const options = {
             fieldSeparator:   ",",
             quoteStrings:     "\"",
@@ -160,12 +159,26 @@ export class RESTMapDataService {
             filename:         `global-tweet-export-${readableTimestamp()}`
             // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
         };
-        for (const region of await this.regionNamesWithData(regionType, startDate, endDate)) {
-            await this.exportRegionForCSV(polygonDatum, regionType, region, exportedTweets, startDate, endDate);
+
+        const regions = await this.places(regionType);
+        const exportedTweets: CSVExportTweet[] = [];
+        const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(regionType, Array.from(regions), startDate, endDate);
+        for (const i of tweetData) {
+            exportedTweets.push(await i);
         }
         const csvExporter = new ExportToCsv(options);
-        csvExporter.generateCsv(exportedTweets);
+        log.debug(exportedTweets);
+        csvExporter.generateCsv(exportedTweets.sort((a, b) => {
+            if (a.region < b.region) {
+                return -1;
+            }
+            if (a.region > b.region) {
+                return 1;
+            }
 
+            // names must be equal
+            return 0;
+        }));
 
     }
 
@@ -176,7 +189,6 @@ export class RESTMapDataService {
             ", selectedAggregates=" + selectedAggregates +
             ", regionType=" + regionType + ", polygonDatum=" + polygonDatum +
             ", startDate=" + startDate + ", endDate=" + endDate + ")");
-        const exportedTweets: CSVExportTweet[] = [];
         const options = {
             fieldSeparator:   ",",
             quoteStrings:     "\"",
@@ -193,24 +205,29 @@ export class RESTMapDataService {
         if (selectedAggregates.length === this.aggregations[aggregrationSetId].aggregates.length) {
             options.filename = `${aggregrationSetId}-tweet-export-all-${readableTimestamp()}`;
         }
-        const layerAggregationList = this.aggregations[aggregrationSetId]
+        const regions = this.aggregations[aggregrationSetId]
             .aggregates
             .filter(i => selectedAggregates.includes(i.id))
-            .flatMap(x => x.regionTypeMap[regionType]);
-        const regions: string[] = await this.regionNamesWithData(regionType, startDate, endDate);
-        log.debug("Regions: ", regions);
-        // TODO: This is a very slow way of downloading the tweet data, needs to be done on the server or completely in SQL
-        // See https://github.com/socialsensingbot/frontend/issues/281
-        for (const region of regions) {
-            console.log(region, layerAggregationList);
-            if (layerAggregationList.includes(region)) {
-                await this.exportRegionForCSV(polygonDatum, regionType, region, exportedTweets, startDate, endDate);
+            .flatMap(x => x.regionTypeMap[regionType]).map(i => "" + i);
 
-            }
+        const exportedTweets: CSVExportTweet[] = [];
+        const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(regionType, regions, startDate, endDate);
+        for (const i of tweetData) {
+            exportedTweets.push(await i);
         }
         const csvExporter = new ExportToCsv(options);
         log.debug(exportedTweets);
-        csvExporter.generateCsv(exportedTweets);
+        csvExporter.generateCsv(exportedTweets.sort((a, b) => {
+            if (a.region < b.region) {
+                return -1;
+            }
+            if (a.region > b.region) {
+                return 1;
+            }
+
+            // names must be equal
+            return 0;
+        }));
 
 
     }
@@ -234,75 +251,6 @@ export class RESTMapDataService {
         return this.mapMetadata.regionAggregations.length > 0;
     }
 
-    public async exportRegionForCSV(polygonDatum: PolygonData, regionType: string, region: string,
-                                    exportedTweets: CSVExportTweet[], startDate, endDate): Promise<void> {
-        let geometry;
-        for (const feature of polygonDatum.features) {
-            if (feature.id === region) {
-                geometry = feature.geometry;
-            }
-        }
-        if (typeof geometry === "undefined") {
-            log.warn("No geometry for " + region);
-        } else {
-
-            const exportedPromises = await this.downloadRegion(regionType, region,
-                                                               geometry, startDate, endDate);
-            for (const exportedElement of exportedPromises) {
-                exportedTweets.push(exportedElement);
-            }
-        }
-    }
-
-
-    private async downloadRegion(regionType: string, region: string,
-                                 geometry: Geometry, startDate: number, endDate: number): Promise<CSVExportTweet[]> {
-        const regionMap = {};
-        if (region.match(/\d+/)) {
-            let minX = null;
-            let maxX = null;
-            let minY = null;
-            let maxY = null;
-            for (const point of geometry.coordinates[0]) {
-                if (minX === null || point[0] < minX) {
-                    minX = point[0];
-                }
-                if (minY === null || point[1] < minY) {
-                    minY = point[1];
-                }
-                if (maxX === null || point[0] > maxX) {
-                    maxX = point[0];
-                }
-                if (maxY === null || point[1] > maxY) {
-                    maxY = point[1];
-                }
-            }
-            log.verbose(
-                `Bounding box of ${JSON.stringify(geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`);
-            regionMap[region] = `(${minX},${minY}),(${maxX},${maxY})`;
-        } else {
-            regionMap[region] = toTitleCase(region);
-        }
-        log.verbose("Exporting region: " + region);
-        const exportedPromises = (await this.tweets(regionType, [region], startDate, endDate))
-            .filter(i => i.valid && !this._pref.isBlacklisted(i))
-            .map(
-                async i => {
-                    const annotationRecord = await this._annotation.getAnnotations(i);
-                    let annotations = {};
-                    if (annotationRecord && annotationRecord.annotations) {
-                        annotations = JSON.parse(annotationRecord.annotations);
-                    }
-                    return i.asCSV(regionMap, this._pref.combined.sanitizeForGDPR,
-                                   annotations);
-                });
-        const result: CSVExportTweet[] = [];
-        for (const exportedPromise of exportedPromises) {
-            result.push(await exportedPromise);
-        }
-        return result;
-
-    }
 
     public async minDate(): Promise<number> {
         return roundToHour(await this.now() - 4 * ONE_DAY);
@@ -335,5 +283,71 @@ export class RESTMapDataService {
 
     public async geoJsonGeographyFor(regionType: string): Promise<FeatureCollection> {
         return await this.loadGeography(regionType) as FeatureCollection;
+    }
+
+    sanitizeForGDPR(tweetText: string): string {
+        // — Tim Hopkins (@thop1988)
+        return tweetText
+            .replace(/@[a-zA-Z0-9_-]+/g, "@USERNAME_REMOVED")
+            .replace(/— .+ \(@USERNAME_REMOVED\).*$/g, "");
+    }
+
+    private async loadDownloadData(regionType: string, regions: string[], startDate: number,
+                                   endDate: number): Promise<Promise<CSVExportTweet>[]> {
+        return (await this.tweets(regionType, regions, startDate, endDate)).filter(i => i.valid && !this._pref.isBlacklisted(i)).map(
+            async (i: Tweet) => {
+
+                let region = "";
+                if (i.region.match(/\d+/)) {
+                    let minX = null;
+                    let maxX = null;
+                    let minY = null;
+                    let maxY = null;
+                    for (const point of i.location.geometries) {
+                        if (minX === null || point[0] < minX) {
+                            minX = point[0];
+                        }
+                        if (minY === null || point[1] < minY) {
+                            minY = point[1];
+                        }
+                        if (maxX === null || point[0] > maxX) {
+                            maxX = point[0];
+                        }
+                        if (maxY === null || point[1] > maxY) {
+                            maxY = point[1];
+                        }
+                    }
+                    log.verbose(
+                        `Bounding box of ${JSON.stringify(i.location.geometries)} is (${minX},${minY}) to (${maxX},${maxY})`);
+                    region = `(${minX},${minY}),(${maxX},${maxY})`;
+                } else {
+                    region = toTitleCase(i.region);
+                }
+                log.verbose("Exporting region: " + i.region);
+                const annotationRecord = await this._annotation.getAnnotations(i);
+                let annotations: any = {};
+                if (annotationRecord && annotationRecord.annotations) {
+                    annotations = JSON.parse(annotationRecord.annotations);
+                }
+                let impact = "";
+                if (annotations.impact) {
+                    impact = annotations.impact;
+                }
+                let source = "";
+                if (annotations.source) {
+                    source = annotations.source;
+                }
+                if (this._pref.combined.sanitizeForGDPR) {
+                    return new CSVExportTweet(region, impact, source, i.id, i.date.toUTCString(),
+                                              "https://twitter.com/username_removed/status/" + i.id,
+                                              this.sanitizeForGDPR($("<div>").html(i.html).text()));
+
+                } else {
+                    return new CSVExportTweet(region, impact, source, i.id, i.date.toUTCString(),
+                                              "https://twitter.com/username_removed/status/" + i.id,
+                                              $("<div>").html(i.html).text());
+                }
+            });
+
     }
 }

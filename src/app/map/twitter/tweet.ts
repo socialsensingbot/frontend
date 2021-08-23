@@ -31,6 +31,18 @@ export class Tweet {
     }
 
 
+    get json(): any {
+        return this._json;
+    }
+
+    get location(): geojson.GeometryCollection {
+        return this._location as geojson.GeometryCollection;
+    }
+
+    get region(): string {
+        return this._region;
+    }
+
     public get date(): Date {
         this.lazyInit();
         return this._date;
