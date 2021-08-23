@@ -17,32 +17,32 @@ export const environment = {
   demo:             false,
   version: "2.2",
   // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
-  timezone:             "UTC",
-  locale:               "en-GB",
-  toolbarColor:         "primary",
-  rollbar:              true,
-  multipleSessions:     true,
-  maxUsers:             -1,
-  hmr:                  false,
-  showErrors:           false,
-  showLoadingMessages:  true,
-  sanitizeForGDPR:      true,
-  confirm:              {
-    email:    "",
-    password: ""
-  },
-  defaultDataSet:       "live",
-  availableDataSets:    ["*"],
-  cacheProcessedTweets: false,
+  timezone:               "UTC",
+  locale:                 "en-GB",
+  toolbarColor:           "primary",
+  rollbar:                true,
+    multipleSessions:     true,
+    maxUsers:             -1,
+    hmr:                  false,
+    showErrors:           false,
+    showLoadingMessages:  true,
+    sanitizeForGDPR:      true,
+    confirm:              {
+        email:    "",
+        password: ""
+    },
+    defaultDataSet:       "uk-flood-live",
+    availableDataSets:    ["uk-flood-live"],
+    cacheProcessedTweets: false,
 
-  impact: {
-    //The ability to tag tweets with an impact annotation
-    levels: [
-      {title: "1 – Minimal", value: "minimal", color: "#43A047"},
-      {title: "2 – Minor", value: "minor", color: "#FFEE58"},
-      {title: "3 - Significant", value: "significant", color: "#FFB300"},
-      {title: "4 - Severe", value: "severe", color: "#F4511E"}
-    ]
+    impact: {
+        //The ability to tag tweets with an impact annotation
+        levels: [
+            {title: "1 – Minimal", value: "minimal", color: "#43A047"},
+            {title: "2 – Minor", value: "minor", color: "#FFEE58"},
+            {title: "3 - Significant", value: "significant", color: "#FFB300"},
+            {title: "4 - Severe", value: "severe", color: "#F4511E"}
+        ]
   },
   source: {
     //The ability to tag tweets with a source

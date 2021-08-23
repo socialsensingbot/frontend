@@ -13,12 +13,13 @@ import * as geojson from "geojson";
 import {AnnotationService} from "../../pref/annotation.service";
 import {LoadingProgressService} from "../../services/loading-progress.service";
 import {
-    AggregationData,
     AggregationMap,
     MapCoreMetadata,
     MapMetadata,
     ONE_DAY,
-    RegionGeography, RegionStats, RegionStatsMap,
+    RegionGeography,
+    RegionStats,
+    RegionStatsMap,
     RegionTweeCount,
     ServiceMetadata
 } from "./map-data";
@@ -197,7 +198,7 @@ export class RESTMapDataService {
             .filter(i => selectedAggregates.includes(i.id))
             .flatMap(x => x.regionTypeMap[regionType]);
         const regions: string[] = await this.regionNamesWithData(regionType, startDate, endDate);
-        log.debug("Regions: ",regions);
+        log.debug("Regions: ", regions);
         // TODO: This is a very slow way of downloading the tweet data, needs to be done on the server or completely in SQL
         // See https://github.com/socialsensingbot/frontend/issues/281
         for (const region of regions) {
