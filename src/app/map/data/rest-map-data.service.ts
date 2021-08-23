@@ -303,7 +303,8 @@ export class RESTMapDataService {
                     let maxX = null;
                     let minY = null;
                     let maxY = null;
-                    for (const point of i.location.geometries) {
+                    const polygon: geojson.Polygon = this.regionGeography[region] as geojson.Polygon;
+                    for (const point of polygon.coordinates) {
                         if (minX === null || point[0] < minX) {
                             minX = point[0];
                         }
@@ -318,7 +319,7 @@ export class RESTMapDataService {
                         }
                     }
                     log.verbose(
-                        `Bounding box of ${JSON.stringify(i.location.geometries)} is (${minX},${minY}) to (${maxX},${maxY})`);
+                        `Bounding box of ${JSON.stringify(polygon)} is (${minX},${minY}) to (${maxX},${maxY})`);
                     region = `(${minX},${minY}),(${maxX},${maxY})`;
                 } else {
                     region = toTitleCase(i.region);
@@ -340,12 +341,12 @@ export class RESTMapDataService {
                 if (this._pref.combined.sanitizeForGDPR) {
                     return new CSVExportTweet(region, impact, source, i.id, i.date.toUTCString(),
                                               "https://twitter.com/username_removed/status/" + i.id,
-                                              this.sanitizeForGDPR($("<div>").html(i.html).text()));
+                                              this.sanitizeForGDPR($("<div>").html(i.html).text()), JSON.stringify(i.location));
 
                 } else {
                     return new CSVExportTweet(region, impact, source, i.id, i.date.toUTCString(),
                                               "https://twitter.com/username_removed/status/" + i.id,
-                                              $("<div>").html(i.html).text());
+                                              $("<div>").html(i.html).text(), JSON.stringify(i.location));
                 }
             });
 
