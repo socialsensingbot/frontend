@@ -105,6 +105,11 @@ export class Tweet {
         return this._html;
     }
 
+    public get text(): string {
+        this.lazyInit();
+        return $(this.html).find("p")[0].innerHTML;
+    }
+
 
     /**
      * Populate this tweet from data from a Tweet like structure.
@@ -163,7 +168,7 @@ export class Tweet {
      */
     private lazyInit() {
         if (!this._init) {
-            this._sender = this._json.user.name;
+            this._sender = this._json.user.screen_name;
             if (this._html !== null) {
                 this._valid = true;
             }
