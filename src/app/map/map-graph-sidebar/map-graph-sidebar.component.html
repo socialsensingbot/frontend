@@ -20,8 +20,8 @@
       ></app-widget-timeseries>
 
         <button mat-button class="app-stats-panel-exceedance-open-in-analytics" (click)="expandExceedanceGraph()">Open in Analytics</button>
-        <button mat-button class="app-stats-panel-exceedance-add-to-dashboard"  *ngIf="this.pref.featureSupported('dashboard')"
-                (click)="this.dash.addCard('timeseries', 'Exceedance for '+regionText(),
+        <button mat-button class="app-stats-panel-exceedance-add-to-dashboard" *ngIf="this.pref.featureSupported('dashboard')"
+                (click)="this.dash.addCard('timeseries', 'Return Period for '+regionText(),
             1,1,graphStateForRegions('exceedance'));showDashboard()">Add to
             Dashboard
         </button>

@@ -5,10 +5,11 @@ import {RESTDataAPIService} from "../../api/rest-api.service";
 import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {
-  TimeseriesAnalyticsComponentState, timeSeriesAutocompleteType,
-  TimeseriesCollectionModel,
-  TimeseriesModel,
-  TimeseriesRESTQuery
+    TimeseriesAnalyticsComponentState,
+    timeSeriesAutocompleteType,
+    TimeseriesCollectionModel,
+    TimeseriesModel,
+    TimeseriesRESTQuery
 } from "../timeseries";
 import {v4 as uuidv4} from "uuid";
 import {UIExecutionService} from "../../services/uiexecution.service";
@@ -237,9 +238,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
   }
 
   public eocChanged() {
-    this.exec.uiActivity();
-    this.seriesCollection.yLabel = this.state.eoc === "exceedance" ? "Exceedance" : "Count";
-    this.seriesCollection.yField = this.state.eoc === "exceedance" ? "exceedance" : "count";
+      this.exec.uiActivity();
+      this.seriesCollection.yLabel = this.state.eoc === "exceedance" ? "Return Period" : "Count";
+      this.seriesCollection.yField = this.state.eoc === "exceedance" ? "exceedance" : "count";
     this.seriesCollection.yAxisHasChanged();
     this.exec.uiActivity();
   }
@@ -360,6 +361,3 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
   }
 }
-
-
-
