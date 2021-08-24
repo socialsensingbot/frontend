@@ -137,9 +137,9 @@
                     <div class="app-twitter-line"></div>
                     <div class="app-twitter-stats">
                         <span class="app-twitter-likes"><mat-icon>favorite_border</mat-icon>
-                            {{tweet.json.favorite_count}}</span>
+                            {{tweet.json.favorite_count > 0 ? tweet.json.favorite_count : " "}}</span>
                         <span class="app-twitter-rt"><mat-icon>cached</mat-icon>
-                            {{tweet.json.retweet_count}}</span>
+                            {{tweet.json.retweet_count > 0 ? tweet.json.retweet_count : " "}}</span>
                     </div>
                     <div class="app-twitter-logo"><a [href]="tweet.url" aria-label="View on Twitter"
                                                      rel="noopener noreferrer" role="link" target="_blank">

@@ -107,7 +107,12 @@ export class Tweet {
 
     public get text(): string {
         this.lazyInit();
-        return $(this.html).find("p")[0].innerHTML;
+        const paragraphElement: HTMLParagraphElement = $(this.html).find("p")[0];
+        if (paragraphElement) {
+            return paragraphElement.innerHTML;
+        } else {
+            return "Tweet Missing";
+        }
     }
 
 
