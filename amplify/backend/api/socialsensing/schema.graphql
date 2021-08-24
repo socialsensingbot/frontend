@@ -39,6 +39,18 @@ owner: String
 createdAt: AWSDateTime
 }
 
+type TextAutocomplete
+@model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
+@auth(rules: [{allow: private}]) {
+  id: ID!
+  type:String!
+  text: String!
+  group: String
+  owner: String
+  createdAt: AWSDateTime
+}
+
+
 
 type UserSession
 @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})

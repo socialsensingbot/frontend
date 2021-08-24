@@ -60,8 +60,8 @@ export const environment = {
             {title: "Coastal", value: "coastal", color: "#F4511E"}
         ]
     },
-    features: ["impact", "source", "map"],
-    // features: ["impact", "source", "map", "dashboard", "analytics"],
+    // features: ["impact", "source", "map"],
+    features: ["impact", "source", "map", "dashboard", "analytics"],
 
     showErrors:                          false,
     showLoadingMessages:                 true,
@@ -77,7 +77,8 @@ export const environment = {
     defaultDashboard:                    defaultDashboard,
     blinkRateInMilliseconds:             1000,
     // mapTileUrlTemplate:   "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"
-    newExceedanceCalc: false
+    newExceedanceCalc: false,
+    shareTextAutocompleteInGroup: true,
 
 };
 

@@ -15,7 +15,7 @@ export const environment = {
   name:             "production",
   lamdaEnvironment: "prod",
   demo:             false,
-  version: "2.0.1",
+  version:          "2.1",
   // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
   timezone:             "UTC",
   locale:               "en-GB",
@@ -54,15 +54,17 @@ export const environment = {
     ]
   },
 
-  features:                            ["impact", "source", "map",],
+  features:                            ["impact", "source", "map", "dashboard", "analytics"],
   mostRecentDateIsNow:                 true,
   continuousUpdateThresholdInMinutes:  90,
   animateOnTimeSliderChange:           false,
   recentTweetHighlightOffsetInSeconds: 1200,
 
-  mapTileUrlTemplate:      "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
-  blinkRateInMilliseconds: 1000,
+  mapTileUrlTemplate:           "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
+  blinkRateInMilliseconds:      1000,
   defaultDashboard,
-  newExceedanceCalc:       false
+  newExceedanceCalc:            false,
+  shareTextAutocompleteInGroup: true,
+
 
 };
