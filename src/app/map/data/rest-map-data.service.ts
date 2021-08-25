@@ -96,7 +96,6 @@ export class RESTMapDataService {
                     {id: "" + region, type: "Feature", properties: {name: region, count: 0}, geometry: this.regionGeography[region]});
             }
         }
-
         this._regionGeographyGeoJSON = {type: "FeatureCollection", features};
 
         return this._regionGeographyGeoJSON;
@@ -258,8 +257,8 @@ export class RESTMapDataService {
 
     public async regionStats(regionType: string, region: string, startDate: number, endDate: number): Promise<RegionStats> {
         const statsMap = await this.getRegionStatsMap(regionType, startDate, endDate);
-        if (statsMap.hasOwnProperty(("" + region))) {
-            return statsMap["" + region];
+        if (statsMap.hasOwnProperty((region))) {
+            return statsMap[region];
         } else {
             return null;
         }
@@ -267,14 +266,8 @@ export class RESTMapDataService {
 
     }
 
-    private async getRegionStatsMap(regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {
-        const statsMap = await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/stats", {
-            layerGroup: this.mapMetadata.defaultLayerGroup,
-            startDate:  roundToHour(startDate),
-            endDate:    roundToHour(endDate)
-
-        }, 60) as RegionStatsMap;
-        return statsMap;
+    public async preCacheRegionStatsMap(activeRegionType: string, _dateMin: number, _dateMax: number): Promise<void> {
+        await this.getRegionStatsMap(activeRegionType, _dateMin, _dateMax);
     }
 
     private async regionNamesWithData(regionType: string, startDate: number, endDate: number): Promise<string[]> {
@@ -350,5 +343,15 @@ export class RESTMapDataService {
                 }
             });
 
+    }
+
+    private async getRegionStatsMap(regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {
+        const statsMap = await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/stats", {
+            layerGroup: this.mapMetadata.defaultLayerGroup,
+            startDate:  roundToHour(startDate),
+            endDate:    roundToHour(endDate)
+
+        }, 600) as RegionStatsMap;
+        return statsMap;
     }
 }

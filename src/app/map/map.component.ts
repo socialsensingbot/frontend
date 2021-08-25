@@ -1,6 +1,6 @@
 import {Component, NgZone, OnDestroy, OnInit} from "@angular/core";
 import {Logger} from "@aws-amplify/core";
-import {Browser, GeoJSON, latLng, Layer, LayerGroup, layerGroup, LeafletMouseEvent, Map, tileLayer} from "leaflet";
+import {Browser, GeoJSON, latLng, LayerGroup, layerGroup, LeafletMouseEvent, Map, tileLayer} from "leaflet";
 import "jquery-ui/ui/widgets/slider.js";
 import {ActivatedRoute, NavigationStart, Params, Router} from "@angular/router";
 import * as rxjs from "rxjs";
@@ -9,19 +9,10 @@ import * as geojson from "geojson";
 import {DateRange, DateRangeSliderOptions} from "./date-range-slider/date-range-slider.component";
 import {LayerStyleService} from "./services/layer-style.service";
 import {NotificationService} from "../services/notification.service";
-import {
-    COUNTY,
-    Feature,
-    NumberLayers,
-    NumberLayerShortName,
-    numberLayerShortNames,
-    PolygonData,
-    PolyLayers,
-    STATS
-} from "./types";
+import {COUNTY, Feature, NumberLayerShortName, PolygonData, PolyLayers, STATS} from "./types";
 import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
-import {UIExecutionService, AppState} from "../services/uiexecution.service";
+import {AppState, UIExecutionService} from "../services/uiexecution.service";
 import {ColorCodeService} from "./services/color-code.service";
 import {Tweet} from "./twitter/tweet";
 import {getOS, roundToHour, roundToMinute, toTitleCase} from "../common";
@@ -30,10 +21,9 @@ import {PreferenceService} from "../pref/preference.service";
 import {NgForageCache} from "ngforage";
 import {environment} from "../../environments/environment";
 import Auth from "@aws-amplify/auth";
-import {FormControl} from "@angular/forms";
 import {DashboardService} from "../pref/dashboard.service";
 import {LoadingProgressService} from "../services/loading-progress.service";
-import {ONE_DAY, RegionGeography} from "./data/map-data";
+import {ONE_DAY} from "./data/map-data";
 import {RESTMapDataService} from "./data/rest-map-data.service";
 
 
@@ -47,6 +37,8 @@ const ONE_MINUTE_IN_MILLIS = 60000;
                styleUrls:   ["./map.component.scss"]
            })
 export class MapComponent implements OnInit, OnDestroy {
+    private currentStatisticsLayer: LayerGroup<any> = layerGroup();
+
     public set selectedFeatureNames(value: string[]) {
         this._selectedFeatureNames = value;
         this.updateSearch({selected: value});
@@ -102,7 +94,6 @@ export class MapComponent implements OnInit, OnDestroy {
         center: latLng([53, -2])
     };
     private _map: Map;
-    private _numberLayers: NumberLayers = {stats: null, count: null};
     private _polyLayers: PolyLayers = {county: null, coarse: null, fine: null};
     // URL state management //
     private _geojson: { stats: GeoJSON, count: GeoJSON } = {stats: null, count: null};
@@ -230,22 +221,7 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this._activeStatistic !== value) {
             this._activeStatistic = value;
             this.updateSearch({active_number: this._activeStatistic});
-            if (this._map) {
-                for (const layer in this._numberLayers) {
-                    if (layer !== value) {
-                        log.debug("Removing " + layer);
-                        this._map.removeLayer(this._numberLayers[layer]);
-                    }
-                }
-                for (const layer in this._numberLayers) {
-                    if (layer === value) {
-                        log.debug("Adding " + layer);
-                        this._map.addLayer(this._numberLayers[layer]);
-
-                    }
-                }
-            }
-            this.scheduleResetLayers(false);
+            this.scheduleResetLayers(value, false);
         }
     }
 
@@ -265,26 +241,9 @@ export class MapComponent implements OnInit, OnDestroy {
         }
 
         if (this.activeRegionType !== value) {
-            if (this._map) {
-                for (const layer in this._polyLayers) {
-                    if (layer !== value) {
-                        log.debug("Removing " + layer);
-                        this._map.removeLayer(this._polyLayers[layer]);
-                    }
-                }
-                for (const layer in this._polyLayers) {
-                    if (layer === value) {
-                        log.debug("Adding " + layer);
-                        this._map.addLayer(this._polyLayers[layer]);
-
-                    }
-                }
-            }
             this._activeRegionType = value;
-            this.scheduleResetLayers();
         }
-
-
+        this.scheduleResetLayers(this.activeStatistic);
     }
 
     /**
@@ -437,7 +396,8 @@ export class MapComponent implements OnInit, OnDestroy {
 
             if (first) {
                 this._exec.changeState("no-params");
-                await this.updateSliderFromData();
+                // noinspection ES6MissingAwait
+                this.updateSliderFromData();
             } else {
                 await this.updateLayers("Data Load", clearSelected);
                 await this._exec.queue("Update Slider", ["ready"],
@@ -494,7 +454,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
 
-    public async  downloadTweetsAsCSV() {
+    public async downloadTweetsAsCSV() {
         log.debug("downloadTweetsAsCSV()");
         log.debug(this.data.regionGeography);
         log.debug(this.activeRegionType);
@@ -550,13 +510,13 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    private scheduleResetLayers(clearSelected = true) {
+    private scheduleResetLayers(layer: string, clearSelected = true) {
         log.debug("scheduleResetLayers()");
-        return this._exec.queue("Reset Layers", ["ready"], () => {
+        this._exec.queue("Reset Layers", ["ready"], async () => {
             this.activity = true;
-            this.resetLayers(clearSelected);
+            await this.resetStatisticsLayer(layer, clearSelected);
             this.activity = false;
-        }, "", false, true, true);
+        }, layer + ":" + clearSelected, true, false, false);
     }
 
     /**
@@ -694,15 +654,6 @@ export class MapComponent implements OnInit, OnDestroy {
         };
         this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 4000});
 
-        // define the layers for the different counts
-        this._numberLayers.stats = layerGroup().addTo(map);
-        this._numberLayers.count = layerGroup();
-
-        // layers for the different polygons
-        this._polyLayers.county = layerGroup().addTo(map);
-        this._polyLayers.coarse = layerGroup();
-        this._polyLayers.fine = layerGroup();
-
 
         this._loggedIn = await Auth.currentAuthenticatedUser() != null;
 
@@ -751,8 +702,7 @@ export class MapComponent implements OnInit, OnDestroy {
                     this._popState = false;
                     this.activity = true;
                     await this.updateMapFromQueryParams(params);
-                    await this.resetLayers(true);
-                    return this.updateLayers("Pop State")
+                    return this.updateLayers("Pop State", true)
                                .then(() => this._twitterIsStale = true)
                                .finally(() => this.activity = false);
                 }
@@ -768,7 +718,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
         await this.updateSearch({selected: []});
         this.selectedFeatureNames = [];
-        await this.resetLayers(true);
+        this.scheduleResetLayers(this.activeStatistic, true);
     }
 
     /**
@@ -797,7 +747,7 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     private highlight(target: any, weight: number = 3) {
-        log.debug("Highlighting ", target.feature);
+        log.verbose("Highlighting ", target.feature);
         const feature = target.feature;
         const count: number = feature.properties.count;
         target.setStyle({
@@ -815,7 +765,7 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     private unhighlight(target: any) {
-        log.debug("Un-highlighting ", target.feature);
+        log.verbose("Un-highlighting ", target.feature);
         const feature = target.feature;
         const count: number = feature.properties.count;
         target.setStyle({
@@ -921,7 +871,7 @@ export class MapComponent implements OnInit, OnDestroy {
         // e.g. ?...&selected=powys&selected=armagh
         // then highlight it and update Twitter
         if (this._selectedFeatureNames.includes(feature.properties.name)) {
-            log.debug("Matched " + feature.properties.name);
+            log.verbose("Matched " + feature.properties.name);
 
             this.highlight(layer, 3);
 
@@ -945,49 +895,57 @@ export class MapComponent implements OnInit, OnDestroy {
      *
      * @param clearSelected clears the selected polygon
      */
-    private async resetLayers(clearSelected) {
-        const geography: PolygonData = await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData;
-        log.debug("resetLayers(" + clearSelected + ")");
-        // this.hideTweets();
-        for (const key of numberLayerShortNames) {
-            log.debug(key);
-            const curLayerGroup = this._numberLayers[key];
+    private async resetStatisticsLayer(layer: string, clearSelected) {
+        console.info("Resetting " + layer);
+        this.loading.showIndeterminateSpinner();
+        try {
+            const geography: PolygonData = await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData;
+            log.debug("resetStatisticsLayer(" + clearSelected + ")");
+            // this.hideTweets();
+            log.debug(layer);
+            const curLayerGroup = layerGroup();
             if (curLayerGroup != null) {
-                // noinspection JSUnfilteredForInLoop
-                curLayerGroup.clearLayers();
 
                 // noinspection JSUnfilteredForInLoop
-                const shortNumberLayerName = key;
                 const regionTweetMap = await this.data.recentTweets(this.activeRegionType);
                 log.debug("Region Tweet Map", regionTweetMap);
 
                 const styleFunc = (feature: geojson.Feature) => {
+                    console.info("styleFunc " + layer);
 
-                    const style = this._color.colorFunctions[shortNumberLayerName].getFeatureStyle(
+                    const style = this._color.colorFunctions[layer].getFeatureStyle(
                         feature);
-                    console.log("Style ", style, feature.properties);
+                    log.verbose("Style ", style, feature.properties);
                     if (this.liveUpdating && regionTweetMap[feature.properties.name]) {
-                        log.debug(`Adding new tweet style for ${feature.properties.name}`);
+                        log.verbose(`Adding new tweet style for ${feature.properties.name}`);
                         style.className = style.className + " leaflet-new-tweet";
                     }
                     return style;
 
                 };
-                await this.updateRegionData(geography);
 
-                this._geojson[shortNumberLayerName] = new GeoJSON(
+                await this.updateRegionData(geography);
+                this._geojson[layer] = new GeoJSON(
                     geography as geojson.GeoJsonObject, {
                         style:         styleFunc,
                         onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
                     }).addTo(curLayerGroup);
+
             } else {
-                log.debug("Null layer " + key);
+                log.debug("Null layer " + layer);
             }
             if (clearSelected) {
                 this.selection.clear();
                 this.hideTweets();
             }
+            this.currentStatisticsLayer.clearLayers();
+            this._map.removeLayer(this.currentStatisticsLayer);
+            this._map.addLayer(curLayerGroup);
+            this.currentStatisticsLayer = curLayerGroup;
+        } finally {
+            this.loading.hideIndeterminateSpinner();
         }
+
     }
 
     /**
@@ -1000,49 +958,58 @@ export class MapComponent implements OnInit, OnDestroy {
     /**
      * Updates the data stored in the polygon data of the leaflet layers.
      */
-    private async updateRegionData(regionData: PolygonData) {
-        const features = regionData.features;
-        for (const feature of features) {
-            const featureProperties = feature.properties;
-            const region = featureProperties.name;
-            const mapStats = await this.data.regionStats(this.activeRegionType, region, this._dateMin, this._dateMax);
-            if (mapStats !== null) {
-                featureProperties.count = mapStats.count;
-                featureProperties.stats = mapStats.exceedance;
-            } else {
-                log.debug("No data for " + region);
-                featureProperties.count = 0;
-                featureProperties.stats = 0;
+    private async updateRegionData(geography: PolygonData) {
+        return new Promise<void>(async (resolve, reject) => {
+            const features = geography.features;
+            await this.data.preCacheRegionStatsMap(this.activeRegionType, this._dateMin, this._dateMax);
+            for (const feature of features) {
+                const featureProperties = feature.properties;
+                const region = featureProperties.name;
+                this.data.regionStats(this.activeRegionType, region, this._dateMin, this._dateMax).then(
+                    mapStats => {
+                        if (mapStats !== null) {
+                            featureProperties.count = mapStats.count;
+                            featureProperties.stats = mapStats.exceedance;
+                        } else {
+                            log.verbose("No data for " + region);
+                            featureProperties.count = 0;
+                            featureProperties.stats = 0;
+                        }
+                        if (feature === features[features.length - 1]) {
+                            resolve();
+                        }
+                    }
+                );
             }
-        }
+        });
+
     }
 
     private async updateLayers(reason: string = "", clearSelected = false) {
         log.debug("updateLayers()");
-        return this._exec.queue("Update Layers: " + reason, ["ready"], async () => {
-                                    // Mark as stale to trigger a refresh
-                                    log.debug("updateLayers() lambda");
-                                    if (!this._updating) {
-                                        this.activity = true;
-                                        this._updating = true;
-                                        try {
+        return await this._exec.queue("Update Layers: " + reason, ["ready"], async () => {
+                                          // Mark as stale to trigger a refresh
+                                          log.debug("updateLayers() lambda");
+                                          if (!this._updating) {
+                                              this.activity = true;
+                                              this._updating = true;
+                                              try {
 
-                                            await this.clearMapFeatures();
-                                            await this.resetLayers(clearSelected);
-                                            await this.updateTwitterPanel();
-                                        } finally {
-                                            this.activity = false;
-                                            this._updating = false;
-                                            if (this._params) {
-                                                this._exec.changeState("ready");
-                                            } else {
-                                                this._exec.changeState("no-params");
-                                            }
-                                        }
-                                    } else {
-                                        log.debug("Update in progress so skipping this update");
-                                    }
-                                }
+                                                  this.scheduleResetLayers(this.activeStatistic, clearSelected);
+                                                  await this.updateTwitterPanel();
+                                              } finally {
+                                                  this.activity = false;
+                                                  this._updating = false;
+                                                  if (this._params) {
+                                                      this._exec.changeState("ready");
+                                                  } else {
+                                                      this._exec.changeState("no-params");
+                                                  }
+                                              }
+                                          } else {
+                                              log.debug("Update in progress so skipping this update");
+                                          }
+                                      }
             , reason, false, true);
     }
 
@@ -1058,7 +1025,7 @@ export class MapComponent implements OnInit, OnDestroy {
      * Reveals the tweet drawer/panel.
      */
     private showTweets() {
-        log.debug("showTweets()");
+        log.verbose("showTweets()");
         this._exec.queue("Tweets Visible", ["ready"], () => {
             this.tweetsVisible = true;
         }, "tweets.visible", true, true, true);

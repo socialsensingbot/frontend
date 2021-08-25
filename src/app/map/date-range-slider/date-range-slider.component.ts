@@ -211,7 +211,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
             for (let step = this.sliderOptions.floor;
                  step < this.sliderOptions.ceil;
                  step = step + 60 * 60 * 1000) {
-                console.log(step);
+                 log.verbose(step);
                 this.sliderOptions.stepsArray.push({value: step});
             }
             if (this.sliderOptions.stepsArray[this.sliderOptions.stepsArray.length - 1].value !== this.sliderOptions.ceil) {
