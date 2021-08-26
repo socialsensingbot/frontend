@@ -653,6 +653,8 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this.route.snapshot.queryParamMap.has("__clear_cache__")) {
             await this.cache.clear();
             await DataStore.clear();
+            await Auth.signOut();
+            await this._router.navigate([""]);
         }
         log.debug("init");
         // map.zoomControl.remove();
