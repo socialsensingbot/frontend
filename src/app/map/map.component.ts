@@ -651,9 +651,12 @@ export class MapComponent implements OnInit, OnDestroy {
         });
         this.dash.init();
         if (this.route.snapshot.queryParamMap.has("__clear_cache__")) {
+            log.info("Clearing cache");
             await this.cache.clear();
             await DataStore.clear();
+            log.info("Cache cleared, logging out.");
             await Auth.signOut();
+            log.info("Logged out, redirecting.");
             await this._router.navigate([""]);
         }
         log.debug("init");
