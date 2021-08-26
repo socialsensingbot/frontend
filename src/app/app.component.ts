@@ -85,7 +85,12 @@ export class AppComponent {
             try {
                 log.info("Clearing cache");
                 await this._cache.clear();
+                sessionStorage.clear();
                 await DataStore.clear();
+                localStorage.clear();
+                document.cookie.split(";").forEach(c => {
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                });
                 log.info("Cache cleared, logging out.");
                 await Auth.signOut();
             } finally {
