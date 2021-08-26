@@ -82,17 +82,17 @@ export class AppComponent {
     async checkSession() {
 
         if (this._route.snapshot.queryParamMap.has("__clear_cache__")) {
-            log.info("Clearing cache");
-            await this._cache.clear().then(() => {
-                return DataStore.clear();
-            }).then(() => {
+            try {
+                log.info("Clearing cache");
+                await this._cache.clear();
+                await DataStore.clear();
                 log.info("Cache cleared, logging out.");
-                return Auth.signOut();
-            }).finally(() => {
+                await Auth.signOut();
+            } finally {
                 log.info("Logged out, redirecting.");
                 window.location.href = "/";
 
-            });
+            }
         }
 
 
