@@ -83,7 +83,7 @@ export class AppComponent {
 
         if (this._route.snapshot.queryParamMap.has("__clear_cache__")) {
             log.info("Clearing cache");
-            this._cache.clear().then(() => {
+            await this._cache.clear().then(() => {
                 return DataStore.clear();
             }).then(() => {
                 log.info("Cache cleared, logging out.");
