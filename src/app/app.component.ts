@@ -55,6 +55,19 @@ export class AppComponent {
                 public loading: LoadingProgressService) {
 
         loading.progress("Starting Application", 1);
+        if (this._route.snapshot.queryParamMap.has("__clear_cache__")) {
+            log.info("Clearing cache");
+            this._cache.clear().then(() => {
+                return DataStore.clear();
+            }).then(() => {
+                log.info("Cache cleared, logging out.");
+                return Auth.signOut();
+            }).then(() => {
+                log.info("Logged out, redirecting.");
+                window.location.href = "/";
+
+            });
+        }
         Auth.currentAuthenticatedUser({bypassCache: true})
             .then(user => this.isAuthenticated = (user != null))
             .then(user => this.auth.loggedIn = (user != null))
@@ -74,19 +87,6 @@ export class AppComponent {
             }
         });
 
-        if (this._route.snapshot.queryParamMap.has("__clear_cache__")) {
-            log.info("Clearing cache");
-            this._cache.clear().then(() => {
-                return DataStore.clear();
-            }).then(() => {
-                log.info("Cache cleared, logging out.");
-                return Auth.signOut();
-            }).then(() => {
-                log.info("Logged out, redirecting.");
-                window.location.href = "/";
-
-            });
-        }
 
         this._router.events.subscribe((val) => log.verbose("Router Event: ", val));
 
