@@ -88,7 +88,7 @@ export class AppComponent {
             }).then(() => {
                 log.info("Cache cleared, logging out.");
                 return Auth.signOut();
-            }).then(() => {
+            }).finally(() => {
                 log.info("Logged out, redirecting.");
                 window.location.href = "/";
 
