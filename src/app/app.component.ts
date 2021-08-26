@@ -75,15 +75,17 @@ export class AppComponent {
         });
 
         if (this._route.snapshot.queryParamMap.has("__clear_cache__")) {
-            (async () => {
-                log.info("Clearing cache");
-                await this._cache.clear();
-                await DataStore.clear();
+            log.info("Clearing cache");
+            this._cache.clear().then(() => {
+                return DataStore.clear();
+            }).then(() => {
                 log.info("Cache cleared, logging out.");
-                await Auth.signOut();
+                return Auth.signOut();
+            }).then(() => {
                 log.info("Logged out, redirecting.");
                 window.location.href = "/";
-            })();
+
+            });
         }
 
         this._router.events.subscribe((val) => log.verbose("Router Event: ", val));
