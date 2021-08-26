@@ -245,13 +245,13 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
-    public eocChanged() {
-        this.exec.uiActivity();
-        this.seriesCollection.yLabel = this.state.eoc === "exceedance" ? "Exceedance" : "Count";
-        this.seriesCollection.yField = this.state.eoc === "exceedance" ? "exceedance" : "count";
-        this.seriesCollection.yAxisHasChanged();
-        this.exec.uiActivity();
-    }
+  public eocChanged() {
+      this.exec.uiActivity();
+      this.seriesCollection.yLabel = this.state.eoc === "exceedance" ? "Return Period" : "Count";
+      this.seriesCollection.yField = this.state.eoc === "exceedance" ? "exceedance" : "count";
+    this.seriesCollection.yAxisHasChanged();
+    this.exec.uiActivity();
+  }
 
     public removeQuery(query: TimeseriesRESTQuery) {
         this.state.queries = this.state.queries.filter(i => i.__series_id !== query.__series_id);

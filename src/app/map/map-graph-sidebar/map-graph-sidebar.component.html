@@ -1,10 +1,10 @@
-<div class="stats-panel"><br/>
+<div *ngIf="this.pref.featureSupported('analytics')" class="stats-panel"><br/>
     <button *ngIf="this.pref.featureSupported('dashboard')" mat-button (click)="showDashboard()">Open Dashboard</button>
 
     <div class="graph-wrapper" *ngIf="this.pref.featureSupported('dashboard')">
-        <app-widget-timeseries  [height]="500" [id]="'region-graph-count-'+selection.asId()"
-                                [state]="graphStateForRegions('count')"
-                                ></app-widget-timeseries>
+        <app-widget-timeseries [height]="500" [id]="'region-graph-count-'+selection.asId()"
+                               [state]="graphStateForRegions('count')"
+        ></app-widget-timeseries>
     </div>
 
 
@@ -27,4 +27,8 @@
         </button>
     </div>
 
+</div>
+<div *ngIf="!this.pref.featureSupported('analytics')" class="stats-panel">
+    <br/>
+    <h3>Stats will be available in a future release</h3>
 </div>

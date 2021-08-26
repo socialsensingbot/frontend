@@ -1,7 +1,7 @@
 import {Component, Inject} from "@angular/core";
 import {AuthService} from "./auth/auth.service";
 import {Hub, Logger} from "@aws-amplify/core";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {environment} from "../environments/environment";
 import {PreferenceService} from "./pref/preference.service";
 import {NotificationService} from "./services/notification.service";
@@ -13,6 +13,7 @@ import Auth from "@aws-amplify/auth";
 import {AnnotationService} from "./pref/annotation.service";
 import {UIExecutionService} from "./services/uiexecution.service";
 import {LoadingProgressService} from "./services/loading-progress.service";
+import {NgForageCache} from "ngforage";
 
 
 const log = new Logger("app");
@@ -45,9 +46,11 @@ export class AppComponent {
     constructor(public auth: AuthService,
                 public pref: PreferenceService,
                 private _router: Router,
+                private _route: ActivatedRoute,
                 private _notify: NotificationService,
                 private _session: SessionService,
                 private _annotation: AnnotationService,
+                private _cache: NgForageCache,
                 @Inject(RollbarService) private _rollbar: Rollbar, private _exec: UIExecutionService,
                 public loading: LoadingProgressService) {
 
@@ -71,11 +74,27 @@ export class AppComponent {
             }
         });
 
+
         this._router.events.subscribe((val) => log.verbose("Router Event: ", val));
 
     }
 
     async checkSession() {
+
+        if (this._route.snapshot.queryParamMap.has("__clear_cache__")) {
+            log.info("Clearing cache");
+            this._cache.clear().then(() => {
+                return DataStore.clear();
+            }).then(() => {
+                log.info("Cache cleared, logging out.");
+                return Auth.signOut();
+            }).then(() => {
+                log.info("Logged out, redirecting.");
+                window.location.href = "/";
+
+            });
+        }
+
 
         log.debug("checkSession()");
         if (!this.isAuthenticated) {

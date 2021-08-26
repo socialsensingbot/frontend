@@ -617,9 +617,6 @@ export class MapComponent implements OnInit, OnDestroy {
             });
         });
         this.dash.init();
-        if (this.route.snapshot.queryParamMap.has("__clear_cache__")) {
-            this.cache.clear();
-        }
         log.debug("init");
         // map.zoomControl.remove();
         await this.pref.waitUntilReady();
