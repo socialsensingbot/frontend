@@ -82,17 +82,29 @@ export class AppComponent {
     async checkSession() {
 
         if (this._route.snapshot.queryParamMap.has("__clear_cache__")) {
-            log.info("Clearing cache");
-            this._cache.clear().then(() => {
-                return DataStore.clear();
-            }).then(() => {
-                log.info("Cache cleared, logging out.");
-                return Auth.signOut();
-            }).then(() => {
+            try {
+                log.info("Clearing ngForage cache");
+                await this._cache.clear();
+                await DataStore.clear();
+                log.info("Clearing session storage");
+                sessionStorage.clear();
+                log.info("Clearing local storage");
+                localStorage.clear();
+                log.info("Clearing IndexDB");
+                ["amplify-datastore", "ngForage"].forEach(item => {
+                    window.indexedDB.deleteDatabase(item);
+                });
+                log.info("Clearing cookies");
+                document.cookie.split(";").forEach(c => {
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                });
+                log.info("ALL caches cleared, logging out.");
+                await Auth.signOut();
+            } finally {
                 log.info("Logged out, redirecting.");
                 window.location.href = "/";
 
-            });
+            }
         }
 
 
