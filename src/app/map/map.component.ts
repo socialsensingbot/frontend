@@ -22,7 +22,7 @@ import {
 } from "./types";
 import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
-import {UIExecutionService, AppState} from "../services/uiexecution.service";
+import {AppState, UIExecutionService} from "../services/uiexecution.service";
 import {ColorCodeService} from "./services/color-code.service";
 import {MapDataService, MapDataServiceInt} from "./data/map-data.service";
 import {MapStatisticsInterface} from "./data/processed-data";
@@ -36,6 +36,7 @@ import Auth from "@aws-amplify/auth";
 import {FormControl} from "@angular/forms";
 import {DashboardService} from "../pref/dashboard.service";
 import {LoadingProgressService} from "../services/loading-progress.service";
+import {DataStore} from "@aws-amplify/datastore";
 
 
 const log = new Logger("map");
@@ -650,7 +651,8 @@ export class MapComponent implements OnInit, OnDestroy {
         });
         this.dash.init();
         if (this.route.snapshot.queryParamMap.has("__clear_cache__")) {
-            this.cache.clear();
+            await this.cache.clear();
+            await DataStore.clear();
         }
         log.debug("init");
         // map.zoomControl.remove();
