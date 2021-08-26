@@ -82,7 +82,7 @@ export class AppComponent {
                 log.info("Cache cleared, logging out.");
                 await Auth.signOut();
                 log.info("Logged out, redirecting.");
-                await this._router.navigate(["/"]);
+                window.location.href = "/";
             })();
         }
 
