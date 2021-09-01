@@ -131,8 +131,8 @@ export class RESTMapDataService {
 
         return await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/recent-text-count", {
             layerGroup: this.mapMetadata.defaultLayerGroup,
-            startDate:  await this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000,
-            endDate:    await this.now()
+            startDate:  roundToMinute(await this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000),
+            endDate:    roundToMinute(await this.now())
 
         }) as Promise<RegionTweeCount>;
     }
