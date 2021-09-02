@@ -18,6 +18,25 @@ const dev = stage === "dev";
 // Load modules
 const mysql = require("mysql");
 
+export const roundToHour = (timestamp: number): any => {
+    const date: Date = new Date(timestamp);
+    date.setUTCMinutes(0);
+    date.setUTCSeconds(0);
+    date.setUTCMilliseconds(0);
+    return date.getTime();
+};
+
+export const roundToMinute = (timestamp: number): any => {
+    const date: Date = new Date(timestamp);
+    date.setUTCSeconds(0);
+    date.setUTCMilliseconds(0);
+    return date.getTime();
+};
+
+// Only set to disable the entire API, i.e. to protect the dev database from excessively long queries.
+const disabled = false;
+
+
 // Initialising the instance
 const connection = mysql.createPool({
                                         connectionLimit: 5,
@@ -49,6 +68,7 @@ app.use((req, res, next) => {
 });
 
 
+
 let metadata = null;
 let queryMap = null;
 
@@ -60,6 +80,11 @@ app.get("/query/:name", async (req, res) => {
 });
 
 const cache = (res, key: string, value: () => Promise<any>, options: { duration: number } = {duration: 60}) => {
+    if (disabled) {
+        res.setHeader("X-SocialSensing-API-Disabled");
+        res.status(500);
+        return;
+    }
     res.setHeader("X-SocialSensing-CachedQuery-Key", key);
     if (queryCache.has(key)) {
         console.log("Returned from cache " + key);
@@ -317,7 +342,7 @@ app.post("/map/:map/region-type/:regionType/text-for-regions", async (req, res) 
                                            ST_AsGeoJSON(t.location) as location,
                                            v.region                 as region
                                     FROM live_text t,
-                                         view_live_regions_and_layers v
+                                         mat_view_regions_and_layers v
                                     WHERE t.source = v.source
                                       and t.source_id = v.source_id
                                       and v.region_type = ?
@@ -544,7 +569,7 @@ app.post("/map/:map/region-type/:regionType/stats", async (req, res) => {
                                                     from (SELECT count(*)                                            as count,
                                                                  floor((? - unix_timestamp(v.source_timestamp)) / ?) as period,
                                                                  cume_dist() OVER w * 100.0                          as exceedance
-                                                          FROM view_live_regions_and_layers v
+                                                          FROM mat_view_regions_and_layers v
                                                           WHERE v.layer_group_id = ?
                                                             and v.region_type = ?
                                                             and v.region = regions.region
@@ -553,7 +578,7 @@ app.post("/map/:map/region-type/:regionType/stats", async (req, res) => {
                                                              as x
                                                     where period = 0) as exceedance,
                                                    (SELECT count(*) as count
-                                                    FROM view_live_regions_and_layers v
+                                                    FROM mat_view_regions_and_layers v
                                                     WHERE v.layer_group_id = ?
                                                       and v.region_type = ?
                                                       and v.region = regions.region

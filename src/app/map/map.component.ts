@@ -1079,7 +1079,7 @@ export class MapComponent implements OnInit, OnDestroy {
         await this._exec.queue("Update Twitter", ["ready"], () => {
             // this.selectedRegion.toggle(this._clicked.target.feature.properties.name,this._clicked.target.feature.geometry);
             this.updateTwitterPanel();
-        }, "", false, true, true);
+        }, "", false, true, false);
     }
 
     public async timeSliderPreset(mins: number) {
