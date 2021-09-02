@@ -1,4 +1,4 @@
-const stage = process.env.AWS_LAMBDA_FUNCTION_NAME.substring("query-".length);
+const stage = process.env.AWS_LAMBDA_FUNCTION_NAME.split("-")[1];
 console.log("STAGE: " + stage);
 const mysql = require("mysql");
 
@@ -13,22 +13,22 @@ const connection = mysql.createPool({
                                         // connectTimeout: 15000,
                                         // acquireTimeout: 10000,
                                         waitForConnections: true,
-                                        queueLimit:         5000,
-                                        debug:              false
+                                        queueLimit:         5,
+                                        debug:              true
                                     });
 
 
 exports.handler = async (event) => {
     console.log(event);
-    try {
-        await connection.query({sql: `CALL refresh_mv_now(@rc);`, values: {}}, (error, results) => {
+    return new Promise((resolve, reject) => {
+        connection.query({sql: `CALL refresh_mv_now(@rc);`, values: {}}, (error, results) => {
             if (error) {
                 console.error(error);
+                reject(error);
             } else {
                 console.log("Returned " + results.length + " rows");
+                resolve(results);
             }
         });
-    } catch (e) {
-        console.error(e);
-    }
+    });
 };
