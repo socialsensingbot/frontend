@@ -1,4 +1,8 @@
 {
   "permissions": {},
-  "lambdaLayers": []
+  "lambdaLayers": [],
+  "secretNames": [
+    "db_password",
+    "DB_PASSWORD"
+  ]
 }

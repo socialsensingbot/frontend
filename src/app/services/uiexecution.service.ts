@@ -13,7 +13,7 @@ class ExecutionTask {
     constructor(private _resolve: (value?: any) => void, private _reject: (reason?: any) => void,
                 private _task: () => any, public name: string, public waitForStates: AppState[] | null,
                 private _dedup: string, private _notify: NotificationService, public reschedule: boolean,
-                public silentFailure: boolean, public waitForUIState: UIState) {
+                public silentFailure: boolean, public waitForUIState: UIState, public rescheduleDelay: number) {
 
     }
 
@@ -87,7 +87,7 @@ export class UIExecutionService {
             this._queue = [];
             while (snapshot.length > 0 && !this._pause) {
                 const task = snapshot.shift();
-                log.debug("Execution Queue", this._queue );
+                log.debug("Execution Queue", this._queue);
                 if ((task.waitForStates === null || task.waitForStates.indexOf(
                     this._state) >= 0) && (task.waitForUIState === null || this.uistate === task.waitForUIState)) {
                     log.info("Executing " + task.name + "(" + task.dedup + ")");
@@ -97,7 +97,11 @@ export class UIExecutionService {
                     }
                 } else {
                     if (task.reschedule) {
-                        this._queue.push(task);
+                        setInterval(
+                            () => {
+                                this._queue.push(task);
+                            }, task.rescheduleDelay
+                        );
                         log.debug(
                             `RESCHEDULED out of sequence task ${task.name} on execution queue,
               state ${this._state} needs to be one of ${task.waitForStates} and ${this.uistate} must be ${task.waitForUIState}.`);
@@ -141,7 +145,7 @@ export class UIExecutionService {
 
     public queue(name: string, waitForStates: AppState[] | null, task: () => any, dedup: any = null,
                  silentFailure: boolean = false, replaceExisting: boolean = false, reschedule: boolean = false,
-                 waitForUIState: UIState = null) {
+                 waitForUIState: UIState = null, rescheduleDelayInMillis = 100) {
 
         return new Promise<any>((resolve, reject) => {
             let dedupKey = null;
@@ -150,7 +154,7 @@ export class UIExecutionService {
 
             }
             const executionTask = new ExecutionTask(resolve, reject, task, name, waitForStates, dedupKey, this._notify,
-                                                    reschedule, silentFailure, waitForUIState);
+                                                    reschedule, silentFailure, waitForUIState, rescheduleDelayInMillis);
             if (dedupKey !== null) {
                 if (this.dedupMap.has(dedupKey)) {
                     if (replaceExisting) {

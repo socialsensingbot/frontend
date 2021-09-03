@@ -111,7 +111,7 @@ export class Tweet {
         if (paragraphElement) {
             return paragraphElement.innerHTML;
         } else {
-            return "Tweet Missing";
+            return "<h3>This tweet's text is no longer available.</h3>";
         }
     }
 
