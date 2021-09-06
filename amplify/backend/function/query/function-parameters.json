@@ -2,7 +2,7 @@
   "permissions": {},
   "lambdaLayers": [],
   "secretNames": [
-    "db_password",
+    "TWITTER_BEARER_TOKEN",
     "DB_PASSWORD"
   ]
 }

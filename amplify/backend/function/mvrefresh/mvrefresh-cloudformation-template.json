@@ -69,6 +69,26 @@
             },
             "REGION": {
               "Ref": "AWS::Region"
+            },
+            "DB_PASSWORD": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Fn::Sub": [
+                      "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
+                      {
+                        "appId": "dtmxl3q3i7oix",
+                        "env": {
+                          "Ref": "env"
+                        },
+                        "functionName": "mvrefresh"
+                      }
+                    ]
+                  },
+                  "DB_PASSWORD"
+                ]
+              ]
             }
           }
         },
@@ -222,6 +242,61 @@
           ]
         }
       }
+    },
+    "AmplifyFunctionSecretsPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-function-secrets-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "ssm:GetParameter",
+                "ssm:GetParameters"
+              ],
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:ssm:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":parameter",
+                    {
+                      "Fn::Sub": [
+                        "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
+                        {
+                          "appId": "dtmxl3q3i7oix",
+                          "env": {
+                            "Ref": "env"
+                          },
+                          "functionName": "mvrefresh"
+                        }
+                      ]
+                    },
+                    "*"
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ]
     }
   },
   "Outputs": {

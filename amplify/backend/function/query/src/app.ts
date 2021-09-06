@@ -5,6 +5,7 @@ import {queries} from "./queries";
 import {QueryMetadataSets} from "./metdata";
 import * as NodeCache from "node-cache";
 import {AggregationMap, MapMetadata, RegionGeography, ServiceMetadata} from "./map-data";
+import {TwitterApi} from "twitter-api-v2";
 
 const awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
 
@@ -35,8 +36,7 @@ export const roundToMinute = (timestamp: number): any => {
 
 // Only set to disable the entire API, i.e. to protect the dev database from excessively long queries.
 const disabled = false;
-module.exports = (c) => {
-    const connection = c;
+module.exports = (connection, twitter: TwitterApi) => {
 
 
     // declare a new express app

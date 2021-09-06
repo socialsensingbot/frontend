@@ -39,24 +39,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
 var aws = require("aws-sdk");
 var mysql = require("mysql");
-var stage = process.env.AWS_LAMBDA_FUNCTION_NAME.substring("query-".length);
+var stage = process.env.AWS_LAMBDA_FUNCTION_NAME.split("-")[1];
+var twitter_api_v2_1 = require("twitter-api-v2");
 console.log("STAGE: " + stage);
 var dev = stage === "dev";
 var awsServerlessExpress = require("aws-serverless-express");
 var init = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var Parameters, dbPassword, connection;
+    var Parameters, dbPassword, twitterBearerToken, connection, twitter;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, ((new aws.SSM())
                     .getParameters({
-                    Names: ["DB_PASSWORD"].map(function (secretName) { return process.env[secretName]; }),
+                    Names: ["DB_PASSWORD", "TWITTER_BEARER_TOKEN"].map(function (secretName) { return process.env[secretName]; }),
                     WithDecryption: true,
                 })
                     .promise())];
             case 1:
                 Parameters = (_a.sent()).Parameters;
                 console.log("Parameters:", Parameters);
-                dbPassword = Parameters.filter(function (i) { return i.Name = "DB_PASSWORD"; }).pop().Value;
+                dbPassword = Parameters.filter(function (i) { return i.Name.endsWith("DB_PASSWORD"); }).pop().Value;
+                twitterBearerToken = Parameters.filter(function (i) { return i.Name.endsWith("TWITTER_BEARER_TOKEN"); }).pop().Value;
                 console.log("DB Password: " + dbPassword);
                 connection = mysql.createPool({
                     connectionLimit: 5,
@@ -72,7 +74,8 @@ var init = function () { return __awaiter(void 0, void 0, void 0, function () {
                     queueLimit: 5000,
                     debug: false
                 });
-                return [2 /*return*/, awsServerlessExpress.createServer(require("./app")(connection))];
+                twitter = new twitter_api_v2_1.default(twitterBearerToken);
+                return [2 /*return*/, awsServerlessExpress.createServer(require("./app")(connection, twitter))];
         }
     });
 }); };
