@@ -188,6 +188,57 @@ mutation DeleteSavedGraph(
     updatedAt
   }
 }
+mutation CreateTextAutocomplete(
+  $input: CreateTextAutocompleteInput!
+  $condition: ModelTextAutocompleteConditionInput
+) {
+  createTextAutocomplete(input: $input, condition: $condition) {
+    id
+    type
+    text
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+mutation UpdateTextAutocomplete(
+  $input: UpdateTextAutocompleteInput!
+  $condition: ModelTextAutocompleteConditionInput
+) {
+  updateTextAutocomplete(input: $input, condition: $condition) {
+    id
+    type
+    text
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+mutation DeleteTextAutocomplete(
+  $input: DeleteTextAutocompleteInput!
+  $condition: ModelTextAutocompleteConditionInput
+) {
+  deleteTextAutocomplete(input: $input, condition: $condition) {
+    id
+    type
+    text
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
 mutation CreateUserSession(
   $input: CreateUserSessionInput!
   $condition: ModelUserSessionConditionInput

@@ -1,19 +1,19 @@
 /* tslint:disable */
 /* eslint-disable */
 //  This file was automatically generated and should not be edited.
-import { Injectable } from "@angular/core";
-import API, { graphqlOperation, GraphQLResult } from "@aws-amplify/api-graphql";
-import { Observable } from "zen-observable-ts";
+import {Injectable} from "@angular/core";
+import API, {graphqlOperation, GraphQLResult} from "@aws-amplify/api-graphql";
+import {Observable} from "zen-observable-ts";
 
 export interface SubscriptionResponse<T> {
-  value: GraphQLResult<T>;
+    value: GraphQLResult<T>;
 }
 
 export type CreateUserPreferencesInput = {
-  id?: string | null;
-  owner?: string | null;
-  prefs?: string | null;
-  _version?: number | null;
+    id?: string | null;
+    owner?: string | null;
+    prefs?: string | null;
+    _version?: number | null;
 };
 
 export type ModelUserPreferencesConditionInput = {
@@ -207,25 +207,75 @@ export type UpdateSavedGraphInput = {
   title?: string | null;
   state?: string | null;
   group?: string | null;
-  owner?: string | null;
-  createdAt?: string | null;
-  _version?: number | null;
+    owner?: string | null;
+    createdAt?: string | null;
+    _version?: number | null;
 };
 
 export type DeleteSavedGraphInput = {
-  id: string;
-  _version?: number | null;
+    id: string;
+    _version?: number | null;
+};
+
+export type CreateTextAutocompleteInput = {
+    id?: string | null;
+    type: string;
+    text: string;
+    group?: string | null;
+    owner?: string | null;
+    createdAt?: string | null;
+    _version?: number | null;
+};
+
+export type ModelTextAutocompleteConditionInput = {
+    type?: ModelStringInput | null;
+    text?: ModelStringInput | null;
+    group?: ModelStringInput | null;
+    owner?: ModelStringInput | null;
+    createdAt?: ModelStringInput | null;
+    and?: Array<ModelTextAutocompleteConditionInput | null> | null;
+    or?: Array<ModelTextAutocompleteConditionInput | null> | null;
+    not?: ModelTextAutocompleteConditionInput | null;
+};
+
+export type TextAutocomplete = {
+    __typename: "TextAutocomplete";
+    id?: string;
+    type?: string;
+    text?: string;
+    group?: string | null;
+    owner?: string | null;
+    createdAt?: string | null;
+    _version?: number;
+    _deleted?: boolean | null;
+    _lastChangedAt?: number;
+    updatedAt?: string;
+};
+
+export type UpdateTextAutocompleteInput = {
+    id: string;
+    type?: string | null;
+    text?: string | null;
+    group?: string | null;
+    owner?: string | null;
+    createdAt?: string | null;
+    _version?: number | null;
+};
+
+export type DeleteTextAutocompleteInput = {
+    id: string;
+    _version?: number | null;
 };
 
 export type CreateUserSessionInput = {
-  id?: string | null;
-  fingerprint?: string | null;
-  client?: string | null;
-  open: boolean;
-  group: string;
-  owner?: string | null;
-  ttl?: number | null;
-  createdAt?: string | null;
+    id?: string | null;
+    fingerprint?: string | null;
+    client?: string | null;
+    open: boolean;
+    group: string;
+    owner?: string | null;
+    ttl?: number | null;
+    createdAt?: string | null;
   sessionId?: string | null;
   _version?: number | null;
 };
@@ -560,25 +610,44 @@ export type ModelSavedGraphFilterInput = {
   createdAt?: ModelStringInput | null;
   and?: Array<ModelSavedGraphFilterInput | null> | null;
   or?: Array<ModelSavedGraphFilterInput | null> | null;
-  not?: ModelSavedGraphFilterInput | null;
+    not?: ModelSavedGraphFilterInput | null;
 };
 
 export type ModelSavedGraphConnection = {
-  __typename: "ModelSavedGraphConnection";
-  items?: Array<SavedGraph | null> | null;
-  nextToken?: string | null;
-  startedAt?: number | null;
+    __typename: "ModelSavedGraphConnection";
+    items?: Array<SavedGraph | null> | null;
+    nextToken?: string | null;
+    startedAt?: number | null;
+};
+
+export type ModelTextAutocompleteFilterInput = {
+    id?: ModelIDInput | null;
+    type?: ModelStringInput | null;
+    text?: ModelStringInput | null;
+    group?: ModelStringInput | null;
+    owner?: ModelStringInput | null;
+    createdAt?: ModelStringInput | null;
+    and?: Array<ModelTextAutocompleteFilterInput | null> | null;
+    or?: Array<ModelTextAutocompleteFilterInput | null> | null;
+    not?: ModelTextAutocompleteFilterInput | null;
+};
+
+export type ModelTextAutocompleteConnection = {
+    __typename: "ModelTextAutocompleteConnection";
+    items?: Array<TextAutocomplete | null> | null;
+    nextToken?: string | null;
+    startedAt?: number | null;
 };
 
 export type ModelUserSessionFilterInput = {
-  id?: ModelIDInput | null;
-  fingerprint?: ModelStringInput | null;
-  client?: ModelStringInput | null;
-  open?: ModelBooleanInput | null;
-  group?: ModelStringInput | null;
-  owner?: ModelStringInput | null;
-  ttl?: ModelIntInput | null;
-  createdAt?: ModelStringInput | null;
+    id?: ModelIDInput | null;
+    fingerprint?: ModelStringInput | null;
+    client?: ModelStringInput | null;
+    open?: ModelBooleanInput | null;
+    group?: ModelStringInput | null;
+    owner?: ModelStringInput | null;
+    ttl?: ModelIntInput | null;
+    createdAt?: ModelStringInput | null;
   sessionId?: ModelStringInput | null;
   and?: Array<ModelUserSessionFilterInput | null> | null;
   or?: Array<ModelUserSessionFilterInput | null> | null;
@@ -807,25 +876,67 @@ export type DeleteSavedGraphMutation = {
   id: string;
   type: string;
   title: string;
-  state: string;
-  group?: string | null;
-  owner?: string | null;
-  createdAt?: string | null;
-  _version: number;
-  _deleted?: boolean | null;
-  _lastChangedAt: number;
-  updatedAt: string;
+    state: string;
+    group?: string | null;
+    owner?: string | null;
+    createdAt?: string | null;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
+    updatedAt: string;
+};
+
+export type CreateTextAutocompleteMutation = {
+    __typename: "TextAutocomplete";
+    id: string;
+    type: string;
+    text: string;
+    group?: string | null;
+    owner?: string | null;
+    createdAt?: string | null;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
+    updatedAt: string;
+};
+
+export type UpdateTextAutocompleteMutation = {
+    __typename: "TextAutocomplete";
+    id: string;
+    type: string;
+    text: string;
+    group?: string | null;
+    owner?: string | null;
+    createdAt?: string | null;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
+    updatedAt: string;
+};
+
+export type DeleteTextAutocompleteMutation = {
+    __typename: "TextAutocomplete";
+    id: string;
+    type: string;
+    text: string;
+    group?: string | null;
+    owner?: string | null;
+    createdAt?: string | null;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
+    updatedAt: string;
 };
 
 export type CreateUserSessionMutation = {
-  __typename: "UserSession";
-  id: string;
-  fingerprint?: string | null;
-  client?: string | null;
-  open: boolean;
-  group: string;
-  owner?: string | null;
-  ttl?: number | null;
+    __typename: "UserSession";
+    id: string;
+    fingerprint?: string | null;
+    client?: string | null;
+    open: boolean;
+    group: string;
+    owner?: string | null;
+    ttl?: number | null;
   createdAt?: string | null;
   sessionId?: string | null;
   _version: number;
@@ -1218,26 +1329,78 @@ export type SyncSavedGraphsQuery = {
     title: string;
     state: string;
     group?: string | null;
+      owner?: string | null;
+      createdAt?: string | null;
+      _version: number;
+      _deleted?: boolean | null;
+      _lastChangedAt: number;
+      updatedAt: string;
+  } | null> | null;
+    nextToken?: string | null;
+    startedAt?: number | null;
+};
+
+export type GetTextAutocompleteQuery = {
+    __typename: "TextAutocomplete";
+    id: string;
+    type: string;
+    text: string;
+    group?: string | null;
     owner?: string | null;
     createdAt?: string | null;
     _version: number;
     _deleted?: boolean | null;
     _lastChangedAt: number;
     updatedAt: string;
-  } | null> | null;
-  nextToken?: string | null;
-  startedAt?: number | null;
+};
+
+export type ListTextAutocompletesQuery = {
+    __typename: "ModelTextAutocompleteConnection";
+    items?: Array<{
+        __typename: "TextAutocomplete";
+        id: string;
+        type: string;
+        text: string;
+        group?: string | null;
+        owner?: string | null;
+        createdAt?: string | null;
+        _version: number;
+        _deleted?: boolean | null;
+        _lastChangedAt: number;
+        updatedAt: string;
+    } | null> | null;
+    nextToken?: string | null;
+    startedAt?: number | null;
+};
+
+export type SyncTextAutocompletesQuery = {
+    __typename: "ModelTextAutocompleteConnection";
+    items?: Array<{
+        __typename: "TextAutocomplete";
+        id: string;
+        type: string;
+        text: string;
+        group?: string | null;
+        owner?: string | null;
+        createdAt?: string | null;
+        _version: number;
+        _deleted?: boolean | null;
+        _lastChangedAt: number;
+        updatedAt: string;
+    } | null> | null;
+    nextToken?: string | null;
+    startedAt?: number | null;
 };
 
 export type GetUserSessionQuery = {
-  __typename: "UserSession";
-  id: string;
-  fingerprint?: string | null;
-  client?: string | null;
-  open: boolean;
-  group: string;
-  owner?: string | null;
-  ttl?: number | null;
+    __typename: "UserSession";
+    id: string;
+    fingerprint?: string | null;
+    client?: string | null;
+    open: boolean;
+    group: string;
+    owner?: string | null;
+    ttl?: number | null;
   createdAt?: string | null;
   sessionId?: string | null;
   _version: number;
@@ -1641,25 +1804,67 @@ export type OnDeleteSavedGraphSubscription = {
   id: string;
   type: string;
   title: string;
-  state: string;
-  group?: string | null;
-  owner?: string | null;
-  createdAt?: string | null;
-  _version: number;
-  _deleted?: boolean | null;
-  _lastChangedAt: number;
-  updatedAt: string;
+    state: string;
+    group?: string | null;
+    owner?: string | null;
+    createdAt?: string | null;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
+    updatedAt: string;
+};
+
+export type OnCreateTextAutocompleteSubscription = {
+    __typename: "TextAutocomplete";
+    id: string;
+    type: string;
+    text: string;
+    group?: string | null;
+    owner?: string | null;
+    createdAt?: string | null;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
+    updatedAt: string;
+};
+
+export type OnUpdateTextAutocompleteSubscription = {
+    __typename: "TextAutocomplete";
+    id: string;
+    type: string;
+    text: string;
+    group?: string | null;
+    owner?: string | null;
+    createdAt?: string | null;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
+    updatedAt: string;
+};
+
+export type OnDeleteTextAutocompleteSubscription = {
+    __typename: "TextAutocomplete";
+    id: string;
+    type: string;
+    text: string;
+    group?: string | null;
+    owner?: string | null;
+    createdAt?: string | null;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
+    updatedAt: string;
 };
 
 export type OnCreateUserSessionSubscription = {
-  __typename: "UserSession";
-  id: string;
-  fingerprint?: string | null;
-  client?: string | null;
-  open: boolean;
-  group: string;
-  owner?: string | null;
-  ttl?: number | null;
+    __typename: "UserSession";
+    id: string;
+    fingerprint?: string | null;
+    client?: string | null;
+    open: boolean;
+    group: string;
+    owner?: string | null;
+    ttl?: number | null;
   createdAt?: string | null;
   sessionId?: string | null;
   _version: number;
@@ -2209,21 +2414,80 @@ export class APIService {
         }
       }`;
     const gqlAPIServiceArguments: any = {
-      input
+        input
     };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <DeleteSavedGraphMutation>response.data.deleteSavedGraph;
+      if (condition) {
+          gqlAPIServiceArguments.condition = condition;
+      }
+      const response = (await API.graphql(
+          graphqlOperation(statement, gqlAPIServiceArguments)
+      )) as any;
+      return <DeleteSavedGraphMutation>response.data.deleteSavedGraph;
   }
-  async CreateUserSession(
-    input: CreateUserSessionInput,
-    condition?: ModelUserSessionConditionInput
-  ): Promise<CreateUserSessionMutation> {
-    const statement = `mutation CreateUserSession($input: CreateUserSessionInput!, $condition: ModelUserSessionConditionInput) {
+
+    OnCreateTextAutocompleteListener: Observable<SubscriptionResponse<OnCreateTextAutocompleteSubscription>> = API.graphql(
+        graphqlOperation(
+            `subscription OnCreateTextAutocomplete {
+        onCreateTextAutocomplete {
+          __typename
+          id
+          type
+          text
+          group
+          owner
+          createdAt
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
+        }
+      }`
+        )
+    ) as Observable<SubscriptionResponse<OnCreateTextAutocompleteSubscription>>;
+    OnUpdateTextAutocompleteListener: Observable<SubscriptionResponse<OnUpdateTextAutocompleteSubscription>> = API.graphql(
+        graphqlOperation(
+            `subscription OnUpdateTextAutocomplete {
+        onUpdateTextAutocomplete {
+          __typename
+          id
+          type
+          text
+          group
+          owner
+          createdAt
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
+        }
+      }`
+        )
+    ) as Observable<SubscriptionResponse<OnUpdateTextAutocompleteSubscription>>;
+    OnDeleteTextAutocompleteListener: Observable<SubscriptionResponse<OnDeleteTextAutocompleteSubscription>> = API.graphql(
+        graphqlOperation(
+            `subscription OnDeleteTextAutocomplete {
+        onDeleteTextAutocomplete {
+          __typename
+          id
+          type
+          text
+          group
+          owner
+          createdAt
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
+        }
+      }`
+        )
+    ) as Observable<SubscriptionResponse<OnDeleteTextAutocompleteSubscription>>;
+
+    async CreateUserSession(
+        input: CreateUserSessionInput,
+        condition?: ModelUserSessionConditionInput
+    ): Promise<CreateUserSessionMutation> {
+        const statement = `mutation CreateUserSession($input: CreateUserSessionInput!, $condition: ModelUserSessionConditionInput) {
         createUserSession(input: $input, condition: $condition) {
           __typename
           id
@@ -3097,18 +3361,112 @@ export class APIService {
       gqlAPIServiceArguments.limit = limit;
     }
     if (nextToken) {
-      gqlAPIServiceArguments.nextToken = nextToken;
+        gqlAPIServiceArguments.nextToken = nextToken;
     }
-    if (lastSync) {
-      gqlAPIServiceArguments.lastSync = lastSync;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <SyncSavedGraphsQuery>response.data.syncSavedGraphs;
+      if (lastSync) {
+          gqlAPIServiceArguments.lastSync = lastSync;
+      }
+      const response = (await API.graphql(
+          graphqlOperation(statement, gqlAPIServiceArguments)
+      )) as any;
+      return <SyncSavedGraphsQuery>response.data.syncSavedGraphs;
   }
-  async GetUserSession(id: string): Promise<GetUserSessionQuery> {
-    const statement = `query GetUserSession($id: ID!) {
+
+    async CreateTextAutocomplete(
+        input: CreateTextAutocompleteInput,
+        condition?: ModelTextAutocompleteConditionInput
+    ): Promise<CreateTextAutocompleteMutation> {
+        const statement = `mutation CreateTextAutocomplete($input: CreateTextAutocompleteInput!, $condition: ModelTextAutocompleteConditionInput) {
+        createTextAutocomplete(input: $input, condition: $condition) {
+          __typename
+          id
+          type
+          text
+          group
+          owner
+          createdAt
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
+        }
+      }`;
+        const gqlAPIServiceArguments: any = {
+            input
+        };
+        if (condition) {
+            gqlAPIServiceArguments.condition = condition;
+        }
+        const response = (await API.graphql(
+            graphqlOperation(statement, gqlAPIServiceArguments)
+        )) as any;
+        return <CreateTextAutocompleteMutation>response.data.createTextAutocomplete;
+    }
+
+    async UpdateTextAutocomplete(
+        input: UpdateTextAutocompleteInput,
+        condition?: ModelTextAutocompleteConditionInput
+    ): Promise<UpdateTextAutocompleteMutation> {
+        const statement = `mutation UpdateTextAutocomplete($input: UpdateTextAutocompleteInput!, $condition: ModelTextAutocompleteConditionInput) {
+        updateTextAutocomplete(input: $input, condition: $condition) {
+          __typename
+          id
+          type
+          text
+          group
+          owner
+          createdAt
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
+        }
+      }`;
+        const gqlAPIServiceArguments: any = {
+            input
+        };
+        if (condition) {
+            gqlAPIServiceArguments.condition = condition;
+        }
+        const response = (await API.graphql(
+            graphqlOperation(statement, gqlAPIServiceArguments)
+        )) as any;
+        return <UpdateTextAutocompleteMutation>response.data.updateTextAutocomplete;
+    }
+
+    async DeleteTextAutocomplete(
+        input: DeleteTextAutocompleteInput,
+        condition?: ModelTextAutocompleteConditionInput
+    ): Promise<DeleteTextAutocompleteMutation> {
+        const statement = `mutation DeleteTextAutocomplete($input: DeleteTextAutocompleteInput!, $condition: ModelTextAutocompleteConditionInput) {
+        deleteTextAutocomplete(input: $input, condition: $condition) {
+          __typename
+          id
+          type
+          text
+          group
+          owner
+          createdAt
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
+        }
+      }`;
+        const gqlAPIServiceArguments: any = {
+            input
+        };
+        if (condition) {
+            gqlAPIServiceArguments.condition = condition;
+        }
+        const response = (await API.graphql(
+            graphqlOperation(statement, gqlAPIServiceArguments)
+        )) as any;
+        return <DeleteTextAutocompleteMutation>response.data.deleteTextAutocomplete;
+    }
+
+    async GetUserSession(id: string): Promise<GetUserSessionQuery> {
+        const statement = `query GetUserSession($id: ID!) {
         getUserSession(id: $id) {
           __typename
           id
@@ -3921,11 +4279,120 @@ export class APIService {
     )
   ) as Observable<SubscriptionResponse<OnDeleteSavedGraphSubscription>>;
 
-  OnCreateUserSessionListener: Observable<
-    SubscriptionResponse<OnCreateUserSessionSubscription>
-  > = API.graphql(
-    graphqlOperation(
-      `subscription OnCreateUserSession {
+    async GetTextAutocomplete(id: string): Promise<GetTextAutocompleteQuery> {
+        const statement = `query GetTextAutocomplete($id: ID!) {
+        getTextAutocomplete(id: $id) {
+          __typename
+          id
+          type
+          text
+          group
+          owner
+          createdAt
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
+        }
+      }`;
+        const gqlAPIServiceArguments: any = {
+            id
+        };
+        const response = (await API.graphql(
+            graphqlOperation(statement, gqlAPIServiceArguments)
+        )) as any;
+        return <GetTextAutocompleteQuery>response.data.getTextAutocomplete;
+    }
+
+    async ListTextAutocompletes(
+        filter?: ModelTextAutocompleteFilterInput,
+        limit?: number,
+        nextToken?: string
+    ): Promise<ListTextAutocompletesQuery> {
+        const statement = `query ListTextAutocompletes($filter: ModelTextAutocompleteFilterInput, $limit: Int, $nextToken: String) {
+        listTextAutocompletes(filter: $filter, limit: $limit, nextToken: $nextToken) {
+          __typename
+          items {
+            __typename
+            id
+            type
+            text
+            group
+            owner
+            createdAt
+            _version
+            _deleted
+            _lastChangedAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+        const gqlAPIServiceArguments: any = {};
+        if (filter) {
+            gqlAPIServiceArguments.filter = filter;
+        }
+        if (limit) {
+            gqlAPIServiceArguments.limit = limit;
+        }
+        if (nextToken) {
+            gqlAPIServiceArguments.nextToken = nextToken;
+        }
+        const response = (await API.graphql(
+            graphqlOperation(statement, gqlAPIServiceArguments)
+        )) as any;
+        return <ListTextAutocompletesQuery>response.data.listTextAutocompletes;
+    }
+
+    async SyncTextAutocompletes(
+        filter?: ModelTextAutocompleteFilterInput,
+        limit?: number,
+        nextToken?: string,
+        lastSync?: number
+    ): Promise<SyncTextAutocompletesQuery> {
+        const statement = `query SyncTextAutocompletes($filter: ModelTextAutocompleteFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
+        syncTextAutocompletes(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
+          __typename
+          items {
+            __typename
+            id
+            type
+            text
+            group
+            owner
+            createdAt
+            _version
+            _deleted
+            _lastChangedAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+        const gqlAPIServiceArguments: any = {};
+        if (filter) {
+            gqlAPIServiceArguments.filter = filter;
+        }
+        if (limit) {
+            gqlAPIServiceArguments.limit = limit;
+        }
+        if (nextToken) {
+            gqlAPIServiceArguments.nextToken = nextToken;
+        }
+        if (lastSync) {
+            gqlAPIServiceArguments.lastSync = lastSync;
+        }
+        const response = (await API.graphql(
+            graphqlOperation(statement, gqlAPIServiceArguments)
+        )) as any;
+        return <SyncTextAutocompletesQuery>response.data.syncTextAutocompletes;
+    }
+
+    OnCreateUserSessionListener: Observable<SubscriptionResponse<OnCreateUserSessionSubscription>> = API.graphql(
+        graphqlOperation(
+            `subscription OnCreateUserSession {
         onCreateUserSession {
           __typename
           id

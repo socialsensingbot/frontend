@@ -240,6 +240,70 @@ query SyncSavedGraphs(
     startedAt
   }
 }
+query GetTextAutocomplete($id: ID!) {
+  getTextAutocomplete(id: $id) {
+    id
+    type
+    text
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+query ListTextAutocompletes(
+  $filter: ModelTextAutocompleteFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listTextAutocompletes(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      type
+      text
+      group
+      owner
+      createdAt
+      _version
+      _deleted
+      _lastChangedAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
+query SyncTextAutocompletes(
+  $filter: ModelTextAutocompleteFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncTextAutocompletes(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      type
+      text
+      group
+      owner
+      createdAt
+      _version
+      _deleted
+      _lastChangedAt
+      updatedAt
+    }
+    nextToken
+    startedAt
+  }
+}
 query GetUserSession($id: ID!) {
   getUserSession(id: $id) {
     id
