@@ -126,10 +126,9 @@
             "sg-c0f105a1"
           ],
           "SubnetIds": [
-            "subnet-6a99e303",
-            "subnet-2c6abf60",
-            "subnet-bbb234c1",
-            "subnet-051fc0ec284508668"
+            "subnet-059feecab2c5b0b44",
+            "subnet-01e25f6a5adc97b59",
+            "subnet-009748954dbfc8cd6"
           ]
         }
       }

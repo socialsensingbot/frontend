@@ -28,7 +28,7 @@
         },
         "mvrefresh": {
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
-          "s3Key": "amplify-builds/mvrefresh-434856492f4977414c52-build.zip"
+          "s3Key": "amplify-builds/mvrefresh-31684a543069706a6546-build.zip"
         },
         "twitterCompliance": {
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
@@ -130,6 +130,49 @@
         "query": {
           "deploymentBucketName": "amplify-socialsensing-pwsdemo-155623-deployment",
           "s3Key": "amplify-builds/query-7930785a5249426d7044-build.zip"
+        }
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "dtmxl3q3i7oix",
+          "type": "cicd"
+        }
+      }
+    }
+  },
+  "test": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-socialsensing-test-151705-authRole",
+      "UnauthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-test-151705-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-test-151705-authRole",
+      "Region": "eu-west-2",
+      "DeploymentBucketName": "amplify-socialsensing-test-151705-deployment",
+      "UnauthRoleName": "amplify-socialsensing-test-151705-unauthRole",
+      "StackName": "amplify-socialsensing-test-151705",
+      "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-test-151705/47ba2900-0fe6-11ec-9580-0a2c5646913c",
+      "AmplifyAppId": "dtmxl3q3i7oix"
+    },
+    "categories": {
+      "auth": {
+        "socialsensingf07a871c": {},
+        "userPoolGroups": {}
+      },
+      "function": {
+        "S3Triggerb3a090e2": {
+          "deploymentBucketName": "amplify-socialsensing-test-151705-deployment",
+          "s3Key": "amplify-builds/S3Triggerb3a090e2-34614f6e574c74506878-build.zip"
+        },
+        "query": {
+          "deploymentBucketName": "amplify-socialsensing-test-151705-deployment",
+          "s3Key": "amplify-builds/query-4d63623776326f425a72-build.zip"
+        },
+        "mvrefresh": {
+          "deploymentBucketName": "amplify-socialsensing-test-151705-deployment",
+          "s3Key": "amplify-builds/mvrefresh-31684a543069706a6546-build.zip"
+        },
+        "twitterCompliance": {
+          "deploymentBucketName": "amplify-socialsensing-test-151705-deployment",
+          "s3Key": "amplify-builds/twitterCompliance-59714c566c5842575450-build.zip"
         }
       },
       "hosting": {
