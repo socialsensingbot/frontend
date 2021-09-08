@@ -91,5 +91,7 @@ exports.handler = async (event) => {
                       });
         }
     }
+    connection.commit();
+
 
 };
