@@ -837,7 +837,7 @@ export class MapComponent implements OnInit, OnDestroy {
     /**
      * Mouse click event.
      */
-    private featureClicked(e: LeafletMouseEvent) {
+    private async featureClicked(e: LeafletMouseEvent) {
         log.debug("featureClicked()");
         log.debug(e.target.feature.properties.name);
         if (this.isMultiSelect(e)) {
@@ -846,9 +846,9 @@ export class MapComponent implements OnInit, OnDestroy {
             this._geojson[this.activeStatistic].resetStyle(e.propagatedFrom);
             this.selection.selectOnly(e.target.feature);
         }
-        this.updateSearch({selected: this.selection.regionNames()});
+        await this.updateSearch({selected: this.selection.regionNames()});
         this.selectedFeatureNames = this.selection.regionNames();
-        this.updateTwitterPanel();
+        await this.updateTwitterPanel();
         if (this.selection.isSelected(e.target.feature)) {
             this.highlight(e.target, 3);
         } else {
@@ -1076,9 +1076,9 @@ export class MapComponent implements OnInit, OnDestroy {
      */
     private async updateTwitter() {
         log.debug("updateTwitter()");
-        await this._exec.queue("Update Twitter", ["ready"], () => {
+        await this._exec.queue("Update Twitter", ["ready"], async () => {
             // this.selectedRegion.toggle(this._clicked.target.feature.properties.name,this._clicked.target.feature.geometry);
-            this.updateTwitterPanel();
+            await this.updateTwitterPanel();
         }, "", false, true, true);
     }
 
