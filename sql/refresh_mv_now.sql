@@ -1,3 +1,5 @@
+# https://fromdual.com/mysql-materialized-views
+
 DROP PROCEDURE refresh_mv_now;
 
 DELIMITER $$
@@ -13,6 +15,7 @@ BEGIN
         END;
 
 
+    DROP TABLE IF EXISTS mat_view_regions_and_layers_new;
     CREATE TABLE mat_view_regions_and_layers_new LIKE mat_view_regions_and_layers;
 
     START TRANSACTION;
@@ -31,7 +34,7 @@ BEGIN
       AND NOT deleted;
     COMMIT;
 
-    DROP TABLE mat_view_regions_and_layers_old;
+    DROP TABLE IF EXISTS mat_view_regions_and_layers_old;
 
 
     SET rc = 0;
