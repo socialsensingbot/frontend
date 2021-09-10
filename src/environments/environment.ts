@@ -25,40 +25,52 @@ const defaultDashboard: Dashboard = {
 };
 
 const layerGroups: LayerGroupsConfiguration = {
-    groups:  {
-        "flood-only":          {
+    groups:            [
+        {
+            "id":       "flood-only",
             "title":    "Floods",
             "sources":  ["twitter"],
             "hazards":  ["flood"],
             "warnings": "exclude",
         },
-        "flood-with-warnings": {
+        {
+            "id":       "flood-with-warnings",
             "title":    "Floods (includes warnings)",
             "sources":  ["twitter"],
             "hazards":  ["flood"],
             "warnings": "include"
         },
-        "flood-warnings-only": {
-            "title":    "Floods (includes warnings)",
+        {
+            "id":       "flood-warnings-only",
+            "title":    "Floods (only warnings)",
             "sources":  ["twitter"],
             "hazards":  ["flood"],
             "warnings": "only"
         },
-        "wind-only":           {
+        {
+            "id":       "wind-only",
             "title":    "Wind",
             "sources":  ["twitter"],
-            "hazards":  ["flood"],
+            "hazards":  ["wind"],
             "warnings": "exclude"
         },
-        "snow-only":           {
+        {
+            "id":       "wind-and-flood",
+            "title":    "Wind & Flood",
+            "sources":  ["twitter"],
+            "hazards":  ["wind", "flood"],
+            "warnings": "exclude"
+        },
+        {
+            "id":       "snow-only",
             "title":    "Snow",
             "sources":  ["twitter"],
-            "hazards":  ["flood"],
+            "hazards":  ["flosnowod"],
             "warnings": "exclude"
         },
 
-    },
-    default: "flood-only"
+    ],
+    defaultLayerGroup: "flood-only"
 };
 
 export const environment = {

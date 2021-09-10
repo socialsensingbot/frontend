@@ -1,5 +1,6 @@
 export interface LayerGroup {
     title: string;
+    id: string;
     sources: string[];
     hazards: string[];
     warnings: "include" | "exclude" | "only";
@@ -10,6 +11,6 @@ export interface LayerGroupsMap {
 }
 
 export interface LayerGroupsConfiguration {
-    groups: LayerGroupsMap;
-    default: string;
+    groups: LayerGroup[];
+    defaultLayerGroup: string;
 }
