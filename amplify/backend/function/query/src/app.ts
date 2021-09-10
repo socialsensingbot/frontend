@@ -303,6 +303,19 @@ module.exports = (connection, twitter: TwitterApi) => {
 
     });
 
+    const warningsValues = (warning: string) => {
+        if (warning === "only") {
+            return [1, 1];
+        }
+        if (warning === "include") {
+            return [0, 1];
+        }
+        if (warning === "exclude") {
+            return [0, 0];
+        }
+        throw new Error("Unrecognized warning option: " + warning);
+    };
+
     app.post("/map/:map/region-type/:regionType/text-for-regions", async (req, res) => {
         const start = Math.floor(req.body.startDate / 1000);
         const lastDate: Date = (await maps)[req.params.map].last_date;
@@ -321,20 +334,24 @@ module.exports = (connection, twitter: TwitterApi) => {
                                   // language=MySQL
                                   sql: `select t.source_json            as json,
                                                t.source_html            as html,
-                                               t.source_timestamp       as timestamp,
-                                               t.source_id              as id,
+                                               r.source_timestamp       as timestamp,
+                                               r.source_id              as id,
                                                ST_AsGeoJSON(t.location) as location,
-                                               v.region                 as region
+                                               r.region                 as region
                                         FROM live_text t,
-                                             mat_view_regions_and_layers v
-                                        WHERE t.source = v.source
-                                          and t.source_id = v.source_id
-                                          and v.region_type = ?
-                                          and v.region in (?)
-                                          and v.layer_group_id = ?
-                                          and floor((? - unix_timestamp(t.source_timestamp)) / ?) = 0
-                                        order by t.source_timestamp desc    `,
-                                  values: [req.params.regionType, req.body.regions, req.body.layerGroup,
+                                             mat_view_regions r
+                                        WHERE t.source = r.source
+                                          and t.source_id = r.source_id
+                                          and t.hazard = r.hazard
+                                          and r.region_type = ?
+                                          and r.region in (?)
+                                          and r.hazard IN (?)
+                                          and r.source IN (?)
+                                          and r.warning IN (?)
+                                          and floor((? - unix_timestamp(r.source_timestamp)) / ?) = 0
+                                        order by r.source_timestamp desc    `,
+                                  values: [req.params.regionType, req.body.regions, req.body.hazards, req.body.sources,
+                                           warningsValues(req.body.warnings),
                                            end, periodLengthInSeconds]
                               })).map(i => {
                 i.json = JSON.parse(i.json);
@@ -429,23 +446,22 @@ module.exports = (connection, twitter: TwitterApi) => {
         cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
             const rows = await sql({
                                        // language=MySQL
-                                       sql:    `select tr.region as region, count(*) as count
+                                       sql:    `select r.region as region, count(*) as count
                                                 FROM live_text t,
-                                                     live_text_regions tr,
-                                                     ref_map_layer_groups_mapping lgm,
-                                                     ref_map_layers l
-                                                WHERE t.source = l.source
-                                                  and t.hazard = l.hazard
-                                                  and l.id = lgm.layer_id
-                                                  and tr.source = t.source
-                                                  and tr.source_id = t.source_id
-                                                  and tr.region_type = ?
-                                                  and lgm.layer_group_id = ?
-                                                  and t.source_timestamp between ? and ?
-                                                group by tr.region
+                                                     mat_view_regions r
+                                                WHERE t.source = r.source
+                                                  and t.hazard = r.hazard
+                                                  and r.source_id = t.source_id
+                                                  and r.region_type = ?
+                                                  and r.source_timestamp between ? and ?
+                                                  and r.hazard IN (?)
+                                                  and r.source IN (?)
+                                                  and r.warning IN (?)
+                                                group by r.region
                                                `,
                                        values: [req.params.regionType, req.body.layerGroup, new Date(req.body.startDate),
-                                                new Date(endDate)]
+                                                new Date(endDate), req.body.hazards, req.body.sources,
+                                                warningsValues(req.body.warnings),]
                                    });
             const result = {};
             for (const row of rows) {
@@ -551,28 +567,36 @@ module.exports = (connection, twitter: TwitterApi) => {
                                        // language=MySQL
                                        sql:    `select (select exceedance
                                                         from (SELECT count(*)                                            as count,
-                                                                     floor((? - unix_timestamp(v.source_timestamp)) / ?) as period,
+                                                                     floor((? - unix_timestamp(r.source_timestamp)) / ?) as period,
                                                                      cume_dist() OVER w * 100.0                          as exceedance
-                                                              FROM mat_view_regions_and_layers v
-                                                              WHERE v.layer_group_id = ?
-                                                                and v.region_type = ?
-                                                                and v.region = regions.region
+                                                              FROM mat_view_regions r
+                                                              WHERE r.region_type = ?
+                                                                and r.region = regions.region
+                                                                and r.hazard IN (?)
+                                                                and r.source IN (?)
+                                                                and r.warning IN (?)
                                                               group by period
                                                                   WINDOW w AS (ORDER BY COUNT(period) desc))
                                                                  as x
                                                         where period = 0) as exceedance,
                                                        (SELECT count(*) as count
-                                                        FROM mat_view_regions_and_layers v
-                                                        WHERE v.layer_group_id = ?
-                                                          and v.region_type = ?
-                                                          and v.region = regions.region
-                                                          and floor((? - unix_timestamp(v.source_timestamp)) / ?) = 0
+                                                        FROM mat_view_regions r
+                                                        WHERE r.region_type = ?
+                                                          and r.region = regions.region
+                                                          and r.hazard IN (?)
+                                                          and r.source IN (?)
+                                                          and r.warning IN (?)
+                                                          and floor((? - unix_timestamp(r.source_timestamp)) / ?) = 0
                                                        )                  as count,
                                                        regions.region     as region
                                                 from (select distinct region_id as region from ref_map_regions where region_type_id = ?) as regions
                                                `,
-                                       values: [end, periodLengthInSeconds, req.body.layerGroup, req.params.regionType,
-                                                req.body.layerGroup, req.params.regionType, end, periodLengthInSeconds,
+                                       values: [end, periodLengthInSeconds,
+                                                req.params.regionType, req.body.hazards, req.body.sources,
+                                                warningsValues(req.body.warnings),
+                                                req.params.regionType, req.body.hazards, req.body.sources,
+                                                warningsValues(req.body.warnings),
+                                                end, periodLengthInSeconds,
                                                 req.params.regionType
                                        ]
                                    });

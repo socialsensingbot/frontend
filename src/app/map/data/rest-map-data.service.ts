@@ -25,6 +25,7 @@ import {
 } from "./map-data";
 import {RESTDataAPIService} from "../../api/rest-api.service";
 import {FeatureCollection} from "@amcharts/amcharts4-geodata/.internal/Geodata";
+import {LayerGroup} from "../../types";
 
 
 const log = new Logger("map-data");
@@ -106,13 +107,15 @@ export class RESTMapDataService {
 
     public async tweets(regionType: string, regions: string[], startDate,
                         endDate): Promise<Tweet[]> {
-
+        const layerGroup: LayerGroup = this.layerGroup(this._pref.combined.layerGroups.default);
         log.debug("requesting tweets for regions " + regions);
         const rawResult = await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/text-for-regions", {
-            layerGroup: this.mapMetadata.defaultLayerGroup,
+            hazards:   layerGroup.hazards,
+            sources:   layerGroup.sources,
+            warnings:  layerGroup.warnings,
             regions,
-            startDate:  roundToHour(startDate),
-            endDate:    roundToMinute(endDate)
+            startDate: roundToHour(startDate),
+            endDate:   roundToMinute(endDate)
 
         }, 0);
         log.debug(rawResult.length + " tweets back from server");
@@ -128,11 +131,13 @@ export class RESTMapDataService {
     }
 
     public async recentTweets(regionType: string): Promise<RegionTweeCount> {
-
+        const layerGroup: LayerGroup = this.layerGroup(this._pref.combined.layerGroups.default);
         return await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/recent-text-count", {
-            layerGroup: this.mapMetadata.defaultLayerGroup,
-            startDate:  roundToMinute(await this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000),
-            endDate:    roundToMinute(await this.now())
+            hazards:   layerGroup.hazards,
+            sources:   layerGroup.sources,
+            warnings:  layerGroup.warnings,
+            startDate: roundToMinute(await this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000),
+            endDate:   roundToMinute(await this.now())
 
         }) as Promise<RegionTweeCount>;
     }
@@ -345,11 +350,18 @@ export class RESTMapDataService {
 
     }
 
+    private layerGroup(id: string): LayerGroup {
+        return this._pref.combined.layerGroups.groups[id];
+    }
+
     private async getRegionStatsMap(regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {
+        const layerGroup: LayerGroup = this.layerGroup(this._pref.combined.layerGroups.default);
         const statsMap = await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/stats", {
-            layerGroup: this.mapMetadata.defaultLayerGroup,
-            startDate:  roundToHour(startDate),
-            endDate:    roundToHour(endDate)
+            hazards:   layerGroup.hazards,
+            sources:   layerGroup.sources,
+            warnings:  layerGroup.warnings,
+            startDate: roundToHour(startDate),
+            endDate:   roundToHour(endDate)
 
         }, 600) as RegionStatsMap;
         return statsMap;

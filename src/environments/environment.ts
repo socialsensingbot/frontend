@@ -1,3 +1,4 @@
+/* tslint:disable:object-literal-key-quotes */
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
@@ -11,16 +12,53 @@ import {Dashboard} from "../app/pref/dashboard.service";
  * on performance if an error is thrown.
  */
 import "zone.js/dist/zone-error"; // Included with Angular CLI.
-import {v4 as uuidv4} from "uuid";
+import {LayerGroupsConfiguration} from "../app/types";
 
 const defaultDashboard: Dashboard = {
-  boards: [{
-    deviceType: "all",
-    pages:      [{
-      title: "First Page",
-      cards: []
+    boards: [{
+        deviceType: "all",
+        pages:      [{
+            title: "First Page",
+            cards: []
+        }]
     }]
-  }]
+};
+
+const layerGroups: LayerGroupsConfiguration = {
+    groups:  {
+        "flood-only":          {
+            "title":    "Floods",
+            "sources":  ["twitter"],
+            "hazards":  ["flood"],
+            "warnings": "exclude",
+        },
+        "flood-with-warnings": {
+            "title":    "Floods (includes warnings)",
+            "sources":  ["twitter"],
+            "hazards":  ["flood"],
+            "warnings": "include"
+        },
+        "flood-warnings-only": {
+            "title":    "Floods (includes warnings)",
+            "sources":  ["twitter"],
+            "hazards":  ["flood"],
+            "warnings": "only"
+        },
+        "wind-only":           {
+            "title":    "Wind",
+            "sources":  ["twitter"],
+            "hazards":  ["flood"],
+            "warnings": "exclude"
+        },
+        "snow-only":           {
+            "title":    "Snow",
+            "sources":  ["twitter"],
+            "hazards":  ["flood"],
+            "warnings": "exclude"
+        },
+
+    },
+    default: "flood-only"
 };
 
 export const environment = {
@@ -32,7 +70,7 @@ export const environment = {
     hmr:              false,
     rollbar:          false,
     toolbarColor:     "primary",
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    timezone:         Intl.DateTimeFormat().resolvedOptions().timeZone,
     // timezone:         "UTC",
     multipleSessions: true, // Can the user be logged into multiple devices/browsers at once?
     maxUsers:         -1, // can be -1 (no limit), 0 - no logins, 1 - single user at a time, n - n concurrent users.
@@ -42,7 +80,7 @@ export const environment = {
         password: ""
     },
 
-    impact:   {
+    impact: {
         // The ability to tag tweets with an impact annotation
         levels: [
             {title: "1 – Minimal", value: "minimal", color: "#43A047"},
@@ -51,7 +89,7 @@ export const environment = {
             {title: "4 - Severe", value: "severe", color: "#F4511E"}
         ]
     },
-    source:   {
+    source: {
         // The ability to tag tweets with a source
         types: [
             {title: "River", value: "river", color: "#43A047"},
@@ -74,11 +112,13 @@ export const environment = {
     availableDataSets:                   ["*"], // A list of datasets that will appear in the toolbar dropdown, or "*" for all.
     cacheProcessedTweets:                false,
     mapTileUrlTemplate:                  "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
-    defaultDashboard:                    defaultDashboard,
+    defaultDashboard,
+    layerGroups,
     blinkRateInMilliseconds:             1000,
-    // mapTileUrlTemplate:   "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"
-    newExceedanceCalc: false,
+    // mapTileUrlTemplate:
+    // "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"
+    newExceedanceCalc:            false,
     shareTextAutocompleteInGroup: true,
-    useRestMapData: true,
+    useRestMapData:               true,
 
 };
