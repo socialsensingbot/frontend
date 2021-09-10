@@ -65,7 +65,7 @@ const layerGroups: LayerGroupsConfiguration = {
             "id":       "snow-only",
             "title":    "Snow",
             "sources":  ["twitter"],
-            "hazards":  ["flosnowod"],
+            "hazards":  ["snow"],
             "warnings": "exclude"
         },
 
