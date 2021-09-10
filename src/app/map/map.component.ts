@@ -510,9 +510,9 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    private scheduleResetLayers(layer: string, clearSelected = true) {
+    private async scheduleResetLayers(layer: string, clearSelected = true) {
         log.debug("scheduleResetLayers()");
-        this._exec.queue("Reset Layers", ["ready"], async () => {
+        await this._exec.queue("Reset Layers", ["ready"], async () => {
             this.activity = true;
             await this.resetStatisticsLayer(layer, clearSelected);
             this.activity = false;
@@ -992,7 +992,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                               this._updating = true;
                                               try {
 
-                                                  this.scheduleResetLayers(this.activeStatistic, clearSelected);
+                                                  await this.scheduleResetLayers(this.activeStatistic, clearSelected);
                                                   await this.updateTwitterPanel();
                                               } finally {
                                                   this.activity = false;

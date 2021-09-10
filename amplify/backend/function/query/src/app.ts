@@ -6,6 +6,7 @@ import {QueryMetadataSets} from "./metdata";
 import * as NodeCache from "node-cache";
 import {AggregationMap, MapMetadata, RegionGeography, ServiceMetadata} from "./map-data";
 import {TwitterApi} from "twitter-api-v2";
+import {Pool} from "mysql";
 
 const awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
 
@@ -34,9 +35,16 @@ export const roundToMinute = (timestamp: number): any => {
     return date.getTime();
 };
 
+export const roundTo15Minute = (timestamp: number): any => {
+    const date: Date = new Date(timestamp);
+    date.setUTCMinutes(Math.floor(date.getUTCMinutes() / 15) * 15);
+    date.setUTCSeconds(0);
+    date.setUTCMilliseconds(0);
+    return date.getTime();
+};
 // Only set to disable the entire API, i.e. to protect the dev database from excessively long queries.
 const disabled = false;
-module.exports = (connection, twitter: TwitterApi) => {
+module.exports = (connection: Pool, twitter: TwitterApi) => {
 
 
     // declare a new express app
@@ -148,19 +156,29 @@ module.exports = (connection, twitter: TwitterApi) => {
     const sql = async (options: {
         sql: string;
         values?: any;
-    }): Promise<any[]> => {
+    }, tx = false): Promise<any[]> => {
         return new Promise((resolve, reject) => {
-            connection.query(options, (error, results) => {
-                if (error) {
-                    console.error(error);
-                    reject(error);
-                } else {
-                    let s: string = JSON.stringify(results);
-                    console.log(options.sql, options.values, s.substring(0, s.length > 1000 ? 1000 : s.length));
-                    console.log("Returned " + results.length + " rows");
-                    resolve(results);
+            connection.getConnection((err, poolConnection) => {
+                if (tx) {
+                    poolConnection.beginTransaction();
                 }
+                poolConnection.query(options, (error, results) => {
+                    if (error) {
+                        console.error(error);
+                        reject(error);
+                    } else {
+                        let s: string = JSON.stringify(results);
+                        console.log(options.sql, options.values, s.substring(0, s.length > 1000 ? 1000 : s.length));
+                        console.log("Returned " + results.length + " rows");
+                        resolve(results);
+                        if (tx) {
+                            poolConnection.commit();
+                        }
+                    }
+                    poolConnection.release();
+                });
             });
+
         });
     };
 
@@ -527,6 +545,24 @@ module.exports = (connection, twitter: TwitterApi) => {
     // dateFromMillis(req.body.endDate)] }); });
 
 
+    async function getCachedStats(end: number, periodLengthInSeconds: number, req): Promise<any[]> {
+        return await sql({
+                             // language=MySQL
+                             sql: `select *
+                                   from cache_stats_calc
+                                   where end_time = ?
+                                     and period_length = ?
+                                     and region_type = ?
+                                     and hazards = ?
+                                     and sources = ?
+                                     and warnings = ?`,
+                             values: [end, periodLengthInSeconds,
+                                      req.params.regionType, req.body.hazards.join(","), req.body.sources.join("?"),
+                                      req.body.warnings,
+                             ]
+                         });
+    }
+
     app.post("/map/:map/region-type/:regionType/stats", async (req, res) => {
 
         cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
@@ -561,45 +597,63 @@ module.exports = (connection, twitter: TwitterApi) => {
             console.debug("EndDate: " + new Date(endDate));
             console.debug("Start: " + new Date(start * 1000));
             console.debug("End: " + new Date(end * 1000));
+            let rows = await getCachedStats(end, periodLengthInSeconds, req);
+            if (rows.length === 0) {
+                // console.log("Test Values: ", testValues);
+                try {
+                    await sql({
+                                  // language=MySQL
+                                  sql: `insert into cache_stats_calc(exceedance, count, region, end_time, period_length, region_type,
+                                                                     hazards,
+                                                                     sources, warnings)
+                                        select (select exceedance
+                                                from (SELECT count(*)                                            as count,
+                                                             floor((? - unix_timestamp(r.source_timestamp)) / ?) as period,
+                                                             cume_dist() OVER w * 100.0                          as exceedance
 
-            // console.log("Test Values: ", testValues);
-            const rows = await sql({
-                                       // language=MySQL
-                                       sql:    `select (select exceedance
-                                                        from (SELECT count(*)                                            as count,
-                                                                     floor((? - unix_timestamp(r.source_timestamp)) / ?) as period,
-                                                                     cume_dist() OVER w * 100.0                          as exceedance
-                                                              FROM mat_view_regions r
-                                                              WHERE r.region_type = ?
-                                                                and r.region = regions.region
-                                                                and r.hazard IN (?)
-                                                                and r.source IN (?)
-                                                                and r.warning IN (?)
-                                                              group by period
-                                                                  WINDOW w AS (ORDER BY COUNT(period) desc))
-                                                                 as x
-                                                        where period = 0) as exceedance,
-                                                       (SELECT count(*) as count
-                                                        FROM mat_view_regions r
-                                                        WHERE r.region_type = ?
-                                                          and r.region = regions.region
-                                                          and r.hazard IN (?)
-                                                          and r.source IN (?)
-                                                          and r.warning IN (?)
-                                                          and floor((? - unix_timestamp(r.source_timestamp)) / ?) = 0
-                                                       )                  as count,
-                                                       regions.region     as region
-                                                from (select distinct region_id as region from ref_map_regions where region_type_id = ?) as regions
-                                               `,
-                                       values: [end, periodLengthInSeconds,
-                                                req.params.regionType, req.body.hazards, req.body.sources,
-                                                warningsValues(req.body.warnings),
-                                                req.params.regionType, req.body.hazards, req.body.sources,
-                                                warningsValues(req.body.warnings),
-                                                end, periodLengthInSeconds,
-                                                req.params.regionType
-                                       ]
-                                   });
+                                                      FROM mat_view_regions r
+                                                      WHERE r.region_type = ?
+                                                        and r.region = regions.region
+                                                        and r.hazard IN (?)
+                                                        and r.source IN (?)
+                                                        and r.warning IN (?)
+                                                      group by period
+                                                          WINDOW w AS (ORDER BY COUNT(period) desc))
+                                                         as x
+                                                where period = 0) as exceedance,
+                                               (SELECT count(*) as count
+                                                FROM mat_view_regions r
+                                                WHERE r.region_type = ?
+                                                  and r.region = regions.region
+                                                  and r.hazard IN (?)
+                                                  and r.source IN (?)
+                                                  and r.warning IN (?)
+                                                  and r.source_timestamp between ? and ?
+                                               )                  as count,
+                                               regions.region     as region,
+                                               ?                  as end_time,
+                                               ?                  as period_length,
+                                               ?                  as region_type,
+                                               ?                  as hazards,
+                                               ?                  as sources,
+                                               ?                  as warnings
+                                        from (select distinct region_id as region from ref_map_regions where region_type_id = ?) as regions`,
+                                  values: [end, periodLengthInSeconds,
+                                           req.params.regionType, req.body.hazards, req.body.sources,
+                                           warningsValues(req.body.warnings),
+                                           req.params.regionType, req.body.hazards, req.body.sources,
+                                           warningsValues(req.body.warnings),
+                                           new Date(req.body.startDate), new Date(req.body.endDate),
+                                           end, periodLengthInSeconds,
+                                           req.params.regionType, req.body.hazards.join(","), req.body.sources.join(","),
+                                           req.body.warnings, req.params.regionType
+                                  ]
+                              }, true);
+                } catch (e) {
+                    console.warn(e);
+                }
+                rows = await getCachedStats(end, periodLengthInSeconds, req);
+            }
 
             for (const row of rows) {
                 console.info("Fetching row ", row);
