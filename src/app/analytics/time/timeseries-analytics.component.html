@@ -2,10 +2,10 @@
   <ng-container *ngIf="ready">
     <mat-toolbar-row>
       <mat-button-toggle-group name="eoc" class="eoc"
-                               aria-label="Exceedance or Count" [(ngModel)]="state.eoc"
+                               [(ngModel)]="state.eoc" aria-label="Return Period or Count"
                                (valueChange)="eocChanged()">
-        <mat-button-toggle value="exceedance">Exceedance</mat-button-toggle>
-        <mat-button-toggle value="count">Count</mat-button-toggle>
+          <mat-button-toggle value="exceedance">Return Period</mat-button-toggle>
+          <mat-button-toggle value="count">Count</mat-button-toggle>
       </mat-button-toggle-group>
 
       <div class="app-toolbar-separator"></div>
@@ -15,19 +15,19 @@
         <mat-button-toggle value="bar">Bar</mat-button-toggle>
       </mat-button-toggle-group>
       <div class="app-toolbar-expanding-separator"></div>
-      <button mat-stroked-button color="primary" (click)="saveGraph();">Save</button>
+      <button mat-stroked-button class="app-analytics-timeseries-toolbar-save" color="primary" (click)="saveGraph();">Save</button>
       <div class="app-toolbar-separator"></div>
-      <button mat-stroked-button color="warn" routerLink="/analytics/time">New</button>
+      <button mat-stroked-button color="warn" routerLink="/analytics/time" [queryParams]="{__clear_ui__:true}" class="app-analytics-timeseries-toolbar-new">New</button>
       <ng-container *ngIf="this.graphId">
         <div class="app-toolbar-separator"></div>
         <button mat-stroked-button
-                (click)="saveGraph(true);">Duplicate
+                (click)="saveGraph(true);" class="app-analytics-timeseries-toolbar-duplicate">Duplicate
         </button>
       </ng-container>
 
       <div class="app-toolbar-separator"></div>
       <button mat-stroked-button *ngIf="this.pref.featureSupported('dashboard')"
-              (click)="addToDashboard()">Add to
+              (click)="addToDashboard()" class="app-analytics-timeseries-toolbar-add-to-dashboard">Add to
         Dashboard
       </button>
       <div class="app-toolbar-separator"></div>

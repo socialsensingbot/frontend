@@ -98,7 +98,7 @@ export abstract class StandardGraphComponent {
         this._changed = false;
         this.updating = true;
         try {
-            const serverResults = await this._api.callAPI("query", {
+            const serverResults = await this._api.callQueryAPI("query", {
                 ...this.query,
                 name:   this.restQueryName,
                 source: this.source,

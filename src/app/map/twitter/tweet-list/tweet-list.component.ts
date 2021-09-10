@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild} from "@angular/core";
 import {Tweet} from "../tweet";
 import {PreferenceService} from "../../../pref/preference.service";
-import {Hub, Logger} from "@aws-amplify/core";
+import {Logger} from "@aws-amplify/core";
 import * as $ from "jquery";
 import {IInfiniteScrollEvent} from "ngx-infinite-scroll";
 import {Subscription, timer} from "rxjs";
@@ -16,74 +16,74 @@ let loadTweets = false;
 
 setInterval(() => {
     // todo: the use of setTimeout is very brittle, revisit.
-    if ((window as any).twttr && (window as any).twttr.widgets) {
-        (window as any).twttr.widgets.load($("app-tweet-list")[0]);
-    }
+    // if ((window as any).twttr && (window as any).twttr.widgets) {
+    //     (window as any).twttr.widgets.load($("app-tweet-list")[0]);
+    // }
 
 }, 1000);
 
 let twitterBound = false;
 
 function twitterInit() {
-    if ((window as any).twttr && (window as any).twttr.events) {
-        (window as any).twttr.events.bind(
-            "rendered",
-            (event) => {
-                log.debug(event);
-                twitterBound = true;
-                loadTweets = false;
-                $(event.target).parents(".app-tweet-page").addClass("app-tweet-page-loaded");
-                Hub.dispatch("twitter-panel", {message: "render", event: "render", data: event.target});
-                const parent = $(event.target).parent();
-                const atr = $(event.target).parents(".app-tweet-row");
-
-                const blockquote = atr.find("blockquote");
-                blockquote.addClass("tweet-rendered");
-                window.setTimeout(() => {
-                    atr.addClass("app-tweet-row-animate-in");
-                    atr.removeClass("app-tweet-row-animate-out");
-                    setTimeout(() => {
-                        atr.addClass("app-tweet-row-rendered");
-                        atr.removeClass("app-tweet-row-animate-in");
-                        if (atr[0]) {
-                            localStorage.setItem("tweet:" + atr.attr("data-tweet-id"),
-                                                 JSON.stringify(
-                                                     {
-                                                         timestamp: Date.now(),
-                                                         html:      atr.find(".app-tweet-item-text").html()
-                                                     }));
-                        }
-                    }, 800);
-                    if (atr.find("blockquote.twitter-tweet-error").length > 0) {
-                        const error = atr.find("blockquote.twitter-tweet-error");
-                        error.find(".app-tweet-item-menu").hide();
-
-
-                        error.css("opacity", 1.0)
-                             .css("min-width", "516px")
-                             .css("display", "block")
-                             .css("text-align", "center");
-                        error.parent().addClass("app-tweet-item-card");
-
-                        error.text("Tweet no longer available");
-                        blockquote.removeClass("tweet-rendered");
-                    }
-                    try {
-                        if (atr.length > 0) {
-                            atr.find("mat-spinner").css("opacity", 0);
-                            atr.find(".app-tweet-item-menu").css("opacity", 1.0);
-                            // atr.find(".tweet-loading-placeholder").remove();
-                        }
-                    } catch (e) {
-                        log.debug(e);
-                    }
-                }, 10);
-
-            }
-        );
-    } else {
-        setTimeout(() => twitterInit(), 500);
-    }
+    // if ((window as any).twttr && (window as any).twttr.events) {
+    //     (window as any).twttr.events.bind(
+    //         "rendered",
+    //         (event) => {
+    //             log.debug(event);
+    //             twitterBound = true;
+    //             loadTweets = false;
+    //             $(event.target).parents(".app-tweet-page").addClass("app-tweet-page-loaded");
+    //             Hub.dispatch("twitter-panel", {message: "render", event: "render", data: event.target});
+    //             const parent = $(event.target).parent();
+    //             const atr = $(event.target).parents(".app-tweet-row");
+    //
+    //             const blockquote = atr.find("blockquote");
+    //             blockquote.addClass("tweet-rendered");
+    //             window.setTimeout(() => {
+    //                 atr.addClass("app-tweet-row-animate-in");
+    //                 atr.removeClass("app-tweet-row-animate-out");
+    //                 setTimeout(() => {
+    //                     atr.addClass("app-tweet-row-rendered");
+    //                     atr.removeClass("app-tweet-row-animate-in");
+    //                     if (atr[0]) {
+    //                         localStorage.setItem("tweet:" + atr.attr("data-tweet-id"),
+    //                                              JSON.stringify(
+    //                                                  {
+    //                                                      timestamp: Date.now(),
+    //                                                      html:      atr.find(".app-tweet-item-text").html()
+    //                                                  }));
+    //                     }
+    //                 }, 800);
+    //                 if (atr.find("blockquote.twitter-tweet-error").length > 0) {
+    //                     const error = atr.find("blockquote.twitter-tweet-error");
+    //                     error.find(".app-tweet-item-menu").hide();
+    //
+    //
+    //                     error.css("opacity", 1.0)
+    //                          .css("min-width", "516px")
+    //                          .css("display", "block")
+    //                          .css("text-align", "center");
+    //                     error.parent().addClass("app-tweet-item-card");
+    //
+    //                     error.text("Tweet no longer available");
+    //                     blockquote.removeClass("tweet-rendered");
+    //                 }
+    //                 try {
+    //                     if (atr.length > 0) {
+    //                         atr.find("mat-spinner").css("opacity", 0);
+    //                         atr.find(".app-tweet-item-menu").css("opacity", 1.0);
+    //                         // atr.find(".tweet-loading-placeholder").remove();
+    //                     }
+    //                 } catch (e) {
+    //                     log.debug(e);
+    //                 }
+    //             }, 10);
+    //
+    //         }
+    //     );
+    // } else {
+    //     setTimeout(() => twitterInit(), 500);
+    // }
 }
 
 twitterInit();
@@ -502,5 +502,3 @@ export class TweetListComponent implements OnInit, OnDestroy {
         }
     }
 }
-
-

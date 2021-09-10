@@ -6,5 +6,9 @@
     "runMode" : 3, "openMode": 0
   },
   "numTestsKeptInMemory" : 0,
-  "projectId": "zxxo89"
+  "projectId": "zxxo89",
+  "ignoreTestFiles": [
+    "**/__snapshots__/*",
+    "**/__image_snapshots__/*"
+  ]
 }

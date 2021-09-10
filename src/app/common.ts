@@ -46,3 +46,18 @@ export function readableTimestamp(): string {
   return format(new Date(), "yyyy_MM_dd@hh.mm.ss");
 }
 
+
+export const roundToHour = (timestamp: number): any => {
+    const date: Date = new Date(timestamp);
+    date.setUTCMinutes(0);
+    date.setUTCSeconds(0);
+    date.setUTCMilliseconds(0);
+    return date.getTime();
+};
+
+export const roundToMinute = (timestamp: number): any => {
+    const date: Date = new Date(timestamp);
+    date.setUTCSeconds(0);
+    date.setUTCMilliseconds(0);
+    return date.getTime();
+};

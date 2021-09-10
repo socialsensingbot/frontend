@@ -63,11 +63,10 @@
                             <mat-option value="1440">24 Hours</mat-option>
                             <mat-option value="2880">2 Days</mat-option>
                             <mat-option value="4320">3 Days</mat-option>
-                            <mat-option value="5760">4 Days</mat-option>
                         </mat-select>
                     </mat-form-field>
                     <div class="app-toolbar-expanding-separator"></div>
-                    <button mat-icon-button  aria-label="Expand or shrink toolbar">
+                    <button mat-icon-button  class="app-map-expand-toolbar-btn" aria-label="Expand or shrink toolbar">
                         <mat-icon matTooltip="Expand toolbar" *ngIf="!appToolbarExpanded"
                                   (click)="appToolbarExpanded=true">arrow_drop_down
                         </mat-icon>
@@ -88,38 +87,42 @@
                     </ng-container>
                     <div class="app-toolbar-separator"></div>
                     <mat-form-field>
-                        <mat-select [(value)]="activePolyLayerShortName" class="map-polygon-layer-select">
-                            <mat-option *ngFor="let regionGrouping of data.dataSetMetdata.regionGroups"
-                                        [value]="regionGrouping.id">{{regionGrouping.title}}</mat-option>
+                        <mat-select (valueChange)="updateLayers('Layer Changed', false)"
+                                    *ngIf="data.mapMetadata.regionTypes" [(ngModel)]="activeRegionType"
+                                    class="map-polygon-layer-select">
+                            <mat-option *ngFor="let regionType of data.mapMetadata.regionTypes"
+                                        [value]="regionType.id">{{regionType.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>
                     <div class="app-toolbar-separator"></div>
                     <mat-form-field>
-                        <mat-select [(value)]="activeNumberLayerShortName" class="map-number-layer-select">
+                        <mat-select [(value)]="activeStatistic" class="map-number-layer-select">
                             <mat-option value="stats">Exceedance</mat-option>
                             <mat-option value="count">Tweet Count</mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <mat-form-field *ngIf="data.dataSetMetdata.layerGroups.length > 1">
+                    <div class="app-toolbar-separator"></div>
+                    <mat-form-field *ngIf="pref.combined.layerGroups.groups.length > 1">
                         <mat-select [(value)]="activeLayerGroup" class="map-number-layer-select">
-                            <mat-option *ngFor="let layerGroup of data.dataSetMetdata.layerGroups"
+                            <mat-option *ngFor="let layerGroup of pref.combined.layerGroups.groups"
                                         [value]="layerGroup.id">{{layerGroup.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>
 
                     <div class="app-toolbar-separator"></div>
-                    <button [disabled]="selectedCountries.length === 0 && data.hasCountryAggregates()" class="app-toolbar-btn"
+                    <button [disabled]="selectedCountries.length === 0 && data.hasCountryAggregates()"
+                            class="app-toolbar-btn"
                             mat-icon-button
                             (click)="downloadTweetsAsCSV()">
                         <mat-icon matTooltip="Download all Tweets as a CSV file.">cloud_download</mat-icon>
                     </button>
-                    <mat-form-field *ngIf="data.hasCountryAggregates()">
+                    <mat-form-field *ngIf="data.ready">
                         <!--                    <mat-label>Countries</mat-label>-->
-                        <mat-select [formControl]="countries" multiple [(ngModel)]="selectedCountries">
+                        <mat-select  multiple [(ngModel)]="selectedCountries" (valueChange)="calculateSelectedCountriesText()">
                             <mat-select-trigger>
-                                <span class="country-additional-selection">{{selectedCountriesText()}}</span>
+                                <span class="country-additional-selection">{{selectedCountriesTextValue}}</span>
                             </mat-select-trigger>
-                            <mat-option *ngFor="let agg of data.aggregations['countries'].aggregates"
+                            <mat-option *ngFor="let agg of data.aggregations['uk-countries'].aggregates"
                                         [value]="agg.id">{{agg.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>
@@ -135,7 +138,7 @@
             </div>
         </div>
 
-        <map-legend *ngIf="ready" class="legend" [activeNumber]="activeNumberLayerShortName"></map-legend>
+        <map-legend *ngIf="ready" class="legend" [activeNumber]="activeStatistic"></map-legend>
 
 
         <mat-progress-bar *ngIf="activity && ready" class="map-progress" mode="indeterminate"

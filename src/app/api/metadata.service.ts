@@ -23,7 +23,7 @@ export class MetadataService {
 
 
     constructor(_api: RESTDataAPIService) {
-        this.regions = _api.callAPI("refdata", {name: "regions"});
+        this.regions = _api.callQueryAPI("refdata", {name: "regions"});
     }
 
 }

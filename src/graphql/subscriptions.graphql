@@ -152,6 +152,48 @@ subscription OnDeleteSavedGraph {
     updatedAt
   }
 }
+subscription OnCreateTextAutocomplete {
+  onCreateTextAutocomplete {
+    id
+    type
+    text
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+subscription OnUpdateTextAutocomplete {
+  onUpdateTextAutocomplete {
+    id
+    type
+    text
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+subscription OnDeleteTextAutocomplete {
+  onDeleteTextAutocomplete {
+    id
+    type
+    text
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
 subscription OnCreateUserSession {
   onCreateUserSession {
     id

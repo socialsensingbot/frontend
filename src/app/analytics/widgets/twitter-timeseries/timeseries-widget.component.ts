@@ -1,15 +1,10 @@
-import {Component, EventEmitter, Input, NgZone, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
 import {MetadataService} from "../../../api/metadata.service";
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute} from "@angular/router";
 import {RESTDataAPIService} from "../../../api/rest-api.service";
 import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../../pref/preference.service";
-import {
-  TimeseriesAnalyticsComponentState,
-  TimeseriesCollectionModel,
-  TimeseriesModel,
-  TimeseriesRESTQuery
-} from "../../timeseries";
+import {TimeseriesAnalyticsComponentState, TimeseriesCollectionModel, TimeseriesModel, TimeseriesRESTQuery} from "../../timeseries";
 import {UIExecutionService} from "../../../services/uiexecution.service";
 import {NotificationService} from "src/app/services/notification.service";
 import {toLabel} from "../../graph";
@@ -38,7 +33,7 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
       if (!this.seriesCollection) {
         this.seriesCollection = new TimeseriesCollectionModel("date",
                                                               this._state.eoc,
-                                                              this._state.eoc === "exceedance" ? "Exceedance" : "Count",
+                                                              this._state.eoc === "exceedance" ? "Return Period" : "Count",
                                                               "Date",
                                                               this._state.rollingAverage || false,
                                                               this._state.avgLength || 14,
@@ -145,7 +140,7 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
         hazard: this.hazard
       };
       delete payload.__series_id;
-      const serverResults = await this._api.callAPI("query", payload);
+      const serverResults = await this._api.callQueryAPI("query", payload);
       this.error = false;
       return this.queryTransform(serverResults);
     } catch (e) {
@@ -164,6 +159,3 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
     return from;
   }
 }
-
-
-

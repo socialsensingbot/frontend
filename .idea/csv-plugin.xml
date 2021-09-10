@@ -10,6 +10,27 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/ref_data/region_aggregations_coarse.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/ref_data/region_aggregations_county.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/ref_data/region_aggregations_fine.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/ref_data/regions.csv">
           <value>
             <Attribute>

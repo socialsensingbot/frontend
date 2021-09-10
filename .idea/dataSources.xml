@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="Social Sensing MySQL" uuid="0d3edb57-3f28-442d-be19-b08f01293afb">
-      <driver-ref>mysql.8</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://database.cxsscwdzsrae.eu-west-2.rds.amazonaws.com:3306/socialsensing?charset=utf8mb4&amp;collation=utf_general_ci</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
     <data-source source="LOCAL" name="Dev" uuid="954c44d0-17c9-4ec9-9053-f68eb285974f">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
@@ -22,11 +15,11 @@
       <jdbc-url>jdbc:mysql://database-prod.cxsscwdzsrae.eu-west-2.rds.amazonaws.com:3306/socialsensing?charset=utf8mb4&amp;collation=utf_general_ci</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="PWS Demo" uuid="fe2a17e7-ca25-4572-ba25-5641bf27407d">
+    <data-source source="LOCAL" name="Test" uuid="da5c9d9b-6e4f-4ed8-a252-a93e1a0fb6da">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://database-pwsdemo.cxsscwdzsrae.eu-west-2.rds.amazonaws.com:3306/socialsensing?charset=utf8mb4&amp;collation=utf_general_ci</jdbc-url>
+      <jdbc-url>jdbc:mysql://database-test.cxsscwdzsrae.eu-west-2.rds.amazonaws.com:3306/socialsensing?charset=utf8mb4&amp;collation=utf_general_ci</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

@@ -8,21 +8,19 @@ describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issu
   // Step 1: setup the application state
   beforeEach(function () {
     cy.visit('http://localhost:4200/map');
-    cy.stubLiveJson("live-old");
-    cy.server();
     cy.login();
   });
 
 
   describe('scroll', () => {
-    const url = MAP_URL + "?selected=carmarthenshire&min_offset=-5399&max_offset=0&lat=53.00817326643286&lng=-2.0104980468750004";
+    const url = MAP_URL + "?selected=greater%20london&zoom=5&max_time=1629131100000&min_time=1628784000000&active_number=stats&active_polygon=county";
 
-    it('row changes', () => {
+    it.only('row changes', () => {
       cy.visitAndWait(url);
-      cy.twitterPanelHeader("Carmarthenshire");
+      cy.twitterPanelHeader("Greater London");
       cy.unhideTweets(10);
       cy.get(".atr-0.atr-visible", {timeout: 90000})
-      cy.get(".atr-0.atr-visible .twitter-tweet", {timeout: 90000}).should("be.visible");
+        cy.get(".atr-0.atr-visible .app-twitter-tweet", {timeout: 90000}).should("be.visible");
 
       cy.log(
         `There should be ${minPages} pages of ${pageSize} tweets loaded at any time. The first page should contain ${pageSize} tweets and the fourth page should contain no tweets.`);
@@ -64,8 +62,8 @@ describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issu
 
       cy.log("And the first tweet should be visible and loaded.")
 
-      cy.get(".atr-0.atr-visible", {timeout: 90000}).should("be.visible");
-      cy.get(".atr-0.atr-visible .twitter-tweet", {timeout: 90000}).should("be.visible");
+        cy.get(".atr-0.atr-visible", {timeout: 90000}).should("be.visible");
+        cy.get(".atr-0.atr-visible .app-twitter-tweet", {timeout: 90000}).should("be.visible");
     });
 
     it('top and bottom', () => {

@@ -29,6 +29,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
       this.metadata.regions.then(
         regions => {
           this.allRegions = regions;
+          log.debug(regions);
           this.regions = regions.filter(i => this._data.regions.includes(i.value));
         });
     }

@@ -1,4 +1,9 @@
 {
   "permissions": {},
-  "lambdaLayers": []
+  "lambdaLayers": [],
+  "secretNames": [
+    "TWITTER_BEARER_TOKEN",
+    "DB_PASSWORD",
+    "twitter_bearer_token"
+  ]
 }

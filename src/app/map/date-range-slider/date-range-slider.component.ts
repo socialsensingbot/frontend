@@ -1,10 +1,10 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from "@angular/core";
 import {ChangeContext, LabelType, Options} from "ng5-slider";
-import {Subscription} from "rxjs";
+import {Subscription, timer} from "rxjs";
 import {Logger} from "@aws-amplify/core";
-import {MapDataService, MapDataServiceInt} from "../data/map-data.service";
 import {environment} from "../../../environments/environment";
 import {PreferenceService} from "../../pref/preference.service";
+import {roundToHour, roundToMinute} from "../../common";
 
 const log = new Logger("date-range");
 
@@ -24,10 +24,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     @Output()
     public onEnd = new EventEmitter<DateRange>();
 
-    /**
-     * Time series data, keyed by one minute interval.
-     */
-    public timeKeyedData: any;
+
     /**
      * This is the output of the component and will emit date ranges
      * when the the slider value changes. Changes are throttled by {@link _emitTimer}.
@@ -41,8 +38,8 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
      * @see https://angular-slider.github.io/ng5-slider
      */
     public sliderOptions: Options = {
-        floor:      0,
-        ceil:       0,
+        floor:      Date.now(),
+        ceil:       Date.now(),
         showTicks:  false,
         ticksArray: [],
         stepsArray: [],
@@ -52,36 +49,34 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
         outputEventsInterval: 100,
         touchEventsInterval:  100,
         ticksTooltip:         (value: number): string => {
-            if (value === 0) {
-                return "now";
-            }
-            return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0, "") : "";
+            return this.cleanDate(value, 0, "");
         },
         translate:            (value: number, label: LabelType): string => {
-            if (typeof this.timeKeyedData !== "undefined" && typeof this.timeKeyedData[-value] !== "undefined") {
-                if (value === 0 && this._pref.combined.mostRecentDateIsNow) {
-                    return `<span class="slider-date-time slider-date-time-max"><span class='slider-time'></span> <span class='slider-date'>now</span></span>`;
+            log.debug("translate value " + value + " for " + label);
 
-                }
-                switch (label) {
-                    case LabelType.Low:
-                        return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0, "min") : "";
-                    case LabelType.High:
-                        return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 1, "max") : "";
-                    default:
-                        return this.timeKeyedData[-value] ? this.cleanDate(this.timeKeyedData[-value], 0, "") : "";
-                }
-            } else {
-                return "";
+            if (value === this.sliderOptions.ceil && this._pref.combined.mostRecentDateIsNow) {
+                return `<span class="slider-date-time slider-date-time-max"><span class='slider-time'></span> <span class='slider-date'>now</span></span>`;
+
             }
+            if (Number.isNaN(value)) {
+                log.error("NaN value for " + label);
+                return "NaN";
+            }
+            switch (label) {
+                case LabelType.Low:
+                    return this.cleanDate(value, 0, "min");
+                case LabelType.High:
+                    return this.cleanDate(value, 1, "max");
+                default:
+                    return this.cleanDate(value, 0, "");
+            }
+
         }
     };
-    public data: MapDataServiceInt;
     private cache: any = {};
-    private timeKeySub: Subscription;
+    private updateTimerSub: Subscription;
 
-    constructor(_data: MapDataService, private _pref: PreferenceService) {
-        this.data = _data;
+    constructor(private _pref: PreferenceService) {
     }
 
     private _lowerValue = -1;
@@ -128,6 +123,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
      * These are the options for *this* component, not the ng5-slider.
      */
     private _options: DateRangeSliderOptions;
+    public ready = false;
 
     /**
      * These are the options for *this* component, not the ng5-slider.
@@ -136,88 +132,93 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
      */
     @Input()
     public set options(value: DateRangeSliderOptions) {
+        log.debug("Options: " + JSON.stringify(value));
         this._options = value;
-        this._lowerValue = value.startMin;
-        this._upperValue = value.startMax;
-        this.sliderOptions = {...this.sliderOptions, ceil: value.max, floor: value.min};
+        this._lowerValue = roundToHour(value.startMin);
+        if (value.min <= 0) {
+            throw new Error("Min value must be positive");
+        }
+        if (value.max <= 0) {
+            throw new Error("Max value must be positive");
+        }
+        if (value.startMin < 0) {
+            throw new Error("Lower value must be positive");
+        }
+        if (value.startMax < 0) {
+            throw new Error("Upper value must be positive");
+        }
+        if (value.max - value.startMax < this._pref.combined.continuousUpdateThresholdInMinutes * 60 * 1000) {
+            this._upperValue = roundToMinute(value.startMax);
+        } else {
+            this._upperValue = roundToHour(value.startMax);
+        }
+        this.sliderOptions = {...this.sliderOptions, ceil: roundToMinute(value.max), floor: roundToHour(value.min)};
+        this.ready = true;
         this.updateTicks();
     }
 
     ngOnInit() {
-        this.timeKeySub = this.data.timeKeyUpdate.subscribe(i => {
-            log.debug("Received new time-keyed data");
-            this.timeKeyedData = i;
-            this.updateTicks();
-            this.refresh.emit();
-        });
+        this.updateTimerSub = timer(0, 60 * 1000).subscribe(i => {
+                                                                log.debug("Received new time-keyed data");
+                                                                this.updateTicks();
+                                                                this.refresh.emit();
+                                                            }
+        );
     }
 
     ngOnDestroy() {
-        this.timeKeySub.unsubscribe();
+        this.updateTimerSub.unsubscribe();
     }
 
-    cleanDate(tstring, add, label): string {
-        const key = ":clean-date:" + tstring + ":" + add + ":" + label;
-        const cachedItem = this.cache[key];
-        if (cachedItem != null) {
-            return cachedItem;
-        } else {
-            const date = new Date(
-                Date.UTC(tstring.substring(0, 4), tstring.substring(4, 6) - 1, tstring.substring(6, 8),
-                         tstring.substring(8, 10), +tstring.substring(10, 12) + add, 0, 0));
-            const ye = new Intl.DateTimeFormat(environment.locale,
-                                               {year: "2-digit", timeZone: environment.timezone}).format(
-                date);
-            const mo = new Intl.DateTimeFormat(environment.locale,
-                                               {month: "short", timeZone: environment.timezone}).format(
-                date);
-            const da = new Intl.DateTimeFormat(environment.locale,
-                                               {day: "2-digit", timeZone: environment.timezone}).format(
-                date);
-            const hr = new Intl.DateTimeFormat(environment.locale,
-                                               {hour: "2-digit", hour12: true, timeZone: environment.timezone}).format(
-                date);
+    cleanDate(value, add, label): string {
+        log.debug("cleanDate(" + value + ")");
+        const date = new Date(value);
+        const ye = new Intl.DateTimeFormat(environment.locale,
+                                           {year: "2-digit", timeZone: environment.timezone}).format(
+            date);
+        const mo = new Intl.DateTimeFormat(environment.locale,
+                                           {month: "short", timeZone: environment.timezone}).format(
+            date);
+        const da = new Intl.DateTimeFormat(environment.locale,
+                                           {day: "2-digit", timeZone: environment.timezone}).format(
+            date);
+        const hr = new Intl.DateTimeFormat(environment.locale,
+                                           {hour: "2-digit", hour12: true, timeZone: environment.timezone}).format(
+            date);
 
-            const text = `<span class="slider-date-time slider-date-time-${label}"><span class='slider-time'>${hr}</span> <span class='slider-date'>${da}-${mo}-${ye}</span></span>`;
-            // var date = new Date( tstring.substring(0,4), tstring.substring(4,6)-1, tstring.substring(6,8), +tstring.substring(8,10)+add, 0, 0, 0);
-            this.cache[key] = text;
-            return text;
-        }
+        return `<span class="slider-date-time slider-date-time-${label}"><span class='slider-time'>${hr}</span> <span class='slider-date'>${da}-${mo}-${ye}</span></span>`;
 
     }
 
     public changeEvent($event: ChangeContext) {
-        if (typeof this.timeKeyedData !== "undefined") {
-            log.debug($event);
+        log.debug("changeEvent()");
+        if (this.ready) {
             this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
         }
     }
 
     public onEndEvent($event: ChangeContext) {
-        if (typeof this.timeKeyedData !== "undefined") {
-            log.debug($event);
+        log.debug("onEndEvent()");
+        if (this.ready) {
             this.onEnd.emit(new DateRange(this._lowerValue, this._upperValue));
         }
     }
 
     private updateTicks() {
-        if (this.timeKeyedData) {
-            // this.sliderOptions.ticksArray = [];
+        log.debug("updateTicks()");
+        if (this.ready && this.sliderOptions.floor < this.sliderOptions.ceil) {
             this.sliderOptions.stepsArray = [];
-            // log.debug(this.timeKeyedData[0]);
-            // log.debug(this.timeKeyedData[0].substring(10, 12));
-            for (let step = this.sliderOptions.floor + (+this.timeKeyedData[0].substring(10, 12));
+            for (let step = this.sliderOptions.floor;
                  step < this.sliderOptions.ceil;
-                 step = step + 60) {
-                // this.sliderOptions.ticksArray.push(step);
+                 step = step + 60 * 60 * 1000) {
+                 log.verbose(step);
                 this.sliderOptions.stepsArray.push({value: step});
             }
             if (this.sliderOptions.stepsArray[this.sliderOptions.stepsArray.length - 1].value !== this.sliderOptions.ceil) {
-                // this.sliderOptions.ticksArray.push(this.sliderOptions.ceil);
                 this.sliderOptions.stepsArray.push({value: this.sliderOptions.ceil});
             }
-            // log.debug(this.sliderOptions.stepsArray);
         }
+
     }
 }
 

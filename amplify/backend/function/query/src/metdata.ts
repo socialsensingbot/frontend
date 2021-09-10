@@ -14,7 +14,7 @@ export class QueryMetadataSets {
                                       FROM ref_regions`,
                                  values:              []
                              },
-                             (results, error) => {
+                             (error, results) => {
                                  if (error) {
                                      reject(error);
                                  } else {
@@ -26,4 +26,3 @@ export class QueryMetadataSets {
     }
 
 }
-

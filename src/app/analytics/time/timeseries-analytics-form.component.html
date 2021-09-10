@@ -36,12 +36,12 @@
         placeholder="Add regions ..."
         #regionInput
         [formControl]="regionControl"
-        [matAutocomplete]="auto"
+        [matAutocomplete]="region"
         [matChipInputFor]="chipList"
         [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
         (matChipInputTokenEnd)="add($event)">
     </mat-chip-list>
-    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+    <mat-autocomplete #region="matAutocomplete" (optionSelected)="selected($event)">
       <mat-option *ngFor="let region of filteredRegions | async" [value]="region">
         {{region.text}}
       </mat-option>
