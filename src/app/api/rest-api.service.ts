@@ -10,6 +10,7 @@ import {NotificationService} from "../services/notification.service"; // npm ins
 import {API} from "@aws-amplify/api";
 import {Logger} from "@aws-amplify/core";
 import {NgForageCache} from "ngforage";
+import {timer} from "rxjs";
 
 const useLambda = false;
 
@@ -20,8 +21,20 @@ const log = new Logger("rest-api-service");
                 providedIn: "root"
             })
 export class RESTDataAPIService {
+    private callsPerMinute = 0;
+    private calls = 0;
+    private lastCPMCount = 0;
 
-    constructor(private _notify: NotificationService, private _ngZone: NgZone, private readonly cache: NgForageCache,) {
+    constructor(private _notify: NotificationService, private _ngZone: NgZone, private readonly cache: NgForageCache) {
+        timer(0, 10000).subscribe(() => {
+            if (this.lastCPMCount === 0) {
+                this.lastCPMCount = Date.now() - 10000;
+            }
+            this.callsPerMinute = (this.calls / (Date.now() - this.lastCPMCount)) * 60000;
+            this.lastCPMCount = Date.now();
+            this.calls = 0;
+            log.debug("Calls Per Minute: " + this.callsPerMinute);
+        });
     }
 
     public async callQueryAPI(functionName: string, payload: any, cacheForSeconds: number = 60): Promise<any> {
@@ -94,6 +107,14 @@ export class RESTDataAPIService {
 
 
     private async callAPIInternal(fullPath: string, payload: any, cacheForSeconds: number, key: string): Promise<Promise<any>> {
+        this.calls++;
+        if (this.callsPerMinute > environment.maxCallsPerMinute) {
+            console.error("Excessive api calls per minute: " + this.callsPerMinute);
+            console.error("API call was path: " + fullPath + " payload: " + JSON.stringify(payload));
+            this._notify.show("Too many calls to the server (" + this.callsPerMinute + " > " + environment.maxCallsPerMinute + ").",
+                              "Throttling ...", 60);
+
+        }
         return API.post("query", fullPath, {
             body:    payload,
             headers: {
@@ -112,6 +133,7 @@ export class RESTDataAPIService {
             }
             return data;
         }).catch(e => {
+            this.calls++;
             log.error(e);
             this._notify.show("No response from the server, maybe a network problem or a slow query.",
                               "Retrying ...", retryPeriod);

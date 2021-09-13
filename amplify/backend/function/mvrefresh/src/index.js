@@ -41,8 +41,7 @@ exports.handler = async (event) => {
                                             // connectTimeout: 15000,
                                             // acquireTimeout: 10000,
                                             waitForConnections: true,
-                                            queueLimit:         5,
-                                            debug:              true
+                                            queueLimit: 5
                                         });
     return new Promise((resolve, reject) => {
         connection.query({sql: `CALL refresh_mv_now(@rc);`, values: {}}, (error, results) => {

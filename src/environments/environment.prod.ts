@@ -1,13 +1,13 @@
 import {Dashboard} from "../app/pref/dashboard.service";
 
 const defaultDashboard: Dashboard = {
-  boards: [{
-    deviceType: "all",
-    pages:      [{
-      title: "First Page",
-      cards: []
+    boards: [{
+        deviceType: "all",
+        pages:      [{
+            title: "First Page",
+            cards: []
+        }]
     }]
-  }]
 };
 
 export const environment = {
@@ -43,29 +43,29 @@ export const environment = {
             {title: "3 - Significant", value: "significant", color: "#FFB300"},
             {title: "4 - Severe", value: "severe", color: "#F4511E"}
         ]
-  },
-  source: {
-    //The ability to tag tweets with a source
-    types: [
-      {title: "River", value: "river", color: "#43A047"},
-      {title: "Surface", value: "surface", color: "#FFEE58"},
-      {title: "Groundwater", value: "groundwater", color: "#FFB300"},
-      {title: "Coastal", value: "coastal", color: "#F4511E"}
-    ]
-  },
+    },
+    source: {
+        //The ability to tag tweets with a source
+        types: [
+            {title: "River", value: "river", color: "#43A047"},
+            {title: "Surface", value: "surface", color: "#FFEE58"},
+            {title: "Groundwater", value: "groundwater", color: "#FFB300"},
+            {title: "Coastal", value: "coastal", color: "#F4511E"}
+        ]
+    },
 
-  features:                            ["impact", "source", "map", "dashboard", "analytics"],
-  mostRecentDateIsNow:                 true,
-  continuousUpdateThresholdInMinutes:  90,
-  animateOnTimeSliderChange:           false,
-  recentTweetHighlightOffsetInSeconds: 1200,
+    features:                            ["impact", "source", "map", "dashboard", "analytics"],
+    mostRecentDateIsNow:                 true,
+    continuousUpdateThresholdInMinutes:  90,
+    animateOnTimeSliderChange:           false,
+    recentTweetHighlightOffsetInSeconds: 1200,
 
-  mapTileUrlTemplate:           "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
-  blinkRateInMilliseconds:      1000,
-  defaultDashboard,
-  newExceedanceCalc:            false,
-  shareTextAutocompleteInGroup: true,
-    useRestMapData: true,
-
+    mapTileUrlTemplate:           "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
+    blinkRateInMilliseconds:      1000,
+    defaultDashboard,
+    newExceedanceCalc:            false,
+    shareTextAutocompleteInGroup: true,
+    useRestMapData:               true,
+    maxCallsPerMinute:            600,
 
 };
