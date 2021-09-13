@@ -37,10 +37,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
+var twitter_api_v2_1 = require("twitter-api-v2");
 var aws = require("aws-sdk");
 var mysql = require("mysql");
 var stage = process.env.AWS_LAMBDA_FUNCTION_NAME.split("-")[1];
-var twitter_api_v2_1 = require("twitter-api-v2");
 console.log("STAGE: " + stage);
 var dev = stage === "dev";
 var awsServerlessExpress = require("aws-serverless-express");

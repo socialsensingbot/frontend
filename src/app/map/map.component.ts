@@ -165,6 +165,9 @@ export class MapComponent implements OnInit, OnDestroy {
     public set activeLayerGroup(value: string) {
         log.debug("set activeLayerGroup");
         this._activeLayerGroup = value;
+        if (this.ready) {
+            this.scheduleResetLayers(this.activeStatistic);
+        }
         this._twitterIsStale = true;
         this.ready = false;
         this.load();
@@ -459,12 +462,13 @@ export class MapComponent implements OnInit, OnDestroy {
         log.debug(this.data.regionGeography);
         log.debug(this.activeRegionType);
         if (this.data.hasCountryAggregates()) {
-            await this.data.downloadAggregate("uk-countries", this.selectedCountries,
+            await this.data.downloadAggregate(this.activeLayerGroup, "uk-countries", this.selectedCountries,
                                               this.activeRegionType,
                                               await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData, this._dateMin,
                                               this._dateMax);
         } else {
-            await this.data.download(await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData, this.activeRegionType,
+            await this.data.download(this.activeLayerGroup, await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData,
+                                     this.activeRegionType,
                                      this._dateMin, this._dateMax);
         }
     }
@@ -510,9 +514,9 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    private scheduleResetLayers(layer: string, clearSelected = true) {
+    private async scheduleResetLayers(layer: string, clearSelected = true) {
         log.debug("scheduleResetLayers()");
-        this._exec.queue("Reset Layers", ["ready"], async () => {
+        await this._exec.queue("Reset Layers", ["ready"], async () => {
             this.activity = true;
             await this.resetStatisticsLayer(layer, clearSelected);
             this.activity = false;
@@ -630,7 +634,7 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this.route.snapshot.queryParamMap.has("layer_group")) {
             this._activeLayerGroup = this.route.snapshot.queryParamMap.get("layer_group");
         } else {
-            this._activeLayerGroup = this.data.mapMetadata.defaultLayerGroup;
+            this._activeLayerGroup = this.pref.combined.layerGroups.defaultLayerGroup;
         }
         if (this.route.snapshot.queryParamMap.has("active_polygon")) {
             this._activeRegionType = this.route.snapshot.queryParamMap.get("active_polygon");
@@ -792,7 +796,8 @@ export class MapComponent implements OnInit, OnDestroy {
             if (feature.properties.count > 0) {
                 log.debug("Count > 0");
                 log.debug(`this.activePolyLayerShortName=${this.activeRegionType}`);
-                this.tweets = await this.data.tweets(this.activeRegionType, this.selection.regionNames(), this._dateMin,
+                this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType, this.selection.regionNames(),
+                                                     this._dateMin,
                                                      this._dateMax);
                 log.debug(this.tweets);
                 this.twitterPanelHeader = true;
@@ -811,7 +816,8 @@ export class MapComponent implements OnInit, OnDestroy {
             this.hideTweets();
         } else {
             log.debug(features.length + " features");
-            this.tweets = await this.data.tweets(this.activeRegionType, this.selection.regionNames(), this._dateMin, this._dateMax);
+            this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType, this.selection.regionNames(), this._dateMin,
+                                                 this._dateMax);
             log.debug(this.tweets);
             this.twitterPanelHeader = true;
             this.showTwitterTimeline = true;
@@ -893,7 +899,7 @@ export class MapComponent implements OnInit, OnDestroy {
      * @param clearSelected clears the selected polygon
      */
     private async resetStatisticsLayer(layer: string, clearSelected) {
-        console.info("Resetting " + layer);
+        log.info("Resetting " + layer);
         this.loading.showIndeterminateSpinner();
         try {
             const geography: PolygonData = await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData;
@@ -904,11 +910,11 @@ export class MapComponent implements OnInit, OnDestroy {
             if (curLayerGroup != null) {
 
                 // noinspection JSUnfilteredForInLoop
-                const regionTweetMap = await this.data.recentTweets(this.activeRegionType);
+                const regionTweetMap = await this.data.recentTweets(this.activeLayerGroup, this.activeRegionType);
                 log.debug("Region Tweet Map", regionTweetMap);
 
                 const styleFunc = (feature: geojson.Feature) => {
-                    console.info("styleFunc " + layer);
+                    log.info("styleFunc " + layer);
 
                     const style = this._color.colorFunctions[layer].getFeatureStyle(
                         feature);
@@ -958,11 +964,11 @@ export class MapComponent implements OnInit, OnDestroy {
     private async updateRegionData(geography: PolygonData) {
         return new Promise<void>(async (resolve, reject) => {
             const features = geography.features;
-            await this.data.preCacheRegionStatsMap(this.activeRegionType, this._dateMin, this._dateMax);
+            await this.data.preCacheRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax);
             for (const feature of features) {
                 const featureProperties = feature.properties;
                 const region = featureProperties.name;
-                this.data.regionStats(this.activeRegionType, region, this._dateMin, this._dateMax).then(
+                this.data.regionStats(this.activeLayerGroup, this.activeRegionType, region, this._dateMin, this._dateMax).then(
                     mapStats => {
                         if (mapStats !== null) {
                             featureProperties.count = mapStats.count;
@@ -992,7 +998,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                               this._updating = true;
                                               try {
 
-                                                  this.scheduleResetLayers(this.activeStatistic, clearSelected);
+                                                  await this.scheduleResetLayers(this.activeStatistic, clearSelected);
                                                   await this.updateTwitterPanel();
                                               } finally {
                                                   this.activity = false;

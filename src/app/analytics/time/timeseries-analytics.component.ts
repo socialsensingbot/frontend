@@ -5,7 +5,8 @@ import {RESTDataAPIService} from "../../api/rest-api.service";
 import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {
-    TimeseriesAnalyticsComponentState, timeSeriesAutocompleteType,
+    TimeseriesAnalyticsComponentState,
+    timeSeriesAutocompleteType,
     TimeseriesCollectionModel,
     TimeseriesModel,
     TimeseriesRESTQuery
@@ -86,7 +87,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this._type = value;
     }
 
-    private _state: TimeseriesAnalyticsComponentState = this.defaultState();
+    private _state: TimeseriesAnalyticsComponentState;
 
     public get state(): any {
         return this._state;
@@ -102,6 +103,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     async ngOnInit() {
+        await this.clear();
         this._route.queryParams.subscribe(async queryParams => {
             if (queryParams.__clear_ui__) {
                 await this.clear();
@@ -152,6 +154,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 }
             }
         });
+
 
     }
 
@@ -245,13 +248,13 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
-  public eocChanged() {
-      this.exec.uiActivity();
-      this.seriesCollection.yLabel = this.state.eoc === "exceedance" ? "Return Period" : "Count";
-      this.seriesCollection.yField = this.state.eoc === "exceedance" ? "exceedance" : "count";
-    this.seriesCollection.yAxisHasChanged();
-    this.exec.uiActivity();
-  }
+    public eocChanged() {
+        this.exec.uiActivity();
+        this.seriesCollection.yLabel = this.state.eoc === "exceedance" ? "Return Period" : "Count";
+        this.seriesCollection.yField = this.state.eoc === "exceedance" ? "exceedance" : "count";
+        this.seriesCollection.yAxisHasChanged();
+        this.exec.uiActivity();
+    }
 
     public removeQuery(query: TimeseriesRESTQuery) {
         this.state.queries = this.state.queries.filter(i => i.__series_id !== query.__series_id);
@@ -260,9 +263,11 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     public async clear() {
-        this.state.queries = [this.newQuery()];
-        this._updateGraphInternal(this.state.queries[0]);
+        log.info("Clearing graph");
+        this.state = await this.defaultState();
+        log.info("State is now " + this.state);
         this.seriesCollection.clear();
+        await this._updateGraphInternal(this.state.queries[0]);
         this.exec.uiActivity();
     }
 
@@ -313,8 +318,11 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         return from;
     }
 
-    private defaultState(): TimeseriesAnalyticsComponentState {
-        return {eoc: "count", lob: "line", queries: [this.newQuery()]};
+    private async defaultState(): Promise<TimeseriesAnalyticsComponentState> {
+        const query: TimeseriesRESTQuery = this.newQuery();
+        await this.pref.waitUntilReady();
+        query.regions = this.pref.combined.analyticsDefaultRegions;
+        return {eoc: "count", lob: "line", queries: [query]};
     }
 
     private async _updateGraphInternal(query) {

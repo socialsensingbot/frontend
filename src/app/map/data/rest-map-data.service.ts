@@ -25,6 +25,7 @@ import {
 } from "./map-data";
 import {RESTDataAPIService} from "../../api/rest-api.service";
 import {FeatureCollection} from "@amcharts/amcharts4-geodata/.internal/Geodata";
+import {LayerGroup} from "../../types";
 
 
 const log = new Logger("map-data");
@@ -104,15 +105,17 @@ export class RESTMapDataService {
     public async load(first: boolean) {
     }
 
-    public async tweets(regionType: string, regions: string[], startDate,
+    public async tweets(layerGroupId: string, regionType: string, regions: string[], startDate,
                         endDate): Promise<Tweet[]> {
-
+        const layerGroup: LayerGroup = this.layerGroup(layerGroupId);
         log.debug("requesting tweets for regions " + regions);
         const rawResult = await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/text-for-regions", {
-            layerGroup: this.mapMetadata.defaultLayerGroup,
+            hazards:   layerGroup.hazards,
+            sources:   layerGroup.sources,
+            warnings:  layerGroup.warnings,
             regions,
-            startDate:  roundToHour(startDate),
-            endDate:    roundToMinute(endDate)
+            startDate: roundToHour(startDate),
+            endDate:   roundToMinute(endDate)
 
         }, 0);
         log.debug(rawResult.length + " tweets back from server");
@@ -127,12 +130,14 @@ export class RESTMapDataService {
         return await this._api.callMapAPIWithCache(this._mapId + "/now", {}, 60) as Promise<number>;
     }
 
-    public async recentTweets(regionType: string): Promise<RegionTweeCount> {
-
+    public async recentTweets(layerGroupId: string, regionType: string): Promise<RegionTweeCount> {
+        const layerGroup: LayerGroup = this.layerGroup(layerGroupId);
         return await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/recent-text-count", {
-            layerGroup: this.mapMetadata.defaultLayerGroup,
-            startDate:  roundToMinute(await this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000),
-            endDate:    roundToMinute(await this.now())
+            hazards:   layerGroup.hazards,
+            sources:   layerGroup.sources,
+            warnings:  layerGroup.warnings,
+            startDate: roundToMinute(await this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000),
+            endDate:   roundToMinute(await this.now())
 
         }) as Promise<RegionTweeCount>;
     }
@@ -144,7 +149,8 @@ export class RESTMapDataService {
     }
 
 
-    public async download(polygonDatum: PolygonData, regionType: string, startDate: number, endDate: number): Promise<void> {
+    public async download(layerGroupId: string, polygonDatum: PolygonData, regionType: string, startDate: number,
+                          endDate: number): Promise<void> {
         const options = {
             fieldSeparator:   ",",
             quoteStrings:     "\"",
@@ -161,7 +167,8 @@ export class RESTMapDataService {
 
         const regions = await this.places(regionType);
         const exportedTweets: CSVExportTweet[] = [];
-        const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(regionType, Array.from(regions), startDate, endDate);
+        const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(layerGroupId, regionType, Array.from(regions), startDate,
+                                                                                 endDate);
         for (const i of tweetData) {
             exportedTweets.push(await i);
         }
@@ -181,7 +188,7 @@ export class RESTMapDataService {
 
     }
 
-    public async downloadAggregate(aggregrationSetId: string, selectedAggregates: string[], regionType: string,
+    public async downloadAggregate(layerGroupId: string, aggregrationSetId: string, selectedAggregates: string[], regionType: string,
                                    polygonDatum: PolygonData, startDate: number, endDate: number) {
         log.debug(
             "downloadAggregate(aggregrationSetId=" + aggregrationSetId +
@@ -210,7 +217,7 @@ export class RESTMapDataService {
             .flatMap(x => x.regionTypeMap[regionType]).map(i => "" + i);
 
         const exportedTweets: CSVExportTweet[] = [];
-        const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(regionType, regions, startDate, endDate);
+        const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(layerGroupId, regionType, regions, startDate, endDate);
         for (const i of tweetData) {
             exportedTweets.push(await i);
         }
@@ -255,8 +262,9 @@ export class RESTMapDataService {
         return roundToHour(await this.now() - 4 * ONE_DAY);
     }
 
-    public async regionStats(regionType: string, region: string, startDate: number, endDate: number): Promise<RegionStats> {
-        const statsMap = await this.getRegionStatsMap(regionType, startDate, endDate);
+    public async regionStats(layerGroupId: string, regionType: string, region: string, startDate: number,
+                             endDate: number): Promise<RegionStats> {
+        const statsMap = await this.getRegionStatsMap(layerGroupId, regionType, startDate, endDate);
         if (statsMap.hasOwnProperty((region))) {
             return statsMap[region];
         } else {
@@ -266,12 +274,12 @@ export class RESTMapDataService {
 
     }
 
-    public async preCacheRegionStatsMap(activeRegionType: string, _dateMin: number, _dateMax: number): Promise<void> {
-        await this.getRegionStatsMap(activeRegionType, _dateMin, _dateMax);
+    public async preCacheRegionStatsMap(layerGroupId: string, activeRegionType: string, _dateMin: number, _dateMax: number): Promise<void> {
+        await this.getRegionStatsMap(layerGroupId, activeRegionType, _dateMin, _dateMax);
     }
 
-    private async regionNamesWithData(regionType: string, startDate: number, endDate: number): Promise<string[]> {
-        return Object.keys(await this.getRegionStatsMap(regionType, startDate, endDate));
+    private async regionNamesWithData(layerGroupId: string, regionType: string, startDate: number, endDate: number): Promise<string[]> {
+        return Object.keys(await this.getRegionStatsMap(layerGroupId, regionType, startDate, endDate));
     }
 
     public async geoJsonGeographyFor(regionType: string): Promise<FeatureCollection> {
@@ -285,9 +293,10 @@ export class RESTMapDataService {
             .replace(/— .+ \(@USERNAME_REMOVED\).*$/g, "");
     }
 
-    private async loadDownloadData(regionType: string, regions: string[], startDate: number,
+    private async loadDownloadData(layerGroupId: string, regionType: string, regions: string[], startDate: number,
                                    endDate: number): Promise<Promise<CSVExportTweet>[]> {
-        return (await this.tweets(regionType, regions, startDate, endDate)).filter(i => i.valid && !this._pref.isBlacklisted(i)).map(
+        return (await this.tweets(layerGroupId, regionType, regions, startDate, endDate)).filter(
+            i => i.valid && !this._pref.isBlacklisted(i)).map(
             async (i: Tweet) => {
 
                 let region = "";
@@ -345,11 +354,18 @@ export class RESTMapDataService {
 
     }
 
-    private async getRegionStatsMap(regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {
+    private layerGroup(id: string): LayerGroup {
+        return this._pref.combined.layerGroups.groups.filter(i => i.id === id)[0];
+    }
+
+    private async getRegionStatsMap(layerGroupId: string, regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {
+        const layerGroup: LayerGroup = this.layerGroup(layerGroupId);
         const statsMap = await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/stats", {
-            layerGroup: this.mapMetadata.defaultLayerGroup,
-            startDate:  roundToHour(startDate),
-            endDate:    roundToHour(endDate)
+            hazards:   layerGroup.hazards,
+            sources:   layerGroup.sources,
+            warnings:  layerGroup.warnings,
+            startDate: roundToHour(startDate),
+            endDate:   roundToHour(endDate)
 
         }, 600) as RegionStatsMap;
         return statsMap;

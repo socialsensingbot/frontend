@@ -1,8 +1,9 @@
+import {Pool} from "mysql";
+import TwitterApi from "twitter-api-v2";
+
 const aws = require("aws-sdk");
 const mysql = require("mysql");
 const stage = process.env.AWS_LAMBDA_FUNCTION_NAME.split("-")[1];
-
-import TwitterApi from "twitter-api-v2";
 
 console.log("STAGE: " + stage);
 const dev = stage === "dev";
@@ -23,20 +24,20 @@ const init = async () => {
     const twitterBearerToken = Parameters.filter(i => i.Name.endsWith("TWITTER_BEARER_TOKEN")).pop().Value;
     console.log("DB Password: " + dbPassword);
     // Initialising the MySQL connection
-    const connection = mysql.createPool({
-                                            connectionLimit: 5,
-                                            host:            "database-" + stage + ".cxsscwdzsrae.eu-west-2.rds.amazonaws.com",
-                                            user:            "admin",
-                                            password:        dbPassword,
-                                            database:        "socialsensing",
-                                            charset:         "utf8mb4",
-                                            // multipleStatements: true,
-                                            // connectTimeout: 15000,
-                                            // acquireTimeout: 10000,
-                                            waitForConnections: true,
-                                            queueLimit:         5000,
-                                            debug:              false
-                                        });
+    const connection: Pool = mysql.createPool({
+                                                  connectionLimit: 5,
+                                                  host:            "database-" + stage + ".cxsscwdzsrae.eu-west-2.rds.amazonaws.com",
+                                                  user:            "admin",
+                                                  password:        dbPassword,
+                                                  database:        "socialsensing",
+                                                  charset:         "utf8mb4",
+                                                  // multipleStatements: true,
+                                                  // connectTimeout: 15000,
+                                                  // acquireTimeout: 10000,
+                                                  waitForConnections: true,
+                                                  queueLimit:         5000,
+                                                  debug:              false
+                                              });
     const twitter = new TwitterApi(twitterBearerToken);
 
     return awsServerlessExpress.createServer(require("./app")(connection, twitter));
