@@ -5,7 +5,8 @@ import {RESTDataAPIService} from "../../api/rest-api.service";
 import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {
-    TimeseriesAnalyticsComponentState, timeSeriesAutocompleteType,
+    TimeseriesAnalyticsComponentState,
+    timeSeriesAutocompleteType,
     TimeseriesCollectionModel,
     TimeseriesModel,
     TimeseriesRESTQuery
@@ -69,7 +70,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 public dash: DashboardService, public auto: TextAutoCompleteService) {
         this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
         this.updateSavedGraphs();
-        this.pref.waitUntilReady().then(() => this.dash.waitUntilReady().then(() => {
+        this.pref.waitUntilReady().then(() => this.dash.waitUntilReady().then(async () => {
             this.ready = true;
         }));
 
@@ -86,7 +87,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this._type = value;
     }
 
-    private _state: TimeseriesAnalyticsComponentState = this.defaultState();
+    private _state: TimeseriesAnalyticsComponentState;
 
     public get state(): any {
         return this._state;
@@ -102,6 +103,12 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     async ngOnInit() {
+        await this.pref.waitUntilReady();
+        await this.clear();
+        this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
+        log.info("State is now " + JSON.stringify(this.state));
+        await this._updateGraphInternal(this.state.queries[0]);
+
         this._route.queryParams.subscribe(async queryParams => {
             if (queryParams.__clear_ui__) {
                 await this.clear();
@@ -126,13 +133,13 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 }
             } else {
                 await this.clear();
+                this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
+                await this.updateGraph(this.state.queries[0], true);
                 this.graphId = null;
                 this.title = "";
-                let doUpdate = false;
                 const queryParams = this._route.snapshot.queryParams;
                 if (typeof queryParams.textSearch !== "undefined") {
                     this.state.queries[0].textSearch = queryParams.textSearch;
-                    doUpdate = true;
                 }
                 if (typeof queryParams.region !== "undefined") {
                     if (Array.isArray(queryParams.region)) {
@@ -145,13 +152,11 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                     } else {
                         this.state.queries[0].regions = [queryParams.region];
                     }
-                    doUpdate = true;
                 }
-                if (doUpdate) {
-                    await this.updateGraph(this.state.queries[0], true);
-                }
+                await this.updateGraph(this.state.queries[0], true);
             }
         });
+
 
     }
 
@@ -173,7 +178,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                                   log.debug("Graph update from query ", query);
                                   this._changed = true;
                                   this.emitChange();
-                                  if (query.textSearch.length > 0 || query.regions.length > 0 || force) {
+                                  if (query.textSearch.length > 0 || force) {
                                       if (query.textSearch.length > 3) {
                                           // noinspection ES6MissingAwait
                                           this.auto.create(timeSeriesAutocompleteType, query.textSearch, true,
@@ -245,13 +250,13 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
-  public eocChanged() {
-      this.exec.uiActivity();
-      this.seriesCollection.yLabel = this.state.eoc === "exceedance" ? "Return Period" : "Count";
-      this.seriesCollection.yField = this.state.eoc === "exceedance" ? "exceedance" : "count";
-    this.seriesCollection.yAxisHasChanged();
-    this.exec.uiActivity();
-  }
+    public eocChanged() {
+        this.exec.uiActivity();
+        this.seriesCollection.yLabel = this.state.eoc === "exceedance" ? "Return Period" : "Count";
+        this.seriesCollection.yField = this.state.eoc === "exceedance" ? "exceedance" : "count";
+        this.seriesCollection.yAxisHasChanged();
+        this.exec.uiActivity();
+    }
 
     public removeQuery(query: TimeseriesRESTQuery) {
         this.state.queries = this.state.queries.filter(i => i.__series_id !== query.__series_id);
@@ -260,10 +265,12 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     public async clear() {
-        this.state.queries = [this.newQuery()];
-        this._updateGraphInternal(this.state.queries[0]);
+        log.info("Clearing graph");
+        this.state = this.defaultState();
+        log.info("State is now " + this.state);
         this.seriesCollection.clear();
-        this.exec.uiActivity();
+        await this._updateGraphInternal(this.state.queries[0]);
+
     }
 
     public graphTypeChanged(type: "bar" | "line") {
@@ -314,7 +321,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     private defaultState(): TimeseriesAnalyticsComponentState {
-        return {eoc: "count", lob: "line", queries: [this.newQuery()]};
+        const query: TimeseriesRESTQuery = this.newQuery();
+        return {eoc: "count", lob: "line", queries: [query]};
     }
 
     private async _updateGraphInternal(query) {

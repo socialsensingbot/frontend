@@ -1,4 +1,19 @@
+/* tslint:disable:object-literal-key-quotes */
 import {Dashboard} from "../app/pref/dashboard.service";
+import {LayerGroupsConfiguration} from "../app/types";
+
+const layerGroups: LayerGroupsConfiguration = {
+    "groups":            [
+        {
+            "id":       "flood-only",
+            "title":    "Floods",
+            "sources":  ["twitter"],
+            "hazards":  ["flood"],
+            "warnings": "exclude",
+        }
+    ],
+    "defaultLayerGroup": "flood-only"
+};
 
 const defaultDashboard: Dashboard = {
   boards: [{
@@ -15,7 +30,7 @@ export const environment = {
     name:             "production",
     lamdaEnvironment: "prod",
     demo:             false,
-    version: "2.3",
+    version:          "2.3",
     // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
     timezone:             "UTC",
     locale:               "en-GB",
@@ -60,12 +75,12 @@ export const environment = {
   animateOnTimeSliderChange:           false,
   recentTweetHighlightOffsetInSeconds: 1200,
 
-  mapTileUrlTemplate:           "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
-  blinkRateInMilliseconds:      1000,
-  defaultDashboard,
-  newExceedanceCalc:            false,
-  shareTextAutocompleteInGroup: true,
-    useRestMapData: true,
-
+    mapTileUrlTemplate:           "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
+    blinkRateInMilliseconds:      1000,
+    defaultDashboard,
+    layerGroups,
+    shareTextAutocompleteInGroup: true,
+    analyticsDefaultRegions:      ["uk"],
+    maxCallsPerMinute:            600,
 
 };

@@ -1,4 +1,3 @@
-/* tslint:disable:object-literal-key-quotes */
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
@@ -25,7 +24,7 @@ const defaultDashboard: Dashboard = {
 };
 
 const layerGroups: LayerGroupsConfiguration = {
-    groups:            [
+    "groups":            [
         {
             "id":       "flood-only",
             "title":    "Floods",
@@ -70,7 +69,7 @@ const layerGroups: LayerGroupsConfiguration = {
         },
 
     ],
-    defaultLayerGroup: "flood-only"
+    "defaultLayerGroup": "flood-only"
 };
 
 export const environment = {
@@ -129,8 +128,10 @@ export const environment = {
     blinkRateInMilliseconds:             1000,
     // mapTileUrlTemplate:
     // "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"
-    newExceedanceCalc:            false,
     shareTextAutocompleteInGroup: true,
     useRestMapData:               true,
+    maxCallsPerMinute:            200,
+
+    analyticsDefaultRegions: ["uk"]
 
 };

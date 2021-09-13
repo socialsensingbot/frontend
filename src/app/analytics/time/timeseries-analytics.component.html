@@ -66,17 +66,17 @@
   </app-timeseries-multi-query-chart>
 </div>
 
-<div class="app-query-builder-surround">
+<div *ngIf="state" class="app-query-builder-surround">
 
-  <mat-card *ngFor="let query of state.queries; index as i">
-    <mat-card-content>
-      <app-timeseries-analytics-form #form (changed)="updateGraph(query, i > 0);exec.uiActivity();"
-                                     [data]="query"></app-timeseries-analytics-form>
-    </mat-card-content>
-    <mat-card-actions>
-      <button *ngIf="i === 0" mat-raised-button color="primary" (click)="addQuery(query);">Add
-      </button>
-      <button *ngIf="i > 0" mat-raised-button color="warn" (click)="removeQuery(query)">Remove</button>
+    <mat-card *ngFor="let query of state.queries; index as i">
+        <mat-card-content>
+            <app-timeseries-analytics-form #form (changed)="updateGraph(query, true);exec.uiActivity();"
+                                           [data]="query"></app-timeseries-analytics-form>
+        </mat-card-content>
+        <mat-card-actions>
+            <button *ngIf="i === 0" mat-raised-button color="primary" (click)="addQuery(query);">Add
+            </button>
+            <button *ngIf="i > 0" mat-raised-button color="warn" (click)="removeQuery(query)">Remove</button>
     </mat-card-actions>
   </mat-card>
 
