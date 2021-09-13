@@ -71,7 +71,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
         this.updateSavedGraphs();
         this.pref.waitUntilReady().then(() => this.dash.waitUntilReady().then(async () => {
-            await this.clear();
             this.ready = true;
         }));
 
@@ -104,6 +103,11 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     async ngOnInit() {
+        await this.pref.waitUntilReady();
+        await this.clear();
+        this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
+        log.info("State is now " + JSON.stringify(this.state));
+        await this._updateGraphInternal(this.state.queries[0]);
 
         this._route.queryParams.subscribe(async queryParams => {
             if (queryParams.__clear_ui__) {
@@ -129,13 +133,13 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 }
             } else {
                 await this.clear();
+                this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
+                await this.updateGraph(this.state.queries[0], true);
                 this.graphId = null;
                 this.title = "";
-                let doUpdate = false;
                 const queryParams = this._route.snapshot.queryParams;
                 if (typeof queryParams.textSearch !== "undefined") {
                     this.state.queries[0].textSearch = queryParams.textSearch;
-                    doUpdate = true;
                 }
                 if (typeof queryParams.region !== "undefined") {
                     if (Array.isArray(queryParams.region)) {
@@ -148,11 +152,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                     } else {
                         this.state.queries[0].regions = [queryParams.region];
                     }
-                    doUpdate = true;
                 }
-                if (doUpdate) {
-                    await this.updateGraph(this.state.queries[0], true);
-                }
+                await this.updateGraph(this.state.queries[0], true);
             }
         });
 
@@ -172,13 +173,12 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         // Immutable copy
         const query = JSON.parse(JSON.stringify(q));
         this.updating = true;
-        console.trace();
         await this.exec.queue("update-timeseries-graph", null,
                               async () => {
                                   log.debug("Graph update from query ", query);
                                   this._changed = true;
                                   this.emitChange();
-                                  if (query.textSearch.length > 0 || query.regions.length > 0 || force) {
+                                  if (query.textSearch.length > 0 || force) {
                                       if (query.textSearch.length > 3) {
                                           // noinspection ES6MissingAwait
                                           this.auto.create(timeSeriesAutocompleteType, query.textSearch, true,
@@ -266,7 +266,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     public async clear() {
         log.info("Clearing graph");
-        this.state = await this.defaultState();
+        this.state = this.defaultState();
         log.info("State is now " + this.state);
         this.seriesCollection.clear();
         await this._updateGraphInternal(this.state.queries[0]);
@@ -320,10 +320,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         return from;
     }
 
-    private async defaultState(): Promise<TimeseriesAnalyticsComponentState> {
+    private defaultState(): TimeseriesAnalyticsComponentState {
         const query: TimeseriesRESTQuery = this.newQuery();
-        await this.pref.waitUntilReady();
-        query.regions = this.pref.combined.analyticsDefaultRegions;
         return {eoc: "count", lob: "line", queries: [query]};
     }
 

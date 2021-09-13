@@ -70,7 +70,7 @@
 
     <mat-card *ngFor="let query of state.queries; index as i">
         <mat-card-content>
-            <app-timeseries-analytics-form #form (changed)="updateGraph(query, i > 0);exec.uiActivity();"
+            <app-timeseries-analytics-form #form (changed)="updateGraph(query, true);exec.uiActivity();"
                                            [data]="query"></app-timeseries-analytics-form>
         </mat-card-content>
         <mat-card-actions>
