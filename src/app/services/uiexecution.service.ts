@@ -97,7 +97,7 @@ export class UIExecutionService {
                     }
                 } else {
                     if (task.reschedule) {
-                        setInterval(
+                        setTimeout(
                             () => {
                                 this._queue.push(task);
                             }, task.rescheduleDelay

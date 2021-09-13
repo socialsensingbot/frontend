@@ -70,7 +70,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 public dash: DashboardService, public auto: TextAutoCompleteService) {
         this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
         this.updateSavedGraphs();
-        this.pref.waitUntilReady().then(() => this.dash.waitUntilReady().then(() => {
+        this.pref.waitUntilReady().then(() => this.dash.waitUntilReady().then(async () => {
+            await this.clear();
             this.ready = true;
         }));
 
@@ -103,7 +104,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     async ngOnInit() {
-        await this.clear();
+
         this._route.queryParams.subscribe(async queryParams => {
             if (queryParams.__clear_ui__) {
                 await this.clear();
@@ -171,6 +172,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         // Immutable copy
         const query = JSON.parse(JSON.stringify(q));
         this.updating = true;
+        console.trace();
         await this.exec.queue("update-timeseries-graph", null,
                               async () => {
                                   log.debug("Graph update from query ", query);
@@ -268,7 +270,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         log.info("State is now " + this.state);
         this.seriesCollection.clear();
         await this._updateGraphInternal(this.state.queries[0]);
-        this.exec.uiActivity();
+
     }
 
     public graphTypeChanged(type: "bar" | "line") {
