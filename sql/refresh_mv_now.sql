@@ -17,7 +17,7 @@ BEGIN
 
     START TRANSACTION;
 
-    SET @maxTimestamp = (select max(source_timestamp) from mat_view_regions);
+    SET @maxTimestamp = IFNULL((select max(source_timestamp) from mat_view_regions), NOW() - INTERVAL 20 YEAR);
 
     REPLACE INTO mat_view_regions
     SELECT t.source_id, t.source, t.hazard, source_timestamp, region_type, region, warning
