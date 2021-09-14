@@ -111,8 +111,11 @@ export class RESTDataAPIService {
         if (this.callsPerMinute > environment.maxCallsPerMinute) {
             console.error("Excessive api calls per minute: " + this.callsPerMinute);
             console.error("API call was path: " + fullPath + " payload: " + JSON.stringify(payload));
-            this._notify.show("Too many calls to the server (" + this.callsPerMinute + " > " + environment.maxCallsPerMinute + ").",
-                              "Throttling ...", 60);
+            if (!environment.production) {
+                this._notify.show("Too many calls to the server (" + this.callsPerMinute + " > " + environment.maxCallsPerMinute + ").",
+                                  "Throttling ...", 60);
+            }
+            return;
 
         }
         return API.post("query", fullPath, {
