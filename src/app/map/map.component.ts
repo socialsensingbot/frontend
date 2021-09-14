@@ -168,6 +168,7 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this.ready) {
             this.scheduleResetLayers(this.activeStatistic);
         }
+        this.updateSearch({active_layer: this._activeLayerGroup});
         this._twitterIsStale = true;
         this.ready = false;
         this.load();
@@ -542,7 +543,7 @@ export class MapComponent implements OnInit, OnDestroy {
             max_time,
             min_offset,
             max_offset,
-            layer_group
+            active_layer
         } = params;
         this._newParams = params;
         this._absoluteTime = await this.data.now();
@@ -563,11 +564,11 @@ export class MapComponent implements OnInit, OnDestroy {
             this._dateMax = roundToMinute(await this.data.now());
         }
         this.sliderOptions = {...this.sliderOptions, startMax: this._dateMax};
-        if (typeof layer_group !== "undefined") {
-            this._activeLayerGroup = layer_group;
+        if (typeof active_layer !== "undefined") {
+            this.activeLayerGroup = active_layer;
         }
 
-        this.checkForLiveUpdating();
+        await this.checkForLiveUpdating();
         // this._notify.show(JSON.stringify(this.sliderOptions));
         log.debug("Slider options: ", this.sliderOptions);
         // This handles the fact that the zoom and lat/lng can change independently of each other
@@ -1041,7 +1042,7 @@ export class MapComponent implements OnInit, OnDestroy {
         log.debug("updateFromSlider()");
         this.liveUpdating = this.sliderOptions.startMax > -this.pref.combined.continuousUpdateThresholdInMinutes;
 
-        this.checkForLiveUpdating();
+        await this.checkForLiveUpdating();
         await this.updateLayers("Slider Change");
         this._twitterIsStale = true;
     }
@@ -1058,7 +1059,7 @@ export class MapComponent implements OnInit, OnDestroy {
             max: await this.data.now(),
             min: await this.data.minDate() - 60 * 1000,
         };
-        this.checkForLiveUpdating();
+        await this.checkForLiveUpdating();
 
     }
 
