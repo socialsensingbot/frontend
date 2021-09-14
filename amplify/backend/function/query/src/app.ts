@@ -520,29 +520,6 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
         }, {duration: 24 * 60 * 60});
     });
 
-    // app.post("/map/:map/region-type/:regionType/regions-with-data", async (req, res) => {
-    //     return sql({
-    //                    // language=MySQL
-    //                    sql: `select *
-    //                          from (SELECT count(*)                      as count,
-    //                                       DATE(source_date)             as date,
-    //                                       (select count(*) from (select distinct date(source_date) from live_text) x) /
-    //                                       (rank() OVER w)               as exceedance,
-    //                                       1.0 / (percent_rank() OVER w) as inv_percent
-    //                                FROM live_text,
-    //                                     ref_map_layer_groups_mapping lgm,
-    //                                     ref_map_layers l
-    //                                WHERE source = l.source
-    //                                  and hazard = l.hazard
-    //                                  and l.id = lgm.layer_id
-    //                                  and lgm.layer_group_id = ?
-    //                                  and region_1 IN (?)
-    //                                group by DATE(source_date)
-    //                                    WINDOW w AS (ORDER BY COUNT(DATE(source_date)) desc)
-    //                                order by source_date) x
-    //                          where date between ? and ? `,
-    //                    values: [req.body.layerGroup, req.params.regions, dateFromMillis(req.body.startDate),
-    // dateFromMillis(req.body.endDate)] }); });
 
 
     async function getCachedStats(end: number, periodLengthInSeconds: number, req): Promise<any[]> {
@@ -568,25 +545,6 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
         cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
             const result = {};
 
-            //
-            // const testValues = await sql({
-            //                            // language=MySQL
-            //                            sql: `SELECT count(*)                                       as count,
-            //                                               round(unix_timestamp(source_timestamp) / ?, 0) as period,
-            //                                               cume_dist()  OVER w * 100                             as exceedance
-            //                                        FROM live_text t,
-            //                                             ref_map_layer_groups_mapping lgm,
-            //                                             ref_map_layers l
-            //                                        WHERE t.source = l.source
-            //                                          and t.hazard = l.hazard
-            //                                          and l.id = lgm.layer_id
-            //                                          and lgm.layer_group_id = ?
-            //                                          and region_1 = 'greater london'
-            //                                        group by period
-            //                                            WINDOW w AS (ORDER BY COUNT(period) desc) `,
-            //
-            //                            values: [periodLengthInSeconds, req.body.layerGroup]
-            //                        });
             const lastDate: Date = (await maps)[req.params.map].last_date;
             const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
             const start = Math.floor(req.body.startDate / 1000);
@@ -663,7 +621,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
 
             return result;
 
-        }, {duration: 50 * 60});
+        }, {duration: 1 * 60});
 
     });
 
