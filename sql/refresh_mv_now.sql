@@ -20,12 +20,14 @@ BEGIN
     SET @maxTimestamp = IFNULL((select max(source_timestamp) from mat_view_regions), NOW() - INTERVAL 20 YEAR);
 
     REPLACE INTO mat_view_regions
-    SELECT t.source_id, t.source, t.hazard, source_timestamp, region_type, region, warning
-    FROM live_text t
-             left join
-         live_text_regions tr on tr.source_id = t.source_id and tr.source = t.source and tr.hazard = t.hazard
-    WHERE source_timestamp >= @maxTimestamp
-      AND NOT deleted;
+    SELECT t.source_id, t.source, t.hazard, t.source_timestamp, tr.region_type, tr.region, t.warning
+    FROM live_text t,
+         live_text_regions tr
+    where tr.source_id = t.source_id
+      and tr.source = t.source
+      and tr.hazard = t.hazard
+      and NOT deleted
+    ORDER BY source_timestamp DESC;
     COMMIT;
 
     SET rc = 0;
