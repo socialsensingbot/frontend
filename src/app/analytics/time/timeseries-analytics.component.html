@@ -1,15 +1,15 @@
 <mat-toolbar class="app-timeseries-toolbar">
-  <ng-container *ngIf="ready">
-    <mat-toolbar-row>
-      <mat-button-toggle-group name="eoc" class="eoc"
-                               [(ngModel)]="state.eoc" aria-label="Return Period or Count"
-                               (valueChange)="eocChanged()">
-          <mat-button-toggle value="exceedance">Return Period</mat-button-toggle>
-          <mat-button-toggle value="count">Count</mat-button-toggle>
-      </mat-button-toggle-group>
+  <ng-container *ngIf="ready && state">
+      <mat-toolbar-row>
+          <mat-button-toggle-group name="eoc" class="eoc"
+                                   [(ngModel)]="state.eoc" aria-label="Return Period or Count"
+                                   (valueChange)="eocChanged()">
+              <mat-button-toggle value="exceedance">Return Period</mat-button-toggle>
+              <mat-button-toggle value="count">Count</mat-button-toggle>
+          </mat-button-toggle-group>
 
-      <div class="app-toolbar-separator"></div>
-      <mat-button-toggle-group name="lob" class="lob" (valueChange)="graphTypeChanged(state.lob)"
+          <div class="app-toolbar-separator"></div>
+          <mat-button-toggle-group name="lob" class="lob" (valueChange)="graphTypeChanged(state.lob)"
                                aria-label="Line or Bar" [(ngModel)]="state.lob">
         <mat-button-toggle value="line">Line</mat-button-toggle>
         <mat-button-toggle value="bar">Bar</mat-button-toggle>
