@@ -1040,7 +1040,10 @@ export class MapComponent implements OnInit, OnDestroy {
      */
     private async updateFromSlider() {
         log.debug("updateFromSlider()");
-        this.liveUpdating = this.sliderOptions.startMax > -this.pref.combined.continuousUpdateThresholdInMinutes;
+        log.debug("updateFromSlider() startMax=" + this.sliderOptions.startMax);
+        log.debug(
+            "updateFromSlider() threshold=" + (await this.data.now() - this.pref.combined.continuousUpdateThresholdInMinutes * 60_000));
+        this.liveUpdating = this.sliderOptions.startMax >= await this.data.now() - this.pref.combined.continuousUpdateThresholdInMinutes * 60_000;
 
         await this.checkForLiveUpdating();
         await this.updateLayers("Slider Change");
@@ -1065,7 +1068,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     private async checkForLiveUpdating() {
         log.debug("checkForLiveUpdating()");
-        if (this.sliderOptions.startMax > -this.pref.combined.continuousUpdateThresholdInMinutes) {
+        if (this.sliderOptions.startMax >= await this.data.now() - this.pref.combined.continuousUpdateThresholdInMinutes * 60_000) {
             this.liveUpdating = true;
         } else {
             log.debug("LIVE UPDATES OFF: slider position was ", this.sliderOptions.startMax);
