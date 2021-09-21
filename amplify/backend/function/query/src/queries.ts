@@ -54,18 +54,20 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                                                                      dateFromMillis(params.to)];
             return {
                 sql: `select *
-                      from (SELECT count(source_date) as count,
-                                   DATE(source_date)        as date,
+                      from (SELECT count(DATE(vr.source_timestamp)) as count,
+                                   DATE(vr.source_timestamp)        as date,
                                    parent             as region, ${exceedance}
-                            FROM live_text live,
+                            FROM mat_view_regions vr,
                                 ref_region_groups as rrg
-                            WHERE live.source = ?
-                              and live.hazard = ?
-                              and live.region_1 = rrg.region
-                              and rrg.parent in (?) ${fullText}
-                            group by DATE (source_date), rrg.parent
-                                WINDOW w AS (ORDER BY COUNT (DATE (source_date)) desc)
-                            order by source_date) x
+                            WHERE vr.source = ?
+                              and vr.hazard = ?
+                              and vr.region = rrg.region
+                              and vr.region_type = 'county'
+                              and rrg.parent in (?) 
+                              ${fullText}
+                            group by DATE (vr.source_timestamp), rrg.parent
+                                WINDOW w AS (ORDER BY COUNT (DATE (vr.source_timestamp)) desc)
+                            order by DATE(vr.source_timestamp)) x
                       where date between ? and ?`,
                 values
             };

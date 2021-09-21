@@ -76,7 +76,7 @@ export class RESTDataAPIService {
                     return cachedItem.data;
                 } else {
                     log.debug("Value for " + key + " not in cache");
-                    return await this.callAPIInternal(path, payload, cacheForSeconds, key);
+                    return await this.callAPIInternal(path, payload, cacheForSeconds, key, false);
                 }
             } else {
                 return await API.get("query", path, {
@@ -89,11 +89,12 @@ export class RESTDataAPIService {
     }
 
 
-    public async callMapAPIWithCache(path: string, payload: any, cacheForSeconds: number = -1): Promise<any> {
+    public async callMapAPIWithCache(path: string, payload: any, cacheForSeconds: number = -1, cacheEmptyResponses = false): Promise<any> {
         log.verbose("callMapAPIWithCache()");
         const key = "rest:map/" + path + ":" + JSON.stringify(payload);
         const cachedItem = await this.cache.getCached(key);
-        if (cacheForSeconds > 0 && cachedItem && cachedItem.hasData && !cachedItem.expired) {
+        if (cacheForSeconds > 0 && cachedItem && cachedItem.hasData && !cachedItem.expired && (cacheEmptyResponses || JSON.stringify(
+            cachedItem.data) !== "{}")) {
             // tslint:disable-next-line:no-console
             log.verbose("Value for " + key + "in cache");
             // log.debug("Value for " + key + " was " + JSON.stringify(cachedItem.data));
@@ -101,12 +102,13 @@ export class RESTDataAPIService {
             return cachedItem.data;
         } else {
             log.info("Value for " + key + " not in cache");
-            return await this.callAPIInternal("/map/" + path, payload, cacheForSeconds, key);
+            return await this.callAPIInternal("/map/" + path, payload, cacheForSeconds, key, cacheEmptyResponses);
         }
     }
 
 
-    private async callAPIInternal(fullPath: string, payload: any, cacheForSeconds: number, key: string): Promise<Promise<any>> {
+    private async callAPIInternal(fullPath: string, payload: any, cacheForSeconds: number, key: string,
+                                  cacheEmptyResponses: boolean): Promise<Promise<any>> {
         this.calls++;
         if (this.callsPerMinute > environment.maxCallsPerMinute) {
             console.error("Excessive api calls per minute: " + this.callsPerMinute);
@@ -130,7 +132,7 @@ export class RESTDataAPIService {
             if (typeof data !== "undefined") {
                 // tslint:disable-next-line:no-console
                 console.debug("Returning uncached item", data);
-                if (cacheForSeconds > 0) {
+                if (cacheForSeconds > 0 && (cacheEmptyResponses || JSON.stringify(data) !== "{}")) {
                     this.cache.setCached(key, data, cacheForSeconds * 1000);
                 }
             } else {
@@ -153,7 +155,7 @@ export class RESTDataAPIService {
                         this._notify.show("Problem resolved", "Good", 2000);
                         // tslint:disable-next-line:no-console
                         console.debug("Returning uncached item", data);
-                        if (cacheForSeconds > 0) {
+                        if (cacheForSeconds > 0 && (cacheEmptyResponses || JSON.stringify(data) !== "{}")) {
                             this.cache.setCached(key, data, cacheForSeconds * 1000);
                         }
                         resolve(data);
