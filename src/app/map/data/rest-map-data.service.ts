@@ -362,7 +362,7 @@ export class RESTMapDataService {
             startDate: roundToHour(startDate),
             endDate:   roundToHour(endDate)
 
-        }, 900) as RegionStatsMap;
+        }, 60) as RegionStatsMap;
         return statsMap;
     }
 }
