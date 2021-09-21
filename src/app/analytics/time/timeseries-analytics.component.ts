@@ -132,9 +132,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                     this.navigateToRoot();
                 }
             } else {
-                await this.clear();
-                this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
-                await this.updateGraph(this.state.queries[0], true);
                 this.graphId = null;
                 this.title = "";
                 const queryParams = this._route.snapshot.queryParams;
@@ -142,18 +139,26 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                     this.state.queries[0].textSearch = queryParams.textSearch;
                 }
                 if (typeof queryParams.region !== "undefined") {
+                    this.state = this.defaultState();
+                    log.info("State is now " + this.state);
+                    this.seriesCollection.clear();
                     if (Array.isArray(queryParams.region)) {
                         for (const region of queryParams.region) {
                             const newQuery = this.newQuery();
                             newQuery.regions.push(region);
-                            this.state.queries.unshift(newQuery);
+                            this.state.queries = [newQuery];
                             await this.updateGraph(newQuery, true);
                         }
                     } else {
                         this.state.queries[0].regions = [queryParams.region];
+                        await this._updateGraphInternal(this.state.queries[0]);
                     }
+                } else {
+                    await this.clear();
+                    this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
+                    await this.updateGraph(this.state.queries[0], true);
+
                 }
-                await this.updateGraph(this.state.queries[0], true);
             }
         });
 
