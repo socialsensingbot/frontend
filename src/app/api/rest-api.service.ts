@@ -14,7 +14,7 @@ import {timer} from "rxjs";
 
 const useLambda = false;
 
-const retryPeriod = 60000;
+const retryPeriod = 20000;
 const log = new Logger("rest-api-service");
 
 @Injectable({
