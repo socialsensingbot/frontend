@@ -24,41 +24,12 @@ const layerGroups: LayerGroupsConfiguration = {
             "warnings": "exclude",
         },
         {
-            "id":       "flood-with-warnings",
-            "title":    "Floods (includes warnings)",
-            "sources":  ["twitter"],
-            "hazards":  ["flood"],
-            "warnings": "include"
-        },
-        {
-            "id":       "flood-warnings-only",
-            "title":    "Floods (only warnings)",
-            "sources":  ["twitter"],
-            "hazards":  ["flood"],
-            "warnings": "only"
-        },
-        {
             "id":       "wind-only",
             "title":    "Wind",
             "sources":  ["twitter"],
             "hazards":  ["wind"],
             "warnings": "exclude"
-        },
-        {
-            "id":       "wind-and-flood",
-            "title":    "Wind & Flood",
-            "sources":  ["twitter"],
-            "hazards":  ["wind", "flood"],
-            "warnings": "exclude"
-        },
-        {
-            "id":       "snow-only",
-            "title":    "Snow",
-            "sources":  ["twitter"],
-            "hazards":  ["snow"],
-            "warnings": "exclude"
-        },
-
+        }
     ],
     "defaultLayerGroup": "flood-only"
 };
