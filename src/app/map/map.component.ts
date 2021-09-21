@@ -170,7 +170,6 @@ export class MapComponent implements OnInit, OnDestroy {
         }
         this.updateSearch({active_layer: this._activeLayerGroup});
         this._twitterIsStale = true;
-        this.ready = false;
         this.load();
     }
 
