@@ -403,7 +403,7 @@ export class PreferenceService {
                                                                      .ownerGroups("contains", this._groups[0]));
         log.debug(result);
         if (result.length === 0) {
-            DataStore.save(new GroupTweetIgnore(
+            await DataStore.save(new GroupTweetIgnore(
                 {
                     url:         tweet.url,
                     tweetId:     tweet.id,

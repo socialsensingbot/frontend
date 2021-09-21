@@ -112,7 +112,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this._route.queryParams.subscribe(async queryParams => {
             if (queryParams.__clear_ui__) {
                 await this.clear();
-                this._router.navigate([], {});
+                await this._router.navigate([], {});
             }
         });
         this._route.params.subscribe(async params => {
@@ -216,7 +216,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                     this.graphId = savedGraph.id;
                     this.title = dialogData.title;
                     this.updateSavedGraphs();
-                    this._router.navigate(["/analytics/time/" + this.graphId], {queryParamsHandling: "preserve"});
+                    await this._router.navigate(["/analytics/time/" + this.graphId], {queryParamsHandling: "preserve"});
 
                 }
             });

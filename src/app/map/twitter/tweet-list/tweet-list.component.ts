@@ -223,7 +223,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
     public async annotateTweetKeyValue(tweet, annotationKey, annotationValue, $event: MouseEvent) {
         const annotations = {};
         annotations[annotationKey] = annotationValue;
-        this.annotateTweet(tweet, annotations, $event);
+        await this.annotateTweet(tweet, annotations, $event);
     }
 
     public async removeTweetAnnotations(tweet, $event: MouseEvent) {
