@@ -9,11 +9,13 @@ import Auth from "@aws-amplify/auth";
 const log = new Logger("uiexecution");
 
 class ExecutionTask {
+    public rescheduleAttempts: number = 0;
 
     constructor(private _resolve: (value?: any) => void, private _reject: (reason?: any) => void,
                 private _task: () => any, public name: string, public waitForStates: AppState[] | null,
                 private _dedup: string, private _notify: NotificationService, public reschedule: boolean,
-                public silentFailure: boolean, public waitForUIState: UIState, public rescheduleDelay: number) {
+                public silentFailure: boolean, public waitForUIState: UIState, public rescheduleDelay: number,
+                public maxRescheduleAttempts: number) {
 
     }
 
@@ -97,14 +99,20 @@ export class UIExecutionService {
                     }
                 } else {
                     if (task.reschedule) {
-                        setTimeout(
-                            () => {
-                                this._queue.push(task);
-                            }, task.rescheduleDelay
-                        );
-                        log.debug(
-                            `RESCHEDULED out of sequence task ${task.name} on execution queue,
+                        task.rescheduleAttempts++;
+                        if (task.rescheduleAttempts < task.maxRescheduleAttempts) {
+                            setTimeout(
+                                () => {
+                                    this._queue.push(task);
+                                }, task.rescheduleDelay
+                            );
+                            log.debug(
+                                `RESCHEDULED out of sequence task ${task.name} on execution queue,
               state ${this._state} needs to be one of ${task.waitForStates} and ${this.uistate} must be ${task.waitForUIState}.`);
+                        } else {
+                            log.warn(`FAILED TO RESCHEDULE out of sequence task ${task.name} on execution queue,
+              state ${this._state} needs to be one of ${task.waitForStates} and ${this.uistate} must be ${task.waitForUIState}, max attempts (${task.maxRescheduleAttempts}) exceeded.`);
+                        }
                         return;
                     } else {
                         const message = `Skipped out of sequence task ${task.name} on execution queue,
@@ -145,7 +153,7 @@ export class UIExecutionService {
 
     public queue(name: string, waitForStates: AppState[] | null, task: () => any, dedup: any = null,
                  silentFailure: boolean = false, replaceExisting: boolean = false, reschedule: boolean = false,
-                 waitForUIState: UIState = null, rescheduleDelayInMillis = 100) {
+                 waitForUIState: UIState = null, rescheduleDelayInMillis = 100, maxRescheduleAttempts = 100000) {
 
         return new Promise<any>((resolve, reject) => {
             let dedupKey = null;
@@ -154,7 +162,8 @@ export class UIExecutionService {
 
             }
             const executionTask = new ExecutionTask(resolve, reject, task, name, waitForStates, dedupKey, this._notify,
-                                                    reschedule, silentFailure, waitForUIState, rescheduleDelayInMillis);
+                                                    reschedule, silentFailure, waitForUIState, rescheduleDelayInMillis,
+                                                    maxRescheduleAttempts);
             if (dedupKey !== null) {
                 if (this.dedupMap.has(dedupKey)) {
                     if (replaceExisting) {
