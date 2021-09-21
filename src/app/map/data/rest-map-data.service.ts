@@ -139,7 +139,7 @@ export class RESTMapDataService {
             startDate: roundToMinute(await this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000),
             endDate:   roundToMinute(await this.now())
 
-        }) as Promise<RegionTweeCount>;
+        }, 60) as Promise<RegionTweeCount>;
     }
 
 
@@ -277,11 +277,6 @@ export class RESTMapDataService {
     public async preCacheRegionStatsMap(layerGroupId: string, activeRegionType: string, _dateMin: number, _dateMax: number): Promise<void> {
         await this.getRegionStatsMap(layerGroupId, activeRegionType, _dateMin, _dateMax);
     }
-
-    private async regionNamesWithData(layerGroupId: string, regionType: string, startDate: number, endDate: number): Promise<string[]> {
-        return Object.keys(await this.getRegionStatsMap(layerGroupId, regionType, startDate, endDate));
-    }
-
     public async geoJsonGeographyFor(regionType: string): Promise<FeatureCollection> {
         return await this.loadGeography(regionType) as FeatureCollection;
     }
@@ -367,7 +362,7 @@ export class RESTMapDataService {
             startDate: roundToHour(startDate),
             endDate:   roundToHour(endDate)
 
-        }, 60) as RegionStatsMap;
+        }, 900) as RegionStatsMap;
         return statsMap;
     }
 }

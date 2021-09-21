@@ -79,7 +79,7 @@ export class RESTDataAPIService {
                     return await this.callAPIInternal(path, payload, cacheForSeconds, key);
                 }
             } else {
-                return API.get("query", path, {
+                return await API.get("query", path, {
                     headers: {
                         Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
                     }
@@ -100,7 +100,7 @@ export class RESTDataAPIService {
             // console.debug("Return cached item", JSON.stringify(cachedItem));
             return cachedItem.data;
         } else {
-            log.verbose("Value for " + key + " not in cache");
+            log.info("Value for " + key + " not in cache");
             return await this.callAPIInternal("/map/" + path, payload, cacheForSeconds, key);
         }
     }

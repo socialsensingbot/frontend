@@ -201,7 +201,7 @@ export class MapComponent implements OnInit, OnDestroy {
                         ...this.data.serviceMetadata.start,
                         ...this.data.mapMetadata.start,
                     };
-                    this.updateSearch({zoom, lng, lat, selected: null});
+                    await this.updateSearch({zoom, lng, lat, selected: null});
                     this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 6000});
                 }
                 this.ready = true;
@@ -272,7 +272,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
         // Merge the params to change into _newParams which holds the
         // next set of parameters to add to the URL state.
-        return this._exec.queue("Update URL Query Params", ["ready", "data-refresh"], async () => {
+        return await this._exec.queue("Update URL Query Params", ["ready", "data-refresh"], async () => {
             const keys = {...this._newParams, ...params};
             this._newParams = {};
             Object.keys(keys).sort().forEach((key) => {
@@ -621,6 +621,7 @@ export class MapComponent implements OnInit, OnDestroy {
                 }
             });
         });
+        // noinspection ES6MissingAwait
         this.dash.init();
         log.debug("init");
         // map.zoomControl.remove();
@@ -667,6 +668,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
             if (!this._params) {
                 this._params = true;
+                // noinspection ES6MissingAwait
                 this._exec.queue("Initial Search Params", ["no-params"],
                                  async () => {
                                      await this.updateMapFromQueryParams(params);
@@ -720,7 +722,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
         await this.updateSearch({selected: []});
         this.selectedFeatureNames = [];
-        this.scheduleResetLayers(this.activeStatistic, true);
+        await this.scheduleResetLayers(this.activeStatistic, true);
     }
 
     /**
@@ -969,7 +971,7 @@ export class MapComponent implements OnInit, OnDestroy {
             for (const feature of features) {
                 const featureProperties = feature.properties;
                 const region = featureProperties.name;
-                this.data.regionStats(this.activeLayerGroup, this.activeRegionType, region, this._dateMin, this._dateMax).then(
+                await this.data.regionStats(this.activeLayerGroup, this.activeRegionType, region, this._dateMin, this._dateMax).then(
                     mapStats => {
                         if (mapStats !== null) {
                             featureProperties.count = mapStats.count;
