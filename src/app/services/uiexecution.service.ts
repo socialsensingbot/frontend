@@ -8,6 +8,8 @@ import Auth from "@aws-amplify/auth";
 
 const log = new Logger("uiexecution");
 
+const maxTaskDuration: number = 1000;
+
 class ExecutionTask {
     public rescheduleAttempts: number = 0;
 
@@ -26,8 +28,13 @@ class ExecutionTask {
 
     public execute() {
         try {
+            const start = Date.now();
             log.info("ExecutionTask: executing " + this.name + "(" + this.dedup + ")");
             this._resolve(this._task());
+            if (Date.now() - start > maxTaskDuration) {
+                log.warn(
+                    `Task exceeded maximum recommended duration: ${this.name}(${this.dedup}) max is ${maxTaskDuration} this took ${Date.now() - start}`);
+            }
         } catch (e) {
             log.error("ERROR Executing " + this.name);
             this._reject(e);
@@ -85,45 +92,57 @@ export class UIExecutionService {
             }
         });
         this._executionTimer = timer(0, 100).subscribe(() => {
+            if (this._queue.length > 0) {
+                log.info(this._queue.length + " items in the execution queue ", this._queue);
+            }
             const snapshot = [...this._queue];
             this._queue = [];
             while (snapshot.length > 0 && !this._pause) {
                 const task = snapshot.shift();
-                log.debug("Execution Queue", this._queue);
-                if ((task.waitForStates === null || task.waitForStates.indexOf(
-                    this._state) >= 0) && (task.waitForUIState === null || this.uistate === task.waitForUIState)) {
-                    log.info("Executing " + task.name + "(" + task.dedup + ")");
-                    task.execute();
-                    if (task.dedup !== null) {
-                        this.dedupMap.delete(task.dedup);
-                    }
-                } else {
-                    if (task.reschedule) {
-                        task.rescheduleAttempts++;
-                        if (task.rescheduleAttempts < task.maxRescheduleAttempts) {
-                            setTimeout(
-                                () => {
-                                    this._queue.push(task);
-                                }, task.rescheduleDelay
-                            );
-                            log.debug(
-                                `RESCHEDULED out of sequence task ${task.name} on execution queue,
-              state ${this._state} needs to be one of ${task.waitForStates} and ${this.uistate} must be ${task.waitForUIState}.`);
-                        } else {
-                            log.warn(`FAILED TO RESCHEDULE out of sequence task ${task.name} on execution queue,
-              state ${this._state} needs to be one of ${task.waitForStates} and ${this.uistate} must be ${task.waitForUIState}, max attempts (${task.maxRescheduleAttempts}) exceeded.`);
+                try {
+                    log.debug("Execution Queue", this._queue);
+                    log.debug(`Task ${task.name} taken from queue`);
+                    if ((task.waitForStates === null || task.waitForStates.indexOf(
+                        this._state) >= 0) && (task.waitForUIState === null || this.uistate === task.waitForUIState)) {
+                        log.info(`Executing ${task.name}(${task.dedup})`);
+                        task.execute();
+                        if (task.dedup !== null) {
+                            this.dedupMap.delete(task.dedup);
                         }
-                        return;
                     } else {
-                        const message = `Skipped out of sequence task ${task.name} on execution queue,
-             state ${this._state} should be one of ${task.waitForStates} and ${this.uistate} must be ${task.waitForUIState}.`;
-                        if (task.silentFailure) {
-                            log.debug(message);
+                        if (task.reschedule) {
+                            task.rescheduleAttempts++;
+                            if (task.rescheduleAttempts < task.maxRescheduleAttempts) {
+                                setTimeout(
+                                    () => {
+
+                                        this._queue.push(task);
+                                        log.debug(
+                                            `RE-ADDED out of sequence task ${task.name} for ${task.rescheduleDelay}ms on execution queue,
+              state ${this._state} needs to be one of ${task.waitForStates} and ${this.uistate} must be ${task.waitForUIState}.`,
+                                            this._queue);
+                                    }, task.rescheduleDelay
+                                );
+                                log.debug(
+                                    `RESCHEDULED out of sequence task ${task.name} for ${task.rescheduleDelay}ms on execution queue,
+              state ${this._state} needs to be one of ${task.waitForStates} and ${this.uistate} must be ${task.waitForUIState}.`);
+                            } else {
+                                log.warn(`FAILED TO RESCHEDULE out of sequence task ${task.name} on execution queue,
+              state ${this._state} needs to be one of ${task.waitForStates} and ${this.uistate} must be ${task.waitForUIState}, max attempts (${task.maxRescheduleAttempts}) exceeded.`);
+                            }
                         } else {
-                            this._notify.error(message);
+                            const message = `Skipped out of sequence task ${task.name} on execution queue,
+             state ${this._state} should be one of ${task.waitForStates} and ${this.uistate} must be ${task.waitForUIState}.`;
+                            if (task.silentFailure) {
+                                log.debug(message);
+                            } else {
+                                this._notify.error(message);
+                            }
+                            // this._queue.push(task)
                         }
-                        // this._queue.push(task)
                     }
+                } catch (e) {
+                    console.error(`FAILED TO EXECUTE task ${task.name} on execution queue error was: ${e.message}`, e);
                 }
             }
 
@@ -167,6 +186,8 @@ export class UIExecutionService {
             if (dedupKey !== null) {
                 if (this.dedupMap.has(dedupKey)) {
                     if (replaceExisting) {
+                        log.info(
+                            `Replacing existing ${name} (${dedupKey}) on execution queue as this task is already queued and deduplication is turned on.`);
                         if (!silentFailure) {
                             log.warn(`Replacing duplicate ${name} (${dedupKey}) on execution queue`);
                         }

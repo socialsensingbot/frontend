@@ -52,7 +52,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
             return this.cleanDate(value, 0, "");
         },
         translate:            (value: number, label: LabelType): string => {
-            log.debug("translate value " + value + " for " + label);
+            log.verbose("translate value " + value + " for " + label);
 
             if (value === this.sliderOptions.ceil && this._pref.combined.mostRecentDateIsNow) {
                 return `<span class="slider-date-time slider-date-time-max"><span class='slider-time'></span> <span class='slider-date'>now</span></span>`;
@@ -171,7 +171,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     }
 
     cleanDate(value, add, label): string {
-        log.debug("cleanDate(" + value + ")");
+        log.verbose("cleanDate(" + value + ")");
         const date = new Date(value);
         const ye = new Intl.DateTimeFormat(environment.locale,
                                            {year: "2-digit", timeZone: environment.timezone}).format(
