@@ -82,21 +82,21 @@ export const environment = {
             {title: "Coastal", value: "coastal", color: "#F4511E"}
         ]
     },
-    features:                            ["impact", "source", "map", "dashboard", "analytics"],
-    showErrors:                          true,
-    showLoadingMessages:                 true,
-    mostRecentDateIsNow:                 true,
-    sanitizeForGDPR:                     true,
-    continuousUpdateThresholdInMinutes:  5,
-    animateOnTimeSliderChange:           false,
+    features: ["impact", "source", "map", "dashboard", "analytics"],
+    showErrors: true,
+    showLoadingMessages: true,
+    mostRecentDateIsNow: true,
+    sanitizeForGDPR: true,
+    continuousUpdateThresholdInMinutes: 5,
+    animateOnTimeSliderChange: false,
     recentTweetHighlightOffsetInSeconds: 1200,
-    defaultDataSet:                      "uk-flood-live",
-    availableDataSets:                   ["*"], // A list of datasets that will appear in the toolbar dropdown, or "*" for all.
-    cacheProcessedTweets:                false,
-    mapTileUrlTemplate:                  "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
+    defaultDataSet: "uk-flood-live",
+    availableDataSets: ["uk-flood-live"], // A list of datasets that will appear in the toolbar dropdown, or "*" for all.
+    cacheProcessedTweets: false,
+    mapTileUrlTemplate: "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
     defaultDashboard,
     layerGroups,
-    blinkRateInMilliseconds:             1000,
+    blinkRateInMilliseconds: 1000,
     // mapTileUrlTemplate:
     // "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"
     shareTextAutocompleteInGroup: true,
