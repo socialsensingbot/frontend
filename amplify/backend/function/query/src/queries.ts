@@ -18,7 +18,7 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
             values: {}
         };
     },
-    time:               (params: any) => {
+    time:             (params: any) => {
         let fullText = "";
         const exceedance =
             "(select count(*) from (select distinct date(source_date) from live_text) x) / (rank() OVER w) as exceedance, "
@@ -27,8 +27,8 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
             fullText = " and MATCH (source_text) AGAINST(? IN BOOLEAN MODE) ";
         }
         if (!params.regions || (params.regions.includes("*") || params.regions.length === 0)) {
-            const values = fullText ? [params.source, params.hazard, params.textSearch, dateFromMillis(params.from),
-                                       dateFromMillis(params.to)] : [params.source, params.hazard,
+            const values = fullText ? [params.layer.sources, params.layer.hazards, params.textSearch, dateFromMillis(params.from),
+                                       dateFromMillis(params.to)] : [params.layer.sources, params.layer.hazards,
                                                                      dateFromMillis(params.from),
                                                                      dateFromMillis(params.to)];
             return {
@@ -37,8 +37,8 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                                    DATE(source_date) as date,
                                    'all'       as region, ${exceedance}
                             FROM live_text
-                            WHERE source = ?
-                              and hazard = ? ${fullText}
+                            WHERE source IN (?)
+                              and hazard IN (?) ${fullText}
                             group by DATE (source_date)
                                 WINDOW w AS (ORDER BY COUNT (DATE (source_date)) desc)
                             order by source_date) x
@@ -46,9 +46,9 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                 values
             };
         } else {
-            const values = fullText ? [params.source, params.hazard,
+            const values = fullText ? [params.layer.sources, params.layer.hazards,
                                        params.regions, params.textSearch, dateFromMillis(params.from),
-                                       dateFromMillis(params.to)] : [params.source, params.hazard,
+                                       dateFromMillis(params.to)] : [params.layer.sources, params.layer.hazards,
                                                                      params.regions,
                                                                      dateFromMillis(params.from),
                                                                      dateFromMillis(params.to)];
@@ -59,11 +59,11 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                                    parent             as region, ${exceedance}
                             FROM mat_view_regions vr,
                                 ref_region_groups as rrg
-                            WHERE vr.source = ?
-                              and vr.hazard = ?
+                            WHERE vr.source IN (?)
+                              and vr.hazard IN (?)
                               and vr.region = rrg.region
                               and vr.region_type = 'county'
-                              and rrg.parent in (?) 
+                              and rrg.parent IN (?) 
                               ${fullText}
                             group by DATE (vr.source_timestamp), rrg.parent
                                 WINDOW w AS (ORDER BY COUNT (DATE (vr.source_timestamp)) desc)
