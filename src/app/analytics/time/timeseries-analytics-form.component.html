@@ -50,9 +50,9 @@
             <mat-icon>close</mat-icon>
         </button>
     </mat-form-field>
-    <mat-form-field *ngIf="pref.combined.layerGroups.groups.length > 1" appearance="fill" class="layer-chooser">
+    <mat-form-field *ngIf="pref.combined.layers.available.length > 1" appearance="fill" class="layer-chooser">
         <mat-select [(value)]="activeLayerGroup" class="map-number-layer-select">
-            <mat-option *ngFor="let layerGroup of pref.combined.layerGroups.groups"
+            <mat-option *ngFor="let layerGroup of pref.combined.layers.available"
                         [value]="layerGroup.id">{{layerGroup.title}}</mat-option>
         </mat-select>
     </mat-form-field>

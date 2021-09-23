@@ -632,7 +632,7 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this.route.snapshot.queryParamMap.has("layer_group")) {
             this._activeLayerGroup = this.route.snapshot.queryParamMap.get("layer_group");
         } else {
-            this._activeLayerGroup = this.pref.combined.layerGroups.defaultLayerGroup;
+            this._activeLayerGroup = this.pref.combined.layers.defaultLayer;
         }
         if (this.route.snapshot.queryParamMap.has("active_polygon")) {
             this._activeRegionType = this.route.snapshot.queryParamMap.get("active_polygon");

@@ -10,7 +10,7 @@ export interface LayerGroupsMap {
     [id: string]: LayerGroup;
 }
 
-export interface LayerGroupsConfiguration {
-    groups: LayerGroup[];
-    defaultLayerGroup: string;
+export interface InfoLayerConfiguration {
+    available: LayerGroup[];
+    defaultLayer: string;
 }

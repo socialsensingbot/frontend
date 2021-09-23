@@ -350,7 +350,7 @@ export class RESTMapDataService {
     }
 
     private layerGroup(id: string): LayerGroup {
-        return this._pref.combined.layerGroups.groups.filter(i => i.id === id)[0];
+        return this._pref.combined.layers.available.filter(i => i.id === id)[0];
     }
 
     private async getRegionStatsMap(layerGroupId: string, regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {

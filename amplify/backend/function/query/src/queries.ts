@@ -55,7 +55,7 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                                    t.source_date       as date,
                                    parent             as region,  
                                    1.0 / (cume_dist()  OVER w) as exceedance 
-                            FROM mat_view_regions vr, live_text t,
+                            FROM live_text_regions vr, live_text t,
                                 ref_region_groups as rrg
                             WHERE vr.source IN (?)
                               and vr.hazard IN (?)
