@@ -103,9 +103,9 @@
                         </mat-select>
                     </mat-form-field>
                     <div class="app-toolbar-separator"></div>
-                    <mat-form-field *ngIf="pref.combined.layerGroups.groups.length > 1">
+                    <mat-form-field *ngIf="pref.combined.layers.available.length > 1">
                         <mat-select [(value)]="activeLayerGroup" class="map-number-layer-select">
-                            <mat-option *ngFor="let layerGroup of pref.combined.layerGroups.groups"
+                            <mat-option *ngFor="let layerGroup of pref.combined.layers.available"
                                         [value]="layerGroup.id">{{layerGroup.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>

@@ -101,7 +101,7 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
                                           const queryResult = await this.executeQuery(query);
                                           if (queryResult && queryResult.length > 0) {
                                               this.seriesCollection.updateTimeseries(
-                                                  new TimeseriesModel(toLabel(query, this.pref.combined.layerGroups),
+                                                  new TimeseriesModel(toLabel(query, this.pref.combined.layers),
                                                                       queryResult,
                                                                       query.__series_id));
                                           } else {
@@ -129,7 +129,7 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
         this.updating = true;
         try {
             const payload = {
-                layer: this.layerGroup(this.pref.combined.layerGroups.defaultLayerGroup),
+                layer: this.layerGroup(this.pref.combined.layers.defaultLayer),
                 ...query,
                 from: nowRoundedToHour() - (365.24 * dayInMillis),
                 to:   nowRoundedToHour(),
@@ -156,6 +156,6 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     private layerGroup(id: string): LayerGroup {
-        return this.pref.combined.layerGroups.groups.filter(i => i.id === id)[0];
+        return this.pref.combined.layers.available.filter(i => i.id === id)[0];
     }
 }

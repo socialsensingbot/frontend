@@ -247,18 +247,6 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
             //                                 where map_id = ?`, values: [req.params.map]
             //                           });
 
-            const layers = await sql({
-                                         // language=MySQL
-                                         sql: `select l.id as id, source, hazard
-                                               from ref_map_metadata_layer_groups mlg,
-                                                    ref_map_layer_groups_mapping lgm,
-                                                    ref_map_layer_groups lg,
-                                                    ref_map_layers l
-                                               where l.id = lgm.layer_id
-                                                 and lg.id = lgm.layer_group_id
-                                                 and mlg.layer_group_id = lgm.layer_group_id
-                                                 and mlg.map_id = ?`, values: [req.params.map]
-                                     });
 
             const regionTypes = await sql({
                                               // language=MySQL
@@ -267,26 +255,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                     where map_id = ?`, values: [req.params.map]
                                           });
 
-            const layerGroups = await sql({
-                                              // language=MySQL
-                                              sql: `select mlg.layer_group_id as id, title
-                                                    from ref_map_metadata_layer_groups mlg,
-                                                         ref_map_layer_groups lg
-                                                    where mlg.layer_group_id = lg.id
-                                                      and mlg.map_id = ?`, values: [req.params.map]
-                                          });
 
-            for (const layerGroup of layerGroups) {
-                const layerGroupLayers = await sql({
-                                                       // language=MySQL
-                                                       sql: `select title
-                                                             from ref_map_layer_groups_mapping lgm,
-                                                                  ref_map_layer_groups lg
-                                                             where lgm.layer_id = lg.id
-                                                               and lgm.layer_group_id = ?`, values: [layerGroup.id]
-                                                   });
-                layerGroup.layers = layerGroupLayers.map(j => j.title);
-            }
 
 
             const regionAggregations = (await sql({
@@ -304,11 +273,8 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                 version:  map.version,
                 location: map.location,
                 // hazards:           hazards.map(i => i.hazard),
-                layers,
-                layerGroups,
                 regionTypes,
                 regionAggregations,
-                defaultLayerGroup: map.default_layer_group,
                 defaultRegionType: map.default_region_type,
                 start:             {
                     lat:  map.start_lat,

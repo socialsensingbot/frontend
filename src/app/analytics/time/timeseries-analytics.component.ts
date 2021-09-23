@@ -336,7 +336,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         const queryResult = await this.executeQuery(query);
         if (queryResult && queryResult.length > 0) {
             this.seriesCollection.updateTimeseries(
-                new TimeseriesModel(toLabel(query, this.pref.combined.layerGroups), queryResult,
+                new TimeseriesModel(toLabel(query, this.pref.combined.layers), queryResult,
                                     query.__series_id));
         } else {
             log.warn(queryResult);
@@ -351,7 +351,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             from:        nowRoundedToHour() - (365.24 * dayInMillis),
             to:          nowRoundedToHour(),
             dateStep:    7 * dayInMillis,
-            layer:       this.pref.combined.layerGroups.defaultLayerGroup
+            layer: this.pref.combined.layers.defaultLayer
         };
     }
 
