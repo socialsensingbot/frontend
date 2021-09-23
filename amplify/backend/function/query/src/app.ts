@@ -482,7 +482,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                       req.params.regionType, req.body.hazards.join(","), req.body.sources.join("?"),
                                       req.body.warnings,
                              ]
-                         });
+                         }, true);
     }
 
     app.post("/map/:map/region-type/:regionType/stats", async (req, res) => {

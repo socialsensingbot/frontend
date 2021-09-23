@@ -157,6 +157,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
         // if (this._data.regions) {
         //   this.regions = this.allRegions.filter(i => this._data.regions.includes(i.value));
         // }
+        await this.pref.waitUntilReady();
         this.filteredRegions = this.regionControl.valueChanges.pipe(
             startWith(null),
             map((region: string | null) => region ? this._filter(region) : this.allRegions.slice()));
@@ -170,6 +171,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
         this.searchControl.valueChanges.subscribe(value => {
             this.textChanged();
         });
+        this.activeLayerGroup = this._data.layer.id || this.pref.combined.layers.defaultLayer;
 
     }
 
