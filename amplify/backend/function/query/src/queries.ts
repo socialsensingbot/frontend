@@ -24,7 +24,7 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
             "(select count(*) from (select distinct date(source_date) from live_text) x) / (rank() OVER w) as exceedance, "
             + "1.0 / (percent_rank()  OVER w) as inv_percent ";
         if (typeof params.textSearch !== "undefined" && params.textSearch.length > 0) {
-            fullText = " and MATCH (source_text) AGAINST(? IN BOOLEAN MODE) ";
+            fullText = " and MATCH (t.source_text) AGAINST(? IN BOOLEAN MODE) ";
         }
         if (!params.regions || (params.regions.includes("*") || params.regions.length === 0)) {
             const values = fullText ? [params.layer.sources, params.layer.hazards, params.textSearch, dateFromMillis(params.from),
@@ -57,12 +57,15 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                       from (SELECT count(DATE(vr.source_timestamp)) as count,
                                    DATE(vr.source_timestamp)        as date,
                                    parent             as region, ${exceedance}
-                            FROM mat_view_regions vr,
+                            FROM mat_view_regions vr, live_text t,
                                 ref_region_groups as rrg
                             WHERE vr.source IN (?)
                               and vr.hazard IN (?)
                               and vr.region = rrg.region
                               and vr.region_type = 'county'
+                              and t.source_id= vr.source_id
+                              and t.source= vr.source
+                              and t.hazard= vr.hazard
                               and rrg.parent IN (?) 
                               ${fullText}
                             group by DATE (vr.source_timestamp), rrg.parent
