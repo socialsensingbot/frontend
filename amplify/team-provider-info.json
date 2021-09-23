@@ -129,7 +129,7 @@
         },
         "query": {
           "deploymentBucketName": "amplify-socialsensing-test-151705-deployment",
-          "s3Key": "amplify-builds/query-306e3943343971713169-build.zip"
+          "s3Key": "amplify-builds/query-2f5456436d5151785162-build.zip"
         },
         "mvrefresh": {
           "deploymentBucketName": "amplify-socialsensing-test-151705-deployment",
