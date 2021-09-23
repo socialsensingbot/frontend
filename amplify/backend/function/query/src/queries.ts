@@ -21,7 +21,7 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
     time:             (params: any) => {
         let fullText = "";
         if (typeof params.textSearch !== "undefined" && params.textSearch.length > 0) {
-            fullText = " and MATCH (t.source_text) AGAINST(? IN BOOLEAN MODE) ";
+            fullText = " and MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
         }
         if (!params.regions || (params.regions.includes("*") || params.regions.length === 0)) {
             const values = fullText ? [params.layer.sources, params.layer.hazards, params.textSearch, dateFromMillis(params.from),
@@ -31,14 +31,14 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
             return {
                 sql: `select *
                       from (SELECT count(*) as count,
-                                   source_date as date,
+                                   tsd.source_date as date,
                                    'all'       as region,  1.0 / (cume_dist()  OVER w) as exceedance 
-                            FROM live_text
+                            FROM mat_view_timeseries_date tsd
                             WHERE source IN (?)
                               and hazard IN (?) ${fullText}
-                            group by source_date
-                                WINDOW w AS (ORDER BY COUNT(source_date) desc)
-                            order by source_date) x
+                            group by tsd.source_date
+                                WINDOW w AS (ORDER BY COUNT(tsd.source_date) desc)
+                            order by tsd.source_date) x
                       where date between ? and ? `,
                 values
             };
@@ -51,24 +51,19 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                                                                      dateFromMillis(params.to)];
             return {
                 sql: `select *
-                      from (SELECT count(t.source_date) as count,
-                                   t.source_date       as date,
-                                   parent             as region,  
+                      from (SELECT count(tsd.source_date) as count,
+                                   tsd.source_date       as date,
+                                   tsd.region_group_name             as region,  
                                    1.0 / (cume_dist()  OVER w) as exceedance 
-                            FROM live_text_regions vr, live_text t,
-                                ref_region_groups as rrg
-                            WHERE vr.source IN (?)
-                              and vr.hazard IN (?)
-                              and vr.region = rrg.region
-                              and vr.region_type = 'county'
-                              and t.source_id= vr.source_id
-                              and t.source= vr.source
-                              and t.hazard= vr.hazard
-                              and rrg.parent IN (?) 
+                            FROM mat_view_timeseries_date tsd
+                            WHERE tsd.source IN (?)
+                              and tsd.hazard IN (?)
+                              and tsd.region_type = 'county'
+                              and tsd.region_group_name IN (?) 
                               ${fullText}
-                            group by  t.source_date, rrg.parent
-                                WINDOW w AS (ORDER BY COUNT ( t.source_date) desc)
-                            order by  t.source_date) x
+                            group by  tsd.source_date, tsd.region_group_name
+                                WINDOW w AS (ORDER BY COUNT(tsd.source_date) desc)
+                            order by  tsd.source_date) x
                       where date between ? and ?`,
                 values
             };

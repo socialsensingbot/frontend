@@ -25,7 +25,7 @@ export const toLabel = (query: TimeseriesRESTQuery, layerGroups): string => {
         }
     }
     if (query.layer && query.layer.id !== layerGroups.defaultLayerGroup) {
-        label = label + "-" + query.layer.id;
+        label = label + " - " + query.layer.id;
     }
 
     return label;

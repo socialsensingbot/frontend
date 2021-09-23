@@ -40,6 +40,27 @@ BEGIN
     ORDER BY source_timestamp DESC;
     COMMIT;
 
+    START TRANSACTION;
+
+    SET @maxTimestampTSD = IFNULL((select max(source_date) from mat_view_timeseries_date), NOW() - INTERVAL 20 YEAR);
+    replace into mat_view_timeseries_date
+    select rrg.parent     as region_group_name,
+           t.source       as source,
+           t.hazard       as hazard,
+           t.warning      as warning,
+           t.source_date  as source_date,
+           t.source_text  as source_text,
+           vr.region_type as region_type
+    FROM live_text_regions vr,
+         live_text t,
+         ref_region_groups as rrg
+    WHERE vr.region = rrg.region
+      and t.source_id = vr.source_id
+      and t.source = vr.source
+      and t.hazard = vr.hazard
+      and t.source_date >= @maxTimestampTSD;
+
+
     SET rc = 0;
 END;
 $$
