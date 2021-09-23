@@ -64,6 +64,34 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
     let metadata = null;
     let queryMap = null;
 
+    const sql = async (options: {
+        sql: string;
+        values?: any;
+    }, tx = false): Promise<any[]> => {
+        return new Promise((resolve, reject) => {
+            connection.getConnection((err, poolConnection) => {
+                if (tx) {
+                    poolConnection.beginTransaction();
+                }
+                poolConnection.query(options, (error, results) => {
+                    if (error) {
+                        console.error(error);
+                        reject(error);
+                    } else {
+                        let s: string = JSON.stringify(results);
+                        console.log(options.sql, options.values, s.substring(0, s.length > 1000 ? 1000 : s.length));
+                        console.log("Returned " + results.length + " rows");
+                        resolve(results);
+                        if (tx) {
+                            poolConnection.commit();
+                        }
+                    }
+                    poolConnection.release();
+                });
+            });
+
+        });
+    };
 
     // Analytics Queries
 
@@ -98,32 +126,15 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
     };
 
     app.post("/query/:name", async (req, res) => {
+        console.log("Query " + req.params.name, req.body);
         const key = req.params.name + ":" + JSON.stringify(req.body);
-        if (!queryMap) {
-            queryMap = queries;
-        }
-        console.log(queryMap[req.params.name]);
-        res.setHeader("X-SocialSensing-CachedQuery-Key", key);
-        if (queryCache.has(key)) {
-            console.log("Returned from cache " + key);
-            res.setHeader("X-SocialSensing-CachedQuery", "true");
-            res.setHeader("X-SocialSensing-CachedQuery-TTL", queryCache.getTtl(key));
-            res.json(queryCache.get(key));
-
-        } else {
-            console.log("Retrieving query for " + key);
-            connection.query((queryMap[req.params.name])(req.body),
-                             (error, results) => {
-                                 if (error) {
-                                     handleError(res, error);
-                                 } else {
-                                     res.setHeader("X-SocialSensing-CachedQuery", "false");
-                                     queryCache.set(key, results);
-                                     console.log("Added to cache " + key);
-                                     res.json(results);
-                                 }
-                             });
-        }
+        cache(res, key, async () => {
+            if (!queryMap) {
+                queryMap = queries;
+            }
+            console.log(queryMap[req.params.name]);
+            return await sql((queryMap[req.params.name])(req.body));
+        });
     });
 
     // General Reference Data Queries
@@ -152,35 +163,6 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                      return res.json({error: error.message, details: JSON.stringify(error)});
                                  });
     });
-
-    const sql = async (options: {
-        sql: string;
-        values?: any;
-    }, tx = false): Promise<any[]> => {
-        return new Promise((resolve, reject) => {
-            connection.getConnection((err, poolConnection) => {
-                if (tx) {
-                    poolConnection.beginTransaction();
-                }
-                poolConnection.query(options, (error, results) => {
-                    if (error) {
-                        console.error(error);
-                        reject(error);
-                    } else {
-                        let s: string = JSON.stringify(results);
-                        console.log(options.sql, options.values, s.substring(0, s.length > 1000 ? 1000 : s.length));
-                        console.log("Returned " + results.length + " rows");
-                        resolve(results);
-                        if (tx) {
-                            poolConnection.commit();
-                        }
-                    }
-                    poolConnection.release();
-                });
-            });
-
-        });
-    };
 
 
     // Map Related Queries
@@ -254,8 +236,6 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                     from ref_map_metadata_region_types
                                                     where map_id = ?`, values: [req.params.map]
                                           });
-
-
 
 
             const regionAggregations = (await sql({
@@ -487,7 +467,6 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
     });
 
 
-
     async function getCachedStats(end: number, periodLengthInSeconds: number, req): Promise<any[]> {
         return await sql({
                              // language=MySQL
@@ -580,7 +559,9 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
             }
 
             for (const row of rows) {
-                console.info("Fetching row ", row);
+                if (req.body.debug) {
+                    console.info("Fetching row ", row);
+                }
 
                 result["" + row.region] = {count: row.count, exceedance: row.exceedance};
             }
