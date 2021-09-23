@@ -555,7 +555,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                 } catch (e) {
                     console.warn(e);
                 }
-                // todo: I know this is awful but I can't figure out why the previous SQL DDL is not immediately available.
+                // todo: I know this is awful but I can't figure out why the previous INSERT is not immediately available.
                 await sleep(100);
                 rows = await getCachedStats(end, periodLengthInSeconds, req);
             }
