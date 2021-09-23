@@ -20,9 +20,6 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
     },
     time:             (params: any) => {
         let fullText = "";
-        const exceedance =
-            "(select count(*) from (select distinct date(source_date) from live_text) x) / (rank() OVER w) as exceedance, "
-            + "1.0 / (percent_rank()  OVER w) as inv_percent ";
         if (typeof params.textSearch !== "undefined" && params.textSearch.length > 0) {
             fullText = " and MATCH (t.source_text) AGAINST(? IN BOOLEAN MODE) ";
         }
@@ -34,13 +31,13 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
             return {
                 sql: `select *
                       from (SELECT count(*) as count,
-                                   DATE(source_date) as date,
-                                   'all'       as region, ${exceedance}
+                                   source_date as date,
+                                   'all'       as region,  1.0 / (cume_dist()  OVER w) as exceedance 
                             FROM live_text
                             WHERE source IN (?)
                               and hazard IN (?) ${fullText}
-                            group by DATE (source_date)
-                                WINDOW w AS (ORDER BY COUNT (DATE (source_date)) desc)
+                            group by source_date
+                                WINDOW w AS (ORDER BY COUNT(source_date) desc)
                             order by source_date) x
                       where date between ? and ? `,
                 values
@@ -54,9 +51,10 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                                                                      dateFromMillis(params.to)];
             return {
                 sql: `select *
-                      from (SELECT count(DATE(vr.source_timestamp)) as count,
-                                   DATE(vr.source_timestamp)        as date,
-                                   parent             as region, ${exceedance}
+                      from (SELECT count(t.source_date) as count,
+                                   t.source_date       as date,
+                                   parent             as region,  
+                                   1.0 / (cume_dist()  OVER w) as exceedance 
                             FROM mat_view_regions vr, live_text t,
                                 ref_region_groups as rrg
                             WHERE vr.source IN (?)
@@ -68,9 +66,9 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                               and t.hazard= vr.hazard
                               and rrg.parent IN (?) 
                               ${fullText}
-                            group by DATE (vr.source_timestamp), rrg.parent
-                                WINDOW w AS (ORDER BY COUNT (DATE (vr.source_timestamp)) desc)
-                            order by DATE(vr.source_timestamp)) x
+                            group by  t.source_date, rrg.parent
+                                WINDOW w AS (ORDER BY COUNT ( t.source_date) desc)
+                            order by  t.source_date) x
                       where date between ? and ?`,
                 values
             };
