@@ -2,7 +2,7 @@ import {TimeseriesRESTQuery} from "./timeseries";
 
 export const toLabel = (query: TimeseriesRESTQuery, layerGroups): string => {
     if (query.textSearch.length === 0 && query.regions.length === 0) {
-        if (query.layer && layerGroups.groups.length > 0) {
+        if (query.layer && layerGroups.available.length > 0) {
             return query.layer.id;
         } else {
             return "all";
