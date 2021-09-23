@@ -33,12 +33,13 @@ const log = new Logger("timeseries-ac");
            })
 export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChanges {
 
+
     public height: number;
     public dateRangeFilter = true;
     public regionFilter = true;
     public textFilter = true;
-    public source = "twitter";
-    public hazard = "flood";
+    public sources = ["twitter"];
+    public hazards = ["flood"];
     public yLabel = "Count";
     public xField = "date";
     public yField = "count";
@@ -75,6 +76,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         }));
 
     }
+
 
     private _type = "line";
 
@@ -298,12 +300,12 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.updating = true;
         try {
             const payload = {
+                sources: this.sources,
+                hazards: this.hazards,
                 ...query,
-                from:   nowRoundedToHour() - (365.24 * dayInMillis),
-                to:     nowRoundedToHour(),
-                name:   "time",
-                source: this.source,
-                hazard: this.hazard
+                from: nowRoundedToHour() - (365.24 * dayInMillis),
+                to:   nowRoundedToHour(),
+                name: "time",
             };
             delete payload.__series_id;
             const serverResults = await this._api.callQueryAPI("query", payload);
@@ -334,7 +336,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         const queryResult = await this.executeQuery(query);
         if (queryResult && queryResult.length > 0) {
             this.seriesCollection.updateTimeseries(
-                new TimeseriesModel(toLabel(query), queryResult,
+                new TimeseriesModel(toLabel(query, this.pref.combined.layerGroups), queryResult,
                                     query.__series_id));
         } else {
             log.warn(queryResult);
@@ -348,7 +350,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             textSearch:  "",
             from:        nowRoundedToHour() - (365.24 * dayInMillis),
             to:          nowRoundedToHour(),
-            dateStep:    7 * dayInMillis
+            dateStep:    7 * dayInMillis,
+            layer:       this.pref.combined.layerGroups.defaultLayerGroup
         };
     }
 

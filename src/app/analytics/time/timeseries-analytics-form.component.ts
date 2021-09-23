@@ -12,8 +12,11 @@ import {RESTDataAPIService} from "../../api/rest-api.service";
 import {PreferenceService} from "../../pref/preference.service";
 import {TextAutoCompleteService} from "../../services/text-autocomplete.service";
 import {timeSeriesAutocompleteType} from "../timeseries";
+import {LayerGroup} from "../../types";
 
 const log = new Logger("timeseries-config");
+
+type DataType = { textSearch: string, regions: string[], layer: LayerGroup };
 
 @Component({
                selector:    "app-timeseries-analytics-form",
@@ -33,16 +36,34 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
     public changed = new EventEmitter<any>();
     public filteredAutocomplete: string[];
 
-    private _data: { textSearch: string, regions: string[] } = {textSearch: "", regions: []};
 
-    public get data(): { textSearch: string; regions: string[] } {
+    private _activeLayerGroup: string;
+
+    public get activeLayerGroup(): string {
+        return this._activeLayerGroup;
+    }
+
+    public set activeLayerGroup(value: string) {
+        this._activeLayerGroup = value;
+        this._data.layer = this.layerGroup(value);
+        this.changed.emit(this._data);
+    }
+
+    private _data: DataType = {
+        textSearch: "",
+        regions:    [],
+        layer:      this.pref.combined.layerGroups.defaultLayerGroup,
+    };
+
+    public get data(): DataType {
         return this._data;
     }
 
     @Input()
-    public set data(value: { textSearch: string; regions: string[] }) {
+    public set data(value: DataType) {
         if (typeof value !== "undefined") {
             this._data = value;
+            this.activeLayerGroup = this._data.layer.id || this.pref.combined.layerGroups.defaultLayerGroup;
             this.searchControl.setValue(this._data.textSearch + this.regions);
             this.metadata.regions.then(
                 regions => {
@@ -52,6 +73,10 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
                 });
         }
 
+    }
+
+    private layerGroup(id: string): LayerGroup {
+        return this.pref.combined.layerGroups.groups.filter(i => i.id === id)[0];
     }
 
     constructor(public metadata: MetadataService, public zone: NgZone, public router: Router,
