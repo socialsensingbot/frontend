@@ -107,9 +107,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     async ngOnInit() {
         await this.pref.waitUntilReady();
         await this.clear();
-        this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
+
         log.info("State is now " + JSON.stringify(this.state));
-        await this._updateGraphInternal(this.state.queries[0]);
+        await this.updateGraph(this.state.queries[0], true);
 
         this._route.queryParams.subscribe(async queryParams => {
             if (queryParams.__clear_ui__) {
@@ -143,7 +143,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 if (typeof queryParams.region !== "undefined") {
                     this.state = this.defaultState();
                     log.info("State is now " + this.state);
-                    this.seriesCollection.clear();
                     if (Array.isArray(queryParams.region)) {
                         for (const region of queryParams.region) {
                             const newQuery = this.newQuery();
@@ -156,9 +155,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                         await this._updateGraphInternal(this.state.queries[0]);
                     }
                 } else {
-                    await this.clear();
                     this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
-                    await this.updateGraph(this.state.queries[0], true);
+                    await this.updateGraph(this.state.queries[0], false);
 
                 }
             }
@@ -184,8 +182,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                               async () => {
                                   log.debug("Graph update from query ", query);
                                   this._changed = true;
-                                  this.emitChange();
                                   if (query.textSearch.length > 0 || force) {
+                                      this.emitChange();
                                       if (query.textSearch.length > 3) {
                                           // noinspection ES6MissingAwait
                                           this.auto.create(timeSeriesAutocompleteType, query.textSearch, true,
@@ -240,7 +238,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     public async addQuery(query: TimeseriesRESTQuery) {
-        await this._updateGraphInternal(query);
 
         if (!this.state.queries) {
             this.state.queries = [];
@@ -276,6 +273,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.state = this.defaultState();
         log.info("State is now " + this.state);
         this.seriesCollection.clear();
+        this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
         await this._updateGraphInternal(this.state.queries[0]);
 
     }
@@ -300,8 +298,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.updating = true;
         try {
             const payload = {
-                sources: this.sources,
-                hazards: this.hazards,
                 ...query,
                 from: nowRoundedToHour() - (365.24 * dayInMillis),
                 to:   nowRoundedToHour(),
@@ -329,7 +325,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     private defaultState(): TimeseriesAnalyticsComponentState {
         const query: TimeseriesRESTQuery = this.newQuery();
-        return {eoc: "count", lob: "line", queries: [query]};
+        return {eoc: "count", lob: "line", queries: [this.newQuery()]};
     }
 
     private async _updateGraphInternal(query) {
@@ -351,7 +347,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             from:        nowRoundedToHour() - (365.24 * dayInMillis),
             to:          nowRoundedToHour(),
             dateStep:    7 * dayInMillis,
-            layer: this.pref.combined.layers.defaultLayer
+            layer: this.pref.combined.layers.available.filter(i => i.id === this.pref.combined.layers.defaultLayer)
         };
     }
 
