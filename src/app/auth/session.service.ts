@@ -280,11 +280,11 @@ export class SessionService {
     if (this._pref.combined.multipleSessions) {
       log.info("User logged in more than once, which group preferences, or the environment allows.");
     } else {
-      this._notify.show("You are logged in more than once this session will now be logged out.", "OK", 30);
-      window.setTimeout(async () => {
-        await this._auth.signOut();
-        window.location.reload();
-      }, 8000);
+      this._notify.show("You are logged in more than once this session will now be logged out.", "OK", 30_000);
+        window.setTimeout(async () => {
+            await this._auth.signOut();
+            window.location.reload();
+        }, 8000);
     }
   }
 
