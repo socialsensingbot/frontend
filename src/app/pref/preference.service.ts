@@ -447,6 +447,6 @@ export class PreferenceService {
     }
 
     public defaultLayer(): LayerGroup {
-        return this.combined.layers.available.filter(i => i.id === this.combined.layers.defaultLayer);
+        return this.combined.layers.available.filter(i => i.id === this.combined.layers.defaultLayer)[0];
     }
 }

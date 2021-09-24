@@ -127,6 +127,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                     console.log("Loaded saved graph with state ", this.state);
                     this.seriesCollection.clear();
                     for (const query of this.state.queries) {
+                        if (!query.layer) {
+                            query.layer = this.pref.defaultLayer();
+                        }
                         await this.updateGraph(query, true);
                     }
                     this.exec.uiActivity();

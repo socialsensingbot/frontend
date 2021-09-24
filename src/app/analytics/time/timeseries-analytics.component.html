@@ -66,8 +66,9 @@
   </app-timeseries-multi-query-chart>
 </div>
 
-<!--{{state|json}}-->
-
+<!--
+{{state|json}}
+-->
 <div *ngIf="state" class="app-query-builder-surround">
 
     <mat-card *ngFor="let query of state.queries; index as i">
