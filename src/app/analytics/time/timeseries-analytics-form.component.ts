@@ -171,7 +171,13 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
         this.searchControl.valueChanges.subscribe(value => {
             this.textChanged();
         });
-        this.activeLayerGroup = this._data.layer.id || this.pref.defaultLayer().id;
+        if (this._data.layer) {
+            this.activeLayerGroup = this._data.layer.id;
+        } else {
+            log.verbose("No layer info found in the data object, using the default layer.", this.pref.defaultLayer());
+            this.activeLayerGroup = this.pref.defaultLayer().id;
+
+        }
 
     }
 
