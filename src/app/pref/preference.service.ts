@@ -447,6 +447,12 @@ export class PreferenceService {
     }
 
     public defaultLayer(): LayerGroup {
-        return this.combined.layers.available.filter(i => i.id === this.combined.layers.defaultLayer)[0];
+        const defaultLayer: LayerGroup = this.combined.layers.available.filter(i => i.id === this.combined.layers.defaultLayer)[0];
+        if (!defaultLayer) {
+            throw new Error(
+                "Configuration specifies " + this.combined.layers.defaultLayer + " as default layer, no such layer exists in " + JSON.stringify(
+                    this.combined.layers));
+        }
+        return defaultLayer;
     }
 }
