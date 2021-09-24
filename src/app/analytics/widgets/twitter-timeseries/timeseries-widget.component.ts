@@ -129,7 +129,7 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
         this.updating = true;
         try {
             const payload = {
-                layer: this.layerGroup(this.pref.combined.layers.defaultLayer),
+                layer: this.pref.defaultLayer(),
                 ...query,
                 from: nowRoundedToHour() - (365.24 * dayInMillis),
                 to:   nowRoundedToHour(),

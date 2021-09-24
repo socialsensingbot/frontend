@@ -127,6 +127,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                     console.log("Loaded saved graph with state ", this.state);
                     this.seriesCollection.clear();
                     for (const query of this.state.queries) {
+                        if (!query.layer) {
+                            query.layer = this.pref.defaultLayer();
+                        }
                         await this.updateGraph(query, true);
                     }
                     this.exec.uiActivity();
@@ -298,6 +301,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.updating = true;
         try {
             const payload = {
+                layer: this.pref.defaultLayer(),
                 ...query,
                 from: nowRoundedToHour() - (365.24 * dayInMillis),
                 to:   nowRoundedToHour(),
@@ -347,7 +351,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             from:        nowRoundedToHour() - (365.24 * dayInMillis),
             to:          nowRoundedToHour(),
             dateStep:    7 * dayInMillis,
-            layer: this.pref.combined.layers.available.filter(i => i.id === this.pref.combined.layers.defaultLayer)
+            layer: this.pref.defaultLayer()
         };
     }
 
