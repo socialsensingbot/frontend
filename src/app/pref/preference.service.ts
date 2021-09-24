@@ -6,6 +6,7 @@ import {environment} from "../../environments/environment";
 import {DataStore, OpType} from "@aws-amplify/datastore";
 import {GroupPreferences, GroupTweetIgnore, GroupTwitterUserIgnore, UserPreferences} from "../../models";
 import Auth from "@aws-amplify/auth";
+import {LayerGroup} from "../types";
 
 const log = new Logger("pref-service");
 
@@ -443,5 +444,9 @@ export class PreferenceService {
 
     public featureSupported(feature: string): boolean {
         return this.combined.features.includes(feature);
+    }
+
+    public defaultLayer(): LayerGroup {
+        return this.combined.layers.available.filter(i => i.id === this.combined.layers.defaultLayer);
     }
 }

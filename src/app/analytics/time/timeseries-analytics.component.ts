@@ -298,6 +298,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.updating = true;
         try {
             const payload = {
+                layer: this.pref.defaultLayer(),
                 ...query,
                 from: nowRoundedToHour() - (365.24 * dayInMillis),
                 to:   nowRoundedToHour(),
@@ -347,7 +348,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             from:        nowRoundedToHour() - (365.24 * dayInMillis),
             to:          nowRoundedToHour(),
             dateStep:    7 * dayInMillis,
-            layer: this.pref.combined.layers.available.filter(i => i.id === this.pref.combined.layers.defaultLayer)
+            layer: this.pref.defaultLayer()
         };
     }
 

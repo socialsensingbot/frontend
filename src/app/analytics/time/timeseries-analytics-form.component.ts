@@ -52,7 +52,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
     private _data: DataType = {
         textSearch: "",
         regions:    [],
-        layer:      this.pref.combined.layers.defaultLayer,
+        layer:      this.pref.defaultLayer(),
     };
 
     public get data(): DataType {
@@ -63,7 +63,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
     public set data(value: DataType) {
         if (typeof value !== "undefined") {
             this._data = value;
-            this.activeLayerGroup = this._data.layer.id || this.pref.combined.layers.defaultLayer;
+            this.activeLayerGroup = this._data.layer.id || this.pref.defaultLayer().id;
             this.searchControl.setValue(this._data.textSearch + this.regions);
             this.metadata.regions.then(
                 regions => {
@@ -171,7 +171,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
         this.searchControl.valueChanges.subscribe(value => {
             this.textChanged();
         });
-        this.activeLayerGroup = this._data.layer.id || this.pref.combined.layers.defaultLayer;
+        this.activeLayerGroup = this._data.layer.id || this.pref.defaultLayer().id;
 
     }
 
