@@ -229,7 +229,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             this.updating = true;
             await this.saves.update(this.graphId, this.title, this.state);
             this.updateSavedGraphs();
-            this.notify.show("Saved graph '" + this.title + "'", "Great!", 4);
+            this.notify.show("Saved graph '" + this.title + "'", "Great!", 4000);
             this.updating = false;
         }
     }

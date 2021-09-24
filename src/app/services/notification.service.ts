@@ -1,4 +1,4 @@
-import {Injectable, NgZone, OnDestroy, OnInit} from '@angular/core';
+import {Injectable, NgZone, OnDestroy} from '@angular/core';
 import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {Subscription} from 'rxjs';
 import {environment} from "../../environments/environment";
@@ -44,22 +44,22 @@ export class NotificationService implements OnDestroy {
     this._configState.unsubscribe();
   }
 
-  /**
-   * Display a MatSnackbar notification and return the reference.
-   * Will set the duration to the global configuration if present.
-   * @param message {string}
-   * @param buttonLabel {string}
-   * @returns {MatSnackBarRef}
-   */
-  show(message: string, buttonLabel: string = "OK", toastTimeout = 8): MatSnackBarRef<any> {
-    if (toastTimeout > 0) {
-      return this.toast.open(message, buttonLabel, {
-        duration: toastTimeout * 1000
-      });
-    } else {
-      return this.toast.open(message, buttonLabel, {});
+    /**
+     * Display a MatSnackbar notification and return the reference.
+     * Will set the duration to the global configuration if present.
+     * @param message {string}
+     * @param buttonLabel {string}
+     * @returns {MatSnackBarRef}
+     */
+    show(message: string, buttonLabel: string = "OK", toastTimeoutInMillis = 8000): MatSnackBarRef<any> {
+        if (toastTimeoutInMillis > 0) {
+            return this.toast.open(message, buttonLabel, {
+                duration: toastTimeoutInMillis
+            });
+        } else {
+            return this.toast.open(message, buttonLabel, {});
+        }
     }
-  }
 
 
   public error(e: any) {
