@@ -313,6 +313,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                           and r.source IN (?)
                                           and r.warning IN (?)
                                           and floor((? - unix_timestamp(r.source_timestamp)) / ?) = 0
+                                          and not t.deleted
                                         order by r.source_timestamp desc    `,
                                   values: [req.params.regionType, req.body.regions, req.body.hazards, req.body.sources,
                                            warningsValues(req.body.warnings),
