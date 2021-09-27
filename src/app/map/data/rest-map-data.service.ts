@@ -8,7 +8,7 @@ import {NotificationService} from "../../services/notification.service";
 import {NgForage, NgForageCache} from "ngforage";
 import {ExportToCsv} from "export-to-csv";
 import {PreferenceService} from "../../pref/preference.service";
-import {readableTimestamp, roundToHour, roundToMinute, toTitleCase} from "../../common";
+import {readableTimestamp, roundToHour, roundToMinute, roundToTenMinutes, toTitleCase} from "../../common";
 import * as geojson from "geojson";
 import {AnnotationService} from "../../pref/annotation.service";
 import {LoadingProgressService} from "../../services/loading-progress.service";
@@ -360,7 +360,7 @@ export class RESTMapDataService {
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,
             startDate: roundToHour(startDate),
-            endDate: roundToMinute(endDate)
+            endDate: roundToTenMinutes(endDate)
 
         }, 60) as RegionStatsMap;
         return statsMap;
