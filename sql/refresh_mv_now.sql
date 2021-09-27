@@ -33,6 +33,7 @@ BEGIN
     WHERE tr.source_id = t.source_id
       AND tr.source = t.source
       AND tr.hazard = t.hazard
+      AND t.source_html IS NOT NULL
       AND t.source_timestamp >= @maxTimestamp - INTERVAL 4 DAY;
     COMMIT;
 
@@ -55,6 +56,7 @@ BEGIN
       AND t.source_id = vr.source_id
       AND t.source = vr.source
       AND t.hazard = vr.hazard
+      AND t.source_html IS NOT NULL
       AND t.source_date >= @maxTimestampTSD - INTERVAL 4 DAY;
     COMMIT;
 
