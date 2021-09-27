@@ -521,6 +521,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                         and r.hazard IN (?)
                                                         and r.source IN (?)
                                                         and r.warning IN (?)
+                                                        and not r.deleted
                                                       group by period
                                                           WINDOW w AS (ORDER BY COUNT(period) desc))
                                                          as x
@@ -532,6 +533,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                   and r.hazard IN (?)
                                                   and r.source IN (?)
                                                   and r.warning IN (?)
+                                                  and not r.deleted
                                                   and r.source_timestamp between ? and ?
                                                )                  as count,
                                                regions.region     as region,
