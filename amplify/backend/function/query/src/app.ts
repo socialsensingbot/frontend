@@ -420,7 +420,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                   and r.warning IN (?)
                                                 group by r.region
                                                `,
-                                       values: [req.params.regionType, req.body.layerGroup, new Date(req.body.startDate),
+                                       values: [req.params.regionType, new Date(req.body.startDate),
                                                 new Date(endDate), req.body.hazards, req.body.sources,
                                                 warningsValues(req.body.warnings),]
                                    });

@@ -32,7 +32,7 @@
         },
         "twitterCompliance": {
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
-          "s3Key": "amplify-builds/twitterCompliance-5631444c4c744d6d316e-build.zip"
+          "s3Key": "amplify-builds/twitterCompliance-464b4851597674414858-build.zip"
         }
       },
       "hosting": {
