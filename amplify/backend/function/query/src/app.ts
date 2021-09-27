@@ -411,14 +411,16 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
         cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
             const rows = await sql({
                                        // language=MySQL
-                                       sql:    `select r.region as region, count(*) as count
-                                                FROM mat_view_regions r
+                                       sql:    `SELECT r.region AS region, count(*) AS count
+                                                FROM live_text t
+                                                         LEFT JOIN live_text_regions r
+                                                                   ON r.source = t.source AND r.hazard = t.hazard AND r.source_id = t.source_id
                                                 WHERE r.region_type = ?
-                                                  and r.source_timestamp between ? and ?
-                                                  and r.hazard IN (?)
-                                                  and r.source IN (?)
-                                                  and r.warning IN (?)
-                                                group by r.region
+                                                  AND t.source_timestamp between ? and ?
+                                                  AND r.hazard IN (?)
+                                                  AND t.source IN (?)
+                                                  AND t.warning IN (?)
+                                                GROUP BY r.region
                                                `,
                                        values: [req.params.regionType, new Date(req.body.startDate),
                                                 new Date(endDate), req.body.hazards, req.body.sources,
