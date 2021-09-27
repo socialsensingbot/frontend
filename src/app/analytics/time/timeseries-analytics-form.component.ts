@@ -136,7 +136,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
     public add(event: MatChipInputEvent): void {
         const input = event.input;
         const value = event.value;
-        log.debug(value);
+        log.verbose("Added event with value: ", value);
         // Add our region
         if ((value || "").trim()) {
             this.regions.push(this.allRegions.find(region => region.value === value.trim()));
