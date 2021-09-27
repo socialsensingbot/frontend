@@ -360,7 +360,7 @@ export class RESTMapDataService {
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,
             startDate: roundToHour(startDate),
-            endDate:   roundToHour(endDate)
+            endDate: roundToMinute(endDate)
 
         }, 60) as RegionStatsMap;
         return statsMap;
