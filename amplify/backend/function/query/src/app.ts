@@ -412,12 +412,8 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
             const rows = await sql({
                                        // language=MySQL
                                        sql:    `select r.region as region, count(*) as count
-                                                FROM live_text t,
-                                                     mat_view_regions r
-                                                WHERE t.source = r.source
-                                                  and t.hazard = r.hazard
-                                                  and r.source_id = t.source_id
-                                                  and r.region_type = ?
+                                                FROM mat_view_regions r
+                                                WHERE r.region_type = ?
                                                   and r.source_timestamp between ? and ?
                                                   and r.hazard IN (?)
                                                   and r.source IN (?)
@@ -521,6 +517,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                         and r.hazard IN (?)
                                                         and r.source IN (?)
                                                         and r.warning IN (?)
+                                                        and not r.deleted
                                                       group by period
                                                           WINDOW w AS (ORDER BY COUNT(period) desc))
                                                          as x
@@ -532,6 +529,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                   and r.hazard IN (?)
                                                   and r.source IN (?)
                                                   and r.warning IN (?)
+                                                  and not r.deleted
                                                   and r.source_timestamp between ? and ?
                                                )                  as count,
                                                regions.region     as region,
