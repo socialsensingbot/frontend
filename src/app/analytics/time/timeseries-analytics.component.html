@@ -69,7 +69,7 @@
 <!--
 {{state|json}}
 -->
-<div *ngIf="state" class="app-query-builder-surround">
+<div *ngIf="ready && state && defaultLayer" class="app-query-builder-surround">
 
     <mat-card *ngFor="let query of state.queries; index as i">
         <mat-card-content>

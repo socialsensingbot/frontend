@@ -22,6 +22,7 @@ import {toLabel} from "../graph";
 import {DashboardService} from "../../pref/dashboard.service";
 import {dayInMillis, nowRoundedToHour} from "../../common";
 import {TextAutoCompleteService} from "../../services/text-autocomplete.service";
+import {LayerGroup} from "../../types";
 
 const log = new Logger("timeseries-ac");
 
@@ -104,31 +105,47 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.saves.listByOwner().then(i => this.savedGraphs = i);
     }
 
+    public defaultLayer: LayerGroup = null;
+
+    public emitChange() {
+
+        this.changed.emit(this.state);
+    }
+
+    public ngOnDestroy(): void {
+        window.clearInterval(this._interval);
+    }
+
     async ngOnInit() {
         await this.pref.waitUntilReady();
-        await this.clear();
 
-        log.info("State is now " + JSON.stringify(this.state));
-        await this.updateGraph(this.state.queries[0], true);
 
         this._route.queryParams.subscribe(async queryParams => {
             if (queryParams.__clear_ui__) {
                 await this.clear();
                 await this._router.navigate([], {});
             }
+            this.defaultLayer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
         });
         this._route.params.subscribe(async params => {
+            const queryParams = this._route.snapshot.queryParams;
+            if (queryParams.active_layer) {
+                this.defaultLayer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
+            } else {
+                this.defaultLayer = this.pref.defaultLayer();
+            }
+            log.info("State is now " + JSON.stringify(this.state));
             if (params.id) {
+                await this.clear(true);
                 this.graphId = params.id;
                 const savedGraph = await this.saves.get(params.id);
                 if (savedGraph !== null) {
                     this.title = savedGraph.title;
                     this.state = JSON.parse(savedGraph.state);
                     console.log("Loaded saved graph with state ", this.state);
-                    this.seriesCollection.clear();
                     for (const query of this.state.queries) {
                         if (!query.layer) {
-                            query.layer = this.pref.defaultLayer();
+                            query.layer = this.defaultLayer;
                         }
                         await this.updateGraph(query, true);
                     }
@@ -137,11 +154,11 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                     this.navigateToRoot();
                 }
             } else {
+                await this.clear(false);
                 this.graphId = null;
                 this.title = "";
-                const queryParams = this._route.snapshot.queryParams;
-                if (typeof queryParams.textSearch !== "undefined") {
-                    this.state.queries[0].textSearch = queryParams.textSearch;
+                if (typeof queryParams.text_search !== "undefined") {
+                    this.state.queries[0].textSearch = queryParams.text_search;
                 }
                 if (typeof queryParams.region !== "undefined") {
                     this.state = this.defaultState();
@@ -159,47 +176,12 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                     }
                 } else {
                     this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
-                    await this.updateGraph(this.state.queries[0], false);
+                    await this.updateGraph(this.state.queries[0], true);
 
                 }
             }
         });
 
-
-    }
-
-    public emitChange() {
-
-        this.changed.emit(this.state);
-    }
-
-    public ngOnDestroy(): void {
-        window.clearInterval(this._interval);
-    }
-
-    public async updateGraph(q: TimeseriesRESTQuery, force) {
-        // Immutable copy
-        const query = JSON.parse(JSON.stringify(q));
-        this.updating = true;
-        await this.exec.queue("update-timeseries-graph", null,
-                              async () => {
-                                  log.debug("Graph update from query ", query);
-                                  this._changed = true;
-                                  if (query.textSearch.length > 0 || force) {
-                                      this.emitChange();
-                                      if (query.textSearch.length > 3) {
-                                          // noinspection ES6MissingAwait
-                                          this.auto.create(timeSeriesAutocompleteType, query.textSearch, true,
-                                                           this.pref.combined.shareTextAutocompleteInGroup);
-                                      }
-                                      await this._updateGraphInternal(query);
-                                  } else {
-                                      log.debug("Skipped time series update, force=" + force);
-                                  }
-                                  this.updating = false;
-
-                              }, query.__series_id + "-" + force, false, true, true, "inactive"
-        );
 
     }
 
@@ -271,13 +253,29 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.exec.uiActivity();
     }
 
-    public async clear() {
-        log.info("Clearing graph");
-        this.state = this.defaultState();
-        log.info("State is now " + this.state);
-        this.seriesCollection.clear();
-        this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
-        await this._updateGraphInternal(this.state.queries[0]);
+    public async updateGraph(q: TimeseriesRESTQuery, force) {
+        // Immutable copy
+        const query = JSON.parse(JSON.stringify(q));
+        this.updating = true;
+        await this.exec.queue("update-timeseries-graph", null,
+                              async () => {
+                                  log.debug("Graph update from query ", query);
+                                  this._changed = true;
+                                  if (query.layer && (query.textSearch.length > 0 || force)) {
+                                      this.emitChange();
+                                      if (query.textSearch.length > 3) {
+                                          // noinspection ES6MissingAwait
+                                          this.auto.create(timeSeriesAutocompleteType, query.textSearch, true,
+                                                           this.pref.combined.shareTextAutocompleteInGroup);
+                                      }
+                                      await this._updateGraphInternal(query);
+                                  } else {
+                                      log.debug("Skipped time series update, force=" + force);
+                                  }
+                                  this.updating = false;
+
+                              }, query.__series_id + "-" + force, false, true, true, "inactive"
+        );
 
     }
 
@@ -293,6 +291,24 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         }
     }
 
+    public async clear(empty = false) {
+        log.warn("Clear called");
+        if (this.defaultLayer !== null) {
+            log.info("Clearing graph");
+            this.state = this.defaultState();
+            log.info("State is now " + this.state);
+            this.seriesCollection.clear();
+            this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
+            if (!empty) {
+                await this._updateGraphInternal(this.state.queries[0]);
+            } else {
+                this.state.queries = [];
+            }
+            log.warn("Clear finished");
+        }
+
+    }
+
     protected async executeQuery(query: TimeseriesRESTQuery): Promise<any[]> {
         if (this._storeQueryInURL) {
             await this._router.navigate([], {queryParams: query});
@@ -301,7 +317,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.updating = true;
         try {
             const payload = {
-                layer: this.pref.defaultLayer(),
+                layer: this.defaultLayer,
                 ...query,
                 from: nowRoundedToHour() - (365.24 * dayInMillis),
                 to:   nowRoundedToHour(),
@@ -351,7 +367,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             from:        nowRoundedToHour() - (365.24 * dayInMillis),
             to:          nowRoundedToHour(),
             dateStep:    7 * dayInMillis,
-            layer: this.pref.defaultLayer()
+            layer:       this.defaultLayer,
         };
     }
 
