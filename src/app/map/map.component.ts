@@ -379,43 +379,40 @@ export class MapComponent implements OnInit, OnDestroy {
      * Read the live.json data file and process contents.
      */
     async load(first: boolean = false, clearSelected = false) {
+
         log.debug("load(" + first + "," + clearSelected + ")");
-        if (!first && this._updating) {
-            log.info("UI is busy so skipping load");
-            setTimeout(() => {
-                this._zone.run(() => this.load());
-            }, 2000);
-            return;
-        }
-        log.debug(`load(${first})`);
         if (!this._loggedIn) {
             log.warn("User logged out, not performing load.");
             return;
         }
+        // noinspection ES6MissingAwait
+        return this._exec.queue("Map Load", null, async () => {
+            try {
 
-        try {
+                await this.data.load(first);
 
-            await this.data.load(first);
+                if (first) {
+                    this._exec.changeState("no-params");
+                    // noinspection ES6MissingAwait
+                    this.updateSliderFromData();
+                } else {
+                    await this.updateLayers("Data Load", clearSelected);
+                    await this._exec.queue("Update Slider", ["ready"],
+                                           () => {
+                                               this.updateSliderFromData();
+                                           }, null, true, true, true);
+                }
 
-            if (first) {
-                this._exec.changeState("no-params");
-                // noinspection ES6MissingAwait
-                this.updateSliderFromData();
-            } else {
-                await this.updateLayers("Data Load", clearSelected);
-                await this._exec.queue("Update Slider", ["ready"],
-                                       () => {
-                                           this.updateSliderFromData();
-                                       }, null, true, true, true);
+                this._twitterIsStale = true;
+
+            } catch (e) {
+                log.error(e);
+                this._notify.error(e);
+            } finally {
             }
+        }, true, false, true, true, "inactive", 200000, 10);
+        ;
 
-            this._twitterIsStale = true;
-
-        } catch (e) {
-            log.error(e);
-            this._notify.error(e);
-        } finally {
-        }
 
     }
 
@@ -635,7 +632,7 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this.route.snapshot.queryParamMap.has("layer_group")) {
             this._activeLayerGroup = this.route.snapshot.queryParamMap.get("layer_group");
         } else {
-            this._activeLayerGroup = this.pref.combined.layerGroups.defaultLayerGroup;
+            this._activeLayerGroup = this.pref.defaultLayer().id;
         }
         if (this.route.snapshot.queryParamMap.has("active_polygon")) {
             this._activeRegionType = this.route.snapshot.queryParamMap.get("active_polygon");
@@ -660,9 +657,10 @@ export class MapComponent implements OnInit, OnDestroy {
         this._loggedIn = await Auth.currentAuthenticatedUser() != null;
 
         this._exec.changeState("map-init");
-        await this.load(true);
-        this.loading.loaded();
-        await this.checkForLiveUpdating();
+        this.load(true).then(() => this.loading.loaded());
+
+        // noinspection ES6MissingAwait
+        this.checkForLiveUpdating();
         this._searchParams.subscribe(async params => {
 
             if (!this._params) {
@@ -670,7 +668,9 @@ export class MapComponent implements OnInit, OnDestroy {
                 // noinspection ES6MissingAwait
                 this._exec.queue("Initial Search Params", ["no-params"],
                                  async () => {
+                                     log.debug("Initial Search Parameters lambda started");
                                      await this.updateMapFromQueryParams(params);
+                                     this._exec.changeState("ready");
 
                                      // Listeners to push map state into URL
                                      map.addEventListener("dragend", () => {
@@ -683,7 +683,6 @@ export class MapComponent implements OnInit, OnDestroy {
                                          return this._zone.run(() => this.updateSearch({zoom: this._map.getZoom()}));
                                      });
 
-                                     this._exec.changeState("ready");
                                      await this.updateLayers("From Parameters");
                                      log.debug("Queued layer update");
                                      // Schedule periodic data loads from the server
@@ -698,7 +697,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                      this.loading.loaded();
                                      this.activity = false;
                                      log.debug("Initial Search Parameters lambda completed");
-                                 });
+                                 }, null, false, false, true, null, 1000, 3);
             } else {
                 if (this._popState) {
                     log.debug("POP STATE detected before URL query params change.");
@@ -916,7 +915,7 @@ export class MapComponent implements OnInit, OnDestroy {
                 log.debug("Region Tweet Map", regionTweetMap);
 
                 const styleFunc = (feature: geojson.Feature) => {
-                    log.info("styleFunc " + layer);
+                    log.verbose("styleFunc " + layer);
 
                     const style = this._color.colorFunctions[layer].getFeatureStyle(
                         feature);
@@ -1088,8 +1087,8 @@ export class MapComponent implements OnInit, OnDestroy {
     private async updateTwitter() {
         log.debug("updateTwitter()");
         await this._exec.queue("Update Twitter", ["ready"], async () => {
-            // this.selectedRegion.toggle(this._clicked.target.feature.properties.name,this._clicked.target.feature.geometry);
-            await this.updateTwitterPanel();
+            // noinspection ES6MissingAwait
+            this.updateTwitterPanel();
         }, "", false, true, true, null, 1000, 5);
     }
 

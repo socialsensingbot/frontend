@@ -1,14 +1,4 @@
-import {
-    AfterViewInit,
-    Component,
-    ElementRef,
-    EventEmitter,
-    Input,
-    NgZone,
-    OnInit,
-    Output,
-    ViewChild
-} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, EventEmitter, Input, NgZone, OnInit, Output, ViewChild} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import * as am4core from "@amcharts/amcharts4/core";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
@@ -134,6 +124,7 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
         this._seriesCollection.cleared.subscribe(() => {
             this.initChart();
             this.seriesMap = {};
+            console.warn("CLEARED");
         });
 
         this.ready.emit(true);

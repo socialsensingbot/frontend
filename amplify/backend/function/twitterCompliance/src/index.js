@@ -69,6 +69,10 @@ exports.handler = async (event) => {
     };
 
 
+    await sql({
+                  sql:    "update live_text set deleted = true, compliance_reason='source_html missing' where source = 'twitter' and source_html ='<blockquote class=''missing''>This tweet is no longer available.</blockquote>' and source_date > now() -  interval 1 day;\n",
+                  values: []
+              });
     const twitter = new TwitterApi(twitterBearerToken);
     const ids = (await sql({
 // language=MySQL
@@ -86,7 +90,7 @@ exports.handler = async (event) => {
         console.log(`#${tweetCompliance.id}: action ${tweetCompliance.action} because ${tweetCompliance.reason}`);
         if (tweetCompliance.action === "delete") {
             await sql({
-                          sql:    "update live_text set deleted = true AND compliance_reason = ? where source = 'twitter' and source_id = ?",
+                          sql:    "update live_text set deleted = true, compliance_reason = ? where source = 'twitter' and source_id = ?",
                           values: [tweetCompliance.reason, tweetCompliance.id]
                       });
         }

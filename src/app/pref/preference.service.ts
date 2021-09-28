@@ -6,6 +6,7 @@ import {environment} from "../../environments/environment";
 import {DataStore, OpType} from "@aws-amplify/datastore";
 import {GroupPreferences, GroupTweetIgnore, GroupTwitterUserIgnore, UserPreferences} from "../../models";
 import Auth from "@aws-amplify/auth";
+import {LayerGroup} from "../types";
 
 const log = new Logger("pref-service");
 
@@ -199,7 +200,7 @@ export class PreferenceService {
         } catch (e) {
             log.error(e);
             this._notify.show("Failed to ignore Twitter user, this could be a network error. Refresh the page and try" +
-                                  " again, if this persists please contact support.", "OK", 60);
+                                  " again, if this persists please contact support.", "OK", 60_000);
         }
     }
 
@@ -213,7 +214,7 @@ export class PreferenceService {
         } catch (e) {
             log.error(e);
             this._notify.show("Failed to ignore Tweet, this could be a network error. Refresh the page and try" +
-                                  " again, if this persists please contact support.", "OK", 60);
+                                  " again, if this persists please contact support.", "OK", 60_000);
         }
 
     }
@@ -242,7 +243,7 @@ export class PreferenceService {
             log.error(e);
             this._notify.show(
                 "Failed to un-ignore Twitter user, this could be a network error. Refresh the page and try" +
-                " again, if this persists please contact support.", "OK", 60);
+                " again, if this persists please contact support.", "OK", 60_000);
         }
     }
 
@@ -253,7 +254,7 @@ export class PreferenceService {
             log.error(e);
             log.error(JSON.stringify(e));
             this._notify.show("Failed to un-ignore Tweet, this could be a network error. Refresh the page and try" +
-                                  " again, if this persists please contact support.", "OK", 60);
+                                  " again, if this persists please contact support.", "OK", 60_000);
         }
     }
 
@@ -443,5 +444,15 @@ export class PreferenceService {
 
     public featureSupported(feature: string): boolean {
         return this.combined.features.includes(feature);
+    }
+
+    public defaultLayer(): LayerGroup {
+        const defaultLayer: LayerGroup = this.combined.layers.available.filter(i => i.id === this.combined.layers.defaultLayer)[0];
+        if (!defaultLayer) {
+            throw new Error(
+                "Configuration specifies " + this.combined.layers.defaultLayer + " as default layer, no such layer exists in " + JSON.stringify(
+                    this.combined.layers));
+        }
+        return defaultLayer;
     }
 }

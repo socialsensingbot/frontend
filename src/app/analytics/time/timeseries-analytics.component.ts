@@ -33,12 +33,13 @@ const log = new Logger("timeseries-ac");
            })
 export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChanges {
 
+
     public height: number;
     public dateRangeFilter = true;
     public regionFilter = true;
     public textFilter = true;
-    public source = "twitter";
-    public hazard = "flood";
+    public sources = ["twitter"];
+    public hazards = ["flood"];
     public yLabel = "Count";
     public xField = "date";
     public yField = "count";
@@ -76,6 +77,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
+
     private _type = "line";
 
     public get type(): string {
@@ -105,9 +107,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     async ngOnInit() {
         await this.pref.waitUntilReady();
         await this.clear();
-        this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
+
         log.info("State is now " + JSON.stringify(this.state));
-        await this._updateGraphInternal(this.state.queries[0]);
+        await this.updateGraph(this.state.queries[0], true);
 
         this._route.queryParams.subscribe(async queryParams => {
             if (queryParams.__clear_ui__) {
@@ -125,6 +127,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                     console.log("Loaded saved graph with state ", this.state);
                     this.seriesCollection.clear();
                     for (const query of this.state.queries) {
+                        if (!query.layer) {
+                            query.layer = this.pref.defaultLayer();
+                        }
                         await this.updateGraph(query, true);
                     }
                     this.exec.uiActivity();
@@ -141,7 +146,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 if (typeof queryParams.region !== "undefined") {
                     this.state = this.defaultState();
                     log.info("State is now " + this.state);
-                    this.seriesCollection.clear();
                     if (Array.isArray(queryParams.region)) {
                         for (const region of queryParams.region) {
                             const newQuery = this.newQuery();
@@ -154,9 +158,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                         await this._updateGraphInternal(this.state.queries[0]);
                     }
                 } else {
-                    await this.clear();
                     this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
-                    await this.updateGraph(this.state.queries[0], true);
+                    await this.updateGraph(this.state.queries[0], false);
 
                 }
             }
@@ -182,8 +185,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                               async () => {
                                   log.debug("Graph update from query ", query);
                                   this._changed = true;
-                                  this.emitChange();
                                   if (query.textSearch.length > 0 || force) {
+                                      this.emitChange();
                                       if (query.textSearch.length > 3) {
                                           // noinspection ES6MissingAwait
                                           this.auto.create(timeSeriesAutocompleteType, query.textSearch, true,
@@ -229,7 +232,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             this.updating = true;
             await this.saves.update(this.graphId, this.title, this.state);
             this.updateSavedGraphs();
-            this.notify.show("Saved graph '" + this.title + "'", "Great!", 4);
+            this.notify.show("Saved graph '" + this.title + "'", "Great!", 4000);
             this.updating = false;
         }
     }
@@ -238,7 +241,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     public async addQuery(query: TimeseriesRESTQuery) {
-        await this._updateGraphInternal(query);
 
         if (!this.state.queries) {
             this.state.queries = [];
@@ -274,6 +276,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.state = this.defaultState();
         log.info("State is now " + this.state);
         this.seriesCollection.clear();
+        this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
         await this._updateGraphInternal(this.state.queries[0]);
 
     }
@@ -298,12 +301,11 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.updating = true;
         try {
             const payload = {
+                layer: this.pref.defaultLayer(),
                 ...query,
-                from:   nowRoundedToHour() - (365.24 * dayInMillis),
-                to:     nowRoundedToHour(),
-                name:   "time",
-                source: this.source,
-                hazard: this.hazard
+                from: nowRoundedToHour() - (365.24 * dayInMillis),
+                to:   nowRoundedToHour(),
+                name: "time",
             };
             delete payload.__series_id;
             const serverResults = await this._api.callQueryAPI("query", payload);
@@ -327,14 +329,14 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     private defaultState(): TimeseriesAnalyticsComponentState {
         const query: TimeseriesRESTQuery = this.newQuery();
-        return {eoc: "count", lob: "line", queries: [query]};
+        return {eoc: "count", lob: "line", queries: [this.newQuery()]};
     }
 
     private async _updateGraphInternal(query) {
         const queryResult = await this.executeQuery(query);
         if (queryResult && queryResult.length > 0) {
             this.seriesCollection.updateTimeseries(
-                new TimeseriesModel(toLabel(query), queryResult,
+                new TimeseriesModel(toLabel(query, this.pref.combined.layers), queryResult,
                                     query.__series_id));
         } else {
             log.warn(queryResult);
@@ -348,7 +350,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             textSearch:  "",
             from:        nowRoundedToHour() - (365.24 * dayInMillis),
             to:          nowRoundedToHour(),
-            dateStep:    7 * dayInMillis
+            dateStep:    7 * dayInMillis,
+            layer: this.pref.defaultLayer()
         };
     }
 

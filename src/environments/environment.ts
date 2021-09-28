@@ -1,3 +1,4 @@
+/* tslint:disable:object-literal-key-quotes */
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
@@ -11,7 +12,7 @@ import {Dashboard} from "../app/pref/dashboard.service";
  * on performance if an error is thrown.
  */
 import "zone.js/dist/zone-error"; // Included with Angular CLI.
-import {LayerGroupsConfiguration} from "../app/types";
+import {InfoLayerConfiguration} from "../app/types";
 
 const defaultDashboard: Dashboard = {
     boards: [{
@@ -23,10 +24,10 @@ const defaultDashboard: Dashboard = {
     }]
 };
 
-const layerGroups: LayerGroupsConfiguration = {
-    "groups":            [
+const layers: InfoLayerConfiguration = {
+    "available":    [
         {
-            "id":       "flood-only",
+            "id":       "flood",
             "title":    "Floods",
             "sources":  ["twitter"],
             "hazards":  ["flood"],
@@ -47,7 +48,7 @@ const layerGroups: LayerGroupsConfiguration = {
             "warnings": "only"
         },
         {
-            "id":       "wind-only",
+            "id":       "wind",
             "title":    "Wind",
             "sources":  ["twitter"],
             "hazards":  ["wind"],
@@ -61,7 +62,7 @@ const layerGroups: LayerGroupsConfiguration = {
             "warnings": "exclude"
         },
         {
-            "id":       "snow-only",
+            "id":       "snow",
             "title":    "Snow",
             "sources":  ["twitter"],
             "hazards":  ["snow"],
@@ -69,19 +70,19 @@ const layerGroups: LayerGroupsConfiguration = {
         },
 
     ],
-    "defaultLayerGroup": "flood-only"
+    "defaultLayer": "flood"
 };
 
 export const environment = {
-    name:             "dev",
-    lamdaEnvironment: "dev",
-    version:          "dev",
-    demo:             false,
-    production:       false,
-    hmr:              false,
-    rollbar:          false,
-    toolbarColor:     "primary",
-    timezone:         Intl.DateTimeFormat().resolvedOptions().timeZone,
+    name:                    "dev",
+    lamdaEnvironment:        "dev",
+    version:                 "dev",
+    demo:                    false,
+    production:              false,
+    hmr:                     false,
+    rollbar:                 false,
+    toolbarColor:            "primary",
+    timezone:                Intl.DateTimeFormat().resolvedOptions().timeZone,
     // timezone:         "UTC",
     multipleSessions: true, // Can the user be logged into multiple devices/browsers at once?
     maxUsers:         -1, // can be -1 (no limit), 0 - no logins, 1 - single user at a time, n - n concurrent users.
@@ -124,7 +125,7 @@ export const environment = {
     cacheProcessedTweets:                false,
     mapTileUrlTemplate:                  "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
     defaultDashboard,
-    layerGroups,
+    layers:                              layers,
     blinkRateInMilliseconds:             1000,
     // mapTileUrlTemplate:
     // "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"

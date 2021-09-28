@@ -41,8 +41,8 @@
       </button>
     </mat-toolbar-row>
     <mat-toolbar-row *ngIf="appToolbarExpanded">
+        <div class="app-toolbar-separator"></div>
 
-      <div class="app-toolbar-separator"></div>
 
     </mat-toolbar-row>
   </ng-container>
@@ -54,18 +54,21 @@
     <br/>
         </span>
   <app-timeseries-multi-query-chart
-    [updating]="updating"
-    [error]="error"
-    [seriesCollection]="seriesCollection"
-    [height]="600"
-    [connect]="connect"
-    [animated]="animated"
-    [scrollBar]="scrollBar"
-    class="twitter-timeseries-chart">
+          [updating]="updating"
+          [error]="error"
+          [seriesCollection]="seriesCollection"
+          [height]="600"
+          [connect]="connect"
+          [animated]="animated"
+          [scrollBar]="scrollBar"
+          class="twitter-timeseries-chart">
 
   </app-timeseries-multi-query-chart>
 </div>
 
+<!--
+{{state|json}}
+-->
 <div *ngIf="state" class="app-query-builder-surround">
 
     <mat-card *ngFor="let query of state.queries; index as i">
@@ -88,7 +91,7 @@
     <a mat-list-item [routerLink]="'/analytics/time/'+savedGraph.id" *ngFor="let savedGraph of
     savedGraphs"> {{
       savedGraph.title }}
-      <!--        - {{savedGraph.state}}-->
+        <!--              - {{savedGraph.state}}-->
       <button mat-button mat-icon-button matSuffix
               (click)="deleteSavedGraph(savedGraph.id); updateSavedGraphs()">
         <mat-icon>close</mat-icon>

@@ -1,55 +1,61 @@
 <form class="ttc-form" (keydown.enter)="$event.preventDefault()">
 
-  <mat-form-field class="text-search" appearance="fill">
-    <mat-label>Filter by Text</mat-label>
-    <mat-icon matPrefix>search</mat-icon>
-    <input #textSearchInput type="text"
-           placeholder="Text search, e.g. coastal"
-           aria-label="Search"
-           matInput
-           [formControl]="searchControl"
-           [matAutocomplete]="auto">
-    <mat-autocomplete #auto="matAutocomplete">
-      <mat-option *ngFor="let option of filteredAutocomplete" [value]="option">
-        {{option}}
-      </mat-option>
-    </mat-autocomplete>
-    <button mat-button mat-icon-button matSuffix (click)="clearTextSearch()" *ngIf="data.textSearch">
-      <mat-icon>close</mat-icon>
-    </button>
-  </mat-form-field>
+    <mat-form-field appearance="fill" class="text-search">
+        <mat-label>Filter by Text</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input #textSearchInput [formControl]="searchControl"
+               [matAutocomplete]="auto"
+               aria-label="Search"
+               matInput
+               placeholder="Text search, e.g. coastal"
+               type="text">
+        <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let option of filteredAutocomplete" [value]="option">
+                {{option}}
+            </mat-option>
+        </mat-autocomplete>
+        <button (click)="clearTextSearch()" *ngIf="data.textSearch" mat-button mat-icon-button matSuffix>
+            <mat-icon>close</mat-icon>
+        </button>
+    </mat-form-field>
 
-  <mat-form-field class="region-chooser" appearance="fill">
-    <mat-label>Filter by Region</mat-label>
-    <mat-chip-list #chipList aria-label="Topic selection">
-      <mat-chip
-        [class]="'region-level-'+region.level"
-        *ngFor="let region of regions"
-        [selectable]="true"
-        [removable]="true"
-        [value]="region"
-        (removed)="remove(region)">
-        {{region.text}}
-        <mat-icon matChipRemove>cancel</mat-icon>
-      </mat-chip>
-      <input
-        placeholder="Add regions ..."
-        #regionInput
-        [formControl]="regionControl"
-        [matAutocomplete]="region"
-        [matChipInputFor]="chipList"
-        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-        (matChipInputTokenEnd)="add($event)">
-    </mat-chip-list>
-    <mat-autocomplete #region="matAutocomplete" (optionSelected)="selected($event)">
-      <mat-option *ngFor="let region of filteredRegions | async" [value]="region">
-        {{region.text}}
-      </mat-option>
-    </mat-autocomplete>
-    <button mat-button mat-icon-button matSuffix (click)="clearRegions()" *ngIf="filteredRegions">
-      <mat-icon>close</mat-icon>
-    </button>
+    <mat-form-field appearance="fill" class="region-chooser">
+        <mat-label>Filter by Region</mat-label>
+        <mat-chip-list #chipList aria-label="Topic selection">
+            <mat-chip
+                    (removed)="remove(region)"
+                    *ngFor="let region of regions"
+                    [class]="'region-level-'+region.level"
+                    [removable]="true"
+                    [selectable]="true"
+                    [value]="region">
+                {{region.text}}
+                <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip>
+            <input
+                    #regionInput
+                    (matChipInputTokenEnd)="add($event)"
+                    [formControl]="regionControl"
+                    [matAutocomplete]="region"
+                    [matChipInputFor]="chipList"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                    placeholder="Add regions ...">
+        </mat-chip-list>
+        <mat-autocomplete #region="matAutocomplete" (optionSelected)="selected($event)">
+            <mat-option *ngFor="let region of filteredRegions | async" [value]="region">
+                {{region.text}}
+            </mat-option>
+        </mat-autocomplete>
+        <button (click)="clearRegions()" *ngIf="filteredRegions" mat-button mat-icon-button matSuffix>
+            <mat-icon>close</mat-icon>
+        </button>
+    </mat-form-field>
+    <mat-form-field *ngIf="pref.combined.layers.available.length > 1" appearance="fill" class="layer-chooser">
+        <mat-select [(value)]="activeLayerGroup" class="map-number-layer-select">
+            <mat-option *ngFor="let layerGroup of pref.combined.layers.available"
+                        [value]="layerGroup.id">{{layerGroup.title}}</mat-option>
+        </mat-select>
+    </mat-form-field>
 
-  </mat-form-field>
 
 </form>
