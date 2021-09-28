@@ -15,6 +15,9 @@
     },
     "s3Key": {
       "Type": "String"
+    },
+    "secretsPathAmplifyAppId": {
+      "Type": "String"
     }
   },
   "Conditions": {
@@ -268,7 +271,9 @@
                       "Fn::Sub": [
                         "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
                         {
-                          "appId": "dtmxl3q3i7oix",
+                          "appId": {
+                            "Ref": "secretsPathAmplifyAppId"
+                          },
                           "env": {
                             "Ref": "env"
                           },

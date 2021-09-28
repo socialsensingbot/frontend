@@ -67,18 +67,18 @@
         },
         "query": {
           "deploymentBucketName": "amplify-socialsensing-prod-224245-deployment",
-          "s3Key": "amplify-builds/query-30425748664e76367a4a-build.zip",
+          "s3Key": "amplify-builds/query-4577674430744a775253-build.zip",
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
         },
         "mvrefresh": {
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
           "deploymentBucketName": "amplify-socialsensing-prod-224245-deployment",
-          "s3Key": "amplify-builds/mvrefresh-4a54385966567a474b67-build.zip"
+          "s3Key": "amplify-builds/mvrefresh-744d53374871686d677a-build.zip"
         },
         "twitterCompliance": {
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
           "deploymentBucketName": "amplify-socialsensing-prod-224245-deployment",
-          "s3Key": "amplify-builds/twitterCompliance-464b4851597674414858-build.zip"
+          "s3Key": "amplify-builds/twitterCompliance-5046457044726449472f-build.zip"
         }
       },
       "hosting": {

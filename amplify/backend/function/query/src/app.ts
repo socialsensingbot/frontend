@@ -587,6 +587,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
         });
     }
 
+
     app.listen(3000, () => {
         console.log("App started");
     });
