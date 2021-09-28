@@ -15,9 +15,6 @@
     },
     "s3Key": {
       "Type": "String"
-    },
-    "secretsPathAmplifyAppId": {
-      "Type": "String"
     }
   },
   "Conditions": {
@@ -81,9 +78,7 @@
                     "Fn::Sub": [
                       "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
                       {
-                        "appId": {
-                          "Ref": "secretsPathAmplifyAppId"
-                        },
+                        "appId": "dtmxl3q3i7oix",
                         "env": {
                           "Ref": "env"
                         },
@@ -273,9 +268,7 @@
                       "Fn::Sub": [
                         "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
                         {
-                          "appId": {
-                            "Ref": "secretsPathAmplifyAppId"
-                          },
+                          "appId": "dtmxl3q3i7oix",
                           "env": {
                             "Ref": "env"
                           },

@@ -52,6 +52,7 @@ exports.handler = async (event) => {
                                                   debug:              false
                                               });
 
+
     const sql = async (options) => {
         return new Promise((resolve, reject) => {
             connection.query(options, (error, results) => {
