@@ -507,23 +507,22 @@
                                 "    response.send(event, context, response.SUCCESS, {message: 'Successfully updated identity pool.'})",
                                 "    } catch(err) {",
                                 "        response.send(event, context, response.FAILED, {message: 'Error updating identity pool'});",
-                                "    }",
-                                "   };",
-                                "};"
-
+                              "    }",
+                              "   };",
+                              "};"
                             ]
                         ]
                     }
                 },
-                "Handler": "index.handler",
-                "Runtime": "nodejs12.x",
-                "Timeout": "300",
-                "Role": {
-                    "Fn::GetAtt": [
-                        "LambdaExecutionRole",
-                        "Arn"
-                    ]
-                }
+              "Handler": "index.handler",
+              "Runtime": "nodejs12.x",
+              "Timeout": 300,
+              "Role": {
+                "Fn::GetAtt": [
+                  "LambdaExecutionRole",
+                  "Arn"
+                ]
+              }
             }
         },
         "RoleMapFunctionInput": {

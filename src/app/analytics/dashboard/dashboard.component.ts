@@ -2,12 +2,14 @@ import {Component, OnInit} from "@angular/core";
 import {BreakpointObserver} from "@angular/cdk/layout";
 import {DashboardCard, DashboardService} from "../../pref/dashboard.service";
 import {Logger} from "@aws-amplify/core";
+import {LoadingProgressService} from "../../services/loading-progress.service";
+
 const log = new Logger("dashboard-component");
 
 @Component({
-               selector: "app-dashboard",
+               selector:    "app-dashboard",
                templateUrl: "./dashboard.component.html",
-               styleUrls: ["./dashboard.component.scss"]
+               styleUrls:   ["./dashboard.component.scss"]
            })
 export class DashboardComponent implements OnInit {
 
@@ -25,8 +27,8 @@ export class DashboardComponent implements OnInit {
     // );
     public readonly = false;
     public types = [{
-        title: "Text and Region Count",
-        type:  "timeseries-text-and-region",
+        title: "Timeseries",
+        type:  "timeseries",
         rows:  2,
         cols:  2,
         state: {textSearch: "", regions: []}
@@ -38,16 +40,18 @@ export class DashboardComponent implements OnInit {
     private maxRows = 2;
     private minRows = 1;
 
-    constructor(private breakpointObserver: BreakpointObserver, public dash: DashboardService) {}
+    constructor(private breakpointObserver: BreakpointObserver, public dash: DashboardService,
+                public loading: LoadingProgressService) {
+
+    }
 
     public async ngOnInit() {
-        $("#loading-div").css("opacity", 0.0);
-        setTimeout(() => $("#loading-div").remove(), 1000);
         await this.dash.init();
         await this.dash.waitUntilReady();
         this.ready = true;
         log.debug("Dashboard ready with ", this.dash.dashboard);
         this.initDashboard();
+        this.loading.loaded();
     }
 
     public saveCard(index: number, data: any) {

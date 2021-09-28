@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SaveGraphDialogComponent } from './save-graph-dialog.component';
+import { NameGraphDialogComponent } from './name-graph-dialog.component';
 
 describe('SaveGraphDialogComponent', () => {
-  let component: SaveGraphDialogComponent;
-  let fixture: ComponentFixture<SaveGraphDialogComponent>;
+  let component: NameGraphDialogComponent;
+  let fixture: ComponentFixture<NameGraphDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SaveGraphDialogComponent ]
+      declarations: [NameGraphDialogComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SaveGraphDialogComponent);
+    fixture = TestBed.createComponent(NameGraphDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

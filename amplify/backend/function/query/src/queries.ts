@@ -15,7 +15,7 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
     time: (params: any) => {
         let fullText = "";
         const exceedance =
-            "(select count(*) from (select distinct source_date from live_text) x) / (rank() OVER w) as exceedance, "
+            "(select count(*) from (select distinct date(source_date) from live_text) x) / (rank() OVER w) as exceedance, "
             + "1.0 / (percent_rank()  OVER w) as inv_percent ";
         if (typeof params.textSearch !== "undefined" && params.textSearch.length > 0) {
             fullText = " and MATCH (source_text) AGAINST(? IN BOOLEAN MODE) ";
@@ -35,7 +35,7 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                             WHERE source = ?
                               and hazard = ? ${fullText}
                             group by DATE(source_date)
-                                WINDOW w AS (ORDER BY COUNT (source_date) desc)
+                                WINDOW w AS (ORDER BY COUNT (DATE(source_date)) desc)
                             order by source_date) x
                       where date between ? and ? `,
                 values
@@ -61,7 +61,7 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                               and rrg.parent in (?)
                                 ${fullText}
                             group by DATE(source_date), rrg.parent
-                                WINDOW w AS (ORDER BY COUNT (source_date) desc)
+                                WINDOW w AS (ORDER BY COUNT (DATE(source_date)) desc)
                             order by source_date) x
                       where date between ? and ?`,
                 values
@@ -71,4 +71,3 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
     }
 
 };
-

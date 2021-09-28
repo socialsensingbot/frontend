@@ -6,6 +6,7 @@ import {NotificationService} from "src/app/services/notification.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {environment} from "src/environments/environment";
 import { Logger} from "@aws-amplify/core";
+import {LoadingProgressService} from "../../services/loading-progress.service";
 
 const log = new Logger("new-pass");
 
@@ -43,13 +44,13 @@ export class NewPassComponent implements OnInit {
     public auth: AuthService,
     private _notification: NotificationService,
     private _router: Router,
-    private _route: ActivatedRoute) {
+    private _route: ActivatedRoute, private loading: LoadingProgressService) {
 
     this.message = _router.getCurrentNavigation().extras.state.message;
   }
 
   ngOnInit(): void {
-    $("#loading-div").remove();
+      this.loading.loaded();
   }
 
 

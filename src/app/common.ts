@@ -10,6 +10,12 @@ export function toTitleCase(str: string): string {
   return str.replace(/\S+/g, repl => repl.charAt(0).toUpperCase() + repl.substr(1).toLowerCase());
 }
 
+export const dayInMillis = 24 * 60 * 60 * 1000;
+const hourInMillis = 60 * 60 * 1000;
+export const nowRoundedToHour = () => {
+  return Math.floor(new Date().getTime() / hourInMillis) * hourInMillis;
+};
+
 export function getOS(): "Mac OS" | "iOS" | "Windows" | "Android" | "Linux" | null {
   const userAgent = window.navigator.userAgent,
     platform = window.navigator.platform,
