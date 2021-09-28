@@ -27,7 +27,9 @@ export class MapGraphSidebarComponent implements OnInit {
                 protected _router: Router, private _route: ActivatedRoute) {
     }
 
-    ngOnInit(): void {
+    async ngOnInit() {
+        await this.pref.waitUntilReady();
+        this.layer = this.pref.defaultLayer();
         this.eState = {queries: [], eoc: "exceedance", lob: "line"};
         this.cState = {queries: [], eoc: "count", lob: "line"};
         this.selection.changed.subscribe(i => {
