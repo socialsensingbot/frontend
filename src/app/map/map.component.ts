@@ -166,7 +166,7 @@ export class MapComponent implements OnInit, OnDestroy {
         log.debug("set activeLayerGroup");
         this._activeLayerGroup = value;
         if (this.ready) {
-            this.scheduleResetLayers(this.activeStatistic);
+            this.scheduleResetLayers(this.activeStatistic, false);
         }
         this.updateSearch({active_layer: this._activeLayerGroup});
         this._twitterIsStale = true;

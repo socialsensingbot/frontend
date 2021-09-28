@@ -47,7 +47,8 @@
                 Analytics
             </button>
             <button *ngIf="isAuthenticated && pref.ready &&
-            pref.featureSupported('dashboard')  && pref.featureSupported('map')" mat-button routerLink="/map">
+            pref.featureSupported('dashboard')  && pref.featureSupported('map')" [queryParamsHandling]="'merge'"
+                    mat-button routerLink="/map">
                 <!--       <mat-icon>power_settings_new</mat-icon>-->
                 Map
             </button>
