@@ -8,9 +8,7 @@
     </div>
 
 
-    <button (click)="expandCountGraph()" *ngIf="this.pref.featureSupported('analytics')"
-            class="app-stats-panel-count-open-in-analytics" mat-button>Open in Analytics
-    </button>
+    <button mat-button class="app-stats-panel-count-open-in-analytics"  *ngIf="this.pref.featureSupported('analytics')"(click)="expandCountGraph()">Open in Analytics</button>
     <button mat-button  class="app-stats-panel-count-add-to-dashboard" *ngIf="this.pref.featureSupported('dashboard')"
             (click)="this.dash.addCard('timeseries', 'Count for '+regionText(),
         2,2,graphStateForRegions('count'));showDashboard()">Add to
@@ -21,13 +19,9 @@
                               [state]="graphStateForRegions('exceedance')"
       ></app-widget-timeseries>
 
-        <button (click)="expandExceedanceGraph()" *ngIf="this.pref.featureSupported('analytics')"
-                class="app-stats-panel-exceedance-open-in-analytics" mat-button>Open
-            in Analytics
-        </button>
-        <button mat-button class="app-stats-panel-exceedance-add-to-dashboard"
-                *ngIf="this.pref.featureSupported('dashboard')"
-                (click)="this.dash.addCard('timeseries', 'Return Period for '+regionText(),
+        <button mat-button class="app-stats-panel-exceedance-open-in-analytics" *ngIf="this.pref.featureSupported('analytics')" (click)="expandExceedanceGraph()">Open in Analytics</button>
+        <button mat-button class="app-stats-panel-exceedance-add-to-dashboard"  *ngIf="this.pref.featureSupported('dashboard')"
+                (click)="this.dash.addCard('timeseries', 'Exceedance for '+regionText(),
             1,1,graphStateForRegions('exceedance'));showDashboard()">Add to
             Dashboard
         </button>

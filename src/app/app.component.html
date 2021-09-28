@@ -37,17 +37,17 @@
         <span class="menu-spacer">&nbsp;</span>
         <div id="login" fxLayout="row" fxShow="false" fxShow.gt-sm>
             <button mat-button routerLink="/dashboard"
-                    queryParamsHandling="merge" *ngIf="isAuthenticated && pref.ready && pref.featureSupported('dashboard')">
+                    *ngIf="isAuthenticated && pref.ready && pref.featureSupported('dashboard')">
                 <!--       <mat-icon>power_settings_new</mat-icon>-->
                 Dashboard
             </button>
             <button mat-button routerLink="/analytics/time"
-                    queryParamsHandling="merge" *ngIf="isAuthenticated && pref.ready &&pref.featureSupported('analytics')">
+                    *ngIf="isAuthenticated && pref.ready &&pref.featureSupported('analytics')">
                 <!--       <mat-icon>power_settings_new</mat-icon>-->
                 Analytics
             </button>
-            <button mat-button queryParamsHandling="merge" routerLink="/map" *ngIf="isAuthenticated && pref.ready &&
-            pref.featureSupported('dashboard')  && pref.featureSupported('map')">
+            <button *ngIf="isAuthenticated && pref.ready &&
+            pref.featureSupported('dashboard')  && pref.featureSupported('map')" mat-button routerLink="/map">
                 <!--       <mat-icon>power_settings_new</mat-icon>-->
                 Map
             </button>
@@ -94,4 +94,5 @@
 </div>
 <mat-progress-bar *ngIf="loading.progressPercentage > 0" class="app-loading-progress" mode="determinate" [value]="loading.progressPercentage*100"></mat-progress-bar>
 
-<mat-spinner *ngIf="loading.progressPercentage > 0" mode="determinate" [value]="loading.progressPercentage*100" class="app-loading-spinner"></mat-spinner>
+<mat-spinner *ngIf="loading.showSpinner" [mode]="loading.spinnerMode" [value]="loading.progressPercentage*100"
+             class="app-loading-spinner"></mat-spinner>

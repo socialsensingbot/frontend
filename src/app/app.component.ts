@@ -173,7 +173,7 @@ export class AppComponent {
                             "please ask an administrator to look into this.",
                             e);
                     }
-                    this._exec.start();
+                    await this._exec.start();
                     log.info("Locale detected: " + getLang());
                     log.info("Locale in use: " + this.pref.combined.locale);
                     log.info("Timezone detected: " + Intl.DateTimeFormat().resolvedOptions().timeZone);
@@ -222,11 +222,12 @@ export class AppComponent {
             log.error(e);
             await DataStore.clear();
             await DataStore.start();
-            this._notify.show("Failed to sync data with the server. Please refresh the page.", "OK", 300);
+            this._notify.show("Failed to sync data with the server. Please refresh the page.", "OK", 300000);
         }
     }
 
     public async logout() {
+        log.info("LOGOUT: Logout triggered by user.");
         await this._session.close();
         if (!this.dataStoreSynced) {
             this.initiateLogout = true;
@@ -245,19 +246,18 @@ export class AppComponent {
             return;
         }
         this.isAuthenticated = false;
-        log.info("Clearing data store.");
-        this.loading.progress("Removing data ...", 2);
-        await DataStore.clear();
-        log.info("Performing sign out.");
-        this.loading.progress("Signing out...", 3);
-
-        await Auth.signOut()
-                  .then(() => this.loading.progress("Signed out...", 0))
-                  .then(() => this._router.navigate(["/"], {queryParamsHandling: "merge"}))
-                  .catch(err => log.error(err));
-        log.info("Performed sign out.");
+        log.info("LOGOUT: Performing sign out.");
+        this.loading.progress("Signing out...", 1);
+        try {
+            await this.auth.signOut();
+            this.loading.progress("Signed out...", 4);
+        } catch (e) {
+            this._notify.error(e);
+        }
         this._exec.stop();
         this.initiateLogout = false;
+        await this._router.navigate(["/"], {queryParamsHandling: "merge"});
+        log.info("LOGOUT: Performed sign out.");
     }
 
 }

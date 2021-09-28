@@ -29,9 +29,9 @@ const LONG_TIMEOUT = 60000;
 const VERY_LONG_TIMEOUT = 120000;
 const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
 const multipleKey = Cypress.platform === "darwin" ? "{command}" : "{ctrl}";
-export const markAsIgnoredMenu = "body .mat-menu-item.tweet-menu-ignore-tweet";
-export const markAsUnignoredMenu = "body .mat-menu-item.tweet-menu-unignore-tweet";
-export const markAsMenu = "body .mat-menu-item.tweet-list-item-menu-mark-as";
+export const markAsIgnoredMenu = ".tweet-menu-ignore-tweet";
+export const markAsUnignoredMenu = ".tweet-menu-unignore-tweet";
+export const markAsMenu = ".tweet-list-item-menu-mark-as";
 
 
 const noLoadingDiv = () => {
@@ -117,10 +117,10 @@ Cypress.Commands.add("tweetsVisible", (count) => {
         count);
 });
 Cypress.Commands.add("tweetCountTotal", (sum) => {
-    cy.get(".mat-tab-label:nth-child(1)", {timeout: 30000}).then(header => {
+    cy.get("#mat-tab-label-1-0 > .mat-tab-label-content", {timeout: 30000}).then(header => {
         const headerParts = header.text().trim().split(" ");
         const visibleCount = +headerParts[0];
-        cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000})
+        cy.get("#mat-tab-label-1-1 > .mat-tab-label-content", {timeout: 30000})
             .then(title => {
                       const hiddenCount = +title.text().trimLeft().split(" ")[0];
                       expect(hiddenCount + visibleCount).equals(sum);
@@ -131,10 +131,11 @@ Cypress.Commands.add("tweetCountTotal", (sum) => {
 });
 
 Cypress.Commands.add("withTweetCounts", (callback) => {
-    cy.get(".mat-tab-label:nth-child(1)").then(header => {
+    cy.wait(4000);
+    cy.get("#mat-tab-label-1-0 > .mat-tab-label-content").then(header => {
         const headerParts = header.text().trim().split(" ");
         const visibleCount = +headerParts[0];
-        cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000})
+        cy.get("#mat-tab-label-1-1 > .mat-tab-label-content", {timeout: 30000})
             .then(title => {
                       const hiddenCount = +title.text().trimLeft().split(" ")[0];
                       callback(visibleCount, hiddenCount);
@@ -146,13 +147,13 @@ Cypress.Commands.add("withTweetCounts", (callback) => {
 
 
 Cypress.Commands.add("tweetCount", (vis, hid) => {
-    cy.get(".mat-tab-label:nth-child(1)").then(header => {
+    cy.get("#mat-tab-label-1-0 > .mat-tab-label-content").then(header => {
         const headerParts = header.text().trim().split(" ");
         const visibleCount = +headerParts[0];
         const totalCount = vis + hid;
         cy.get(".app-tweet-outer").find('.atr-visible').its('length').should('eq', vis);
 
-        cy.get(".mat-tab-label:nth-child(2)", {timeout: 30000}).click()
+        cy.get("#mat-tab-label-1-1 > .mat-tab-label-content", {timeout: 30000}).click()
             .then(title => {
                       const hiddenCount = +title.text().trimLeft().split(" ")[0];
                       cy.get(".app-tweet-outer").find('.atr-hidden').its('length').should('eq', hid);
@@ -165,12 +166,13 @@ Cypress.Commands.add("tweetCount", (vis, hid) => {
 
 
 Cypress.Commands.add("clickTweetTab", (index) => {
-    cy.get(`.mat-tab-label:nth-child(${index})`, {timeout: 30000}).click({force: true});
+    cy.get(`#mat-tab-label-1-${index-1} > .mat-tab-label-content`, {timeout: 30000}).click({force: true});
 });
 
 Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
+    cy.wait(1000);
     cy.get(tweetSelector + " .mat-icon", {timeout: 10000})
-    cy.get(tweetSelector + " .mat-icon").trigger("click", {force: true});
+    cy.get(tweetSelector + " .mat-icon ").click();
     cy.wait(1000);
     cy.get(markAsMenu, {timeout: LONG_TIMEOUT}).click();
     cy.wait(1000);
@@ -179,8 +181,9 @@ Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
 });
 
 Cypress.Commands.add("unignoreTweet", (tweetSelector) => {
-    cy.get(tweetSelector + " .mat-icon", {timeout: 10000})
-    cy.get(tweetSelector + " .mat-icon").trigger("click", {force: true});
+    cy.wait(1000);
+    cy.get(tweetSelector + " .mat-icon", {timeout: 10000});
+    cy.get(tweetSelector + " .mat-icon").click();
     cy.wait(1000);
     cy.get(markAsMenu, {timeout: LONG_TIMEOUT}).click();
     cy.wait(1000);
@@ -227,7 +230,7 @@ Cypress.Commands.add("multiSelectRegions", (regions) => {
     for (let region of regions) {
         const path = `div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-${region}`;
         cy.get("body").type(multipleKey, {release: false, force: true})
-        cy.get(path).click({force: true});
+        cy.get(path).click({force: true, multiple:true});
         cy.wait(1000);
         cy.get("body").type(multipleKey, {release: true, force: true})
     }
@@ -236,38 +239,7 @@ Cypress.Commands.add("pushStateDelay", () => {
     cy.wait(500);
 });
 Cypress.Commands.add("stubLiveJson", (map_data, analaytics_all = "timeseries-all") => {
-    // Alternatively you can use CommonJS syntax:
-// require('./commands')
-// sets up cy.server, so cypress knows to
-// prepare network responses
-    cy.server();
-// this is where we tell cypress to intercept
-// certain XHR calls,
-// and to stub in our fixture instead
-    cy.route({
-                 // our example is a GET call, but you could also
-                 // have a POST, if you're pushing data up
-                 method: "GET",
-                 // more on the URL below
-                 url: /.*\/public\/data\/twitter\/uk-flood-2018.json?.*/g,
-                 // the fixture: shortcut will know to
-                 // look in cypress/fixtures,
-                 // unless you configure cypress to
-                 // put it somewhere else
-                 response: "fixture:" + map_data + ".json"
-             });
-    cy.route({
-                 // our example is a GET call, but you could also
-                 // have a POST, if you're pushing data up
-                 method: "GET",
-                 // more on the URL below
-                 url: /.*\/dev\/query\/time?.*/g,
-                 // the fixture: shortcut will know to
-                 // look in cypress/fixtures,
-                 // unless you configure cypress to
-                 // put it somewhere else
-                 response: "fixture:" + analaytics_all + ".json"
-             });
+    cy.log("stubLiveJson is no longer needed");
 
 });
 

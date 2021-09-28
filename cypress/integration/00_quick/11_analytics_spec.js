@@ -17,9 +17,6 @@ function snapshot(query = 'app-timeseries-multi-query-chart', name = "analytics-
 }
 
 describe('11 Analytics: ', function () {
-    beforeEach(() => {
-        cy.stubLiveJson("live-old");
-    })
 
     describe("Test Timeseries Graph", () => {
         const url = ANALYTICS_URL + "/time"
@@ -47,10 +44,11 @@ describe('11 Analytics: ', function () {
             cy.get('#mat-input-0').type("everywhere");
             cy.get('#mat-chip-list-input-0').type("Greater L");
             cy.wait(4000);
+            cy.get(".mat-option-text").should("contain.text","Greater London");
             cy.get(".mat-option-text").click();
             cy.get('.mat-chip').should("contain.text","Greater London")
             cy.get('.mat-card-actions > .mat-focus-indicator > .mat-button-wrapper').click();
-            cy.wait(1000);
+            cy.wait(3000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-criteria-1");
             cy.wait(1000);
             cy.get(':nth-child(1) > .mat-card-content > app-timeseries-analytics-form > .ttc-form > .text-search').type("everywhere");
@@ -59,7 +57,7 @@ describe('11 Analytics: ', function () {
             cy.get(".mat-option-text").click();
             cy.get('.mat-chip').should("contain.text","Cardiff")
             cy.get(':nth-child(1) > .mat-card-actions > .mat-focus-indicator > .mat-button-wrapper').click();
-            cy.wait(1000);
+            cy.wait(3000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-criteria-2");
             cy.get('.mat-toolbar-row > .mat-primary > .mat-button-wrapper').click();
             cy.wait(1000);
@@ -78,7 +76,7 @@ describe('11 Analytics: ', function () {
         });
 
 
-        it.only('Import from Map Stats', () => {
+        it('Import from Map Stats', () => {
             let url = MAP_URL+"?active_number=stats&active_polygon=county&selected=greater%20london";
             cy.visit(url);
             cy.login();
@@ -90,7 +88,7 @@ describe('11 Analytics: ', function () {
             cy.wait(1000);
             cy.url().should("contain",ANALYTICS_URL + "/time");
             cy.get('.mat-chip').should("contain.text","Greater London");
-            cy.wait(1000);
+            cy.wait(3000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-imported-from-map-1");
 
         });

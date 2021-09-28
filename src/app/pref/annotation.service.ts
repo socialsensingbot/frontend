@@ -114,7 +114,7 @@ export class AnnotationService {
         } catch (e) {
             log.error(e);
             this._notify.show("Failed to annotate Tweet, this could be a network error. Refresh the page and try" +
-                                  " again, if this persists please contact support.", "OK", 60);
+                                  " again, if this persists please contact support.", "OK", 60_000);
         }
 
     }

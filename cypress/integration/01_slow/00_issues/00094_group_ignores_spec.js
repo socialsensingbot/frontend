@@ -1,6 +1,6 @@
-import {MAP_URL} from "../../../support";
+import {LONDON_URL, MAP_URL} from "../../../support";
 
-const url = MAP_URL + "?selected=carmarthenshire&min_offset=-5399&max_offset=0&lat=53.00817326643286&lng=-2.0104980468750004&active_number=stats&active_polygon=county";
+const url = LONDON_URL;
 
 const testUnhide = (refresh, count, fail) => {
   cy.log("Un-ignoring " + count);
@@ -51,7 +51,7 @@ describe('#94 Group Ignore Prefs : https://github.com/socialsensingbot/frontend/
   it('Reproduce issue ', () => {
     cy.visit(url);
     cy.login("cypress1@example.com");
-    cy.wait(1000);
+    cy.wait(4000);
 
     cy.get(".app-tweet-drawer", {timeout: 30000});
 

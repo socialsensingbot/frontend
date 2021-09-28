@@ -2,6 +2,7 @@ import {EventEmitter} from "@angular/core";
 import {Logger} from "@aws-amplify/core";
 import {v4 as uuidv4} from "uuid";
 import {dayInMillis} from "../common";
+import {LayerGroup} from "../types";
 
 const log = new Logger("timeseries");
 
@@ -28,6 +29,7 @@ export interface TimeseriesRESTQuery {
   regions: string[];
   textSearch?: string;
   __series_id?: string;
+    layer?: LayerGroup
 }
 
 
@@ -165,4 +167,3 @@ export class TimeseriesCollectionModel {
     return result;
   }
 }
-
