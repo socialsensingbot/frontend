@@ -5,6 +5,7 @@ import {RESTDataAPIService} from "../../api/rest-api.service";
 import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {
+    EOC,
     TimeseriesAnalyticsComponentState,
     timeSeriesAutocompleteType,
     TimeseriesCollectionModel,
@@ -64,6 +65,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     private _interval: number;
     private _changed: boolean;
     private _storeQueryInURL: boolean;
+    public eoc: EOC = "exceedance";
 
     constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
                 public notify: NotificationService,
@@ -125,8 +127,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 await this.clear();
                 await this._router.navigate([], {});
             }
-            this.defaultLayer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
-
+            if (queryParams.active_layer) {
+                this.defaultLayer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
+            }
         });
         this._route.params.subscribe(async params => {
             const queryParams = this._route.snapshot.queryParams;
@@ -164,7 +167,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 }
                 if (typeof queryParams.selected !== "undefined") {
                     await this.clear(true);
-                    this.setEOCFromQuery(queryParams);
                     log.info("State is now " + this.state);
                     if (Array.isArray(queryParams.selected)) {
                         for (const region of queryParams.selected) {
@@ -181,6 +183,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 } else {
                     await this.clear(false);
                     this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
+                    this.setEOCFromQuery(queryParams);
                     await this.updateGraph(this.state.queries[0], true);
 
                 }
@@ -192,15 +195,20 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
-    public eocChanged() {
-        log.debug("EOC changed to " + this.state.eoc);
+    public userChangedEOC() {
         this._router.navigate([], {
-            queryParams:         {active_number: this.state.eoc === "count" ? "count" : "stats"},
+            queryParams:         {active_number: (this.eoc === "count" ? "count" : "stats")},
             queryParamsHandling: "merge"
         });
+        this.eocChanged();
+    }
+
+    public eocChanged() {
+        log.debug("EOC changed to " + this.eoc);
+        this.state.eoc = this.eoc;
         this.exec.uiActivity();
-        this.seriesCollection.yLabel = this.state.eoc === "exceedance" ? "Return Period" : "Count";
-        this.seriesCollection.yField = this.state.eoc === "exceedance" ? "exceedance" : "count";
+        this.seriesCollection.yLabel = this.eoc === "exceedance" ? "Return Period" : "Count";
+        this.seriesCollection.yField = this.eoc === "exceedance" ? "exceedance" : "count";
         this.seriesCollection.yAxisHasChanged();
         this.exec.uiActivity();
     }
@@ -266,6 +274,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             } else {
                 this.state.eoc = "exceedance";
             }
+            this.eoc = this.state.eoc;
             this.eocChanged();
         }
     }
@@ -368,7 +377,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     private defaultState(): TimeseriesAnalyticsComponentState {
         const query: TimeseriesRESTQuery = this.newQuery();
-        return {eoc: "count", lob: "line", queries: [this.newQuery()]};
+        return {eoc: this.eoc, lob: "line", queries: [this.newQuery()]};
     }
 
     private async _updateGraphInternal(query) {
