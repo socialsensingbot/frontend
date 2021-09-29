@@ -36,7 +36,9 @@ export class MapGraphSidebarComponent implements OnInit {
             this.updateStatesForRegions();
         });
         this._route.queryParams.subscribe(async queryParams => {
-            this.layer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
+            if (queryParams.active_layer) {
+                this.layer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
+            }
             this.regionList = this.selection.regionNames();
             this.updateStatesForRegions();
             for (const query of this.eState.queries) {
@@ -48,13 +50,14 @@ export class MapGraphSidebarComponent implements OnInit {
         });
     }
 
-    public expandCountGraph() {
-        this._router.navigate(["/analytics/time"], {queryParams: {selected: this.regionList, eoc: "count", active_layer: this.layer.id}});
+    public async expandCountGraph() {
+        await this._router.navigate(["/analytics/time"],
+                                    {queryParams: {selected: this.regionList, eoc: "count", active_layer: this.layer.id}});
     }
 
-    public expandExceedanceGraph() {
-        this._router.navigate(["/analytics/time"],
-                              {queryParams: {selected: this.regionList, eoc: "exceedance", active_layer: this.layer.id}});
+    public async expandExceedanceGraph() {
+        await this._router.navigate(["/analytics/time"],
+                                    {queryParams: {selected: this.regionList, eoc: "exceedance", active_layer: this.layer.id}});
     }
 
     public showDashboard() {
