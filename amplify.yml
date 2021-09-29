@@ -13,6 +13,7 @@ frontend:
   phases:
     preBuild:
       commands:
+        - amplify init
         - amplify env checkout $BACKEND
         - npm ci
         - mkdir -p dist/frontend
