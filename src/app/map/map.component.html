@@ -119,7 +119,8 @@
                     </button>
                     <mat-form-field *ngIf="data.ready">
                         <!--                    <mat-label>Countries</mat-label>-->
-                        <mat-select  multiple [(ngModel)]="selectedCountries" (valueChange)="calculateSelectedCountriesText()">
+                        <mat-select (valueChange)="calculateSelectedCountriesText($event)"
+                                    [(ngModel)]="selectedCountries" multiple>
                             <mat-select-trigger>
                                 <span class="country-additional-selection">{{selectedCountriesTextValue}}</span>
                             </mat-select-trigger>
