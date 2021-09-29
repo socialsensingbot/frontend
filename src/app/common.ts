@@ -69,3 +69,7 @@ export const roundToTenMinutes = (timestamp: number): any => {
     date.setUTCMilliseconds(0);
     return date.getTime();
 };
+
+export const sleep = ms => new Promise((resolve) => {
+    setTimeout(resolve, ms);
+});

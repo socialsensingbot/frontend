@@ -412,14 +412,12 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
             const rows = await sql({
                                        // language=MySQL
                                        sql:    `SELECT r.region AS region, count(*) AS count
-                                                FROM live_text t
-                                                         LEFT JOIN live_text_regions r
-                                                                   ON r.source = t.source AND r.hazard = t.hazard AND r.source_id = t.source_id
+                                                FROM mat_view_regions r
                                                 WHERE r.region_type = ?
-                                                  AND t.source_timestamp between ? and ?
+                                                  AND r.source_timestamp between ? and ?
                                                   AND r.hazard IN (?)
-                                                  AND t.source IN (?)
-                                                  AND t.warning IN (?)
+                                                  AND r.source IN (?)
+                                                  AND r.warning IN (?)
                                                 GROUP BY r.region
                                                `,
                                        values: [req.params.regionType, new Date(req.body.startDate),
@@ -500,6 +498,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
             console.debug("Start: " + new Date(start * 1000));
             console.debug("End: " + new Date(end * 1000));
             let rows = await getCachedStats(end, periodLengthInSeconds, req);
+
             if (rows.length === 0) {
                 // console.log("Test Values: ", testValues);
                 try {
@@ -509,21 +508,28 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                                      hazards,
                                                                      sources, warnings)
                                         select (select exceedance
-                                                from (SELECT count(*)                                            as count,
-                                                             floor((? - unix_timestamp(r.source_timestamp)) / ?) as period,
-                                                             cume_dist() OVER w * 100.0                          as exceedance
+                                                from (select cume_dist() OVER w * 100.0   as exceedance,
+                                                             rhs.period                   as period,
+                                                             IFNULL(lhs.count, rhs.count) as count
+                                                      from (SELECT count(source_id)                                    as count,
+                                                                   floor((? - unix_timestamp(r.source_timestamp)) / ?) as period
 
-                                                      FROM mat_view_regions r
-                                                      WHERE r.region_type = ?
-                                                        and r.region = regions.region
-                                                        and r.hazard IN (?)
-                                                        and r.source IN (?)
-                                                        and r.warning IN (?)
-                                                        and not r.deleted
-                                                      group by period
-                                                          WINDOW w AS (ORDER BY COUNT(period) desc))
-                                                         as x
-                                                where period = 0) as exceedance,
+                                                            FROM mat_view_regions r
+                                                            WHERE r.region_type = ?
+                                                              and r.region = regions.region
+                                                              and r.hazard IN (?)
+                                                              and r.source IN (?)
+                                                              and r.warning IN (?)
+
+                                                              and not r.deleted
+                                                            group by period
+                                                            order by period
+                                                           ) lhs
+                                                               RIGHT JOIN (select distinct floor((? - unix_timestamp(source_timestamp)) / ?) as period,
+                                                                                           0                                                 as count
+                                                                           from mat_view_regions) rhs ON lhs.period = rhs.period
+                                                          WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)) x
+                                                where period = 0 and count > 0) as exceedance,
                                                (SELECT count(*) as count
                                                 FROM mat_view_regions r
                                                 WHERE r.region_type = ?
@@ -544,7 +550,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                         from (select distinct region_id as region from ref_map_regions where region_type_id = ?) as regions`,
                                   values: [end, periodLengthInSeconds,
                                            req.params.regionType, req.body.hazards, req.body.sources,
-                                           warningsValues(req.body.warnings),
+                                           warningsValues(req.body.warnings), end, periodLengthInSeconds,
                                            req.params.regionType, req.body.hazards, req.body.sources,
                                            warningsValues(req.body.warnings),
                                            new Date(req.body.startDate), new Date(req.body.endDate),
@@ -571,7 +577,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
 
             return result;
 
-        }, {duration: 1 * 60});
+        }, {duration: 5 * 60});
 
     });
 
@@ -580,6 +586,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
             setTimeout(resolve, ms);
         });
     }
+
 
     app.listen(3000, () => {
         console.log("App started");

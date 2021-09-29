@@ -166,7 +166,7 @@ export class MapComponent implements OnInit, OnDestroy {
         log.debug("set activeLayerGroup");
         this._activeLayerGroup = value;
         if (this.ready) {
-            this.scheduleResetLayers(this.activeStatistic);
+            this.scheduleResetLayers(this.activeStatistic, false);
         }
         this.updateSearch({active_layer: this._activeLayerGroup});
         this._twitterIsStale = true;
@@ -1022,7 +1022,9 @@ export class MapComponent implements OnInit, OnDestroy {
      */
     private hideTweets() {
         log.debug("hideTweets()");
-        this.tweetsVisible = false;
+        this._exec.queue("Tweets Visible", ["ready"], () => {
+            this.tweetsVisible = false;
+        }, "tweets.visibility", true, true, true);
     }
 
     /**
@@ -1032,7 +1034,7 @@ export class MapComponent implements OnInit, OnDestroy {
         log.verbose("showTweets()");
         this._exec.queue("Tweets Visible", ["ready"], () => {
             this.tweetsVisible = true;
-        }, "tweets.visible", true, true, true);
+        }, "tweets.visibility", true, true, true);
     }
 
     /**

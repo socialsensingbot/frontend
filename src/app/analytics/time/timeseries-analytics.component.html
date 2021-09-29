@@ -2,10 +2,9 @@
   <ng-container *ngIf="ready && state">
       <mat-toolbar-row>
           <mat-button-toggle-group name="eoc" class="eoc"
-                                   [(ngModel)]="state.eoc" aria-label="Return Period or Count"
-                                   (valueChange)="eocChanged()">
-              <mat-button-toggle value="exceedance">Return Period</mat-button-toggle>
-              <mat-button-toggle value="count">Count</mat-button-toggle>
+                                   [(ngModel)]="eoc" aria-label="Return Period or Count">
+              <mat-button-toggle (click)="userChangedEOC()" value="exceedance">Return Period</mat-button-toggle>
+              <mat-button-toggle (click)="userChangedEOC()" value="count">Count</mat-button-toggle>
           </mat-button-toggle-group>
 
           <div class="app-toolbar-separator"></div>
@@ -66,10 +65,11 @@
   </app-timeseries-multi-query-chart>
 </div>
 
+<!--{{eoc}}-->
 <!--
 {{state|json}}
 -->
-<div *ngIf="state" class="app-query-builder-surround">
+<div *ngIf="ready && state && defaultLayer" class="app-query-builder-surround">
 
     <mat-card *ngFor="let query of state.queries; index as i">
         <mat-card-content>
