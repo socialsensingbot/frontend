@@ -108,6 +108,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
             this._data.regions = [];
             this.changed.emit(this._data);
         }
+        this.updateRegions()
     }
 
     remove(selectedTopic: MetadataKeyValue): void {
@@ -216,6 +217,10 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
             log.debug("Update Regions", this.regions);
             this._data.regions = this.regions.map(i => i.value);
         }
+        this.router.navigate([], {
+            queryParams:         {selected: null},
+            queryParamsHandling: "merge"
+        });
     }
 
     private _filter(region: any): MetadataKeyValue[] {

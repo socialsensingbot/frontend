@@ -165,7 +165,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 if (typeof queryParams.text_search !== "undefined") {
                     this.state.queries[0].textSearch = queryParams.text_search;
                 }
-                if (typeof queryParams.selected !== "undefined") {
+                if (typeof queryParams.selected !== "undefined" && queryParams.active_polygon === "county") {
                     await this.clear(true);
                     log.info("State is now " + this.state);
                     if (Array.isArray(queryParams.selected)) {
@@ -355,6 +355,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 to:   nowRoundedToHour(),
                 name: "time",
             };
+            if (payload.regions.length === 0) {
+                payload.regions = this.pref.combined.analyticsDefaultRegions;
+            }
             delete payload.__series_id;
             const serverResults = await this._api.callQueryAPI("query", payload);
             log.debug("Server result was ", serverResults);

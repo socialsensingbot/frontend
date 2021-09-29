@@ -488,8 +488,9 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    public calculateSelectedCountriesText() {
-        log.debug("selectedCountriesText()");
+    public calculateSelectedCountriesText(value: string[]) {
+        this.selectedCountries = value;
+        log.debug("selectedCountriesText(" + value + ")");
         // log.info(countries.value);
         if (!this.selectedCountries || this.selectedCountries.length === 0) {
             log.debug("None");
