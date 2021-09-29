@@ -8,7 +8,7 @@ import {NotificationService} from "../../services/notification.service";
 import {NgForage, NgForageCache} from "ngforage";
 import {ExportToCsv} from "export-to-csv";
 import {PreferenceService} from "../../pref/preference.service";
-import {readableTimestamp, roundToHour, roundToMinute, toTitleCase} from "../../common";
+import {readableTimestamp, roundToFiveMinutes, roundToHour, roundToMinute, toTitleCase} from "../../common";
 import * as geojson from "geojson";
 import {AnnotationService} from "../../pref/annotation.service";
 import {LoadingProgressService} from "../../services/loading-progress.service";
@@ -136,8 +136,8 @@ export class RESTMapDataService {
             hazards:   layerGroup.hazards,
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,
-            startDate: roundToMinute(await this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000),
-            endDate:   roundToMinute(await this.now())
+            startDate: roundToFiveMinutes(await this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000),
+            endDate:   roundToFiveMinutes(await this.now())
 
         }, 60) as Promise<RegionTweeCount>;
     }
@@ -277,6 +277,7 @@ export class RESTMapDataService {
     public async preCacheRegionStatsMap(layerGroupId: string, activeRegionType: string, _dateMin: number, _dateMax: number): Promise<void> {
         await this.getRegionStatsMap(layerGroupId, activeRegionType, _dateMin, _dateMax);
     }
+
     public async geoJsonGeographyFor(regionType: string): Promise<FeatureCollection> {
         return await this.loadGeography(regionType) as FeatureCollection;
     }
@@ -360,7 +361,7 @@ export class RESTMapDataService {
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,
             startDate: roundToHour(startDate),
-            endDate: roundToMinute(endDate)
+            endDate: roundToFiveMinutes(endDate)
 
         }, 60) as RegionStatsMap;
         return statsMap;
