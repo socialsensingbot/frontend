@@ -17,6 +17,8 @@ BEGIN
 
     START TRANSACTION;
 
+#     delete from mat_view_regions where source_timestamp < NOW() - INTERVAL 1 YEAR;
+
     SET @maxTimestamp = IFNULL((select max(source_timestamp) from mat_view_regions), NOW() - INTERVAL 20 YEAR);
 
     REPLACE INTO mat_view_regions

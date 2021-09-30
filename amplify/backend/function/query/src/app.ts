@@ -490,8 +490,8 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
             const lastDate: Date = (await maps)[req.params.map].last_date;
             const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
             const start = Math.floor(req.body.startDate / 1000);
-            const end = Math.floor(endDate / 1000);
-            const periodLengthInSeconds: number = end - start;
+            const end = Math.ceil(Math.floor(endDate / 1000) / (60 * 60)) * 60 * 60;
+            const periodLengthInSeconds: number = Math.ceil((end - start) / (60 * 60)) * 60 * 60;
             console.debug("Period Length in Seconds: " + periodLengthInSeconds);
             console.debug("StartDate: " + new Date(req.body.startDate));
             console.debug("EndDate: " + new Date(endDate));
@@ -529,7 +529,8 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                                                            0                                                 as count
                                                                            from mat_view_regions) rhs ON lhs.period = rhs.period
                                                           WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)) x
-                                                where period = 0 and count > 0) as exceedance,
+                                                where period = 0
+                                                  and count > 0) as exceedance,
                                                (SELECT count(*) as count
                                                 FROM mat_view_regions r
                                                 WHERE r.region_type = ?
@@ -539,14 +540,14 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                   and r.warning IN (?)
                                                   and not r.deleted
                                                   and r.source_timestamp between ? and ?
-                                               )                  as count,
-                                               regions.region     as region,
-                                               ?                  as end_time,
-                                               ?                  as period_length,
-                                               ?                  as region_type,
-                                               ?                  as hazards,
-                                               ?                  as sources,
-                                               ?                  as warnings
+                                               )                 as count,
+                                               regions.region    as region,
+                                               ?                 as end_time,
+                                               ?                 as period_length,
+                                               ?                 as region_type,
+                                               ?                 as hazards,
+                                               ?                 as sources,
+                                               ?                 as warnings
                                         from (select distinct region_id as region from ref_map_regions where region_type_id = ?) as regions`,
                                   values: [end, periodLengthInSeconds,
                                            req.params.regionType, req.body.hazards, req.body.sources,
