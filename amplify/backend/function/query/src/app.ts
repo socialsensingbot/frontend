@@ -485,6 +485,15 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
     app.post("/map/:map/region-type/:regionType/stats", async (req, res) => {
 
         cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
+
+            const firstDateInSeconds = (await sql({
+                                                      // language=MySQL
+                                                      sql: `select unix_timestamp(max(source_timestamp)) as ts
+                                                            from mat_view_first_entries
+                                                            where hazard IN (?)
+                                                              and source IN (?)`, values: [req.body.hazards, req.body.sources]
+                                                  }))[0].ts
+            console.debug("First date in seconds: " + firstDateInSeconds);
             const result = {};
 
             const lastDate: Date = (await maps)[req.params.map].last_date;
@@ -492,6 +501,8 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
             const start = Math.floor(req.body.startDate / 1000);
             const end = Math.ceil(Math.floor(endDate / 1000) / (60 * 60)) * 60 * 60;
             const periodLengthInSeconds: number = Math.ceil((end - start) / (60 * 60)) * 60 * 60;
+            const maxPeriods: number = (end - firstDateInSeconds) / periodLengthInSeconds;
+
             console.debug("Period Length in Seconds: " + periodLengthInSeconds);
             console.debug("StartDate: " + new Date(req.body.startDate));
             console.debug("EndDate: " + new Date(endDate));
@@ -515,26 +526,24 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                                    floor((? - unix_timestamp(r.source_timestamp)) / ?) as period
 
                                                             FROM mat_view_regions r
-                                                            WHERE r.region_type = ?
-                                                              and r.region = regions.region
+                                                            WHERE r.region = regions.region
+                                                              and r.region_type = ?
                                                               and r.hazard IN (?)
                                                               and r.source IN (?)
                                                               and r.warning IN (?)
-
                                                               and not r.deleted
                                                             group by period
                                                             order by period
                                                            ) lhs
-                                                               RIGHT JOIN (select distinct floor((? - unix_timestamp(source_timestamp)) / ?) as period,
-                                                                                           0                                                 as count
-                                                                           from mat_view_regions) rhs ON lhs.period = rhs.period
+                                                               RIGHT OUTER JOIN (select value as period, 0 as count from ref_integers where value < ?) rhs
+                                                                                ON lhs.period = rhs.period
                                                           WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)) x
                                                 where period = 0
                                                   and count > 0) as exceedance,
                                                (SELECT count(*) as count
                                                 FROM mat_view_regions r
-                                                WHERE r.region_type = ?
-                                                  and r.region = regions.region
+                                                WHERE r.region = regions.region
+                                                  and r.region_type = ?
                                                   and r.hazard IN (?)
                                                   and r.source IN (?)
                                                   and r.warning IN (?)
@@ -551,7 +560,8 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                         from (select distinct region_id as region from ref_map_regions where region_type_id = ?) as regions`,
                                   values: [end, periodLengthInSeconds,
                                            req.params.regionType, req.body.hazards, req.body.sources,
-                                           warningsValues(req.body.warnings), end, periodLengthInSeconds,
+                                           warningsValues(req.body.warnings),
+                                           maxPeriods,
                                            req.params.regionType, req.body.hazards, req.body.sources,
                                            warningsValues(req.body.warnings),
                                            new Date(req.body.startDate), new Date(req.body.endDate),
