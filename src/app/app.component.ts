@@ -173,7 +173,7 @@ export class AppComponent {
                             "please ask an administrator to look into this.",
                             e);
                     }
-                    this._exec.start();
+                    await this._exec.start();
                     log.info("Locale detected: " + getLang());
                     log.info("Locale in use: " + this.pref.combined.locale);
                     log.info("Timezone detected: " + Intl.DateTimeFormat().resolvedOptions().timeZone);
@@ -222,7 +222,7 @@ export class AppComponent {
             log.error(e);
             await DataStore.clear();
             await DataStore.start();
-            this._notify.show("Failed to sync data with the server. Please refresh the page.", "OK", 300);
+            this._notify.show("Failed to sync data with the server. Please refresh the page.", "OK", 300000);
         }
     }
 
@@ -256,7 +256,7 @@ export class AppComponent {
         }
         this._exec.stop();
         this.initiateLogout = false;
-        this._router.navigate(["/"], {queryParamsHandling: "merge"});
+        await this._router.navigate(["/"], {queryParamsHandling: "merge"});
         log.info("LOGOUT: Performed sign out.");
     }
 

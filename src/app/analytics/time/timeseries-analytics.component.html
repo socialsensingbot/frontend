@@ -1,15 +1,14 @@
 <mat-toolbar class="app-timeseries-toolbar">
-  <ng-container *ngIf="ready">
-    <mat-toolbar-row>
-      <mat-button-toggle-group name="eoc" class="eoc"
-                               [(ngModel)]="state.eoc" aria-label="Return Period or Count"
-                               (valueChange)="eocChanged()">
-          <mat-button-toggle value="exceedance">Return Period</mat-button-toggle>
-          <mat-button-toggle value="count">Count</mat-button-toggle>
-      </mat-button-toggle-group>
+  <ng-container *ngIf="ready && state">
+      <mat-toolbar-row>
+          <mat-button-toggle-group name="eoc" class="eoc"
+                                   [(ngModel)]="eoc" aria-label="Return Period or Count">
+              <mat-button-toggle (click)="userChangedEOC()" value="exceedance">Return Period</mat-button-toggle>
+              <mat-button-toggle (click)="userChangedEOC()" value="count">Count</mat-button-toggle>
+          </mat-button-toggle-group>
 
-      <div class="app-toolbar-separator"></div>
-      <mat-button-toggle-group name="lob" class="lob" (valueChange)="graphTypeChanged(state.lob)"
+          <div class="app-toolbar-separator"></div>
+          <mat-button-toggle-group name="lob" class="lob" (valueChange)="graphTypeChanged(state.lob)"
                                aria-label="Line or Bar" [(ngModel)]="state.lob">
         <mat-button-toggle value="line">Line</mat-button-toggle>
         <mat-button-toggle value="bar">Bar</mat-button-toggle>
@@ -41,8 +40,8 @@
       </button>
     </mat-toolbar-row>
     <mat-toolbar-row *ngIf="appToolbarExpanded">
+        <div class="app-toolbar-separator"></div>
 
-      <div class="app-toolbar-separator"></div>
 
     </mat-toolbar-row>
   </ng-container>
@@ -54,19 +53,23 @@
     <br/>
         </span>
   <app-timeseries-multi-query-chart
-    [updating]="updating"
-    [error]="error"
-    [seriesCollection]="seriesCollection"
-    [height]="600"
-    [connect]="connect"
-    [animated]="animated"
-    [scrollBar]="scrollBar"
-    class="twitter-timeseries-chart">
+          [updating]="updating"
+          [error]="error"
+          [seriesCollection]="seriesCollection"
+          [height]="600"
+          [connect]="connect"
+          [animated]="animated"
+          [scrollBar]="scrollBar"
+          class="twitter-timeseries-chart">
 
   </app-timeseries-multi-query-chart>
 </div>
 
-<div *ngIf="state" class="app-query-builder-surround">
+<!--{{eoc}}-->
+<!--
+{{state|json}}
+-->
+<div *ngIf="ready && state && defaultLayer" class="app-query-builder-surround">
 
     <mat-card *ngFor="let query of state.queries; index as i">
         <mat-card-content>
@@ -88,7 +91,7 @@
     <a mat-list-item [routerLink]="'/analytics/time/'+savedGraph.id" *ngFor="let savedGraph of
     savedGraphs"> {{
       savedGraph.title }}
-      <!--        - {{savedGraph.state}}-->
+        <!--              - {{savedGraph.state}}-->
       <button mat-button mat-icon-button matSuffix
               (click)="deleteSavedGraph(savedGraph.id); updateSavedGraphs()">
         <mat-icon>close</mat-icon>

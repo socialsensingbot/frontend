@@ -230,7 +230,7 @@ export class SessionService {
         throw e;
       } else {
         // Potential race condition here with another window logging in so we retry (but fail next time for real)
-        return this.getOrCreateServerSession(userInfo, true);
+        return await this.getOrCreateServerSession(userInfo, true);
       }
     }
   }
@@ -256,15 +256,15 @@ export class SessionService {
     }
 
 
-    return DataStore.save(new UserSession({
-                                            fingerprint: this.calculateFingerPrint(),
-                                            client,
-                                            open:        true,
-                                            ttl:         this.serverTTL(),
-                                            group:       this._pref.groups[0],
-                                            owner:       (await Auth.currentUserInfo()).username,
-                                            sessionId:   this._sessionId
-                                          }));
+      return await DataStore.save(new UserSession({
+                                                      fingerprint: this.calculateFingerPrint(),
+                                                      client,
+                                                      open:        true,
+                                                      ttl:         this.serverTTL(),
+                                                      group:       this._pref.groups[0],
+                                                      owner:       (await Auth.currentUserInfo()).username,
+                                                      sessionId:   this._sessionId
+                                                  }));
 
 
   }
@@ -280,11 +280,11 @@ export class SessionService {
     if (this._pref.combined.multipleSessions) {
       log.info("User logged in more than once, which group preferences, or the environment allows.");
     } else {
-      this._notify.show("You are logged in more than once this session will now be logged out.", "OK", 30);
-      window.setTimeout(async () => {
-        await this._auth.signOut();
-        window.location.reload();
-      }, 8000);
+      this._notify.show("You are logged in more than once this session will now be logged out.", "OK", 30_000);
+        window.setTimeout(async () => {
+            await this._auth.signOut();
+            window.location.reload();
+        }, 8000);
     }
   }
 

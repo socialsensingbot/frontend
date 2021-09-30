@@ -166,10 +166,10 @@ export class MapComponent implements OnInit, OnDestroy {
         log.debug("set activeLayerGroup");
         this._activeLayerGroup = value;
         if (this.ready) {
-            this.scheduleResetLayers(this.activeStatistic);
+            this.scheduleResetLayers(this.activeStatistic, false);
         }
+        this.updateSearch({active_layer: this._activeLayerGroup});
         this._twitterIsStale = true;
-        this.ready = false;
         this.load();
     }
 
@@ -200,7 +200,7 @@ export class MapComponent implements OnInit, OnDestroy {
                         ...this.data.serviceMetadata.start,
                         ...this.data.mapMetadata.start,
                     };
-                    this.updateSearch({zoom, lng, lat, selected: null});
+                    await this.updateSearch({zoom, lng, lat, selected: null});
                     this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 6000});
                 }
                 this.ready = true;
@@ -271,7 +271,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
         // Merge the params to change into _newParams which holds the
         // next set of parameters to add to the URL state.
-        return this._exec.queue("Update URL Query Params", ["ready", "data-refresh"], async () => {
+        return await this._exec.queue("Update URL Query Params", ["ready", "data-refresh"], async () => {
             const keys = {...this._newParams, ...params};
             this._newParams = {};
             Object.keys(keys).sort().forEach((key) => {
@@ -379,43 +379,40 @@ export class MapComponent implements OnInit, OnDestroy {
      * Read the live.json data file and process contents.
      */
     async load(first: boolean = false, clearSelected = false) {
+
         log.debug("load(" + first + "," + clearSelected + ")");
-        if (!first && this._updating) {
-            log.info("UI is busy so skipping load");
-            setTimeout(() => {
-                this._zone.run(() => this.load());
-            }, 2000);
-            return;
-        }
-        log.debug(`load(${first})`);
         if (!this._loggedIn) {
             log.warn("User logged out, not performing load.");
             return;
         }
+        // noinspection ES6MissingAwait
+        return this._exec.queue("Map Load", null, async () => {
+            try {
 
-        try {
+                await this.data.load(first);
 
-            await this.data.load(first);
+                if (first) {
+                    this._exec.changeState("no-params");
+                    // noinspection ES6MissingAwait
+                    this.updateSliderFromData();
+                } else {
+                    await this.updateLayers("Data Load", clearSelected);
+                    await this._exec.queue("Update Slider", ["ready"],
+                                           () => {
+                                               this.updateSliderFromData();
+                                           }, null, true, true, true);
+                }
 
-            if (first) {
-                this._exec.changeState("no-params");
-                // noinspection ES6MissingAwait
-                this.updateSliderFromData();
-            } else {
-                await this.updateLayers("Data Load", clearSelected);
-                await this._exec.queue("Update Slider", ["ready"],
-                                       () => {
-                                           this.updateSliderFromData();
-                                       }, null, true, true, true);
+                this._twitterIsStale = true;
+
+            } catch (e) {
+                log.error(e);
+                this._notify.error(e);
+            } finally {
             }
+        }, true, false, true, true, "inactive", 200000, 10);
+        ;
 
-            this._twitterIsStale = true;
-
-        } catch (e) {
-            log.error(e);
-            this._notify.error(e);
-        } finally {
-        }
 
     }
 
@@ -491,8 +488,9 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    public calculateSelectedCountriesText() {
-        log.debug("selectedCountriesText()");
+    public calculateSelectedCountriesText(value: string[]) {
+        this.selectedCountries = value;
+        log.debug("selectedCountriesText(" + value + ")");
         // log.info(countries.value);
         if (!this.selectedCountries || this.selectedCountries.length === 0) {
             log.debug("None");
@@ -542,7 +540,7 @@ export class MapComponent implements OnInit, OnDestroy {
             max_time,
             min_offset,
             max_offset,
-            layer_group
+            active_layer
         } = params;
         this._newParams = params;
         this._absoluteTime = await this.data.now();
@@ -563,11 +561,11 @@ export class MapComponent implements OnInit, OnDestroy {
             this._dateMax = roundToMinute(await this.data.now());
         }
         this.sliderOptions = {...this.sliderOptions, startMax: this._dateMax};
-        if (typeof layer_group !== "undefined") {
-            this._activeLayerGroup = layer_group;
+        if (typeof active_layer !== "undefined") {
+            this.activeLayerGroup = active_layer;
         }
 
-        this.checkForLiveUpdating();
+        await this.checkForLiveUpdating();
         // this._notify.show(JSON.stringify(this.sliderOptions));
         log.debug("Slider options: ", this.sliderOptions);
         // This handles the fact that the zoom and lat/lng can change independently of each other
@@ -620,6 +618,7 @@ export class MapComponent implements OnInit, OnDestroy {
                 }
             });
         });
+        // noinspection ES6MissingAwait
         this.dash.init();
         log.debug("init");
         // map.zoomControl.remove();
@@ -634,7 +633,7 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this.route.snapshot.queryParamMap.has("layer_group")) {
             this._activeLayerGroup = this.route.snapshot.queryParamMap.get("layer_group");
         } else {
-            this._activeLayerGroup = this.pref.combined.layerGroups.defaultLayerGroup;
+            this._activeLayerGroup = this.pref.defaultLayer().id;
         }
         if (this.route.snapshot.queryParamMap.has("active_polygon")) {
             this._activeRegionType = this.route.snapshot.queryParamMap.get("active_polygon");
@@ -659,16 +658,20 @@ export class MapComponent implements OnInit, OnDestroy {
         this._loggedIn = await Auth.currentAuthenticatedUser() != null;
 
         this._exec.changeState("map-init");
-        await this.load(true);
-        this.loading.loaded();
-        await this.checkForLiveUpdating();
+        this.load(true).then(() => this.loading.loaded());
+
+        // noinspection ES6MissingAwait
+        this.checkForLiveUpdating();
         this._searchParams.subscribe(async params => {
 
             if (!this._params) {
                 this._params = true;
+                // noinspection ES6MissingAwait
                 this._exec.queue("Initial Search Params", ["no-params"],
                                  async () => {
+                                     log.debug("Initial Search Parameters lambda started");
                                      await this.updateMapFromQueryParams(params);
+                                     this._exec.changeState("ready");
 
                                      // Listeners to push map state into URL
                                      map.addEventListener("dragend", () => {
@@ -681,7 +684,6 @@ export class MapComponent implements OnInit, OnDestroy {
                                          return this._zone.run(() => this.updateSearch({zoom: this._map.getZoom()}));
                                      });
 
-                                     this._exec.changeState("ready");
                                      await this.updateLayers("From Parameters");
                                      log.debug("Queued layer update");
                                      // Schedule periodic data loads from the server
@@ -696,7 +698,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                      this.loading.loaded();
                                      this.activity = false;
                                      log.debug("Initial Search Parameters lambda completed");
-                                 });
+                                 }, null, false, false, true, null, 1000, 3);
             } else {
                 if (this._popState) {
                     log.debug("POP STATE detected before URL query params change.");
@@ -719,7 +721,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
         await this.updateSearch({selected: []});
         this.selectedFeatureNames = [];
-        this.scheduleResetLayers(this.activeStatistic, true);
+        await this.scheduleResetLayers(this.activeStatistic, true);
     }
 
     /**
@@ -914,7 +916,7 @@ export class MapComponent implements OnInit, OnDestroy {
                 log.debug("Region Tweet Map", regionTweetMap);
 
                 const styleFunc = (feature: geojson.Feature) => {
-                    log.info("styleFunc " + layer);
+                    log.verbose("styleFunc " + layer);
 
                     const style = this._color.colorFunctions[layer].getFeatureStyle(
                         feature);
@@ -968,7 +970,7 @@ export class MapComponent implements OnInit, OnDestroy {
             for (const feature of features) {
                 const featureProperties = feature.properties;
                 const region = featureProperties.name;
-                this.data.regionStats(this.activeLayerGroup, this.activeRegionType, region, this._dateMin, this._dateMax).then(
+                await this.data.regionStats(this.activeLayerGroup, this.activeRegionType, region, this._dateMin, this._dateMax).then(
                     mapStats => {
                         if (mapStats !== null) {
                             featureProperties.count = mapStats.count;
@@ -1021,7 +1023,9 @@ export class MapComponent implements OnInit, OnDestroy {
      */
     private hideTweets() {
         log.debug("hideTweets()");
-        this.tweetsVisible = false;
+        this._exec.queue("Tweets Visible", ["ready"], () => {
+            this.tweetsVisible = false;
+        }, "tweets.visibility", true, true, true);
     }
 
     /**
@@ -1031,7 +1035,7 @@ export class MapComponent implements OnInit, OnDestroy {
         log.verbose("showTweets()");
         this._exec.queue("Tweets Visible", ["ready"], () => {
             this.tweetsVisible = true;
-        }, "tweets.visible", true, true, true);
+        }, "tweets.visibility", true, true, true);
     }
 
     /**
@@ -1039,9 +1043,12 @@ export class MapComponent implements OnInit, OnDestroy {
      */
     private async updateFromSlider() {
         log.debug("updateFromSlider()");
-        this.liveUpdating = this.sliderOptions.startMax > -this.pref.combined.continuousUpdateThresholdInMinutes;
+        log.debug("updateFromSlider() startMax=" + this.sliderOptions.startMax);
+        log.debug(
+            "updateFromSlider() threshold=" + (await this.data.now() - this.pref.combined.continuousUpdateThresholdInMinutes * 60_000));
+        this.liveUpdating = this.sliderOptions.startMax >= await this.data.now() - this.pref.combined.continuousUpdateThresholdInMinutes * 60_000;
 
-        this.checkForLiveUpdating();
+        await this.checkForLiveUpdating();
         await this.updateLayers("Slider Change");
         this._twitterIsStale = true;
     }
@@ -1058,13 +1065,13 @@ export class MapComponent implements OnInit, OnDestroy {
             max: await this.data.now(),
             min: await this.data.minDate() - 60 * 1000,
         };
-        this.checkForLiveUpdating();
+        await this.checkForLiveUpdating();
 
     }
 
     private async checkForLiveUpdating() {
         log.debug("checkForLiveUpdating()");
-        if (this.sliderOptions.startMax > -this.pref.combined.continuousUpdateThresholdInMinutes) {
+        if (this.sliderOptions.startMax >= await this.data.now() - this.pref.combined.continuousUpdateThresholdInMinutes * 60_000) {
             this.liveUpdating = true;
         } else {
             log.debug("LIVE UPDATES OFF: slider position was ", this.sliderOptions.startMax);
@@ -1083,9 +1090,9 @@ export class MapComponent implements OnInit, OnDestroy {
     private async updateTwitter() {
         log.debug("updateTwitter()");
         await this._exec.queue("Update Twitter", ["ready"], async () => {
-            // this.selectedRegion.toggle(this._clicked.target.feature.properties.name,this._clicked.target.feature.geometry);
-            await this.updateTwitterPanel();
-        }, "", false, true, true);
+            // noinspection ES6MissingAwait
+            this.updateTwitterPanel();
+        }, "", false, true, true, null, 1000, 5);
     }
 
     public async timeSliderPreset(mins: number) {

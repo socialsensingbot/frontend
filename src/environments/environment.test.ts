@@ -1,3 +1,4 @@
+/* tslint:disable:object-literal-key-quotes */
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
@@ -11,56 +12,27 @@ import {Dashboard} from "../app/pref/dashboard.service";
  * on performance if an error is thrown.
  */
 import "zone.js/dist/zone-error";
-import {LayerGroupsConfiguration} from "../app/types"; // Included with Angular CLI.
+import {InfoLayerConfiguration} from "../app/types"; // Included with Angular CLI.
 
 
-const layerGroups: LayerGroupsConfiguration = {
-    "groups":            [
+const layers: InfoLayerConfiguration = {
+    "available":    [
         {
-            "id":       "flood-only",
+            "id":       "flood",
             "title":    "Floods",
             "sources":  ["twitter"],
             "hazards":  ["flood"],
             "warnings": "exclude",
         },
         {
-            "id":       "flood-with-warnings",
-            "title":    "Floods (includes warnings)",
-            "sources":  ["twitter"],
-            "hazards":  ["flood"],
-            "warnings": "include"
-        },
-        {
-            "id":       "flood-warnings-only",
-            "title":    "Floods (only warnings)",
-            "sources":  ["twitter"],
-            "hazards":  ["flood"],
-            "warnings": "only"
-        },
-        {
-            "id":       "wind-only",
+            "id":       "wind",
             "title":    "Wind",
             "sources":  ["twitter"],
             "hazards":  ["wind"],
             "warnings": "exclude"
-        },
-        {
-            "id":       "wind-and-flood",
-            "title":    "Wind & Flood",
-            "sources":  ["twitter"],
-            "hazards":  ["wind", "flood"],
-            "warnings": "exclude"
-        },
-        {
-            "id":       "snow-only",
-            "title":    "Snow",
-            "sources":  ["twitter"],
-            "hazards":  ["snow"],
-            "warnings": "exclude"
-        },
-
+        }
     ],
-    "defaultLayerGroup": "flood-only"
+    "defaultLayer": "flood"
 };
 
 const defaultDashboard: Dashboard = {
@@ -74,14 +46,14 @@ const defaultDashboard: Dashboard = {
 };
 
 export const environment = {
-    name:                                "test",
-    lamdaEnvironment:                    "test",
-    version:                             "test",
-    demo:                                false,
-    production:                          false,
-    test:                                true,
-    hmr:                                 false,
-    rollbar:                             false,
+    name:                         "test",
+    lamdaEnvironment:             "test",
+    version:                      "test",
+    demo:                         false,
+    production:                   false,
+    test:                         true,
+    hmr:                          false,
+    rollbar:                      false,
     toolbarColor:                 "accent",
     // timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     timezone:         "UTC",
@@ -93,7 +65,7 @@ export const environment = {
         password: ""
     },
 
-    impact: {
+    impact:                              {
         // The ability to tag tweets with an impact annotation
         levels: [
             {title: "1 – Minimal", value: "minimal", color: "#43A047"},
@@ -120,11 +92,11 @@ export const environment = {
     animateOnTimeSliderChange:           false,
     recentTweetHighlightOffsetInSeconds: 1200,
     defaultDataSet:                      "uk-flood-live",
-    availableDataSets:                   ["*"], // A list of datasets that will appear in the toolbar dropdown, or "*" for all.
+    availableDataSets:                   ["uk-flood-live"], // A list of datasets that will appear in the toolbar dropdown, or "*" for all.
     cacheProcessedTweets:                false,
     mapTileUrlTemplate:                  "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
     defaultDashboard,
-    layerGroups,
+    layers,
     blinkRateInMilliseconds:             1000,
     // mapTileUrlTemplate:
     // "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"

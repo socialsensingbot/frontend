@@ -27,6 +27,14 @@
         <mat-toolbar class="app-toolbar">
             <ng-container *ngIf="ready">
                 <mat-toolbar-row>
+                    <button aria-label="Expand or shrink toolbar" class="app-map-expand-toolbar-btn" mat-icon-button>
+                        <mat-icon (click)="appToolbarExpanded=true" *ngIf="!appToolbarExpanded"
+                                  matTooltip="Expand toolbar">arrow_drop_down
+                        </mat-icon>
+                        <mat-icon (click)="appToolbarExpanded=false" *ngIf="appToolbarExpanded"
+                                  matTooltip="Shrink toolbar">arrow_drop_up
+                        </mat-icon>
+                    </button>
                     <button class="app-toolbar-btn map-zoom-in" mat-icon-button (click)="zoomIn()">
                         <mat-icon matTooltip="Zoom In">zoom_in</mat-icon>
                     </button>
@@ -66,13 +74,6 @@
                         </mat-select>
                     </mat-form-field>
                     <div class="app-toolbar-expanding-separator"></div>
-                    <button mat-icon-button  class="app-map-expand-toolbar-btn" aria-label="Expand or shrink toolbar">
-                        <mat-icon matTooltip="Expand toolbar" *ngIf="!appToolbarExpanded"
-                                  (click)="appToolbarExpanded=true">arrow_drop_down
-                        </mat-icon>
-                        <mat-icon matTooltip="Shrink toolbar" *ngIf="appToolbarExpanded"
-                                  (click)="appToolbarExpanded=false">arrow_drop_up</mat-icon>
-                    </button>
                 </mat-toolbar-row>
                 <mat-toolbar-row *ngIf="appToolbarExpanded">
                     <ng-container *ngIf="data.availableDataSets && data.availableDataSets.length > 1">
@@ -102,9 +103,9 @@
                         </mat-select>
                     </mat-form-field>
                     <div class="app-toolbar-separator"></div>
-                    <mat-form-field *ngIf="pref.combined.layerGroups.groups.length > 1">
+                    <mat-form-field *ngIf="pref.combined.layers.available.length > 1">
                         <mat-select [(value)]="activeLayerGroup" class="map-number-layer-select">
-                            <mat-option *ngFor="let layerGroup of pref.combined.layerGroups.groups"
+                            <mat-option *ngFor="let layerGroup of pref.combined.layers.available"
                                         [value]="layerGroup.id">{{layerGroup.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>
@@ -118,7 +119,8 @@
                     </button>
                     <mat-form-field *ngIf="data.ready">
                         <!--                    <mat-label>Countries</mat-label>-->
-                        <mat-select  multiple [(ngModel)]="selectedCountries" (valueChange)="calculateSelectedCountriesText()">
+                        <mat-select (valueChange)="calculateSelectedCountriesText($event)"
+                                    [(ngModel)]="selectedCountries" multiple>
                             <mat-select-trigger>
                                 <span class="country-additional-selection">{{selectedCountriesTextValue}}</span>
                             </mat-select-trigger>

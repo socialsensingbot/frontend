@@ -8,7 +8,7 @@ import {NotificationService} from "../../services/notification.service";
 import {NgForage, NgForageCache} from "ngforage";
 import {ExportToCsv} from "export-to-csv";
 import {PreferenceService} from "../../pref/preference.service";
-import {readableTimestamp, roundToHour, roundToMinute, toTitleCase} from "../../common";
+import {readableTimestamp, roundToFiveMinutes, roundToHour, roundToMinute, toTitleCase} from "../../common";
 import * as geojson from "geojson";
 import {AnnotationService} from "../../pref/annotation.service";
 import {LoadingProgressService} from "../../services/loading-progress.service";
@@ -136,10 +136,10 @@ export class RESTMapDataService {
             hazards:   layerGroup.hazards,
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,
-            startDate: roundToMinute(await this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000),
-            endDate:   roundToMinute(await this.now())
+            startDate: roundToFiveMinutes(await this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000),
+            endDate:   roundToFiveMinutes(await this.now())
 
-        }) as Promise<RegionTweeCount>;
+        }, 60) as Promise<RegionTweeCount>;
     }
 
 
@@ -278,10 +278,6 @@ export class RESTMapDataService {
         await this.getRegionStatsMap(layerGroupId, activeRegionType, _dateMin, _dateMax);
     }
 
-    private async regionNamesWithData(layerGroupId: string, regionType: string, startDate: number, endDate: number): Promise<string[]> {
-        return Object.keys(await this.getRegionStatsMap(layerGroupId, regionType, startDate, endDate));
-    }
-
     public async geoJsonGeographyFor(regionType: string): Promise<FeatureCollection> {
         return await this.loadGeography(regionType) as FeatureCollection;
     }
@@ -355,7 +351,7 @@ export class RESTMapDataService {
     }
 
     private layerGroup(id: string): LayerGroup {
-        return this._pref.combined.layerGroups.groups.filter(i => i.id === id)[0];
+        return this._pref.combined.layers.available.filter(i => i.id === id)[0];
     }
 
     private async getRegionStatsMap(layerGroupId: string, regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {
@@ -365,9 +361,9 @@ export class RESTMapDataService {
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,
             startDate: roundToHour(startDate),
-            endDate:   roundToHour(endDate)
+            endDate: roundToFiveMinutes(endDate)
 
-        }, 600) as RegionStatsMap;
+        }, 60) as RegionStatsMap;
         return statsMap;
     }
 }

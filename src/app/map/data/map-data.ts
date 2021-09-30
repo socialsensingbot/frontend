@@ -45,13 +45,10 @@ export interface MapMetadata {
     title: string;
     version?: string;
     regionTypes: RegionMetadata[];
-    layerGroups: LayerGroupMetadata[];
     regionAggregations: string[];
-    layers: LayerMetadata[];
     start: StartMetadata;
     location: string;
     hazards: string[];
-    defaultLayerGroup: string;
     defaultRegionType: string;
 }
 

@@ -16,19 +16,58 @@ BEGIN
 
 
     START TRANSACTION;
+    REPLACE INTO mat_view_first_entries
+    SELECT min(source_timestamp) as source_timestamp, hazard, source
+    FROM mat_view_regions
+    GROUP BY hazard, source;
+    COMMIT;
+
+    START TRANSACTION;
+
+#     delete from mat_view_regions where source_timestamp < NOW() - INTERVAL 1 YEAR;
 
     SET @maxTimestamp = IFNULL((select max(source_timestamp) from mat_view_regions), NOW() - INTERVAL 20 YEAR);
 
     REPLACE INTO mat_view_regions
-    SELECT t.source_id, t.source, t.hazard, t.source_timestamp, tr.region_type, tr.region, t.warning
+    SELECT t.source_id,
+           t.source,
+           t.hazard,
+           t.source_timestamp,
+           tr.region_type,
+           tr.region,
+           t.warning,
+           IFNULL(t.deleted, false)
     FROM live_text t,
          live_text_regions tr
-    where tr.source_id = t.source_id
-      and tr.source = t.source
-      and tr.hazard = t.hazard
-      and NOT deleted
-    ORDER BY source_timestamp DESC;
+    WHERE tr.source_id = t.source_id
+      AND tr.source = t.source
+      AND tr.hazard = t.hazard
+      AND t.source_timestamp >= @maxTimestamp - INTERVAL 4 DAY;
     COMMIT;
+
+    START TRANSACTION;
+
+    SET @maxTimestampTSD = IFNULL((select max(source_date) from mat_view_timeseries_date), NOW() - INTERVAL 20 YEAR);
+    REPLACE INTO mat_view_timeseries_date
+    SELECT rrg.parent               as region_group_name,
+           t.source                 as source,
+           t.hazard                 as hazard,
+           t.warning                as warning,
+           t.source_date            as source_date,
+           t.source_text            as source_text,
+           vr.region_type           as region_type,
+           IFNULL(t.deleted, false) as deleted,
+           t.source_id as source_id
+    FROM live_text_regions vr,
+         live_text t,
+         ref_region_groups as rrg
+    WHERE vr.region = rrg.region
+      AND t.source_id = vr.source_id
+      AND t.source = vr.source
+      AND t.hazard = vr.hazard
+      AND t.source_date >= @maxTimestampTSD - INTERVAL 4 DAY;
+    COMMIT;
+
 
     SET rc = 0;
 END;

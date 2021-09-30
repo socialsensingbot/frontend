@@ -18,54 +18,52 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
             values: {}
         };
     },
-    time:               (params: any) => {
+    time:             (params: any) => {
         let fullText = "";
-        const exceedance =
-            "(select count(*) from (select distinct date(source_date) from live_text) x) / (rank() OVER w) as exceedance, "
-            + "1.0 / (percent_rank()  OVER w) as inv_percent ";
         if (typeof params.textSearch !== "undefined" && params.textSearch.length > 0) {
-            fullText = " and MATCH (source_text) AGAINST(? IN BOOLEAN MODE) ";
+            fullText = " and MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
         }
         if (!params.regions || (params.regions.includes("*") || params.regions.length === 0)) {
-            const values = fullText ? [params.source, params.hazard, params.textSearch, dateFromMillis(params.from),
-                                       dateFromMillis(params.to)] : [params.source, params.hazard,
+            const values = fullText ? [params.layer.sources, params.layer.hazards, params.textSearch, dateFromMillis(params.from),
+                                       dateFromMillis(params.to)] : [params.layer.sources, params.layer.hazards,
                                                                      dateFromMillis(params.from),
                                                                      dateFromMillis(params.to)];
             return {
                 sql: `select *
                       from (SELECT count(*) as count,
-                                   DATE(source_date) as date,
-                                   'all'       as region, ${exceedance}
-                            FROM live_text
-                            WHERE source = ?
-                              and hazard = ? ${fullText}
-                            group by DATE (source_date)
-                                WINDOW w AS (ORDER BY COUNT (DATE (source_date)) desc)
-                            order by source_date) x
+                                   tsd.source_date as date,
+                                   'all'       as region,  1.0 / (cume_dist()  OVER w) as exceedance 
+                            FROM mat_view_timeseries_date tsd
+                            WHERE source IN (?)
+                              and hazard IN (?) ${fullText}
+                            group by tsd.source_date
+                                WINDOW w AS (ORDER BY COUNT(tsd.source_date) desc)
+                            order by tsd.source_date) x
                       where date between ? and ? `,
                 values
             };
         } else {
-            const values = fullText ? [params.source, params.hazard,
+            const values = fullText ? [params.layer.sources, params.layer.hazards,
                                        params.regions, params.textSearch, dateFromMillis(params.from),
-                                       dateFromMillis(params.to)] : [params.source, params.hazard,
+                                       dateFromMillis(params.to)] : [params.layer.sources, params.layer.hazards,
                                                                      params.regions,
                                                                      dateFromMillis(params.from),
                                                                      dateFromMillis(params.to)];
             return {
                 sql: `select *
-                      from (SELECT count(source_date) as count,
-                                   DATE(source_date)        as date,
-                                   parent             as region, ${exceedance}
-                            FROM live_text live,
-                                ref_region_groups as rrg
-                            WHERE live.source = ?
-                              and live.hazard = ?
-                              and live.region_1 = rrg.region
-                              and rrg.parent in (?) ${fullText}
-                            group by DATE (source_date), rrg.parent
-                                WINDOW w AS (ORDER BY COUNT (DATE (source_date)) desc)
-                            order by source_date) x
+                      from (SELECT count(tsd.source_date) as count,
+                                   tsd.source_date       as date,
+                                   tsd.region_group_name             as region,  
+                                   1.0 / (cume_dist()  OVER w) as exceedance 
+                            FROM mat_view_timeseries_date tsd
+                            WHERE tsd.source IN (?)
+                              and tsd.hazard IN (?)
+                              and tsd.region_type = 'county'
+                              and tsd.region_group_name IN (?) 
+                              ${fullText}
+                            group by  tsd.source_date, tsd.region_group_name
+                                WINDOW w AS (ORDER BY COUNT(tsd.source_date) desc)
+                            order by  tsd.source_date) x
                       where date between ? and ?`,
                 values
             };

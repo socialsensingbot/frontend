@@ -1,9 +1,8 @@
 import {Injectable} from "@angular/core";
 import Auth from "@aws-amplify/auth";
-import {Hub} from "@aws-amplify/core";
+import {Hub, Logger} from "@aws-amplify/core";
 import {Observable, Subject} from "rxjs";
 import {CognitoUser} from "amazon-cognito-identity-js";
-import {Logger} from "@aws-amplify/core";
 import {DataStore} from "@aws-amplify/datastore";
 import {LoadingProgressService} from "../services/loading-progress.service";
 
@@ -98,16 +97,16 @@ export class AuthService {
     }
 
     public async userInfo() {
-        return Auth.currentUserInfo();
+        return await Auth.currentUserInfo();
     }
 
     public async forgotPassword(username: string) {
         // Send confirmation code to user's email
-        return Auth.forgotPassword(username);
+        return await Auth.forgotPassword(username);
     }
 
     public async resetPassword(username: string, code: string, password: string) {
         await Auth.forgotPasswordSubmit(username, "" + code, password);
-        return this.signIn(username, password);
+        return await this.signIn(username, password);
     }
 }

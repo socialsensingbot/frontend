@@ -1,18 +1,18 @@
 /* tslint:disable:object-literal-key-quotes */
 import {Dashboard} from "../app/pref/dashboard.service";
-import {LayerGroupsConfiguration} from "../app/types";
+import {InfoLayerConfiguration} from "../app/types";
 
-const layerGroups: LayerGroupsConfiguration = {
-    "groups":            [
+const layers: InfoLayerConfiguration = {
+    "available":    [
         {
-            "id":       "flood-only",
+            "id":       "flood",
             "title":    "Floods",
             "sources":  ["twitter"],
             "hazards":  ["flood"],
             "warnings": "exclude",
         }
     ],
-    "defaultLayerGroup": "flood-only"
+    "defaultLayer": "flood"
 };
 
 const defaultDashboard: Dashboard = {
@@ -30,7 +30,7 @@ export const environment = {
     name:             "production",
     lamdaEnvironment: "prod",
     demo:             false,
-    version:          "2.3",
+    version: "2.3.3",
     // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
     timezone:             "UTC",
     locale:               "en-GB",
@@ -69,16 +69,16 @@ export const environment = {
     ]
   },
 
-  features:                            ["impact", "source", "map", "dashboard", "analytics"],
-  mostRecentDateIsNow:                 true,
-  continuousUpdateThresholdInMinutes:  90,
-  animateOnTimeSliderChange:           false,
-  recentTweetHighlightOffsetInSeconds: 1200,
+    features:                            ["impact", "source", "map", "dashboard", "analytics"],
+    mostRecentDateIsNow:                 true,
+    continuousUpdateThresholdInMinutes:  90,
+    animateOnTimeSliderChange:           false,
+    recentTweetHighlightOffsetInSeconds: 1200,
 
     mapTileUrlTemplate:           "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
     blinkRateInMilliseconds:      1000,
     defaultDashboard,
-    layerGroups,
+    layers:                       layers,
     shareTextAutocompleteInGroup: true,
     analyticsDefaultRegions:      ["uk"],
     maxCallsPerMinute:            600,
