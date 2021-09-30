@@ -499,8 +499,8 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
             const lastDate: Date = (await maps)[req.params.map].last_date;
             const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
             const start = Math.floor(req.body.startDate / 1000);
-            const end = Math.ceil(Math.floor(endDate / 1000) / (60 * 60)) * 60 * 60;
-            const periodLengthInSeconds: number = Math.ceil((end - start) / (60 * 60)) * 60 * 60;
+            const end = Math.floor(endDate / 1000);
+            const periodLengthInSeconds: number = Math.min(end - start, 3600);
             const maxPeriods: number = (end - firstDateInSeconds) / periodLengthInSeconds;
 
             console.debug("Period Length in Seconds: " + periodLengthInSeconds);
