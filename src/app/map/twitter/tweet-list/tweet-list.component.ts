@@ -11,6 +11,8 @@ import {MatDialog} from "@angular/material/dialog";
 import {MatMenuTrigger} from "@angular/material/menu";
 import {TweetCopyDialogComponent} from "./tweet-copy-dialog/tweet-copy-dialog.component";
 
+const twitterLink = require("twitter-text")
+
 const log = new Logger("tweet-list");
 let loadTweets = false;
 
@@ -516,8 +518,23 @@ export class TweetListComponent implements OnInit, OnDestroy {
         };
     }
 
+
+    public entities(tweet: any): any {
+        const entities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities : tweet.json.entities;
+        return typeof entities !== "undefined" ? entities : {};
+    }
+
+    public tweetHtml(tweet: any): any {
+        const entities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities : tweet.json.entities;
+        const text = tweet.json.extended_tweet ? tweet.json.extended_tweet.full_text : tweet.json.text;
+        console.log(twitterLink);
+        return "<p>" + twitterLink.default.autoLink(text, {entities, targetBlank: true}) + "</p>";
+    }
+
     public mediaEntities(tweet: any): any[] {
         const mediaEntities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities.media : tweet.json.entities.media;
         return typeof mediaEntities !== "undefined" ? mediaEntities : [];
     }
+
+
 }
