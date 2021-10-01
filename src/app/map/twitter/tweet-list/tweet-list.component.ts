@@ -527,8 +527,12 @@ export class TweetListComponent implements OnInit, OnDestroy {
     public tweetHtml(tweet: any): any {
         const entities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities : tweet.json.entities;
         const text = tweet.json.extended_tweet ? tweet.json.extended_tweet.full_text : tweet.json.text;
-        console.log(twitterLink);
-        return "<p>" + twitterLink.default.autoLink(text, {entities, targetBlank: true}) + "</p>";
+        console.log(entities);
+        let urlEntities: string[] = entities.urls;
+        if (entities.media) {
+            urlEntities = [...urlEntities, ...entities.media]
+        }
+        return "<p>" + twitterLink.default.autoLink(text, {urlEntities, targetBlank: true, title: false}) + "</p>";
     }
 
     public mediaEntities(tweet: any): any[] {

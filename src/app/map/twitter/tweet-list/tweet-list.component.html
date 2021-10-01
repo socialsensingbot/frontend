@@ -141,9 +141,9 @@
                         <div *ngFor="let media of mediaEntities(tweet)">
                             <!--                            {{media|json}}-->
                             <div *ngIf="media.type === 'photo'">
-                                <img [ngStyle]="styleForPhoto(media)" [src]="media.media_url"
+                               <a [href]="media.media_url"><img [ngStyle]="styleForPhoto(media)" [src]="media.media_url"
 
-                                     alt="photo"/>
+                                                                alt="photo"/></a>
                             </div>
                             <div *ngIf="media.type === 'video'">
                                 <video [ngStyle]="styleForPhoto(media)" controls>
