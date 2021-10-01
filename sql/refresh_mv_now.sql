@@ -16,6 +16,15 @@ BEGIN
 
 
     START TRANSACTION;
+    REPLACE INTO mat_view_first_entries
+    SELECT min(source_timestamp) as source_timestamp, hazard, source
+    FROM mat_view_regions
+    GROUP BY hazard, source;
+    COMMIT;
+
+    START TRANSACTION;
+
+#     delete from mat_view_regions where source_timestamp < NOW() - INTERVAL 1 YEAR;
 
     SET @maxTimestamp = IFNULL((select max(source_timestamp) from mat_view_regions), NOW() - INTERVAL 20 YEAR);
 
@@ -58,6 +67,7 @@ BEGIN
       AND t.hazard = vr.hazard
       AND t.source_date >= @maxTimestampTSD - INTERVAL 4 DAY;
     COMMIT;
+
 
     SET rc = 0;
 END;
