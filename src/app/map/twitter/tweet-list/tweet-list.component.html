@@ -134,6 +134,25 @@
                     <div [innerHTML]="tweet.text | safeHtml" class="app-twitter-text"></div>
                     <div class="app-twitter-date">{{tweet.date | date:"shortTime"}}
                         - {{tweet.date | date:"mediumDate"}}</div>
+                    <!--                    {{tweet.json.extended_tweet.entities.media|json}}-->
+                    <div *ngIf="true">
+                        <div *ngFor="let media of mediaEntities(tweet)">
+                            <!--                            {{media|json}}-->
+                            <div *ngIf="media.type === 'photo'">
+                                <img [ngStyle]="styleForPhoto(media)" [src]="media.media_url"
+
+                                     alt="photo"/>
+                            </div>
+                            <div *ngIf="media.type === 'video'">
+                                <video [ngStyle]="styleForPhoto(media)" controls>
+                                    <source [src]="media.video_info.variants[0].url"
+                                            [type]="media.video_info.variants[0].content_type">
+                                    Your browser does not support the video tag.
+                                </video>
+
+                            </div>
+                        </div>
+                    </div>
                     <div class="app-twitter-line"></div>
                     <div class="app-twitter-stats">
                         <span *ngIf="pref.combined.showTwitterLikes" class="app-twitter-likes"><mat-icon>favorite_border</mat-icon>
