@@ -52,12 +52,26 @@ export class MapGraphSidebarComponent implements OnInit {
 
     public async expandCountGraph() {
         await this._router.navigate(["/analytics/time"],
-                                    {queryParams: {selected: this.regionList, eoc: "count", active_layer: this.layer.id}});
+                                    {
+                                        queryParamsHandling: "merge",
+                                        queryParams:         {
+                                            selected:      this.regionList,
+                                            active_number: "count",
+                                            active_layer:  this.layer.id
+                                        }
+                                    });
     }
 
     public async expandExceedanceGraph() {
         await this._router.navigate(["/analytics/time"],
-                                    {queryParams: {selected: this.regionList, eoc: "exceedance", active_layer: this.layer.id}});
+                                    {
+                                        queryParamsHandling: "merge",
+                                        queryParams:         {
+                                            selected:      this.regionList,
+                                            active_number: "stats",
+                                            active_layer:  this.layer.id
+                                        }
+                                    });
     }
 
     public showDashboard() {

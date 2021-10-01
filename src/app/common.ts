@@ -70,6 +70,14 @@ export const roundToTenMinutes = (timestamp: number): any => {
     return date.getTime();
 };
 
+export const roundToFiveMinutes = (timestamp: number): any => {
+    const date: Date = new Date(timestamp);
+    date.setUTCMinutes(Math.floor(date.getUTCMinutes() / 5) * 5);
+    date.setUTCSeconds(0);
+    date.setUTCMilliseconds(0);
+    return date.getTime();
+};
+
 export const sleep = ms => new Promise((resolve) => {
     setTimeout(resolve, ms);
 });
