@@ -541,4 +541,12 @@ export class TweetListComponent implements OnInit, OnDestroy {
     }
 
 
+    public videoVariant(media: any): any {
+        for (const variant of media.video_info.variants) {
+            if (variant.content_type === "video/mp4") {
+                return variant;
+            }
+        }
+        return null;
+    }
 }
