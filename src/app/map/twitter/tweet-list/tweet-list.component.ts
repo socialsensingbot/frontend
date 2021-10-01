@@ -11,6 +11,8 @@ import {MatDialog} from "@angular/material/dialog";
 import {MatMenuTrigger} from "@angular/material/menu";
 import {TweetCopyDialogComponent} from "./tweet-copy-dialog/tweet-copy-dialog.component";
 
+const twitterLink = require("twitter-text")
+
 const log = new Logger("tweet-list");
 let loadTweets = false;
 
@@ -22,7 +24,7 @@ setInterval(() => {
 
 }, 1000);
 
-let twitterBound = false;
+const twitterBound = false;
 
 function twitterInit() {
     // if ((window as any).twttr && (window as any).twttr.events) {
@@ -92,7 +94,8 @@ twitterInit();
 class TweetPage {
     public loaded = false;
 
-    constructor(public page: number, public start: number, public tweets: Tweet[]) {}
+    constructor(public page: number, public start: number, public tweets: Tweet[]) {
+    }
 
     public is(other: TweetPage) {
         return other.page === this.page
@@ -151,7 +154,8 @@ export class TweetListComponent implements OnInit, OnDestroy {
     private _annotationRemovalSubscription: Subscription;
 
     constructor(private _zone: NgZone, private _dialog: MatDialog, public pref: PreferenceService,
-                public annotate: AnnotationService) {}
+                public annotate: AnnotationService) {
+    }
 
     private _tweets: Tweet[] | null = [];
 
@@ -501,4 +505,36 @@ export class TweetListComponent implements OnInit, OnDestroy {
             this.pages[page].loaded = true;
         }
     }
+
+
+    public styleForPhoto(media: any): any {
+        const width: number = Math.min(media.sizes.small.w, 400);
+        const height = (width / media.sizes.small.w) * media.sizes.small.h;
+
+        return {
+            "object-fit": media.sizes.small.resize === "fit" ? "contain" : "cover",
+            "width.px":   width,
+            "height.px":  height
+        };
+    }
+
+
+    public entities(tweet: any): any {
+        const entities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities : tweet.json.entities;
+        return typeof entities !== "undefined" ? entities : {};
+    }
+
+    public tweetHtml(tweet: any): any {
+        const entities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities : tweet.json.entities;
+        const text = tweet.json.extended_tweet ? tweet.json.extended_tweet.full_text : tweet.json.text;
+        console.log(twitterLink);
+        return "<p>" + twitterLink.default.autoLink(text, {entities, targetBlank: true}) + "</p>";
+    }
+
+    public mediaEntities(tweet: any): any[] {
+        const mediaEntities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities.media : tweet.json.entities.media;
+        return typeof mediaEntities !== "undefined" ? mediaEntities : [];
+    }
+
+
 }
