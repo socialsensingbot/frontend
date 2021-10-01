@@ -145,10 +145,10 @@
                             <ng-container *ngIf="media?.additional_media_info?.embeddable !== false">
                                 <div *ngIf="media.type === 'photo'">
                                     <!-- Image cannot be embedded -->
-                                    <a [href]="media.media_url"><img [ngStyle]="styleForPhoto(media)"
-                                                                     [src]="media.media_url"
+                                    <a [href]="media.media_url" target="_blank"><img [ngStyle]="styleForPhoto(media)"
+                                                                                     [src]="media.media_url"
 
-                                                                     alt="photo"/></a>
+                                                                                     alt="photo"/></a>
                                 </div>
                                 <div *ngIf="media.type === 'animated_gif'">
                                     <!-- Image cannot be embedded -->
