@@ -195,12 +195,13 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
-    public userChangedEOC() {
+    public userChangedEOC(type: EOC) {
+        this.eoc = type;
+        this.eocChanged();
         this._router.navigate([], {
-            queryParams:         {active_number: (this.eoc === "count" ? "count" : "stats")},
+            queryParams:         {active_number: (type === "count" ? "count" : "stats")},
             queryParamsHandling: "merge"
         });
-        this.eocChanged();
     }
 
     public eocChanged() {

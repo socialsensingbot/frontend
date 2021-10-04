@@ -2,9 +2,10 @@
   <ng-container *ngIf="ready && state">
       <mat-toolbar-row>
           <mat-button-toggle-group name="eoc" class="eoc"
-                                   [(ngModel)]="eoc" aria-label="Return Period or Count">
-              <mat-button-toggle (click)="userChangedEOC()" value="exceedance">Return Period</mat-button-toggle>
-              <mat-button-toggle (click)="userChangedEOC()" value="count">Count</mat-button-toggle>
+                                   [ngModel]="eoc" aria-label="Return Period or Count">
+              <mat-button-toggle (click)="userChangedEOC('exceedance')" value="exceedance">Return Period
+              </mat-button-toggle>
+              <mat-button-toggle (click)="userChangedEOC('count')" value="count">Count</mat-button-toggle>
           </mat-button-toggle-group>
 
           <div class="app-toolbar-separator"></div>
