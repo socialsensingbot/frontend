@@ -546,7 +546,8 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                      )                 as count,
                                                      regions.region    as region
 
-                                              from (select distinct region_id as region from ref_map_regions where region_type_id = ?) as regions`,
+                                              from (select distinct region from ref_geo_regions where region_type = ?) as regions`,
+
                                        values: [end, periodLengthInSeconds,
                                                 req.params.regionType, req.body.hazards, req.body.sources,
                                                 warningsValues(req.body.warnings),

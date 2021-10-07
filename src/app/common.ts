@@ -11,7 +11,7 @@ export function toTitleCase(str: string): string {
 }
 
 export const dayInMillis = 24 * 60 * 60 * 1000;
-const hourInMillis = 60 * 60 * 1000;
+export const hourInMillis = 60 * 60 * 1000;
 export const nowRoundedToHour = () => {
     return Math.floor(new Date().getTime() / hourInMillis) * hourInMillis;
 };

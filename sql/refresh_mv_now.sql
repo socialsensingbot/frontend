@@ -57,7 +57,28 @@ BEGIN
            t.source_text            as source_text,
            vr.region_type           as region_type,
            IFNULL(t.deleted, false) as deleted,
-           t.source_id as source_id
+           t.source_id              as source_id
+    FROM live_text_regions vr,
+         live_text t,
+         ref_region_groups as rrg
+    WHERE vr.region = rrg.region
+      AND t.source_id = vr.source_id
+      AND t.source = vr.source
+      AND t.hazard = vr.hazard
+      AND t.source_date >= @maxTimestampTSD - INTERVAL 4 DAY;
+    COMMIT;
+
+    SET @maxTimestampTSH = IFNULL((select max(source_date) from mat_view_timeseries_hour), NOW() - INTERVAL 20 YEAR);
+    REPLACE INTO mat_view_timeseries_hour
+    SELECT rrg.parent                                                       as region_group_name,
+           t.source                                                         as source,
+           t.hazard                                                         as hazard,
+           t.warning                                                        as warning,
+           cast(date_format(t.source_timestamp, '%Y-%m-%d %H') as DATETIME) as source_date,
+           t.source_text                                                    as source_text,
+           vr.region_type                                                   as region_type,
+           IFNULL(t.deleted, false)                                         as deleted,
+           t.source_id                                                      as source_id
     FROM live_text_regions vr,
          live_text t,
          ref_region_groups as rrg

@@ -6,6 +6,7 @@ import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {
     EOC,
+    TimePeriod,
     TimeseriesAnalyticsComponentState,
     timeSeriesAutocompleteType,
     TimeseriesCollectionModel,
@@ -21,9 +22,10 @@ import {MatDialog} from "@angular/material/dialog";
 import {NotificationService} from "src/app/services/notification.service";
 import {toLabel} from "../graph";
 import {DashboardService} from "../../pref/dashboard.service";
-import {dayInMillis, nowRoundedToHour} from "../../common";
+import {dayInMillis, hourInMillis, nowRoundedToHour} from "../../common";
 import {TextAutoCompleteService} from "../../services/text-autocomplete.service";
 import {LayerGroup} from "../../types";
+import {FormControl, FormGroup} from "@angular/forms";
 
 const log = new Logger("timeseries-ac");
 
@@ -94,13 +96,13 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     private _state: TimeseriesAnalyticsComponentState;
 
-    public get state(): any {
-        return this._state;
-    }
+    public range: FormGroup = new FormGroup({
+                                                start: new FormControl(new Date()),
+                                                end:   new FormControl(new Date())
+                                            });
 
-    @Input()
-    public set state(value: any) {
-        this._state = value;
+    public get state(): TimeseriesAnalyticsComponentState {
+        return this._state;
     }
 
     public updateSavedGraphs() {
@@ -108,6 +110,12 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     public defaultLayer: LayerGroup = null;
+
+    @Input()
+    public set state(value: TimeseriesAnalyticsComponentState) {
+        this._state = value;
+    }
+    ;
 
     public emitChange() {
 
@@ -149,12 +157,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                     this.title = savedGraph.title;
                     this.state = JSON.parse(savedGraph.state);
                     console.log("Loaded saved graph with state ", this.state);
-                    for (const query of this.state.queries) {
-                        if (!query.layer) {
-                            query.layer = this.defaultLayer;
-                        }
-                        await this.updateGraph(query, true);
-                    }
+                    await this.refreshAllSeries();
                     this.exec.uiActivity();
                 } else {
                     this.navigateToRoot();
@@ -173,27 +176,36 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                             const newQuery = this.newQuery();
                             newQuery.regions.push(region);
                             this.state.queries = [newQuery];
-                            await this.updateGraph(newQuery, true);
+                            await this.updateGraph(newQuery, this.state.timePeriod, true);
                         }
                     } else {
                         this.state.queries = [this.newQuery()];
                         this.state.queries[0].regions = [queryParams.selected];
-                        await this._updateGraphInternal(this.state.queries[0]);
+                        await this._updateGraphInternal(this.state.queries[0], this.state.timePeriod);
                     }
                     this.setEOCFromQuery(queryParams);
                 } else {
                     await this.clear(false);
                     this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
                     this.setEOCFromQuery(queryParams);
-                    await this.updateGraph(this.state.queries[0], true);
+                    await this.updateGraph(this.state.queries[0], this.state.timePeriod, true);
 
                 }
             }
 
-
         });
 
 
+    }
+
+    public async refreshAllSeries(): Promise<void> {
+        log.debug("Refreshing all series");
+        for (const query of this.state.queries) {
+            if (!query.layer) {
+                query.layer = this.defaultLayer;
+            }
+            await this.updateGraph(query, this.state.timePeriod, true);
+        }
     }
 
     public userChangedEOC(type: EOC) {
@@ -262,7 +274,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         log.info("Adding query ", newQuery);
         this.state.queries.unshift(newQuery);
 
-        await this.updateGraph(newQuery, false);
+        await this.updateGraph(newQuery, this.state.timePeriod, false);
     }
 
     public refreshGraph() {
@@ -287,7 +299,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.exec.uiActivity();
     }
 
-    public async updateGraph(q: TimeseriesRESTQuery, force) {
+    public async updateGraph(q: TimeseriesRESTQuery, timePeriod, force) {
         // Immutable copy
         const query = JSON.parse(JSON.stringify(q));
         this.updating = true;
@@ -302,7 +314,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                                           this.auto.create(timeSeriesAutocompleteType, query.textSearch, true,
                                                            this.pref.combined.shareTextAutocompleteInGroup);
                                       }
-                                      await this._updateGraphInternal(query);
+                                      await this._updateGraphInternal(query, timePeriod);
                                   } else {
                                       log.debug("Skipped time series update, force=" + force);
                                   }
@@ -332,9 +344,10 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             this.state = this.defaultState();
             log.info("State is now " + this.state);
             this.seriesCollection.clear();
+            this.timePeriodChanged(this.state.timePeriod);
             this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
             if (!empty) {
-                await this._updateGraphInternal(this.state.queries[0]);
+                await this._updateGraphInternal(this.state.queries[0], this.state.timePeriod);
             } else {
                 this.state.queries = [];
             }
@@ -343,7 +356,49 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
-    protected async executeQuery(query: TimeseriesRESTQuery): Promise<any[]> {
+    public async timePeriodChanged(timePeriod: TimePeriod) {
+        this.state.timePeriod = timePeriod;
+        const today = new Date();
+        const day = today.getDate();
+        const month = today.getMonth();
+        const year = today.getFullYear();
+        if (timePeriod === "day") {
+            this.range.controls.start.setValue(new Date(year - 1, month, day));
+        } else {
+            this.range.controls.start.setValue(new Date(Date.now() - dayInMillis));
+        }
+        this.seriesCollection.dateSpacing = timePeriod === "day" ? dayInMillis : hourInMillis;
+        await this.refreshAllSeries();
+
+    }
+
+    public async addToDashboard() {
+
+        const dialogData = {
+            dialogTitle: "Add to Dashboard",
+            title:       (this.title || "")
+        };
+        const dialogRef = this.dialog.open(NameGraphDialogComponent, {
+            width: "500px",
+            data:  dialogData
+        });
+
+        dialogRef.afterClosed().subscribe(async result => {
+            if (result !== null) {
+                await this.dash.addCard("timeseries", dialogData.title,
+                                        1, 1, this.state);
+                this.showDashboard();
+            }
+        });
+
+
+    }
+
+    protected queryTransform(from: any[]): any[] {
+        return from;
+    }
+
+    protected async executeQuery(query: TimeseriesRESTQuery, timePeriod: TimePeriod): Promise<any[]> {
         if (this._storeQueryInURL) {
             await this._router.navigate([], {queryParams: query});
         }
@@ -353,9 +408,10 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             const payload = {
                 layer: this.defaultLayer,
                 ...query,
-                from: nowRoundedToHour() - (365.24 * dayInMillis),
-                to:   nowRoundedToHour(),
+                from: this.range.controls.start.value !== null ? this.range.controls.start.value.getTime() : (nowRoundedToHour() - (365.24 * dayInMillis)),
+                to:   this.range.controls.end.value !== null ? this.range.controls.end.value.getTime() : nowRoundedToHour(),
                 name: "time",
+                timePeriod
             };
             if (payload.regions.length === 0) {
                 payload.regions = this.pref.combined.analyticsDefaultRegions;
@@ -374,26 +430,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         }
 
 
-    }
-
-    protected queryTransform(from: any[]): any[] {
-        return from;
-    }
-
-    private defaultState(): TimeseriesAnalyticsComponentState {
-        const query: TimeseriesRESTQuery = this.newQuery();
-        return {eoc: this.eoc, lob: "line", queries: [this.newQuery()]};
-    }
-
-    private async _updateGraphInternal(query) {
-        const queryResult = await this.executeQuery(query);
-        if (queryResult && queryResult.length > 0) {
-            this.seriesCollection.updateTimeseries(
-                new TimeseriesModel(toLabel(query, this.pref.combined.layers), queryResult,
-                                    query.__series_id));
-        } else {
-            log.warn(queryResult);
-        }
     }
 
     private newQuery(): TimeseriesRESTQuery {
@@ -417,25 +453,22 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this._router.navigate(["/dashboard"]);
     }
 
-    public async addToDashboard() {
+    private defaultState(): TimeseriesAnalyticsComponentState {
+        const query: TimeseriesRESTQuery = this.newQuery();
+        return {eoc: this.eoc, lob: "line", queries: [this.newQuery()], timePeriod: "day"};
+    }
 
-        const dialogData = {
-            dialogTitle: "Add to Dashboard",
-            title:       (this.title || "")
-        };
-        const dialogRef = this.dialog.open(NameGraphDialogComponent, {
-            width: "500px",
-            data:  dialogData
-        });
-
-        dialogRef.afterClosed().subscribe(async result => {
-            if (result !== null) {
-                await this.dash.addCard("timeseries", dialogData.title,
-                                        1, 1, this.state);
-                this.showDashboard();
-            }
-        });
-
-
+    private async _updateGraphInternal(query, timePeriod: TimePeriod) {
+        const queryResult = await this.executeQuery(query, timePeriod);
+        for (const element of queryResult) {
+            element.date = new Date(element.date);
+        }
+        if (queryResult && queryResult.length > 0) {
+            this.seriesCollection.updateTimeseries(
+                new TimeseriesModel(toLabel(query, this.pref.combined.layers), queryResult,
+                                    query.__series_id));
+        } else {
+            log.warn(queryResult);
+        }
     }
 }
