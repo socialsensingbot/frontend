@@ -26,7 +26,7 @@
         "query": {
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
-          "s3Key": "amplify-builds/query-4171524f4f354137576c-build.zip"
+          "s3Key": "amplify-builds/query-336c6758724e734b6371-build.zip"
         },
         "mvrefresh": {
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
