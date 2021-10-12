@@ -106,7 +106,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
             return;
         }
         res.setHeader("X-SocialSensing-CachedQuery-Key", key);
-        if (queryCache.has(key)) {
+        if (key != null && queryCache.has(key)) {
             console.log("Returned from cache " + key);
             res.setHeader("X-SocialSensing-CachedQuery-Key", key);
             res.setHeader("X-SocialSensing-CachedQuery-Expires-At", queryCache.getTtl(key));
@@ -119,7 +119,9 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
 
             res.setHeader("X-SocialSensing-CachedQuery", "false");
             value().then(result => {
-                queryCache.set(key, result, options.duration);
+                if (key !== null) {
+                    queryCache.set(key, result, options.duration);
+                }
                 res.json(result);
             }).catch(e => handleError(res, e));
         }
@@ -328,7 +330,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
     });
 
     app.post("/map/:map/region-type/:regionType/geography", async (req, res) => {
-        cache(res, req.path, async () => {
+        cache(res, null, async () => {
 
 
             const geography = await sql({
@@ -336,9 +338,11 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                             sql: `select ST_AsGeoJSON(boundary) as geo, region
                                                   from ref_geo_regions gr,
                                                        ref_map_metadata mm
-                                                  where gr.map_location = mm.location
-                                                    and mm.id = ?
-                                                    and region_type = ?`, values: [req.params.map, req.params.regionType]
+                                                  where mm.id = ?
+                                                    and region_type = ?
+                                                    and gr.map_location = mm.location`, values: [req.params.map, req.params.regionType]
+
+
                                         });
             const regionGeoMap: RegionGeography = {};
             for (const row of geography) {

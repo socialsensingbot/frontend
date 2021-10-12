@@ -79,3 +79,4 @@ amplifytools.xcconfig
 /ref_data/uk_countries.geojson
 /ref_data/uk_countries.sql
 /ref_data/uk_countries_to_sql.sh
+/ref_data_tmp/
