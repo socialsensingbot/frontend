@@ -94,7 +94,12 @@ export class RESTMapDataService {
         for (const region in this.regionGeography) {
             if (this.regionGeography.hasOwnProperty(region)) {
                 features.push(
-                    {id: "" + region, type: "Feature", properties: {name: region, count: 0}, geometry: this.regionGeography[region]});
+                    // tslint:disable-next-line:no-string-literal
+                    {id: "" + region,
+                        type: "Feature",
+                        properties: {...this.regionGeography[region]["properties"], name: region, count: 0},
+                        geometry: this.regionGeography[region]
+                    });
             }
         }
         this._regionGeographyGeoJSON = {type: "FeatureCollection", features};

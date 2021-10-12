@@ -335,7 +335,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
 
             const geography = await sql({
                                             // language=MySQL
-                                            sql: `select ST_AsGeoJSON(boundary) as geo, region
+                                            sql: `select ST_AsGeoJSON(boundary) as geo, region, gr.title
                                                   from ref_geo_regions gr,
                                                        ref_map_metadata mm
                                                   where mm.id = ?
@@ -347,6 +347,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
             const regionGeoMap: RegionGeography = {};
             for (const row of geography) {
                 regionGeoMap[row.region] = JSON.parse(row.geo);
+                regionGeoMap[row.region]["properties"] = {name: row.region, title: row.title}
             }
             return regionGeoMap;
         }, {duration: 24 * 60 * 60});

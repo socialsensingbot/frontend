@@ -15,7 +15,7 @@ import {HttpClient} from "@angular/common/http";
 import {AppState, UIExecutionService} from "../services/uiexecution.service";
 import {ColorCodeService} from "./services/color-code.service";
 import {Tweet} from "./twitter/tweet";
-import {getOS, roundToHour, roundToMinute, toTitleCase} from "../common";
+import {getOS, roundToHour, roundToMinute} from "../common";
 import {RegionSelection} from "./region-selection";
 import {PreferenceService} from "../pref/preference.service";
 import {NgForageCache} from "ngforage";
@@ -730,7 +730,7 @@ export class MapComponent implements OnInit, OnDestroy {
     private featureEntered(e: LeafletMouseEvent) {
         const feature = e.target.feature;
         const exceedanceProbability: number = Math.round(feature.properties.stats * 100) / 100;
-        const region: string = toTitleCase(feature.properties.name);
+        const region: string = feature.properties.title;
         const count: number = feature.properties.count;
         this.highlight(e.target, 1);
 
