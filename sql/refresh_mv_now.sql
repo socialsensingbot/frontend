@@ -33,15 +33,15 @@ BEGIN
            t.source,
            t.hazard,
            t.source_timestamp,
-           tr.region_type,
-           tr.region,
+           gr.region_type,
+           gr.region,
            t.warning,
-           IFNULL(t.deleted, false)
+           IFNULL(t.deleted, false) as deleted
     FROM live_text t,
-         live_text_regions tr
-    WHERE tr.source_id = t.source_id
-      AND tr.source = t.source
-      AND tr.hazard = t.hazard
+         ref_geo_regions gr
+    WHERE ST_Contains(boundary, location)
+
+
       AND t.source_timestamp >= @maxTimestamp - INTERVAL 4 DAY;
     COMMIT;
 
@@ -49,22 +49,39 @@ BEGIN
 
     SET @maxTimestampTSD = IFNULL((select max(source_date) from mat_view_timeseries_date), NOW() - INTERVAL 20 YEAR);
     REPLACE INTO mat_view_timeseries_date
-    SELECT rrg.parent               as region_group_name,
+    SELECT r.region                 as region_group_name,
            t.source                 as source,
            t.hazard                 as hazard,
            t.warning                as warning,
            t.source_date            as source_date,
            t.source_text            as source_text,
-           vr.region_type           as region_type,
+           r.region_type            as region_type,
            IFNULL(t.deleted, false) as deleted,
-           t.source_id as source_id
-    FROM live_text_regions vr,
-         live_text t,
-         ref_region_groups as rrg
-    WHERE vr.region = rrg.region
-      AND t.source_id = vr.source_id
-      AND t.source = vr.source
-      AND t.hazard = vr.hazard
+           t.source_id              as source_id
+    FROM mat_view_regions r,
+         live_text t
+    WHERE t.source_id = r.source_id
+      AND t.source = r.source
+      AND t.hazard = r.hazard
+      AND t.source_date >= @maxTimestampTSD - INTERVAL 4 DAY;
+    COMMIT;
+
+    SET @maxTimestampTSH = IFNULL((select max(source_date) from mat_view_timeseries_hour), NOW() - INTERVAL 20 YEAR);
+    REPLACE INTO mat_view_timeseries_hour
+    SELECT r.region                                                         as region_group_name,
+           t.source                                                         as source,
+           t.hazard                                                         as hazard,
+           t.warning                                                        as warning,
+           cast(date_format(t.source_timestamp, '%Y-%m-%d %H') as DATETIME) as source_date,
+           t.source_text                                                    as source_text,
+           r.region_type                                                    as region_type,
+           IFNULL(t.deleted, false)                                         as deleted,
+           t.source_id                                                      as source_id
+    FROM mat_view_regions r,
+         live_text t
+    WHERE t.source_id = r.source_id
+      AND t.source = r.source
+      AND t.hazard = r.hazard
       AND t.source_date >= @maxTimestampTSD - INTERVAL 4 DAY;
     COMMIT;
 

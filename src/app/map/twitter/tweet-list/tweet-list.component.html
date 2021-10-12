@@ -140,19 +140,33 @@
                     <div *ngIf="true">
                         <div *ngFor="let media of mediaEntities(tweet)">
                             <!--                            {{media|json}}-->
-                            <div *ngIf="media.type === 'photo'">
-                               <a [href]="media.media_url"><img [ngStyle]="styleForPhoto(media)" [src]="media.media_url"
+                            <ng-container *ngIf="media?.additional_media_info?.embeddable === false">
+                            </ng-container>
+                            <ng-container *ngIf="media?.additional_media_info?.embeddable !== false">
+                                <div *ngIf="media.type === 'photo'">
+                                    <!-- Image cannot be embedded -->
+                                    <a [href]="media.media_url" target="_blank"><img [ngStyle]="styleForPhoto(media)"
+                                                                                     [src]="media.media_url"
 
-                                                                alt="photo"/></a>
-                            </div>
-                            <div *ngIf="media.type === 'video'">
-                                <video [ngStyle]="styleForPhoto(media)" controls>
-                                    <source [src]="media.video_info.variants[0].url"
-                                            [type]="media.video_info.variants[0].content_type">
-                                    Your browser does not support the video tag.
-                                </video>
+                                                                                     alt="photo"/></a>
+                                </div>
+                                <div *ngIf="media.type === 'animated_gif'">
+                                    <!-- Image cannot be embedded -->
+                                    <a [href]="media.media_url"><img [ngStyle]="styleForPhoto(media)"
+                                                                     [src]="media.media_url"
 
-                            </div>
+                                                                     alt="photo"/></a>
+                                </div>
+                                <div *ngIf="media.type === 'video'">
+                                    <video *ngIf="videoVariant(media) !== null" [ngStyle]="styleForPhoto(media)"
+                                           controls>
+                                        <source [src]="videoVariant(media).url"
+                                                [type]="videoVariant(media).content_type">
+                                        Your browser does not support the video tag.
+                                    </video>
+
+                                </div>
+                            </ng-container>
                         </div>
                     </div>
                     <div class="app-twitter-line"></div>

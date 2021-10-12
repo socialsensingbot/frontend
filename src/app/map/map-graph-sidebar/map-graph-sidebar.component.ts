@@ -30,8 +30,8 @@ export class MapGraphSidebarComponent implements OnInit {
     async ngOnInit() {
         await this.pref.waitUntilReady();
         this.layer = this.pref.defaultLayer();
-        this.eState = {queries: [], eoc: "exceedance", lob: "line"};
-        this.cState = {queries: [], eoc: "count", lob: "line"};
+        this.eState = {queries: [], eoc: "exceedance", lob: "line", timePeriod: "day"};
+        this.cState = {queries: [], eoc: "count", lob: "line", timePeriod: "day"};
         this.selection.changed.subscribe(i => {
             this.updateStatesForRegions();
         });
@@ -84,8 +84,8 @@ export class MapGraphSidebarComponent implements OnInit {
 
     private updateStatesForRegions(): void {
         this.regionList = this.selection.regionNames();
-        this.eState = {queries: [], eoc: "exceedance", lob: "line"};
-        this.cState = {queries: [], eoc: "count", lob: "line"};
+        this.eState = {queries: [], eoc: "exceedance", lob: "line", timePeriod: "day"};
+        this.cState = {queries: [], eoc: "count", lob: "line", timePeriod: "day"};
         for (const region of this.selection.regionNames()) {
             this.cState.queries.push({textSearch: "", regions: [region], __series_id: region, layer: this.layer});
             this.eState.queries.push({textSearch: "", regions: [region], __series_id: region, layer: this.layer});
