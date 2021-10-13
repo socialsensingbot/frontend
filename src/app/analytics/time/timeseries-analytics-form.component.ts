@@ -13,6 +13,7 @@ import {PreferenceService} from "../../pref/preference.service";
 import {TextAutoCompleteService} from "../../services/text-autocomplete.service";
 import {timeSeriesAutocompleteType} from "../timeseries";
 import {LayerGroup} from "../../types";
+import {RESTMapDataService} from "../../map/data/rest-map-data.service";
 
 const log = new Logger("timeseries-config");
 
@@ -71,7 +72,8 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
 
             }
             this.searchControl.setValue(this._data.textSearch + this.regions);
-            this.metadata.regions.then(
+            //TODO: Remove this hardcoding
+            this.mapData.regions("uk-flood-live").then(
                 regions => {
                     this.allRegions = regions;
                     log.debug(regions);
@@ -87,7 +89,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
 
     constructor(public metadata: MetadataService, public zone: NgZone, public router: Router,
                 public route: ActivatedRoute, public pref: PreferenceService,
-                private _api: RESTDataAPIService, public auto: TextAutoCompleteService
+                private _api: RESTDataAPIService, public auto: TextAutoCompleteService, public mapData: RESTMapDataService
     ) {
 
         this.metadata.regions.then(i => this.allRegions = i);

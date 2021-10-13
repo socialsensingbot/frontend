@@ -447,15 +447,35 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
         res.json(endDate);
     });
 
+    /**
+     * Returns all the regions for a given map, regardless of region type.
+     * IMPORTANT: this screens out numerically named regions.
+     */
+    app.post("/map/:map/regions", async (req, res) => {
+        cache(res, req.path, async () => {
+            return await sql({
+                                 // language=MySQL
+                                 sql: `select distinct region as value, gr.title as text, gr.region_type as type
+                                       from ref_geo_regions gr,
+                                            ref_map_metadata mm
+                                       where not region REGEXP '^[0-9]+$'
+                                         and gr.map_location = mm.location
+                                         and mm.id = ?`,
+                                 values: [req.params.map]
+                             });
+        }, {duration: 60 * 60});
+    });
+
+
     app.post("/map/:map/region-type/:regionType/regions", async (req, res) => {
         cache(res, req.path, async () => {
             const rows = await sql({
                                        // language=MySQL
-                                       sql: `select region
-                                             from ref_geo_regions gr,
-                                                  ref_map_metadata mm
-                                             where gr.region_type = ?
-                                               and gr.map_location = mm.location
+                                       sql:                 `select region
+                                                             from ref_geo_regions gr,
+                                                                  ref_map_metadata mm
+                                                             where gr.region_type = ?
+                                                               and gr.map_location = mm.location
                                                and mm.id = ?`,
                                        values: [req.params.regionType, req.params.map]
                                    });

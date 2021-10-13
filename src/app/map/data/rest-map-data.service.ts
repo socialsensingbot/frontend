@@ -95,10 +95,11 @@ export class RESTMapDataService {
             if (this.regionGeography.hasOwnProperty(region)) {
                 features.push(
                     // tslint:disable-next-line:no-string-literal
-                    {id: "" + region,
-                        type: "Feature",
+                    {
+                        id:         "" + region,
+                        type:       "Feature",
                         properties: {...this.regionGeography[region]["properties"], name: region, count: 0},
-                        geometry: this.regionGeography[region]
+                        geometry:   this.regionGeography[region]
                     });
             }
         }
@@ -359,6 +360,10 @@ export class RESTMapDataService {
         return this._pref.combined.layers.available.filter(i => i.id === id)[0];
     }
 
+    public async regions(map = this._mapId) {
+        return await this._api.callMapAPIWithCache(map + "/regions", {});
+    }
+
     private async getRegionStatsMap(layerGroupId: string, regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {
         const layerGroup: LayerGroup = this.layerGroup(layerGroupId);
         const statsMap = await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/stats", {
@@ -366,7 +371,7 @@ export class RESTMapDataService {
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,
             startDate: roundToHour(startDate),
-            endDate: roundToFiveMinutes(endDate)
+            endDate:   roundToFiveMinutes(endDate)
 
         }, 60) as RegionStatsMap;
         return statsMap;
