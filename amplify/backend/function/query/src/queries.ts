@@ -24,9 +24,10 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
             fullText = " and MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
         }
         const timeSeriesTable = params.timePeriod === "day" ? "mat_view_timeseries_date" : "mat_view_timeseries_hour";
+        const dateTable = params.timePeriod === "day" ? "mat_view_days" : "mat_view_hours";
         if (!params.regions || (params.regions.includes("*") || params.regions.length === 0)) {
-            const values = fullText ? [params.layer.sources, params.layer.hazards, params.textSearch, dateFromMillis(params.from),
-                                       dateFromMillis(params.to)] : [params.layer.sources, params.layer.hazards,
+            const values = fullText ? [params.layer.hazards, params.layer.sources, params.textSearch, dateFromMillis(params.from),
+                                       dateFromMillis(params.to)] : [params.layer.hazards, params.layer.sources,
                                                                      dateFromMillis(params.from),
                                                                      dateFromMillis(params.to)
             ];
@@ -41,13 +42,13 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                                          tsd.source_date as date
 
                                   FROM ${timeSeriesTable} tsd
-                                  WHERE source IN (?)
-                                    and hazard IN (?)
+                                  WHERE hazard IN (?)
+                                    and source IN (?)
                                       ${fullText}
                                   group by date
                                   order by date) lhs
-                                     RIGHT OUTER JOIN (select distinct source_date as date, 0 as count
-                                                       from ${timeSeriesTable}) rhs
+                                     RIGHT OUTER JOIN (select date, 0 as count
+                                                       from ${dateTable}) rhs
                                                       ON lhs.date = rhs.date
                                 WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)
                             order by date) x
@@ -56,10 +57,10 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                 values
             };
         } else {
-            const values = fullText ? [params.layer.sources, params.layer.hazards,
-                                       params.regions, params.textSearch, dateFromMillis(params.from),
-                                       dateFromMillis(params.to)] : [params.layer.sources, params.layer.hazards,
-                                                                     params.regions,
+            const values = fullText ? [params.regions, params.layer.hazards, params.layer.sources,
+                                       params.textSearch, dateFromMillis(params.from),
+                                       dateFromMillis(params.to)] : [params.regions, params.layer.hazards, params.layer.sources,
+
                                                                      dateFromMillis(params.from),
                                                                      dateFromMillis(params.to)];
             return {
@@ -70,15 +71,14 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                                          tsd.source_date        as date,
                                          tsd.region_group_name  as region
                                   FROM ${timeSeriesTable} tsd
-                                  WHERE tsd.source IN (?)
+                                  WHERE tsd.region_group_name IN (?)
                                     and tsd.hazard IN (?)
-                                    and tsd.region_group_name IN (?)
+                                    and tsd.source IN (?)
                                       ${fullText}
                                   group by date, region
                                   order by date
                                  ) lhs
-                                     RIGHT OUTER JOIN (select distinct source_date as date, 0 as count
-                                                       from ${timeSeriesTable}) rhs
+                                     RIGHT OUTER JOIN (select date, 0 as count from ${dateTable}) rhs
                                                       ON lhs.date = rhs.date
                                 WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)
                            ) x

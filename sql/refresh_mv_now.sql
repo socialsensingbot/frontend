@@ -27,7 +27,7 @@ CREATE PROCEDURE refresh_mv_map_window(
 )
 BEGIN
 
-    call refresh_mv(DATE_SUB(NOW(), INTERVAL 4 DAY), NOW(), @rc);
+    call refresh_mv(DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY), @rc);
     SET rc = 0;
 END;
 $$
@@ -72,8 +72,8 @@ DROP PROCEDURE IF EXISTS refresh_mv;
 
 DELIMITER $$
 CREATE PROCEDURE refresh_mv(
-    IN start_date DATE,
-    IN end_date DATE,
+    IN start_date DATETIME,
+    IN end_date DATETIME,
     OUT rc INT
 )
 BEGIN
@@ -84,6 +84,8 @@ BEGIN
             ROLLBACK;
         END;
 
+    call debug_msg(CONCAT('Start Date: ', start_date));
+    call debug_msg(CONCAT('End Date: ', end_date));
 
     START TRANSACTION;
 
@@ -103,10 +105,9 @@ BEGIN
     FROM live_text t,
          ref_geo_regions gr
     WHERE ST_Contains(boundary, location)
-
-
       AND t.source_timestamp BETWEEN start_date and end_date;
     COMMIT;
+    call debug_msg('Updated mat_view_regions');
 
     START TRANSACTION;
 
@@ -129,6 +130,9 @@ BEGIN
       and not r.region REGEXP '^[0-9]+$'
       AND t.source_timestamp BETWEEN start_date and end_date;
     COMMIT;
+    call debug_msg('Updated mat_view_timeseries_date');
+
+    START TRANSACTION;
 
 #     SET @maxTimestampTSH = IFNULL((select max(source_date) from mat_view_timeseries_hour), NOW() - INTERVAL 20 YEAR);
     REPLACE INTO mat_view_timeseries_hour
@@ -149,7 +153,22 @@ BEGIN
       and not r.region REGEXP '^[0-9]+$'
       AND t.source_timestamp BETWEEN start_date and end_date;
     COMMIT;
+    call debug_msg('Updated mat_view_timeseries_hour');
 
+    START TRANSACTION;
+
+    REPLACE INTO mat_view_hours
+    SELECT DISTINCT source_date AS DATE
+    from mat_view_timeseries_hour
+    WHERE source_date BETWEEN start_date AND end_date;
+    call debug_msg('Updated mat_view_hours');
+
+    REPLACE INTO mat_view_days
+    SELECT DISTINCT source_date AS DATE
+    from mat_view_timeseries_date
+    WHERE source_date BETWEEN start_date AND end_date;
+    COMMIT;
+    call debug_msg('Updated mat_view_hours');
 
     SET rc = 0;
 END;
