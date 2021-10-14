@@ -5,7 +5,6 @@ export PATH=$PATH:$(pwd)
 cd ..
 #cd amplify && git clean -fdx && cd ..
 
-envCache --set stackInfo ""
 if [[ "${AWS_BRANCH}" == staging ]]; then
   backup.sh
   amplifyPush --simple
