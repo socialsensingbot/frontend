@@ -32,6 +32,10 @@
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
           "s3Key": "amplify-builds/twitterCompliance-5877644a425561383271-build.zip"
+        },
+        "mvrefresh": {
+          "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
+          "s3Key": "amplify-builds/mvrefresh-5a744e61715162663679-build.zip"
         }
       },
       "hosting": {

@@ -35,6 +35,12 @@
       "service": "Lambda",
       "dependsOn": []
     },
+    "mvrefresh": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": []
+    },
     "twitterCompliance": {
       "build": true,
       "providerPlugin": "awscloudformation",
