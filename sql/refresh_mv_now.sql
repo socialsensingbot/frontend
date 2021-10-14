@@ -126,6 +126,7 @@ BEGIN
     WHERE t.source_id = r.source_id
       AND t.source = r.source
       AND t.hazard = r.hazard
+      and not r.region REGEXP '^[0-9]+$'
       AND t.source_timestamp BETWEEN start_date and end_date;
     COMMIT;
 
@@ -145,6 +146,7 @@ BEGIN
     WHERE t.source_id = r.source_id
       AND t.source = r.source
       AND t.hazard = r.hazard
+      and not r.region REGEXP '^[0-9]+$'
       AND t.source_timestamp BETWEEN start_date and end_date;
     COMMIT;
 

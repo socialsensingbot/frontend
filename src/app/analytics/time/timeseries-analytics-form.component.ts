@@ -1,5 +1,5 @@
 import {Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild} from "@angular/core";
-import {MetadataKeyValue, MetadataService} from "../../api/metadata.service";
+import {MetadataKeyValue} from "../../api/metadata.service";
 import {COMMA, ENTER} from "@angular/cdk/keycodes";
 import {FormControl} from "@angular/forms";
 import {Observable} from "rxjs";
@@ -87,12 +87,12 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
         return this.pref.combined.layers.available.filter(i => i.id === id)[0];
     }
 
-    constructor(public metadata: MetadataService, public zone: NgZone, public router: Router,
+    constructor(public zone: NgZone, public router: Router,
                 public route: ActivatedRoute, public pref: PreferenceService,
                 private _api: RESTDataAPIService, public auto: TextAutoCompleteService, public mapData: RESTMapDataService
     ) {
 
-        this.metadata.regions.then(i => this.allRegions = i);
+        this.mapData.regions("uk-flood-live").then(i => this.allRegions = i);
     }
 
     onNoClick(): void {
@@ -126,9 +126,13 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
         }
     }
 
+    // TODO:
+    // TODO: Selected chips are not being added to the regions list.
+    // TODO:
+
     selected(event: MatAutocompleteSelectedEvent): void {
         log.debug("Event value", event.option.value);
-        this.regions.push(this.allRegions.find(region => region.value === event.option.value.value.trim()));
+        this.regions.push(this.allRegions.find(region => region.text === event.option.value.text.trim()));
         log.debug("Regions", this.regions);
         this.regionInput.nativeElement.value = "";
         this.regionControl.setValue(null);
@@ -139,10 +143,10 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
     public add(event: MatChipInputEvent): void {
         const input = event.input;
         const value = event.value;
-        log.verbose("Added event with value: ", value);
+        log.debug("Added event with value: ", value);
         // Add our region
         if ((value || "").trim()) {
-            this.regions.push(this.allRegions.find(region => region.value === value.trim()));
+            this.regions.push(this.allRegions.find(region => region.text === value.trim()));
             log.debug("Add Regions", this.regions);
 
         }
@@ -219,6 +223,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
             log.debug("Update Regions", this.regions);
             this._data.regions = this.regions.map(i => i.value);
         }
+        log.debug("Updated data regions", this._data.regions);
         this.router.navigate([], {
             queryParams:         {selected: null},
             queryParamsHandling: "merge"
@@ -226,10 +231,10 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
     }
 
     private _filter(region: any): MetadataKeyValue[] {
-        if (region && !region.value) {
+        if (region && !region.text) {
             const filterValue = region.toLowerCase();
             log.debug("Topic string value is ", region);
-            return this.allRegions.filter(t => t.value.toLowerCase().indexOf(filterValue) === 0);
+            return this.allRegions.filter(t => t.text.toLowerCase().indexOf(filterValue) === 0);
         } else {
             log.debug("Topic selected", region);
             return region;

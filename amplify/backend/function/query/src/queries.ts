@@ -72,7 +72,6 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                                   FROM ${timeSeriesTable} tsd
                                   WHERE tsd.source IN (?)
                                     and tsd.hazard IN (?)
-                                    and tsd.region_type = 'county'
                                     and tsd.region_group_name IN (?)
                                       ${fullText}
                                   group by date, region
