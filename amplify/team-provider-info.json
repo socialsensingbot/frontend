@@ -28,11 +28,6 @@
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
           "s3Key": "amplify-builds/query-52796f704a5549436e77-build.zip"
         },
-        "mvrefresh": {
-          "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
-          "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
-          "s3Key": "amplify-builds/mvrefresh-5a744e61715162663679-build.zip"
-        },
         "twitterCompliance": {
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
