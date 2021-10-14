@@ -14,6 +14,7 @@ import {AnnotationService} from "./pref/annotation.service";
 import {UIExecutionService} from "./services/uiexecution.service";
 import {LoadingProgressService} from "./services/loading-progress.service";
 import {NgForageCache} from "ngforage";
+import {DateAdapter} from "@angular/material/core";
 
 
 const log = new Logger("app");
@@ -51,6 +52,7 @@ export class AppComponent {
                 private _session: SessionService,
                 private _annotation: AnnotationService,
                 private _cache: NgForageCache,
+                private _adapter: DateAdapter<any>,
                 @Inject(RollbarService) private _rollbar: Rollbar, private _exec: UIExecutionService,
                 public loading: LoadingProgressService) {
 
@@ -140,6 +142,7 @@ export class AppComponent {
                 if (userInfo) {
                     try {
                         await this.pref.init(userInfo);
+
                         this.ready = true;
                     } catch (e) {
                         this._rollbar.error(e);
@@ -151,6 +154,8 @@ export class AppComponent {
                             30);
                         return;
                     }
+
+                    this._adapter.setLocale(this.pref.combined.locale);
                     try {
                         await this._session.open(userInfo);
                     } catch (e) {

@@ -344,7 +344,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             this.state = this.defaultState();
             log.info("State is now " + this.state);
             this.seriesCollection.clear();
-            this.timePeriodChanged(this.state.timePeriod);
+            await this.timePeriodChanged(this.state.timePeriod);
             this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
             if (!empty) {
                 await this._updateGraphInternal(this.state.queries[0], this.state.timePeriod);
