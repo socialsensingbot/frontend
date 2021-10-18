@@ -134,6 +134,7 @@ export const environment = {
     maxCallsPerMinute:            200,
 
     analyticsDefaultRegions: ["uk"],
-    tweetCSVExportFormat:    "default"
+    tweetCSVExportFormat:    "default",
+    showAnalyticsSideMenu:   false
 
 };
