@@ -86,6 +86,7 @@ export class RESTMapDataService {
      */
     public async loadGeography(regionType: string): Promise<geojson.FeatureCollection> {
         log.debug("Loading Geography");
+        this._notify.show("Loading Geographic data ...");
         this.regionGeography = await this._api.callMapAPIWithCache(
             this._mapId + "/region-type/" + regionType + "/geography", {}, 24 * 60 * 60) as RegionGeography;
         const features = [];
@@ -102,6 +103,7 @@ export class RESTMapDataService {
             }
         }
         this._regionGeographyGeoJSON = {type: "FeatureCollection", features};
+        this._notify.dismiss();
 
         return this._regionGeographyGeoJSON;
     }
