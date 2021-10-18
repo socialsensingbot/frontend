@@ -77,6 +77,9 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
                 regions => {
                     this.allRegions = regions;
                     log.debug(regions);
+                    this.filteredRegions = this.regionControl.valueChanges.pipe(
+                        startWith(null),
+                        map((region: string | null) => region ? this._filter(region) : this.allRegions.slice()));
                     this.regions = regions.filter(i => this._data.regions.includes(i.value));
                 });
         }
@@ -171,9 +174,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
         //   this.regions = this.allRegions.filter(i => this._data.regions.includes(i.value));
         // }
         await this.pref.waitUntilReady();
-        this.filteredRegions = this.regionControl.valueChanges.pipe(
-            startWith(null),
-            map((region: string | null) => region ? this._filter(region) : this.allRegions.slice()));
+
         await this.searchControl.valueChanges.subscribe(async value => {
             const filterValue = value.toLowerCase();
             this.filteredAutocomplete = (await this.auto.listByOwnerOrGroup(timeSeriesAutocompleteType, filterValue)).map(
