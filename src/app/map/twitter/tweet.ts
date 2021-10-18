@@ -138,26 +138,6 @@ export class Tweet {
         return this;
     }
 
-    public asCSV(regionMap: any, sanitize: boolean, annotations: any = {}): CSVExportTweet {
-        let impact = "";
-        if (annotations.impact) {
-            impact = annotations.impact;
-        }
-        let source = "";
-        if (annotations.source) {
-            source = annotations.source;
-        }
-        this.lazyInit();
-        if (sanitize) {
-            return new CSVExportTweet(regionMap[this._region], impact, source, this._id, this._date.toUTCString(),
-                                      "https://twitter.com/username_removed/status/" + this._id,
-                                      this.sanitizeForGDPR($("<div>").html(this._html).text()), JSON.stringify(this._location));
-
-        } else {
-            return new CSVExportTweet(regionMap[this._region], impact, source, this._id, this._date.toUTCString(), this._url,
-                                      $("<div>").html(this._html).text(), JSON.stringify(this._location));
-        }
-    }
 
     sanitizeForGDPR(tweetText: string): string {
         // — Tim Hopkins (@thop1988)
@@ -171,7 +151,7 @@ export class Tweet {
      * This is called when various accessors need to access
      * fields that are computationally expensive to populate.
      */
-    private lazyInit() {
+    public lazyInit() {
         if (!this._init) {
             this._sender = this._json.user.screen_name;
             if (this._html !== null) {

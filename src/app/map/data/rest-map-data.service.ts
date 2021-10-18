@@ -1,14 +1,12 @@
 import {Injectable, NgZone} from "@angular/core";
-import {PolygonData} from "../types";
 import {Logger} from "@aws-amplify/core";
 import {HttpClient} from "@angular/common/http";
 import {UIExecutionService} from "../../services/uiexecution.service";
-import {CSVExportTweet, Tweet} from "../twitter/tweet";
+import {Tweet} from "../twitter/tweet";
 import {NotificationService} from "../../services/notification.service";
 import {NgForage, NgForageCache} from "ngforage";
-import {ExportToCsv} from "export-to-csv";
 import {PreferenceService} from "../../pref/preference.service";
-import {readableTimestamp, roundToFiveMinutes, roundToHour, roundToMinute, toTitleCase} from "../../common";
+import {roundToFiveMinutes, roundToHour, roundToMinute} from "../../common";
 import * as geojson from "geojson";
 import {AnnotationService} from "../../pref/annotation.service";
 import {LoadingProgressService} from "../../services/loading-progress.service";
@@ -88,6 +86,7 @@ export class RESTMapDataService {
      */
     public async loadGeography(regionType: string): Promise<geojson.FeatureCollection> {
         log.debug("Loading Geography");
+        this._notify.show("Loading Geographic data ...");
         this.regionGeography = await this._api.callMapAPIWithCache(
             this._mapId + "/region-type/" + regionType + "/geography", {}, 24 * 60 * 60) as RegionGeography;
         const features = [];
@@ -104,6 +103,7 @@ export class RESTMapDataService {
             }
         }
         this._regionGeographyGeoJSON = {type: "FeatureCollection", features};
+        this._notify.dismiss();
 
         return this._regionGeographyGeoJSON;
     }
@@ -155,94 +155,6 @@ export class RESTMapDataService {
     }
 
 
-    public async download(layerGroupId: string, polygonDatum: PolygonData, regionType: string, startDate: number,
-                          endDate: number): Promise<void> {
-        const options = {
-            fieldSeparator:   ",",
-            quoteStrings:     "\"",
-            decimalSeparator: ".",
-            showLabels:       true,
-            showTitle:        false,
-            title:            "",
-            useTextFile:      false,
-            useBom:           true,
-            useKeysAsHeaders: true,
-            filename:         `global-tweet-export-${readableTimestamp()}`
-            // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
-        };
-
-        const regions = await this.places(regionType);
-        const exportedTweets: CSVExportTweet[] = [];
-        const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(layerGroupId, regionType, Array.from(regions), startDate,
-                                                                                 endDate);
-        for (const i of tweetData) {
-            exportedTweets.push(await i);
-        }
-        const csvExporter = new ExportToCsv(options);
-        log.debug(exportedTweets);
-        csvExporter.generateCsv(exportedTweets.sort((a, b) => {
-            if (a.region < b.region) {
-                return -1;
-            }
-            if (a.region > b.region) {
-                return 1;
-            }
-
-            // names must be equal
-            return 0;
-        }));
-
-    }
-
-    public async downloadAggregate(layerGroupId: string, aggregrationSetId: string, selectedAggregates: string[], regionType: string,
-                                   polygonDatum: PolygonData, startDate: number, endDate: number) {
-        log.debug(
-            "downloadAggregate(aggregrationSetId=" + aggregrationSetId +
-            ", selectedAggregates=" + selectedAggregates +
-            ", regionType=" + regionType + ", polygonDatum=" + polygonDatum +
-            ", startDate=" + startDate + ", endDate=" + endDate + ")");
-        const options = {
-            fieldSeparator:   ",",
-            quoteStrings:     "\"",
-            decimalSeparator: ".",
-            showLabels:       true,
-            showTitle:        false,
-            title:            "",
-            useTextFile:      false,
-            useBom:           true,
-            useKeysAsHeaders: true,
-            filename:         `${aggregrationSetId}-tweet-export-${selectedAggregates.join("-")}-${readableTimestamp()}`
-            // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
-        };
-        if (selectedAggregates.length === this.aggregations[aggregrationSetId].aggregates.length) {
-            options.filename = `${aggregrationSetId}-tweet-export-all-${readableTimestamp()}`;
-        }
-        const regions = this.aggregations[aggregrationSetId]
-            .aggregates
-            .filter(i => selectedAggregates.includes(i.id))
-            .flatMap(x => x.regionTypeMap[regionType]).map(i => "" + i);
-
-        const exportedTweets: CSVExportTweet[] = [];
-        const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(layerGroupId, regionType, regions, startDate, endDate);
-        for (const i of tweetData) {
-            exportedTweets.push(await i);
-        }
-        const csvExporter = new ExportToCsv(options);
-        log.debug(exportedTweets);
-        csvExporter.generateCsv(exportedTweets.sort((a, b) => {
-            if (a.region < b.region) {
-                return -1;
-            }
-            if (a.region > b.region) {
-                return 1;
-            }
-
-            // names must be equal
-            return 0;
-        }));
-
-
-    }
 
     public async switchDataSet(dataset: string): Promise<MapMetadata> {
         if (!this.initialized) {
@@ -288,73 +200,7 @@ export class RESTMapDataService {
         return await this.loadGeography(regionType) as FeatureCollection;
     }
 
-    sanitizeForGDPR(tweetText: string): string {
-        // — Tim Hopkins (@thop1988)
-        return tweetText
-            .replace(/@[a-zA-Z0-9_-]+/g, "@USERNAME_REMOVED")
-            .replace(/— .+ \(@USERNAME_REMOVED\).*$/g, "");
-    }
 
-    private async loadDownloadData(layerGroupId: string, regionType: string, regions: string[], startDate: number,
-                                   endDate: number): Promise<Promise<CSVExportTweet>[]> {
-        return (await this.tweets(layerGroupId, regionType, regions, startDate, endDate)).filter(
-            i => i.valid && !this._pref.isBlacklisted(i)).map(
-            async (i: Tweet) => {
-
-                let region = "";
-                if (i.region.match(/\d+/)) {
-                    let minX = null;
-                    let maxX = null;
-                    let minY = null;
-                    let maxY = null;
-                    const polygon: geojson.Polygon = this.regionGeography[region] as geojson.Polygon;
-                    for (const point of polygon.coordinates) {
-                        if (minX === null || point[0] < minX) {
-                            minX = point[0];
-                        }
-                        if (minY === null || point[1] < minY) {
-                            minY = point[1];
-                        }
-                        if (maxX === null || point[0] > maxX) {
-                            maxX = point[0];
-                        }
-                        if (maxY === null || point[1] > maxY) {
-                            maxY = point[1];
-                        }
-                    }
-                    log.verbose(
-                        `Bounding box of ${JSON.stringify(polygon)} is (${minX},${minY}) to (${maxX},${maxY})`);
-                    region = `(${minX},${minY}),(${maxX},${maxY})`;
-                } else {
-                    region = toTitleCase(i.region);
-                }
-                log.verbose("Exporting region: " + i.region);
-                const annotationRecord = await this._annotation.getAnnotations(i);
-                let annotations: any = {};
-                if (annotationRecord && annotationRecord.annotations) {
-                    annotations = JSON.parse(annotationRecord.annotations);
-                }
-                let impact = "";
-                if (annotations.impact) {
-                    impact = annotations.impact;
-                }
-                let source = "";
-                if (annotations.source) {
-                    source = annotations.source;
-                }
-                if (this._pref.combined.sanitizeForGDPR) {
-                    return new CSVExportTweet(region, impact, source, i.id, i.date.toUTCString(),
-                                              "https://twitter.com/username_removed/status/" + i.id,
-                                              this.sanitizeForGDPR($("<div>").html(i.html).text()), JSON.stringify(i.location));
-
-                } else {
-                    return new CSVExportTweet(region, impact, source, i.id, i.date.toUTCString(),
-                                              "https://twitter.com/username_removed/status/" + i.id,
-                                              $("<div>").html(i.html).text(), JSON.stringify(i.location));
-                }
-            });
-
-    }
 
     private layerGroup(id: string): LayerGroup {
         return this._pref.combined.layers.available.filter(i => i.id === id)[0];

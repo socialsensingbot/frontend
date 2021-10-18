@@ -132,11 +132,31 @@ FROM INFORMATION_SCHEMA.TABLES
 WHERE TABLE_SCHEMA = 'socialsensing'
   AND TABLE_TYPE = 'BASE TABLE';
 
+ALTER TABLE socialsensing.internal_debug
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE socialsensing.live_text
     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE socialsensing.live_text_regions
     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE socialsensing.mat_view_days
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE socialsensing.mat_view_first_entries
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE socialsensing.mat_view_hours
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE socialsensing.mat_view_regions
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE socialsensing.mat_view_time_periods_zero
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE socialsensing.mat_view_timeseries_date
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE socialsensing.mat_view_timeseries_hour
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE socialsensing.ref_geo_regions
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE socialsensing.ref_integers
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE socialsensing.ref_key_value
     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE socialsensing.ref_map_layer_groups
     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;

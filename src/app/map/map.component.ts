@@ -25,6 +25,7 @@ import {DashboardService} from "../pref/dashboard.service";
 import {LoadingProgressService} from "../services/loading-progress.service";
 import {ONE_DAY} from "./data/map-data";
 import {RESTMapDataService} from "./data/rest-map-data.service";
+import {TwitterExporterService} from "./twitter/twitter-exporter.service";
 
 
 const log = new Logger("map");
@@ -145,6 +146,7 @@ export class MapComponent implements OnInit, OnDestroy {
                 private _exec: UIExecutionService,
                 private _color: ColorCodeService,
                 public data: RESTMapDataService,
+                public _exporter: TwitterExporterService,
                 public pref: PreferenceService,
                 private readonly cache: NgForageCache,
                 public dash: DashboardService,
@@ -459,14 +461,14 @@ export class MapComponent implements OnInit, OnDestroy {
         log.debug(this.data.regionGeography);
         log.debug(this.activeRegionType);
         if (this.data.hasCountryAggregates()) {
-            await this.data.downloadAggregate(this.activeLayerGroup, "uk-countries", this.selectedCountries,
-                                              this.activeRegionType,
-                                              await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData, this._dateMin,
-                                              this._dateMax);
+            await this._exporter.downloadAggregate(this.activeLayerGroup, "uk-countries", this.selectedCountries,
+                                                   this.activeRegionType,
+                                                   await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData, this._dateMin,
+                                                   this._dateMax);
         } else {
-            await this.data.download(this.activeLayerGroup, await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData,
-                                     this.activeRegionType,
-                                     this._dateMin, this._dateMax);
+            await this._exporter.download(this.activeLayerGroup, await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData,
+                                          this.activeRegionType,
+                                          this._dateMin, this._dateMax);
         }
     }
 

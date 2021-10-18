@@ -42,7 +42,7 @@
                     placeholder="Add regions ...">
         </mat-chip-list>
         <mat-autocomplete #region="matAutocomplete" (optionSelected)="selected($event)">
-            <mat-option *ngFor="let region of filteredRegions | async" [value]="region">
+            <mat-option *ngFor="let region of filteredRegions | async; let i=index" [value]="region">
                 {{region.text}}
             </mat-option>
         </mat-autocomplete>
