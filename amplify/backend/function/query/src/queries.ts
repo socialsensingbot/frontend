@@ -42,8 +42,9 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                                          tsd.source_date as date
 
                                   FROM ${timeSeriesTable} tsd
-                                  WHERE hazard IN (?)
-                                    and source IN (?)
+                                  WHERE tsd.hazard IN (?)
+                                    and tsd.map_location = 'uk'
+                                    and tsd.source IN (?)
                                       ${fullText}
                                   group by date
                                   order by date) lhs
@@ -74,6 +75,7 @@ export const queries: { [id: string]: (params) => QueryOptions } = {
                                   WHERE tsd.region_group_name IN (?)
                                     and tsd.hazard IN (?)
                                     and tsd.source IN (?)
+                                    and tsd.map_location = 'uk'
                                       ${fullText}
                                   group by date, region
                                   order by date

@@ -91,42 +91,6 @@ export class RegionSelection {
         return this.all()[0];
     }
 
-    public regionMap() {
-        const regionMap = {};
-        for (const r of this.all()) {
-            let regionName = `${r.title}`;
-
-            if (r.isNumericRegion()) {
-                let minX = null;
-                let maxX = null;
-                let minY = null;
-                let maxY = null;
-                for (const point of r.geometry.coordinates[0]) {
-                    if (minX === null || point[0] < minX) {
-                        minX = point[0];
-                    }
-                    if (minY === null || point[1] < minY) {
-                        minY = point[1];
-                    }
-                    if (maxX === null || point[0] > maxX) {
-                        maxX = point[0];
-                    }
-                    if (maxY === null || point[1] > maxY) {
-                        maxY = point[1];
-                    }
-                }
-                log.debug(
-                    `Bounding box of ${JSON.stringify(
-                        r.geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`);
-                regionName = `(${minX},${minY}),(${maxX},${maxY})`;
-                regionMap[r.name] = regionName;
-            } else {
-                regionMap[r.name] = toTitleCase(regionName);
-            }
-
-        }
-        return regionMap;
-    }
 
     public asTitleText() {
         const regions = this.regionNames();
