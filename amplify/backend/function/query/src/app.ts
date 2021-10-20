@@ -298,25 +298,26 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
 
             return (await sql({
                                   // language=MySQL
-                                  sql: `select t.source_json            as json,
-                                               t.source_html            as html,
-                                               r.source_timestamp       as timestamp,
-                                               r.source_id              as id,
-                                               ST_AsGeoJSON(t.location) as location,
-                                               r.region                 as region
-                                        FROM live_text t,
-                                             mat_view_regions r
-                                        WHERE t.source = r.source
-                                          and t.source_id = r.source_id
-                                          and t.hazard = r.hazard
-                                          and r.region_type = ?
-                                          and r.region in (?)
-                                          and r.hazard IN (?)
-                                          and r.source IN (?)
-                                          and r.warning IN (?)
+                                  sql: `/* app.ts: text_for_regions */ select t.source_json            as json,
+                                                                              t.source_html            as html,
+                                                                              r.source_timestamp       as timestamp,
+                                                                              r.source_id              as id,
+                                                                              ST_AsGeoJSON(t.location) as location,
+                                                                              r.region                 as region,
+                                                                              t.sensitive              as potentiallySensitive
+                                                                       FROM live_text t,
+                                                                            mat_view_regions r
+                                                                       WHERE t.source = r.source
+                                                                         and t.source_id = r.source_id
+                                                                         and t.hazard = r.hazard
+                                                                         and r.region_type = ?
+                                                                         and r.region in (?)
+                                                                         and r.hazard IN (?)
+                                                                         and r.source IN (?)
+                                                                         and r.warning IN (?)
                                           and floor((? - unix_timestamp(r.source_timestamp)) / ?) = 0
                                           and not t.deleted
-                                        order by r.source_timestamp desc    `,
+                                                                       order by r.source_timestamp desc    `,
                                   values: [req.params.regionType, req.body.regions, req.body.hazards, req.body.sources,
                                            warningsValues(req.body.warnings),
                                            end, periodLengthInSeconds]
@@ -335,12 +336,12 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
 
             const geography = await sql({
                                             // language=MySQL
-                                            sql: `select ST_AsGeoJSON(boundary) as geo, region, gr.title
-                                                  from ref_geo_regions gr,
-                                                       ref_map_metadata mm
-                                                  where mm.id = ?
-                                                    and region_type = ?
-                                                    and gr.map_location = mm.location`, values: [req.params.map, req.params.regionType]
+                                            sql: `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
+                                                                          from ref_geo_regions gr,
+                                                                               ref_map_metadata mm
+                                                                          where mm.id = ?
+                                                                            and region_type = ?
+                                                                            and gr.map_location = mm.location`, values: [req.params.map, req.params.regionType]
 
 
                                         });
@@ -359,11 +360,11 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
 
             const aggregationTypes = await sql({
                                                    // language=MySQL
-                                                   sql: `select rat.id as region_aggregation_type_id, rat.title as title
-                                                         from ref_map_metadata_region_aggregations rmmra,
-                                                              ref_map_region_aggregation_types rat
-                                                         where rat.id = rmmra.region_aggregation_type_id
-                                                           and rmmra.map_id = ?`, values: [req.params.map]
+                                                   sql: `/* app.ts: aggregations */ select rat.id as region_aggregation_type_id, rat.title as title
+                                                                                    from ref_map_metadata_region_aggregations rmmra,
+                                                                                         ref_map_region_aggregation_types rat
+                                                                                    where rat.id = rmmra.region_aggregation_type_id
+                                                                                      and rmmra.map_id = ?`, values: [req.params.map]
                                                });
 
 
@@ -416,15 +417,15 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
         cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
             const rows = await sql({
                                        // language=MySQL
-                                       sql:    `SELECT r.region AS region, count(*) AS count
-                                                FROM mat_view_regions r
-                                                WHERE r.region_type = ?
-                                                  AND r.source_timestamp between ? and ?
-                                                  AND r.hazard IN (?)
-                                                  AND r.source IN (?)
-                                                  AND r.warning IN (?)
-                                                GROUP BY r.region
-                                               `,
+                                       sql: `/* app.ts: recent-text-count */ SELECT r.region AS region, count(*) AS count
+                                                                             FROM mat_view_regions r
+                                                                             WHERE r.region_type = ?
+                                                                               AND r.source_timestamp between ? and ?
+                                                                               AND r.hazard IN (?)
+                                                                               AND r.source IN (?)
+                                                                               AND r.warning IN (?)
+                                                                             GROUP BY r.region
+                                            `,
                                        values: [req.params.regionType, new Date(req.body.startDate),
                                                 new Date(endDate), req.body.hazards, req.body.sources,
                                                 warningsValues(req.body.warnings),]
@@ -455,13 +456,16 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
         cache(res, req.path, async () => {
             return await sql({
                                  // language=MySQL
-                                 sql: `select distinct region as value, gr.title as text, gr.region_type as type, gr.level as level
-                                       from ref_geo_regions gr,
-                                            ref_map_metadata mm
-                                       where not region REGEXP '^[0-9]+$'
-                                         and gr.map_location = mm.location
-                                         and mm.id = ?
-                                       order by level desc, text asc`,
+                                 sql: `/* app.ts: map regions */ select distinct region         as value,
+                                                                                 gr.title       as text,
+                                                                                 gr.region_type as type,
+                                                                                 gr.level       as level
+                                                                 from ref_geo_regions gr,
+                                                                      ref_map_metadata mm
+                                                                 where not region REGEXP '^[0-9]+$'
+                                                                   and gr.map_location = mm.location
+                                                                   and mm.id = ?
+                                                                 order by level desc, text asc`,
                                  values: [req.params.map]
                              });
         }, {duration: 60 * 60});
@@ -472,12 +476,12 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
         cache(res, req.path, async () => {
             const rows = await sql({
                                        // language=MySQL
-                                       sql: `select region
-                                             from ref_geo_regions gr,
-                                                  ref_map_metadata mm
-                                             where gr.region_type = ?
-                                               and gr.map_location = mm.location
-                                               and mm.id = ?`,
+                                       sql: `/* app.ts: regionType regions */ select region
+                                                                              from ref_geo_regions gr,
+                                                                                   ref_map_metadata mm
+                                                                              where gr.region_type = ?
+                                                                                and gr.map_location = mm.location
+                                                                                and mm.id = ?`,
                                        values: [req.params.regionType, req.params.map]
                                    });
             const result = [];
@@ -488,26 +492,6 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
 
         }, {duration: 24 * 60 * 60});
     });
-
-
-    async function getCachedStats(end: number, periodLengthInSeconds: number, req): Promise<any[]> {
-        return await sql({
-                             // language=MySQL
-                             sql: `select *
-                                   from cache_stats_calc
-                                   where end_time = ?
-                                     and period_length = ?
-                                     and region_type = ?
-                                     and hazards = ?
-                                     and sources = ?
-                                     and warnings = ?`,
-                             values: [end, periodLengthInSeconds,
-                                      req.params.regionType, req.body.hazards.join(","), req.body.sources.join("?"),
-                                      req.body.warnings,
-                             ]
-                         }, true);
-    }
-
     app.post("/map/:map/region-type/:regionType/stats", async (req, res) => {
 
         cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
@@ -538,17 +522,17 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
 
             const rows = await sql({
                                        // language=MySQL
-                                       sql: ` select (select exceedance
-                                                      from (select cume_dist() OVER w * 100.0   as exceedance,
-                                                                   rhs.period                   as period,
-                                                                   IFNULL(lhs.count, rhs.count) as count
-                                                            from (SELECT count(source_id)                                    as count,
-                                                                         floor((? - unix_timestamp(r.source_timestamp)) / ?) as period
+                                       sql: `/* app.ts: stats */ select (select exceedance
+                                                                         from (select cume_dist() OVER w * 100.0   as exceedance,
+                                                                                      rhs.period                   as period,
+                                                                                      IFNULL(lhs.count, rhs.count) as count
+                                                                               from (SELECT count(source_id)                                    as count,
+                                                                                            floor((? - unix_timestamp(r.source_timestamp)) / ?) as period
 
-                                                                  FROM mat_view_regions r
-                                                                  WHERE r.region = regions.region
-                                                                    and r.region_type = ?
-                                                                    and r.hazard IN (?)
+                                                                                     FROM mat_view_regions r
+                                                                                     WHERE r.region = regions.region
+                                                                                       and r.region_type = ?
+                                                                                       and r.hazard IN (?)
                                                                     and r.source IN (?)
                                                                     and r.warning IN (?)
                                                                     and not r.deleted
@@ -560,7 +544,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                                 WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)) x
                                                       where period = 0
                                                         and count > 0) as exceedance,
-                                                     (SELECT count(*) as count
+                                                                        (SELECT count(*) as count
                                                       FROM mat_view_regions r
                                                       WHERE r.region = regions.region
                                                         and r.region_type = ?
@@ -570,9 +554,9 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                         and not r.deleted
                                                         and r.source_timestamp between ? and ?
                                                      )                 as count,
-                                                     regions.region    as region
+                                                                        regions.region    as region
 
-                                              from (select distinct region from ref_geo_regions where region_type = ?) as regions`,
+                                                                 from (select distinct region from ref_geo_regions where region_type = ?) as regions`,
 
                                        values: [end, periodLengthInSeconds,
                                                 req.params.regionType, req.body.hazards, req.body.sources,
@@ -584,46 +568,6 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                        ]
                                    }, true);
 
-            // let rows = await getCachedStats(end, periodLengthInSeconds, req);
-            //
-            // if (rows.length === 0) {
-            //     // console.log("Test Values: ", testValues);
-            //     try {
-            //         await sql({
-            //                       // language=MySQL
-            //                       sql: `insert into cache_stats_calc(exceedance, count, region, end_time, period_length, region_type,
-            //                                                          hazards,
-            //                                                          sources, warnings)
-            //                             select (select exceedance
-            //                                     from (select cume_dist() OVER w * 100.0   as exceedance,
-            //                                                  rhs.period                   as period,
-            //                                                  IFNULL(lhs.count, rhs.count) as count
-            //                                           from (SELECT count(source_id)                                    as count,
-            //                                                        floor((? - unix_timestamp(r.source_timestamp)) / ?) as period
-            //
-            //                                                 FROM mat_view_regions r
-            //                                                 WHERE r.region = regions.region
-            //                                                   and r.region_type = ?
-            //                                                   and r.hazard IN (?)
-            //                                                   and r.source IN (?)
-            //                                                   and r.warning IN (?)
-            //                                                   and not r.deleted
-            //                                                 group by period
-            //                                                 order by period
-            //                                                ) lhs
-            //                                                    RIGHT OUTER JOIN (select value as period, 0 as count from ref_integers
-            // where value < ?) rhs ON lhs.period = rhs.period WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)) x where period = 0
-            // and count > 0) as exceedance, (SELECT count(*) as count FROM mat_view_regions r WHERE r.region = regions.region and
-            // r.region_type = ? and r.hazard IN (?) and r.source IN (?) and r.warning IN (?) and not r.deleted and r.source_timestamp
-            // between ? and ? )                 as count, regions.region    as region, ?                 as end_time, ?                 as
-            // period_length, ?                 as region_type, ?                 as hazards, ?                 as sources, ?
-            //   as warnings from (select distinct region_id as region from ref_map_regions where region_type_id = ?) as regions`, values:
-            // [end, periodLengthInSeconds, req.params.regionType, req.body.hazards, req.body.sources, warningsValues(req.body.warnings),
-            // maxPeriods, req.params.regionType, req.body.hazards, req.body.sources, warningsValues(req.body.warnings), new
-            // Date(req.body.startDate), new Date(req.body.endDate), end, periodLengthInSeconds, req.params.regionType,
-            // req.body.hazards.join(","), req.body.sources.join(","), req.body.warnings, req.params.regionType ] }, true); } catch (e) {
-            // console.warn(e); } // todo: I know this is awful but I can't figure out why the previous INSERT is not immediately
-            // available. await sleep(100); rows = await getCachedStats(end, periodLengthInSeconds, req); }
 
             for (const row of rows) {
                 if (req.body.debug) {

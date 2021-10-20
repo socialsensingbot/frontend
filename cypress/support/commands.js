@@ -23,7 +23,6 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
-import "cypress-graphql-mock";
 
 const LONG_TIMEOUT = 60000;
 const VERY_LONG_TIMEOUT = 120000;

@@ -120,7 +120,8 @@
             <!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
 
         </mat-menu>
-        <div [style]="styleForImpact(tweet)" class="app-tweet-item app-tweet-row-active">
+        <div [ngClass]="tweet.json.possibly_sensitive  ? 'sensitive': 'non-sensitive'" [style]="styleForImpact(tweet)"
+             class="app-tweet-item app-tweet-row-active">
             <div class="app-tweet-item-text">
                 <div class="app-twitter-tweet">
                     <img [src]="tweet.json.user.profile_image_url" class="app-twitter-profile-image">
@@ -137,7 +138,7 @@
                     <div class="app-twitter-date">{{tweet.date | date:"shortTime"}}
                         - {{tweet.date | date:"mediumDate"}}</div>
                     <!--                    {{tweet.json.extended_tweet.entities.media|json}}-->
-                    <div *ngIf="true">
+                    <div *ngIf="!tweet.json.possibly_sensitive">
                         <div *ngFor="let media of mediaEntities(tweet)">
                             <!--                            {{media|json}}-->
                             <ng-container *ngIf="media?.additional_media_info?.embeddable === false">

@@ -127,7 +127,8 @@ export class RESTMapDataService {
         log.debug(rawResult.length + " tweets back from server");
         const result: Tweet[] = [];
         for (const tweet of rawResult) {
-            result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region));
+            result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
+                                  tweet.potentially_sensitive));
         }
         return result;
     }

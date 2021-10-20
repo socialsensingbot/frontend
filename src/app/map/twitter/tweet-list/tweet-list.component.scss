@@ -58,6 +58,11 @@
 
             padding-left: 4px;
 
+            &.sensitive {
+                .app-twitter-tweet {
+                    opacity: 0.3;
+                }
+            }
 
             .app-twitter-tweet p {
                 font-size: 16px;
@@ -96,6 +101,7 @@
                 width: $drawer-width - 96px;
                 background: white !important;
                 position: relative;
+
 
                 .app-twitter-profile-image {
                     border-radius: 100%;

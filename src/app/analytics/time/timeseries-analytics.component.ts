@@ -149,14 +149,14 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
             log.info("State is now " + JSON.stringify(this.state));
             if (params.id) {
-                await this.clear(true);
+                this.state = this.defaultState();
                 this.setEOCFromQuery(queryParams);
                 this.graphId = params.id;
                 const savedGraph = await this.saves.get(params.id);
                 if (savedGraph !== null) {
                     this.title = savedGraph.title;
                     this.state = JSON.parse(savedGraph.state);
-                    console.log("Loaded saved graph with state ", this.state);
+                    log.debug("Loaded saved graph with state ", this.state);
                     await this.refreshAllSeries();
                     this.exec.uiActivity();
                 } else {
@@ -168,9 +168,10 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 if (typeof queryParams.text_search !== "undefined") {
                     this.state.queries[0].textSearch = queryParams.text_search;
                 }
-                if (typeof queryParams.selected !== "undefined" && queryParams.active_polygon === "county") {
-                    await this.clear(true);
-                    log.info("State is now " + this.state);
+                if (typeof queryParams.selected !== "undefined" && queryParams.active_polygon !== "coarse" && queryParams.active_polygon !== "fine") {
+                    log.debug("Taking the selected region from the query ", queryParams.selected);
+                    this.state = this.defaultState();
+                    log.debug("State is now ", JSON.stringify(this.state));
                     if (Array.isArray(queryParams.selected)) {
                         for (const region of queryParams.selected) {
                             const newQuery = this.newQuery();
@@ -181,8 +182,10 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                     } else {
                         this.state.queries = [this.newQuery()];
                         this.state.queries[0].regions = [queryParams.selected];
-                        await this._updateGraphInternal(this.state.queries[0], this.state.timePeriod);
+                        await this.updateGraph(this.state.queries[0], this.state.timePeriod, true);
                     }
+                    this.state = this.defaultState();
+                    log.debug("State is now ", JSON.stringify(this.state));
                     this.setEOCFromQuery(queryParams);
                 } else {
                     await this.clear(false);
@@ -338,11 +341,11 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     public async clear(empty = false) {
-        log.warn("Clear called");
+        log.debug("Clear called");
         if (this.defaultLayer !== null) {
-            log.info("Clearing graph");
+            log.debug("Clearing graph");
             this.state = this.defaultState();
-            log.info("State is now " + this.state);
+            log.debug("State is now ", this.state);
             this.seriesCollection.clear();
             await this.timePeriodChanged(this.state.timePeriod);
             this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
@@ -351,7 +354,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             } else {
                 this.state.queries = [];
             }
-            log.warn("Clear finished");
+            log.debug("Clear finished");
         }
 
     }
@@ -459,6 +462,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     private async _updateGraphInternal(query, timePeriod: TimePeriod) {
+        log.debug("_updateGraphInternal() called");
         const queryResult = await this.executeQuery(query, timePeriod);
         for (const element of queryResult) {
             element.date = new Date(element.date);
@@ -470,5 +474,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         } else {
             log.warn(queryResult);
         }
+        log.debug("_updateGraphInternal() finished");
     }
 }
