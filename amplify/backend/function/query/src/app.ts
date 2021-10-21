@@ -132,6 +132,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
         const lastDateInDB: any = (await maps)[req.params.map].last_date;
         const key = req.params.name + ":" + JSON.stringify(req.body);
         const params: any = req.body;
+
         cache(res, key, async () => {
             let fullText = "";
             const textSearch: (string[] | Date)[] = params.textSearch;
