@@ -129,7 +129,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
 
     app.post("/map/:map/analytics/time", async (req, res) => {
         console.log("Query " + req.params.map, req.body);
-        const lastDate = (await maps)[req.params.map].last_date.getTime();
+        const lastDateInDB: any = (await maps)[req.params.map].last_date;
         const key = req.params.name + ":" + JSON.stringify(req.body);
         const params: any = req.body;
         cache(res, key, async () => {
@@ -142,7 +142,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
             const timeSeriesTable = dayTimePeriod ? "mat_view_timeseries_date" : "mat_view_timeseries_hour";
             const dateTable = dayTimePeriod ? "mat_view_days" : "mat_view_hours";
             const from: Date = dateFromMillis(params.from);
-            const to: Date = dateFromMillis(Math.min(params.to, lastDate));
+            const to: Date = lastDateInDB ? dateFromMillis(Math.min(params.to, lastDateInDB.getTime())) : dateFromMillis(params.to);
             const hazards: string[] = params.layer.hazards;
             const sources: string[] = params.layer.sources;
             const regions: string[] = params.regions;
