@@ -11,6 +11,7 @@ import {toLabel} from "../../graph";
 import {dayInMillis, nowRoundedToHour} from "../../../common";
 import {v4 as uuidv4} from "uuid";
 import {LayerGroup} from "../../../types";
+import {MapSelectionService} from "../../../map-selection.service";
 
 const log = new Logger("timeseries-ac");
 
@@ -70,6 +71,7 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
 
     constructor(public metadata: MetadataService,
                 public notify: NotificationService,
+                public map: MapSelectionService,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
                 public exec: UIExecutionService) {
     }
@@ -136,7 +138,7 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
                 name: "time"
             };
             delete payload.__series_id;
-            const serverResults = await this._api.callQueryAPI("query", payload);
+            const serverResults = await this._api.callMapAPIWithCache(this.map.id + "/analytics/time", payload);
             this.error = false;
             return this.queryTransform(serverResults);
         } catch (e) {

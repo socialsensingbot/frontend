@@ -14,6 +14,7 @@ import {TextAutoCompleteService} from "../../services/text-autocomplete.service"
 import {timeSeriesAutocompleteType} from "../timeseries";
 import {LayerGroup} from "../../types";
 import {RESTMapDataService} from "../../map/data/rest-map-data.service";
+import {MapSelectionService} from "../../map-selection.service";
 
 const log = new Logger("timeseries-config");
 
@@ -60,6 +61,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
         return this._data;
     }
 
+
     @Input()
     public set data(value: DataType) {
         if (typeof value !== "undefined") {
@@ -73,7 +75,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
             }
             this.searchControl.setValue(this._data.textSearch + this.regions);
             //TODO: Remove this hardcoding
-            this.mapData.regions("uk-flood-live").then(
+            this.mapData.regions(this.map.id).then(
                 regions => {
                     this.allRegions = regions;
                     log.debug(regions);
@@ -91,11 +93,11 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
     }
 
     constructor(public zone: NgZone, public router: Router,
+                public map: MapSelectionService,
                 public route: ActivatedRoute, public pref: PreferenceService,
                 private _api: RESTDataAPIService, public auto: TextAutoCompleteService, public mapData: RESTMapDataService
     ) {
 
-        this.mapData.regions("uk-flood-live").then(i => this.allRegions = i);
     }
 
     onNoClick(): void {

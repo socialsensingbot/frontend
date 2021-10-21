@@ -24,6 +24,7 @@ import {
 import {RESTDataAPIService} from "../../api/rest-api.service";
 import {FeatureCollection} from "@amcharts/amcharts4-geodata/.internal/Geodata";
 import {LayerGroup} from "../../types";
+import {MapSelectionService} from "../../map-selection.service";
 
 
 const log = new Logger("map-data");
@@ -38,7 +39,7 @@ export class RESTMapDataService {
     public mapMetadata: MapMetadata;
     public serviceMetadata: ServiceMetadata;
 
-    private _mapId: string;
+
     public availableDataSets: MapCoreMetadata[];
     /**
      * This is the processed data from the server.
@@ -53,6 +54,7 @@ export class RESTMapDataService {
     constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
                 private _notify: NotificationService, private readonly cache: NgForageCache,
                 private readonly ngf: NgForage,
+                private map: MapSelectionService,
                 private _pref: PreferenceService,
                 private _annotation: AnnotationService,
                 private _loading: LoadingProgressService,
@@ -65,7 +67,7 @@ export class RESTMapDataService {
         this.initialized = true;
         this.serviceMetadata = await this._api.callMapAPIWithCache("metadata", {}, 60 * 60) as ServiceMetadata;
         await this.switchDataSet(mapId);
-        this.aggregations = await this._api.callMapAPIWithCache(this._mapId + "/aggregations", {}, 24 * 60 * 60) as AggregationMap;
+        this.aggregations = await this._api.callMapAPIWithCache(this.map.id + "/aggregations", {}, 24 * 60 * 60) as AggregationMap;
         log.debug("Aggregations", this.aggregations);
         await this._pref.waitUntilReady();
         const available = this._pref.combined.availableDataSets;
@@ -88,7 +90,7 @@ export class RESTMapDataService {
         log.debug("Loading Geography");
         this._notify.show("Loading Geographic data ...");
         this.regionGeography = await this._api.callMapAPIWithCache(
-            this._mapId + "/region-type/" + regionType + "/geography", {}, 24 * 60 * 60) as RegionGeography;
+            this.map.id + "/region-type/" + regionType + "/geography", {}, 24 * 60 * 60) as RegionGeography;
         const features = [];
         for (const region in this.regionGeography) {
             if (this.regionGeography.hasOwnProperty(region)) {
@@ -115,7 +117,7 @@ export class RESTMapDataService {
                         endDate): Promise<Tweet[]> {
         const layerGroup: LayerGroup = this.layerGroup(layerGroupId);
         log.debug("requesting tweets for regions " + regions);
-        const rawResult = await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/text-for-regions", {
+        const rawResult = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/text-for-regions", {
             hazards:   layerGroup.hazards,
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,
@@ -128,18 +130,18 @@ export class RESTMapDataService {
         const result: Tweet[] = [];
         for (const tweet of rawResult) {
             result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
-                                  tweet.potentially_sensitive));
+                                  tweet.possibly_sensitive));
         }
         return result;
     }
 
     public async now(): Promise<number> {
-        return await this._api.callMapAPIWithCache(this._mapId + "/now", {}, 60) as Promise<number>;
+        return await this._api.callMapAPIWithCache(this.map.id + "/now", {}, 60) as Promise<number>;
     }
 
     public async recentTweets(layerGroupId: string, regionType: string): Promise<RegionTweeCount> {
         const layerGroup: LayerGroup = this.layerGroup(layerGroupId);
-        return await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/recent-text-count", {
+        return await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/recent-text-count", {
             hazards:   layerGroup.hazards,
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,
@@ -152,17 +154,16 @@ export class RESTMapDataService {
 
     public async places(regionType: string): Promise<Set<string>> {
         return new Set<string>(
-            await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/regions", {}, 24 * 60 * 60) as string[]);
+            await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/regions", {}, 24 * 60 * 60) as string[]);
     }
-
 
 
     public async switchDataSet(dataset: string): Promise<MapMetadata> {
         if (!this.initialized) {
             this._notify.error("Map Data Service not Initialized");
         }
-        this._mapId = dataset;
-        this.mapMetadata = (await this._api.callMapAPIWithCache(this._mapId + "/metadata", {}, 3600)) as MapMetadata;
+        this.map.id = dataset;
+        this.mapMetadata = (await this._api.callMapAPIWithCache(this.map.id + "/metadata", {}, 3600)) as MapMetadata;
         return this.mapMetadata;
 
     }
@@ -202,18 +203,17 @@ export class RESTMapDataService {
     }
 
 
-
     private layerGroup(id: string): LayerGroup {
         return this._pref.combined.layers.available.filter(i => i.id === id)[0];
     }
 
-    public async regions(map = this._mapId) {
+    public async regions(map = this.map.id) {
         return await this._api.callMapAPIWithCache(map + "/regions", {});
     }
 
     private async getRegionStatsMap(layerGroupId: string, regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {
         const layerGroup: LayerGroup = this.layerGroup(layerGroupId);
-        const statsMap = await this._api.callMapAPIWithCache(this._mapId + "/region-type/" + regionType + "/stats", {
+        const statsMap = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/stats", {
             hazards:   layerGroup.hazards,
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,

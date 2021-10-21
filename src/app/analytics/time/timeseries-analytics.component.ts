@@ -26,6 +26,7 @@ import {dayInMillis, hourInMillis, nowRoundedToHour} from "../../common";
 import {TextAutoCompleteService} from "../../services/text-autocomplete.service";
 import {LayerGroup} from "../../types";
 import {FormControl, FormGroup} from "@angular/forms";
+import {MapSelectionService} from "../../map-selection.service";
 
 const log = new Logger("timeseries-ac");
 
@@ -70,7 +71,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     public eoc: EOC = "exceedance";
 
     constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
-                public notify: NotificationService,
+                public notify: NotificationService, public map: MapSelectionService,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
                 public exec: UIExecutionService, public saves: SavedGraphService, public dialog: MatDialog,
                 public dash: DashboardService, public auto: TextAutoCompleteService) {
@@ -129,7 +130,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     async ngOnInit() {
         await this.pref.waitUntilReady();
 
-
         this._route.queryParams.subscribe(async queryParams => {
             if (queryParams.__clear_ui__) {
                 await this.clear();
@@ -138,6 +138,13 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             if (queryParams.active_layer) {
                 this.defaultLayer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
             }
+
+        });
+        this._route.parent.params.subscribe(async params => {
+            if (params.map) {
+                this.map.id = params.map;
+            }
+
         });
         this._route.params.subscribe(async params => {
             const queryParams = this._route.snapshot.queryParams;
@@ -401,9 +408,30 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         return from;
     }
 
+    public showDashboard() {
+        this._router.navigate(["map", this.map.id, "dashboard"]);
+    }
+
+    private newQuery(): TimeseriesRESTQuery {
+        return {
+            __series_id: uuidv4(),
+            regions:     [],
+            textSearch:  "",
+            from:        nowRoundedToHour() - (365.24 * dayInMillis),
+            to:          nowRoundedToHour(),
+            dateStep:    7 * dayInMillis,
+            layer:       this.defaultLayer,
+        };
+    }
+
     protected async executeQuery(query: TimeseriesRESTQuery, timePeriod: TimePeriod): Promise<any[]> {
         if (this._storeQueryInURL) {
             await this._router.navigate([], {queryParams: query});
+
+
+        }
+        if (!this.map.id) {
+            return;
         }
 
         this.updating = true;
@@ -420,7 +448,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 payload.regions = this.pref.combined.analyticsDefaultRegions;
             }
             delete payload.__series_id;
-            const serverResults = await this._api.callQueryAPI("query", payload);
+            const serverResults = await this._api.callMapAPIWithCache(this.map.id + "/analytics/time", payload);
             log.debug("Server result was ", serverResults);
             this.error = false;
             return this.queryTransform(serverResults);
@@ -435,25 +463,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
-    private newQuery(): TimeseriesRESTQuery {
-        return {
-            __series_id: uuidv4(),
-            regions:     [],
-            textSearch:  "",
-            from:        nowRoundedToHour() - (365.24 * dayInMillis),
-            to:          nowRoundedToHour(),
-            dateStep:    7 * dayInMillis,
-            layer:       this.defaultLayer,
-        };
-    }
-
     private navigateToRoot() {
-        this._router.navigate(["/analytics/time"], {queryParamsHandling: "merge"});
-    }
-
-
-    public showDashboard() {
-        this._router.navigate(["/dashboard"]);
+        this._router.navigate(["map", this.map.id, "analytics", "time"], {queryParamsHandling: "merge"});
     }
 
     private defaultState(): TimeseriesAnalyticsComponentState {

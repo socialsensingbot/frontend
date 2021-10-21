@@ -1,7 +1,6 @@
 /* tslint:disable:no-console */
 import * as express from "express";
 import * as bodyParser from "body-parser";
-import {queries} from "./queries";
 import {QueryMetadataSets} from "./metdata";
 import * as NodeCache from "node-cache";
 import {AggregationMap, MapMetadata, RegionGeography, ServiceMetadata} from "./map-data";
@@ -127,15 +126,83 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
         }
     };
 
-    app.post("/query/:name", async (req, res) => {
-        console.log("Query " + req.params.name, req.body);
+
+    app.post("/map/:map/analytics/time", async (req, res) => {
+        console.log("Query " + req.params.map, req.body);
+        const lastDate = (await maps)[req.params.map].last_date.getTime();
         const key = req.params.name + ":" + JSON.stringify(req.body);
+        const params: any = req.body;
         cache(res, key, async () => {
-            if (!queryMap) {
-                queryMap = queries;
+            let fullText = "";
+            const textSearch: (string[] | Date)[] = params.textSearch;
+            if (typeof textSearch !== "undefined" && textSearch.length > 0) {
+                fullText = " and MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
             }
-            console.log(queryMap[req.params.name]);
-            return await sql((queryMap[req.params.name])(req.body));
+            const dayTimePeriod: boolean = params.timePeriod === "day";
+            const timeSeriesTable = dayTimePeriod ? "mat_view_timeseries_date" : "mat_view_timeseries_hour";
+            const dateTable = dayTimePeriod ? "mat_view_days" : "mat_view_hours";
+            const from: Date = dateFromMillis(params.from);
+            const to: Date = dateFromMillis(Math.min(params.to, lastDate));
+            const hazards: string[] = params.layer.hazards;
+            const sources: string[] = params.layer.sources;
+            const regions: string[] = params.regions;
+            if (!regions || regions.length === 0) {
+                const values = fullText ? [hazards, sources, textSearch, from, to] : [hazards, sources, from, to];
+                return await sql({
+                                     // language=MySQL
+                                     sql: `select *
+                                           from (select IFNULL(lhs.count, rhs.count) as count,
+                                                        'all'                        as region,
+                                                        1.0 / (cume_dist() OVER w)   as exceedance,
+                                                        lhs.date                     as date
+                                                 from (SELECT count(*)        as count,
+                                                              tsd.source_date as date
+
+                                                       FROM ${timeSeriesTable} tsd
+                                                       WHERE tsd.hazard IN (?)
+                                                         and tsd.map_location = 'uk'
+                                                         and tsd.source IN (?)
+                                                           ${fullText}
+                                                       group by date
+                                                       order by date) lhs
+                                                          RIGHT OUTER JOIN (select date, 0 as count
+                                                                            from ${dateTable}) rhs
+                                                                           ON lhs.date = rhs.date
+                                                     WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)
+                                                 order by date) x
+                                           where date between ? and ?
+                                           order by date `,
+                                     values
+                                 });
+            } else {
+                const values = fullText ? [regions, hazards, sources, textSearch, from, to] : [regions, hazards, sources, from, to];
+                return await sql({
+                                     // language=MySQL
+                                     sql: `select *
+                                           from (select IFNULL(lhs.count, rhs.count) as count,
+                                                        region,
+                                                        1.0 / (cume_dist() OVER w)   as exceedance,
+                                                        lhs.date                     as date
+                                                 from (SELECT count(tsd.source_date) as count,
+                                                              tsd.source_date        as date,
+                                                              tsd.region_group_name  as region
+                                                       FROM ${timeSeriesTable} tsd
+                                                       WHERE tsd.region_group_name IN (?)
+                                                         and tsd.hazard IN (?)
+                                                         and tsd.source IN (?)
+                                                         and tsd.map_location = 'uk'
+                                                           ${fullText}
+                                                       group by date, region
+                                                       order by date
+                                                      ) lhs
+                                                          RIGHT OUTER JOIN (select date, 0 as count from ${dateTable}) rhs
+                                                                           ON lhs.date = rhs.date
+                                                     WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)
+                                                ) x
+                                           where date between ? and ?
+                                           order by date`, values
+                                 });
+            }
         });
     });
 
@@ -304,7 +371,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                                               r.source_id              as id,
                                                                               ST_AsGeoJSON(t.location) as location,
                                                                               r.region                 as region,
-                                                                              t.sensitive              as potentiallySensitive
+                                                                              t.possibly_sensitive     as possibly_sensitive
                                                                        FROM live_text t,
                                                                             mat_view_regions r
                                                                        WHERE t.source = r.source
@@ -315,8 +382,8 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                                          and r.hazard IN (?)
                                                                          and r.source IN (?)
                                                                          and r.warning IN (?)
-                                          and floor((? - unix_timestamp(r.source_timestamp)) / ?) = 0
-                                          and not t.deleted
+                                                                         and floor((? - unix_timestamp(r.source_timestamp)) / ?) = 0
+                                                                         and not t.deleted
                                                                        order by r.source_timestamp desc    `,
                                   values: [req.params.regionType, req.body.regions, req.body.hazards, req.body.sources,
                                            warningsValues(req.body.warnings),
@@ -341,7 +408,8 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                                                ref_map_metadata mm
                                                                           where mm.id = ?
                                                                             and region_type = ?
-                                                                            and gr.map_location = mm.location`, values: [req.params.map, req.params.regionType]
+                                                                            and gr.map_location = mm.location`,
+                                            values: [req.params.map, req.params.regionType]
 
 
                                         });
@@ -417,15 +485,15 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
         cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
             const rows = await sql({
                                        // language=MySQL
-                                       sql: `/* app.ts: recent-text-count */ SELECT r.region AS region, count(*) AS count
-                                                                             FROM mat_view_regions r
-                                                                             WHERE r.region_type = ?
-                                                                               AND r.source_timestamp between ? and ?
-                                                                               AND r.hazard IN (?)
-                                                                               AND r.source IN (?)
-                                                                               AND r.warning IN (?)
-                                                                             GROUP BY r.region
-                                            `,
+                                       sql:    `/* app.ts: recent-text-count */ SELECT r.region AS region, count(*) AS count
+                                                                                FROM mat_view_regions r
+                                                                                WHERE r.region_type = ?
+                                                                                  AND r.source_timestamp between ? and ?
+                                                                                  AND r.hazard IN (?)
+                                                                                  AND r.source IN (?)
+                                                                                  AND r.warning IN (?)
+                                                                                GROUP BY r.region
+                                               `,
                                        values: [req.params.regionType, new Date(req.body.startDate),
                                                 new Date(endDate), req.body.hazards, req.body.sources,
                                                 warningsValues(req.body.warnings),]
@@ -533,27 +601,27 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                                                      WHERE r.region = regions.region
                                                                                        and r.region_type = ?
                                                                                        and r.hazard IN (?)
-                                                                    and r.source IN (?)
-                                                                    and r.warning IN (?)
-                                                                    and not r.deleted
-                                                                  group by period
-                                                                  order by period
-                                                                 ) lhs
-                                                                     RIGHT OUTER JOIN (select value as period, 0 as count from ref_integers where value < ?) rhs
-                                                                                      ON lhs.period = rhs.period
-                                                                WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)) x
-                                                      where period = 0
-                                                        and count > 0) as exceedance,
+                                                                                       and r.source IN (?)
+                                                                                       and r.warning IN (?)
+                                                                                       and not r.deleted
+                                                                                     group by period
+                                                                                     order by period
+                                                                                    ) lhs
+                                                                                        RIGHT OUTER JOIN (select value as period, 0 as count from ref_integers where value < ?) rhs
+                                                                                                         ON lhs.period = rhs.period
+                                                                                   WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)) x
+                                                                         where period = 0
+                                                                           and count > 0) as exceedance,
                                                                         (SELECT count(*) as count
-                                                      FROM mat_view_regions r
-                                                      WHERE r.region = regions.region
-                                                        and r.region_type = ?
-                                                        and r.hazard IN (?)
-                                                        and r.source IN (?)
-                                                        and r.warning IN (?)
-                                                        and not r.deleted
-                                                        and r.source_timestamp between ? and ?
-                                                     )                 as count,
+                                                                         FROM mat_view_regions r
+                                                                         WHERE r.region = regions.region
+                                                                           and r.region_type = ?
+                                                                           and r.hazard IN (?)
+                                                                           and r.source IN (?)
+                                                                           and r.warning IN (?)
+                                                                           and not r.deleted
+                                                                           and r.source_timestamp between ? and ?
+                                                                        )                 as count,
                                                                         regions.region    as region
 
                                                                  from (select distinct region from ref_geo_regions where region_type = ?) as regions`,

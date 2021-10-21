@@ -23,8 +23,8 @@ import 'cypress-plugin-snapshots/commands';
 //     win.indexedDB.deleteDatabase("ngForage");
 // });
 export const MAP_URL = "http://localhost:4200/map/uk-flood-test"
-export const ANALYTICS_URL = "http://localhost:4200/analytics"
-export const DASHBOARD_URL = "http://localhost:4200/dashboard"
+export const ANALYTICS_URL = "http://localhost:4200/map/uk-flood-test/analytics"
+export const DASHBOARD_URL = "http://localhost:4200/map/uk-flood-test/dashboard"
 export const MIN_DATE_MILLIS = 1628784000000;
 export const MAX_DATE_MILLIS = 1629158400000;
 export const ONE_DAY_MILLIS = 24 * 60 * 60 * 1000;
