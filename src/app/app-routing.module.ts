@@ -49,6 +49,9 @@ const routes: Routes = [
             }
         ]
     },
+    {path: "analytics/time", redirectTo: "map/uk-flood-live/analytics/time", pathMatch: "full"},
+    {path: "dashboard", redirectTo: "map/uk-flood-live/dashboard", pathMatch: "full"},
+    {path: "map", redirectTo: "map/uk-flood-live", pathMatch: "full"},
     {
         path: "map/:map", component: MapComponent, canActivate: [AuthGuard],
     },
