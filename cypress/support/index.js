@@ -25,8 +25,10 @@ import 'cypress-plugin-snapshots/commands';
 export const MAP_URL = "http://localhost:4200/map/uk-flood-test"
 export const ANALYTICS_URL = "http://localhost:4200/map/uk-flood-test/analytics"
 export const DASHBOARD_URL = "http://localhost:4200/map/uk-flood-test/dashboard"
-export const MAX_DATE = "16-Sep-21";
-export const MIN_DATE = "11-Sep-21";
+export const MAX_DATE = "16-Sept-21";
+export const TS_SELECTED_MIN_DATE = "14-Sept-21";
+export const TS_SELECTED_MIN_TIME = "01 am";
+export const MIN_DATE = "11-Sept-21";
 export const MIN_DATE_MILLIS = 1631577600000;
 export const MAX_DATE_MILLIS = 1631664000000;
 export const ONE_DAY_MILLIS = 24 * 60 * 60 * 1000;
