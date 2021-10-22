@@ -25,8 +25,10 @@ import 'cypress-plugin-snapshots/commands';
 export const MAP_URL = "http://localhost:4200/map/uk-flood-test"
 export const ANALYTICS_URL = "http://localhost:4200/map/uk-flood-test/analytics"
 export const DASHBOARD_URL = "http://localhost:4200/map/uk-flood-test/dashboard"
-export const MIN_DATE_MILLIS = 1628784000000;
-export const MAX_DATE_MILLIS = 1629158400000;
+export const MAX_DATE = "16-Sep-21";
+export const MIN_DATE = "11-Sep-21";
+export const MIN_DATE_MILLIS = 1631577600000;
+export const MAX_DATE_MILLIS = 1631664000000;
 export const ONE_DAY_MILLIS = 24 * 60 * 60 * 1000;
 export const LONDON_URL = MAP_URL + "?selected=greater%20london&zoom=5&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=stats&active_polygon=county";
 export const LONDON_TWEET = ".app-twitter-id-1437925044643155976";
