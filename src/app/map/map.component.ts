@@ -285,7 +285,7 @@ export class MapComponent implements OnInit, OnDestroy {
             Object.keys(keys).sort().forEach((key) => {
                 this._newParams[key] = keys[key];
             });
-            await this._router.navigate([], {
+            await this._router.navigate(["map", this._mapSelectionService.id], {
                 queryParams:         this._newParams,
                 queryParamsHandling: "merge"
             });
@@ -305,10 +305,14 @@ export class MapComponent implements OnInit, OnDestroy {
 
         // Avoids race condition with access to this.pref.combined
         await this.pref.waitUntilReady();
-        if (!this._mapSelectionService.id || this.route.snapshot.params.map === "undefined") {
+        if (!this._mapSelectionService.id && this.route.snapshot.params.map === "undefined") {
             log.debug("Redirecting to /map/" + this.pref.combined.defaultDataSet);
             this._mapSelectionService.id = this.pref.combined.defaultDataSet;
             await this._router.navigate(["map", this.pref.combined.defaultDataSet], {queryParamsHandling: "preserve"});
+        }
+        if (this._mapSelectionService.id && this.route.snapshot.params.map === "undefined") {
+            log.debug("Redirecting to /map/" + this._mapSelectionService.id);
+            await this._router.navigate(["map", this._mapSelectionService.id], {queryParamsHandling: "preserve"});
         }
         this._stateSub = this._exec.state.subscribe((state: AppState) => {
             if (state === "ready") {

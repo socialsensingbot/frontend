@@ -127,85 +127,6 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
     };
 
 
-    app.post("/map/:map/analytics/time", async (req, res) => {
-        console.log("Query " + req.params.map, req.body);
-        const lastDateInDB: any = (await maps)[req.params.map].last_date;
-        const key = req.params.name + ":" + JSON.stringify(req.body);
-        const params: any = req.body;
-
-        cache(res, key, async () => {
-            let fullText = "";
-            const textSearch: (string[] | Date)[] = params.textSearch;
-            if (typeof textSearch !== "undefined" && textSearch.length > 0) {
-                fullText = " and MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
-            }
-            const dayTimePeriod: boolean = params.timePeriod === "day";
-            const timeSeriesTable = dayTimePeriod ? "mat_view_timeseries_date" : "mat_view_timeseries_hour";
-            const dateTable = dayTimePeriod ? "mat_view_days" : "mat_view_hours";
-            const from: Date = dateFromMillis(params.from);
-            const to: Date = lastDateInDB ? dateFromMillis(Math.min(params.to, lastDateInDB.getTime())) : dateFromMillis(params.to);
-            const hazards: string[] = params.layer.hazards;
-            const sources: string[] = params.layer.sources;
-            const regions: string[] = params.regions;
-            if (!regions || regions.length === 0) {
-                const values = fullText ? [hazards, sources, textSearch, from, to] : [hazards, sources, from, to];
-                return await sql({
-                                     // language=MySQL
-                                     sql: `select *
-                                           from (select IFNULL(lhs.count, rhs.count) as count,
-                                                        'all'                        as region,
-                                                        1.0 / (cume_dist() OVER w)   as exceedance,
-                                                        lhs.date                     as date
-                                                 from (SELECT count(*)        as count,
-                                                              tsd.source_date as date
-
-                                                       FROM ${timeSeriesTable} tsd
-                                                       WHERE tsd.hazard IN (?)
-                                                         and tsd.map_location = 'uk'
-                                                         and tsd.source IN (?)
-                                                           ${fullText}
-                                                       group by date
-                                                       order by date) lhs
-                                                          RIGHT OUTER JOIN (select date, 0 as count
-                                                                            from ${dateTable}) rhs
-                                                                           ON lhs.date = rhs.date
-                                                     WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)
-                                                 order by date) x
-                                           where date between ? and ?
-                                           order by date `,
-                                     values
-                                 });
-            } else {
-                const values = fullText ? [regions, hazards, sources, textSearch, from, to] : [regions, hazards, sources, from, to];
-                return await sql({
-                                     // language=MySQL
-                                     sql: `select *
-                                           from (select IFNULL(lhs.count, rhs.count) as count,
-                                                        region,
-                                                        1.0 / (cume_dist() OVER w)   as exceedance,
-                                                        lhs.date                     as date
-                                                 from (SELECT count(tsd.source_date) as count,
-                                                              tsd.source_date        as date,
-                                                              tsd.region_group_name  as region
-                                                       FROM ${timeSeriesTable} tsd
-                                                       WHERE tsd.region_group_name IN (?)
-                                                         and tsd.hazard IN (?)
-                                                         and tsd.source IN (?)
-                                                         and tsd.map_location = 'uk'
-                                                           ${fullText}
-                                                       group by date, region
-                                                       order by date
-                                                      ) lhs
-                                                          RIGHT OUTER JOIN (select date, 0 as count from ${dateTable}) rhs
-                                                                           ON lhs.date = rhs.date
-                                                     WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)
-                                                ) x
-                                           where date between ? and ?
-                                           order by date`, values
-                                 });
-            }
-        });
-    });
 
     // General Reference Data Queries
     app.get("/refdata/:name", (req, res) => {
@@ -545,7 +466,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
         cache(res, req.path, async () => {
             const rows = await sql({
                                        // language=MySQL
-                                       sql: `/* app.ts: regionType regions */ select region
+                                       sql:    `/* app.ts: regionType regions */ select region
                                                                               from ref_geo_regions gr,
                                                                                    ref_map_metadata mm
                                                                               where gr.region_type = ?
@@ -561,6 +482,23 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
 
         }, {duration: 24 * 60 * 60});
     });
+
+    /**
+     * Returns the data for a timeseries graph on the give map.
+     * @example JSON body
+     *
+     * {
+     *     "layer" : {
+     *         "hazards" : ["flood","wind"]
+     *         "sources" :["twitter"]
+     *     },
+     *     "regions":["wales","england"],
+     *     "from": 1634911245041,
+     *     "to": 1634911245041,
+     * }
+     *
+     *
+     */
     app.post("/map/:map/region-type/:regionType/stats", async (req, res) => {
 
         cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
@@ -651,6 +589,103 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
         }, {duration: 5 * 60});
 
     });
+
+    /**
+     * Returns the data for a timeseries graph on the give map.
+     * @example JSON body
+     *
+     * {
+     *     "layer" : {
+     *         "hazards" : ["flood","wind"]
+     *         "sources" :["twitter"]
+     *     },
+     *     "regions":["wales","england"],
+     *     "from": 1634911245041,
+     *     "to": 1634911245041,
+     * }
+     *
+     *
+     */
+    app.post("/map/:map/analytics/time", async (req, res) => {
+        console.log("Query " + req.params.map, req.body);
+        const lastDateInDB: any = (await maps)[req.params.map].last_date;
+        const key = req.params.map + ":" + JSON.stringify(req.body);
+        const params: any = req.body;
+
+        cache(res, key, async () => {
+            let fullText = "";
+            const textSearch: (string[] | Date)[] = params.textSearch;
+            if (typeof textSearch !== "undefined" && textSearch.length > 0) {
+                fullText = " and MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
+            }
+            const dayTimePeriod: boolean = params.timePeriod === "day";
+            const timeSeriesTable = dayTimePeriod ? "mat_view_timeseries_date" : "mat_view_timeseries_hour";
+            const dateTable = dayTimePeriod ? "mat_view_days" : "mat_view_hours";
+            const from: Date = dateFromMillis(params.from);
+            const to: Date = lastDateInDB ? dateFromMillis(Math.min(params.to, lastDateInDB.getTime())) : dateFromMillis(params.to);
+            const hazards: string[] = params.layer.hazards;
+            const sources: string[] = params.layer.sources;
+            const regions: string[] = params.regions;
+            if (!regions || regions.length === 0) {
+                const values = fullText ? [hazards, sources, textSearch, from, to] : [hazards, sources, from, to];
+                return await sql({
+                                     // language=MySQL
+                                     sql: `select *
+                                           from (select IFNULL(lhs.count, rhs.count) as count,
+                                                        'all'                        as region,
+                                                        1.0 / (cume_dist() OVER w)   as exceedance,
+                                                        lhs.date                     as date
+                                                 from (SELECT count(*)        as count,
+                                                              tsd.source_date as date
+
+                                                       FROM ${timeSeriesTable} tsd
+                                                       WHERE tsd.hazard IN (?)
+                                                         and tsd.map_location = 'uk'
+                                                         and tsd.source IN (?)
+                                                           ${fullText}
+                                                       group by date
+                                                       order by date) lhs
+                                                          RIGHT OUTER JOIN (select date, 0 as count
+                                                                            from ${dateTable}) rhs
+                                                                           ON lhs.date = rhs.date
+                                                     WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)
+                                                 order by date) x
+                                           where date between ? and ?
+                                           order by date `,
+                                     values
+                                 });
+            } else {
+                const values = fullText ? [regions, hazards, sources, textSearch, from, to] : [regions, hazards, sources, from, to];
+                return await sql({
+                                     // language=MySQL
+                                     sql: `select *
+                                           from (select IFNULL(lhs.count, rhs.count) as count,
+                                                        region,
+                                                        1.0 / (cume_dist() OVER w)   as exceedance,
+                                                        lhs.date                     as date
+                                                 from (SELECT count(tsd.source_date) as count,
+                                                              tsd.source_date        as date,
+                                                              tsd.region_group_name  as region
+                                                       FROM ${timeSeriesTable} tsd
+                                                       WHERE tsd.region_group_name IN (?)
+                                                         and tsd.hazard IN (?)
+                                                         and tsd.source IN (?)
+                                                         and tsd.map_location = 'uk'
+                                                           ${fullText}
+                                                       group by date, region
+                                                       order by date
+                                                      ) lhs
+                                                          RIGHT OUTER JOIN (select date, 0 as count from ${dateTable}) rhs
+                                                                           ON lhs.date = rhs.date
+                                                     WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)
+                                                ) x
+                                           where date between ? and ?
+                                           order by date`, values
+                                 });
+            }
+        });
+    });
+
 
     function sleep(ms) {
         return new Promise((resolve) => {

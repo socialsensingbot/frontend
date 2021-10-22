@@ -35,7 +35,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
 var twitter_api_v2_1 = require("twitter-api-v2");
 var aws = require("aws-sdk");
@@ -51,7 +51,7 @@ var init = function () { return __awaiter(void 0, void 0, void 0, function () {
             case 0: return [4 /*yield*/, ((new aws.SSM())
                     .getParameters({
                     Names: ["DB_PASSWORD", "TWITTER_BEARER_TOKEN"].map(function (secretName) { return process.env[secretName]; }),
-                    WithDecryption: true
+                    WithDecryption: true,
                 })
                     .promise())];
             case 1:
@@ -74,7 +74,7 @@ var init = function () { return __awaiter(void 0, void 0, void 0, function () {
                     queueLimit: 5000,
                     debug: false
                 });
-                twitter = new twitter_api_v2_1["default"](twitterBearerToken);
+                twitter = new twitter_api_v2_1.default(twitterBearerToken);
                 return [2 /*return*/, awsServerlessExpress.createServer(require("./app")(connection, twitter))];
         }
     });
