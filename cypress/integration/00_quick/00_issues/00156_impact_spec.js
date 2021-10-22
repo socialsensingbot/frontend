@@ -1,12 +1,11 @@
-import {LONDON_TWEET, MAP_URL} from "../../../support";
+import {LONDON_TWEET, LONDON_TWEET_MENU, MAP_URL} from "../../../support";
 
 const twitterIdClass = LONDON_TWEET;
 const impactOption = "body .tweet-list-item-menu-impact";
 const url = MAP_URL + "?selected=greater%20london&max_offset=0&min_offset=-1439";
-const menu = twitterIdClass + " > .app-tweet-item-card-surround > .app-tweet-item-menu > .mat-focus-indicator > .mat-button-wrapper > .mat-icon";
 
 let clickImpactMenu = function () {
-    cy.get(menu, {timeout: 60000}).click({force: true});
+    cy.get(LONDON_TWEET_MENU, {timeout: 60000}).click({force: true});
     cy.get(impactOption).contains("Impact");
     cy.get(impactOption).click();
     cy.wait(3000);
@@ -31,8 +30,8 @@ describe('00156 Impact: ', function () {
         cy.get(".app-tweet-table", {timeout: 30000});
         cy.get(twitterIdClass, {timeout: 60000});
         cy.get(twitterIdClass, {timeout: 60000}).should('be.visible');
-        cy.get(menu, {timeout: 60000});
-        cy.get(menu, {timeout: 60000}).should('be.visible');
+        cy.get(LONDON_TWEET_MENU, {timeout: 60000});
+        cy.get(LONDON_TWEET_MENU, {timeout: 60000}).should('be.visible');
         clickImpactMenu();
         cy.get("body .tweet-list-item-menu-impact-level-clear", {timeout: 30000}).click();
         clickImpactMenu();

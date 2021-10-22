@@ -1,12 +1,10 @@
-import {LONDON_TWEET, MAP_URL} from "../../../support";
+import {LONDON_TWEET, LONDON_TWEET_MENU, MAP_URL} from "../../../support";
 
 const sourceOptions = "body .tweet-list-item-menu-source";
 const twitterIdClass = LONDON_TWEET;
 const url = MAP_URL + "?selected=greater%20london&max_offset=0&min_offset=-1439";
-const menu = twitterIdClass + " > .app-tweet-item-card-surround > .app-tweet-item-menu > .mat-focus-indicator > .mat-button-wrapper > .mat-icon";
-
 let clickSourceMenu = function () {
-    cy.get(menu, {timeout: 60000}).click({force: true});
+    cy.get(LONDON_TWEET_MENU, {timeout: 60000}).click({force: true});
     cy.get(sourceOptions).contains("Source");
   cy.get(sourceOptions).click();
   cy.wait(3000);
@@ -33,8 +31,8 @@ describe('00173 Source: ', function () {
       cy.get(".app-tweet-table", {timeout: 30000});
       cy.get(twitterIdClass, {timeout: 60000});
       cy.get(twitterIdClass, {timeout: 60000}).should('be.visible');
-      cy.get(menu, {timeout: 60000});
-      cy.get(menu, {timeout: 60000}).should('be.visible');
+      cy.get(LONDON_TWEET_MENU, {timeout: 60000});
+      cy.get(LONDON_TWEET_MENU, {timeout: 60000}).should('be.visible');
       clickSourceMenu();
       cy.get("body .tweet-list-item-menu-source-type-clear", {timeout: 30000}).click();
       clickSourceMenu();

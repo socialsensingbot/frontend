@@ -34,6 +34,11 @@ export const MAX_DATE_MILLIS = 1631664000000;
 export const ONE_DAY_MILLIS = 24 * 60 * 60 * 1000;
 export const LONDON_URL = MAP_URL + "?selected=greater%20london&zoom=5&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=stats&active_polygon=county";
 export const LONDON_TWEET = ".app-twitter-id-1437925044643155976";
+export const LONDON_TWEET_MENU = LONDON_TWEET + " > .app-tweet-item-card-surround > .app-tweet-item-menu > .mat-focus-indicator > .mat-button-wrapper > .mat-icon";
+export const LONDON_TWEET_VISIBLE = LONDON_TWEET + ".atr-visible";
+export const LONDON_TWEET_VISIBLE_MENU = LONDON_TWEET_VISIBLE + " > .app-tweet-item-card-surround > .app-tweet-item-menu > .mat-focus-indicator > .mat-button-wrapper > .mat-icon";
+export const LONDON_TWEET_HIDDEN = LONDON_TWEET + ".atr-hidden";
+export const LONDON_TWEET_HIDDEN_MENU = LONDON_TWEET_HIDDEN + " > .app-tweet-item-card-surround > .app-tweet-item-menu > .mat-focus-indicator > .mat-button-wrapper > .mat-icon";
 
 // https://github.com/cypress-io/cypress/issues/8525
 afterEach(() => {
