@@ -26,11 +26,11 @@ class ExecutionTask {
         return this._dedup;
     }
 
-    public execute() {
+    public async execute() {
         try {
             const start = Date.now();
             log.info("ExecutionTask: executing " + this.name + "(" + this.dedup + ")");
-            this._resolve(this._task());
+            this._resolve(await this._task());
             if (Date.now() - start > maxTaskDuration) {
                 log.warn(
                     `Task exceeded maximum recommended duration: ${this.name}(${this.dedup}) max is ${maxTaskDuration} this took ${Date.now() - start}`);
@@ -91,7 +91,7 @@ export class UIExecutionService {
                 // console.log("active");
             }
         });
-        this._executionTimer = timer(0, 100).subscribe(() => {
+        this._executionTimer = timer(0, 100).subscribe(async () => {
             if (this._queue.length > 0) {
                 log.info(this._queue.length + " items in the execution queue ", this._queue);
             }
@@ -105,7 +105,7 @@ export class UIExecutionService {
                     if ((task.waitForStates === null || task.waitForStates.indexOf(
                         this._state) >= 0) && (task.waitForUIState === null || this.uistate === task.waitForUIState)) {
                         log.info(`Executing ${task.name}(${task.dedup})`);
-                        task.execute();
+                        await task.execute();
                         if (task.dedup !== null) {
                             this.dedupMap.delete(task.dedup);
                         }

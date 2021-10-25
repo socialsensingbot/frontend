@@ -157,12 +157,14 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             log.info("State is now " + JSON.stringify(this.state));
             if (params.id) {
                 this.state = this.defaultState();
+                this.seriesCollection.clear();
                 this.setEOCFromQuery(queryParams);
                 this.graphId = params.id;
                 const savedGraph = await this.saves.get(params.id);
                 if (savedGraph !== null) {
                     this.title = savedGraph.title;
                     this.state = JSON.parse(savedGraph.state);
+                    await this.timePeriodChanged(this.state.timePeriod || "day");
                     log.debug("Loaded saved graph with state ", this.state);
                     await this.refreshAllSeries();
                     this.exec.uiActivity();
@@ -210,11 +212,15 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     public async refreshAllSeries(): Promise<void> {
         log.debug("Refreshing all series");
+        const promisesPromises = [];
         for (const query of this.state.queries) {
             if (!query.layer) {
                 query.layer = this.defaultLayer;
             }
-            await this.updateGraph(query, this.state.timePeriod, true);
+            promisesPromises.push(this.updateGraph(query, this.state.timePeriod, true));
+        }
+        for (const promise of promisesPromises) {
+            await promise;
         }
     }
 
@@ -309,28 +315,31 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.exec.uiActivity();
     }
 
-    public async updateGraph(q: TimeseriesRESTQuery, timePeriod, force) {
+    public async updateGraph(q: TimeseriesRESTQuery, timePeriod, force): Promise<any> {
+        log.debug("updateGraph");
+        // console.trace("timeseries updateGraph");
         // Immutable copy
         const query = JSON.parse(JSON.stringify(q));
         this.updating = true;
-        await this.exec.queue("update-timeseries-graph", null,
-                              async () => {
-                                  log.debug("Graph update from query ", query);
-                                  this._changed = true;
-                                  if (query.layer && (query.textSearch.length > 0 || force)) {
-                                      this.emitChange();
-                                      if (query.textSearch.length > 3) {
-                                          // noinspection ES6MissingAwait
-                                          this.auto.create(timeSeriesAutocompleteType, query.textSearch, true,
-                                                           this.pref.combined.shareTextAutocompleteInGroup);
-                                      }
-                                      await this._updateGraphInternal(query, timePeriod);
-                                  } else {
-                                      log.debug("Skipped time series update, force=" + force);
-                                  }
-                                  this.updating = false;
+        // noinspection ES6MissingAwait
+        return this.exec.queue("update-timeseries-graph", null,
+                               async () => {
+                                   log.debug("Graph update from query ", query);
+                                   this._changed = true;
+                                   if (query.layer && (query.textSearch.length > 0 || force)) {
+                                       this.emitChange();
+                                       if (query.textSearch.length > 3) {
+                                           // noinspection ES6MissingAwait
+                                           this.auto.create(timeSeriesAutocompleteType, query.textSearch, true,
+                                                            this.pref.combined.shareTextAutocompleteInGroup);
+                                       }
+                                       await this._updateGraphInternal(query, timePeriod);
+                                       this.updating = false;
+                                   } else {
+                                       log.debug("Skipped time series update, force=" + force);
+                                   }
 
-                              }, query.__series_id + "-" + force, false, true, true, "inactive"
+                               }, query.__series_id + "-" + force, false, false, true, "inactive"
         );
 
     }

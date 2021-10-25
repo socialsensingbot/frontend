@@ -67,10 +67,10 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
         if (typeof value !== "undefined") {
             this._data = value;
             if (this._data.layer) {
-                this.activeLayerGroup = this._data.layer.id;
+                this._activeLayerGroup = this._data.layer.id;
             } else {
                 log.verbose("No layer info found in the data object, using the default layer.", this.pref.defaultLayer());
-                this.activeLayerGroup = this.pref.defaultLayer().id;
+                this._activeLayerGroup = this.pref.defaultLayer().id;
 
             }
             this.searchControl.setValue(this._data.textSearch + this.regions);
@@ -188,10 +188,10 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
             this.textChanged();
         });
         if (this._data.layer) {
-            this.activeLayerGroup = this._data.layer.id;
+            this._activeLayerGroup = this._data.layer.id;
         } else {
             log.verbose("No layer info found in the data object, using the default layer.", this.pref.defaultLayer());
-            this.activeLayerGroup = this.pref.defaultLayer().id;
+            this._activeLayerGroup = this.pref.defaultLayer().id;
 
         }
 

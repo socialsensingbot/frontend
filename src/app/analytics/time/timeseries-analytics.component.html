@@ -9,13 +9,13 @@
           </mat-button-toggle-group>
 
           <div class="app-toolbar-separator"></div>
-          <mat-button-toggle-group name="lob" class="lob" (valueChange)="graphTypeChanged(state.lob)"
+          <mat-button-toggle-group (click)="graphTypeChanged(state.lob)" class="lob" name="lob"
                                    [(ngModel)]="state.lob" aria-label="Line or Bar">
               <mat-button-toggle value="line">Line</mat-button-toggle>
               <mat-button-toggle value="bar">Bar</mat-button-toggle>
           </mat-button-toggle-group>
           <div class="app-toolbar-separator"></div>
-          <mat-button-toggle-group (valueChange)="timePeriodChanged(state.timePeriod)" [(ngModel)]="state.timePeriod"
+          <mat-button-toggle-group (click)="timePeriodChanged(state.timePeriod)" [(ngModel)]="state.timePeriod"
                                    aria-label="Line or Bar"
                                    class="timeperiod-btn-group" name="timeperiod">
               <mat-button-toggle value="day">Day</mat-button-toggle>
