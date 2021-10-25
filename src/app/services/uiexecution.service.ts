@@ -30,7 +30,7 @@ class ExecutionTask {
         try {
             const start = Date.now();
             log.info("ExecutionTask: executing " + this.name + "(" + this.dedup + ")");
-            this._resolve(await this._task());
+            this._resolve(this._task());
             if (Date.now() - start > maxTaskDuration) {
                 log.warn(
                     `Task exceeded maximum recommended duration: ${this.name}(${this.dedup}) max is ${maxTaskDuration} this took ${Date.now() - start}`);

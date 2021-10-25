@@ -15,6 +15,7 @@ import {timeSeriesAutocompleteType} from "../timeseries";
 import {LayerGroup} from "../../types";
 import {RESTMapDataService} from "../../map/data/rest-map-data.service";
 import {MapSelectionService} from "../../map-selection.service";
+import {UIExecutionService} from "../../services/uiexecution.service";
 
 const log = new Logger("timeseries-config");
 
@@ -94,6 +95,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
 
     constructor(public zone: NgZone, public router: Router,
                 public map: MapSelectionService,
+                public exec: UIExecutionService,
                 public route: ActivatedRoute, public pref: PreferenceService,
                 private _api: RESTDataAPIService, public auto: TextAutoCompleteService, public mapData: RESTMapDataService
     ) {

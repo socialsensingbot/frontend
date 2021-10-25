@@ -127,7 +127,6 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
     };
 
 
-
     // General Reference Data Queries
     app.get("/refdata/:name", (req, res) => {
         if (!metadata) {
@@ -466,7 +465,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
         cache(res, req.path, async () => {
             const rows = await sql({
                                        // language=MySQL
-                                       sql:    `/* app.ts: regionType regions */ select region
+                                       sql: `/* app.ts: regionType regions */ select region
                                                                               from ref_geo_regions gr,
                                                                                    ref_map_metadata mm
                                                                               where gr.region_type = ?
@@ -609,6 +608,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
     app.post("/map/:map/analytics/time", async (req, res) => {
         console.log("Query " + req.params.map, req.body);
         const lastDateInDB: any = (await maps)[req.params.map].last_date;
+        const location: any = (await maps)[req.params.map].location;
         const key = req.params.map + ":" + JSON.stringify(req.body);
         const params: any = req.body;
 
@@ -627,7 +627,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
             const sources: string[] = params.layer.sources;
             const regions: string[] = params.regions;
             if (!regions || regions.length === 0) {
-                const values = fullText ? [hazards, sources, textSearch, from, to] : [hazards, sources, from, to];
+                const values = fullText ? [hazards, sources, location, textSearch, from, to] : [hazards, sources, location, from, to];
                 return await sql({
                                      // language=MySQL
                                      sql: `select *
@@ -640,9 +640,8 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
 
                                                        FROM ${timeSeriesTable} tsd
                                                        WHERE tsd.hazard IN (?)
-                                                         and tsd.map_location = 'uk'
                                                          and tsd.source IN (?)
-                                                           ${fullText}
+                                                         and tsd.map_location = ? ${fullText}
                                                        group by date
                                                        order by date) lhs
                                                           RIGHT OUTER JOIN (select date, 0 as count
@@ -655,7 +654,8 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                      values
                                  });
             } else {
-                const values = fullText ? [regions, hazards, sources, textSearch, from, to] : [regions, hazards, sources, from, to];
+                const values = fullText ? [regions, hazards, sources, location, textSearch, from, to] : [regions, hazards, sources,
+                                                                                                         location, from, to];
                 return await sql({
                                      // language=MySQL
                                      sql: `select *
@@ -670,8 +670,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                                        WHERE tsd.region_group_name IN (?)
                                                          and tsd.hazard IN (?)
                                                          and tsd.source IN (?)
-                                                         and tsd.map_location = 'uk'
-                                                           ${fullText}
+                                                         and tsd.map_location = ? ${fullText}
                                                        group by date, region
                                                        order by date
                                                       ) lhs
@@ -683,7 +682,7 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
                                            order by date`, values
                                  });
             }
-        });
+        }, {duration: 60 * 60});
     });
 
 
