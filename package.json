@@ -51,7 +51,7 @@
     "export-to-csv": "^0.2.1",
     "fingerprintjs2": "^2.1.4",
     "jquery": "^3.6.0",
-    "jquery-ui": "^1.12.1",
+    "jquery-ui": "^1.13.0",
     "leaflet": "^1.7.1",
     "localforage": "^1.9.0",
     "ng-event-bus": "^2.0.0",
