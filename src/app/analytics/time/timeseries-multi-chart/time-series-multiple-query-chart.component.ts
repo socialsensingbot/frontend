@@ -97,7 +97,11 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
         this._seriesCollection.seriesUpdated.subscribe(series => {
             try {
                 log.debug("Series updated: ", series);
-                this.createSeriesFromData(series.label, series.data, series.id);
+                if (series.data.length === 0) {
+                    this.chart.series.removeValue(this.seriesMap[series.id]);
+                } else {
+                    this.createSeriesFromData(series.label, series.data, series.id);
+                }
                 this.reZoom();
             } catch (e) {
                 log.error(e);

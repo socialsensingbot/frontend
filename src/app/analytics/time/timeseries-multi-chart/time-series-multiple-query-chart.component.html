@@ -6,11 +6,9 @@
 >
     <mat-spinner *ngIf="updating" style="opacity:0.3"></mat-spinner>
     <div *ngIf="error">Error</div>
-    <div *ngIf="noData">No Data</div>
+    <div *ngIf="noData && !updating">No Data</div>
 </div>
 
 <div [style.opacity]="updating || noData ? 0.2 : 1.0">
     <div #chart style="width: 100%" [style.height]="height+'px'"></div>
 </div>
-
-

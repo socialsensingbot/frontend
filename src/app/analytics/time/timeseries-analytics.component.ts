@@ -6,6 +6,7 @@ import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {
     EOC,
+    GraphType,
     TimePeriod,
     TimeseriesAnalyticsComponentState,
     timeSeriesAutocompleteType,
@@ -37,6 +38,34 @@ const log = new Logger("timeseries-ac");
                styleUrls:   ["./timeseries-analytics.component.scss"]
            })
 export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChanges {
+
+    /**
+     * If this is true then the current graph contains no data.
+     */
+    public noData = false;
+
+    /**
+     * What type of timeseries graph is being shown.
+     *
+     * @see GraphType
+     * @private
+     */
+    private _type: GraphType = "line";
+
+    public get type(): GraphType {
+        return this._type;
+    }
+
+    @Input()
+    public set type(value: GraphType) {
+        this._type = value;
+    }
+
+    /**
+     * This is the component state, when the graph is saved it's this that is saved.
+     * @private
+     */
+    private _state: TimeseriesAnalyticsComponentState;
 
 
     public height: number;
@@ -70,6 +99,22 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     private _storeQueryInURL: boolean;
     public eoc: EOC = "exceedance";
 
+    public get state(): TimeseriesAnalyticsComponentState {
+        return this._state;
+    }
+
+    @Input()
+    public set state(value: TimeseriesAnalyticsComponentState) {
+        this._state = value;
+    }
+
+    public range: FormGroup = new FormGroup({
+                                                start: new FormControl(new Date()),
+                                                end:   new FormControl(new Date())
+                                            });
+
+    public defaultLayer: LayerGroup = null;
+
     constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
                 public notify: NotificationService, public map: MapSelectionService,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
@@ -83,41 +128,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
-
-    private _type = "line";
-
-    public get type(): string {
-        return this._type;
-    }
-
-    @Input()
-    public set type(value: string) {
-        this._type = value;
-    }
-
-    private _state: TimeseriesAnalyticsComponentState;
-
-    public range: FormGroup = new FormGroup({
-                                                start: new FormControl(new Date()),
-                                                end:   new FormControl(new Date())
-                                            });
-
-    public get state(): TimeseriesAnalyticsComponentState {
-        return this._state;
-    }
-
     public updateSavedGraphs() {
         this.saves.listByOwner().then(i => this.savedGraphs = i);
     }
-
-    public defaultLayer: LayerGroup = null;
-    public noData = false;
-
-    @Input()
-    public set state(value: TimeseriesAnalyticsComponentState) {
-        this._state = value;
-    }
-    ;
 
     public emitChange() {
 
@@ -148,6 +161,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
         });
         this._route.params.subscribe(async params => {
+            this.noData = true;
             const queryParams = this._route.snapshot.queryParams;
             if (queryParams.active_layer) {
                 this.defaultLayer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
@@ -214,6 +228,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     public async refreshAllSeries(): Promise<void> {
         log.debug("Refreshing all series");
         const promisesPromises = [];
+        this.noData = true;
         for (const query of this.state.queries) {
             if (!query.layer) {
                 query.layer = this.defaultLayer;
@@ -327,7 +342,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                                    const query = JSON.parse(JSON.stringify(q));
                                    log.debug("Graph update from query ", query);
                                    this._changed = true;
-                                   let text: string = query.textSearch;
+                                   const text: string = query.textSearch;
                                    if (query.layer && (text.length > 0 || force)) {
                                        this.emitChange();
                                        if (text.length > 3) {
@@ -390,7 +405,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         if (timePeriod === "day") {
             minDate = new Date(year - 1, month, day);
         } else {
-            minDate = new Date(Date.now() - dayInMillis)
+            minDate = new Date(Date.now() - dayInMillis);
         }
         this.range.controls.start.setValue(minDate);
         this.seriesCollection.dateSpacing = timePeriod === "day" ? dayInMillis : hourInMillis;
@@ -496,7 +511,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         return this.executeQuery(query, timePeriod).then(queryResult => {
             if (queryResult && queryResult.length === 0) {
                 log.info("No data returned from query");
-                this.noData = true;
             } else {
                 log.info("Data returned from query", queryResult);
                 this.noData = false;
@@ -506,12 +520,15 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 element.date = new Date(element.date);
             }
             if (queryResult && queryResult.length > 0) {
-                log.debug("Updating time series.")
+                log.debug("Updating time series.");
                 this.seriesCollection.updateTimeseries(
                     new TimeseriesModel(toLabel(query, this.pref.combined.layers), queryResult,
                                         query.__series_id));
             } else {
                 log.warn(queryResult);
+                this.seriesCollection.updateTimeseries(
+                    new TimeseriesModel(toLabel(query, this.pref.combined.layers), [],
+                                        query.__series_id));
             }
             log.debug("_updateGraphInternal() finished");
         });
