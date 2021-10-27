@@ -109,7 +109,7 @@
                                            [data]="query"></app-timeseries-analytics-form>
         </mat-card-content>
         <mat-card-actions>
-            <button *ngIf="i === 0" mat-raised-button color="primary" (click)="addQuery(query);">Add
+            <button (click)="addQuery();" *ngIf="i === 0" color="primary" mat-raised-button>Add
             </button>
             <button *ngIf="i > 0" mat-raised-button color="warn" (click)="removeQuery(query)">Remove</button>
     </mat-card-actions>

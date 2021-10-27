@@ -266,7 +266,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                     this.setEOCFromQuery(queryParams);
                 } else {
                     // No region is selected or a numeric region is selected.
-                    await this.clear(false);
+                    await this.clear();
                     this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
                     this.setEOCFromQuery(queryParams);
                     await this.updateGraph(this.state.queries[0], this.state.timePeriod, true);
@@ -365,7 +365,11 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     public ngOnChanges(changes: SimpleChanges): void {
     }
 
-    public async addQuery(query: TimeseriesRESTQuery) {
+    /**
+     * Adds a new blank query to the queries in the graph's state.
+     * Each query produces a separate series on the resulting graph.
+     */
+    public async addQuery() {
 
         if (!this.state.queries) {
             this.state.queries = [];
@@ -382,28 +386,46 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
-    public async clear(empty = false) {
+    /**
+     * Clears down the entire graph, state and all.
+     */
+    public async clear() {
         log.debug("Clear called");
         if (this.mapLayer !== null) {
             log.debug("Clearing graph");
+
+            // Reset the graph state
             this.state = this.defaultState();
             log.debug("State is now ", this.state);
+
+            // Remove all the series data from the graph.
             this.seriesCollection.clear();
+
+            // Reset the time period.
             await this.timePeriodChanged(this.state.timePeriod);
+
+            // Sets the default region in the first query this is to make sure
+            // we have at least one series visible in the graph initially.
             this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
-            if (!empty) {
-                await this._updateGraphInternal(this.state.queries[0], this.state.timePeriod);
-            } else {
-                this.state.queries = [];
-            }
+
+            // Now display the graph for that first query.
+            await this._updateGraphInternal(this.state.queries[0], this.state.timePeriod);
             log.debug("Clear finished");
         }
 
     }
 
+    /**
+     * Removes a query, it's series and all it's state from the graph.
+     * @param query
+     */
     public removeQuery(query: TimeseriesRESTQuery) {
+        // Remove the query
         this.state.queries = this.state.queries.filter(i => i.__series_id !== query.__series_id);
+        // Remove it's associated series
         this.seriesCollection.removeTimeseries(query.__series_id);
+
+        // This counts as UI activity i.e. prevents new queries from being run for a few secs.
         this.exec.uiActivity();
     }
 
