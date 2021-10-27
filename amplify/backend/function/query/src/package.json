@@ -11,6 +11,7 @@
     "aws-serverless-express": "^3.3.3",
     "body-parser": "^1.17.1",
     "express": "^4.15.2",
+    "md5": "^2.3.0",
     "mysql": "^2.18.1",
     "mysql-connection-pool-manager": "^1.5.9",
     "node-cache": "^5.1.2",

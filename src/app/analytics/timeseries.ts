@@ -49,11 +49,30 @@ export class TimeseriesCollectionModel {
     public seriesRemoved: EventEmitter<string> = new EventEmitter<string>();
     public seriesUpdated: EventEmitter<TimeseriesModel> = new EventEmitter<TimeseriesModel>();
     public yAxisChanged: EventEmitter<void> = new EventEmitter<void>();
+    public xAxisChanged: EventEmitter<void> = new EventEmitter<void>();
     public graphTypeChanged: EventEmitter<GraphType> = new EventEmitter<GraphType>();
     public cleared: EventEmitter<void> = new EventEmitter<void>();
     private map: Map<string, TimeseriesModel> = new Map<string, TimeseriesModel>();
     private _minDate: Date = null;
     private _maxDate: Date = null;
+
+    public get minDate(): Date {
+        return this._minDate;
+    }
+
+    public set minDate(value: Date) {
+        log.debug("Min date: " + value)
+        this._minDate = value;
+    }
+
+    public get maxDate(): Date {
+        return this._maxDate;
+    }
+
+    public set maxDate(value: Date) {
+        log.debug("Max date: " + value)
+        this._maxDate = value;
+    }
 
     public get graphType(): GraphType {
         return this._graphType;
@@ -68,6 +87,14 @@ export class TimeseriesCollectionModel {
         return this.map.size;
     }
 
+    get dateSpacing(): number {
+        return this._dateSpacing;
+    }
+
+    set dateSpacing(value: number) {
+        this._dateSpacing = value;
+    }
+
     constructor(public xField = "date",
                 public yField = "Count",
                 public yLabel: string = "count",
@@ -75,7 +102,7 @@ export class TimeseriesCollectionModel {
                 public rollingAvg: boolean = false,
                 public avgLength = 14,
                 public zeroFillMissingDates = true,
-                public dateSpacing = dayInMillis,
+                private _dateSpacing = dayInMillis,
                 private _graphType: GraphType = "line") {
 
 
@@ -95,10 +122,10 @@ export class TimeseriesCollectionModel {
             const result = [];
             let lastRowDate = null;
             for (const row of mappedData) {
-                const rowDate = Math.round(new Date(row[this.xField]).getTime() / this.dateSpacing) * this.dateSpacing;
+                const rowDate = Math.round(new Date(row[this.xField]).getTime() / this._dateSpacing) * this._dateSpacing;
                 if (lastRowDate !== null) {
-                    if (rowDate > lastRowDate + this.dateSpacing) {
-                        for (let fillDate = lastRowDate + this.dateSpacing; fillDate < rowDate; fillDate += this.dateSpacing) {
+                    if (rowDate > lastRowDate + this._dateSpacing) {
+                        for (let fillDate = lastRowDate + this._dateSpacing; fillDate < rowDate; fillDate += this._dateSpacing) {
                             const fillRow = {};
                             fillRow[this.xField] = new Date(fillDate);
                             fillRow[this.yField] = 0;
@@ -129,17 +156,32 @@ export class TimeseriesCollectionModel {
     }
 
     public updateTimeseries(timeseriesModel: TimeseriesModel) {
+        log.debug("updateTimeseries() called");
         this.map.delete(timeseriesModel.id);
         this.seriesUpdated.emit(this._addSeries(timeseriesModel));
+        log.debug("updateTimeseries() finished");
     }
 
     public yAxisHasChanged() {
         this.yAxisChanged.emit();
     }
 
+    public xAxisHasChanged() {
+        this.xAxisChanged.emit();
+    }
+
+
     public clear() {
         this.map.clear();
         this.cleared.emit();
+    }
+
+    public maximumDate(): void {
+
+    }
+
+    public minimumDate(): any {
+
     }
 
     private _addSeries(series: TimeseriesModel) {
@@ -147,9 +189,11 @@ export class TimeseriesCollectionModel {
         for (const item of data) {
             const date = new Date(item[this.xField]);
             if (this._minDate === null || date.getTime() < this._minDate.getTime()) {
+                log.debug("Updating minDate from " + this._maxDate + " to " + date);
                 this._minDate = date;
             }
             if (this._maxDate === null || date.getTime() > this._maxDate.getTime()) {
+                log.debug("Updating maxDate from " + this._maxDate + " to " + date);
                 this._maxDate = date;
             }
         }

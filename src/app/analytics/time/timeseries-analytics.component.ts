@@ -111,6 +111,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     public defaultLayer: LayerGroup = null;
+    public noData = false;
 
     @Input()
     public set state(value: TimeseriesAnalyticsComponentState) {
@@ -379,17 +380,22 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     public async timePeriodChanged(timePeriod: TimePeriod) {
+        log.debug("Time period is now " + timePeriod);
         this.state.timePeriod = timePeriod;
         const today = new Date();
         const day = today.getDate();
         const month = today.getMonth();
         const year = today.getFullYear();
+        let minDate: Date;
         if (timePeriod === "day") {
-            this.range.controls.start.setValue(new Date(year - 1, month, day));
+            minDate = new Date(year - 1, month, day);
         } else {
-            this.range.controls.start.setValue(new Date(Date.now() - dayInMillis));
+            minDate = new Date(Date.now() - dayInMillis)
         }
+        this.range.controls.start.setValue(minDate);
         this.seriesCollection.dateSpacing = timePeriod === "day" ? dayInMillis : hourInMillis;
+        this.seriesCollection.minDate = minDate;
+        this.seriesCollection.maxDate = this.range.controls.end.value;
         await this.refreshAllSeries();
 
     }
@@ -488,10 +494,19 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     private async _updateGraphInternal(query, timePeriod: TimePeriod) {
         log.debug("_updateGraphInternal() called");
         return this.executeQuery(query, timePeriod).then(queryResult => {
+            if (queryResult && queryResult.length === 0) {
+                log.info("No data returned from query");
+                this.noData = true;
+            } else {
+                log.info("Data returned from query", queryResult);
+                this.noData = false;
+
+            }
             for (const element of queryResult) {
                 element.date = new Date(element.date);
             }
             if (queryResult && queryResult.length > 0) {
+                log.debug("Updating time series.")
                 this.seriesCollection.updateTimeseries(
                     new TimeseriesModel(toLabel(query, this.pref.combined.layers), queryResult,
                                         query.__series_id));

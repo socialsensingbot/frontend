@@ -7,6 +7,7 @@ import {AggregationMap, MapMetadata, RegionGeography, ServiceMetadata} from "./m
 import {TwitterApi} from "twitter-api-v2";
 import {Pool} from "mysql";
 
+const md5 = require('md5');
 const awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
 
 const queryCache = new NodeCache({stdTTL: 60 * 60, checkperiod: 60 * 60, useClones: true});
@@ -614,9 +615,21 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
 
         cache(res, key, async () => {
             let fullText = "";
-            const textSearch: (string[] | Date)[] = params.textSearch;
+            let textSearch: string = params.textSearch;
+            //           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',
             if (typeof textSearch !== "undefined" && textSearch.length > 0) {
                 fullText = " and MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
+                let additionalQuery = "+(";
+                for (const source of params.layer.sources) {
+                    for (const hazard of params.layer.hazards) {
+                        for (const region of params.regions) {
+                            additionalQuery += md5(source + ":" + hazard + ":" + region) + " ";
+                        }
+                    }
+                }
+                additionalQuery += ") ";
+                textSearch = additionalQuery + "+(" + textSearch + ")";
+                console.log("Ammended text search is '" + textSearch + "'");
             }
             const dayTimePeriod: boolean = params.timePeriod === "day";
             const timeSeriesTable = dayTimePeriod ? "mat_view_timeseries_date" : "mat_view_timeseries_hour";

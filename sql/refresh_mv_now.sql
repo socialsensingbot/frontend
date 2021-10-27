@@ -75,6 +75,10 @@ BEGIN
     GROUP BY hazard, source;
     COMMIT;
 
+    optimize table mat_view_timeseries_date;
+    optimize table mat_view_timeseries_hour;
+    optimize table mat_view_regions;
+
     SET rc = 0;
 END;
 $$
@@ -134,7 +138,8 @@ BEGIN
            t.hazard                 as hazard,
            t.warning                as warning,
            t.source_date            as source_date,
-           t.source_text            as source_text,
+           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',
+                  t.source_text)    as source_text,
            r.region_type            as region_type,
            IFNULL(t.deleted, false) as deleted,
            t.source_id              as source_id,
@@ -159,7 +164,8 @@ BEGIN
            t.hazard                                                         as hazard,
            t.warning                                                        as warning,
            cast(date_format(t.source_timestamp, '%Y-%m-%d %H') as DATETIME) as source_date,
-           t.source_text                                                    as source_text,
+           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',
+                  t.source_text)                                            as source_text,
            r.region_type                                                    as region_type,
            IFNULL(t.deleted, false)                                         as deleted,
            t.source_id                                                      as source_id,

@@ -15,11 +15,11 @@
               <mat-button-toggle value="bar">Bar</mat-button-toggle>
           </mat-button-toggle-group>
           <div class="app-toolbar-separator"></div>
-          <mat-button-toggle-group (click)="timePeriodChanged(state.timePeriod)" [(ngModel)]="state.timePeriod"
-                                   aria-label="Line or Bar"
+          <mat-button-toggle-group [(ngModel)]="state.timePeriod"
+                                   aria-label="Time Period"
                                    class="timeperiod-btn-group" name="timeperiod">
-              <mat-button-toggle value="day">Day</mat-button-toggle>
-              <mat-button-toggle value="hour">Hour</mat-button-toggle>
+              <mat-button-toggle (click)="timePeriodChanged('day')" value="day">Day</mat-button-toggle>
+              <mat-button-toggle (click)="timePeriodChanged('hour')" value="hour">Hour</mat-button-toggle>
           </mat-button-toggle-group>
           <div class="app-toolbar-expanding-separator"></div>
           <button (click)="saveGraph();" class="app-analytics-timeseries-toolbar-save" color="primary"
@@ -81,6 +81,7 @@
 
     <!--    <p>Date range: {{range.value | json}}</p>-->
 
+
     <app-timeseries-multi-query-chart
             [animated]="animated"
             [connect]="connect"
@@ -89,6 +90,7 @@
             [scrollBar]="scrollBar"
             [seriesCollection]="seriesCollection"
             [updating]="updating"
+            [noData]="noData"
             class="twitter-timeseries-chart">
 
     </app-timeseries-multi-query-chart>
