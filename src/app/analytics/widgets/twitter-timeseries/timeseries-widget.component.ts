@@ -10,7 +10,7 @@ import {NotificationService} from "src/app/services/notification.service";
 import {toLabel} from "../../graph";
 import {dayInMillis, nowRoundedToHour} from "../../../common";
 import {v4 as uuidv4} from "uuid";
-import {LayerGroup} from "../../../types";
+import {SSMapLayer} from "../../../types";
 import {MapSelectionService} from "../../../map-selection.service";
 
 const log = new Logger("timeseries-ac");
@@ -157,7 +157,7 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
         return from;
     }
 
-    private layerGroup(id: string): LayerGroup {
+    private layerGroup(id: string): SSMapLayer {
         return this.pref.combined.layers.available.filter(i => i.id === id)[0];
     }
 }

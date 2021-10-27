@@ -1,12 +1,12 @@
-import {Component, EventEmitter, Input, NgZone, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
+import {Component, Input, NgZone, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
 import {MetadataService} from "../../api/metadata.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {RESTDataAPIService} from "../../api/rest-api.service";
 import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {
-    EOC,
     GraphType,
+    StatisticType,
     TimePeriod,
     TimeseriesAnalyticsComponentState,
     timeSeriesAutocompleteType,
@@ -25,7 +25,7 @@ import {toLabel} from "../graph";
 import {DashboardService} from "../../pref/dashboard.service";
 import {dayInMillis, hourInMillis, nowRoundedToHour, roundToHour} from "../../common";
 import {TextAutoCompleteService} from "../../services/text-autocomplete.service";
-import {LayerGroup} from "../../types";
+import {SSMapLayer} from "../../types";
 import {FormControl, FormGroup} from "@angular/forms";
 import {MapSelectionService} from "../../map-selection.service";
 
@@ -68,36 +68,69 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     private _state: TimeseriesAnalyticsComponentState;
 
 
-    public height: number;
-    public dateRangeFilter = true;
-    public regionFilter = true;
-    public textFilter = true;
-    public sources = ["twitter"];
-    public hazards = ["flood"];
     public yLabel = "Count";
     public xField = "date";
     public yField = "count";
+    /**
+     * Whether the timeseries graph should use animations (this is passed down to the actual graph).
+     */
     public animated = false;
+
+    /**
+     * Is the graph ready to be displayed.
+     */
     public ready: boolean;
+
+    /**
+     * Is the graph being updated (i.e. show spinner)
+     */
     public updating = false;
+
+    /**
+     * Was there an error updating the graph.
+     */
     public error: boolean;
+
+    /**
+     * Show the fancy scrollbar.
+     */
     public scrollBar = true;
-    public changed = new EventEmitter();
-    public removable = true;
-    public mappingColumns: string[] = [];
-    public showForm = true;
+
+    /**
+     * Connect missing parts of the graph
+     */
     public connect = false;
-    public activity: boolean;
+
+    /**
+     * This contains all the data relating to the display of the graph and is passed
+     * to the actual graph display widget.
+     */
     public seriesCollection: TimeseriesCollectionModel;
-    public appToolbarExpanded = false;
+
+    /**
+     * Internal state, has the UI's toolbar been expanded or not.
+     */
+    public toolbarExpanded = false;
+
+    /**
+     * A collection of graphs saved by this user.
+     */
     public savedGraphs: SavedGraph[] = [];
+
+    /**
+     * The title of the currently selected graph or empty if this graph has never been saved.
+     */
     public title = "";
+
+    /**
+     * The id of this graph if it has been saved.
+     */
     public graphId: string;
-    private _savedGraphType = "timeseries-graph";
-    private _interval: number;
-    private _changed: boolean;
-    private _storeQueryInURL: boolean;
-    public eoc: EOC = "exceedance";
+
+    /**
+     * The statistic type (e.g. exceedance or count)
+     */
+    public statType: StatisticType = "exceedance";
 
     public get state(): TimeseriesAnalyticsComponentState {
         return this._state;
@@ -108,12 +141,20 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this._state = value;
     }
 
+    /**
+     * The date range for this graph. Although the scrollbars allow zooming in this
+     * delineates the max and min **possible** dates for the graph. I.e. this is used in the actual
+     * query to retrieve the data.
+     */
     public range: FormGroup = new FormGroup({
                                                 start: new FormControl(new Date()),
                                                 end:   new FormControl(new Date())
                                             });
 
-    public defaultLayer: LayerGroup = null;
+    /**
+     * The data layer used for this graph i.e. the source and hazards etc.
+     */
+    public mapLayer: SSMapLayer = null;
 
     constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
                 public notify: NotificationService, public map: MapSelectionService,
@@ -132,45 +173,54 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this.saves.listByOwner().then(i => this.savedGraphs = i);
     }
 
-    public emitChange() {
-
-        this.changed.emit(this.state);
-    }
 
     public ngOnDestroy(): void {
-        window.clearInterval(this._interval);
+
     }
 
     async ngOnInit() {
+        // Always wait until the preference service is ready.
         await this.pref.waitUntilReady();
 
+        /**
+         * Listen for changes to the query (i.e. after ? ) part of the URL. This can be
+         * changed by history navigation.
+         */
         this._route.queryParams.subscribe(async queryParams => {
             if (queryParams.__clear_ui__) {
                 await this.clear();
                 await this._router.navigate([], {});
             }
             if (queryParams.active_layer) {
-                this.defaultLayer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
+                this.mapLayer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
             }
 
         });
+        /**
+         * Listen to changes in the parent routes parameters, i.e. the map
+         * We listen for changes to the map id which is used in all queries.
+         */
         this._route.parent.params.subscribe(async params => {
             if (params.map) {
                 this.map.id = params.map;
             }
 
         });
+        /**
+         * Listen for changes in our own routes parameters i.e. the id (which is the id of a saved graph).
+         */
         this._route.params.subscribe(async params => {
             this.noData = true;
             const queryParams = this._route.snapshot.queryParams;
             if (queryParams.active_layer) {
-                this.defaultLayer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
+                this.mapLayer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
             } else {
-                this.defaultLayer = this.pref.defaultLayer();
+                this.mapLayer = this.pref.defaultLayer();
             }
 
             log.info("State is now " + JSON.stringify(this.state));
             if (params.id) {
+                // We need to load a saved graph
                 this.state = this.defaultState();
                 this.seriesCollection.clear();
                 this.setEOCFromQuery(queryParams);
@@ -187,11 +237,14 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                     this.navigateToRoot();
                 }
             } else {
+                // This is a new (unsaved) graph.
                 this.graphId = null;
                 this.title = "";
                 if (typeof queryParams.text_search !== "undefined") {
                     this.state.queries[0].textSearch = queryParams.text_search;
                 }
+                // We don't support coarse or fine region types as they are numeric (grid) based.
+                // The selected region can be passed in from other parts of the app such as the map.
                 if (typeof queryParams.selected !== "undefined" && queryParams.active_polygon !== "coarse" && queryParams.active_polygon !== "fine") {
                     log.debug("Taking the selected region from the query ", queryParams.selected);
                     this.state = this.defaultState();
@@ -212,6 +265,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                     log.debug("State is now ", JSON.stringify(this.state));
                     this.setEOCFromQuery(queryParams);
                 } else {
+                    // No region is selected or a numeric region is selected.
                     await this.clear(false);
                     this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
                     this.setEOCFromQuery(queryParams);
@@ -225,40 +279,52 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
+    /**
+     * Called to refresh (i.e. query and redisplay) each time series (this.state.queries) in the graph.
+     * For example after changing the duration the graph is segmented over.
+     */
     public async refreshAllSeries(): Promise<void> {
         log.debug("Refreshing all series");
         const promisesPromises = [];
         this.noData = true;
+        // This is a fork-join
         for (const query of this.state.queries) {
             if (!query.layer) {
-                query.layer = this.defaultLayer;
+                query.layer = this.mapLayer;
             }
             promisesPromises.push(this.updateGraph(query, this.state.timePeriod, true));
         }
         for (const promise of promisesPromises) {
             await promise;
         }
+        // fork-join ends
     }
 
-    public userChangedEOC(type: EOC) {
-        this.eoc = type;
-        this.eocChanged();
-        // this._router.navigate([], {
-        //     queryParams:         {active_number: (type === "count" ? "count" : "stats")},
-        //     queryParamsHandling: "merge"
-        // });
+    public userChangedStatisticType(type: StatisticType) {
+        this.statType = type;
+        this.statTypeChanged();
     }
 
-    public eocChanged() {
-        log.debug("EOC changed to " + this.eoc);
-        this.state.eoc = this.eoc;
+    /**
+     * THhe statistic type (e.g. exceedance or count) has changed so we need to change the graph via
+     * the seriesCollection model.
+     */
+    public statTypeChanged() {
+        log.debug("Stat type changed to " + this.statType);
+        this.state.eoc = this.statType;
         this.exec.uiActivity();
-        this.seriesCollection.yLabel = this.eoc === "exceedance" ? "Return Period" : "Count";
-        this.seriesCollection.yField = this.eoc === "exceedance" ? "exceedance" : "count";
+        this.seriesCollection.yLabel = this.statType === "exceedance" ? "Return Period" : "Count";
+        this.seriesCollection.yField = this.statType === "exceedance" ? "exceedance" : "count";
         this.seriesCollection.yAxisHasChanged();
         this.exec.uiActivity();
     }
 
+    /**
+     * Either save or duplicate this graph.
+     * If duplicate is true create a new graph with this state and a different id.
+     * @param duplicate {boolean} If true, create a new graph if false save the existing graph.
+     *
+     */
     async saveGraph(duplicate = false): Promise<void> {
         if (!this.graphId || duplicate) {
 
@@ -276,7 +342,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 if (result !== null) {
                     this.savedGraphs = await this.saves.listByOwner();
 
-                    const savedGraph = await this.saves.create(this._savedGraphType, dialogData.title, this.state);
+                    const savedGraph = await this.saves.create("timeseries-graph", dialogData.title, this.state);
                     this.graphId = savedGraph.id;
                     this.title = dialogData.title;
                     this.updateSavedGraphs();
@@ -286,10 +352,13 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             });
         } else {
             this.updating = true;
-            await this.saves.update(this.graphId, this.title, this.state);
-            this.updateSavedGraphs();
-            this.notify.show("Saved graph '" + this.title + "'", "Great!", 4000);
-            this.updating = false;
+            try {
+                await this.saves.update(this.graphId, this.title, this.state);
+                this.updateSavedGraphs();
+                this.notify.show("Saved graph '" + this.title + "'", "Great!", 4000);
+            } finally {
+                this.updating = false;
+            }
         }
     }
 
@@ -313,16 +382,23 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
-    private setEOCFromQuery(queryParams): void {
-        if (queryParams.active_number) {
-            if (queryParams.active_number === "count") {
-                this.state.eoc = "count";
+    public async clear(empty = false) {
+        log.debug("Clear called");
+        if (this.mapLayer !== null) {
+            log.debug("Clearing graph");
+            this.state = this.defaultState();
+            log.debug("State is now ", this.state);
+            this.seriesCollection.clear();
+            await this.timePeriodChanged(this.state.timePeriod);
+            this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
+            if (!empty) {
+                await this._updateGraphInternal(this.state.queries[0], this.state.timePeriod);
             } else {
-                this.state.eoc = "exceedance";
+                this.state.queries = [];
             }
-            this.eoc = this.state.eoc;
-            this.eocChanged();
+            log.debug("Clear finished");
         }
+
     }
 
     public removeQuery(query: TimeseriesRESTQuery) {
@@ -341,10 +417,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                                async () => {
                                    const query = JSON.parse(JSON.stringify(q));
                                    log.debug("Graph update from query ", query);
-                                   this._changed = true;
                                    const text: string = query.textSearch;
                                    if (query.layer && (text.length > 0 || force)) {
-                                       this.emitChange();
                                        if (text.length > 3) {
                                            // noinspection ES6MissingAwait
                                            this.auto.create(timeSeriesAutocompleteType, text, true,
@@ -375,22 +449,39 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         }
     }
 
-    public async clear(empty = false) {
-        log.debug("Clear called");
-        if (this.defaultLayer !== null) {
-            log.debug("Clearing graph");
-            this.state = this.defaultState();
-            log.debug("State is now ", this.state);
-            this.seriesCollection.clear();
-            await this.timePeriodChanged(this.state.timePeriod);
-            this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
-            if (!empty) {
-                await this._updateGraphInternal(this.state.queries[0], this.state.timePeriod);
-            } else {
-                this.state.queries = [];
-            }
-            log.debug("Clear finished");
+    protected async executeQuery(query: TimeseriesRESTQuery, timePeriod: TimePeriod): Promise<any[]> {
+
+        if (!this.map.id) {
+            return;
         }
+
+        this.updating = true;
+        try {
+            const payload = {
+                layer: this.mapLayer,
+                ...query,
+                from: this.range.controls.start.value !== null ? roundToHour(
+                    this.range.controls.start.value.getTime()) : (nowRoundedToHour() - (365.24 * dayInMillis)),
+                to:   this.range.controls.end.value !== null ? roundToHour(this.range.controls.end.value.getTime()) : nowRoundedToHour(),
+                name: "time",
+                timePeriod
+            };
+            if (payload.regions.length === 0) {
+                payload.regions = this.pref.combined.analyticsDefaultRegions;
+            }
+            delete payload.__series_id;
+            const serverResults = await this._api.callMapAPIWithCache(this.map.id + "/analytics/time", payload, 60 * 60);
+            log.debug("Server result was ", serverResults);
+            this.error = false;
+            return this.queryTransform(serverResults);
+        } catch (e) {
+            log.error(e);
+            this.error = true;
+            return null;
+        } finally {
+            this.updating = false;
+        }
+
 
     }
 
@@ -445,6 +536,18 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this._router.navigate(["map", this.map.id, "dashboard"]);
     }
 
+    private setEOCFromQuery(queryParams): void {
+        if (queryParams.active_number) {
+            if (queryParams.active_number === "count") {
+                this.state.eoc = "count";
+            } else {
+                this.state.eoc = "exceedance";
+            }
+            this.statType = this.state.eoc;
+            this.statTypeChanged();
+        }
+    }
+
     private newQuery(): TimeseriesRESTQuery {
         return {
             __series_id: uuidv4(),
@@ -453,48 +556,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             from:        nowRoundedToHour() - (365.24 * dayInMillis),
             to:          nowRoundedToHour(),
             dateStep:    7 * dayInMillis,
-            layer:       this.defaultLayer,
+            layer:       this.mapLayer,
         };
-    }
-
-    protected async executeQuery(query: TimeseriesRESTQuery, timePeriod: TimePeriod): Promise<any[]> {
-        if (this._storeQueryInURL) {
-            await this._router.navigate([], {queryParams: query});
-
-
-        }
-        if (!this.map.id) {
-            return;
-        }
-
-        this.updating = true;
-        try {
-            const payload = {
-                layer: this.defaultLayer,
-                ...query,
-                from: this.range.controls.start.value !== null ? roundToHour(
-                    this.range.controls.start.value.getTime()) : (nowRoundedToHour() - (365.24 * dayInMillis)),
-                to:   this.range.controls.end.value !== null ? roundToHour(this.range.controls.end.value.getTime()) : nowRoundedToHour(),
-                name: "time",
-                timePeriod
-            };
-            if (payload.regions.length === 0) {
-                payload.regions = this.pref.combined.analyticsDefaultRegions;
-            }
-            delete payload.__series_id;
-            const serverResults = await this._api.callMapAPIWithCache(this.map.id + "/analytics/time", payload, 60 * 60);
-            log.debug("Server result was ", serverResults);
-            this.error = false;
-            return this.queryTransform(serverResults);
-        } catch (e) {
-            log.error(e);
-            this.error = true;
-            return null;
-        } finally {
-            this.updating = false;
-        }
-
-
     }
 
     private navigateToRoot() {
@@ -503,7 +566,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     private defaultState(): TimeseriesAnalyticsComponentState {
         const query: TimeseriesRESTQuery = this.newQuery();
-        return {eoc: this.eoc, lob: "line", queries: [this.newQuery()], timePeriod: "day"};
+        return {eoc: this.statType, lob: "line", queries: [this.newQuery()], timePeriod: "day"};
     }
 
     private async _updateGraphInternal(query, timePeriod: TimePeriod) {

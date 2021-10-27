@@ -23,7 +23,7 @@ import {
 } from "./map-data";
 import {RESTDataAPIService} from "../../api/rest-api.service";
 import {FeatureCollection} from "@amcharts/amcharts4-geodata/.internal/Geodata";
-import {LayerGroup} from "../../types";
+import {SSMapLayer} from "../../types";
 import {MapSelectionService} from "../../map-selection.service";
 
 
@@ -115,7 +115,7 @@ export class RESTMapDataService {
 
     public async tweets(layerGroupId: string, regionType: string, regions: string[], startDate,
                         endDate): Promise<Tweet[]> {
-        const layerGroup: LayerGroup = this.layerGroup(layerGroupId);
+        const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
         log.debug("requesting tweets for regions " + regions);
         const rawResult = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/text-for-regions", {
             hazards:   layerGroup.hazards,
@@ -140,7 +140,7 @@ export class RESTMapDataService {
     }
 
     public async recentTweets(layerGroupId: string, regionType: string): Promise<RegionTweeCount> {
-        const layerGroup: LayerGroup = this.layerGroup(layerGroupId);
+        const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
         return await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/recent-text-count", {
             hazards:   layerGroup.hazards,
             sources:   layerGroup.sources,
@@ -203,7 +203,7 @@ export class RESTMapDataService {
     }
 
 
-    private layerGroup(id: string): LayerGroup {
+    private layerGroup(id: string): SSMapLayer {
         return this._pref.combined.layers.available.filter(i => i.id === id)[0];
     }
 
@@ -212,7 +212,7 @@ export class RESTMapDataService {
     }
 
     private async getRegionStatsMap(layerGroupId: string, regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {
-        const layerGroup: LayerGroup = this.layerGroup(layerGroupId);
+        const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
         const statsMap = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/stats", {
             hazards:   layerGroup.hazards,
             sources:   layerGroup.sources,

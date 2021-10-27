@@ -12,7 +12,7 @@ import {Dashboard} from "../app/pref/dashboard.service";
  * on performance if an error is thrown.
  */
 import "zone.js/dist/zone-error"; // Included with Angular CLI.
-import {InfoLayerConfiguration} from "../app/types";
+import {SSLayerConfiguration} from "../app/types";
 
 const defaultDashboard: Dashboard = {
     boards: [{
@@ -24,8 +24,8 @@ const defaultDashboard: Dashboard = {
     }]
 };
 
-const layers: InfoLayerConfiguration = {
-    "available":    [
+const layers: SSLayerConfiguration = {
+    "available": [
         {
             "id":       "flood",
             "title":    "Floods",

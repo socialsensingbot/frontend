@@ -12,14 +12,14 @@ import {RESTDataAPIService} from "../../api/rest-api.service";
 import {PreferenceService} from "../../pref/preference.service";
 import {TextAutoCompleteService} from "../../services/text-autocomplete.service";
 import {timeSeriesAutocompleteType} from "../timeseries";
-import {LayerGroup} from "../../types";
+import {SSMapLayer} from "../../types";
 import {RESTMapDataService} from "../../map/data/rest-map-data.service";
 import {MapSelectionService} from "../../map-selection.service";
 import {UIExecutionService} from "../../services/uiexecution.service";
 
 const log = new Logger("timeseries-config");
 
-type DataType = { textSearch: string, regions: string[], layer: LayerGroup };
+type DataType = { textSearch: string, regions: string[], layer: SSMapLayer };
 
 @Component({
                selector:    "app-timeseries-analytics-form",
@@ -89,7 +89,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
 
     }
 
-    private layerGroup(id: string): LayerGroup {
+    private layerGroup(id: string): SSMapLayer {
         return this.pref.combined.layers.available.filter(i => i.id === id)[0];
     }
 

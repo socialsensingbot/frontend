@@ -66,6 +66,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/ref_data_tmp/regions.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
       </map>
     </option>
   </component>

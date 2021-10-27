@@ -2,13 +2,13 @@ import {EventEmitter} from "@angular/core";
 import {Logger} from "@aws-amplify/core";
 import {v4 as uuidv4} from "uuid";
 import {dayInMillis} from "../common";
-import {LayerGroup} from "../types";
+import {SSMapLayer} from "../types";
 
 const log = new Logger("timeseries");
 
 export const timeSeriesAutocompleteType = "graph-text-search";
 
-export type  EOC = "count" | "exceedance";
+export type  StatisticType = "count" | "exceedance";
 
 export type TimePeriod = "hour" | "day";
 
@@ -17,7 +17,7 @@ export interface TimeseriesAnalyticsComponentState {
     dateSpacing?: number;
     avgLength?: number;
     rollingAverage?: boolean;
-    eoc: EOC;
+    eoc: StatisticType;
     lob: "line" | "bar";
     queries: TimeseriesRESTQuery[];
     timePeriod: TimePeriod;
@@ -32,7 +32,7 @@ export interface TimeseriesRESTQuery {
     regions: string[];
     textSearch?: string;
     __series_id?: string;
-    layer?: LayerGroup
+    layer?: SSMapLayer
 }
 
 

@@ -2,10 +2,10 @@
   <ng-container *ngIf="ready && state">
       <mat-toolbar-row>
           <mat-button-toggle-group name="eoc" class="eoc"
-                                   [ngModel]="eoc" aria-label="Return Period or Count">
-              <mat-button-toggle (click)="userChangedEOC('exceedance')" value="exceedance">Return Period
+                                   [ngModel]="statType" aria-label="Return Period or Count">
+              <mat-button-toggle (click)="userChangedStatisticType('exceedance')" value="exceedance">Return Period
               </mat-button-toggle>
-              <mat-button-toggle (click)="userChangedEOC('count')" value="count">Count</mat-button-toggle>
+              <mat-button-toggle (click)="userChangedStatisticType('count')" value="count">Count</mat-button-toggle>
           </mat-button-toggle-group>
 
           <div class="app-toolbar-separator"></div>
@@ -44,19 +44,19 @@
           </button>
           <div class="app-toolbar-separator"></div>
           <button mat-icon-button aria-label="Expand or shrink toolbar">
-              <mat-icon matTooltip="Expand toolbar" *ngIf="!appToolbarExpanded"
-                        (click)="appToolbarExpanded=true">arrow_drop_down
-        </mat-icon>
-        <mat-icon matTooltip="Shrink toolbar" *ngIf="appToolbarExpanded"
-                  (click)="appToolbarExpanded=false">arrow_drop_up
-        </mat-icon>
-      </button>
+              <mat-icon (click)="toolbarExpanded=true" *ngIf="!toolbarExpanded"
+                        matTooltip="Expand toolbar">arrow_drop_down
+              </mat-icon>
+              <mat-icon (click)="toolbarExpanded=false" *ngIf="toolbarExpanded"
+                        matTooltip="Shrink toolbar">arrow_drop_up
+              </mat-icon>
+          </button>
     </mat-toolbar-row>
-    <mat-toolbar-row *ngIf="appToolbarExpanded">
-        <div class="app-toolbar-separator"></div>
+      <mat-toolbar-row *ngIf="toolbarExpanded">
+          <div class="app-toolbar-separator"></div>
 
 
-    </mat-toolbar-row>
+      </mat-toolbar-row>
   </ng-container>
 </mat-toolbar>
 
@@ -100,7 +100,7 @@
 <!--
 {{state|json}}
 -->
-<div *ngIf="ready && state && defaultLayer" class="app-query-builder-surround">
+<div *ngIf="ready && state && mapLayer" class="app-query-builder-surround">
 
     <mat-card *ngFor="let query of state.queries; index as i">
         <mat-card-content>

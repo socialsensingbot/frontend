@@ -12,10 +12,10 @@ import {Dashboard} from "../app/pref/dashboard.service";
  * on performance if an error is thrown.
  */
 import "zone.js/dist/zone-error";
-import {InfoLayerConfiguration} from "../app/types"; // Included with Angular CLI.
+import {SSLayerConfiguration} from "../app/types"; // Included with Angular CLI.
 
 
-const layers: InfoLayerConfiguration = {
+const layers: SSLayerConfiguration = {
     "available":    [
         {
             "id":       "flood",

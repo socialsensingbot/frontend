@@ -6,7 +6,7 @@ import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {TimeseriesAnalyticsComponentState} from "../../analytics/timeseries";
 import {ActivatedRoute, Router} from "@angular/router";
-import {LayerGroup} from "../../types";
+import {SSMapLayer} from "../../types";
 import {MapSelectionService} from "../../map-selection.service";
 
 const log = new Logger("map-graph-sidebar");
@@ -22,7 +22,7 @@ export class MapGraphSidebarComponent implements OnInit {
     public regionList: string[] = [];
     public eState: TimeseriesAnalyticsComponentState;
     public cState: TimeseriesAnalyticsComponentState;
-    private layer: LayerGroup;
+    private layer: SSMapLayer;
 
     constructor(public dialog: MatDialog, public dash: DashboardService, public pref: PreferenceService,
                 public map: MapSelectionService,
