@@ -49,7 +49,6 @@ export class TimeseriesCollectionModel {
     public seriesRemoved: EventEmitter<string> = new EventEmitter<string>();
     public seriesUpdated: EventEmitter<TimeseriesModel> = new EventEmitter<TimeseriesModel>();
     public yAxisChanged: EventEmitter<void> = new EventEmitter<void>();
-    public xAxisChanged: EventEmitter<void> = new EventEmitter<void>();
     public graphTypeChanged: EventEmitter<GraphType> = new EventEmitter<GraphType>();
     public cleared: EventEmitter<void> = new EventEmitter<void>();
     private map: Map<string, TimeseriesModel> = new Map<string, TimeseriesModel>();
@@ -164,10 +163,6 @@ export class TimeseriesCollectionModel {
 
     public yAxisHasChanged() {
         this.yAxisChanged.emit();
-    }
-
-    public xAxisHasChanged() {
-        this.xAxisChanged.emit();
     }
 
 

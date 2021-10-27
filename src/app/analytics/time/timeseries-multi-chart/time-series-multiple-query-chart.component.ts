@@ -91,7 +91,7 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
         });
 
         this._seriesCollection.seriesAdded.subscribe(series => {
-            this.createSeriesFromData(series.label, series.data, series.id);
+            try { this.createSeriesFromData(series.label, series.data, series.id);} catch (e) {log.error(e);}
         });
 
         this._seriesCollection.seriesUpdated.subscribe(series => {
@@ -105,44 +105,45 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
         });
 
         this._seriesCollection.seriesRemoved.subscribe(series => {
-            this.chart.series.removeValue(this.seriesMap[series]);
-            if (this.scrollBar) {
-                // @ts-ignore
-                this.chart.scrollbarX.series.removeValue(this.seriesMap[series]);
+            try {
+                this.chart.series.removeValue(this.seriesMap[series]);
+                if (this.scrollBar) {
+                    // @ts-ignore
+                    this.chart.scrollbarX.series.removeValue(this.seriesMap[series]);
+                }
+                delete this.seriesMap[series];
+            } catch (e) {
+                log.error(e);
             }
-            delete this.seriesMap[series];
         });
 
         this._seriesCollection.yAxisChanged.subscribe(() => {
-            this.initChart();
-            this.valueAxis.title.text = this._seriesCollection.yLabel;
-            this._seriesCollection.foreachSeries((label, data, id) => {
-                this.createSeriesFromData(label, data, id);
-            });
+            try {
+                this.initChart();
+                this.valueAxis.title.text = this._seriesCollection.yLabel;
+                this._seriesCollection.foreachSeries((label, data, id) => {
+                    this.createSeriesFromData(label, data, id);
+                });
+            } catch (e) {log.error(e); }
         });
 
-        this._seriesCollection.xAxisChanged.subscribe(() => {
-            this._dateSpacing = this._seriesCollection.dateSpacing;
-            this.initChart();
-            this._seriesCollection.foreachSeries((label, data, id) => {
-                this.createSeriesFromData(label, data, id);
-            });
-            this.chart.validateData(); //redraw everything
-        });
 
         this._seriesCollection.graphTypeChanged.subscribe(() => {
-            this.type = this._seriesCollection.graphType;
-            this.initChart();
-            this._seriesCollection.foreachSeries((label, data, id) => {
-                this.createSeriesFromData(label, data, id);
-            });
-            this.chart.validateData(); //redraw everything
+            try {
+                this.type = this._seriesCollection.graphType;
+                this.initChart();
+                this._seriesCollection.foreachSeries((label, data, id) => {
+                    this.createSeriesFromData(label, data, id);
+                });
+                this.chart.validateData(); //redraw everything
+            } catch (e) {log.error(e); }
         });
 
         this._seriesCollection.cleared.subscribe(() => {
-            this.initChart();
-            this.seriesMap = {};
-            console.warn("CLEARED");
+            try {
+                this.initChart();
+                this.seriesMap = {};
+            } catch (e) {log.error(e); }
         });
 
         this.ready.emit(true);
