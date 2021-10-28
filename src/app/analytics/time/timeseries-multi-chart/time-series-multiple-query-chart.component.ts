@@ -139,7 +139,6 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
                 this._seriesCollection.foreachSeries((label, data, id) => {
                     this.createSeriesFromData(label, data, id);
                 });
-                this.chart.validateData(); //redraw everything
             } catch (e) {log.error(e); }
         });
 
@@ -224,7 +223,6 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
         if (typeof this.seriesMap[id] !== "undefined") {
             this.seriesMap[id].data = seriesData;
             this.seriesMap[id].name = label;
-            this.seriesMap[id].validateData();
             return this.seriesMap[id];
         }
         // Create series

@@ -117,31 +117,48 @@ export class TimeseriesCollectionModel {
     }
 
     public zeroFill(mappedData: any[]) {
+        for (const item of mappedData) {
+            const date = new Date(item[this.xField]);
+            if (this._minDate === null || date.getTime() < this._minDate.getTime()) {
+                log.debug("Updating minDate from " + this._maxDate + " to " + date);
+                this._minDate = date;
+            }
+            if (this._maxDate === null || date.getTime() > this._maxDate.getTime()) {
+                log.debug("Updating maxDate from " + this._maxDate + " to " + date);
+                this._maxDate = date;
+            }
+        }
+        log.debug("MIN_DATE", this._minDate);
+        log.debug("MAX_DATE", this._maxDate);
+
         if (this.zeroFillMissingDates) {
-            const result = [];
-            let lastRowDate = null;
+            const result = new Map();
+            for (let timestamp = this.roundDate(
+                this._minDate.getTime()); timestamp <= this._maxDate.getTime(); timestamp += this._dateSpacing) {
+                const fillRow = {};
+                fillRow[this.xField] = new Date(new Date(timestamp));
+                fillRow[this.yField] = 0;
+                result.set(timestamp, fillRow);
+            }
             for (const row of mappedData) {
-                const rowDate = Math.round(new Date(row[this.xField]).getTime() / this._dateSpacing) * this._dateSpacing;
-                if (lastRowDate !== null) {
-                    if (rowDate > lastRowDate + this._dateSpacing) {
-                        for (let fillDate = lastRowDate + this._dateSpacing; fillDate < rowDate; fillDate += this._dateSpacing) {
-                            const fillRow = {};
-                            fillRow[this.xField] = new Date(fillDate);
-                            fillRow[this.yField] = 0;
-                            result.push(fillRow);
-                        }
-                    }
-                }
-                result.push(row);
-                lastRowDate = rowDate;
+                const rowDate = this.roundDate(new Date(row[this.xField]).getTime());
+                result.set(rowDate, row);
+            }
+            const newMappedData = [];
+            for (const resultElement of result.values()) {
+                newMappedData.push(resultElement);
             }
             log.debug("Before ZERO FILL ", mappedData);
-            log.debug("After ZERO FILL ", result);
-            return result;
+            log.debug("After ZERO FILL ", newMappedData);
+            return newMappedData.sort((a, b) => a[this.xField] - b[this.xField]);
         } else {
             return mappedData;
         }
 
+    }
+
+    private roundDate(val): number {
+        return Math.round(val / this._dateSpacing) * this._dateSpacing;
     }
 
     public foreachSeries(fn: (label, data, id?) => void) {
@@ -181,19 +198,6 @@ export class TimeseriesCollectionModel {
 
     private _addSeries(series: TimeseriesModel) {
         const data = this.zeroFill(series.data);
-        for (const item of data) {
-            const date = new Date(item[this.xField]);
-            if (this._minDate === null || date.getTime() < this._minDate.getTime()) {
-                log.debug("Updating minDate from " + this._maxDate + " to " + date);
-                this._minDate = date;
-            }
-            if (this._maxDate === null || date.getTime() > this._maxDate.getTime()) {
-                log.debug("Updating maxDate from " + this._maxDate + " to " + date);
-                this._maxDate = date;
-            }
-        }
-        log.debug("MIN_DATE", this._minDate);
-        log.debug("MAX_DATE", this._maxDate);
         let count = 0;
         for (const item of data) {
             if (this.rollingAvg || count % this.avgLength === 0) {

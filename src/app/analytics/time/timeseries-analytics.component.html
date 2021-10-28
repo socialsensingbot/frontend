@@ -80,8 +80,7 @@
     </mat-form-field>
 
     <!--    <p>Date range: {{range.value | json}}</p>-->
-
-
+    <!--    {{updating}}/{{noData}}-->
     <app-timeseries-multi-query-chart
             [animated]="animated"
             [connect]="connect"
@@ -90,7 +89,6 @@
             [scrollBar]="scrollBar"
             [seriesCollection]="seriesCollection"
             [updating]="updating"
-            [noData]="noData"
             class="twitter-timeseries-chart">
 
     </app-timeseries-multi-query-chart>
@@ -105,7 +103,7 @@
     <mat-card *ngFor="let query of state.queries; index as i">
         <mat-card-content>
             <app-timeseries-analytics-form #form
-                                           (changed)="updateGraph(query, state.timePeriod,true);exec.uiActivity();"
+                                           (changed)="formChanged(query)"
                                            [data]="query"></app-timeseries-analytics-form>
         </mat-card-content>
         <mat-card-actions>

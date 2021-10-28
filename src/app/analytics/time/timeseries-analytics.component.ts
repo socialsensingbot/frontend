@@ -42,7 +42,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     /**
      * If this is true then the current graph contains no data.
      */
-    public noData = false;
+    public noData = true;
 
     /**
      * What type of timeseries graph is being shown.
@@ -211,67 +211,72 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
          */
         this._route.params.subscribe(async params => {
             this.noData = true;
-            const queryParams = this._route.snapshot.queryParams;
-            if (queryParams.active_layer) {
-                this.mapLayer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
-            } else {
-                this.mapLayer = this.pref.defaultLayer();
-            }
-
-            log.info("State is now " + JSON.stringify(this.state));
-            if (params.id) {
-                // We need to load a saved graph
-                this.state = this.defaultState();
-                this.seriesCollection.clear();
-                this.setEOCFromQuery(queryParams);
-                this.graphId = params.id;
-                const savedGraph = await this.saves.get(params.id);
-                if (savedGraph !== null) {
-                    this.title = savedGraph.title;
-                    this.state = JSON.parse(savedGraph.state);
-                    await this.timePeriodChanged(this.state.timePeriod || "day");
-                    log.debug("Loaded saved graph with state ", this.state);
-                    await this.refreshAllSeries();
-                    this.exec.uiActivity();
+            this.updating = true;
+            try {
+                const queryParams = this._route.snapshot.queryParams;
+                if (queryParams.active_layer) {
+                    this.mapLayer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
                 } else {
-                    this.navigateToRoot();
+                    this.mapLayer = this.pref.defaultLayer();
                 }
-            } else {
-                // This is a new (unsaved) graph.
-                this.graphId = null;
-                this.title = "";
-                if (typeof queryParams.text_search !== "undefined") {
-                    this.state.queries[0].textSearch = queryParams.text_search;
-                }
-                // We don't support coarse or fine region types as they are numeric (grid) based.
-                // The selected region can be passed in from other parts of the app such as the map.
-                if (typeof queryParams.selected !== "undefined" && queryParams.active_polygon !== "coarse" && queryParams.active_polygon !== "fine") {
-                    log.debug("Taking the selected region from the query ", queryParams.selected);
+
+                log.info("State is now " + JSON.stringify(this.state));
+                if (params.id) {
+                    // We need to load a saved graph
                     this.state = this.defaultState();
-                    log.debug("State is now ", JSON.stringify(this.state));
-                    if (Array.isArray(queryParams.selected)) {
-                        for (const region of queryParams.selected) {
-                            const newQuery = this.newQuery();
-                            newQuery.regions.push(region);
-                            this.state.queries = [newQuery];
-                            await this.updateGraph(newQuery, this.state.timePeriod, true);
-                        }
+                    this.seriesCollection.clear();
+                    this.setEOCFromQuery(queryParams);
+                    this.graphId = params.id;
+                    const savedGraph = await this.saves.get(params.id);
+                    if (savedGraph !== null) {
+                        this.title = savedGraph.title;
+                        this.state = JSON.parse(savedGraph.state);
+                        await this.timePeriodChanged(this.state.timePeriod || "day");
+                        log.debug("Loaded saved graph with state ", this.state);
+                        await this.refreshAllSeries();
+                        // this.exec.uiActivity();
                     } else {
-                        this.state.queries = [this.newQuery()];
-                        this.state.queries[0].regions = [queryParams.selected];
-                        await this.updateGraph(this.state.queries[0], this.state.timePeriod, true);
+                        this.navigateToRoot();
                     }
-                    this.state = this.defaultState();
-                    log.debug("State is now ", JSON.stringify(this.state));
-                    this.setEOCFromQuery(queryParams);
                 } else {
-                    // No region is selected or a numeric region is selected.
-                    await this.clear();
-                    this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
-                    this.setEOCFromQuery(queryParams);
-                    await this.updateGraph(this.state.queries[0], this.state.timePeriod, true);
+                    // This is a new (unsaved) graph.
+                    this.graphId = null;
+                    this.title = "";
+                    if (typeof queryParams.text_search !== "undefined") {
+                        this.state.queries[0].textSearch = queryParams.text_search;
+                    }
+                    // We don't support coarse or fine region types as they are numeric (grid) based.
+                    // The selected region can be passed in from other parts of the app such as the map.
+                    if (typeof queryParams.selected !== "undefined" && queryParams.active_polygon !== "coarse" && queryParams.active_polygon !== "fine") {
+                        log.debug("Taking the selected region from the query ", queryParams.selected);
+                        this.state = this.defaultState();
+                        log.debug("State is now ", JSON.stringify(this.state));
+                        if (Array.isArray(queryParams.selected)) {
+                            for (const region of queryParams.selected) {
+                                const newQuery = this.newQuery();
+                                newQuery.regions.push(region);
+                                this.state.queries = [newQuery];
+                                await this.updateGraph(newQuery, this.state.timePeriod, true);
+                            }
+                        } else {
+                            this.state.queries = [this.newQuery()];
+                            this.state.queries[0].regions = [queryParams.selected];
+                            await this.updateGraph(this.state.queries[0], this.state.timePeriod, true);
+                        }
+                        this.state = this.defaultState();
+                        log.debug("State is now ", JSON.stringify(this.state));
+                        this.setEOCFromQuery(queryParams);
+                    } else {
+                        // No region is selected or a numeric region is selected.
+                        await this.clear();
+                        this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
+                        this.setEOCFromQuery(queryParams);
+                        await this.updateGraph(this.state.queries[0], this.state.timePeriod, true);
 
+                    }
                 }
+            } finally {
+                this.updating = false;
             }
 
         });
@@ -284,19 +289,26 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
      * For example after changing the duration the graph is segmented over.
      */
     public async refreshAllSeries(): Promise<void> {
-        log.debug("Refreshing all series");
-        const promisesPromises = [];
-        this.noData = true;
-        // This is a fork-join
-        for (const query of this.state.queries) {
-            if (!query.layer) {
-                query.layer = this.mapLayer;
+        this.updating = true;
+        try {
+            log.debug("Refreshing all series");
+            const promisesPromises = [];
+            this.noData = true;
+            // This is a fork-join
+            for (const query of this.state.queries) {
+                if (!query.layer) {
+                    query.layer = this.mapLayer;
+                }
+                promisesPromises.push(this.updateGraph(query, this.state.timePeriod, true));
             }
-            promisesPromises.push(this.updateGraph(query, this.state.timePeriod, true));
+            for (const promise of promisesPromises) {
+                await promise;
+            }
+            log.debug("Refreshed all series");
+        } finally {
+            this.updating = false;
         }
-        for (const promise of promisesPromises) {
-            await promise;
-        }
+
         // fork-join ends
     }
 
@@ -379,7 +391,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         log.info("Adding query ", newQuery);
         this.state.queries.unshift(newQuery);
 
+        this.updating = true;
         await this.updateGraph(newQuery, this.state.timePeriod, false);
+        this.updating = false;
     }
 
     public refreshGraph() {
@@ -409,7 +423,10 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
 
             // Now display the graph for that first query.
+            this.noData = true;
+            this.updating = true;
             await this._updateGraphInternal(this.state.queries[0], this.state.timePeriod);
+            this.updating = false;
             log.debug("Clear finished");
         }
 
@@ -432,11 +449,10 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     public async updateGraph(q: TimeseriesRESTQuery, timePeriod, force): Promise<any> {
         log.debug("updateGraph");
         // console.trace("timeseries updateGraph");
-        // Immutable copy
-        this.updating = true;
         // noinspection ES6MissingAwait
         return this.exec.queue("update-timeseries-graph", null,
                                async () => {
+                                   // Immutable copy
                                    const query = JSON.parse(JSON.stringify(q));
                                    log.debug("Graph update from query ", query);
                                    const text: string = query.textSearch;
@@ -449,7 +465,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                                        // No need to do an await here as we want async execution
                                        // the await needs to be called on the result of this function updateGraph()
                                        // noinspection ES6MissingAwait
-                                       return this._updateGraphInternal(query, timePeriod);
+                                       await this._updateGraphInternal(query, timePeriod);
                                    } else {
                                        log.debug("Skipped time series update, force=" + force);
                                    }
@@ -459,7 +475,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
-    public graphTypeChanged(type: "bar" | "line") {
+    public graphTypeChanged(type: GraphType) {
         this.exec.uiActivity();
         this.seriesCollection.graphType = type;
     }
@@ -477,7 +493,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             return;
         }
 
-        this.updating = true;
         try {
             const payload = {
                 layer: this.mapLayer,
@@ -500,10 +515,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             log.error(e);
             this.error = true;
             return null;
-        } finally {
-            this.updating = false;
         }
-
 
     }
 
@@ -570,16 +582,17 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         }
     }
 
-    private newQuery(): TimeseriesRESTQuery {
-        return {
-            __series_id: uuidv4(),
-            regions:     [],
-            textSearch:  "",
-            from:        nowRoundedToHour() - (365.24 * dayInMillis),
-            to:          nowRoundedToHour(),
-            dateStep:    7 * dayInMillis,
-            layer:       this.mapLayer,
-        };
+    public async formChanged(query: TimeseriesRESTQuery) {
+        this.updating = true;
+        if (this.state.queries.length === 1) {
+            this.noData = true;
+        }
+        try {
+            await this.updateGraph(query, this.state.timePeriod, true);
+        } finally {
+            this.updating = false;
+            this.exec.uiActivity();
+        }
     }
 
     private navigateToRoot() {
@@ -617,5 +630,17 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             }
             log.debug("_updateGraphInternal() finished");
         });
+    }
+
+    private newQuery(): TimeseriesRESTQuery {
+        return {
+            __series_id: uuidv4(),
+            regions:     this.pref.combined.analyticsDefaultRegions,
+            textSearch:  "",
+            from:        nowRoundedToHour() - (365.24 * dayInMillis),
+            to:          nowRoundedToHour(),
+            dateStep:    7 * dayInMillis,
+            layer:       this.mapLayer,
+        };
     }
 }
