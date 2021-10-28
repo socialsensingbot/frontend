@@ -14,6 +14,8 @@ import {AnnotationService} from "./pref/annotation.service";
 import {UIExecutionService} from "./services/uiexecution.service";
 import {LoadingProgressService} from "./services/loading-progress.service";
 import {NgForageCache} from "ngforage";
+import {DateAdapter} from "@angular/material/core";
+import {MapSelectionService} from "./map-selection.service";
 
 
 const log = new Logger("app");
@@ -46,11 +48,13 @@ export class AppComponent {
     constructor(public auth: AuthService,
                 public pref: PreferenceService,
                 private _router: Router,
-                private _route: ActivatedRoute,
+                public route: ActivatedRoute,
                 private _notify: NotificationService,
                 private _session: SessionService,
                 private _annotation: AnnotationService,
                 private _cache: NgForageCache,
+                public map: MapSelectionService,
+                private _adapter: DateAdapter<any>,
                 @Inject(RollbarService) private _rollbar: Rollbar, private _exec: UIExecutionService,
                 public loading: LoadingProgressService) {
 
@@ -81,7 +85,7 @@ export class AppComponent {
 
     async checkSession() {
 
-        if (this._route.snapshot.queryParamMap.has("__clear_cache__")) {
+        if (this.route.snapshot.queryParamMap.has("__clear_cache__")) {
             try {
                 log.info("Clearing ngForage cache");
                 await this._cache.clear();
@@ -140,6 +144,7 @@ export class AppComponent {
                 if (userInfo) {
                     try {
                         await this.pref.init(userInfo);
+
                         this.ready = true;
                     } catch (e) {
                         this._rollbar.error(e);
@@ -151,6 +156,8 @@ export class AppComponent {
                             30);
                         return;
                     }
+
+                    this._adapter.setLocale(this.pref.combined.locale);
                     try {
                         await this._session.open(userInfo);
                     } catch (e) {
@@ -259,5 +266,6 @@ export class AppComponent {
         await this._router.navigate(["/"], {queryParamsHandling: "merge"});
         log.info("LOGOUT: Performed sign out.");
     }
+
 
 }

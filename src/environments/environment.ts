@@ -12,7 +12,7 @@ import {Dashboard} from "../app/pref/dashboard.service";
  * on performance if an error is thrown.
  */
 import "zone.js/dist/zone-error"; // Included with Angular CLI.
-import {InfoLayerConfiguration} from "../app/types";
+import {SSLayerConfiguration} from "../app/types";
 
 const defaultDashboard: Dashboard = {
     boards: [{
@@ -24,8 +24,8 @@ const defaultDashboard: Dashboard = {
     }]
 };
 
-const layers: InfoLayerConfiguration = {
-    "available":    [
+const layers: SSLayerConfiguration = {
+    "available": [
         {
             "id":       "flood",
             "title":    "Floods",
@@ -74,15 +74,15 @@ const layers: InfoLayerConfiguration = {
 };
 
 export const environment = {
-    name:                    "dev",
-    lamdaEnvironment:        "dev",
-    version:                 "dev",
-    demo:                    false,
-    production:              false,
-    hmr:                     false,
-    rollbar:                 false,
-    toolbarColor:            "primary",
-    timezone:                Intl.DateTimeFormat().resolvedOptions().timeZone,
+    name:             "dev",
+    lamdaEnvironment: "dev",
+    version:          "dev",
+    demo:             false,
+    production:       false,
+    hmr:              false,
+    rollbar:          false,
+    toolbarColor:     "primary",
+    timezone:         Intl.DateTimeFormat().resolvedOptions().timeZone,
     // timezone:         "UTC",
     multipleSessions: true, // Can the user be logged into multiple devices/browsers at once?
     maxUsers:         -1, // can be -1 (no limit), 0 - no logins, 1 - single user at a time, n - n concurrent users.
@@ -133,6 +133,8 @@ export const environment = {
     useRestMapData:               true,
     maxCallsPerMinute:            200,
 
-    analyticsDefaultRegions: ["uk"]
+    analyticsDefaultRegions: ["uk"],
+    tweetCSVExportFormat:    "default",
+    showAnalyticsSideMenu:   false
 
 };

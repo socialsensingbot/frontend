@@ -24,7 +24,7 @@ export class LoadingProgressService {
     }
 
     public progress(message: string, stage: number = -1) {
-        if (!this.loadingComplete && stage > 0) {
+        if (!this.loadingComplete && stage > 0 && stage > this.currentStage) {
             this.currentStage = stage;
             this.showSpinner = true;
         }

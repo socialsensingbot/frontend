@@ -17,6 +17,10 @@ export class CSVExportTweet {
 export class Tweet {
     private _init: boolean;
 
+    get potentiallySensitive(): boolean {
+        return this._possibly_sensitive;
+    }
+
     /**
      * All constructor values bust be optional for the {@link Tweet#populate} method.
      * @param _id the tweet id as defined by Twitter
@@ -27,9 +31,8 @@ export class Tweet {
      * @param _region the region associated with this tweet
      */
     constructor(private _id: string = null, private _html: string = null, private _json: any = {}, private _location: geojson.GeoJsonObject,
-                private _date: Date, private _region: string) {
+                private _date: Date, private _region: string, private _possibly_sensitive = false) {
     }
-
 
     get json(): any {
         return this._json;
@@ -135,29 +138,10 @@ export class Tweet {
         this._url = tweet._url;
         this._valid = tweet._valid;
         this._init = tweet._init;
+        this._possibly_sensitive = tweet._possibly_sensitive;
         return this;
     }
 
-    public asCSV(regionMap: any, sanitize: boolean, annotations: any = {}): CSVExportTweet {
-        let impact = "";
-        if (annotations.impact) {
-            impact = annotations.impact;
-        }
-        let source = "";
-        if (annotations.source) {
-            source = annotations.source;
-        }
-        this.lazyInit();
-        if (sanitize) {
-            return new CSVExportTweet(regionMap[this._region], impact, source, this._id, this._date.toUTCString(),
-                                      "https://twitter.com/username_removed/status/" + this._id,
-                                      this.sanitizeForGDPR($("<div>").html(this._html).text()), JSON.stringify(this._location));
-
-        } else {
-            return new CSVExportTweet(regionMap[this._region], impact, source, this._id, this._date.toUTCString(), this._url,
-                                      $("<div>").html(this._html).text(), JSON.stringify(this._location));
-        }
-    }
 
     sanitizeForGDPR(tweetText: string): string {
         // — Tim Hopkins (@thop1988)
@@ -171,7 +155,7 @@ export class Tweet {
      * This is called when various accessors need to access
      * fields that are computationally expensive to populate.
      */
-    private lazyInit() {
+    public lazyInit() {
         if (!this._init) {
             this._sender = this._json.user.screen_name;
             if (this._html !== null) {

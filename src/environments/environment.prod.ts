@@ -1,8 +1,8 @@
 /* tslint:disable:object-literal-key-quotes */
 import {Dashboard} from "../app/pref/dashboard.service";
-import {InfoLayerConfiguration} from "../app/types";
+import {SSLayerConfiguration} from "../app/types";
 
-const layers: InfoLayerConfiguration = {
+const layers: SSLayerConfiguration = {
     "available":    [
         {
             "id":       "flood",
@@ -30,7 +30,7 @@ export const environment = {
     name:             "production",
     lamdaEnvironment: "prod",
     demo:             false,
-    version:          "2.3",
+    version:          "2.4",
     // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
     timezone:             "UTC",
     locale:               "en-GB",

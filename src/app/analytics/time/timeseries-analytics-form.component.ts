@@ -1,5 +1,5 @@
 import {Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild} from "@angular/core";
-import {MetadataKeyValue, MetadataService} from "../../api/metadata.service";
+import {MetadataKeyValue} from "../../api/metadata.service";
 import {COMMA, ENTER} from "@angular/cdk/keycodes";
 import {FormControl} from "@angular/forms";
 import {Observable} from "rxjs";
@@ -12,11 +12,14 @@ import {RESTDataAPIService} from "../../api/rest-api.service";
 import {PreferenceService} from "../../pref/preference.service";
 import {TextAutoCompleteService} from "../../services/text-autocomplete.service";
 import {timeSeriesAutocompleteType} from "../timeseries";
-import {LayerGroup} from "../../types";
+import {SSMapLayer} from "../../types";
+import {RESTMapDataService} from "../../map/data/rest-map-data.service";
+import {MapSelectionService} from "../../map-selection.service";
+import {UIExecutionService} from "../../services/uiexecution.service";
 
 const log = new Logger("timeseries-config");
 
-type DataType = { textSearch: string, regions: string[], layer: LayerGroup };
+type DataType = { textSearch: string, regions: string[], layer: SSMapLayer };
 
 @Component({
                selector:    "app-timeseries-analytics-form",
@@ -59,38 +62,44 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
         return this._data;
     }
 
+
     @Input()
     public set data(value: DataType) {
         if (typeof value !== "undefined") {
             this._data = value;
             if (this._data.layer) {
-                this.activeLayerGroup = this._data.layer.id;
+                this._activeLayerGroup = this._data.layer.id;
             } else {
                 log.verbose("No layer info found in the data object, using the default layer.", this.pref.defaultLayer());
-                this.activeLayerGroup = this.pref.defaultLayer().id;
+                this._activeLayerGroup = this.pref.defaultLayer().id;
 
             }
             this.searchControl.setValue(this._data.textSearch + this.regions);
-            this.metadata.regions.then(
+            //TODO: Remove this hardcoding
+            this.mapData.regions(this.map.id).then(
                 regions => {
                     this.allRegions = regions;
                     log.debug(regions);
+                    this.filteredRegions = this.regionControl.valueChanges.pipe(
+                        startWith(null),
+                        map((region: string | null) => region ? this._filter(region) : this.allRegions.slice()));
                     this.regions = regions.filter(i => this._data.regions.includes(i.value));
                 });
         }
 
     }
 
-    private layerGroup(id: string): LayerGroup {
+    private layerGroup(id: string): SSMapLayer {
         return this.pref.combined.layers.available.filter(i => i.id === id)[0];
     }
 
-    constructor(public metadata: MetadataService, public zone: NgZone, public router: Router,
+    constructor(public zone: NgZone, public router: Router,
+                public map: MapSelectionService,
+                public exec: UIExecutionService,
                 public route: ActivatedRoute, public pref: PreferenceService,
-                private _api: RESTDataAPIService, public auto: TextAutoCompleteService
+                private _api: RESTDataAPIService, public auto: TextAutoCompleteService, public mapData: RESTMapDataService
     ) {
 
-        this.metadata.regions.then(i => this.allRegions = i);
     }
 
     onNoClick(): void {
@@ -108,6 +117,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
             this._data.regions = [];
             this.changed.emit(this._data);
         }
+        this.updateRegions()
     }
 
     remove(selectedTopic: MetadataKeyValue): void {
@@ -123,9 +133,13 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
         }
     }
 
+    // TODO:
+    // TODO: Selected chips are not being added to the regions list.
+    // TODO:
+
     selected(event: MatAutocompleteSelectedEvent): void {
         log.debug("Event value", event.option.value);
-        this.regions.push(this.allRegions.find(region => region.value === event.option.value.value.trim()));
+        this.regions.push(this.allRegions.find(region => region.text === event.option.value.text.trim()));
         log.debug("Regions", this.regions);
         this.regionInput.nativeElement.value = "";
         this.regionControl.setValue(null);
@@ -136,10 +150,10 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
     public add(event: MatChipInputEvent): void {
         const input = event.input;
         const value = event.value;
-        log.verbose("Added event with value: ", value);
+        log.debug("Added event with value: ", value);
         // Add our region
         if ((value || "").trim()) {
-            this.regions.push(this.allRegions.find(region => region.value === value.trim()));
+            this.regions.push(this.allRegions.find(region => region.text === value.trim()));
             log.debug("Add Regions", this.regions);
 
         }
@@ -164,9 +178,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
         //   this.regions = this.allRegions.filter(i => this._data.regions.includes(i.value));
         // }
         await this.pref.waitUntilReady();
-        this.filteredRegions = this.regionControl.valueChanges.pipe(
-            startWith(null),
-            map((region: string | null) => region ? this._filter(region) : this.allRegions.slice()));
+
         await this.searchControl.valueChanges.subscribe(async value => {
             const filterValue = value.toLowerCase();
             this.filteredAutocomplete = (await this.auto.listByOwnerOrGroup(timeSeriesAutocompleteType, filterValue)).map(
@@ -178,10 +190,10 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
             this.textChanged();
         });
         if (this._data.layer) {
-            this.activeLayerGroup = this._data.layer.id;
+            this._activeLayerGroup = this._data.layer.id;
         } else {
             log.verbose("No layer info found in the data object, using the default layer.", this.pref.defaultLayer());
-            this.activeLayerGroup = this.pref.defaultLayer().id;
+            this._activeLayerGroup = this.pref.defaultLayer().id;
 
         }
 
@@ -216,13 +228,18 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
             log.debug("Update Regions", this.regions);
             this._data.regions = this.regions.map(i => i.value);
         }
+        log.debug("Updated data regions", this._data.regions);
+        this.router.navigate([], {
+            queryParams:         {selected: null},
+            queryParamsHandling: "merge"
+        });
     }
 
     private _filter(region: any): MetadataKeyValue[] {
-        if (region && !region.value) {
+        if (region && !region.text) {
             const filterValue = region.toLowerCase();
             log.debug("Topic string value is ", region);
-            return this.allRegions.filter(t => t.value.toLowerCase().indexOf(filterValue) === 0);
+            return this.allRegions.filter(t => t.text.toLowerCase().indexOf(filterValue) === 0);
         } else {
             log.debug("Topic selected", region);
             return region;

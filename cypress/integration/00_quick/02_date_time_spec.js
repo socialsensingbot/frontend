@@ -1,4 +1,4 @@
-import {MAP_URL, MAX_DATE_MILLIS, MIN_DATE_MILLIS} from "../../support";
+import {MAP_URL, MAX_DATE_MILLIS, MIN_DATE_MILLIS, TS_SELECTED_MIN_DATE, TS_SELECTED_MIN_TIME} from "../../support";
 
 describe('02 Date time: ', function () {
     // Step 1: setup the application state
@@ -16,8 +16,8 @@ describe('02 Date time: ', function () {
             cy.visitAndWait(url);
             cy.get(".slider-date-time", {timeout: 20000});
             cy.wait(10000);
-            cy.get(".slider-date-time-min .slider-date").should("contain.text", "13-Aug-21");
-            cy.get(".slider-date-time-min .slider-time").should("contain.text", "00 am");
+            cy.get(".slider-date-time-min .slider-date").should("contain.text", TS_SELECTED_MIN_DATE);
+            cy.get(".slider-date-time-min .slider-time").should("contain.text", TS_SELECTED_MIN_TIME);
             cy.get(".slider-date-time-max .slider-date").should("contain.text", "now");
             cy.get(".slider-date-time-max .slider-time").should("contain.text", "");
             cy.get(".app-tweet-drawer", {timeout: 60000}).should("be.visible");

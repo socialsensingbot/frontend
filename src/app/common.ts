@@ -11,7 +11,7 @@ export function toTitleCase(str: string): string {
 }
 
 export const dayInMillis = 24 * 60 * 60 * 1000;
-const hourInMillis = 60 * 60 * 1000;
+export const hourInMillis = 60 * 60 * 1000;
 export const nowRoundedToHour = () => {
     return Math.floor(new Date().getTime() / hourInMillis) * hourInMillis;
 };
@@ -69,3 +69,15 @@ export const roundToTenMinutes = (timestamp: number): any => {
     date.setUTCMilliseconds(0);
     return date.getTime();
 };
+
+export const roundToFiveMinutes = (timestamp: number): any => {
+    const date: Date = new Date(timestamp);
+    date.setUTCMinutes(Math.floor(date.getUTCMinutes() / 5) * 5);
+    date.setUTCSeconds(0);
+    date.setUTCMilliseconds(0);
+    return date.getTime();
+};
+
+export const sleep = ms => new Promise((resolve) => {
+    setTimeout(resolve, ms);
+});

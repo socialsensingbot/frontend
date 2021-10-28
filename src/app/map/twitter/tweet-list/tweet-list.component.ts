@@ -11,88 +11,16 @@ import {MatDialog} from "@angular/material/dialog";
 import {MatMenuTrigger} from "@angular/material/menu";
 import {TweetCopyDialogComponent} from "./tweet-copy-dialog/tweet-copy-dialog.component";
 
+const twitterLink = require("twitter-text")
+
 const log = new Logger("tweet-list");
 let loadTweets = false;
-
-setInterval(() => {
-    // todo: the use of setTimeout is very brittle, revisit.
-    // if ((window as any).twttr && (window as any).twttr.widgets) {
-    //     (window as any).twttr.widgets.load($("app-tweet-list")[0]);
-    // }
-
-}, 1000);
-
-let twitterBound = false;
-
-function twitterInit() {
-    // if ((window as any).twttr && (window as any).twttr.events) {
-    //     (window as any).twttr.events.bind(
-    //         "rendered",
-    //         (event) => {
-    //             log.debug(event);
-    //             twitterBound = true;
-    //             loadTweets = false;
-    //             $(event.target).parents(".app-tweet-page").addClass("app-tweet-page-loaded");
-    //             Hub.dispatch("twitter-panel", {message: "render", event: "render", data: event.target});
-    //             const parent = $(event.target).parent();
-    //             const atr = $(event.target).parents(".app-tweet-row");
-    //
-    //             const blockquote = atr.find("blockquote");
-    //             blockquote.addClass("tweet-rendered");
-    //             window.setTimeout(() => {
-    //                 atr.addClass("app-tweet-row-animate-in");
-    //                 atr.removeClass("app-tweet-row-animate-out");
-    //                 setTimeout(() => {
-    //                     atr.addClass("app-tweet-row-rendered");
-    //                     atr.removeClass("app-tweet-row-animate-in");
-    //                     if (atr[0]) {
-    //                         localStorage.setItem("tweet:" + atr.attr("data-tweet-id"),
-    //                                              JSON.stringify(
-    //                                                  {
-    //                                                      timestamp: Date.now(),
-    //                                                      html:      atr.find(".app-tweet-item-text").html()
-    //                                                  }));
-    //                     }
-    //                 }, 800);
-    //                 if (atr.find("blockquote.twitter-tweet-error").length > 0) {
-    //                     const error = atr.find("blockquote.twitter-tweet-error");
-    //                     error.find(".app-tweet-item-menu").hide();
-    //
-    //
-    //                     error.css("opacity", 1.0)
-    //                          .css("min-width", "516px")
-    //                          .css("display", "block")
-    //                          .css("text-align", "center");
-    //                     error.parent().addClass("app-tweet-item-card");
-    //
-    //                     error.text("Tweet no longer available");
-    //                     blockquote.removeClass("tweet-rendered");
-    //                 }
-    //                 try {
-    //                     if (atr.length > 0) {
-    //                         atr.find("mat-spinner").css("opacity", 0);
-    //                         atr.find(".app-tweet-item-menu").css("opacity", 1.0);
-    //                         // atr.find(".tweet-loading-placeholder").remove();
-    //                     }
-    //                 } catch (e) {
-    //                     log.debug(e);
-    //                 }
-    //             }, 10);
-    //
-    //         }
-    //     );
-    // } else {
-    //     setTimeout(() => twitterInit(), 500);
-    // }
-}
-
-twitterInit();
-
 
 class TweetPage {
     public loaded = false;
 
-    constructor(public page: number, public start: number, public tweets: Tweet[]) {}
+    constructor(public page: number, public start: number, public tweets: Tweet[]) {
+    }
 
     public is(other: TweetPage) {
         return other.page === this.page
@@ -151,7 +79,8 @@ export class TweetListComponent implements OnInit, OnDestroy {
     private _annotationRemovalSubscription: Subscription;
 
     constructor(private _zone: NgZone, private _dialog: MatDialog, public pref: PreferenceService,
-                public annotate: AnnotationService) {}
+                public annotate: AnnotationService) {
+    }
 
     private _tweets: Tweet[] | null = [];
 
@@ -215,7 +144,11 @@ export class TweetListComponent implements OnInit, OnDestroy {
         // we then get the authoritative version from the server
         this.annotations[tweet.id] = {...this.annotationsFor(tweet), ...annotations};
         const groupTweetAnnotations = await this.annotate.addAnnotations(tweet, annotations);
-        this.annotations[tweet.id] = JSON.parse(groupTweetAnnotations.annotations);
+        try {
+            this.annotations[tweet.id] = groupTweetAnnotations.annotations;
+        } catch (e) {
+            log.error(e);
+        }
         log.info("Emitting ", tweet);
         this.update.emit(tweet);
     }
@@ -243,7 +176,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
         this._annotationSubscription = this.annotate.tweetAnnotated.subscribe(groupTweetAnnotations => {
             if (groupTweetAnnotations.annotations) {
                 log.info("Received new annotation record of ", groupTweetAnnotations);
-                this.annotations[groupTweetAnnotations.tweetId] = JSON.parse(groupTweetAnnotations.annotations);
+                this.annotations[groupTweetAnnotations.tweetId] = groupTweetAnnotations.annotations;
             }
         });
     }
@@ -469,7 +402,8 @@ export class TweetListComponent implements OnInit, OnDestroy {
             if (tweet.valid) {
                 this.annotate.getAnnotations(tweet).then(tweetAnnotationRecord => {
                     if (tweetAnnotationRecord && tweetAnnotationRecord.annotations && tweetAnnotationRecord.annotations[0] !== "u") {
-                        this.annotations[tweet.id] = JSON.parse(tweetAnnotationRecord.annotations);
+                        log.debug("Annotation record for tweet was ", tweetAnnotationRecord.annotations);
+                        this.annotations[tweet.id] = tweetAnnotationRecord.annotations;
                     } else {
                         this.annotations[tweet.id] = {};
                     }
@@ -500,5 +434,48 @@ export class TweetListComponent implements OnInit, OnDestroy {
             loadTweets = true;
             this.pages[page].loaded = true;
         }
+    }
+
+
+    public styleForPhoto(media: any): any {
+        const width: number = Math.min(media.sizes.small.w, 400);
+        const height = (width / media.sizes.small.w) * media.sizes.small.h;
+
+        return {
+            "object-fit": media.sizes.small.resize === "fit" ? "contain" : "cover",
+            "width.px":   width,
+            "height.px":  height
+        };
+    }
+
+
+    public entities(tweet: any): any {
+        const entities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities : tweet.json.entities;
+        return typeof entities !== "undefined" ? entities : {};
+    }
+
+    public tweetHtml(tweet: any): any {
+        const entities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities : tweet.json.entities;
+        const text = tweet.json.extended_tweet ? tweet.json.extended_tweet.full_text : tweet.json.text;
+        let urlEntities: string[] = entities.urls;
+        if (entities.media) {
+            urlEntities = [...urlEntities, ...entities.media]
+        }
+        return "<p>" + twitterLink.default.autoLink(text, {urlEntities, targetBlank: true, title: false}) + "</p>";
+    }
+
+    public mediaEntities(tweet: any): any[] {
+        const mediaEntities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities.media : tweet.json.entities.media;
+        return typeof mediaEntities !== "undefined" ? mediaEntities : [];
+    }
+
+
+    public videoVariant(media: any): any {
+        for (const variant of media.video_info.variants) {
+            if (variant.content_type === "video/mp4") {
+                return variant;
+            }
+        }
+        return null;
     }
 }
