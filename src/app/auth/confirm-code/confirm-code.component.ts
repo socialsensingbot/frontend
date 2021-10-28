@@ -4,7 +4,7 @@ import {environment} from 'src/environments/environment';
 import {Router} from '@angular/router';
 import Auth from '@aws-amplify/auth';
 import {NotificationService} from 'src/app/services/notification.service';
-import {Logger} from "aws-amplify";
+import {Logger} from "@aws-amplify/core";
 const log = new Logger('confirm-code');
 
 @Component({

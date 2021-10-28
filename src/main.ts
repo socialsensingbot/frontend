@@ -1,64 +1,43 @@
-import 'hammerjs';
-import {enableProdMode} from '@angular/core';
-import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
-import PubSub from '@aws-amplify/pubsub';
-import Amplify, {Auth, Logger, Storage} from 'aws-amplify';
-import API from '@aws-amplify/api';
-import awsconfig from './aws-exports';
-
-const log = new Logger('main');
-
-API.configure(awsconfig);
-PubSub.configure(awsconfig);
-Amplify.configure(awsconfig);
-// Storage.configure({ level: 'private' });
-
-import {AppModule} from './app/app.module';
-import {environment} from './environments/environment';
-import {hmrBootstrap} from "./hmr";
-
-if (environment.production) {
-  enableProdMode();
-  Amplify.Logger.LOG_LEVEL = 'INFO';
-} else {
-  window.onerror = (message, file, line, col, e) => {
-    log.error(e)
-    window.alert(`${file}(${line}:${col}): ${message}`);
-    return false;
-  };
-  window.addEventListener("error", (e) => {
-    log.error(e);
-    window.alert(`${e.filename}(${e.lineno}:${e.colno}): ${e.message}`);
-    return false;
-  });
-  window.addEventListener('unhandledrejection', (e) => {
-    log.error(e);
-    window.alert(e.reason);
-
-  })
-  Amplify.Logger.LOG_LEVEL = 'DEBUG';
-}
+import {enableProdMode} from "@angular/core";
+import {platformBrowserDynamic} from "@angular/platform-browser-dynamic";
+import awsconfig from "./aws-exports";
+import "@angular/compiler";
+import {AppModule} from "./app/app.module";
+import {environment} from "./environments/environment";
+import Amplify, {Logger} from "@aws-amplify/core";
+import "regenerator-runtime/runtime";
 
 
-if (window.location.search.indexOf('__debug__') >= 0) {
-  Amplify.Logger.LOG_LEVEL = 'VERBOSE';
-}
+const log = new Logger("main");
+try {
+  // API.configure(awsconfig);
+  // PubSub.configure(awsconfig);
+  Amplify.configure(awsconfig);
+  // Storage.configure({ level: 'private' });
 
-
-log.info("**********************************");
-log.info("*** Social Sensing Version " + environment.version);
-log.info("**********************************");
-log.info("");
-
-const bootstrap = () => platformBrowserDynamic().bootstrapModule(AppModule);
-
-if (environment.hmr) {
-  if (module['hot']) {
-    hmrBootstrap(module, bootstrap);
+  if (environment.production) {
+    enableProdMode();
+    Amplify.Logger.LOG_LEVEL = "INFO";
   } else {
-    console.error('HMR is not enabled for webpack-dev-server!');
-    log.debug('Are you using the --hmr flag for ng serve?');
+    Amplify.Logger.LOG_LEVEL = "DEBUG";
   }
-} else {
+
+
+  if (window.location.search.indexOf("__debug__") >= 0) {
+    Amplify.Logger.LOG_LEVEL = "VERBOSE";
+  }
+
+
+  log.info("**********************************");
+  log.info("*** Social Sensing Version " + environment.version);
+  log.info("**********************************");
+  log.info("");
+
+  const bootstrap = () => platformBrowserDynamic().bootstrapModule(AppModule);
   bootstrap().catch(err => log.debug(err));
+
+  $("#loading-div-img").attr("src", "assets/loading-2.jpg");
+} catch (e) {
+  log.error(e);
+  log.error("FATAL ERROR");
 }

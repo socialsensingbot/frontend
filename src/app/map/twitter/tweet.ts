@@ -1,159 +1,178 @@
-import {PolygonLayerShortName} from "../types";
 import {environment} from "../../../environments/environment";
+import * as geojson from "geojson";
 
 export class CSVExportTweet {
-  constructor(public region: string, public id: string, public date: string, public url: string, public text: string) {
+    constructor(public region: string, public impact: string = "", public source: string = "", public id: string, public date: string,
+                public url: string, public text: string, public location: string) {
 
-  }
+    }
 
 }
+
 
 /**
  * This class encapsulates the data and functionality for the in memory representation of a tweet.
  * The class is lazily initialized on various data accesses as the full construction of this object includes some CPU intensive tasks.
  */
 export class Tweet {
-  private _date: Date;
-  private _year: string;
-  private _month: string;
-  private _day: string;
-  private _hour: string;
-  private _sender: string;
-  private _url: string;
-  private _valid: boolean;
-  private _init: boolean;
+    private _init: boolean;
 
-
-  public get date(): Date {
-    this.lazyInit();
-    return this._date;
-  }
-
-  public get year(): string {
-    this.lazyInit();
-    return this._year;
-  }
-
-  public get month(): string {
-    this.lazyInit();
-    return this._month;
-  }
-
-  public get day(): string {
-    this.lazyInit();
-    return this._day;
-  }
-
-  public get hour(): string {
-    this.lazyInit();
-    return this._hour;
-  }
-
-  public get valid(): boolean {
-    this.lazyInit();
-    return this._valid;
-  }
-
-  public get sender(): string {
-    this.lazyInit();
-    return this._sender;
-  }
-
-  public get id(): string {
-    return this._id;
-  }
-
-  public get url(): string {
-    this.lazyInit();
-    return this._url;
-  }
-
-
-  get html(): string {
-    return this._html;
-  }
-
-  get poly(): PolygonLayerShortName {
-    return this._poly;
-  }
-
-  get place(): string {
-    return this._place;
-  }
-
-  /**
-   * All constructor values bust be optional for the {@link Tweet#populate} method.
-   * @param _id the tweet id as defined by Twitter
-   * @param _html the html text used tio stub the tweet before the Twitter scripts are called.
-   * @param _internalDateString this is a date string in the format supplied by the live.json file.
-   * @param _poly type of region map ({@link PolygonLayerShortName}) this is associated with.
-   * @param _place the region that this tweet is associated with
-   */
-  constructor(private _id: string = null, private _html: string = null, private _internalDateString: string = null,
-              private _poly: PolygonLayerShortName = null, private _place: string = null) {
-  }
-
-  /**
-   * Perform lazy initializing of the class. This is called when various accessors need to access fields that are computationally expensive to populate.
-   */
-  private lazyInit() {
-    if (!this._init) {
-
-      const regex = /.*<a href="https:\/\/twitter.com\/(\w+)\/status\/(\d+).*">.*<\/a><\/blockquote>/;
-      const matched = this._html.match(regex);
-      this._valid = (matched != null);
-      if (matched) {
-        this._sender = matched[1];
-        console.assert(this._id == matched[2]);
-        this._url = "https://twitter.com/" + this._sender + "/status/" + this._id
-      }
-      this._date = new Date(Date.UTC(Number(this._internalDateString.substring(0, 4)),
-                                     Number(this._internalDateString.substring(4, 6)) - 1,
-                                     Number(this._internalDateString.substring(6, 8)),
-                                     Number(this._internalDateString.substring(8, 10)),
-                                     +Number(this._internalDateString.substring(10, 12)), 0, 0));
-
-      this._year = new Intl.DateTimeFormat(environment.locale,
-                                           {year: '2-digit', timeZone: environment.timezone}).format(this._date);
-      this._month = new Intl.DateTimeFormat(environment.locale,
-                                            {month: 'short', timeZone: environment.timezone}).format(this._date);
-      this._day = new Intl.DateTimeFormat(environment.locale, {day: '2-digit', timeZone: environment.timezone}).format(
-        this._date);
-      this._hour = new Intl.DateTimeFormat(environment.locale,
-                                           {hour: '2-digit', hour12: true, timeZone: environment.timezone}).format(
-        this._date);
-      this._init = true;
+    get potentiallySensitive(): boolean {
+        return this._possibly_sensitive;
     }
-  }
 
-  /**
-   * Populate this tweet from data from a Tweet like structure. Primarily used to copy a deserialized Tweet which is not a class but a Tweet like class.
-   *
-   * @param tweet the {@link Tweet} to copy data from.
-   */
-  public populate(tweet: Tweet): Tweet {
-    this._id = tweet._id;
-    this._html = tweet._html;
-    this._internalDateString = tweet._internalDateString;
-    this._poly = tweet._poly;
-    this._place = tweet._place;
-    this._date = tweet._date;
-    this._year = tweet._year;
-    this._month = tweet._month;
-    this._day = tweet._day;
-    this._hour = tweet._hour;
-    this._sender = tweet._sender;
-    this._url = tweet._url;
-    this._valid = tweet._valid;
-    this._init = tweet._init;
-    return this;
-  }
+    /**
+     * All constructor values bust be optional for the {@link Tweet#populate} method.
+     * @param _id the tweet id as defined by Twitter
+     * @param _html the html text used tio stub the tweet before the Twitter scripts are called.
+     * @param _json the original JSON of the tweet.
+     * @param _location the location associated with the tweet as determined by the backend process.
+     * @param _date the timestamp associated with the tweet.
+     * @param _region the region associated with this tweet
+     */
+    constructor(private _id: string = null, private _html: string = null, private _json: any = {}, private _location: geojson.GeoJsonObject,
+                private _date: Date, private _region: string, private _possibly_sensitive = false) {
+    }
 
-  public asCSV(region: string): CSVExportTweet {
-    this.lazyInit();
-    return new CSVExportTweet(region, this._id, this._date.toUTCString(), this._url,
-                              $("<div>").html(this._html).text());
-  }
+    get json(): any {
+        return this._json;
+    }
+
+    get location(): geojson.GeometryCollection {
+        return this._location as geojson.GeometryCollection;
+    }
+
+    get region(): string {
+        return this._region;
+    }
+
+    public get date(): Date {
+        this.lazyInit();
+        return this._date;
+    }
+
+    private _year: string;
+
+    public get year(): string {
+        this.lazyInit();
+        return this._year;
+    }
+
+    private _month: string;
+
+    public get month(): string {
+        this.lazyInit();
+        return this._month;
+    }
+
+    private _day: string;
+
+    public get day(): string {
+        this.lazyInit();
+        return this._day;
+    }
+
+    private _hour: string;
+
+    public get hour(): string {
+        this.lazyInit();
+        return this._hour;
+    }
+
+    private _sender: string;
+
+    public get sender(): string {
+        this.lazyInit();
+        return this._sender;
+    }
+
+    private _url: string;
+
+    public get url(): string {
+        this.lazyInit();
+        return this._url;
+    }
+
+    private _valid: boolean;
+
+    public get valid(): boolean {
+        this.lazyInit();
+        return this._valid;
+    }
+
+    public get id(): string {
+        return this._id;
+    }
+
+    public get html(): string {
+        return this._html;
+    }
+
+    public get text(): string {
+        this.lazyInit();
+        const paragraphElement: HTMLParagraphElement = $(this.html).find("p")[0];
+        if (paragraphElement) {
+            return paragraphElement.innerHTML;
+        } else {
+            return "<h3>This tweet's text is no longer available.</h3>";
+        }
+    }
+
+
+    /**
+     * Populate this tweet from data from a Tweet like structure.
+     * Primarily used to copy a deserialized Tweet which is not a
+     * class but a Tweet like class.
+     *
+     * @param tweet the {@link Tweet} to copy data from.
+     */
+    public populate(tweet: Tweet): Tweet {
+        this._id = tweet._id;
+        this._html = tweet._html;
+        this._date = tweet._date;
+        this._year = tweet._year;
+        this._month = tweet._month;
+        this._day = tweet._day;
+        this._hour = tweet._hour;
+        this._sender = tweet._sender;
+        this._url = tweet._url;
+        this._valid = tweet._valid;
+        this._init = tweet._init;
+        this._possibly_sensitive = tweet._possibly_sensitive;
+        return this;
+    }
+
+
+    sanitizeForGDPR(tweetText: string): string {
+        // — Tim Hopkins (@thop1988)
+        return tweetText
+            .replace(/@[a-zA-Z0-9_-]+/g, "@USERNAME_REMOVED")
+            .replace(/— .+ \(@USERNAME_REMOVED\).*$/g, "");
+    }
+
+    /**
+     * Perform lazy initializing of the class.
+     * This is called when various accessors need to access
+     * fields that are computationally expensive to populate.
+     */
+    public lazyInit() {
+        if (!this._init) {
+            this._sender = this._json.user.screen_name;
+            if (this._html !== null) {
+                this._valid = true;
+            }
+            this._url = "https://twitter.com/" + this._sender + "/status/" + this._id;
+
+            this._year = new Intl.DateTimeFormat(environment.locale,
+                                                 {year: "2-digit", timeZone: environment.timezone}).format(this._date);
+            this._month = new Intl.DateTimeFormat(environment.locale,
+                                                  {month: "short", timeZone: environment.timezone}).format(this._date);
+            this._day = new Intl.DateTimeFormat(environment.locale, {day: "2-digit", timeZone: environment.timezone}).format(
+                this._date);
+            this._hour = new Intl.DateTimeFormat(environment.locale,
+                                                 {hour: "2-digit", hour12: true, timeZone: environment.timezone}).format(
+                this._date);
+            this._init = true;
+        }
+    }
 }
-
-

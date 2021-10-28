@@ -1,8 +1,8 @@
-import {Injectable, NgZone, OnDestroy, OnInit} from '@angular/core';
-import {MatSnackBar, MatSnackBarRef} from '@angular/material';
+import {Injectable, NgZone, OnDestroy} from '@angular/core';
+import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {Subscription} from 'rxjs';
 import {environment} from "../../environments/environment";
-import {Logger} from "aws-amplify";
+import {Logger} from "@aws-amplify/core";
 
 const log = new Logger('map');
 
@@ -19,7 +19,7 @@ const log = new Logger('map');
 @Injectable({
               providedIn: 'root'
             })
-export class NotificationService implements OnDestroy, OnInit {
+export class NotificationService implements OnDestroy {
 
 
   // Configuration api subscription
@@ -34,22 +34,6 @@ export class NotificationService implements OnDestroy, OnInit {
 
   }
 
-  ngOnInit(): void {
-    window.onerror = (message, file, line, col, e) => {
-      log.error(e)
-      this._zone.run(() => this.error(message));
-      return false;
-    };
-    window.addEventListener("error", (e) => {
-      log.error(e);
-      this._zone.run(() => this.error(e.message));
-      return false;
-    });
-    window.addEventListener('unhandledrejection', (e) => {
-      log.error(e);
-      this._zone.run(() => this.error(e.reason));
-    })
-  }
 
   /**
    * Unsubscribe from the config state
@@ -60,33 +44,43 @@ export class NotificationService implements OnDestroy, OnInit {
     this._configState.unsubscribe();
   }
 
-  /**
-   * Display a MatSnackbar notification and return the reference.
-   * Will set the duration to the global configuration if present.
-   * @param message {string}
-   * @param buttonLabel {string}
-   * @returns {MatSnackBarRef}
-   */
-  show(message: string, buttonLabel: string = 'OK', toastTimeout = 8): MatSnackBarRef<any> {
-    if (toastTimeout > 0) {
-      return this.toast.open(message, buttonLabel, {
-        duration: toastTimeout * 1000
-      });
-    } else {
-      return this.toast.open(message, buttonLabel, {});
+    /**
+     * Display a MatSnackbar notification and return the reference.
+     * Will set the duration to the global configuration if present.
+     * @param message {string}
+     * @param buttonLabel {string}
+     * @returns {MatSnackBarRef}
+     */
+    show(message: string, buttonLabel: string = "OK", toastTimeoutInMillis = 8000): MatSnackBarRef<any> {
+        if (toastTimeoutInMillis > 0) {
+            return this.toast.open(message, buttonLabel, {
+                duration: toastTimeoutInMillis
+            });
+        } else {
+            return this.toast.open(message, buttonLabel, {});
+        }
     }
-  }
+
 
   public error(e: any) {
     if (environment.production) {
-      console.error(e);
+      log.error(e);
     } else {
       log.error(e);
-      return this.toast.open(`ERROR: ${e.toString()} (this message will not appear in production)`, "got it", {
+      log.error(e);
+      let msg = JSON.stringify(e);
+      if (e.hasOwnProperty("message")) {
+        msg = e.message;
+      }
+      return this.toast.open(`ERROR: ${msg} (this message will not appear in production)`, "got it", {
         duration:   30000,
         politeness: "assertive",
       });
 
     }
+  }
+
+  public dismiss() {
+    this.toast.dismiss();
   }
 }

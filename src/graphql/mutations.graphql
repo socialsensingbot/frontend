@@ -5,15 +5,13 @@ mutation CreateUserPreferences(
 ) {
   createUserPreferences(input: $input, condition: $condition) {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
+    owner
+    prefs
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
-    owner
   }
 }
 mutation UpdateUserPreferences(
@@ -22,15 +20,13 @@ mutation UpdateUserPreferences(
 ) {
   updateUserPreferences(input: $input, condition: $condition) {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
+    owner
+    prefs
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
-    owner
   }
 }
 mutation DeleteUserPreferences(
@@ -39,15 +35,208 @@ mutation DeleteUserPreferences(
 ) {
   deleteUserPreferences(input: $input, condition: $condition) {
     id
-    ignoreTweets {
-      nextToken
-    }
-    ignorePeople {
-      nextToken
-    }
+    owner
+    prefs
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
+  }
+}
+mutation CreateUserDashboard(
+  $input: CreateUserDashboardInput!
+  $condition: ModelUserDashboardConditionInput
+) {
+  createUserDashboard(input: $input, condition: $condition) {
+    id
     owner
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation UpdateUserDashboard(
+  $input: UpdateUserDashboardInput!
+  $condition: ModelUserDashboardConditionInput
+) {
+  updateUserDashboard(input: $input, condition: $condition) {
+    id
+    owner
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation DeleteUserDashboard(
+  $input: DeleteUserDashboardInput!
+  $condition: ModelUserDashboardConditionInput
+) {
+  deleteUserDashboard(input: $input, condition: $condition) {
+    id
+    owner
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation CreateGroupDashboard(
+  $input: CreateGroupDashboardInput!
+  $condition: ModelGroupDashboardConditionInput
+) {
+  createGroupDashboard(input: $input, condition: $condition) {
+    id
+    group
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation UpdateGroupDashboard(
+  $input: UpdateGroupDashboardInput!
+  $condition: ModelGroupDashboardConditionInput
+) {
+  updateGroupDashboard(input: $input, condition: $condition) {
+    id
+    group
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation DeleteGroupDashboard(
+  $input: DeleteGroupDashboardInput!
+  $condition: ModelGroupDashboardConditionInput
+) {
+  deleteGroupDashboard(input: $input, condition: $condition) {
+    id
+    group
+    dashboard
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation CreateSavedGraph(
+  $input: CreateSavedGraphInput!
+  $condition: ModelSavedGraphConditionInput
+) {
+  createSavedGraph(input: $input, condition: $condition) {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+mutation UpdateSavedGraph(
+  $input: UpdateSavedGraphInput!
+  $condition: ModelSavedGraphConditionInput
+) {
+  updateSavedGraph(input: $input, condition: $condition) {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+mutation DeleteSavedGraph(
+  $input: DeleteSavedGraphInput!
+  $condition: ModelSavedGraphConditionInput
+) {
+  deleteSavedGraph(input: $input, condition: $condition) {
+    id
+    type
+    title
+    state
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+mutation CreateTextAutocomplete(
+  $input: CreateTextAutocompleteInput!
+  $condition: ModelTextAutocompleteConditionInput
+) {
+  createTextAutocomplete(input: $input, condition: $condition) {
+    id
+    type
+    text
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+mutation UpdateTextAutocomplete(
+  $input: UpdateTextAutocompleteInput!
+  $condition: ModelTextAutocompleteConditionInput
+) {
+  updateTextAutocomplete(input: $input, condition: $condition) {
+    id
+    type
+    text
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
+  }
+}
+mutation DeleteTextAutocomplete(
+  $input: DeleteTextAutocompleteInput!
+  $condition: ModelTextAutocompleteConditionInput
+) {
+  deleteTextAutocomplete(input: $input, condition: $condition) {
+    id
+    type
+    text
+    group
+    owner
+    createdAt
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
   }
 }
 mutation CreateUserSession(
@@ -59,9 +248,15 @@ mutation CreateUserSession(
     fingerprint
     client
     open
-    createdAt
-    updatedAt
+    group
     owner
+    ttl
+    createdAt
+    sessionId
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
   }
 }
 mutation UpdateUserSession(
@@ -73,9 +268,15 @@ mutation UpdateUserSession(
     fingerprint
     client
     open
-    createdAt
-    updatedAt
+    group
     owner
+    ttl
+    createdAt
+    sessionId
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
   }
 }
 mutation DeleteUserSession(
@@ -87,9 +288,15 @@ mutation DeleteUserSession(
     fingerprint
     client
     open
-    createdAt
-    updatedAt
+    group
     owner
+    ttl
+    createdAt
+    sessionId
+    _version
+    _deleted
+    _lastChangedAt
+    updatedAt
   }
 }
 mutation CreateGroupPreferences(
@@ -99,9 +306,10 @@ mutation CreateGroupPreferences(
   createGroupPreferences(input: $input, condition: $condition) {
     id
     group
-    locale
-    timezone
-    multipleSessions
+    prefs
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -113,9 +321,10 @@ mutation UpdateGroupPreferences(
   updateGroupPreferences(input: $input, condition: $condition) {
     id
     group
-    locale
-    timezone
-    multipleSessions
+    prefs
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -127,9 +336,10 @@ mutation DeleteGroupPreferences(
   deleteGroupPreferences(input: $input, condition: $condition) {
     id
     group
-    locale
-    timezone
-    multipleSessions
+    prefs
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -145,6 +355,9 @@ mutation CreateGroupTweetIgnore(
     tweetId
     ownerGroups
     scope
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -160,6 +373,9 @@ mutation UpdateGroupTweetIgnore(
     tweetId
     ownerGroups
     scope
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -175,6 +391,63 @@ mutation DeleteGroupTweetIgnore(
     tweetId
     ownerGroups
     scope
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation CreateGroupTweetAnnotations(
+  $input: CreateGroupTweetAnnotationsInput!
+  $condition: ModelGroupTweetAnnotationsConditionInput
+) {
+  createGroupTweetAnnotations(input: $input, condition: $condition) {
+    id
+    url
+    annotatedBy
+    tweetId
+    ownerGroups
+    annotations
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation UpdateGroupTweetAnnotations(
+  $input: UpdateGroupTweetAnnotationsInput!
+  $condition: ModelGroupTweetAnnotationsConditionInput
+) {
+  updateGroupTweetAnnotations(input: $input, condition: $condition) {
+    id
+    url
+    annotatedBy
+    tweetId
+    ownerGroups
+    annotations
+    _version
+    _deleted
+    _lastChangedAt
+    createdAt
+    updatedAt
+  }
+}
+mutation DeleteGroupTweetAnnotations(
+  $input: DeleteGroupTweetAnnotationsInput!
+  $condition: ModelGroupTweetAnnotationsConditionInput
+) {
+  deleteGroupTweetAnnotations(input: $input, condition: $condition) {
+    id
+    url
+    annotatedBy
+    tweetId
+    ownerGroups
+    annotations
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -189,6 +462,9 @@ mutation CreateGroupTwitterUserIgnore(
     ignoredBy
     ownerGroups
     scope
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -203,6 +479,9 @@ mutation UpdateGroupTwitterUserIgnore(
     ignoredBy
     ownerGroups
     scope
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
   }
@@ -217,118 +496,10 @@ mutation DeleteGroupTwitterUserIgnore(
     ignoredBy
     ownerGroups
     scope
+    _version
+    _deleted
+    _lastChangedAt
     createdAt
     updatedAt
-  }
-}
-mutation CreateTweetIgnore(
-  $input: CreateTweetIgnoreInput!
-  $condition: ModelTweetIgnoreConditionInput
-) {
-  createTweetIgnore(input: $input, condition: $condition) {
-    id
-    url
-    tweetId
-    user {
-      id
-      createdAt
-      updatedAt
-      owner
-    }
-    createdAt
-    updatedAt
-    owner
-  }
-}
-mutation UpdateTweetIgnore(
-  $input: UpdateTweetIgnoreInput!
-  $condition: ModelTweetIgnoreConditionInput
-) {
-  updateTweetIgnore(input: $input, condition: $condition) {
-    id
-    url
-    tweetId
-    user {
-      id
-      createdAt
-      updatedAt
-      owner
-    }
-    createdAt
-    updatedAt
-    owner
-  }
-}
-mutation DeleteTweetIgnore(
-  $input: DeleteTweetIgnoreInput!
-  $condition: ModelTweetIgnoreConditionInput
-) {
-  deleteTweetIgnore(input: $input, condition: $condition) {
-    id
-    url
-    tweetId
-    user {
-      id
-      createdAt
-      updatedAt
-      owner
-    }
-    createdAt
-    updatedAt
-    owner
-  }
-}
-mutation CreateTwitterUserIgnore(
-  $input: CreateTwitterUserIgnoreInput!
-  $condition: ModelTwitterUserIgnoreConditionInput
-) {
-  createTwitterUserIgnore(input: $input, condition: $condition) {
-    id
-    twitterScreenName
-    user {
-      id
-      createdAt
-      updatedAt
-      owner
-    }
-    createdAt
-    updatedAt
-    owner
-  }
-}
-mutation UpdateTwitterUserIgnore(
-  $input: UpdateTwitterUserIgnoreInput!
-  $condition: ModelTwitterUserIgnoreConditionInput
-) {
-  updateTwitterUserIgnore(input: $input, condition: $condition) {
-    id
-    twitterScreenName
-    user {
-      id
-      createdAt
-      updatedAt
-      owner
-    }
-    createdAt
-    updatedAt
-    owner
-  }
-}
-mutation DeleteTwitterUserIgnore(
-  $input: DeleteTwitterUserIgnoreInput!
-  $condition: ModelTwitterUserIgnoreConditionInput
-) {
-  deleteTwitterUserIgnore(input: $input, condition: $condition) {
-    id
-    twitterScreenName
-    user {
-      id
-      createdAt
-      updatedAt
-      owner
-    }
-    createdAt
-    updatedAt
-    owner
   }
 }

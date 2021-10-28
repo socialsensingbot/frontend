@@ -1,0 +1,136 @@
+<mat-toolbar class="app-timeseries-toolbar">
+  <ng-container *ngIf="ready && state">
+      <mat-toolbar-row>
+          <mat-button-toggle-group name="eoc" class="eoc"
+                                   [ngModel]="statType" aria-label="Return Period or Count">
+              <mat-button-toggle (click)="userChangedStatisticType('exceedance')" value="exceedance">Return Period
+              </mat-button-toggle>
+              <mat-button-toggle (click)="userChangedStatisticType('count')" value="count">Count</mat-button-toggle>
+          </mat-button-toggle-group>
+
+          <div class="app-toolbar-separator"></div>
+          <mat-button-toggle-group (click)="graphTypeChanged(state.lob)" class="lob" name="lob"
+                                   [(ngModel)]="state.lob" aria-label="Line or Bar">
+              <mat-button-toggle value="line">Line</mat-button-toggle>
+              <mat-button-toggle value="bar">Bar</mat-button-toggle>
+          </mat-button-toggle-group>
+          <div class="app-toolbar-separator"></div>
+          <mat-button-toggle-group [(ngModel)]="state.timePeriod"
+                                   aria-label="Time Period"
+                                   class="timeperiod-btn-group" name="timeperiod">
+              <mat-button-toggle (click)="timePeriodChanged('day')" value="day">Day</mat-button-toggle>
+              <mat-button-toggle (click)="timePeriodChanged('hour')" value="hour">Hour</mat-button-toggle>
+          </mat-button-toggle-group>
+          <div class="app-toolbar-expanding-separator"></div>
+          <button (click)="saveGraph();" class="app-analytics-timeseries-toolbar-save" color="primary"
+                  mat-stroked-button>Save
+          </button>
+          <div class="app-toolbar-separator"></div>
+          <button [queryParams]="{__clear_ui__:true}" class="app-analytics-timeseries-toolbar-new" color="warn"
+                  mat-stroked-button
+                  routerLink="/analytics/time">New
+          </button>
+          <ng-container *ngIf="this.graphId">
+              <div class="app-toolbar-separator"></div>
+              <button (click)="saveGraph(true);"
+                      class="app-analytics-timeseries-toolbar-duplicate" mat-stroked-button>Duplicate
+              </button>
+          </ng-container>
+
+          <div class="app-toolbar-separator"></div>
+          <button mat-stroked-button *ngIf="this.pref.featureSupported('dashboard')"
+                  (click)="addToDashboard()" class="app-analytics-timeseries-toolbar-add-to-dashboard">Add to
+              Dashboard
+          </button>
+          <div class="app-toolbar-separator"></div>
+          <button mat-icon-button aria-label="Expand or shrink toolbar">
+              <mat-icon (click)="toolbarExpanded=true" *ngIf="!toolbarExpanded"
+                        matTooltip="Expand toolbar">arrow_drop_down
+              </mat-icon>
+              <mat-icon (click)="toolbarExpanded=false" *ngIf="toolbarExpanded"
+                        matTooltip="Shrink toolbar">arrow_drop_up
+              </mat-icon>
+          </button>
+    </mat-toolbar-row>
+      <mat-toolbar-row *ngIf="toolbarExpanded">
+          <div class="app-toolbar-separator"></div>
+
+
+      </mat-toolbar-row>
+  </ng-container>
+</mat-toolbar>
+
+<div class="app-timeseries-graph-surround">
+    <span *ngIf="title.length >0">
+    <h2>{{title}}</h2>
+    <br/>
+        </span>
+
+    <mat-form-field appearance="fill">
+        <mat-label>Enter a date range</mat-label>
+        <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+            <input formControlName="start" matStartDate placeholder="Start date">
+            <input formControlName="end" matEndDate placeholder="End date">
+        </mat-date-range-input>
+        <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
+        <mat-date-range-picker #picker (closed)="this.refreshAllSeries()"></mat-date-range-picker>
+
+        <mat-error *ngIf="range.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+        <mat-error *ngIf="range.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+    </mat-form-field>
+
+    <!--    <p>Date range: {{range.value | json}}</p>-->
+    <!--    {{updating}}/{{noData}}-->
+    <app-timeseries-multi-query-chart
+            [animated]="animated"
+            [connect]="connect"
+            [error]="error"
+            [height]="600"
+            [scrollBar]="scrollBar"
+            [seriesCollection]="seriesCollection"
+            [updating]="updating"
+            class="twitter-timeseries-chart">
+
+    </app-timeseries-multi-query-chart>
+</div>
+
+<!--{{eoc}}-->
+<!--
+{{state|json}}
+-->
+<div *ngIf="ready && state && mapLayer" class="app-query-builder-surround">
+
+    <mat-card *ngFor="let query of state.queries; index as i">
+        <mat-card-content>
+            <app-timeseries-analytics-form #form
+                                           (changed)="formChanged(query)"
+                                           [data]="query"></app-timeseries-analytics-form>
+        </mat-card-content>
+        <mat-card-actions>
+            <button (click)="addQuery();" *ngIf="i === 0" color="primary" mat-raised-button>Add
+            </button>
+            <button *ngIf="i > 0" mat-raised-button color="warn" (click)="removeQuery(query)">Remove</button>
+    </mat-card-actions>
+  </mat-card>
+
+</div>
+
+<div class="app-saved-queries-surround">
+  <h3>Saved Queries</h3>
+    <mat-nav-list>
+        <a *ngFor="let savedGraph of
+    savedGraphs" [routerLink]="'/map/'+map.id+'/analytics/time/'+savedGraph.id" mat-list-item> {{
+            savedGraph.title }}
+            <!--              - {{savedGraph.state}}-->
+            <button mat-button mat-icon-button matSuffix
+                    (click)="deleteSavedGraph(savedGraph.id); updateSavedGraphs()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </a>
+
+
+    </mat-nav-list>
+</div>
+<mat-progress-bar *ngIf="updating && ready" class="app-analytics-progress" mode="indeterminate"
+                  [color]="pref.combined.toolbarColor"></mat-progress-bar>
+<!--<mat-spinner *ngIf="!ready" class="app-analytics-spinner"></mat-spinner>-->

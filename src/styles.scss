@@ -2,6 +2,9 @@
 @import "~@aws-amplify/ui/src/Theme.css";
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
+$blackish: rgba(50,50, 50, 1.0);
+$lighter-black: rgba(128, 128, 128, 1.0);
+$disabled-black: rgba(75, 75, 75, 1.0);
 .amplify-block {
   @import "~@aws-amplify/ui/src/Angular";
 
@@ -31,10 +34,36 @@ $app-warn: mat-palette($mat-red);
 // Create the theme object (a Sass map containing all of the palettes).
 $app-theme: mat-light-theme($app-primary, $app-accent, $app-warn);
 
+
+@function my-mat-light-theme-foreground($color) {
+  @return (
+    base: $blackish,
+    divider: $lighter-black,
+    dividers: $lighter-black,
+    disabled: rgba(black, 0.3),
+    disabled-button: rgba(black, 0.3),
+    disabled-text: rgba(black, 0.3),
+    hint-text: $blackish,
+    secondary-text: $blackish,
+    icon: $blackish,
+    icons: $blackish,
+    text: $blackish,
+    slider-min: $blackish,
+    slider-off: $blackish,
+    slider-off-active: $blackish,
+  );
+}
+
+;
+
+// You can put any color here. I've chosen mat-color($my-app-primary, 700)
+$my-foreground: my-mat-light-theme-foreground(mat-color($app-primary, 700));
+$my-app-theme-custom: map-merge($app-theme, (foreground: $my-foreground));
+
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
-@include angular-material-theme($app-theme);
+@include angular-material-theme($my-app-theme-custom);
 
 .active {
   color: mat-color($app-primary);
@@ -88,4 +117,36 @@ blockquote {
   }
 }
 
+.app-toolbar-separator {
+  display: flex;
+  min-width: 1em;
+}
 
+.app-toolbar-expanding-separator {
+  display: flex;
+  flex-grow: 10;
+  min-width: 1em;
+  max-width: 100%;
+}
+
+.app-toolbar-btn {
+  display: flex;
+}
+
+.app-toolbar {
+  display: flex;
+  //flex-direction: row;
+  justify-content: left;
+  font-size: 14px;
+  //overflow: visible;
+  background-color: white;
+  box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.3);
+}
+
+.mat-tab-label, .mat-tab-link {
+  font-weight: lighter !important;
+}
+
+.mat-tab-label-active {
+  font-weight: normal !important;
+}

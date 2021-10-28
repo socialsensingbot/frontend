@@ -1,33 +1,82 @@
-type UserPreferences @model @auth(
-  rules: [
-    {allow: owner, operations: [create, update, delete, read]},
-  ]){
+# See https://github.com/aws-amplify/amplify-cli/issues/3118#issuecomment-674593946 - datastore works very badly with
+# groups so when you see [{allow: private}] it should be [{allow: groups, groupsField: "ownerGroups"}]
+# TODO: Change this when better support exists for dynamic groups in DataStore.
+
+
+type UserPreferences @model @auth(rules: [{allow: owner,  operations: [create, update, delete, read]}]) {
   id: ID!
-  ignoreTweets: [TweetIgnore] @connection(name: "UserTweetIgnores")
-  ignorePeople: [TwitterUserIgnore] @connection(name: "UserTwitterUserIgnores")
+  owner: String
+  #  ignoreTweets: [TweetIgnore] @connection(name: "UserTweetIgnores")
+  #  ignorePeople: [TwitterUserIgnore] @connection(name: "UserTwitterUserIgnores")
+  prefs: AWSJSON
 }
 
-type UserSession @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" }) @auth(
-  rules: [
-    {allow: owner},
-  ]){
+type UserDashboard @model @auth(rules: [{allow: owner,  operations: [create, update, delete, read]}]) {
+  id: ID!
+  owner: String
+  #  ignoreTweets: [TweetIgnore] @connection(name: "UserTweetIgnores")
+  #  ignorePeople: [TwitterUserIgnore] @connection(name: "UserTwitterUserIgnores")
+  dashboard: String!
+}
+
+type GroupDashboard
+@model
+@auth(rules: [{allow: private}]) {
+  id: ID!
+  group: String!
+  dashboard: String!
+}
+
+type SavedGraph
+@model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
+@auth(rules: [{allow: private}]) {
+id: ID!
+type:String!
+title: String!
+state: String!
+group: String
+owner: String
+createdAt: AWSDateTime
+}
+
+type TextAutocomplete
+@model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
+@auth(rules: [{allow: private}]) {
+  id: ID!
+  type:String!
+  text: String!
+  group: String
+  owner: String
+  createdAt: AWSDateTime
+}
+
+
+
+type UserSession
+@model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
+@auth(rules: [{allow: private}]) {
   id: ID!
   fingerprint: String
   client: AWSJSON
   open: Boolean!
+  group: String!
+  owner: String
+  ttl: Int
+  createdAt: AWSDateTime
+  sessionId: String
 }
 
-
-type GroupPreferences @model @auth(rules: [{allow: groups, operations: [create, update, delete, read], groupsField: "group"}]){
+type GroupPreferences
+@model
+@auth(rules: [{allow: private}]) {
   id: ID!
   group: String!
-  locale: String
-  timezone: String
-  multipleSessions: Boolean
+  prefs: AWSJSON
 }
 
-
-type GroupTweetIgnore @model( timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" })  @auth(rules: [{allow: groups, groupsField: "ownerGroups"}]) {
+type GroupTweetIgnore
+@model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
+@auth(rules: [{allow: private}]) {
   id: ID!
   url: String!
   ignoredBy: String!
@@ -36,7 +85,21 @@ type GroupTweetIgnore @model( timestamps: {createdAt: "createdAt", updatedAt: "u
   scope: String!
 }
 
-type GroupTwitterUserIgnore @model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt" })   @auth(rules: [{allow: groups, groupsField: "ownerGroups"}]) {
+type GroupTweetAnnotations
+@model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
+@auth(rules: [{allow: private}]) {
+  id: ID!
+  url: String!
+  annotatedBy: String!
+  tweetId: String!
+  ownerGroups: [String]
+  annotations: AWSJSON
+}
+
+
+type GroupTwitterUserIgnore
+@model(timestamps: {createdAt: "createdAt", updatedAt: "updatedAt"})
+@auth(rules: [{allow: private}]) {
   id: ID!
   twitterScreenName: String!
   ignoredBy: String!
@@ -44,18 +107,16 @@ type GroupTwitterUserIgnore @model(timestamps: {createdAt: "createdAt", updatedA
   scope: String!
 }
 
-
-
-type TweetIgnore @model @auth(rules: [ {allow: owner}]) {
-  id: ID!
-  url: String!
-  tweetId: String
-  user: UserPreferences @connection(name: "UserTweetIgnores")
-}
-
-
-type TwitterUserIgnore @model  @auth(rules: [ {allow: owner}]) {
-  id: ID!
-  twitterScreenName: String!
-  user: UserPreferences @connection(name: "UserTwitterUserIgnores")
-}
+#type TweetIgnore @model @auth(rules: [{allow: private}]) {
+#  id: ID!
+#  url: String!
+#  tweetId: String
+#  user: UserPreferences @connection(name: "UserTweetIgnores")
+#}
+#
+#type TwitterUserIgnore @model @auth(rules: [{allow: private}]) {
+#  id: ID!
+#  twitterScreenName: String!
+#  user: UserPreferences @connection(name: "UserTwitterUserIgnores")
+#}
+#

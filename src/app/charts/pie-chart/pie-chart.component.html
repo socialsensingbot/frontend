@@ -1,0 +1,12 @@
+<div style=" display: flex;
+  justify-content: center;
+  align-items: center; height: 500px; width:100%;position:absolute">
+  <mat-spinner *ngIf="updating" style="opacity:0.3"></mat-spinner>
+  <div *ngIf="!updating && data.length == 0">No Data</div>
+</div>
+
+<div  [style.opacity]="updating ? 0.2 : 1.0">
+  <div #chart style="width: 100%; height: 500px"></div>
+</div>
+
+

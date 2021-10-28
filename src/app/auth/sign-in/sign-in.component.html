@@ -22,7 +22,9 @@
           {{getPasswordInputError()}}
         </mat-error>
       </mat-form-field>
-      <button mat-raised-button color="primary" (click)="signIn()" [disabled]="!signinForm.valid">Sign In</button>
+      <button mat-raised-button color="{{buttonColor}}" (click)="signIn()" [disabled]="!signinForm.valid">Sign In
+      </button>
+        <p>Forgot your password? <a routerLink="/auth/forgotpass"  [queryParams]="{username: emailInput.value}">Reset it Here</a></p>
       <!--  <p style="text-align:center;">or</p>-->
       <!--  <button mat-raised-button color="primary" (click)="signInWithFacebook()">Sign In with Facebook</button><br/><br/>-->
       <!--  <button mat-raised-button color="primary" (click)="signInWithGoogle()">Sign In with Google</button>-->

@@ -1,28 +1,34 @@
+import {MAP_URL} from "../../../support";
+
 describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/10): ', function () {
+
+  const pageSize = 5;
+  const minPages = 3;
+
   // Step 1: setup the application state
   beforeEach(function () {
-    cy.visit('http://localhost:4200/map');
-    cy.stubLiveJson("live-old");
-    cy.server();
-    cy.login();
+    cy.visit(MAP_URL);
+      cy.login();
   });
 
-  describe('scroll', () => {
-    const url = "http://localhost:4200/map?selected=carmarthenshire&min_offset=-5399&max_offset=0&lat=53.00817326643286&lng=-2.0104980468750004";
 
-    it('row changes', () => {
-      cy.mockGraphQL();
+  describe('scroll', () => {
+    const url = MAP_URL + "?selected=greater%20london&zoom=5&max_time=1629131100000&min_time=1628784000000&active_number=stats&active_polygon=county";
+
+    it.only('row changes', () => {
       cy.visitAndWait(url);
-      cy.twitterPanelHeader("Carmarthenshire");
+      cy.twitterPanelHeader("Greater London");
+      cy.unhideTweets(10);
       cy.get(".atr-0.atr-visible", {timeout: 90000})
-      cy.get(".atr-0.atr-visible .twitter-tweet", {timeout: 90000}).should("be.visible");
+        cy.get(".atr-0.atr-visible .app-twitter-tweet", {timeout: 90000}).should("be.visible");
 
       cy.log(
-        "There should be 3 pages of 20 tweets loaded at any time. The first page should contain 20 tweets and the fourth page should contain no tweets.");
+        `There should be ${minPages} pages of ${pageSize} tweets loaded at any time. The first page should contain ${pageSize} tweets and the fourth page should contain no tweets.`);
 
-      cy.get("twitter-panel").find('.app-tweet-paged .app-tweet-row-active').its('length').should('eq', 60);
-      cy.get(".app-tweet-page-0").find('.app-tweet-row-active').its('length').should('eq', 20);
-      cy.get(".app-tweet-page-3 .app-tweet-row-active").should("not.exist");
+      cy.get("twitter-panel").find('.app-tweet-paged .app-tweet-row-active').its('length').should('eq',
+                                                                                                  minPages * pageSize);
+      cy.get(".app-tweet-page-0").find('.app-tweet-row-active').its('length').should('eq', pageSize);
+      cy.get(`.app-tweet-page-${minPages} .app-tweet-row-active`).should("not.exist");
 
       cy.log("Now we scroll to the bottom.");
 
@@ -32,11 +38,12 @@ describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issu
       cy.wait(5000);
 
       cy.log(
-        "There should be 3 pages of 20 tweets loaded at any time. The first page should not have any visible tweets and the fourth page should contain 20 tweets.");
+        `There should be ${minPages} pages of ${pageSize} tweets loaded at any time. The first page should not have any visible tweets and the fourth page should contain ${pageSize} tweets.`);
 
-      cy.get("twitter-panel").find('.app-tweet-paged .app-tweet-row-active').its('length').should('be.gt', 60);
+      cy.get("twitter-panel").find('.app-tweet-paged .app-tweet-row-active').its('length').should('be.gt',
+                                                                                                  minPages * pageSize);
       cy.get(".app-tweet-page-0 .app-tweet-row-active").should("not.be.visible");
-      cy.get(".app-tweet-page-3").find('.app-tweet-row-active').its('length').should('eq', 20);
+      cy.get(`.app-tweet-page-${minPages}`).find('.app-tweet-row-active').its('length').should('eq', pageSize);
       cy.get(".atr-0", {timeout: 20000}).should("not.be.visible");
 
       cy.log("Now we scroll back to the top.");
@@ -47,19 +54,19 @@ describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issu
       cy.wait(5000);
 
       cy.log(
-        "There should be 3 pages of 20 tweets loaded at any time. The first page should again contain 20 tweets and the fourth page should now contain no tweets.");
-      cy.get("twitter-panel").find('.app-tweet-paged .app-tweet-row-active').its('length').should('eq', 60);
-      cy.get(".app-tweet-page-0").find('.app-tweet-row-active').its('length').should('eq', 20);
-      cy.get(".app-tweet-page-3 .app-tweet-row-active").should("not.exist");
+        `There should be ${minPages} pages of ${pageSize} tweets loaded at any time. The first page should again contain ${pageSize} tweets and the fourth page should now contain no tweets.`);
+      cy.get("twitter-panel").find('.app-tweet-paged .app-tweet-row-active').its('length').should('eq',
+                                                                                                  minPages * pageSize);
+      cy.get(".app-tweet-page-0").find('.app-tweet-row-active').its('length').should('eq', pageSize);
+      cy.get(`.app-tweet-page-${minPages} .app-tweet-row-active`).should("not.exist");
 
       cy.log("And the first tweet should be visible and loaded.")
 
-      cy.get(".atr-0.atr-visible", {timeout: 90000}).should("be.visible");
-      cy.get(".atr-0.atr-visible .twitter-tweet", {timeout: 90000}).should("be.visible");
+        cy.get(".atr-0.atr-visible", {timeout: 90000}).should("be.visible");
+        cy.get(".atr-0.atr-visible .app-twitter-tweet", {timeout: 90000}).should("be.visible");
     });
 
     it('top and bottom', () => {
-      cy.mockGraphQL();
       cy.visitAndWait(url);
       cy.twitterPanelHeader("Carmarthenshire");
       cy.get(".atr-0.atr-visible", {timeout: 90000})
@@ -74,7 +81,7 @@ describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issu
   });
 
   describe('various side effects', () => {
-    const url = "http://localhost:4200/map?selected=carmarthenshire&min_offset=-5399&max_offset=0&lat=53.00817326643286&lng=-2.0104980468750004";
+    const url = MAP_URL + "?selected=carmarthenshire&min_offset=-5399&max_offset=0&lat=53.00817326643286&lng=-2.0104980468750004";
 
     it('correct row count', () => {
       cy.visitAndWait(url);

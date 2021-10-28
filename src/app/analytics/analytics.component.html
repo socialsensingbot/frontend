@@ -1,0 +1,22 @@
+<mat-sidenav-container class="app-analytics-outer " >
+    <mat-sidenav #sidenav *ngIf="pref.ready && pref.combined.showAnalyticsSideMenu" [(opened)]="sidebarVisible"
+                 class="app-analytics-sidenav" disableClose mode="side">
+        <button mat-icon-button class="app-draw-close-button" aria-label="Close" (click)="sidenav.toggle()">
+            <mat-icon>close</mat-icon>
+        </button>
+        <mat-nav-list>
+            <a mat-list-item routerLink="/analytics/time">Timeseries</a>
+        </mat-nav-list>
+    </mat-sidenav>
+
+
+    <mat-sidenav-content >
+
+        <div class="app-analytics-main-area">
+            <router-outlet></router-outlet>
+        </div>
+
+
+        <!--    <div class="map-inset-shadow"></div>-->
+    </mat-sidenav-content>
+</mat-sidenav-container>

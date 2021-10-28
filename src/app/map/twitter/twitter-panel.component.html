@@ -1,37 +1,49 @@
 <div class="app-tweet-outer">
 
-  <div class="app-tweet-header">
+  <mat-toolbar class="expanded-toolbar app-toolbar">
     <ng-container *ngIf="ready">
-      <ng-container *ngIf="tweets.length > 0">
-        <span class="app-tweet-heading" style="color: black">{{region}}:</span>
-        <help page="help-and-support#exceedance"
-              tooltip="Exceedance probability is calculated by comparing the current level of tweet activity with historical tweet activity.">
-          Exceedance probability
-        </help>
-        {{exceedanceProbability}}%
-      </ng-container>
+      <div class="app-tweet-heading-text">
+        <ng-container *ngIf="selection.count === 1">
+          <ng-container *ngIf="tweets.length > 0">
+            <div class="app-tweet-heading" style="color: black">{{selection.firstRegion().title}}</div>
 
-      <ng-container *ngIf="tweets.length === 0">
+            <div class="app-tweet-sub-heading">
+              <help page="help-and-support#exceedance"
+                    tooltip="Exceedance probability is calculated by comparing the current level of tweet activity with historical tweet activity.">
+                Exceedance probability&nbsp;
+              </help>
+              {{selection.firstRegion().exceedanceProbability}}%
+            </div>
 
-      <span *ngIf="region" class="app-tweet-heading"
-            style="color: black">No Tweets from {{region}}<br/></span>
+          </ng-container>
 
-        <span *ngIf="!region" class="app-tweet-heading" style="color: black">Loading ...<br/></span>
-      </ng-container>
+          <ng-container *ngIf="tweets.length === 0">
 
-      <span>&nbsp;&nbsp;&nbsp;</span>
-      <button mat-icon-button class="app-tweet-btn app-tweet-export-btn" (click)="download()">
-        <mat-icon matTooltip="Download these Tweets as a CSV file.">cloud_download</mat-icon>
+            <div *ngIf="selection" class="app-tweet-heading"
+                 style="color: black">{{selection.firstRegion().title}}<br/></div>
+            <div class="app-tweet-sub-heading">No Tweets</div>
+            <span *ngIf="!selection" class="app-tweet-heading" style="color: black">Loading ...<br/></span>
+          </ng-container>
+        </ng-container>
+        <ng-container *ngIf="selection.count > 1">
+          <span class="app-tweet-heading">{{selection.count}} regions selected</span>
+        </ng-container>
+        <span>&nbsp;&nbsp;&nbsp;</span>
+      </div>
+      <div class="app-toolbar-expanding-separator"></div>
+      <button mat-icon-button class="app-toolbar-btn app-tweet-btn app-tweet-export-btn" (click)="download()">
+        <mat-icon matTooltip="Download these Tweets as a CSV file.">vertical_align_bottom</mat-icon>
       </button>
-      <button mat-icon-button class="app-tweet-btn app-tweet-refresh-btn" (click)="refresh()">
+      <button mat-icon-button class="app-toolbar-btn app-tweet-btn app-tweet-refresh-btn" (click)="refresh()">
         <mat-icon matTooltip="Manually refresh the tweet list.">refresh</mat-icon>
       </button>
+      <div class="app-toolbar-separator"></div>
     </ng-container>
 
     <div *ngIf="!ready">
       <mat-spinner diameter="48" class="app-tweet-area-loading-spinner"></mat-spinner>
     </div>
-  </div>
+  </mat-toolbar>
 
 
   <div class="app-tweet-table" *ngIf="showTimeline">

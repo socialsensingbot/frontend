@@ -1,6 +1,14 @@
 {
   "env": {
-    "RETRIES": 2
+    "RETRIES": 0
   },
-  "projectId": "zxxo89"
+  "retries" : {
+    "runMode" : 3, "openMode": 0
+  },
+  "numTestsKeptInMemory" : 0,
+  "projectId": "zxxo89",
+  "ignoreTestFiles": [
+    "**/__snapshots__/*",
+    "**/__image_snapshots__/*"
+  ]
 }

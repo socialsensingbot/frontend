@@ -1,11 +1,13 @@
-import {Component, OnInit} from '@angular/core';
-import {FormGroup, FormControl, Validators, ValidationErrors} from '@angular/forms';
-import {AuthService} from '../auth.service';
-import {CognitoUser} from '@aws-amplify/auth';
-import {NotificationService} from 'src/app/services/notification.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {environment} from 'src/environments/environment';
-import {Auth, Logger} from "aws-amplify";
+import {Component, OnInit} from "@angular/core";
+import {FormGroup, FormControl, Validators, ValidationErrors} from "@angular/forms";
+import {AuthService} from "../auth.service";
+import {Auth} from "@aws-amplify/auth";
+import {NotificationService} from "src/app/services/notification.service";
+import {ActivatedRoute, Router} from "@angular/router";
+import {environment} from "src/environments/environment";
+import { Logger} from "@aws-amplify/core";
+import {LoadingProgressService} from "../../services/loading-progress.service";
+
 const log = new Logger("new-pass");
 
 /**
@@ -13,53 +15,57 @@ const log = new Logger("new-pass");
  * password. Primarily that is to allow the user to change the Admin set temporary password.
  */
 @Component({
-             selector:    'app-new-pass',
-             templateUrl: './new-pass.component.html',
-             styleUrls:   ['./new-pass.component.scss']
+             selector:    "app-new-pass",
+             templateUrl: "./new-pass.component.html",
+             styleUrls:   ["./new-pass.component.scss"]
            })
 export class NewPassComponent implements OnInit {
-
+  buttonColor = environment.toolbarColor;
   changePassForm: FormGroup = new FormGroup({
-                                              password: new FormControl('', [Validators.required, Validators.min(8)]),
-                                              confirm:  new FormControl('', [Validators.required, Validators.min(8),
+                                              password: new FormControl("", [Validators.required, Validators.min(8)]),
+                                              confirm:  new FormControl("", [Validators.required, Validators.min(8),
                                                                              control => {
-                                                                               let errors: ValidationErrors = {};
+                                                                               const errors: ValidationErrors = {};
                                                                                if (this && this.changePassForm && this.passwordInput.value !== control.value) {
-                                                                                 errors.different = "Password and confirmation are not the same."
+                                                                                 errors.different = "Password and confirmation are not the same.";
                                                                                }
                                                                                return errors;
                                                                              }])
                                             });
 
   hide = true;
-  message: string= "Change Password";
+  message = "Change Password";
 
-  get passwordInput() { return this.changePassForm.get('password'); }
+  get passwordInput() { return this.changePassForm.get("password"); }
 
-  get confirmInput() { return this.changePassForm.get('confirm'); }
+  get confirmInput() { return this.changePassForm.get("confirm"); }
 
   constructor(
     public auth: AuthService,
     private _notification: NotificationService,
     private _router: Router,
-    private route: ActivatedRoute) {
+    private _route: ActivatedRoute, private loading: LoadingProgressService) {
 
-    this.message=_router.getCurrentNavigation().extras.state.message;
+    this.message = _router.getCurrentNavigation().extras.state.message;
+  }
+
+  ngOnInit(): void {
+      this.loading.loaded();
   }
 
 
   getPasswordError() {
-    if (this.passwordInput.hasError('required')) {
-      return 'Please supply a password.';
+    if (this.passwordInput.hasError("required")) {
+      return "Please supply a password.";
     }
   }
 
   getConfirmPasswordError() {
-    if (this.confirmInput.hasError('required')) {
-      return 'Please confirm password.';
+    if (this.confirmInput.hasError("required")) {
+      return "Please confirm password.";
     }
-    if (this.confirmInput.hasError('different')) {
-      return 'Password and confirmation do not match';
+    if (this.confirmInput.hasError("different")) {
+      return "Password and confirmation do not match";
     }
   }
 
@@ -67,12 +73,10 @@ export class NewPassComponent implements OnInit {
     log.debug("changePass()");
     return this.auth.completeNewPassword(this.passwordInput.value).then(() => {
       log.debug("completed new password");
-      this._router.navigate(['/map'], {queryParamsHandling: "merge"});
+      window.location.replace(this._route.snapshot.queryParams._return);
+
     }).catch(e => log.error(e));
   }
 
 
-  public ngOnInit(): void {
-
-  }
 }

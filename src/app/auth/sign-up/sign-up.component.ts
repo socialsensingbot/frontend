@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { MatBottomSheet } from '@angular/material';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { CountryCodeSelectComponent } from '../country-code-select/country-code-select.component';
 import { CountryCode } from '../country-code-select/country-codes';
 import { AuthService } from '../auth.service';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
-import {Logger} from "aws-amplify";
+import {Logger} from "@aws-amplify/core";
 const log = new Logger('sign-up');
 
 @Component({
