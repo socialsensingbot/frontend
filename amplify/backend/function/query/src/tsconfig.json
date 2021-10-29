@@ -8,7 +8,9 @@
       "dom",
       "es5",
       "scripthost",
-      "es2015.promise"
+      "es2015.promise",
+      "es2015",
+      "es2018"
     ]
   },
   "include": ["."],
