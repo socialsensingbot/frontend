@@ -91,7 +91,15 @@
         "userPoolGroups": {}
       },
       "function": {
-        "S3Triggerb3a090e2": {}
+        "S3Triggerb3a090e2": {},
+        "twitterCompliance": {
+          "deploymentBucketName": "amplify-socialsensing-demo-144920-deployment",
+          "s3Key": "amplify-builds/twitterCompliance-345744665841366d6969-build.zip"
+        },
+        "query": {
+          "deploymentBucketName": "amplify-socialsensing-demo-144920-deployment",
+          "s3Key": "amplify-builds/query-4e6e504f6e4b73695931-build.zip"
+        }
       },
       "hosting": {
         "amplifyhosting": {
