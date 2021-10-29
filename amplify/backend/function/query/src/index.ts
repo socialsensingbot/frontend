@@ -1,5 +1,4 @@
 import {Pool} from "mysql";
-import TwitterApi from "twitter-api-v2";
 
 const aws = require("aws-sdk");
 const mysql = require("mysql");
@@ -21,7 +20,6 @@ const init = async () => {
 
     console.log("Parameters:", Parameters);
     const dbPassword = Parameters.filter(i => i.Name.endsWith("DB_PASSWORD")).pop().Value;
-    const twitterBearerToken = Parameters.filter(i => i.Name.endsWith("TWITTER_BEARER_TOKEN")).pop().Value;
     console.log("DB Password: " + dbPassword);
     // Initialising the MySQL connection
     const connection: Pool = mysql.createPool({
@@ -38,9 +36,7 @@ const init = async () => {
                                                   queueLimit:         5000,
                                                   debug:              false
                                               });
-    const twitter = new TwitterApi(twitterBearerToken);
-
-    return awsServerlessExpress.createServer(require("./app")(connection, twitter));
+    return awsServerlessExpress.createServer(require("./app")(connection));
 
 };
 const server = init();

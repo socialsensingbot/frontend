@@ -14,8 +14,7 @@
     "md5": "^2.3.0",
     "mysql": "^2.18.1",
     "mysql-connection-pool-manager": "^1.5.9",
-    "node-cache": "^5.1.2",
-    "twitter-api-v2": "^1.4.1"
+    "node-cache": "^5.1.2"
   },
   "devDependencies": {
     "@types/node": "^12.11.1",

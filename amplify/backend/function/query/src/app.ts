@@ -4,7 +4,6 @@ import * as bodyParser from "body-parser";
 import {QueryMetadataSets} from "./metdata";
 import * as NodeCache from "node-cache";
 import {AggregationMap, MapMetadata, RegionGeography, ServiceMetadata} from "./map-data";
-import {TwitterApi} from "twitter-api-v2";
 import {Pool} from "mysql";
 
 const md5 = require('md5');
@@ -44,7 +43,7 @@ export const roundTo15Minute = (timestamp: number): any => {
 };
 // Only set to disable the entire API, i.e. to protect the dev database from excessively long queries.
 const disabled = false;
-module.exports = (connection: Pool, twitter: TwitterApi) => {
+module.exports = (connection: Pool) => {
 
 
     // declare a new express app
