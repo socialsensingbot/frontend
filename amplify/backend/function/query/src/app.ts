@@ -69,6 +69,10 @@ module.exports = (connection: Pool) => {
     }, tx = false): Promise<any[]> => {
         return new Promise((resolve, reject) => {
             connection.getConnection((err, poolConnection) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
                 if (tx) {
                     poolConnection.beginTransaction();
                 }
