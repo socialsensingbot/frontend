@@ -42,7 +42,6 @@
     </data-source>
     <data-source name="Demo" uuid="77c800f6-db56-489a-b48a-3a03b76a30d4">
       <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="MYSQL" exact-version="0" />
-      <user-name>admin</user-name>
       <schema-mapping />
     </data-source>
   </component>
