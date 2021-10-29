@@ -117,7 +117,7 @@ export const environment = {
     defaultDashboard,
     layers:                       layers,
     shareTextAutocompleteInGroup: true,
-    analyticsDefaultRegions:      ["republic of ireland"],
+    analyticsDefaultRegions:      ["ireland"],
     maxCallsPerMinute:            600,
 
 };
