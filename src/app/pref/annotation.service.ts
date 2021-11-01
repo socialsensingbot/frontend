@@ -8,7 +8,7 @@ import {PreferenceService} from "./preference.service";
 import {AuthService} from "../auth/auth.service";
 import {NgForageCache} from "ngforage";
 
-const log = new Logger("AnnotationService");
+const log = new Logger("annotation-service");
 
 @Injectable({
                 providedIn: "root"
@@ -72,7 +72,7 @@ export class AnnotationService {
             return;
         }
 
-        log.debug(this._cached[tweet.id]);
+        log.debug("Cached tweet was ", this._cached[tweet.id]);
         return this._cached[tweet.id] || null;
     }
 
@@ -86,7 +86,7 @@ export class AnnotationService {
         try {
 
             const result = await this.getAnnotations(tweet);
-            log.debug(result);
+            log.debug("Annotation: ", result);
             const email = await this._auth.email();
             if (typeof result === "undefined" || result === null) {
                 log.info("No annotations returned ", result);
@@ -103,7 +103,13 @@ export class AnnotationService {
                 return await saved;
 
             } else {
-                const mergedAnnotations = JSON.stringify({...JSON.parse(result.annotations), ...annotations});
+                let mergedAnnotations: string;
+                if (typeof result.annotations === "string") {
+                    mergedAnnotations = JSON.stringify({...JSON.parse(result.annotations), ...annotations});
+                } else {
+                    mergedAnnotations = JSON.stringify({...(result.annotations as any), ...annotations});
+
+                }
                 const saved = DataStore.save(GroupTweetAnnotations.copyOf(result, m => {
                     m.annotations = mergedAnnotations;
                     m.annotatedBy = email;
@@ -143,8 +149,8 @@ export class AnnotationService {
         return await DataStore.query(GroupTweetAnnotations,
                                      q => q.ownerGroups("contains", this._pref.groups[0]))
                               .then(result => {
-                                  log.debug(result);
-                                  if (result.length === 0) {
+                                  log.debug("Updated cache with", result);
+                                  if (!result || result.length === 0) {
                                       return null;
                                   } else {
                                       result.forEach(i => this._cached[i.tweetId] = i);

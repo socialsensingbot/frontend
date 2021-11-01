@@ -6,7 +6,7 @@ import {environment} from "../../environments/environment";
 import {DataStore, OpType} from "@aws-amplify/datastore";
 import {GroupPreferences, GroupTweetIgnore, GroupTwitterUserIgnore, UserPreferences} from "../../models";
 import Auth from "@aws-amplify/auth";
-import {LayerGroup} from "../types";
+import {SSMapLayer} from "../types";
 
 const log = new Logger("pref-service");
 
@@ -446,8 +446,8 @@ export class PreferenceService {
         return this.combined.features.includes(feature);
     }
 
-    public defaultLayer(): LayerGroup {
-        const defaultLayer: LayerGroup = this.combined.layers.available.filter(i => i.id === this.combined.layers.defaultLayer)[0];
+    public defaultLayer(): SSMapLayer {
+        const defaultLayer: SSMapLayer = this.combined.layers.available.filter(i => i.id === this.combined.layers.defaultLayer)[0];
         if (!defaultLayer) {
             throw new Error(
                 "Configuration specifies " + this.combined.layers.defaultLayer + " as default layer, no such layer exists in " + JSON.stringify(

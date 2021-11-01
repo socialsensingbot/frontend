@@ -8,6 +8,8 @@
                aria-label="Search"
                matInput
                placeholder="Text search, e.g. coastal"
+               (change)="exec.uiActivity()"
+               (ngModelChange)="exec.uiActivity()"
                type="text">
         <mat-autocomplete #auto="matAutocomplete">
             <mat-option *ngFor="let option of filteredAutocomplete" [value]="option">

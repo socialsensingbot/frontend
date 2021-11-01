@@ -1,8 +1,8 @@
 /* tslint:disable:object-literal-key-quotes */
 import {Dashboard} from "../app/pref/dashboard.service";
-import {InfoLayerConfiguration} from "../app/types";
+import {SSLayerConfiguration} from "../app/types";
 
-const layers: InfoLayerConfiguration = {
+const layers: SSLayerConfiguration = {
     "available":    [
         {
             "id":       "flood",

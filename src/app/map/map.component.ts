@@ -26,6 +26,7 @@ import {LoadingProgressService} from "../services/loading-progress.service";
 import {ONE_DAY} from "./data/map-data";
 import {RESTMapDataService} from "./data/rest-map-data.service";
 import {TwitterExporterService} from "./twitter/twitter-exporter.service";
+import {MapSelectionService} from "../map-selection.service";
 
 
 const log = new Logger("map");
@@ -39,6 +40,7 @@ const ONE_MINUTE_IN_MILLIS = 60000;
            })
 export class MapComponent implements OnInit, OnDestroy {
     private currentStatisticsLayer: LayerGroup<any> = layerGroup();
+    private destroyed = false;
 
     public set selectedFeatureNames(value: string[]) {
         this._selectedFeatureNames = value;
@@ -136,52 +138,10 @@ export class MapComponent implements OnInit, OnDestroy {
     private _inFeature: boolean;
     public selectedCountriesTextValue = "";
 
-    constructor(private _router: Router,
-                private route: ActivatedRoute,
-                private _zone: NgZone,
-                private _layerStyles: LayerStyleService,
-                private _notify: NotificationService,
-                private _auth: AuthService,
-                private _http: HttpClient,
-                private _exec: UIExecutionService,
-                private _color: ColorCodeService,
-                public data: RESTMapDataService,
-                public _exporter: TwitterExporterService,
-                public pref: PreferenceService,
-                private readonly cache: NgForageCache,
-                public dash: DashboardService,
-                public loading: LoadingProgressService
-    ) {
-        // save the query parameter observable
-        this._searchParams = this.route.queryParams;
-
-
-    }
-
-    private _activeLayerGroup: string = this.DEFAULT_LAYER_GROUP;
-
-    public get activeLayerGroup(): string {
-        return this._activeLayerGroup;
-    }
-
-    public set activeLayerGroup(value: string) {
-        log.debug("set activeLayerGroup");
-        this._activeLayerGroup = value;
-        if (this.ready) {
-            this.scheduleResetLayers(this.activeStatistic, false);
-        }
-        this.updateSearch({active_layer: this._activeLayerGroup});
-        this._twitterIsStale = true;
-        this.load();
-    }
-
-    private _dataset: string;
-
-    public get dataset(): string {
-        return this._dataset;
-    }
-
     public set dataset(value: string) {
+        if (this.destroyed) {
+            return;
+        }
         log.debug("set dataset");
         if (value && value !== this._dataset) {
             this.activity = true;
@@ -213,6 +173,44 @@ export class MapComponent implements OnInit, OnDestroy {
 
             });
         }
+    }
+
+    private _activeLayerGroup: string = this.DEFAULT_LAYER_GROUP;
+
+    public get activeLayerGroup(): string {
+        return this._activeLayerGroup;
+    }
+
+    //     //                             this.activePolyLayerShortName,
+    public annotationTypes: any[] = [];
+
+    private _dataset: string;
+
+    public get dataset(): string {
+        return this._dataset;
+    }
+
+    constructor(private _router: Router,
+                private route: ActivatedRoute,
+                private _mapSelectionService: MapSelectionService,
+                private _zone: NgZone,
+                private _layerStyles: LayerStyleService,
+                private _notify: NotificationService,
+                private _auth: AuthService,
+                private _http: HttpClient,
+                private _exec: UIExecutionService,
+                private _color: ColorCodeService,
+                public data: RESTMapDataService,
+                public _exporter: TwitterExporterService,
+                public pref: PreferenceService,
+                private readonly cache: NgForageCache,
+                public dash: DashboardService,
+                public loading: LoadingProgressService
+    ) {
+        // save the query parameter observable
+        this._searchParams = this.route.queryParams;
+
+
     }
 
     private _activeStatistic: NumberLayerShortName;
@@ -279,7 +277,7 @@ export class MapComponent implements OnInit, OnDestroy {
             Object.keys(keys).sort().forEach((key) => {
                 this._newParams[key] = keys[key];
             });
-            await this._router.navigate([], {
+            await this._router.navigate(["map", this._mapSelectionService.id], {
                 queryParams:         this._newParams,
                 queryParamsHandling: "merge"
             });
@@ -293,9 +291,21 @@ export class MapComponent implements OnInit, OnDestroy {
         // of a flag and queued events. The throttling is acheived by the the periodicity of the
         // schedulers execution.
 
+        if (this.destroyed) {
+            return;
+        }
 
         // Avoids race condition with access to this.pref.combined
         await this.pref.waitUntilReady();
+        if (!this._mapSelectionService.id && this.route.snapshot.params.map === "undefined") {
+            log.debug("Redirecting to /map/" + this.pref.combined.defaultDataSet);
+            this._mapSelectionService.id = this.pref.combined.defaultDataSet;
+            await this._router.navigate(["map", this.pref.combined.defaultDataSet], {queryParamsHandling: "preserve"});
+        }
+        if (this._mapSelectionService.id && this.route.snapshot.params.map === "undefined") {
+            log.debug("Redirecting to /map/" + this._mapSelectionService.id);
+            await this._router.navigate(["map", this._mapSelectionService.id], {queryParamsHandling: "preserve"});
+        }
         this._stateSub = this._exec.state.subscribe((state: AppState) => {
             if (state === "ready") {
                 log.debug("Setting this to be ready");
@@ -355,6 +365,7 @@ export class MapComponent implements OnInit, OnDestroy {
      * Clear up when the component is destroyed.
      */
     ngOnDestroy() {
+        this.destroyed = true;
         if (this._loadTimer) {
             this._loadTimer.unsubscribe();
         }
@@ -373,6 +384,31 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this._blinkTimer) {
             this._blinkTimer.unsubscribe();
         }
+        this._map.eachLayer((layer) => {
+            this._map.removeLayer(layer);
+        });
+        let timeoutIndex = 0;
+        const watcher = setInterval(() => {
+            this._zone.run(() => {
+                timeoutIndex++;
+                if (this._map && this._map.remove) {
+                    try {
+                        this._map.off();
+                        this._map.remove();
+                        this._map = null;
+                        log.debug("MAP Destroyed");
+
+                        clearInterval(watcher);
+                    } catch (e) {
+                        log.warn(e);
+                    }
+                }
+                if (timeoutIndex > 10) {  //wait for 2 seconds before giving up
+                    log.debug("MAP Could not be destroyed");
+                    clearInterval(watcher);
+                }
+            });
+        }, 200);
         log.debug("Destroyed");
 
     }
@@ -381,7 +417,9 @@ export class MapComponent implements OnInit, OnDestroy {
      * Read the live.json data file and process contents.
      */
     async load(first: boolean = false, clearSelected = false) {
-
+        if (this.destroyed) {
+            return;
+        }
         log.debug("load(" + first + "," + clearSelected + ")");
         if (!this._loggedIn) {
             log.warn("User logged out, not performing load.");
@@ -425,6 +463,9 @@ export class MapComponent implements OnInit, OnDestroy {
      * @param range the user selected upper and lower date range.
      */
     public sliderChange(range: DateRange) {
+        if (this.destroyed) {
+            return;
+        }
         // tslint:disable-next-line:prefer-const
         let {lower, upper} = range;
         log.debug("sliderChange(" + lower + "->" + upper + ")");
@@ -442,12 +483,26 @@ export class MapComponent implements OnInit, OnDestroy {
 
     // public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
     //     // this.data.downloadAggregate(aggregrationSetId, id,
-    //     //                             this.activePolyLayerShortName,
+
+    public set activeLayerGroup(value: string) {
+        log.debug("set activeLayerGroup");
+        this._activeLayerGroup = value;
+        if (this.ready) {
+            this.scheduleResetLayers(this.activeStatistic, false);
+        }
+        this.updateSearch({active_layer: this._activeLayerGroup});
+        this._twitterIsStale = true;
+        this.updateAnnotationTypes();
+        this.load();
+    }
 
     /**
      * Triggered when the user has finished sliding the slider.
      */
     public sliderChangeOnEnd(range: DateRange) {
+        if (this.destroyed) {
+            return;
+        }
         log.info("sliderChangeOnEnd()", range);
         if (!this.pref.combined.animateOnTimeSliderChange) {
             this._sliderIsStale = true;
@@ -457,6 +512,9 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     public async downloadTweetsAsCSV() {
+        if (this.destroyed) {
+            return;
+        }
         log.debug("downloadTweetsAsCSV()");
         log.debug(this.data.regionGeography);
         log.debug(this.activeRegionType);
@@ -473,6 +531,10 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     public zoomIn() {
+        if (this.destroyed) {
+            return;
+        }
+
         log.debug("zoomIn()");
         if (this._map.getZoom() < 18) {
             this._map.setZoom(this._map.getZoom() + 1);
@@ -482,6 +544,10 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     public zoomOut() {
+        if (this.destroyed) {
+            return;
+        }
+
         log.debug("zoomOut()");
         if (this._map.getZoom() > 2) {
             this._map.setZoom(this._map.getZoom() - 1);
@@ -491,6 +557,9 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     public calculateSelectedCountriesText(value: string[]) {
+        if (this.destroyed) {
+            return;
+        }
         this.selectedCountries = value;
         log.debug("selectedCountriesText(" + value + ")");
         // log.info(countries.value);
@@ -514,7 +583,26 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
+    public async timeSliderPreset(mins: number) {
+        log.debug("timeSliderPreset()");
+        if (this.destroyed) {
+            return;
+        }
+        const now: number = await this.data.now();
+        await this.sliderChange({lower: roundToHour(now - mins * ONE_MINUTE_IN_MILLIS), upper: roundToMinute(now)});
+        this.sliderOptions = {
+            max:      roundToMinute(now),
+            min:      roundToHour(await this.data.minDate()),
+            startMin: roundToHour(now - mins * ONE_MINUTE_IN_MILLIS),
+            startMax: roundToMinute(now)
+        };
+        this._sliderIsStale = true;
+    }
+
     private async scheduleResetLayers(layer: string, clearSelected = true) {
+        if (this.destroyed) {
+            return;
+        }
         log.debug("scheduleResetLayers()");
         await this._exec.queue("Reset Layers", ["ready"], async () => {
             this.activity = true;
@@ -529,6 +617,10 @@ export class MapComponent implements OnInit, OnDestroy {
      * @param params the new value for the query parameters.
      */
     private async updateMapFromQueryParams(params: Params) {
+        if (this.destroyed) {
+            return;
+        }
+
         log.debug("updateMapFromQueryParams()");
         log.debug("Params:", params);
         const {
@@ -613,6 +705,10 @@ export class MapComponent implements OnInit, OnDestroy {
      * @param map the leaflet.js Map
      */
     private async init(map: Map) {
+        if (this.destroyed) {
+            return;
+        }
+
         map.addEventListener("click", event => {
             this._zone.run(args => {
                 if (!this._inFeature) {
@@ -626,8 +722,8 @@ export class MapComponent implements OnInit, OnDestroy {
         // map.zoomControl.remove();
         await this.pref.waitUntilReady();
         this.activity = true;
-        if (this.route.snapshot.paramMap.has("dataset")) {
-            this._dataset = this.route.snapshot.paramMap.get("dataset");
+        if (this.route.snapshot.paramMap.has("map")) {
+            this._dataset = this.route.snapshot.paramMap.get("map");
         } else {
             this._dataset = this.pref.combined.defaultDataSet;
         }
@@ -637,6 +733,8 @@ export class MapComponent implements OnInit, OnDestroy {
         } else {
             this._activeLayerGroup = this.pref.defaultLayer().id;
         }
+        this.updateAnnotationTypes();
+
         if (this.route.snapshot.queryParamMap.has("active_polygon")) {
             this._activeRegionType = this.route.snapshot.queryParamMap.get("active_polygon");
         } else {
@@ -671,6 +769,9 @@ export class MapComponent implements OnInit, OnDestroy {
                 // noinspection ES6MissingAwait
                 this._exec.queue("Initial Search Params", ["no-params"],
                                  async () => {
+                                     if (this.destroyed) {
+                                         return;
+                                     }
                                      log.debug("Initial Search Parameters lambda started");
                                      await this.updateMapFromQueryParams(params);
                                      this._exec.changeState("ready");
@@ -718,9 +819,24 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
 
+    private updateAnnotationTypes(): void {
+        log.debug("Finding annotations for layer ", this._activeLayerGroup);
+        const currentLayer: any = this.pref.combined.layers.available.filter(i => i.id == this._activeLayerGroup)[0];
+        log.debug("Finding annotations for layer ", currentLayer);
+        if (currentLayer) {
+            let activeAnnotationTypes: any = currentLayer.annotations;
+            log.debug("Available annotations are ", activeAnnotationTypes);
+            this.annotationTypes = this.pref.combined.annotations.filter(
+                i => typeof activeAnnotationTypes === "undefined" || activeAnnotationTypes.includes(i.name));
+            log.debug("Annotations are ", this.annotationTypes);
+        }
+    }
+
     private async clearSelectedRegions() {
         log.debug("clearSelectedRegions()");
-
+        if (this.destroyed) {
+            return;
+        }
         await this.updateSearch({selected: []});
         this.selectedFeatureNames = [];
         await this.scheduleResetLayers(this.activeStatistic, true);
@@ -730,6 +846,9 @@ export class MapComponent implements OnInit, OnDestroy {
      * When the user places their mouse over a feature (region) this is called.
      */
     private featureEntered(e: LeafletMouseEvent) {
+        if (this.destroyed) {
+            return;
+        }
         const feature = e.target.feature;
         const exceedanceProbability: number = Math.round(feature.properties.stats * 100) / 100;
         const region: string = feature.properties.title;
@@ -753,6 +872,9 @@ export class MapComponent implements OnInit, OnDestroy {
 
     private highlight(target: any, weight: number = 3) {
         log.verbose("Highlighting ", target.feature);
+        if (this.destroyed) {
+            return;
+        }
         const feature = target.feature;
         const count: number = feature.properties.count;
         target.setStyle({
@@ -771,6 +893,9 @@ export class MapComponent implements OnInit, OnDestroy {
 
     private unhighlight(target: any) {
         log.verbose("Un-highlighting ", target.feature);
+        if (this.destroyed) {
+            return;
+        }
         const feature = target.feature;
         const count: number = feature.properties.count;
         target.setStyle({
@@ -792,6 +917,9 @@ export class MapComponent implements OnInit, OnDestroy {
      */
     private async updateTwitterPanel() {
         log.debug("updateTwitterPanel()");
+        if (this.destroyed) {
+            return;
+        }
         const features = this.selection.features();
         if (features.length === 1) {
             log.debug("1 feature");
@@ -835,6 +963,9 @@ export class MapComponent implements OnInit, OnDestroy {
      */
     private featureLeft(e: LeafletMouseEvent) {
         log.debug("featureLeft(" + this._activeStatistic + ")");
+        if (this.destroyed) {
+            return;
+        }
         if (this.selection.isSelected(e.target.feature)) {
             this.highlight(e.target);
         } else {
@@ -844,12 +975,19 @@ export class MapComponent implements OnInit, OnDestroy {
         this._inFeature = false;
     }
 
+    private isMultiSelect(e: LeafletMouseEvent) {
+        return (getOS() === "Mac OS" && e.originalEvent.metaKey) || (getOS() !== "Mac OS" && e.originalEvent.ctrlKey);
+    }
+
     /**
      * Mouse click event.
      */
     private async featureClicked(e: LeafletMouseEvent) {
         log.debug("featureClicked()");
         log.debug(e.target.feature.properties.name);
+        if (this.destroyed) {
+            return;
+        }
         if (this.isMultiSelect(e)) {
             this.selection.toggle(e.target.feature);
         } else {
@@ -867,13 +1005,11 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
 
-    private isMultiSelect(e: LeafletMouseEvent) {
-        return (getOS() === "Mac OS" && e.originalEvent.metaKey) || (getOS() !== "Mac OS" && e.originalEvent.ctrlKey);
-    }
-
     private onEachFeature(feature: geojson.Feature<geojson.GeometryObject, any>, layer: GeoJSON) {
         log.verbose("onEachFeature()");
-
+        if (this.destroyed) {
+            return;
+        }
         // If this feature is referenced in the URL query parameters selected
         // e.g. ?...&selected=powys&selected=armagh
         // then highlight it and update Twitter
@@ -898,11 +1034,22 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Clears and iialises feature data on the map.
+     */
+    private async clearMapFeatures() {
+
+    }
+
+    /**
      * Reset the polygon layers.
      *
      * @param clearSelected clears the selected polygon
      */
     private async resetStatisticsLayer(layer: string, clearSelected) {
+        if (this.destroyed) {
+            return;
+        }
+
         log.info("Resetting " + layer);
         this.loading.showIndeterminateSpinner();
         try {
@@ -956,16 +1103,12 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Clears and iialises feature data on the map.
-     */
-    private async clearMapFeatures() {
-
-    }
-
-    /**
      * Updates the data stored in the polygon data of the leaflet layers.
      */
     private async updateRegionData(geography: PolygonData) {
+        if (this.destroyed) {
+            return;
+        }
         return new Promise<void>(async (resolve, reject) => {
             const features = geography.features;
             await this.data.preCacheRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax);
@@ -994,9 +1137,15 @@ export class MapComponent implements OnInit, OnDestroy {
 
     private async updateLayers(reason: string = "", clearSelected = false) {
         log.debug("updateLayers()");
+        if (this.destroyed) {
+            return;
+        }
         return await this._exec.queue("Update Layers: " + reason, ["ready"], async () => {
                                           // Mark as stale to trigger a refresh
                                           log.debug("updateLayers() lambda");
+                                          if (this.destroyed) {
+                                              return;
+                                          }
                                           if (!this._updating) {
                                               this.activity = true;
                                               this._updating = true;
@@ -1025,6 +1174,9 @@ export class MapComponent implements OnInit, OnDestroy {
      */
     private hideTweets() {
         log.debug("hideTweets()");
+        if (this.destroyed) {
+            return;
+        }
         this._exec.queue("Tweets Visible", ["ready"], () => {
             this.tweetsVisible = false;
         }, "tweets.visibility", true, true, true);
@@ -1035,6 +1187,9 @@ export class MapComponent implements OnInit, OnDestroy {
      */
     private showTweets() {
         log.verbose("showTweets()");
+        if (this.destroyed) {
+            return;
+        }
         this._exec.queue("Tweets Visible", ["ready"], () => {
             this.tweetsVisible = true;
         }, "tweets.visibility", true, true, true);
@@ -1048,6 +1203,9 @@ export class MapComponent implements OnInit, OnDestroy {
         log.debug("updateFromSlider() startMax=" + this.sliderOptions.startMax);
         log.debug(
             "updateFromSlider() threshold=" + (await this.data.now() - this.pref.combined.continuousUpdateThresholdInMinutes * 60_000));
+        if (this.destroyed) {
+            return;
+        }
         this.liveUpdating = this.sliderOptions.startMax >= await this.data.now() - this.pref.combined.continuousUpdateThresholdInMinutes * 60_000;
 
         await this.checkForLiveUpdating();
@@ -1060,6 +1218,9 @@ export class MapComponent implements OnInit, OnDestroy {
      */
     private async updateSliderFromData() {
         log.debug("updateSliderFromData()");
+        if (this.destroyed) {
+            return;
+        }
         this._absoluteTime = (await this.data.now());
 
         this.sliderOptions = {
@@ -1073,6 +1234,9 @@ export class MapComponent implements OnInit, OnDestroy {
 
     private async checkForLiveUpdating() {
         log.debug("checkForLiveUpdating()");
+        if (this.destroyed) {
+            return;
+        }
         if (this.sliderOptions.startMax >= await this.data.now() - this.pref.combined.continuousUpdateThresholdInMinutes * 60_000) {
             this.liveUpdating = true;
         } else {
@@ -1091,22 +1255,12 @@ export class MapComponent implements OnInit, OnDestroy {
      */
     private async updateTwitter() {
         log.debug("updateTwitter()");
+        if (this.destroyed) {
+            return;
+        }
         await this._exec.queue("Update Twitter", ["ready"], async () => {
             // noinspection ES6MissingAwait
             this.updateTwitterPanel();
         }, "", false, true, true, null, 1000, 5);
-    }
-
-    public async timeSliderPreset(mins: number) {
-        log.debug("timeSliderPreset()");
-        const now: number = await this.data.now();
-        await this.sliderChange({lower: roundToHour(now - mins * ONE_MINUTE_IN_MILLIS), upper: roundToMinute(now)});
-        this.sliderOptions = {
-            max:      roundToMinute(now),
-            min:      roundToHour(await this.data.minDate()),
-            startMin: roundToHour(now - mins * ONE_MINUTE_IN_MILLIS),
-            startMax: roundToMinute(now)
-        };
-        this._sliderIsStale = true;
     }
 }

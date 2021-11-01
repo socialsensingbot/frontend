@@ -12,7 +12,7 @@ import {Dashboard} from "../app/pref/dashboard.service";
  * on performance if an error is thrown.
  */
 import "zone.js/dist/zone-error"; // Included with Angular CLI.
-import {InfoLayerConfiguration} from "../app/types";
+import {SSLayerConfiguration} from "../app/types";
 
 const defaultDashboard: Dashboard = {
     boards: [{
@@ -24,49 +24,57 @@ const defaultDashboard: Dashboard = {
     }]
 };
 
-const layers: InfoLayerConfiguration = {
-    "available":    [
+const layers: SSLayerConfiguration = {
+    "available": [
         {
-            "id":       "flood",
-            "title":    "Floods",
-            "sources":  ["twitter"],
-            "hazards":  ["flood"],
-            "warnings": "exclude",
+            "id":          "flood",
+            "title":       "Floods",
+            "sources":     ["twitter"],
+            "hazards":     ["flood"],
+            "warnings":    "exclude",
+            "annotations": ["source", "impact"]
         },
         {
-            "id":       "flood-with-warnings",
-            "title":    "Floods (includes warnings)",
-            "sources":  ["twitter"],
-            "hazards":  ["flood"],
-            "warnings": "include"
+            "id":          "flood-with-warnings",
+            "title":       "Floods (includes warnings)",
+            "sources":     ["twitter"],
+            "hazards":     ["flood"],
+            "warnings":    "include",
+            "annotations": ["source", "impact"]
         },
         {
-            "id":       "flood-warnings-only",
-            "title":    "Floods (only warnings)",
-            "sources":  ["twitter"],
-            "hazards":  ["flood"],
-            "warnings": "only"
+            "id":          "flood-warnings-only",
+            "title":       "Floods (only warnings)",
+            "sources":     ["twitter"],
+            "hazards":     ["flood"],
+            "warnings":    "only",
+            "annotations": ["source", "impact"]
         },
         {
-            "id":       "wind",
-            "title":    "Wind",
-            "sources":  ["twitter"],
-            "hazards":  ["wind"],
-            "warnings": "exclude"
+            "id":          "wind",
+            "title":       "Wind",
+            "sources":     ["twitter"],
+            "hazards":     ["wind"],
+            "warnings":    "exclude",
+            "annotations": ["impact"]
         },
         {
-            "id":       "wind-and-flood",
-            "title":    "Wind & Flood",
-            "sources":  ["twitter"],
-            "hazards":  ["wind", "flood"],
-            "warnings": "exclude"
+            "id":          "wind-and-flood",
+            "title":       "Wind & Flood",
+            "sources":     ["twitter"],
+            "hazards":     ["wind", "flood"],
+            "warnings":    "exclude",
+            "annotations": ["source", "impact"]
+
         },
         {
-            "id":       "snow",
-            "title":    "Snow",
-            "sources":  ["twitter"],
-            "hazards":  ["snow"],
-            "warnings": "exclude"
+            "id":          "snow",
+            "title":       "Snow",
+            "sources":     ["twitter"],
+            "hazards":     ["snow"],
+            "warnings":    "exclude",
+            "annotations": ["impact"]
+
         },
 
     ],
@@ -91,25 +99,31 @@ export const environment = {
         email:    "",
         password: ""
     },
+    annotations:      [
+        {
+            name:  "impact",
+            title: "Impact",
+            // The ability to tag tweets with an impact annotation
+            options: [
+                {title: "1 – Minimal", value: "minimal", color: "#43A047"},
+                {title: "2 – Minor", value: "minor", color: "#FFEE58"},
+                {title: "3 - Significant", value: "significant", color: "#FFB300"},
+                {title: "4 - Severe", value: "severe", color: "#F4511E"}
+            ]
+        },
+        {
+            name:  "source",
+            title: "Source",
+            // The ability to tag tweets with a source
+            options: [
+                {title: "River", value: "river", color: "#43A047"},
+                {title: "Surface", value: "surface", color: "#FFEE58"},
+                {title: "Groundwater", value: "groundwater", color: "#FFB300"},
+                {title: "Coastal", value: "coastal", color: "#F4511E"}
+            ]
+        },
+    ],
 
-    impact: {
-        // The ability to tag tweets with an impact annotation
-        levels: [
-            {title: "1 – Minimal", value: "minimal", color: "#43A047"},
-            {title: "2 – Minor", value: "minor", color: "#FFEE58"},
-            {title: "3 - Significant", value: "significant", color: "#FFB300"},
-            {title: "4 - Severe", value: "severe", color: "#F4511E"}
-        ]
-    },
-    source: {
-        // The ability to tag tweets with a source
-        types: [
-            {title: "River", value: "river", color: "#43A047"},
-            {title: "Surface", value: "surface", color: "#FFEE58"},
-            {title: "Groundwater", value: "groundwater", color: "#FFB300"},
-            {title: "Coastal", value: "coastal", color: "#F4511E"}
-        ]
-    },
     // features: ["impact", "source", "map"],
     features: ["impact", "source", "map", "dashboard", "analytics"],
 

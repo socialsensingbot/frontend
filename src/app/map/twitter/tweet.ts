@@ -17,6 +17,10 @@ export class CSVExportTweet {
 export class Tweet {
     private _init: boolean;
 
+    get potentiallySensitive(): boolean {
+        return this._possibly_sensitive;
+    }
+
     /**
      * All constructor values bust be optional for the {@link Tweet#populate} method.
      * @param _id the tweet id as defined by Twitter
@@ -27,9 +31,8 @@ export class Tweet {
      * @param _region the region associated with this tweet
      */
     constructor(private _id: string = null, private _html: string = null, private _json: any = {}, private _location: geojson.GeoJsonObject,
-                private _date: Date, private _region: string) {
+                private _date: Date, private _region: string, private _possibly_sensitive = false) {
     }
-
 
     get json(): any {
         return this._json;
@@ -135,6 +138,7 @@ export class Tweet {
         this._url = tweet._url;
         this._valid = tweet._valid;
         this._init = tweet._init;
+        this._possibly_sensitive = tweet._possibly_sensitive;
         return this;
     }
 

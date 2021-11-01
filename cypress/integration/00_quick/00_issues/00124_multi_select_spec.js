@@ -9,36 +9,36 @@ describe('#124 Region multi select : https://github.com/socialsensingbot/fronten
 
 
              it('Select manually', () => {
-                 const url = MAP_URL + "?active_number=stats&active_polygon=county&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&zoom=5&selected=powys";
+                 const url = MAP_URL + "?active_number=stats&active_polygon=county&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&zoom=5&selected=west%20yorkshire";
                  cy.visitAndWait(url);
-                 cy.get(`div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-powys[stroke-width=3]`);
+                 cy.get(`div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-west-yorkshire[stroke-width=3]`);
                  cy.wait(10000);
-                 cy.twitterPanelHeader("Powys");
-                 cy.multiSelectRegions(["ceredigion", "carmarthenshire"]);
+                 cy.twitterPanelHeader("West Yorkshire");
+                 cy.multiSelectRegions(["cambridgeshire", "hertfordshire"]);
                  cy.twitterPanelHeader("3 regions selected");
                  cy.wait(10000);
-                 cy.tweetCountTotal(108);
+                 cy.tweetCountTotal(28);
                  cy.url().should("equal",
-                                 MAP_URL + "?active_number=stats&active_polygon=county&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&zoom=5&selected=powys&selected=ceredigion&selected=carmarthenshire")
-                 cy.multiSelectRegions(["ceredigion"]);
+                                 MAP_URL + "?active_number=stats&active_polygon=county&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&zoom=5&selected=west%20yorkshire&selected=cambridgeshire&selected=hertfordshire")
+                 cy.multiSelectRegions(["cambridgeshire"]);
                  cy.twitterPanelHeader("2 regions selected");
-                 cy.tweetCountTotal(90);
+                 cy.tweetCountTotal(8);
                  cy.url().should("equal",
-                                 MAP_URL + "?active_number=stats&active_polygon=county&max_time="+MAX_DATE_MILLIS + "&min_time="+MIN_DATE_MILLIS+"&zoom=5&selected=powys&selected=carmarthenshire")
-                 cy.get(`div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-powys[stroke-width=3]`).click(
+                                 MAP_URL + "?active_number=stats&active_polygon=county&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&zoom=5&selected=west%20yorkshire&selected=hertfordshire")
+                 cy.get(`div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-hertfordshire[stroke-width=3]`).click(
                      {force: true});
                  cy.url().should("equal", url);
-                 cy.twitterPanelHeader("Powys");
+                 cy.twitterPanelHeader("West Yorkshire");
              });
 
 
              it('Select from URL', () => {
-                 const url = MAP_URL + "?active_number=stats&active_polygon=county&max_time="+ MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&zoom=5&selected=powys&selected=ceredigion&selected=carmarthenshire";
+                 const url = MAP_URL + "?active_number=stats&active_polygon=county&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&zoom=5&selected=cambridgeshire&selected=hertfordshire&selected=west%20yorkshire";
                  cy.visitAndWait(url);
                  cy.wait(10000);
                  cy.twitterPanelHeader("3 regions selected");
-                 cy.tweetCountTotal(2);
-                 for (let county of ["powys", "ceredigion", "carmarthenshire"]) {
+                 cy.tweetCountTotal(28);
+                 for (let county of ["cambridgeshire", "hertfordshire", "west-yorkshire"]) {
                      cy.get(`div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-${county}[stroke-width=3]`);
                  }
              });

@@ -3,14 +3,14 @@ import {MAP_URL} from "../../support";
 describe('04: Map: ', function () {
     // Step 1: setup the application state
     beforeEach(function () {
-        cy.visit('http://localhost:4200/map');
+        cy.visit(MAP_URL);
         cy.stubLiveJson("live-old");
         cy.login();
     });
 
     describe('Interact', () => {
         it('with the map', () => {
-            cy.visitAndWait('http://localhost:4200/map');
+            cy.visitAndWait(MAP_URL);
             cy.get('.content-inner').click();
             cy.get('.map').click();
             cy.get('#logout').click();
@@ -19,7 +19,7 @@ describe('04: Map: ', function () {
         });
 
         it('with a tooltip', () => {
-            cy.visitAndWait('http://localhost:4200/map');
+            cy.visitAndWait(MAP_URL);
             cy.get(
                 'body > app-root > div > div > app-map > mat-sidenav-container > mat-sidenav-content > div.map-surround > div > div.leaflet-pane.leaflet-map-pane > div.leaflet-pane.leaflet-overlay-pane > svg > g > path:nth-child(174)',
                 {timeout: 60000}).trigger("mouseover", {force: true});
@@ -39,7 +39,7 @@ describe('04: Map: ', function () {
         const countFirstLegendVal = " 150–";
 
         it('has correct default', () => {
-            cy.visitAndWait("http://localhost:4200/map");
+            cy.visitAndWait(MAP_URL);
             cy.get(legendEntry).should("be.visible");
             cy.get(legendEntry).get("i").should("have.attr", "style").should("contain", statsFirstLegendColour)
             cy.get(legendEntry).should("have.text", statsFirstLegendVal);

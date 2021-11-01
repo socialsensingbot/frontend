@@ -31,50 +31,6 @@
 
 
     <ng-template #tweetEntry let-tweet="tweet" let-si="senderIgnore" let-ti="tweetIgnore">
-        <mat-menu #impact="matMenu">
-            <ng-container *ngFor="let level of pref.combined.impact.levels">
-                <button
-                        class="tweet-list-item-menu-impact-level-{{level.value}} tweet-list-item-menu-impact-level-{{level.value}}-selected"
-                        *ngIf="annotationValueIs(tweet,
-        'impact',level.value)"
-                        mat-menu-item><strong>{{level.title}}</strong>
-                </button>
-                <button *ngIf="annotationValueIsNot(tweet, 'impact',level.value)"
-                        (click)="annotateTweet(tweet,{impact:level.value}, $event);"
-                        class="tweet-list-item-menu-impact-level-{{level.value}} tweet-list-item-menu-impact-level-{{level.value}}-not-selected"
-                        mat-menu-item>{{level.title}}
-                </button>
-            </ng-container>
-            <button
-                    (click)="annotateTweet(tweet,{impact:''}, $event);"
-                    class="tweet-list-item-menu-impact-level-clear"
-                    mat-menu-item>Clear
-            </button>
-
-        </mat-menu>
-
-        <mat-menu #source="matMenu">
-            <ng-container *ngFor="let type of pref.combined.source.types">
-                <button
-                        class="tweet-list-item-menu-source-type-{{type.value}} tweet-list-item-menu-source-type-{{type.value}}-selected"
-                        *ngIf="annotationValueIs(tweet,
-        'source',type.value)"
-                        mat-menu-item><strong>{{type.title}}</strong>
-                </button>
-                <button *ngIf="annotationValueIsNot(tweet, 'source',type.value)"
-                        (click)="annotateTweet(tweet,{source:type.value}, $event);"
-                        class="tweet-list-item-menu-source-type-{{type.value}} tweet-list-item-menu-source-type-{{type.value}}-not-selected"
-                        mat-menu-item>{{type.title}}
-                </button>
-            </ng-container>
-            <button
-                    (click)="annotateTweet(tweet,{source:''}, $event);"
-                    class="tweet-list-item-menu-source-type-clear"
-                    mat-menu-item>Clear
-            </button>
-
-        </mat-menu>
-
 
         <mat-menu #markAs="matMenu">
             <button *ngIf="!si" (click)="ignoreSender(tweet,$event);" mat-menu-item
@@ -104,13 +60,32 @@
             <button class="tweet-list-item-menu-mark-as"
                     [matMenuTriggerFor]="markAs" mat-menu-item>Mark As ...
             </button>
-            <button class="tweet-list-item-menu-impact" *ngIf="pref.combined.features.includes('impact')"
-                    [matMenuTriggerFor]="impact" mat-menu-item>Impact
-            </button>
-            <button class="tweet-list-item-menu-source" *ngIf="pref.combined.features.includes('source')"
-                    [matMenuTriggerFor]="source" mat-menu-item>Source
-            </button>
+            <ng-container *ngFor="let annotationType of annotationTypes">
+                <mat-menu #annotationMenu="matMenu">
+                    <ng-container *ngFor="let level of annotationType.options">
+                        <button
+                                *ngIf="annotationValueIs(tweet,
+        annotationType.name,level.value)"
+                                class="tweet-list-item-menu-{{annotationType.name}}-level-{{level.value}} tweet-list-item-menu-{{annotationType.name}}-level-{{level.value}}-selected"
+                                mat-menu-item><strong>{{level.title}}</strong>
+                        </button>
+                        <button (click)="annotateTweetKeyValue(tweet,annotationType.name,level.value, $event);"
+                                *ngIf="annotationValueIsNot(tweet, annotationType.name,level.value)"
+                                class="tweet-list-item-menu-impact-level-{{level.value}} tweet-list-item-menu-impact-level-{{level.value}}-not-selected"
+                                mat-menu-item>{{level.title}}
+                        </button>
+                    </ng-container>
+                    <button
+                            (click)="annotateTweetKeyValue(tweet,annotationType.name,'', $event);"
+                            class="tweet-list-item-menu-impact-level-clear"
+                            mat-menu-item>Clear
+                    </button>
 
+                </mat-menu>
+                <button [matMenuTriggerFor]="annotationMenu"
+                        class="tweet-list-item-menu-impact" mat-menu-item>{{annotationType.title}}
+                </button>
+            </ng-container>
             <button
                     (click)="copy(tweet,$event);"
                     class="tweet-list-item-menu-copy"
@@ -120,7 +95,9 @@
             <!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
 
         </mat-menu>
-        <div [style]="styleForImpact(tweet)" class="app-tweet-item app-tweet-row-active">
+        <div [ngClass]="tweet.json.possibly_sensitive  ? 'sensitive': 'non-sensitive'"
+             [style]="styleFor('impact',tweet)"
+             class="app-tweet-item app-tweet-row-active">
             <div class="app-tweet-item-text">
                 <div class="app-twitter-tweet">
                     <img [src]="tweet.json.user.profile_image_url" class="app-twitter-profile-image">
@@ -137,7 +114,7 @@
                     <div class="app-twitter-date">{{tweet.date | date:"shortTime"}}
                         - {{tweet.date | date:"mediumDate"}}</div>
                     <!--                    {{tweet.json.extended_tweet.entities.media|json}}-->
-                    <div *ngIf="true">
+                    <div *ngIf="!tweet.json.possibly_sensitive">
                         <div *ngFor="let media of mediaEntities(tweet)">
                             <!--                            {{media|json}}-->
                             <ng-container *ngIf="media?.additional_media_info?.embeddable === false">

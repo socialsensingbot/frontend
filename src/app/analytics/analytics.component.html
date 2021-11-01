@@ -1,5 +1,5 @@
 <mat-sidenav-container class="app-analytics-outer " >
-    <mat-sidenav #sidenav *ngIf="pref.combined.showAnalyticsSideMenu" [(opened)]="sidebarVisible"
+    <mat-sidenav #sidenav *ngIf="pref.ready && pref.combined.showAnalyticsSideMenu" [(opened)]="sidebarVisible"
                  class="app-analytics-sidenav" disableClose mode="side">
         <button mat-icon-button class="app-draw-close-button" aria-label="Close" (click)="sidenav.toggle()">
             <mat-icon>close</mat-icon>

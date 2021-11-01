@@ -6,7 +6,8 @@ import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {TimeseriesAnalyticsComponentState} from "../../analytics/timeseries";
 import {ActivatedRoute, Router} from "@angular/router";
-import {LayerGroup} from "../../types";
+import {SSMapLayer} from "../../types";
+import {MapSelectionService} from "../../map-selection.service";
 
 const log = new Logger("map-graph-sidebar");
 
@@ -21,9 +22,10 @@ export class MapGraphSidebarComponent implements OnInit {
     public regionList: string[] = [];
     public eState: TimeseriesAnalyticsComponentState;
     public cState: TimeseriesAnalyticsComponentState;
-    private layer: LayerGroup;
+    private layer: SSMapLayer;
 
     constructor(public dialog: MatDialog, public dash: DashboardService, public pref: PreferenceService,
+                public map: MapSelectionService,
                 protected _router: Router, private _route: ActivatedRoute) {
     }
 
@@ -51,7 +53,7 @@ export class MapGraphSidebarComponent implements OnInit {
     }
 
     public async expandCountGraph() {
-        await this._router.navigate(["/analytics/time"],
+        await this._router.navigate(["map", this.map.id, "analytics", "time"],
                                     {
                                         queryParamsHandling: "merge",
                                         queryParams:         {
@@ -63,7 +65,7 @@ export class MapGraphSidebarComponent implements OnInit {
     }
 
     public async expandExceedanceGraph() {
-        await this._router.navigate(["/analytics/time"],
+        await this._router.navigate(["map", this.map.id, "analytics", "time"],
                                     {
                                         queryParamsHandling: "merge",
                                         queryParams:         {
@@ -75,7 +77,7 @@ export class MapGraphSidebarComponent implements OnInit {
     }
 
     public showDashboard() {
-        this._router.navigate(["/dashboard"]);
+        this._router.navigate(["map", this.map.id, "dashboard"]);
     }
 
     public regionText() {

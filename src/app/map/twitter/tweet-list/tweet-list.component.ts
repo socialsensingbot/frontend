@@ -78,6 +78,9 @@ export class TweetListComponent implements OnInit, OnDestroy {
     private _annotationSubscription: any;
     private _annotationRemovalSubscription: Subscription;
 
+    @Input()
+    public annotationTypes: any[] = [];
+
     constructor(private _zone: NgZone, private _dialog: MatDialog, public pref: PreferenceService,
                 public annotate: AnnotationService) {
     }
@@ -144,7 +147,11 @@ export class TweetListComponent implements OnInit, OnDestroy {
         // we then get the authoritative version from the server
         this.annotations[tweet.id] = {...this.annotationsFor(tweet), ...annotations};
         const groupTweetAnnotations = await this.annotate.addAnnotations(tweet, annotations);
-        this.annotations[tweet.id] = JSON.parse(groupTweetAnnotations.annotations);
+        try {
+            this.annotations[tweet.id] = groupTweetAnnotations.annotations;
+        } catch (e) {
+            log.error(e);
+        }
         log.info("Emitting ", tweet);
         this.update.emit(tweet);
     }
@@ -172,7 +179,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
         this._annotationSubscription = this.annotate.tweetAnnotated.subscribe(groupTweetAnnotations => {
             if (groupTweetAnnotations.annotations) {
                 log.info("Received new annotation record of ", groupTweetAnnotations);
-                this.annotations[groupTweetAnnotations.tweetId] = JSON.parse(groupTweetAnnotations.annotations);
+                this.annotations[groupTweetAnnotations.tweetId] = groupTweetAnnotations.annotations;
             }
         });
     }
@@ -313,13 +320,16 @@ export class TweetListComponent implements OnInit, OnDestroy {
         return !this.annotationValueIs(tweet, key, value);
     }
 
-    public styleForImpact(tweet: Tweet) {
-        const impactValue = this.annotationValueFor(tweet, "impact");
-        for (const level of this.pref.combined.impact.levels) {
-            if (level.value === impactValue) {
-                return "border-left: 3px solid " + level.color;
+    public styleFor(type: string, tweet: Tweet) {
+        const value = this.annotationValueFor(tweet, type);
+        this.annotationTypes.filter(i => i.name === type).forEach((a) => {
+            for (const level of a.options) {
+                if (level.value === value) {
+                    return "border-left: 3px solid " + level.color;
+                }
             }
-        }
+        });
+
         return "border-left: 3px solid transparent";
 
     }
@@ -398,7 +408,8 @@ export class TweetListComponent implements OnInit, OnDestroy {
             if (tweet.valid) {
                 this.annotate.getAnnotations(tweet).then(tweetAnnotationRecord => {
                     if (tweetAnnotationRecord && tweetAnnotationRecord.annotations && tweetAnnotationRecord.annotations[0] !== "u") {
-                        this.annotations[tweet.id] = JSON.parse(tweetAnnotationRecord.annotations);
+                        log.debug("Annotation record for tweet was ", tweetAnnotationRecord.annotations);
+                        this.annotations[tweet.id] = tweetAnnotationRecord.annotations;
                     } else {
                         this.annotations[tweet.id] = {};
                     }
@@ -452,7 +463,6 @@ export class TweetListComponent implements OnInit, OnDestroy {
     public tweetHtml(tweet: any): any {
         const entities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities : tweet.json.entities;
         const text = tweet.json.extended_tweet ? tweet.json.extended_tweet.full_text : tweet.json.text;
-        console.log(entities);
         let urlEntities: string[] = entities.urls;
         if (entities.media) {
             urlEntities = [...urlEntities, ...entities.media]

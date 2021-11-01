@@ -7,11 +7,17 @@ import {PreferenceService} from "../pref/preference.service";
 
 const log = new Logger("state-history-service");
 
+/**
+ * Encapsulates the mechanics of CRUD operations on Saved Graphs.
+ * These graphs are used by the analytics graphs.
+ *
+ * @see SavedGraph
+ */
 @Injectable({
                 providedIn: "root"
             })
 export class SavedGraphService {
- 
+
 
     constructor(private _notify: NotificationService, private _prefs: PreferenceService) {
 
@@ -26,12 +32,12 @@ export class SavedGraphService {
     public async create(type: string, title: string, state: any, forOwner = true,
                         forGroup = false): Promise<SavedGraph> {
         return await DataStore.save(new SavedGraph({
-                                                         type,
-                                                         title,
-                                                         state: JSON.stringify(state),
-                                                         owner: forOwner ? await this._prefs.username : null,
-                                                         group: forOwner ? this._groups[0] : null
-                                                     }));
+                                                       type,
+                                                       title,
+                                                       state: JSON.stringify(state),
+                                                       owner: forOwner ? await this._prefs.username : null,
+                                                       group: forOwner ? this._groups[0] : null
+                                                   }));
     }
 
     public async update(id: string, title: string, state: any): Promise<SavedGraph> {
@@ -43,10 +49,10 @@ export class SavedGraphService {
     }
 
 
-    public async get(id: string): Promise<SavedGraph|null> {
+    public async get(id: string): Promise<SavedGraph | null> {
         const results = await DataStore.query(SavedGraph, q => q.id("eq", id));
         if (results.length === 0) {
-           return null;
+            return null;
         } else {
             console.log(results);
             return results[0];

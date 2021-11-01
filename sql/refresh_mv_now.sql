@@ -69,11 +69,18 @@ BEGIN
         END WHILE;
 
     START TRANSACTION;
+    call debug_msg(2, 'refresh_mv_full', 'Refreshing first entries.');
+
     REPLACE INTO mat_view_first_entries
     SELECT min(source_timestamp) as source_timestamp, hazard, source
     FROM mat_view_regions
     GROUP BY hazard, source;
     COMMIT;
+
+    optimize table mat_view_timeseries_date;
+    optimize table mat_view_timeseries_hour;
+    optimize table mat_view_regions;
+    optimize table mat_view_first_entries;
 
     SET rc = 0;
 END;
@@ -134,7 +141,8 @@ BEGIN
            t.hazard                 as hazard,
            t.warning                as warning,
            t.source_date            as source_date,
-           t.source_text            as source_text,
+           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',
+                  t.source_text)    as source_text,
            r.region_type            as region_type,
            IFNULL(t.deleted, false) as deleted,
            t.source_id              as source_id,
@@ -159,7 +167,8 @@ BEGIN
            t.hazard                                                         as hazard,
            t.warning                                                        as warning,
            cast(date_format(t.source_timestamp, '%Y-%m-%d %H') as DATETIME) as source_date,
-           t.source_text                                                    as source_text,
+           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',
+                  t.source_text)                                            as source_text,
            r.region_type                                                    as region_type,
            IFNULL(t.deleted, false)                                         as deleted,
            t.source_id                                                      as source_id,

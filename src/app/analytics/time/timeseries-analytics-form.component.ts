@@ -12,12 +12,14 @@ import {RESTDataAPIService} from "../../api/rest-api.service";
 import {PreferenceService} from "../../pref/preference.service";
 import {TextAutoCompleteService} from "../../services/text-autocomplete.service";
 import {timeSeriesAutocompleteType} from "../timeseries";
-import {LayerGroup} from "../../types";
+import {SSMapLayer} from "../../types";
 import {RESTMapDataService} from "../../map/data/rest-map-data.service";
+import {MapSelectionService} from "../../map-selection.service";
+import {UIExecutionService} from "../../services/uiexecution.service";
 
 const log = new Logger("timeseries-config");
 
-type DataType = { textSearch: string, regions: string[], layer: LayerGroup };
+type DataType = { textSearch: string, regions: string[], layer: SSMapLayer };
 
 @Component({
                selector:    "app-timeseries-analytics-form",
@@ -60,20 +62,21 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
         return this._data;
     }
 
+
     @Input()
     public set data(value: DataType) {
         if (typeof value !== "undefined") {
             this._data = value;
             if (this._data.layer) {
-                this.activeLayerGroup = this._data.layer.id;
+                this._activeLayerGroup = this._data.layer.id;
             } else {
                 log.verbose("No layer info found in the data object, using the default layer.", this.pref.defaultLayer());
-                this.activeLayerGroup = this.pref.defaultLayer().id;
+                this._activeLayerGroup = this.pref.defaultLayer().id;
 
             }
             this.searchControl.setValue(this._data.textSearch + this.regions);
             //TODO: Remove this hardcoding
-            this.mapData.regions("uk-flood-live").then(
+            this.mapData.regions(this.map.id).then(
                 regions => {
                     this.allRegions = regions;
                     log.debug(regions);
@@ -86,16 +89,17 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
 
     }
 
-    private layerGroup(id: string): LayerGroup {
+    private layerGroup(id: string): SSMapLayer {
         return this.pref.combined.layers.available.filter(i => i.id === id)[0];
     }
 
     constructor(public zone: NgZone, public router: Router,
+                public map: MapSelectionService,
+                public exec: UIExecutionService,
                 public route: ActivatedRoute, public pref: PreferenceService,
                 private _api: RESTDataAPIService, public auto: TextAutoCompleteService, public mapData: RESTMapDataService
     ) {
 
-        this.mapData.regions("uk-flood-live").then(i => this.allRegions = i);
     }
 
     onNoClick(): void {
@@ -186,10 +190,10 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
             this.textChanged();
         });
         if (this._data.layer) {
-            this.activeLayerGroup = this._data.layer.id;
+            this._activeLayerGroup = this._data.layer.id;
         } else {
             log.verbose("No layer info found in the data object, using the default layer.", this.pref.defaultLayer());
-            this.activeLayerGroup = this.pref.defaultLayer().id;
+            this._activeLayerGroup = this.pref.defaultLayer().id;
 
         }
 

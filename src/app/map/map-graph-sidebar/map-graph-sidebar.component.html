@@ -8,7 +8,9 @@
     </div>
 
 
-    <button mat-button class="app-stats-panel-count-open-in-analytics"  *ngIf="this.pref.featureSupported('analytics')"(click)="expandCountGraph()">Open in Analytics</button>
+    <button (click)="expandCountGraph()" *ngIf="this.pref.featureSupported('analytics')"
+            class="app-stats-panel-count-open-in-analytics" mat-button>Open in Analytics
+    </button>
     <button mat-button class="app-stats-panel-count-add-to-dashboard" *ngIf="this.pref.featureSupported('dashboard')"
             (click)="this.dash.addCard('timeseries', 'Count for '+regionText(),
         2,2,this.cState);showDashboard()">Add to

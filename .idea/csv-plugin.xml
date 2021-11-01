@@ -3,13 +3,6 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="/dumpDataPreview">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
         <entry key="/ref_data/region-groupings.csv">
           <value>
             <Attribute>
@@ -73,7 +66,7 @@
             </Attribute>
           </value>
         </entry>
-        <entry key="/textView">
+        <entry key="/ref_data_tmp/regions.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

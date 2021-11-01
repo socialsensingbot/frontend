@@ -15,6 +15,9 @@
     },
     "s3Key": {
       "Type": "String"
+    },
+    "secretsPathAmplifyAppId": {
+      "Type": "String"
     }
   },
   "Conditions": {
@@ -78,7 +81,9 @@
                     "Fn::Sub": [
                       "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
                       {
-                        "appId": "dtmxl3q3i7oix",
+                        "appId": {
+                          "Ref": "secretsPathAmplifyAppId"
+                        },
                         "env": {
                           "Ref": "env"
                         },
@@ -98,7 +103,9 @@
                     "Fn::Sub": [
                       "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
                       {
-                        "appId": "dtmxl3q3i7oix",
+                        "appId": {
+                          "Ref": "secretsPathAmplifyAppId"
+                        },
                         "env": {
                           "Ref": "env"
                         },
@@ -107,26 +114,6 @@
                     ]
                   },
                   "DB_PASSWORD"
-                ]
-              ]
-            },
-            "twitter_bearer_token": {
-              "Fn::Join": [
-                "",
-                [
-                  {
-                    "Fn::Sub": [
-                      "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
-                      {
-                        "appId": "dtmxl3q3i7oix",
-                        "env": {
-                          "Ref": "env"
-                        },
-                        "functionName": "query"
-                      }
-                    ]
-                  },
-                  "twitter_bearer_token"
                 ]
               ]
             }
@@ -140,7 +127,7 @@
         },
         "Runtime": "nodejs14.x",
         "Layers": [],
-        "Timeout": "100"
+        "Timeout": "300"
       }
     },
     "LambdaExecutionRole": {
@@ -269,7 +256,9 @@
                       "Fn::Sub": [
                         "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
                         {
-                          "appId": "dtmxl3q3i7oix",
+                          "appId": {
+                            "Ref": "secretsPathAmplifyAppId"
+                          },
                           "env": {
                             "Ref": "env"
                           },
