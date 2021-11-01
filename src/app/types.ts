@@ -8,6 +8,7 @@ export interface SSMapLayer {
     sources: string[];
     hazards: string[];
     warnings: "include" | "exclude" | "only";
+    annotations: string[];
 }
 
 /**

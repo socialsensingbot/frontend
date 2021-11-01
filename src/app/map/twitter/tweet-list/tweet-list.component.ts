@@ -78,6 +78,9 @@ export class TweetListComponent implements OnInit, OnDestroy {
     private _annotationSubscription: any;
     private _annotationRemovalSubscription: Subscription;
 
+    @Input()
+    public annotationTypes: any[] = [];
+
     constructor(private _zone: NgZone, private _dialog: MatDialog, public pref: PreferenceService,
                 public annotate: AnnotationService) {
     }
@@ -317,13 +320,16 @@ export class TweetListComponent implements OnInit, OnDestroy {
         return !this.annotationValueIs(tweet, key, value);
     }
 
-    public styleForImpact(tweet: Tweet) {
-        const impactValue = this.annotationValueFor(tweet, "impact");
-        for (const level of this.pref.combined.impact.levels) {
-            if (level.value === impactValue) {
-                return "border-left: 3px solid " + level.color;
+    public styleFor(type: string, tweet: Tweet) {
+        const value = this.annotationValueFor(tweet, type);
+        this.annotationTypes.filter(i => i.name === type).forEach((a) => {
+            for (const level of a.options) {
+                if (level.value === value) {
+                    return "border-left: 3px solid " + level.color;
+                }
             }
-        }
+        });
+
         return "border-left: 3px solid transparent";
 
     }
