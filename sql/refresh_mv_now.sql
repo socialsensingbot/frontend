@@ -69,6 +69,8 @@ BEGIN
         END WHILE;
 
     START TRANSACTION;
+    call debug_msg(2, 'refresh_mv_full', 'Refreshing first entries.');
+
     REPLACE INTO mat_view_first_entries
     SELECT min(source_timestamp) as source_timestamp, hazard, source
     FROM mat_view_regions
@@ -78,6 +80,7 @@ BEGIN
     optimize table mat_view_timeseries_date;
     optimize table mat_view_timeseries_hour;
     optimize table mat_view_regions;
+    optimize table mat_view_first_entries;
 
     SET rc = 0;
 END;

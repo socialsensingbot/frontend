@@ -181,16 +181,8 @@ export class MapComponent implements OnInit, OnDestroy {
         return this._activeLayerGroup;
     }
 
-    public set activeLayerGroup(value: string) {
-        log.debug("set activeLayerGroup");
-        this._activeLayerGroup = value;
-        if (this.ready) {
-            this.scheduleResetLayers(this.activeStatistic, false);
-        }
-        this.updateSearch({active_layer: this._activeLayerGroup});
-        this._twitterIsStale = true;
-        this.load();
-    }
+    //     //                             this.activePolyLayerShortName,
+    public annotationTypes: any[] = [];
 
     private _dataset: string;
 
@@ -491,7 +483,18 @@ export class MapComponent implements OnInit, OnDestroy {
 
     // public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
     //     // this.data.downloadAggregate(aggregrationSetId, id,
-    //     //                             this.activePolyLayerShortName,
+
+    public set activeLayerGroup(value: string) {
+        log.debug("set activeLayerGroup");
+        this._activeLayerGroup = value;
+        if (this.ready) {
+            this.scheduleResetLayers(this.activeStatistic, false);
+        }
+        this.updateSearch({active_layer: this._activeLayerGroup});
+        this._twitterIsStale = true;
+        this.updateAnnotationTypes();
+        this.load();
+    }
 
     /**
      * Triggered when the user has finished sliding the slider.
@@ -730,6 +733,8 @@ export class MapComponent implements OnInit, OnDestroy {
         } else {
             this._activeLayerGroup = this.pref.defaultLayer().id;
         }
+        this.updateAnnotationTypes();
+
         if (this.route.snapshot.queryParamMap.has("active_polygon")) {
             this._activeRegionType = this.route.snapshot.queryParamMap.get("active_polygon");
         } else {
@@ -812,6 +817,19 @@ export class MapComponent implements OnInit, OnDestroy {
         });
         log.debug("Init completed successfully");
 
+    }
+
+    private updateAnnotationTypes(): void {
+        log.debug("Finding annotations for layer ", this._activeLayerGroup);
+        const currentLayer: any = this.pref.combined.layers.available.filter(i => i.id == this._activeLayerGroup)[0];
+        log.debug("Finding annotations for layer ", currentLayer);
+        if (currentLayer) {
+            let activeAnnotationTypes: any = currentLayer.annotations;
+            log.debug("Available annotations are ", activeAnnotationTypes);
+            this.annotationTypes = this.pref.combined.annotations.filter(
+                i => typeof activeAnnotationTypes === "undefined" || activeAnnotationTypes.includes(i.name));
+            log.debug("Annotations are ", this.annotationTypes);
+        }
     }
 
     private async clearSelectedRegions() {
