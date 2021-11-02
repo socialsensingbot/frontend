@@ -52,7 +52,8 @@
     <mat-tab-group (selectedTabChange)="update(null)">
       <mat-tab label="{{ready ? visibleTweets.length: ''}} Tweets">
         <ng-template matTabContent>
-          <app-tweet-list group="visible" [tweets]="visibleTweets" (update)="update($event)"
+          <app-tweet-list (update)="update($event)" [annotationTypes]="annotationTypes" [tweets]="visibleTweets"
+                          group="visible"
                           [style.visibility]="tweetsReady ? 'visible' : 'hidden'"></app-tweet-list>
         </ng-template>
       </mat-tab>
@@ -68,5 +69,3 @@
   </div>
 
 </div>
-
-

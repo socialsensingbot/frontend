@@ -9,7 +9,7 @@
 
         <mat-tab-group mat-align-tabs="center">
             <mat-tab label="Twitter">
-                <twitter-panel class="twitter-panel" [selection]="selection"
+                <twitter-panel [annotationTypes]="annotationTypes" [selection]="selection" class="twitter-panel"
                                [tweets]="tweets" [showHeaderInfo]="twitterPanelHeader"
                                [showTimeline]="showTwitterTimeline"></twitter-panel>
             </mat-tab>

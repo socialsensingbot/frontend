@@ -45,7 +45,6 @@ export const roundTo15Minute = (timestamp: number): any => {
 const disabled = false;
 module.exports = (connection: Pool) => {
 
-
     // declare a new express app
     const app = express();
     app.use(bodyParser.json());

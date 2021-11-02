@@ -34,6 +34,9 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
     private _tweets: Tweet[] | null = null;
 
+    @Input()
+    public annotationTypes: any[];
+
     public get tweets(): Tweet[] | null {
         return this._tweets != null ? this._tweets : [];
     }
