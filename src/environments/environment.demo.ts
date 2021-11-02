@@ -83,8 +83,8 @@ export const environment = {
         email:    "",
         password: ""
     },
-    defaultDataSet:       "ireland",
-    availableDataSets:    ["ireland", "uk-flood-live"],
+    defaultDataSet:       "uk-flood-live",
+    availableDataSets:    ["uk-flood-live"],
     cacheProcessedTweets: false,
 
     impact: {
