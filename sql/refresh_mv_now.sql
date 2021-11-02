@@ -131,11 +131,10 @@ BEGIN
     FROM live_text t,
          ref_geo_regions gr
     WHERE ST_Intersects(boundary, location)
-      AND map_location <> 'uk'
       AND t.source_timestamp BETWEEN start_date and end_date;
 
 
-    INSERT INTO mat_view_regions
+    REPLACE INTO mat_view_regions
     SELECT t.source_id,
            t.source,
            t.hazard,
@@ -149,6 +148,7 @@ BEGIN
          ref_geo_regions gr
     WHERE ST_Intersects(buffered, location)
       AND map_location = 'uk'
+      AND (select count(*) from ref_geo_regions where st_intersects(boundary, t.location) and map_location = 'uk') = 0
       AND t.source_timestamp BETWEEN start_date and end_date;
     COMMIT;
 
