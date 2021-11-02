@@ -10,6 +10,7 @@ const layers: SSLayerConfiguration = {
             "sources":  ["twitter"],
             "hazards":  ["flood"],
             "warnings": "exclude",
+            "annotations": ["source", "impact"]
         }
     ],
     "defaultLayer": "flood"
@@ -49,25 +50,30 @@ export const environment = {
     defaultDataSet:       "uk-flood-live",
     availableDataSets:    ["uk-flood-live"],
     cacheProcessedTweets: false,
-
-    impact: {
-        //The ability to tag tweets with an impact annotation
-        levels: [
-            {title: "1 – Minimal", value: "minimal", color: "#43A047"},
-            {title: "2 – Minor", value: "minor", color: "#FFEE58"},
-            {title: "3 - Significant", value: "significant", color: "#FFB300"},
-            {title: "4 - Severe", value: "severe", color: "#F4511E"}
-        ]
-  },
-  source: {
-    //The ability to tag tweets with a source
-    types: [
-      {title: "River", value: "river", color: "#43A047"},
-      {title: "Surface", value: "surface", color: "#FFEE58"},
-      {title: "Groundwater", value: "groundwater", color: "#FFB300"},
-      {title: "Coastal", value: "coastal", color: "#F4511E"}
-    ]
-  },
+    annotations:          [
+        {
+            name:  "impact",
+            title: "Impact",
+            // The ability to tag tweets with an impact annotation
+            options: [
+                {title: "1 – Minimal", value: "minimal", color: "#43A047"},
+                {title: "2 – Minor", value: "minor", color: "#FFEE58"},
+                {title: "3 - Significant", value: "significant", color: "#FFB300"},
+                {title: "4 - Severe", value: "severe", color: "#F4511E"}
+            ]
+        },
+        {
+            name:  "source",
+            title: "Source",
+            // The ability to tag tweets with a source
+            options: [
+                {title: "River", value: "river", color: "#43A047"},
+                {title: "Surface", value: "surface", color: "#FFEE58"},
+                {title: "Groundwater", value: "groundwater", color: "#FFB300"},
+                {title: "Coastal", value: "coastal", color: "#F4511E"}
+            ]
+        },
+    ],
 
     features:                            ["impact", "source", "map", "dashboard", "analytics"],
     mostRecentDateIsNow:                 true,
