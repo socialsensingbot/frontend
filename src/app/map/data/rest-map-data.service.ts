@@ -88,21 +88,21 @@ export class RESTMapDataService {
      */
     public async loadGeography(regionType: string): Promise<geojson.FeatureCollection> {
         log.debug("Loading Geography");
-        this._notify.show("Loading Geographic data ...");
-        this.regionGeography = await this._api.callMapAPIWithCache(
-            this.map.id + "/region-type/" + regionType + "/geography", {}, 24 * 60 * 60) as RegionGeography;
+        this._notify.show("Loading Geographic data ...", "OK", 20000);
+        const regions = (await this.regions()).filter(i => i.type === regionType).map(i => i.value);
         const features = [];
-        for (const region in this.regionGeography) {
-            if (this.regionGeography.hasOwnProperty(region)) {
-                features.push(
+        for (const region of regions) {
+            this.regionGeography = await this._api.callMapAPIWithCache(
+                this.map.id + "/region-type/" + regionType + "/region/" + region + "/geography", {}, 24 * 60 * 60) as RegionGeography;
+            features.push(
+                {
+                    id:   "" + region,
+                    type: "Feature",
                     // tslint:disable-next-line:no-string-literal
-                    {
-                        id:         "" + region,
-                        type:       "Feature",
-                        properties: {...this.regionGeography[region]["properties"], name: region, count: 0},
-                        geometry:   this.regionGeography[region]
-                    });
-            }
+                    properties: {...this.regionGeography["properties"], name: region, count: 0},
+                    geometry:   this.regionGeography
+                });
+
         }
         this._regionGeographyGeoJSON = {type: "FeatureCollection", features};
         this._notify.dismiss();

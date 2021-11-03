@@ -323,26 +323,58 @@ module.exports = (connection: Pool) => {
 
     app.post("/map/:map/region-type/:regionType/geography", async (req, res) => {
         cache(res, null, async () => {
+            try {
+
+                const geography = await sql({
+                                                // language=MySQL
+                                                sql: `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
+                                                                              from ref_geo_regions gr,
+                                                                                   ref_map_metadata mm
+                                                                              where mm.id = ?
+                                                                                and region_type = ?
+                                                                                and gr.map_location = mm.location`,
+                                                values: [req.params.map, req.params.regionType]
 
 
-            const geography = await sql({
-                                            // language=MySQL
-                                            sql: `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
-                                                                          from ref_geo_regions gr,
-                                                                               ref_map_metadata mm
-                                                                          where mm.id = ?
-                                                                            and region_type = ?
-                                                                            and gr.map_location = mm.location`,
-                                            values: [req.params.map, req.params.regionType]
-
-
-                                        });
-            const regionGeoMap: RegionGeography = {};
-            for (const row of geography) {
-                regionGeoMap[row.region] = JSON.parse(row.geo);
-                regionGeoMap[row.region]["properties"] = {name: row.region, title: row.title}
+                                            });
+                const regionGeoMap: RegionGeography = {};
+                for (const row of geography) {
+                    regionGeoMap[row.region] = JSON.parse(row.geo);
+                    regionGeoMap[row.region]["properties"] = {name: row.region, title: row.title}
+                }
+                console.info("SUCCESS: Obtained geography.");
+                return regionGeoMap;
+            } catch (e) {
+                console.error("FAILED: Could not get geography, hit this error ", e);
             }
-            return regionGeoMap;
+        }, {duration: 24 * 60 * 60});
+    });
+
+
+    app.post("/map/:map/region-type/:regionType/region/:region/geography", async (req, res) => {
+        cache(res, null, async () => {
+            try {
+
+                const geography = await sql({
+                                                // language=MySQL
+                                                sql: `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
+                                                                              from ref_geo_regions gr,
+                                                                                   ref_map_metadata mm
+                                                                              where mm.id = ?
+                                                                                and region_type = ?
+                                                                                and region = ?
+                                                                                and gr.map_location = mm.location`,
+                                                values: [req.params.map, req.params.regionType, req.params.region]
+
+
+                                            });
+                const result = JSON.parse(geography[0].geo);
+                result["properties"] = {name: geography[0].region, title: geography[0].title}
+                console.info("SUCCESS: Obtained geography.");
+                return result;
+            } catch (e) {
+                console.error("FAILED: Could not get geography, hit this error ", e);
+            }
         }, {duration: 24 * 60 * 60});
     });
 
@@ -352,9 +384,9 @@ module.exports = (connection: Pool) => {
 
             const aggregationTypes = await sql({
                                                    // language=MySQL
-                                                   sql: `/* app.ts: aggregations */ select rat.id as region_aggregation_type_id, rat.title as title
-                                                                                    from ref_map_metadata_region_aggregations rmmra,
-                                                                                         ref_map_region_aggregation_types rat
+                                                   sql:                                                   `/* app.ts: aggregations */ select rat.id as region_aggregation_type_id, rat.title as title
+                                                                                                                                      from ref_map_metadata_region_aggregations rmmra,
+                                                                                                                                           ref_map_region_aggregation_types rat
                                                                                     where rat.id = rmmra.region_aggregation_type_id
                                                                                       and rmmra.map_id = ?`, values: [req.params.map]
                                                });
