@@ -93,7 +93,7 @@ export class Tweet {
         return this._url;
     }
 
-    private _valid: boolean;
+    private _valid: boolean = true;
 
     public get valid(): boolean {
         this.lazyInit();
@@ -158,9 +158,6 @@ export class Tweet {
     public lazyInit() {
         if (!this._init) {
             this._sender = this._json.user.screen_name;
-            if (this._html !== null) {
-                this._valid = true;
-            }
             this._url = "https://twitter.com/" + this._sender + "/status/" + this._id;
 
             this._year = new Intl.DateTimeFormat(environment.locale,

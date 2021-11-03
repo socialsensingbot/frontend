@@ -1,4 +1,3 @@
-
 # https://fromdual.com/mysql-materialized-views
 
 
@@ -83,7 +82,6 @@ BEGIN
     FROM mat_view_regions
     GROUP BY hazard, source;
     COMMIT;
-
 
 
     SET rc = 0;
@@ -211,6 +209,13 @@ BEGIN
       and not r.region REGEXP '^[0-9]+$'
       AND source_date BETWEEN start_date and end_date;
     COMMIT;
+
+    #This swaps XY on broken UK data, this is a temporary solution and should be removed.
+    UPDATE live_text
+    SET location = st_swapxy(location)
+    WHERE NOT st_contains(ST_GeomFromText('POLYGON((65 -15, 40 -15, 40 5, 65 5, 65 -15))', 4326), location)
+      AND source_date BETWEEN start_date and end_date;
+
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_timeseries_hour');
     call debug_msg(1, 'refresh_mv', 'SUCCESS');
 
