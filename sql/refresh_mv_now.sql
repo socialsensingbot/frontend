@@ -62,6 +62,12 @@ BEGIN
     DECLARE dt DATE DEFAULT '2017-01-01';
     call debug_msg(2, 'refresh_mv_full', 'Refreshing (Full) Materialized Views');
 
+
+    optimize table mat_view_timeseries_date;
+    optimize table mat_view_timeseries_hour;
+    optimize table mat_view_regions;
+    optimize table mat_view_first_entries;
+
     WHILE dt <= NOW()
         DO
             CALL refresh_mv(dt, DATE_ADD(dt, INTERVAL 1 MONTH), @rc);
@@ -77,10 +83,6 @@ BEGIN
     GROUP BY hazard, source;
     COMMIT;
 
-    optimize table mat_view_timeseries_date;
-    optimize table mat_view_timeseries_hour;
-    optimize table mat_view_regions;
-    optimize table mat_view_first_entries;
 
     SET rc = 0;
 END;
@@ -102,7 +104,10 @@ BEGIN
     -- rollback transaction and bubble up errors if something bad happens
     DECLARE exit handler FOR SQLEXCEPTION, SQLWARNING
         BEGIN
+            GET DIAGNOSTICS CONDITION 1
+                @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
             ROLLBACK;
+            call debug_msg(-2, 'refresh_mv', concat('FAILED: ', @p1, ': ', @p2));
         END;
     call debug_msg(2, 'refresh_mv', 'Refreshing Materialized Views');
     call debug_msg(1, 'refresh_mv', CONCAT('Start Date: ', start_date));
@@ -115,9 +120,6 @@ BEGIN
 #     SET @maxTimestamp = IFNULL((select max(source_timestamp) from mat_view_regions), NOW() - INTERVAL 20 YEAR);
     DELETE FROM mat_view_regions WHERE source_timestamp BETWEEN start_date and end_date;
 
-    # UK Locations are buffered with a 0.01 degree buffer. At present this is not done on the world map
-    # If the world map is supported then this may be required to capture location just outside of the strict
-    # boundary supplied.
     INSERT INTO mat_view_regions
     SELECT t.source_id,
            t.source,
@@ -131,26 +133,29 @@ BEGIN
     FROM live_text t,
          ref_geo_regions gr
     WHERE ST_Intersects(boundary, location)
-      AND map_location <> 'uk'
       AND t.source_timestamp BETWEEN start_date and end_date;
 
-
-    INSERT INTO mat_view_regions
-    SELECT t.source_id,
-           t.source,
-           t.hazard,
-           t.source_timestamp,
-           gr.region_type,
-           gr.region,
-           t.warning,
-           IFNULL(t.deleted, false) as deleted,
-           gr.map_location
-    FROM live_text t,
-         ref_geo_regions gr
-    WHERE ST_Intersects(buffered, location)
-      AND map_location = 'uk'
-      AND t.source_timestamp BETWEEN start_date and end_date;
-    COMMIT;
+    #
+#     # UK Locations are buffered with a 0.01 degree buffer. At present this is not done on the world map
+#     # If the world map is supported then this may be required to capture location just outside of the strict
+#     # boundary supplied. We only use the buffered values when the non buffered regions do not match.
+#     INSERT INTO mat_view_regions
+#     SELECT t.source_id,
+#            t.source,
+#            t.hazard,
+#            t.source_timestamp,
+#            gr.region_type,
+#            gr.region,
+#            t.warning,
+#            IFNULL(t.deleted, false) as deleted,
+#            gr.map_location
+#     FROM live_text t,
+#          ref_geo_regions gr
+#     WHERE ST_Intersects(buffered, location)
+#       AND map_location = 'uk'
+#       AND (select count(*) from ref_geo_regions where st_intersects(boundary, t.location) and map_location = 'uk') = 0
+#       AND t.source_timestamp BETWEEN start_date and end_date;
+#     COMMIT;
 
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions');
 
@@ -204,7 +209,15 @@ BEGIN
       and not r.region REGEXP '^[0-9]+$'
       AND source_date BETWEEN start_date and end_date;
     COMMIT;
+
+    #This swaps XY on broken UK data, this is a temporary solution and should be removed.
+    UPDATE live_text
+    SET location = st_swapxy(location)
+    WHERE NOT st_contains(ST_GeomFromText('POLYGON((65 -15, 40 -15, 40 5, 65 5, 65 -15))', 4326), location)
+      AND source_date BETWEEN start_date and end_date;
+
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_timeseries_hour');
+    call debug_msg(1, 'refresh_mv', 'SUCCESS');
 
 
     SET rc = 0;

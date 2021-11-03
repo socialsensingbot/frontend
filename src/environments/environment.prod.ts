@@ -87,6 +87,6 @@ export const environment = {
     layers:                       layers,
     shareTextAutocompleteInGroup: true,
     analyticsDefaultRegions:      ["uk"],
-    maxCallsPerMinute:            600,
+    maxCallsPerMinute:            10000,
 
 };

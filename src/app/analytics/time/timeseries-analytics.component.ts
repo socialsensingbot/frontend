@@ -51,6 +51,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
      * @private
      */
     private _type: GraphType = "line";
+    private now: Date;
 
     public get type(): GraphType {
         return this._type;
@@ -141,6 +142,23 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this._state = value;
     }
 
+    constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
+                public notify: NotificationService, public map: MapSelectionService,
+                protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
+                public exec: UIExecutionService, public saves: SavedGraphService, public dialog: MatDialog,
+                public dash: DashboardService, public auto: TextAutoCompleteService) {
+        this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
+        this.updateSavedGraphs();
+        this.pref.waitUntilReady().then(() => this.dash.waitUntilReady().then(async () => {
+            this.now = new Date(+await this.serverNow());
+            this.range.controls.end.setValue(this.now);
+            this.range.controls.start.setValue(new Date(this.now.getTime() - 365 * 24 * 60 * 60 * 1000));
+            await this.timePeriodChanged(this.state.timePeriod);
+            this.ready = true;
+        }));
+
+    }
+
     /**
      * The date range for this graph. Although the scrollbars allow zooming in this
      * delineates the max and min **possible** dates for the graph. I.e. this is used in the actual
@@ -156,17 +174,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
      */
     public mapLayer: SSMapLayer = null;
 
-    constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
-                public notify: NotificationService, public map: MapSelectionService,
-                protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
-                public exec: UIExecutionService, public saves: SavedGraphService, public dialog: MatDialog,
-                public dash: DashboardService, public auto: TextAutoCompleteService) {
-        this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
-        this.updateSavedGraphs();
-        this.pref.waitUntilReady().then(() => this.dash.waitUntilReady().then(async () => {
-            this.ready = true;
-        }));
-
+    public async serverNow(): Promise<number> {
+        return await this._api.callMapAPIWithCache(this.map.id + "/now", {}, 60) as Promise<number>;
     }
 
     public updateSavedGraphs() {
@@ -522,7 +531,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     public async timePeriodChanged(timePeriod: TimePeriod) {
         log.debug("Time period is now " + timePeriod);
         this.state.timePeriod = timePeriod;
-        const today = new Date();
+        const today = this.now;
         const day = today.getDate();
         const month = today.getMonth();
         const year = today.getFullYear();
@@ -530,7 +539,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         if (timePeriod === "day") {
             minDate = new Date(year - 1, month, day);
         } else {
-            minDate = new Date(Date.now() - dayInMillis);
+            minDate = new Date(this.now.getTime() - dayInMillis);
         }
         this.range.controls.start.setValue(minDate);
         this.seriesCollection.dateSpacing = timePeriod === "day" ? dayInMillis : hourInMillis;

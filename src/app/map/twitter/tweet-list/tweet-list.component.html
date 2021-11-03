@@ -100,7 +100,8 @@
              class="app-tweet-item app-tweet-row-active">
             <div class="app-tweet-item-text">
                 <div class="app-twitter-tweet">
-                    <img [src]="tweet.json.user.profile_image_url" class="app-twitter-profile-image">
+                    <img [src]="tweet.json.user.profile_image_url" class="app-twitter-profile-image"
+                         onerror="this.style.opacity = 0">
                     <div class="app-twitter-user-name">{{tweet.json.user.name}}
                         <span *ngIf="tweet.json.user.verified"
                               class="app-twitter-verified"><svg aria-label="Verified account" viewBox="0 0 24 24"><g
