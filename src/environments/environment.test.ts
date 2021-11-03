@@ -23,13 +23,15 @@ const layers: SSLayerConfiguration = {
             "sources":  ["twitter"],
             "hazards":  ["flood"],
             "warnings": "exclude",
+            "annotations": ["source", "impact"]
         },
         {
-            "id":       "wind",
-            "title":    "Wind",
-            "sources":  ["twitter"],
-            "hazards":  ["wind"],
-            "warnings": "exclude"
+            "id":          "wind",
+            "title":       "Wind",
+            "sources":     ["twitter"],
+            "hazards":     ["wind"],
+            "warnings":    "exclude",
+            "annotations": ["impact"]
         }
     ],
     "defaultLayer": "flood"
@@ -46,43 +48,48 @@ const defaultDashboard: Dashboard = {
 };
 
 export const environment = {
-    name:                         "test",
-    lamdaEnvironment:             "test",
-    version:                      "test",
-    demo:                         false,
-    production:                   false,
-    test:                         true,
-    hmr:                          false,
-    rollbar:                      false,
-    toolbarColor:                 "accent",
+    name:             "test",
+    lamdaEnvironment: "test",
+    version:          "test",
+    demo:             false,
+    production:       false,
+    test:             true,
+    hmr:              false,
+    rollbar:          false,
+    toolbarColor:     "accent",
     // timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    timezone:         "UTC",
-    multipleSessions: true, // Can the user be logged into multiple devices/browsers at once?
-    maxUsers:         -1, // can be -1 (no limit), 0 - no logins, 1 - single user at a time, n - n concurrent users.
-    locale:           "en-GB",
-    confirm:          {
+    timezone:                            "UTC",
+    multipleSessions:                    true, // Can the user be logged into multiple devices/browsers at once?
+    maxUsers:                            -1, // can be -1 (no limit), 0 - no logins, 1 - single user at a time, n - n concurrent users.
+    locale:                              "en-GB",
+    confirm:                             {
         email:    "",
         password: ""
     },
-
-    impact:                              {
-        // The ability to tag tweets with an impact annotation
-        levels: [
-            {title: "1 – Minimal", value: "minimal", color: "#43A047"},
-            {title: "2 – Minor", value: "minor", color: "#FFEE58"},
-            {title: "3 - Significant", value: "significant", color: "#FFB300"},
-            {title: "4 - Severe", value: "severe", color: "#F4511E"}
-        ]
-    },
-    source:                              {
-        // The ability to tag tweets with a source
-        types: [
-            {title: "River", value: "river", color: "#43A047"},
-            {title: "Surface", value: "surface", color: "#FFEE58"},
-            {title: "Groundwater", value: "groundwater", color: "#FFB300"},
-            {title: "Coastal", value: "coastal", color: "#F4511E"}
-        ]
-    },
+    annotations:                         [
+        {
+            name:  "impact",
+            title: "Impact",
+            // The ability to tag tweets with an impact annotation
+            options: [
+                {title: "1 – Minimal", value: "minimal", color: "#43A047"},
+                {title: "2 – Minor", value: "minor", color: "#FFEE58"},
+                {title: "3 - Significant", value: "significant", color: "#FFB300"},
+                {title: "4 - Severe", value: "severe", color: "#F4511E"}
+            ]
+        },
+        {
+            name:  "source",
+            title: "Source",
+            // The ability to tag tweets with a source
+            options: [
+                {title: "River", value: "river", color: "#43A047"},
+                {title: "Surface", value: "surface", color: "#FFEE58"},
+                {title: "Groundwater", value: "groundwater", color: "#FFB300"},
+                {title: "Coastal", value: "coastal", color: "#F4511E"}
+            ]
+        },
+    ],
     features:                            ["impact", "source", "map", "dashboard", "analytics"],
     showErrors:                          true,
     showLoadingMessages:                 true,
@@ -101,7 +108,7 @@ export const environment = {
     // mapTileUrlTemplate:
     // "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"
     shareTextAutocompleteInGroup: true,
-    maxCallsPerMinute:            100,
+    maxCallsPerMinute:            10000,
     analyticsDefaultRegions:      ["uk"]
 
 
