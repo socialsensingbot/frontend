@@ -1118,7 +1118,7 @@ export class MapComponent implements OnInit, OnDestroy {
             return;
         }
         return new Promise<void>(async (resolve, reject) => {
-            log.info("Loading stats");
+            log.debug("Loading stats");
             const features = geography.features;
             await this.data.preCacheRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax);
             for (const feature of features) {
