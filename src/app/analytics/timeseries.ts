@@ -21,6 +21,9 @@ export interface TimeseriesAnalyticsComponentState {
     lob: "line" | "bar";
     queries: TimeseriesRESTQuery[];
     timePeriod: TimePeriod;
+    from?: number;
+    to?: number;
+
 }
 
 
