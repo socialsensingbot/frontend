@@ -41,6 +41,10 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
 
     private _state: TimeseriesAnalyticsComponentState = null;
 
+    public get state(): TimeseriesAnalyticsComponentState {
+        return this._state;
+    }
+
     @Input()
     public set state(value: TimeseriesAnalyticsComponentState) {
         if (JSON.stringify(value) !== JSON.stringify(this._state)) {
@@ -59,6 +63,8 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
                                                                       this._state.dateSpacing || dayInMillis,
                                                                       this._state.lob || "line"
                 );
+                this.seriesCollection.minDate = value.from ? new Date(value.from) : null;
+                this.seriesCollection.maxDate = value.to ? new Date(value.to) : null;
             } else {
                 this.seriesCollection.clear();
             }
@@ -133,8 +139,8 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
             const payload = {
                 layer: this.pref.defaultLayer(),
                 ...query,
-                from: nowRoundedToHour() - (365.24 * dayInMillis),
-                to:   nowRoundedToHour(),
+                from: this._state.from ? this._state.from : (nowRoundedToHour() - (365.24 * dayInMillis)),
+                to:   this._state.to ? this._state.to : nowRoundedToHour(),
                 name: "time"
             };
             delete payload.__series_id;
