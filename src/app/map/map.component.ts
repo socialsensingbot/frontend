@@ -341,22 +341,6 @@ export class MapComponent implements OnInit, OnDestroy {
             }
         });
 
-        let updateStatsLayerInProgress = false;
-        this._updateStatsLayerTimer = timer(0, 1000).subscribe(async () => {
-            if (!updateStatsLayerInProgress) {
-                if (this.resetThisStatsLayer !== null) {
-                    log.debug("Twitter is stale");
-                    updateStatsLayerInProgress = true;
-                    await this._exec.queue("Reset Layers", ["ready"], async () => {
-                        this.activity = true;
-                        await this.resetStatisticsLayer(this.resetThisStatsLayer, false);
-                        this.activity = false;
-                    }, this.resetThisStatsLayer, true, true, false)
-                    this.resetThisStatsLayer = null;
-                    updateStatsLayerInProgress = false;
-                }
-            }
-        });
 
         this._blinkTimer = timer(0, this.pref.combined.blinkRateInMilliseconds).subscribe(async () => {
             this.blinkOn = !this.blinkOn;
@@ -627,11 +611,11 @@ export class MapComponent implements OnInit, OnDestroy {
         }
         log.debug("scheduleResetLayers()");
         console.trace("scheduleResetLayers");
-        if (clearSelected) {
-            await this.resetStatisticsLayer(layer, false);
-        } else {
-            this.resetThisStatsLayer = layer;
-        }
+        await this._exec.queue("Reset Layers", ["ready"], async () => {
+            this.activity = true;
+            await this.resetStatisticsLayer(layer, clearSelected);
+            this.activity = false;
+        }, layer + ":" + clearSelected, false, false, false);
     }
 
     /**
@@ -1119,6 +1103,8 @@ export class MapComponent implements OnInit, OnDestroy {
             this._map.removeLayer(this.currentStatisticsLayer);
             this._map.addLayer(curLayerGroup);
             this.currentStatisticsLayer = curLayerGroup;
+        } catch (e) {
+            console.error(e);
         } finally {
             this.loading.hideIndeterminateSpinner();
         }
