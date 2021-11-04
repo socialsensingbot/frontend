@@ -610,7 +610,6 @@ export class MapComponent implements OnInit, OnDestroy {
             return;
         }
         log.debug("scheduleResetLayers()");
-        console.trace("scheduleResetLayers");
         await this._exec.queue("Reset Layers", ["ready"], async () => {
             this.activity = true;
             await this.resetStatisticsLayer(layer, clearSelected);
@@ -1120,7 +1119,6 @@ export class MapComponent implements OnInit, OnDestroy {
         }
         return new Promise<void>(async (resolve, reject) => {
             log.info("Loading stats");
-            console.trace("Loading stats");
             const features = geography.features;
             await this.data.preCacheRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax);
             for (const feature of features) {
