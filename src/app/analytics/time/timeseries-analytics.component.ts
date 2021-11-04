@@ -581,6 +581,8 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
         dialogRef.afterClosed().subscribe(async result => {
             if (result !== null) {
+                this.state.from = this.range.controls.start.value.getTime();
+                this.state.to = this.range.controls.end.value.getTime();
                 await this.dash.addCard("timeseries", dialogData.title,
                                         1, 1, this.state);
                 this.showDashboard();
