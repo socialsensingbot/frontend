@@ -94,7 +94,7 @@ export class RESTMapDataService {
         const promises = [];
         this.regionGeography = {};
         for (const region of regions) {
-            log.debug("Loading geography for : " + region);
+            log.verbose("Loading geography for : " + region);
             try {
                 const promise: Promise<void> = this._api.callMapAPIWithCache(
                     this.map.id + "/region-type/" + regionType + "/region/" + region + "/geography", {}, 24 * 60 * 60)
