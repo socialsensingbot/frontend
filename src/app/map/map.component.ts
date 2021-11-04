@@ -41,6 +41,8 @@ const ONE_MINUTE_IN_MILLIS = 60000;
 export class MapComponent implements OnInit, OnDestroy {
     private currentStatisticsLayer: LayerGroup<any> = layerGroup();
     private destroyed = false;
+    private resetThisStatsLayer: string;
+    private _updateStatsLayerTimer: Subscription;
 
     public set selectedFeatureNames(value: string[]) {
         this._selectedFeatureNames = value;
@@ -339,6 +341,23 @@ export class MapComponent implements OnInit, OnDestroy {
             }
         });
 
+        let updateStatsLayerInProgress = false;
+        this._updateStatsLayerTimer = timer(0, 1000).subscribe(async () => {
+            if (!updateStatsLayerInProgress) {
+                if (this.resetThisStatsLayer !== null) {
+                    log.debug("Twitter is stale");
+                    updateStatsLayerInProgress = true;
+                    await this._exec.queue("Reset Layers", ["ready"], async () => {
+                        this.activity = true;
+                        await this.resetStatisticsLayer(this.resetThisStatsLayer, false);
+                        this.activity = false;
+                    }, this.resetThisStatsLayer, true, true, false)
+                    this.resetThisStatsLayer = null;
+                    updateStatsLayerInProgress = false;
+                }
+            }
+        });
+
         this._blinkTimer = timer(0, this.pref.combined.blinkRateInMilliseconds).subscribe(async () => {
             this.blinkOn = !this.blinkOn;
         });
@@ -374,6 +393,9 @@ export class MapComponent implements OnInit, OnDestroy {
         }
         if (this._sliderUpdateTimer) {
             this._sliderUpdateTimer.unsubscribe();
+        }
+        if (this._updateStatsLayerTimer) {
+            this._updateStatsLayerTimer.unsubscribe();
         }
         if (this._stateSub) {
             this._stateSub.unsubscribe();
@@ -604,11 +626,12 @@ export class MapComponent implements OnInit, OnDestroy {
             return;
         }
         log.debug("scheduleResetLayers()");
-        await this._exec.queue("Reset Layers", ["ready"], async () => {
-            this.activity = true;
-            await this.resetStatisticsLayer(layer, clearSelected);
-            this.activity = false;
-        }, layer + ":" + clearSelected, true, false, false);
+        console.trace("scheduleResetLayers");
+        if (clearSelected) {
+            await this.resetStatisticsLayer(layer, false);
+        } else {
+            this.resetThisStatsLayer = layer;
+        }
     }
 
     /**
@@ -1110,6 +1133,8 @@ export class MapComponent implements OnInit, OnDestroy {
             return;
         }
         return new Promise<void>(async (resolve, reject) => {
+            log.info("Loading stats");
+            console.trace("Loading stats");
             const features = geography.features;
             await this.data.preCacheRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax);
             for (const feature of features) {

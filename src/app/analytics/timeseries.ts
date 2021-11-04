@@ -103,8 +103,8 @@ export class TimeseriesCollectionModel {
                 public zeroFillMissingDates = true,
                 private _dateSpacing = dayInMillis,
                 private _graphType: GraphType = "line") {
-
-
+        this.minDate = new Date();
+        this.maxDate = new Date();
     }
 
     public addTimeseries(series: TimeseriesModel) {
