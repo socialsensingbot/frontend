@@ -198,9 +198,10 @@ export class UIExecutionService {
                         if (silentFailure) {
                             resolve(null);
                         } else {
-                            log.warn(
-                                `Skipped duplicate ${name} (${dedupKey}) on execution queue as this task is already queued.`);
-                            reject(DUPLICATE_REASON);
+                            let duplicateMessage: string = `Duplicate ${name} (${dedupKey}) on execution queue as this task is already queued.`;
+                            log.error(duplicateMessage);
+                            console.trace(duplicateMessage);
+                            reject(duplicateMessage);
                         }
                         return;
                     }
