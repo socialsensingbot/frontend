@@ -86,7 +86,7 @@ export const environment = {
     lamdaEnvironment: "demo",
     version:          "demo",
     demo:             true,
-    production:       false,
+    production:       true,
     hmr:              false,
     rollbar:          false,
     toolbarColor:     "primary",

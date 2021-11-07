@@ -69,10 +69,12 @@ export class RESTDataAPIService {
                 const key = "rest:query/" + path + ":" + JSON.stringify(payload);
                 const cachedItem = await this.cache.getCached(key);
                 if (cacheForSeconds > 0 && cachedItem && cachedItem.hasData && !cachedItem.expired) {
-                    // tslint:disable-next-line:no-console
                     log.debug("Value for " + key + "in cache");
                     // log.debug("Value for " + key + " was " + JSON.stringify(cachedItem.data));
-                    console.debug("Return cached item", JSON.stringify(cachedItem));
+                    if (!environment.production) {
+                        // tslint:disable-next-line:no-console
+                        console.debug("Return cached item", JSON.stringify(cachedItem));
+                    }
                     return cachedItem.data;
                 } else {
                     log.debug("Value for " + key + " not in cache");
@@ -129,12 +131,16 @@ export class RESTDataAPIService {
         }).then(data => {
             if (typeof data !== "undefined") {
                 // tslint:disable-next-line:no-console
-                console.debug("Returning uncached item", data);
+                if (!environment.production) {
+                    console.debug("Returning uncached item", data);
+                }
                 if (cacheForSeconds > 0) {
                     this.cache.setCached(key, data, cacheForSeconds * 1000);
                 }
             } else {
-                console.debug("Returning undefined item", data);
+                if (!environment.production) {
+                    console.debug("Returning undefined item", data);
+                }
             }
             return data;
         }).catch(e => {
@@ -151,8 +157,10 @@ export class RESTDataAPIService {
                         },
                     }).then(data => this._ngZone.run(() => {
                         this._notify.show("Problem resolved", "Good", 2000);
-                        // tslint:disable-next-line:no-console
-                        console.debug("Returning uncached item", data);
+                        if (!environment.production) {
+                            // tslint:disable-next-line:no-console
+                            console.debug("Returning uncached item", data);
+                        }
                         if (cacheForSeconds > 0) {
                             this.cache.setCached(key, data, cacheForSeconds * 1000);
                         }

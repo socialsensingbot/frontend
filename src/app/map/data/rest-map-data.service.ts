@@ -94,26 +94,34 @@ export class RESTMapDataService {
         const promises = [];
         this.regionGeography = {};
         for (const region of regions) {
-            log.warn("REGION: " + region);
-            const promise: Promise<void> = this._api.callMapAPIWithCache(
-                this.map.id + "/region-type/" + regionType + "/region/" + region + "/geography", {}, 24 * 60 * 60)
-                                               .then((regionGeography) => {
-                                                   this.regionGeography[region] = regionGeography;
-                                                   features.push(
-                                                       {
-                                                           id:   "" + region,
-                                                           type: "Feature",
-                                                           // tslint:disable-next-line:no-string-literal
-                                                           properties: {...regionGeography["properties"], name: region, count: 0},
-                                                           geometry:   regionGeography
-                                                       });
-                                               });
-            promises.push(promise);
+            log.verbose("Loading geography for : " + region);
+            try {
+                const promise: Promise<void> = this._api.callMapAPIWithCache(
+                    this.map.id + "/region-type/" + regionType + "/region/" + region + "/geography", {}, 24 * 60 * 60)
+                                                   .then((regionGeography) => {
+                                                       this.regionGeography[region] = regionGeography;
+                                                       features.push(
+                                                           {
+                                                               id:   "" + region,
+                                                               type: "Feature",
+                                                               // tslint:disable-next-line:no-string-literal
+                                                               properties: {...regionGeography["properties"], name: region, count: 0},
+                                                               geometry:   regionGeography
+                                                           });
+                                                   });
+                promises.push(promise);
+            } catch (e) {
+                console.error(e);
+            }
 
         }
         // Fork join.
         for (const promise of promises) {
-            await promise;
+            try {
+                await promise;
+            } catch (e) {
+                console.error(e);
+            }
         }
         this._regionGeographyGeoJSON = {type: "FeatureCollection", features};
         this._notify.dismiss();
