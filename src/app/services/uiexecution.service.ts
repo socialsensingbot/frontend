@@ -105,7 +105,12 @@ export class UIExecutionService {
                     if ((task.waitForStates === null || task.waitForStates.indexOf(
                         this._state) >= 0) && (task.waitForUIState === null || this.uistate === task.waitForUIState)) {
                         log.info(`Executing ${task.name}(${task.dedup})`);
-                        await task.execute();
+                        try {
+                            await task.execute();
+                        } catch (e) {
+                            console.error(`ERROR: executing ${task.name}(${task.dedup})`, e);
+                        }
+                        log.info(`Executed ${task.name}(${task.dedup})`);
                         if (task.dedup !== null) {
                             this.dedupMap.delete(task.dedup);
                         }
@@ -198,9 +203,10 @@ export class UIExecutionService {
                         if (silentFailure) {
                             resolve(null);
                         } else {
-                            log.warn(
-                                `Skipped duplicate ${name} (${dedupKey}) on execution queue as this task is already queued.`);
-                            reject(DUPLICATE_REASON);
+                            let duplicateMessage: string = `Duplicate ${name} (${dedupKey}) on execution queue as this task is already queued.`;
+                            log.error(duplicateMessage);
+                            console.trace(duplicateMessage);
+                            reject(duplicateMessage);
                         }
                         return;
                     }

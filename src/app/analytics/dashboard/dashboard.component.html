@@ -1,14 +1,14 @@
-<div class="grid-container">
-  <h1 class="mat-h1">Dashboard
-    <button mat-button (click)="reset()">reset</button>
+<div *ngIf="ready" class="grid-container">
+    <h1 class="mat-h1">Dashboard
+        <button mat-button (click)="reset()">reset</button>
 
-  </h1>
-  <mat-grid-list cols="2" rowHeight="500px">
-    <ng-container *ngFor="let card of cards; let i=index ">
-      <mat-grid-tile *ngIf="!card.hidden" [colspan]="card.cols" [rowspan]="card.rows">
-        <mat-card class="dashboard-card  dashboard-card-{{card.cols}}x{{card.rows}} dasboard-card-number-{{i}}
+    </h1>
+    <mat-grid-list cols="2" rowHeight="500px">
+        <ng-container *ngFor="let card of cards; let i=index ">
+            <mat-grid-tile *ngIf="!card.hidden" [colspan]="card.cols" [rowspan]="card.rows">
+                <mat-card class="dashboard-card  dashboard-card-{{card.cols}}x{{card.rows}} dasboard-card-number-{{i}}
                     dashboard-card-cols-{{card.cols}} dashboard-card-rows-{{card.rows}}">
-          <mat-card-header>
+                    <mat-card-header>
             <mat-card-title>
                 <span class="dashboard-card-number-{{i}}-title dashboard-card-title">{{card.title}}</span>
               <button mat-icon-button class="more-button dasboard-card-number-{{i}}-menu-btn dashboard-card-menu-btn" [matMenuTriggerFor]="menu"

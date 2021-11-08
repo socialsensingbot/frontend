@@ -41,6 +41,8 @@ const ONE_MINUTE_IN_MILLIS = 60000;
 export class MapComponent implements OnInit, OnDestroy {
     private currentStatisticsLayer: LayerGroup<any> = layerGroup();
     private destroyed = false;
+    private resetThisStatsLayer: string;
+    private _updateStatsLayerTimer: Subscription;
 
     public set selectedFeatureNames(value: string[]) {
         this._selectedFeatureNames = value;
@@ -339,6 +341,7 @@ export class MapComponent implements OnInit, OnDestroy {
             }
         });
 
+
         this._blinkTimer = timer(0, this.pref.combined.blinkRateInMilliseconds).subscribe(async () => {
             this.blinkOn = !this.blinkOn;
         });
@@ -374,6 +377,9 @@ export class MapComponent implements OnInit, OnDestroy {
         }
         if (this._sliderUpdateTimer) {
             this._sliderUpdateTimer.unsubscribe();
+        }
+        if (this._updateStatsLayerTimer) {
+            this._updateStatsLayerTimer.unsubscribe();
         }
         if (this._stateSub) {
             this._stateSub.unsubscribe();
@@ -604,11 +610,12 @@ export class MapComponent implements OnInit, OnDestroy {
             return;
         }
         log.debug("scheduleResetLayers()");
+        console.trace("scheduleResetLayers");
         await this._exec.queue("Reset Layers", ["ready"], async () => {
             this.activity = true;
             await this.resetStatisticsLayer(layer, clearSelected);
             this.activity = false;
-        }, layer + ":" + clearSelected, true, false, false);
+        }, layer + ":" + clearSelected, false, false, false);
     }
 
     /**
@@ -1096,6 +1103,8 @@ export class MapComponent implements OnInit, OnDestroy {
             this._map.removeLayer(this.currentStatisticsLayer);
             this._map.addLayer(curLayerGroup);
             this.currentStatisticsLayer = curLayerGroup;
+        } catch (e) {
+            console.error(e);
         } finally {
             this.loading.hideIndeterminateSpinner();
         }
@@ -1110,6 +1119,8 @@ export class MapComponent implements OnInit, OnDestroy {
             return;
         }
         return new Promise<void>(async (resolve, reject) => {
+            log.info("Loading stats");
+            console.trace("Loading stats");
             const features = geography.features;
             await this.data.preCacheRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax);
             for (const feature of features) {
