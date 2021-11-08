@@ -223,11 +223,11 @@ export class RESTMapDataService {
      * @param map
      */
     public async regions(map = this.map.id) {
-        return await this._api.callMapAPIWithCache(map + "/regions", {});
+        return await this._api.callMapAPIWithCache(map + "/regions", {}, 12 * 60 * 60);
     }
 
     public async allRegions(map = this.map.id) {
-        return await this._api.callMapAPIWithCache(map + "/all-regions", {});
+        return await this._api.callMapAPIWithCache(map + "/all-regions", {}, 12 * 60 * 60);
     }
 
     private async getRegionStatsMap(layerGroupId: string, regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {

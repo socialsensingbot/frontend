@@ -515,7 +515,7 @@ module.exports = (connection: Pool) => {
                                                                  order by level desc, text asc`,
                                  values: [req.params.map]
                              });
-        }, {duration: 60 * 60});
+        }, {duration: 12 * 60 * 60});
     });
 
 
