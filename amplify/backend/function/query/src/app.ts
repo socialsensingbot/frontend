@@ -541,15 +541,18 @@ module.exports = (connection: Pool) => {
     });
 
     /**
-     * Returns the data for a timeseries graph on the give map.
+     * Returns the data to show the exceedance and counts on the main map. This is a highly optimized version
+     * of the 'complex-stats' call. It makes a lot of assumptions and allows only the simple enumerated and boolean
+     * criteria of hazards, sources and warning.
+     *
      * @example JSON body
      *
      * {
      *     "layer" : {
      *         "hazards" : ["flood","wind"]
      *         "sources" :["twitter"]
+     *         "warnings": "include"
      *     },
-     *     "regions":["wales","england"],
      *     "from": 1634911245041,
      *     "to": 1634911245041,
      * }
@@ -560,22 +563,12 @@ module.exports = (connection: Pool) => {
 
         cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
 
-            const firstDateInSeconds = (await sql({
-                                                      // language=MySQL
-                                                      sql: `select unix_timestamp(max(source_timestamp)) as ts
-                                                            from mat_view_first_entries
-                                                            where hazard IN (?)
-                                                              and source IN (?)`, values: [req.body.hazards, req.body.sources]
-                                                  }))[0].ts
-            console.debug("First date in seconds: " + firstDateInSeconds);
             const result = {};
 
             const lastDate: Date = (await maps)[req.params.map].last_date;
             const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
             console.debug("StartDate: " + new Date(req.body.startDate));
             console.debug("EndDate: " + new Date(endDate));
-
-
             const periodInDays = (endDate - req.body.startDate) / (24 * 60 * 60 * 1000);
             const rows = await sql({
                                        // language=MySQL
@@ -589,13 +582,14 @@ module.exports = (connection: Pool) => {
                                                                                            and tc.source IN (?)
                                                                                            and tc.warning IN (?)
                                                                                            and not tc.deleted
-                                                                                           and text_count > count / ?) / (select days
-                                                                                                                          from mat_view_data_days d
-                                                                                                                          where region_counts.region = d.region
-                                                                                                                            and d.region_type = ?
-                                                                                                                            and d.hazard IN (?)
-                                                                                                                            and d.source IN (?)
-                                                                                                                            and d.warning IN (?)))
+                                                                                           and text_count > count / ?)
+                                                                            / (select days
+                                                                               from mat_view_data_days d
+                                                                               where region_counts.region = d.region
+                                                                                 and d.region_type = ?
+                                                                                 and d.hazard IN (?)
+                                                                                 and d.source IN (?)
+                                                                                 and d.warning IN (?)))
                                                                             , ?)) * 100 as exceedance
 
                                                                  FROM (SELECT count(*) as count, region as region
