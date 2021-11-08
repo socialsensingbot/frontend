@@ -67,6 +67,25 @@ BEGIN
     optimize table mat_view_timeseries_hour;
     optimize table mat_view_regions;
     optimize table mat_view_first_entries;
+    optimize table mat_view_text_count;
+
+    START TRANSACTION;
+
+    call debug_msg(2, 'refresh_mv_full', 'Refreshing map criteria.');
+
+    # noinspection SqlWithoutWhere
+    delete from mat_view_map_criteria;
+    insert into mat_view_map_criteria
+    SELECT distinct region,
+                    region_type,
+                    hazard,
+                    source,
+                    warning,
+                    deleted,
+                    map_location
+    FROM mat_view_regions;
+    call debug_msg(2, 'refresh_mv_full', 'Refreshed map criteria.');
+    COMMIT;
 
     WHILE dt <= NOW()
         DO
@@ -81,6 +100,28 @@ BEGIN
     SELECT min(source_timestamp) as source_timestamp, hazard, source
     FROM mat_view_regions
     GROUP BY hazard, source;
+    COMMIT;
+
+    START TRANSACTION;
+    call debug_msg(2, 'refresh_mv_full', 'Refreshing data day counts.');
+    replace into mat_view_data_days
+    select count(*) as days, region, region_type, hazard, source, warning
+    from mat_view_text_count tc
+    group by region, region_type, hazard, source, warning;
+    COMMIT;
+
+    START TRANSACTION;
+    call debug_msg(2, 'refresh_mv_full', 'Refreshing map criteria.');
+    delete from mat_view_map_criteria;
+    insert into mat_view_map_criteria
+    SELECT distinct region,
+                    region_type,
+                    hazard,
+                    source,
+                    warning,
+                    deleted,
+                    map_location
+    FROM mat_view_regions;
     COMMIT;
 
 
@@ -120,21 +161,53 @@ BEGIN
 #     SET @maxTimestamp = IFNULL((select max(source_timestamp) from mat_view_regions), NOW() - INTERVAL 20 YEAR);
     DELETE FROM mat_view_regions WHERE source_timestamp BETWEEN start_date and end_date;
 
-    INSERT INTO mat_view_regions
+    REPLACE INTO mat_view_regions
     SELECT t.source_id,
            t.source,
            t.hazard,
-           t.source_timestamp,
+           cast(date_format(t.source_timestamp, '%Y-%m-%d %H') as DATETIME) as source_timestamp,
            gr.region_type,
            gr.region,
            t.warning,
-           IFNULL(t.deleted, false) as deleted,
+           IFNULL(t.deleted, false)                                         as deleted,
            gr.map_location
     FROM live_text t,
          ref_geo_regions gr
     WHERE ST_Intersects(boundary, location)
       AND t.source_timestamp BETWEEN start_date and end_date;
+    COMMIT;
 
+    START TRANSACTION;
+    DELETE FROM mat_view_text_count WHERE source_date BETWEEN start_date and end_date;
+
+    INSERT INTO mat_view_text_count
+    SELECT distinct 0    as text_count,
+                    t.source,
+                    t.hazard,
+                    date as source_date,
+                    t.region_type,
+                    t.region,
+                    t.warning,
+                    t.deleted,
+                    t.map_location
+    FROM mat_view_map_criteria t,
+         (select date from mat_view_days where date BETWEEN start_date and end_date) days;
+
+    REPLACE INTO mat_view_text_count
+    SELECT count(t.source)                                               as text_count,
+           t.source,
+           t.hazard,
+           cast(date_format(t.source_timestamp, '%Y-%m-%d') as DATETIME) as source_date,
+           t.region_type,
+           t.region,
+           t.warning,
+           t.deleted,
+           t.map_location
+    FROM mat_view_regions t
+    WHERE t.source_timestamp BETWEEN start_date and end_date
+    GROUP BY region, region_type, hazard, source, t.map_location, warning, deleted, source_date;
+    COMMIT;
+    call debug_msg(1, 'refresh_mv', 'Updated mat_view_text_count');
     #
 #     # UK Locations are buffered with a 0.01 degree buffer. At present this is not done on the world map
 #     # If the world map is supported then this may be required to capture location just outside of the strict
