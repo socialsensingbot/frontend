@@ -235,7 +235,7 @@ export class RESTMapDataService {
         return await this._api.callMapAPIWithCache(map + "/all-regions", {}, 12 * 60 * 60);
     }
 
-    private async getRegionStatsMap(layerGroupId: string, regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {
+    public async getRegionStatsMap(layerGroupId: string, regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {
         const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
         const statsMap = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/stats", {
             hazards:   layerGroup.hazards,

@@ -614,7 +614,7 @@ export class MapComponent implements OnInit, OnDestroy {
             this.activity = true;
             await this.resetStatisticsLayer(layer, clearSelected);
             this.activity = false;
-        }, layer + ":" + clearSelected, false, true, false);
+        }, layer, false, false, true);
     }
 
     /**
@@ -1067,29 +1067,31 @@ export class MapComponent implements OnInit, OnDestroy {
             if (curLayerGroup != null) {
 
                 // noinspection JSUnfilteredForInLoop
-                const regionTweetMap = await this.data.recentTweets(this.activeLayerGroup, this.activeRegionType);
-                log.debug("Region Tweet Map", regionTweetMap);
+                await this.data.recentTweets(this.activeLayerGroup, this.activeRegionType).then(async regionTweetMap => {
+                    log.debug("Region Tweet Map", regionTweetMap);
 
-                const styleFunc = (feature: geojson.Feature) => {
-                    log.verbose("styleFunc " + layer);
+                    const styleFunc = (feature: geojson.Feature) => {
+                        log.verbose("styleFunc " + layer);
 
-                    const style = this._color.colorFunctions[layer].getFeatureStyle(
-                        feature);
-                    log.verbose("Style ", style, feature.properties);
-                    if (this.liveUpdating && regionTweetMap[feature.properties.name]) {
-                        log.verbose(`Adding new tweet style for ${feature.properties.name}`);
-                        style.className = style.className + " leaflet-new-tweet";
-                    }
-                    return style;
+                        const style = this._color.colorFunctions[layer].getFeatureStyle(
+                            feature);
+                        log.verbose("Style ", style, feature.properties);
+                        if (this.liveUpdating && regionTweetMap[feature.properties.name]) {
+                            log.verbose(`Adding new tweet style for ${feature.properties.name}`);
+                            style.className = style.className + " leaflet-new-tweet";
+                        }
+                        return style;
 
-                };
+                    };
+                    await this.updateRegionData(geography);
+                    this._geojson[layer] = new GeoJSON(
+                        geography as geojson.GeoJsonObject, {
+                            style:         styleFunc,
+                            onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
+                        }).addTo(curLayerGroup);
 
-                await this.updateRegionData(geography);
-                this._geojson[layer] = new GeoJSON(
-                    geography as geojson.GeoJsonObject, {
-                        style:         styleFunc,
-                        onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
-                    }).addTo(curLayerGroup);
+                }).catch(e => log.error(e));
+
 
             } else {
                 log.debug("Null layer " + layer);
@@ -1120,25 +1122,25 @@ export class MapComponent implements OnInit, OnDestroy {
         return new Promise<void>(async (resolve, reject) => {
             log.debug("Loading stats");
             const features = geography.features;
-            await this.data.preCacheRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax);
+            log.debug("Before stats");
+            const statsMap = await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax);
+            log.debug("After stats");
             for (const feature of features) {
                 const featureProperties = feature.properties;
                 const region = featureProperties.name;
-                await this.data.regionStats(this.activeLayerGroup, this.activeRegionType, region, this._dateMin, this._dateMax).then(
-                    mapStats => {
-                        if (mapStats !== null) {
-                            featureProperties.count = mapStats.count;
-                            featureProperties.stats = mapStats.exceedance;
-                        } else {
-                            log.verbose("No data for " + region);
-                            featureProperties.count = 0;
-                            featureProperties.stats = 0;
-                        }
-                        if (feature === features[features.length - 1]) {
-                            resolve();
-                        }
-                    }
-                );
+                const regionStats = statsMap[region];
+                if (regionStats) {
+                    featureProperties.count = regionStats.count;
+                    featureProperties.stats = regionStats.exceedance;
+                } else {
+                    log.verbose("No data for " + region);
+                    featureProperties.count = 0;
+                    featureProperties.stats = 0;
+                }
+                if (feature === features[features.length - 1]) {
+                    resolve();
+                }
+
             }
         });
 
