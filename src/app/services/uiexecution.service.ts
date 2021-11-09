@@ -13,7 +13,7 @@ const maxTaskDuration: number = 1000;
 class ExecutionTask {
     public rescheduleAttempts: number = 0;
 
-    constructor(private _resolve: (value?: any) => void, private _reject: (reason?: any) => void,
+    constructor(public resolve: (value?: any) => void, public reject: (reason?: any) => void,
                 private _task: () => any, public name: string, public waitForStates: AppState[] | null,
                 private _dedup: string, private _notify: NotificationService, public reschedule: boolean,
                 public silentFailure: boolean, public waitForUIState: UIState, public rescheduleDelay: number,
@@ -30,14 +30,14 @@ class ExecutionTask {
         try {
             const start = Date.now();
             log.info("ExecutionTask: executing " + this.name + "(" + this.dedup + ")");
-            this._resolve(this._task());
+            this.resolve(this._task());
             if (Date.now() - start > maxTaskDuration) {
                 log.warn(
                     `Task exceeded maximum recommended duration: ${this.name}(${this.dedup}) max is ${maxTaskDuration} this took ${Date.now() - start}`);
             }
         } catch (e) {
             log.error("ERROR Executing " + this.name);
-            this._reject(e);
+            this.reject(e);
         }
     }
 }
@@ -108,7 +108,7 @@ export class UIExecutionService {
                         try {
                             await task.execute();
                         } catch (e) {
-                            console.error(`ERROR: executing ${task.name}(${task.dedup})`, e);
+                            log.error(`ERROR: executing ${task.name}(${task.dedup})`, e);
                         }
                         log.info(`Executed ${task.name}(${task.dedup})`);
                         if (task.dedup !== null) {
@@ -197,6 +197,11 @@ export class UIExecutionService {
                             log.warn(`Replacing duplicate ${name} (${dedupKey}) on execution queue`);
                         }
                         const oldTask = this.dedupMap.get(dedupKey);
+                        executionTask.resolve = (value) => {
+                            log.info("Resolving original task " + oldTask.dedup);
+                            oldTask.resolve(value);
+                            resolve(value);
+                        };
                         this._queue = this._queue.filter(i => i.dedup !== oldTask.dedup);
                         this.dedupMap.set(dedupKey, executionTask);
                     } else {
