@@ -100,29 +100,23 @@ export class RESTMapDataService {
             this._notify.show("Loading Geographic data ...", "OK", 20000);
             const regions = (await this.allRegions()).filter(i => i.type === regionType).map(i => i.value);
             const features = [];
-            const promises = [];
             this.regionGeography = {};
             for (const region of regions) {
                 log.warn("REGION: " + region);
-                const promise: Promise<void> = this._api.callMapAPIWithCache(
+                await this._api.callMapAPIWithCache(
                     this.map.id + "/region-type/" + regionType + "/region/" + region + "/geography", {}, 24 * 60 * 60)
-                                                   .then((regionGeography) => {
-                                                       this.regionGeography[region] = regionGeography;
-                                                       features.push(
-                                                           {
-                                                               id:   "" + region,
-                                                               type: "Feature",
-                                                               // tslint:disable-next-line:no-string-literal
-                                                               properties: {...regionGeography["properties"], name: region, count: 0},
-                                                               geometry:   regionGeography
+                          .then((regionGeography) => {
+                              this.regionGeography[region] = regionGeography;
+                              features.push(
+                                  {
+                                      id:   "" + region,
+                                      type: "Feature",
+                                      // tslint:disable-next-line:no-string-literal
+                                      properties: {...regionGeography["properties"], name: region, count: 0},
+                                      geometry:   regionGeography
                                                            });
                                                    });
-                promises.push(promise);
 
-            }
-            // Fork join.
-            for (const promise of promises) {
-                await promise;
             }
             this._regionGeographyGeoJSON = {type: "FeatureCollection", features};
             await this.cache.setCached(key, this._regionGeographyGeoJSON, 24 * 60 * 60 * 1000);
