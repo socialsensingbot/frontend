@@ -55,6 +55,7 @@ module.exports = (connection: Pool) => {
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "*");
         res.setHeader("X-SocialSensing", "true");
+        res.setHeader("X-SocialSensing-Date", "" + new Date());
         next();
     });
 
@@ -316,17 +317,17 @@ module.exports = (connection: Pool) => {
         }, {duration: 60});
     });
 
-    app.post("/map/:map/region-type/:regionType/geography", async (req, res) => {
+    let geographyFunc: (req, res) => Promise<void> = async (req, res) => {
         cache(res, null, async () => {
             try {
 
                 const geography = await sql({
                                                 // language=MySQL
-                                                sql: `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
-                                                                              from ref_geo_regions gr,
-                                                                                   ref_map_metadata mm
-                                                                              where mm.id = ?
-                                                                                and region_type = ?
+                                                sql:                                                             `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
+                                                                                                                                          from ref_geo_regions gr,
+                                                                                                                                               ref_map_metadata mm
+                                                                                                                                          where mm.id = ?
+                                                                                                                                            and region_type = ?
                                                                                 and gr.map_location = mm.location`,
                                                 values: [req.params.map, req.params.regionType]
 
@@ -343,20 +344,23 @@ module.exports = (connection: Pool) => {
                 console.error("FAILED: Could not get geography, hit this error ", e);
             }
         }, {duration: 24 * 60 * 60});
-    });
+    };
+
+    app.get("/map/:map/region-type/:regionType/geography", geographyFunc);
+    app.post("/map/:map/region-type/:regionType/geography", geographyFunc);
 
 
-    app.post("/map/:map/region-type/:regionType/region/:region/geography", async (req, res) => {
+    let regionGeographyFunc: (req, res) => Promise<void> = async (req, res) => {
         cache(res, null, async () => {
             try {
 
                 const geography = await sql({
                                                 // language=MySQL
-                                                sql: `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
-                                                                              from ref_geo_regions gr,
-                                                                                   ref_map_metadata mm
-                                                                              where mm.id = ?
-                                                                                and region_type = ?
+                                                sql:                                                             `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
+                                                                                                                                          from ref_geo_regions gr,
+                                                                                                                                               ref_map_metadata mm
+                                                                                                                                          where mm.id = ?
+                                                                                                                                            and region_type = ?
                                                                                 and region = ?
                                                                                 and gr.map_location = mm.location`,
                                                 values: [req.params.map, req.params.regionType, req.params.region]
@@ -371,7 +375,10 @@ module.exports = (connection: Pool) => {
                 console.error("FAILED: Could not get geography, hit this error ", e);
             }
         }, {duration: 24 * 60 * 60});
-    });
+    };
+
+    app.post("/map/:map/region-type/:regionType/region/:region/geography", regionGeographyFunc);
+    app.get("/map/:map/region-type/:regionType/region/:region/geography", regionGeographyFunc);
 
     app.post("/map/:map/aggregations", async (req, res) => {
 
@@ -379,9 +386,9 @@ module.exports = (connection: Pool) => {
 
             const aggregationTypes = await sql({
                                                    // language=MySQL
-                                                   sql: `/* app.ts: aggregations */ select rat.id as region_aggregation_type_id, rat.title as title
-                                                                                    from ref_map_metadata_region_aggregations rmmra,
-                                                                                         ref_map_region_aggregation_types rat
+                                                   sql:                                                   `/* app.ts: aggregations */ select rat.id as region_aggregation_type_id, rat.title as title
+                                                                                                                                      from ref_map_metadata_region_aggregations rmmra,
+                                                                                                                                           ref_map_region_aggregation_types rat
                                                                                     where rat.id = rmmra.region_aggregation_type_id
                                                                                       and rmmra.map_id = ?`, values: [req.params.map]
                                                });
@@ -569,23 +576,27 @@ module.exports = (connection: Pool) => {
                                        // language=MySQL
                                        sql: `/* app.ts: stats */ select region,
                                                                         count,
-                                                                        (1 - POWER(LEAST(1 - ((select count(*)
-                                                                                               from mat_view_text_count tc
-                                                                                               where region_counts.region = tc.region
-                                                                                                 and tc.region_type = ?
-                                                                                                 and tc.hazard IN (?)
-                                                                                                 and tc.source IN (?)
-                                                                                                 and tc.warning IN (?)
-                                                                                                 and not tc.deleted
-                                                                                                 and text_count > count / ?)
-                                                                            / (select days
-                                                                               from mat_view_data_days d
-                                                                               where region_counts.region = d.region
-                                                                                 and d.region_type = ?
-                                                                                 and d.hazard IN (?)
-                                                                                 and d.source IN (?)
-                                                                                 and d.warning IN (?)))
-                                                                                       , ?), 1023)) * 100 as exceedance
+                                                                        (1 -
+                                                                         POWER(1 - ((select count(*)
+                                                                                     from (select sum(tc.text_count) as sum_count, source_date
+                                                                                           from mat_view_text_count tc
+                                                                                           where region_counts.region = tc.region
+                                                                                             and tc.region_type = ?
+                                                                                             and tc.hazard IN (?)
+                                                                                             and tc.source IN (?)
+                                                                                             and tc.warning IN (?)
+                                                                                             and not tc.deleted
+                                                                                           group by source_date
+                                                                                           having sum(tc.text_count) > (region_counts.count / ?)) re_summed_counts)
+                                                                             / (select max(days)
+                                                                                from mat_view_data_days d
+                                                                                where region_counts.region = d.region
+                                                                                  and d.region_type = ?
+                                                                                  and d.hazard IN (?)
+                                                                                  and d.source IN (?)
+                                                                                  and d.warning IN (?)))
+                                                                             , LEAST(?, 1023))
+                                                                            ) * 100 as exceedance
 
                                                                  FROM (SELECT count(*) as count, region as region
                                                                        FROM mat_view_regions r
