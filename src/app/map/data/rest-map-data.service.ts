@@ -95,6 +95,7 @@ export class RESTMapDataService {
             // log.debug("Value for " + key + " was " + JSON.stringify(cachedItem.data));
             // console.debug("Return cached item", JSON.stringify(cachedItem));
             this._regionGeographyGeoJSON = cachedItem.data as geojson.FeatureCollection;
+            //TODO: IMPORTANT NEED TO READ THE REGION GEOGRAPHY FROM CACHE ALSO.
         } else {
             log.debug("Loading Geography");
             this._notify.show("Loading Geographic data ...", "OK", 20000);

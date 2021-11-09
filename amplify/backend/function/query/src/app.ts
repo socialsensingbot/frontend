@@ -577,24 +577,24 @@ module.exports = (connection: Pool) => {
                                        sql: `/* app.ts: stats */ select region,
                                                                         count,
                                                                         (1 -
-                                                                         POWER(1 - ((select count(*)
-                                                                                     from (select sum(tc.text_count) as sum_count, source_date
-                                                                                           from mat_view_text_count tc
-                                                                                           where region_counts.region = tc.region
-                                                                                             and tc.region_type = ?
-                                                                                             and tc.hazard IN (?)
-                                                                                             and tc.source IN (?)
-                                                                                             and tc.warning IN (?)
-                                                                                             and not tc.deleted
-                                                                                           group by source_date
-                                                                                           having sum(tc.text_count) > (region_counts.count / ?)) re_summed_counts)
+                                                                         POWER(GREATEST(0, 1 - ((select count(*)
+                                                                                                 from (select sum(tc.text_count) as sum_count, source_date
+                                                                                                       from mat_view_text_count tc
+                                                                                                       where region_counts.region = tc.region
+                                                                                                         and tc.region_type = ?
+                                                                                                         and tc.hazard IN (?)
+                                                                                                         and tc.source IN (?)
+                                                                                                         and tc.warning IN (?)
+                                                                                                         and not tc.deleted
+                                                                                                       group by source_date
+                                                                                                       having sum(tc.text_count) > (region_counts.count / ?)) re_summed_counts)
                                                                              / (select max(days)
                                                                                 from mat_view_data_days d
                                                                                 where region_counts.region = d.region
                                                                                   and d.region_type = ?
                                                                                   and d.hazard IN (?)
                                                                                   and d.source IN (?)
-                                                                                  and d.warning IN (?)))
+                                                                                  and d.warning IN (?))))
                                                                              , LEAST(?, 1023))
                                                                             ) * 100 as exceedance
 
