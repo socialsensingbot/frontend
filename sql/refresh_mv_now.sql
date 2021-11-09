@@ -187,6 +187,8 @@ BEGIN
     START TRANSACTION;
     DELETE FROM mat_view_text_count WHERE source_date BETWEEN start_date and end_date;
 
+    # This zeros out all daily counts for ALL the days in the range. So that when the actual values are
+    # placed in the table, any missing days (i.e. with no data) still get these zero values.
     INSERT INTO mat_view_text_count
     SELECT distinct 0    as text_count,
                     t.source,
@@ -200,6 +202,7 @@ BEGIN
     FROM mat_view_map_criteria t,
          (select date from mat_view_days where date BETWEEN start_date and end_date) days;
 
+    #Now replace all non-zero days.
     REPLACE INTO mat_view_text_count
     SELECT count(t.source)                                               as text_count,
            t.source,
@@ -214,6 +217,8 @@ BEGIN
     WHERE t.source_timestamp BETWEEN start_date and end_date
     GROUP BY region, region_type, hazard, source, t.map_location, warning, deleted, source_date;
     COMMIT;
+
+
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_text_count');
     #
 #     # UK Locations are buffered with a 0.01 degree buffer. At present this is not done on the world map

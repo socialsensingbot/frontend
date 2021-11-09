@@ -69,9 +69,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     private _state: TimeseriesAnalyticsComponentState;
 
 
-    public yLabel = "Count";
+    public yLabel = "Return Period";
     public xField = "date";
-    public yField = "count";
+    public yField = "exceedance";
     /**
      * Whether the timeseries graph should use animations (this is passed down to the actual graph).
      */
