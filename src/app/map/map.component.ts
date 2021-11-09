@@ -1057,7 +1057,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
 
         log.info("Resetting " + layer);
-        this.loading.showIndeterminateSpinner();
+        // this.loading.showIndeterminateSpinner();
         try {
             const geography: PolygonData = await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData;
             log.debug("resetStatisticsLayer(" + clearSelected + ")");
@@ -1105,7 +1105,7 @@ export class MapComponent implements OnInit, OnDestroy {
         } catch (e) {
             console.error(e);
         } finally {
-            this.loading.hideIndeterminateSpinner();
+            // this.loading.hideIndeterminateSpinner();
         }
 
     }
