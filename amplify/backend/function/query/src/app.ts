@@ -569,15 +569,15 @@ module.exports = (connection: Pool) => {
                                        // language=MySQL
                                        sql: `/* app.ts: stats */ select region,
                                                                         count,
-                                                                        (1 - POWER(1 - ((select count(*)
-                                                                                         from mat_view_text_count tc
-                                                                                         where region_counts.region = tc.region
-                                                                                           and tc.region_type = ?
-                                                                                           and tc.hazard IN (?)
-                                                                                           and tc.source IN (?)
-                                                                                           and tc.warning IN (?)
-                                                                                           and not tc.deleted
-                                                                                           and text_count > count / ?)
+                                                                        (1 - POWER(LEAST(1 - ((select count(*)
+                                                                                               from mat_view_text_count tc
+                                                                                               where region_counts.region = tc.region
+                                                                                                 and tc.region_type = ?
+                                                                                                 and tc.hazard IN (?)
+                                                                                                 and tc.source IN (?)
+                                                                                                 and tc.warning IN (?)
+                                                                                                 and not tc.deleted
+                                                                                                 and text_count > count / ?)
                                                                             / (select days
                                                                                from mat_view_data_days d
                                                                                where region_counts.region = d.region
@@ -585,7 +585,7 @@ module.exports = (connection: Pool) => {
                                                                                  and d.hazard IN (?)
                                                                                  and d.source IN (?)
                                                                                  and d.warning IN (?)))
-                                                                            , ?)) * 100 as exceedance
+                                                                                       , ?), 1023)) * 100 as exceedance
 
                                                                  FROM (SELECT count(*) as count, region as region
                                                                        FROM mat_view_regions r
