@@ -87,46 +87,43 @@ export class RESTMapDataService {
      * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
      */
     public async loadGeography(regionType: string): Promise<geojson.FeatureCollection> {
-        log.debug("Loading Geography");
-        this._notify.show("Loading Geographic data ...", "OK", 20000);
-        const regions = (await this.allRegions()).filter(i => i.type === regionType).map(i => i.value);
-        const features = [];
-        const promises = [];
-        this.regionGeography = {};
-        for (const region of regions) {
-            log.verbose("Loading geography for : " + region);
-            try {
-                const promise: Promise<void> = this._api.callMapAPIWithCache(
+        let key: string = "geography-cache:" + regionType;
+        const cachedItem = await this.cache.getCached(key);
+        if (cachedItem && cachedItem.hasData && !cachedItem.expired) {
+            // tslint:disable-next-line:no-console
+            log.verbose("Value for " + key + "in cache");
+            // log.debug("Value for " + key + " was " + JSON.stringify(cachedItem.data));
+            // console.debug("Return cached item", JSON.stringify(cachedItem));
+            this._regionGeographyGeoJSON = cachedItem.data as geojson.FeatureCollection;
+        } else {
+            log.debug("Loading Geography");
+            this._notify.show("Loading Geographic data ...", "OK", 20000);
+            const regions = (await this.allRegions()).filter(i => i.type === regionType).map(i => i.value);
+            const features = [];
+            this.regionGeography = {};
+            for (const region of regions) {
+                log.warn("REGION: " + region);
+                await this._api.callMapAPIWithCache(
                     this.map.id + "/region-type/" + regionType + "/region/" + region + "/geography", {}, 24 * 60 * 60)
-                                                   .then((regionGeography) => {
-                                                       this.regionGeography[region] = regionGeography;
-                                                       features.push(
-                                                           {
-                                                               id:   "" + region,
-                                                               type: "Feature",
-                                                               // tslint:disable-next-line:no-string-literal
-                                                               properties: {...regionGeography["properties"], name: region, count: 0},
-                                                               geometry:   regionGeography
+                          .then((regionGeography) => {
+                              this.regionGeography[region] = regionGeography;
+                              features.push(
+                                  {
+                                      id:   "" + region,
+                                      type: "Feature",
+                                      // tslint:disable-next-line:no-string-literal
+                                      properties: {...regionGeography["properties"], name: region, count: 0},
+                                      geometry:   regionGeography
                                                            });
                                                    });
-                promises.push(promise);
-            } catch (e) {
-                console.error(e);
-            }
 
-        }
-        // Fork join.
-        for (const promise of promises) {
-            try {
-                await promise;
-            } catch (e) {
-                console.error(e);
             }
+            this._regionGeographyGeoJSON = {type: "FeatureCollection", features};
+            await this.cache.setCached(key, this._regionGeographyGeoJSON, 24 * 60 * 60 * 1000);
+            this._notify.dismiss();
         }
-        this._regionGeographyGeoJSON = {type: "FeatureCollection", features};
-        this._notify.dismiss();
-
         return this._regionGeographyGeoJSON;
+
     }
 
     public async load(first: boolean) {

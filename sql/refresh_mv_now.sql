@@ -63,11 +63,14 @@ BEGIN
     call debug_msg(2, 'refresh_mv_full', 'Refreshing (Full) Materialized Views');
 
 
+    call debug_msg(2, 'refresh_mv_full', 'Optimizing tables first');
+
     optimize table mat_view_timeseries_date;
     optimize table mat_view_timeseries_hour;
     optimize table mat_view_regions;
     optimize table mat_view_first_entries;
     optimize table mat_view_text_count;
+    call debug_msg(2, 'refresh_mv_full', 'Optimized tables');
 
     START TRANSACTION;
 
@@ -94,12 +97,14 @@ BEGIN
         END WHILE;
 
     START TRANSACTION;
+
     call debug_msg(2, 'refresh_mv_full', 'Refreshing first entries.');
 
     REPLACE INTO mat_view_first_entries
     SELECT min(source_timestamp) as source_timestamp, hazard, source
     FROM mat_view_regions
     GROUP BY hazard, source;
+    call debug_msg(2, 'refresh_mv_full', 'Refreshed first entries.');
     COMMIT;
 
     START TRANSACTION;
@@ -108,6 +113,7 @@ BEGIN
     select count(*) as days, region, region_type, hazard, source, warning
     from mat_view_text_count tc
     group by region, region_type, hazard, source, warning;
+    call debug_msg(2, 'refresh_mv_full', 'Refreshed data day counts.');
     COMMIT;
 
     START TRANSACTION;
@@ -122,6 +128,7 @@ BEGIN
                     deleted,
                     map_location
     FROM mat_view_regions;
+    call debug_msg(2, 'refresh_mv_full', 'Refreshed map criteria.');
     COMMIT;
 
 
@@ -180,6 +187,8 @@ BEGIN
     START TRANSACTION;
     DELETE FROM mat_view_text_count WHERE source_date BETWEEN start_date and end_date;
 
+    # This zeros out all daily counts for ALL the days in the range. So that when the actual values are
+    # placed in the table, any missing days (i.e. with no data) still get these zero values.
     INSERT INTO mat_view_text_count
     SELECT distinct 0    as text_count,
                     t.source,
@@ -193,6 +202,7 @@ BEGIN
     FROM mat_view_map_criteria t,
          (select date from mat_view_days where date BETWEEN start_date and end_date) days;
 
+    #Now replace all non-zero days.
     REPLACE INTO mat_view_text_count
     SELECT count(t.source)                                               as text_count,
            t.source,
@@ -207,6 +217,8 @@ BEGIN
     WHERE t.source_timestamp BETWEEN start_date and end_date
     GROUP BY region, region_type, hazard, source, t.map_location, warning, deleted, source_date;
     COMMIT;
+
+
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_text_count');
     #
 #     # UK Locations are buffered with a 0.01 degree buffer. At present this is not done on the world map

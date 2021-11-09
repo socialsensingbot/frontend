@@ -274,44 +274,39 @@ module.exports = (connection: Pool) => {
     };
 
     app.post("/map/:map/region-type/:regionType/text-for-regions", async (req, res) => {
-        const start = Math.floor(req.body.startDate / 1000);
         const lastDate: Date = (await maps)[req.params.map].last_date;
         const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
-        const end = Math.floor(endDate / 1000);
-        const periodLengthInSeconds: number = end - start;
-        console.debug("Period Length in Seconds: " + periodLengthInSeconds);
         console.debug("StartDate: " + new Date(req.body.startDate));
         console.debug("EndDate: " + new Date(endDate));
-        console.debug("Start: " + new Date(start * 1000));
-        console.debug("End: " + new Date(end * 1000));
 
         cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
 
             return (await sql({
+                                  sql:
                                   // language=MySQL
-                                  sql: `/* app.ts: text_for_regions */ select t.source_json            as json,
-                                                                              t.source_html            as html,
-                                                                              r.source_timestamp       as timestamp,
-                                                                              r.source_id              as id,
-                                                                              ST_AsGeoJSON(t.location) as location,
-                                                                              r.region                 as region,
-                                                                              t.possibly_sensitive     as possibly_sensitive
-                                                                       FROM live_text t,
-                                                                            mat_view_regions r
-                                                                       WHERE t.source = r.source
-                                                                         and t.source_id = r.source_id
-                                                                         and t.hazard = r.hazard
-                                                                         and r.region_type = ?
-                                                                         and r.region in (?)
-                                                                         and r.hazard IN (?)
-                                                                         and r.source IN (?)
-                                                                         and r.warning IN (?)
-                                                                         and floor((? - unix_timestamp(r.source_timestamp)) / ?) = 0
-                                                                         and not t.deleted
-                                                                       order by r.source_timestamp desc    `,
-                                  values: [req.params.regionType, req.body.regions, req.body.hazards, req.body.sources,
+                                      `/* app.ts: text_for_regions */ select t.source_json            as json,
+                                                                             t.source_html            as html,
+                                                                             r.source_timestamp       as timestamp,
+                                                                             r.source_id              as id,
+                                                                             ST_AsGeoJSON(t.location) as location,
+                                                                             r.region                 as region,
+                                                                             t.possibly_sensitive     as possibly_sensitive
+                                                                      FROM live_text t
+                                                                               LEFT JOIN mat_view_regions r
+                                                                                         ON t.source = r.source and t.source_id = r.source_id and t.hazard = r.hazard
+                                                                      WHERE r.source_timestamp between ? and ?
+                                                                        and r.region in (?)
+                                                                        and r.region_type = ?
+                                                                        and r.hazard IN (?)
+                                                                        and r.source IN (?)
+                                                                        and r.warning IN (?)
+                                                                        and not t.deleted
+                                                                      order by r.source_timestamp desc    `,
+                                  values: [new Date(req.body.startDate), new Date(endDate),
+                                           req.body.regions, req.params.regionType, req.body.hazards,
+                                           req.body.sources,
                                            warningsValues(req.body.warnings),
-                                           end, periodLengthInSeconds]
+                                  ]
                               })).map(i => {
                 i.json = JSON.parse(i.json);
                 return i;
@@ -541,15 +536,18 @@ module.exports = (connection: Pool) => {
     });
 
     /**
-     * Returns the data for a timeseries graph on the give map.
+     * Returns the data to show the exceedance and counts on the main map. This is a highly optimized version
+     * of the 'complex-stats' call. It makes a lot of assumptions and allows only the simple enumerated and boolean
+     * criteria of hazards, sources and warning.
+     *
      * @example JSON body
      *
      * {
      *     "layer" : {
      *         "hazards" : ["flood","wind"]
      *         "sources" :["twitter"]
+     *         "warnings": "include"
      *     },
-     *     "regions":["wales","england"],
      *     "from": 1634911245041,
      *     "to": 1634911245041,
      * }
@@ -560,22 +558,12 @@ module.exports = (connection: Pool) => {
 
         cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
 
-            const firstDateInSeconds = (await sql({
-                                                      // language=MySQL
-                                                      sql: `select unix_timestamp(max(source_timestamp)) as ts
-                                                            from mat_view_first_entries
-                                                            where hazard IN (?)
-                                                              and source IN (?)`, values: [req.body.hazards, req.body.sources]
-                                                  }))[0].ts
-            console.debug("First date in seconds: " + firstDateInSeconds);
             const result = {};
 
             const lastDate: Date = (await maps)[req.params.map].last_date;
             const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
             console.debug("StartDate: " + new Date(req.body.startDate));
             console.debug("EndDate: " + new Date(endDate));
-
-
             const periodInDays = (endDate - req.body.startDate) / (24 * 60 * 60 * 1000);
             const rows = await sql({
                                        // language=MySQL
@@ -589,13 +577,14 @@ module.exports = (connection: Pool) => {
                                                                                            and tc.source IN (?)
                                                                                            and tc.warning IN (?)
                                                                                            and not tc.deleted
-                                                                                           and text_count > count / ?) / (select days
-                                                                                                                          from mat_view_data_days d
-                                                                                                                          where region_counts.region = d.region
-                                                                                                                            and d.region_type = ?
-                                                                                                                            and d.hazard IN (?)
-                                                                                                                            and d.source IN (?)
-                                                                                                                            and d.warning IN (?)))
+                                                                                           and text_count > count / ?)
+                                                                            / (select days
+                                                                               from mat_view_data_days d
+                                                                               where region_counts.region = d.region
+                                                                                 and d.region_type = ?
+                                                                                 and d.hazard IN (?)
+                                                                                 and d.source IN (?)
+                                                                                 and d.warning IN (?)))
                                                                             , ?)) * 100 as exceedance
 
                                                                  FROM (SELECT count(*) as count, region as region
