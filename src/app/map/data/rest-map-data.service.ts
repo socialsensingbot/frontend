@@ -87,19 +87,22 @@ export class RESTMapDataService {
      * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
      */
     public async loadGeography(regionType: string): Promise<geojson.FeatureCollection> {
-        let key: string = "geography-cache:" + regionType;
+        let key: string = "geography-cache-v2:" + regionType;
         const cachedItem = await this.cache.getCached(key);
         if (cachedItem && cachedItem.hasData && !cachedItem.expired) {
             // tslint:disable-next-line:no-console
             log.verbose("Value for " + key + "in cache");
             // log.debug("Value for " + key + " was " + JSON.stringify(cachedItem.data));
             // console.debug("Return cached item", JSON.stringify(cachedItem));
-            this._regionGeographyGeoJSON = cachedItem.data as geojson.FeatureCollection;
-            //TODO: IMPORTANT NEED TO READ THE REGION GEOGRAPHY FROM CACHE ALSO.
+            this._regionGeographyGeoJSON = (cachedItem.data as any).geojson as geojson.FeatureCollection;
+            this.regionGeography = (cachedItem.data as any).regionGeography as RegionGeography;
         } else {
             log.debug("Loading Geography");
-            this._notify.show("Loading Geographic data ...", "OK", 20000);
             const regions = (await this.allRegions()).filter(i => i.type === regionType).map(i => i.value);
+            let lotsOfRegions: boolean = regions.length > 50;
+            if (lotsOfRegions) {
+                this._notify.show("Loading Geographic data ...", "OK", 20000);
+            }
             const features = [];
             const promises = [];
             this.regionGeography = {};
@@ -109,7 +112,7 @@ export class RESTMapDataService {
 
                 log.warn("REGION: " + region);
                 promises.push(this._api.callMapAPIWithCache(
-                    this.map.id + "/region-type/" + regionType + "/region/" + region + "/geography", {}, 24 * 60 * 60, true)
+                    this.map.id + "/region-type/" + regionType + "/region/" + region + "/geography", {}, 365 * 24 * 60 * 60, true)
                                   .then((regionGeography) => {
                                       this.regionGeography[region] = regionGeography;
                                       // featureString += JSON.stringify(jsonObject) + ",";
@@ -125,20 +128,32 @@ export class RESTMapDataService {
             }
             this._loading.showSpinner = true;
             let count = 0;
+            let timeMessage = "this shouldn't take more than a few seconds";
+            if (regions.length > 200) {
+                timeMessage = "this may take a minute or two";
+            }
+            if (regions.length > 1000) {
+                timeMessage = "this can take a few minutes, please bear with us";
+            }
             for (const promise of promises) {
                 this._loading.progressPercentage = count * 100 / features.length;
-                if (count % 100 === 0) {
-                    this._notify.show(`Loading geographic data, ${promises.length - count} regions left, please wait ...`, "OK", 20000);
+                if (count % 100 === 0 && lotsOfRegions) {
+                    this._notify.show(`Loading geographic data ${timeMessage}, ${promises.length - count} regions left.`, "OK", 20000);
                 }
                 await promise;
                 count++;
             }
             // featureString = featureString.substring(0, featureString.length - 1) + "]}";
-            this._notify.show(`Geographic data loaded, now caching for future use.`, "OK", 60000);
+            if (lotsOfRegions) {
+                this._notify.show(`Geographic data loaded, now caching for future use ${timeMessage}.`, "OK", 60000);
+            }
             this._regionGeographyGeoJSON = {type: "FeatureCollection", features};
-            await this.cache.setCached(key, this._regionGeographyGeoJSON, 24 * 60 * 60 * 1000);
+            await this.cache.setCached(key, {geojson: this._regionGeographyGeoJSON, regionGeography: this.regionGeography},
+                                       24 * 60 * 60 * 1000);
             this._loading.showSpinner = false;
-            this._notify.dismiss();
+            if (lotsOfRegions) {
+                this._notify.show(`All done now, thanks for your patience.`, "OK", 2000);
+            }
         }
         return this._regionGeographyGeoJSON;
 
