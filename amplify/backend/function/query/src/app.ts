@@ -160,7 +160,7 @@ module.exports = (connection: Pool) => {
 
 
     // Map Related Queries
-    app.post("/map/metadata", async (req, res) => {
+    let mapMetadataFunc: (req, res) => Promise<void> = async (req, res) => {
 
 
         cache(res, req.path, async () => {
@@ -182,7 +182,9 @@ module.exports = (connection: Pool) => {
         });
 
 
-    });
+    };
+    app.post("/map/metadata", mapMetadataFunc);
+    app.get("/map/metadata", mapMetadataFunc);
 
 
     function handleError<ResBody>(res, e): void {
@@ -210,7 +212,7 @@ module.exports = (connection: Pool) => {
     });
 
 
-    app.post("/map/:map/metadata", async (req, res) => {
+    let metadataForMapByIDFunc: (req, res) => Promise<void> = async (req, res) => {
         cache(res, req.path, async () => {
 
 
@@ -259,7 +261,9 @@ module.exports = (connection: Pool) => {
 
         });
 
-    });
+    };
+    app.get("/map/:map/metadata", metadataForMapByIDFunc);
+    app.post("/map/:map/metadata", metadataForMapByIDFunc);
 
     const warningsValues = (warning: string) => {
         if (warning === "only") {
@@ -380,15 +384,15 @@ module.exports = (connection: Pool) => {
     app.post("/map/:map/region-type/:regionType/region/:region/geography", regionGeographyFunc);
     app.get("/map/:map/region-type/:regionType/region/:region/geography", regionGeographyFunc);
 
-    app.post("/map/:map/aggregations", async (req, res) => {
+    let mapAggregationsFunc: (req, res) => Promise<void> = async (req, res) => {
 
         cache(res, req.path, async () => {
 
             const aggregationTypes = await sql({
                                                    // language=MySQL
-                                                   sql:                                                   `/* app.ts: aggregations */ select rat.id as region_aggregation_type_id, rat.title as title
-                                                                                                                                      from ref_map_metadata_region_aggregations rmmra,
-                                                                                                                                           ref_map_region_aggregation_types rat
+                                                   sql: `/* app.ts: aggregations */ select rat.id as region_aggregation_type_id, rat.title as title
+                                                                                    from ref_map_metadata_region_aggregations rmmra,
+                                                                                         ref_map_region_aggregation_types rat
                                                                                     where rat.id = rmmra.region_aggregation_type_id
                                                                                       and rmmra.map_id = ?`, values: [req.params.map]
                                                });
@@ -434,7 +438,9 @@ module.exports = (connection: Pool) => {
 
             return aggroMap;
         }, {duration: 24 * 60 * 60});
-    });
+    };
+    app.post("/map/:map/aggregations", mapAggregationsFunc);
+    app.get("/map/:map/aggregations", mapAggregationsFunc);
 
     app.post("/map/:map/region-type/:regionType/recent-text-count", async (req, res) => {
         const lastDate: Date = (await maps)[req.params.map].last_date;
@@ -474,11 +480,7 @@ module.exports = (connection: Pool) => {
         res.json(endDate);
     });
 
-    /**
-     * Returns all the regions for a given map, regardless of region type.
-     * IMPORTANT: this screens out numerically named regions.
-     */
-    app.post("/map/:map/regions", async (req, res) => {
+    let mapRegionsFunc: (req, res) => Promise<void> = async (req, res) => {
         cache(res, req.path, async () => {
             return await sql({
                                  // language=MySQL
@@ -495,14 +497,17 @@ module.exports = (connection: Pool) => {
                                  values: [req.params.map]
                              });
         }, {duration: 60 * 60});
-    });
-
+    };
 
     /**
      * Returns all the regions for a given map, regardless of region type.
      * IMPORTANT: this screens out numerically named regions.
      */
-    app.post("/map/:map/all-regions", async (req, res) => {
+    app.post("/map/:map/regions", mapRegionsFunc);
+    app.get("/map/:map/regions", mapRegionsFunc);
+
+
+    let allMapRegionsFunc: (req, res) => Promise<void> = async (req, res) => {
         cache(res, req.path, async () => {
             return await sql({
                                  // language=MySQL
@@ -518,10 +523,16 @@ module.exports = (connection: Pool) => {
                                  values: [req.params.map]
                              });
         }, {duration: 12 * 60 * 60});
-    });
+    };
+    /**
+     * Returns all the regions for a given map, regardless of region type.
+     * IMPORTANT: this screens out numerically named regions.
+     */
+    app.get("/map/:map/all-regions", allMapRegionsFunc);
+    app.post("/map/:map/all-regions", allMapRegionsFunc);
 
 
-    app.post("/map/:map/region-type/:regionType/regions", async (req, res) => {
+    let regionsForRegionTypeFunc: (req, res) => Promise<void> = async (req, res) => {
         cache(res, req.path, async () => {
             const rows = await sql({
                                        // language=MySQL
@@ -540,7 +551,9 @@ module.exports = (connection: Pool) => {
             return result;
 
         }, {duration: 24 * 60 * 60});
-    });
+    };
+    app.post("/map/:map/region-type/:regionType/regions", regionsForRegionTypeFunc);
+    app.get("/map/:map/region-type/:regionType/regions", regionsForRegionTypeFunc);
 
     /**
      * Returns the data to show the exceedance and counts on the main map. This is a highly optimized version
