@@ -65,9 +65,9 @@ export class RESTMapDataService {
 
     public async init(mapId: string): Promise<ServiceMetadata> {
         this.initialized = true;
-        this.serviceMetadata = await this._api.callMapAPIWithCache("metadata", {}, 60 * 60) as ServiceMetadata;
+        this.serviceMetadata = await this._api.callMapAPIWithCache("metadata", {}, 60 * 60, true) as ServiceMetadata;
         await this.switchDataSet(mapId);
-        this.aggregations = await this._api.callMapAPIWithCache(this.map.id + "/aggregations", {}, 24 * 60 * 60) as AggregationMap;
+        this.aggregations = await this._api.callMapAPIWithCache(this.map.id + "/aggregations", {}, 24 * 60 * 60, true) as AggregationMap;
         log.debug("Aggregations", this.aggregations);
         await this._pref.waitUntilReady();
         const available = this._pref.combined.availableDataSets;
@@ -98,7 +98,9 @@ export class RESTMapDataService {
             this.regionGeography = (cachedItem.data as any).regionGeography as RegionGeography;
         } else {
             log.debug("Loading Geography");
-            const regions = (await this.allRegions()).filter(i => i.type === regionType).map(i => i.value);
+            let allRegions: any = await this.allRegions();
+            log.debug(allRegions);
+            const regions = allRegions.filter(i => i.type === regionType).map(i => i.value);
             let lotsOfRegions: boolean = regions.length > 50;
             if (lotsOfRegions) {
                 this._notify.show("Loading Geographic data ...", "OK", 20000);
@@ -185,7 +187,7 @@ export class RESTMapDataService {
     }
 
     public async now(): Promise<number> {
-        return await this._api.callMapAPIWithCache(this.map.id + "/now", {}, 60) as Promise<number>;
+        return await this._api.callMapAPIWithCache(this.map.id + "/now", {}, 60, false) as Promise<number>;
     }
 
     public async recentTweets(layerGroupId: string, regionType: string): Promise<RegionTweeCount> {
@@ -203,7 +205,8 @@ export class RESTMapDataService {
 
     public async places(regionType: string): Promise<Set<string>> {
         return new Set<string>(
-            await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/regions", {}, 24 * 60 * 60) as string[]);
+            await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/regions", {}, 24 * 60 * 60,
+                                                true) as string[]);
     }
 
 
@@ -212,7 +215,7 @@ export class RESTMapDataService {
             this._notify.error("Map Data Service not Initialized");
         }
         this.map.id = dataset;
-        this.mapMetadata = (await this._api.callMapAPIWithCache(this.map.id + "/metadata", {}, 3600)) as MapMetadata;
+        this.mapMetadata = (await this._api.callMapAPIWithCache(this.map.id + "/metadata", {}, 3600, true)) as MapMetadata;
         return this.mapMetadata;
 
     }
@@ -261,11 +264,11 @@ export class RESTMapDataService {
      * @param map
      */
     public async regions(map = this.map.id) {
-        return await this._api.callMapAPIWithCache(map + "/regions", {}, 12 * 60 * 60);
+        return await this._api.callMapAPIWithCache(map + "/regions", {}, 12 * 60 * 60, true);
     }
 
     public async allRegions(map = this.map.id) {
-        return await this._api.callMapAPIWithCache(map + "/all-regions", {}, 12 * 60 * 60);
+        return await this._api.callMapAPIWithCache(map + "/all-regions", {}, 12 * 60 * 60, true);
     }
 
     public async getRegionStatsMap(layerGroupId: string, regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {
