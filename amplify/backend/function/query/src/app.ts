@@ -327,11 +327,11 @@ module.exports = (connection: Pool) => {
 
                 const geography = await sql({
                                                 // language=MySQL
-                                                sql:                                                             `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
-                                                                                                                                          from ref_geo_regions gr,
-                                                                                                                                               ref_map_metadata mm
-                                                                                                                                          where mm.id = ?
-                                                                                                                                            and region_type = ?
+                                                sql: `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
+                                                                              from ref_geo_regions gr,
+                                                                                   ref_map_metadata mm
+                                                                              where mm.id = ?
+                                                                                and region_type = ?
                                                                                 and gr.map_location = mm.location`,
                                                 values: [req.params.map, req.params.regionType]
 
@@ -360,11 +360,11 @@ module.exports = (connection: Pool) => {
 
                 const geography = await sql({
                                                 // language=MySQL
-                                                sql:                                                             `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
-                                                                                                                                          from ref_geo_regions gr,
-                                                                                                                                               ref_map_metadata mm
-                                                                                                                                          where mm.id = ?
-                                                                                                                                            and region_type = ?
+                                                sql: `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
+                                                                              from ref_geo_regions gr,
+                                                                                   ref_map_metadata mm
+                                                                              where mm.id = ?
+                                                                                and region_type = ?
                                                                                 and region = ?
                                                                                 and gr.map_location = mm.location`,
                                                 values: [req.params.map, req.params.regionType, req.params.region]
@@ -590,7 +590,7 @@ module.exports = (connection: Pool) => {
                                        sql: `/* app.ts: stats */ select region,
                                                                         count,
                                                                         (1 -
-                                                                         POWER(GREATEST(0, 1 - ((select count(*)
+                                                                         POWER(GREATEST(0, 1 - ((select count(*) + 1
                                                                                                  from (select sum(tc.text_count) as sum_count, source_date
                                                                                                        from mat_view_text_count tc
                                                                                                        where region_counts.region = tc.region
@@ -600,14 +600,15 @@ module.exports = (connection: Pool) => {
                                                                                                          and tc.warning IN (?)
                                                                                                          and not tc.deleted
                                                                                                        group by source_date
-                                                                                                       having sum(tc.text_count) > (region_counts.count / ?)) re_summed_counts)
-                                                                             / (select max(days)
-                                                                                from mat_view_data_days d
-                                                                                where region_counts.region = d.region
-                                                                                  and d.region_type = ?
-                                                                                  and d.hazard IN (?)
-                                                                                  and d.source IN (?)
-                                                                                  and d.warning IN (?))))
+                                                                                                       having sum(tc.text_count) >= ROUND(region_counts.count / ?)) re_summed_counts)
+                                                                             /
+                                                                                                (select max(days) /* We add 1 here to include today, which may be missing from mat_view_data_days */
+                                                                                                 from mat_view_data_days d
+                                                                                                 where region_counts.region = d.region
+                                                                                                   and d.region_type = ?
+                                                                                                   and d.hazard IN (?)
+                                                                                                   and d.source IN (?)
+                                                                                                   and d.warning IN (?))))
                                                                              , LEAST(?, 1023))
                                                                             ) * 100 as exceedance
 
