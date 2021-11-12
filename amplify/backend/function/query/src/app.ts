@@ -600,7 +600,7 @@ module.exports = (connection: Pool) => {
                                                                                                          and tc.warning IN (?)
                                                                                                          and not tc.deleted
                                                                                                        group by source_date
-                                                                                                       having sum(tc.text_count) > (region_counts.count / ?)) re_summed_counts)
+                                                                                                       having sum(tc.text_count) >= ROUND(region_counts.count / ?)) re_summed_counts)
                                                                              / (select max(days)
                                                                                 from mat_view_data_days d
                                                                                 where region_counts.region = d.region
