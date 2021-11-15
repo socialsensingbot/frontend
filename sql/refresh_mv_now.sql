@@ -9,7 +9,7 @@ CREATE PROCEDURE refresh_mv_auto(
 BEGIN
 
     -- rollback transaction and bubble up errors if something bad happens
-    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
             DO RELEASE_LOCK('internal_mv_refresh');
             GET DIAGNOSTICS CONDITION 1
@@ -18,18 +18,15 @@ BEGIN
             set @rc = @p1;
         END;
     call debug_msg(1, 'refresh_mv_auto', 'STARTING');
+    set @max_id = (select max(id) from internal_mv_refresh);
     IF GET_LOCK('internal_mv_refresh', 60) THEN
-        START TRANSACTION;
-        INSERT INTO internal_mv_refresh (time) values (now());
-        set @max_id = (select max(id) from internal_mv_refresh);
-        COMMIT;
 
-        IF mod(@max_id, 12 * 24) = 0
+        IF mod(@max_id, 12 * 24) = 1
         THEN
             call debug_msg(0, 'refresh_mv_auto', 'Selected FULL');
             call refresh_mv_full(@rc);
             call debug_msg(0, 'refresh_mv_auto', 'Completed FULL');
-        ELSEIF mod(@max_id, 12) = 0
+        ELSEIF mod(@max_id, 12) = 1
         THEN
             call debug_msg(0, 'refresh_mv_auto', 'Selected WINDOW');
             call refresh_mv_map_window(@rc);
@@ -42,6 +39,9 @@ BEGIN
     ELSE
         call debug_msg(1, 'refresh_mv_auto', 'Already running.');
     END IF;
+    START TRANSACTION;
+    INSERT INTO internal_mv_refresh (time) values (now());
+    COMMIT;
     call debug_msg(1, 'refresh_mv_auto', 'COMPLETED');
     DO RELEASE_LOCK('internal_mv_refresh');
     SET rc = 0;
@@ -152,16 +152,16 @@ BEGIN
 
     WHILE dt <= NOW()
         DO
-            CALL debug_msg(1, 'refresh_mv_full', CONCAT('Refreshing month starting ', dt));
-            CALL refresh_mv(dt, DATE_ADD(dt, INTERVAL 1 MONTH), @rc);
-            CALL debug_msg(1, 'refresh_mv_full', CONCAT('Updating text count for month starting ', dt));
-            CALL update_text_count(dt, DATE_ADD(dt, INTERVAL 1 MONTH));
-            CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling days for month starting ', dt));
-            CALL fill_days(dt, DATE_ADD(dt, INTERVAL 1 MONTH));
-            CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling hours for month starting ', dt));
-            CALL fill_hours(dt, DATE_ADD(dt, INTERVAL 1 MONTH));
+            CALL debug_msg(1, 'refresh_mv_full', CONCAT('Refreshing week starting ', dt));
+            CALL refresh_mv(dt, DATE_ADD(dt, INTERVAL 1 WEEK), @rc);
+            CALL debug_msg(1, 'refresh_mv_full', CONCAT('Updating text count for week starting ', dt));
+            CALL update_text_count(dt, DATE_ADD(dt, INTERVAL 1 WEEK));
+            CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling days for week starting ', dt));
+            CALL fill_days(dt, DATE_ADD(dt, INTERVAL 1 WEEK));
+            CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling hours for week starting ', dt));
+            CALL fill_hours(dt, DATE_ADD(dt, INTERVAL 1 WEEK));
             CALL refresh_mv_now(@rc);
-            SET dt = DATE_ADD(dt, INTERVAL 1 MONTH);
+            SET dt = DATE_ADD(dt, INTERVAL 1 WEEK);
         END WHILE;
 
     START TRANSACTION;
@@ -222,6 +222,26 @@ BEGIN
     DELETE FROM mat_view_regions WHERE source_timestamp BETWEEN start_date and end_date;
     call debug_msg(1, 'refresh_mv', 'Updating mat_view_regions');
 
+    # Put in the fine, coarse and county stats that Rudy generates data for (the old way of doing this)
+    INSERT INTO mat_view_regions
+    SELECT t.source_id,
+           t.source,
+           t.hazard,
+           t.source_timestamp          source_timestamp,
+           tr.region_type,
+           tr.region,
+           t.warning,
+           IFNULL(t.deleted, false) as deleted,
+           'uk'
+    FROM live_text t,
+         live_text_regions tr
+    WHERE t.source_id = tr.source_id
+      AND t.source = tr.source
+      AND t.hazard = tr.hazard
+      AND t.source_timestamp BETWEEN start_date and end_date;
+
+
+    # Add in all other regions (the new way of doing this)
     REPLACE INTO mat_view_regions
     SELECT t.source_id,
            t.source,
@@ -236,30 +256,31 @@ BEGIN
          ref_geo_regions gr
     WHERE ST_Intersects(boundary, location)
       AND t.source_timestamp BETWEEN start_date and end_date;
+
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with exact matches.');
 
 
-    call debug_msg(1, 'refresh_mv', 'Fixing mat_view_regions for UK only');
+    #     call debug_msg(1, 'refresh_mv', 'Fixing mat_view_regions for UK only');
 
     #     # UK Locations are buffered with a 0.01 degree buffer. At present this is not done on the world map
 #     # If the world map is supported then this may be required to capture location just outside of the strict
 #     # boundary supplied. We only use the buffered values when the non buffered regions do not match.
-    INSERT INTO mat_view_regions
-    SELECT t.source_id,
-           t.source,
-           t.hazard,
-           t.source_timestamp,
-           gr.region_type,
-           gr.region,
-           t.warning,
-           IFNULL(t.deleted, false) as deleted,
-           gr.map_location
-    FROM live_text t,
-         ref_geo_regions gr
-    WHERE ST_Intersects(buffered, location)
-      AND map_location = 'uk'
-      AND (select count(*) from ref_geo_regions where st_intersects(boundary, t.location) and map_location = 'uk') = 0
-      AND t.source_timestamp BETWEEN start_date and end_date;
+#     INSERT INTO mat_view_regions
+#     SELECT t.source_id,
+#            t.source,
+#            t.hazard,
+#            t.source_timestamp,
+#            gr.region_type,
+#            gr.region,
+#            t.warning,
+#            IFNULL(t.deleted, false) as deleted,
+#            gr.map_location
+#     FROM live_text t,
+#          ref_geo_regions gr
+#     WHERE ST_Intersects(buffered, location)
+#       AND map_location = 'uk'
+#       AND (select count(*) from ref_geo_regions where st_intersects(boundary, t.location) and map_location = 'uk') = 0
+#       AND t.source_timestamp BETWEEN start_date and end_date;
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions');
     COMMIT;
 

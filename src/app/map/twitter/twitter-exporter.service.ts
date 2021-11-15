@@ -9,6 +9,7 @@ import {Logger} from "@aws-amplify/core";
 import {PolygonData} from "../types";
 import {RESTMapDataService} from "../data/rest-map-data.service";
 import * as geojson from "geojson";
+import {NotificationService} from "../../services/notification.service";
 
 const log = new Logger("twitter-exporter");
 
@@ -17,7 +18,8 @@ const log = new Logger("twitter-exporter");
             })
 export class TwitterExporterService {
 
-    constructor(private _annotation: AnnotationService, private _pref: PreferenceService, private _mapdata: RESTMapDataService) {
+    constructor(private _annotation: AnnotationService, private _pref: PreferenceService, private _mapdata: RESTMapDataService,
+                private _notify: NotificationService) {
     }
 
 
@@ -180,6 +182,7 @@ export class TwitterExporterService {
     }
 
     public async exportToCSV(tweets: Tweet[], regions: Region[]) {
+        this._notify.show("Preparing CSV download");
         let filename;
         if (regions.length === 1) {
             filename = `${regions[0].name}-tweet-export-${readableTimestamp()}`;
@@ -208,16 +211,19 @@ export class TwitterExporterService {
                                                const annotationRecord = await this._annotation.getAnnotations(i);
                                                let annotations = {};
                                                if (annotationRecord && annotationRecord.annotations) {
-                                                   annotations = JSON.parse(annotationRecord.annotations);
+                                                   annotations = annotationRecord.annotations;
                                                }
                                                return this.asCSV(i, this.regionMap(regions),
                                                                  this._pref.combined.sanitizeForGDPR, annotations);
                                            });
+        this._notify.show("All tweets annotated");
         const result: CSVExportTweet[] = [];
         for (const exportedPromise of exportedPromises) {
             result.push(await exportedPromise);
         }
+        this._notify.show("Generating CSV");
         csvExporter.generateCsv(result);
+        this._notify.dismiss();
     }
 
 
