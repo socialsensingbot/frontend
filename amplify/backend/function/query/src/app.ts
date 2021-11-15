@@ -518,6 +518,7 @@ module.exports = (connection: Pool) => {
                                                                  from ref_geo_regions gr,
                                                                       ref_map_metadata mm
                                                                  where gr.map_location = mm.location
+                                                                   and gr.disabled = false
                                                                    and mm.id = ?
                                                                  order by level desc, text asc`,
                                  values: [req.params.map]

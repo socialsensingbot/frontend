@@ -85,10 +85,8 @@ export class TwitterExporterService {
         if (selectedAggregates.length === this._mapdata.aggregations[aggregrationSetId].aggregates.length) {
             options.filename = `${aggregrationSetId}-tweet-export-all-${readableTimestamp()}`;
         }
-        const regions = this._mapdata.aggregations[aggregrationSetId]
-            .aggregates
-            .filter(i => selectedAggregates.includes(i.id))
-            .flatMap(x => x.regionTypeMap[regionType]).map(i => "" + i);
+        const allRegions = await this._mapdata.allRegions();
+        const regions = allRegions.filter(i => i.type === "uk_country").filter(i => selectedAggregates.includes(i.value)).map(i => i.value);
 
         const exportedTweets: CSVExportTweet[] = [];
         const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(layerGroupId, regionType, regions, startDate, endDate);
@@ -149,7 +147,7 @@ export class TwitterExporterService {
                 const annotationRecord = await this._annotation.getAnnotations(i);
                 let annotations: any = {};
                 if (annotationRecord && annotationRecord.annotations) {
-                    annotations = JSON.parse(annotationRecord.annotations);
+                    annotations = annotationRecord.annotations;
                 }
                 let impact = "";
                 if (annotations.impact) {
