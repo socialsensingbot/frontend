@@ -62,12 +62,12 @@ export class TwitterExporterService {
 
     }
 
-    public async downloadAggregate(layerGroupId: string, aggregrationSetId: string, selectedAggregates: string[], regionType: string,
+    public async downloadAggregate(layerGroupId: string, aggregrationSetId: string, selectedAggregates: string[],
                                    polygonDatum: PolygonData, startDate: number, endDate: number) {
         log.debug(
             "downloadAggregate(aggregrationSetId=" + aggregrationSetId +
             ", selectedAggregates=" + selectedAggregates +
-            ", regionType=" + regionType + ", polygonDatum=" + polygonDatum +
+            ", polygonDatum=" + polygonDatum +
             ", startDate=" + startDate + ", endDate=" + endDate + ")");
         const options = {
             fieldSeparator:   ",",
@@ -86,10 +86,10 @@ export class TwitterExporterService {
             options.filename = `${aggregrationSetId}-tweet-export-all-${readableTimestamp()}`;
         }
         const allRegions = await this._mapdata.allRegions();
-        const regions = allRegions.filter(i => i.type === "uk_country").filter(i => selectedAggregates.includes(i.value)).map(i => i.value);
+        const regions = allRegions.filter(i => i.type === "bi_country").filter(i => selectedAggregates.includes(i.value)).map(i => i.value);
 
         const exportedTweets: CSVExportTweet[] = [];
-        const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(layerGroupId, regionType, regions, startDate, endDate);
+        const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(layerGroupId, "bi_country", regions, startDate, endDate);
         for (const i of tweetData) {
             exportedTweets.push(await i);
         }

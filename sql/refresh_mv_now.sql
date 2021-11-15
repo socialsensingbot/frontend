@@ -253,7 +253,7 @@ BEGIN
            IFNULL(t.deleted, false) as deleted,
            gr.map_location
     FROM live_text t,
-         ref_geo_regions gr
+         view_geo_regions_with_virtual gr
     WHERE ST_Intersects(boundary, location)
       AND t.source_timestamp BETWEEN start_date and end_date;
 
