@@ -85,11 +85,13 @@ export class TwitterExporterService {
         if (selectedAggregates.length === this._mapdata.aggregations[aggregrationSetId].aggregates.length) {
             options.filename = `${aggregrationSetId}-tweet-export-all-${readableTimestamp()}`;
         }
-        const allRegions = await this._mapdata.allRegions();
-        const regions = allRegions.filter(i => i.type === "bi_country").filter(i => selectedAggregates.includes(i.value)).map(i => i.value);
+        const allRegions = await this._mapdata.regionsOfType(this._pref.combined.countryDownloadRegionType);
+        const regions = allRegions.filter(i => selectedAggregates.includes(i.value)).map(i => i.value);
 
         const exportedTweets: CSVExportTweet[] = [];
-        const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(layerGroupId, "bi_country", regions, startDate, endDate);
+        const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(layerGroupId,
+                                                                                 this._pref.combined.countryDownloadRegionType, regions,
+                                                                                 startDate, endDate);
         for (const i of tweetData) {
             exportedTweets.push(await i);
         }

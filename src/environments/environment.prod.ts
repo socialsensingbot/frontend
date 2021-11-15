@@ -88,5 +88,6 @@ export const environment = {
     shareTextAutocompleteInGroup: true,
     analyticsDefaultRegions:      ["uk"],
     maxCallsPerMinute:            10000,
+    countryDownloadRegionType:    "bi_country",
 
 };

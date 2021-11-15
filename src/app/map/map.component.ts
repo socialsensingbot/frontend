@@ -756,7 +756,7 @@ export class MapComponent implements OnInit, OnDestroy {
             ...this._newParams
         };
         this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 4000});
-        this.countries = await this.data.regionsOfType("bi_country");
+        this.countries = await this.data.regionsOfType(this.pref.combined.countryDownloadRegionType);
         this.countries.forEach(i => this.selectedCountries.push(i.value));
 
         this._loggedIn = await Auth.currentAuthenticatedUser() != null;
