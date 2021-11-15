@@ -322,13 +322,13 @@ export class TweetListComponent implements OnInit, OnDestroy {
 
     public styleFor(type: string, tweet: Tweet) {
         const value = this.annotationValueFor(tweet, type);
-        console.log("Annotation value is ", value);
+        log.verbose("Annotation value is ", value);
         let filtered: any[] = this.annotationTypes.filter(i => i.name === type);
-        console.log("Annotations filtered: ", filtered);
+        log.verbose("Annotations filtered: ", filtered);
         for (const filteredElement of filtered) {
             for (const option of filteredElement.options) {
                 if (option.value === value) {
-                    console.log("Annotations selected ", option);
+                    log.verbose("Annotations selected ", option);
                     return "border-left: 3px solid " + option.color;
                 }
             }
