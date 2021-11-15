@@ -488,7 +488,7 @@ module.exports = (connection: Pool) => {
                                                                                  gr.title       as text,
                                                                                  gr.region_type as type,
                                                                                  gr.level       as level
-                                                                 from ref_geo_regions gr,
+                                                                 from view_geo_regions_with_virtual gr,
                                                                       ref_map_metadata mm
                                                                  where not region REGEXP '^[0-9]+$'
                                                                    and gr.map_location = mm.location
@@ -511,11 +511,11 @@ module.exports = (connection: Pool) => {
         cache(res, req.path, async () => {
             return await sql({
                                  // language=MySQL
-                                 sql: `/* app.ts: map regions */ select distinct region         as value,
+                                 sql: `/* app.ts: map regions */ select distinct gr.region      as value,
                                                                                  gr.title       as text,
                                                                                  gr.region_type as type,
                                                                                  gr.level       as level
-                                                                 from ref_geo_regions gr,
+                                                                 from view_geo_regions_with_virtual gr,
                                                                       ref_map_metadata mm
                                                                  where gr.map_location = mm.location
                                                                    and gr.disabled = false
@@ -538,7 +538,7 @@ module.exports = (connection: Pool) => {
             const rows = await sql({
                                        // language=MySQL
                                        sql: `/* app.ts: regionType regions */ select region
-                                                                              from ref_geo_regions gr,
+                                                                              from view_geo_regions_with_virtual gr,
                                                                                    ref_map_metadata mm
                                                                               where gr.region_type = ?
                                                                                 and gr.map_location = mm.location

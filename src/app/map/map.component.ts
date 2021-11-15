@@ -527,7 +527,6 @@ export class MapComponent implements OnInit, OnDestroy {
         log.debug(this.activeRegionType);
         if (this.data.hasCountryAggregates()) {
             await this._exporter.downloadAggregate(this.activeLayerGroup, "uk-countries", this.selectedCountries,
-                                                   this.activeRegionType,
                                                    await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData, this._dateMin,
                                                    this._dateMax);
         } else {
@@ -757,7 +756,7 @@ export class MapComponent implements OnInit, OnDestroy {
             ...this._newParams
         };
         this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 4000});
-        this.countries = await this.data.regionsOfType("uk_country");
+        this.countries = await this.data.regionsOfType("bi_country");
         this.countries.forEach(i => this.selectedCountries.push(i.value));
 
         this._loggedIn = await Auth.currentAuthenticatedUser() != null;
