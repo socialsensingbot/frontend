@@ -283,4 +283,9 @@ export class RESTMapDataService {
         }, 5 * 60) as RegionStatsMap;
         return statsMap;
     }
+
+    public async regionsOfType(regionType: string): Promise<string[]> {
+        const allRegions = await this.allRegions();
+        return allRegions.filter(i => i.type === regionType);
+    }
 }
