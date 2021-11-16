@@ -112,7 +112,7 @@
                     </mat-form-field>
 
                     <div class="app-toolbar-separator"></div>
-                    <button [disabled]="selectedCountries.length === 0 && data.hasCountryAggregates()"
+                    <button [disabled]="pref.combined.downloadByCountryDisabled"
                             class="app-toolbar-btn"
                             mat-icon-button
                             (click)="downloadTweetsAsCSV()">
@@ -124,8 +124,8 @@
                             <mat-select-trigger>
                                 <span class="country-additional-selection">{{selectedCountriesTextValue}}</span>
                             </mat-select-trigger>
-                            <mat-option *ngFor="let agg of data.aggregations['uk-countries'].aggregates"
-                                        [value]="agg.id">{{agg.title}}</mat-option>
+                            <mat-option *ngFor="let country of countries"
+                                        [value]="country.value">{{country.text}}</mat-option>
                         </mat-select>
                         <mat-label>Countries to Download</mat-label>
 

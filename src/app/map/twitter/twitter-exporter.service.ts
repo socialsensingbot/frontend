@@ -9,6 +9,7 @@ import {Logger} from "@aws-amplify/core";
 import {PolygonData} from "../types";
 import {RESTMapDataService} from "../data/rest-map-data.service";
 import * as geojson from "geojson";
+import {NotificationService} from "../../services/notification.service";
 
 const log = new Logger("twitter-exporter");
 
@@ -17,7 +18,8 @@ const log = new Logger("twitter-exporter");
             })
 export class TwitterExporterService {
 
-    constructor(private _annotation: AnnotationService, private _pref: PreferenceService, private _mapdata: RESTMapDataService) {
+    constructor(private _annotation: AnnotationService, private _pref: PreferenceService, private _mapdata: RESTMapDataService,
+                private _notify: NotificationService) {
     }
 
 
@@ -60,12 +62,12 @@ export class TwitterExporterService {
 
     }
 
-    public async downloadAggregate(layerGroupId: string, aggregrationSetId: string, selectedAggregates: string[], regionType: string,
+    public async downloadAggregate(layerGroupId: string, aggregrationSetId: string, selectedAggregates: string[],
                                    polygonDatum: PolygonData, startDate: number, endDate: number) {
         log.debug(
             "downloadAggregate(aggregrationSetId=" + aggregrationSetId +
             ", selectedAggregates=" + selectedAggregates +
-            ", regionType=" + regionType + ", polygonDatum=" + polygonDatum +
+            ", polygonDatum=" + polygonDatum +
             ", startDate=" + startDate + ", endDate=" + endDate + ")");
         const options = {
             fieldSeparator:   ",",
@@ -83,13 +85,13 @@ export class TwitterExporterService {
         if (selectedAggregates.length === this._mapdata.aggregations[aggregrationSetId].aggregates.length) {
             options.filename = `${aggregrationSetId}-tweet-export-all-${readableTimestamp()}`;
         }
-        const regions = this._mapdata.aggregations[aggregrationSetId]
-            .aggregates
-            .filter(i => selectedAggregates.includes(i.id))
-            .flatMap(x => x.regionTypeMap[regionType]).map(i => "" + i);
+        const allRegions = await this._mapdata.regionsOfType(this._pref.combined.countryDownloadRegionType);
+        const regions = allRegions.filter(i => selectedAggregates.includes(i.value)).map(i => i.value);
 
         const exportedTweets: CSVExportTweet[] = [];
-        const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(layerGroupId, regionType, regions, startDate, endDate);
+        const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(layerGroupId,
+                                                                                 this._pref.combined.countryDownloadRegionType, regions,
+                                                                                 startDate, endDate);
         for (const i of tweetData) {
             exportedTweets.push(await i);
         }
@@ -147,7 +149,7 @@ export class TwitterExporterService {
                 const annotationRecord = await this._annotation.getAnnotations(i);
                 let annotations: any = {};
                 if (annotationRecord && annotationRecord.annotations) {
-                    annotations = JSON.parse(annotationRecord.annotations);
+                    annotations = annotationRecord.annotations;
                 }
                 let impact = "";
                 if (annotations.impact) {
@@ -180,6 +182,7 @@ export class TwitterExporterService {
     }
 
     public async exportToCSV(tweets: Tweet[], regions: Region[]) {
+        this._notify.show("Preparing CSV download");
         let filename;
         if (regions.length === 1) {
             filename = `${regions[0].name}-tweet-export-${readableTimestamp()}`;
@@ -208,16 +211,19 @@ export class TwitterExporterService {
                                                const annotationRecord = await this._annotation.getAnnotations(i);
                                                let annotations = {};
                                                if (annotationRecord && annotationRecord.annotations) {
-                                                   annotations = JSON.parse(annotationRecord.annotations);
+                                                   annotations = annotationRecord.annotations;
                                                }
                                                return this.asCSV(i, this.regionMap(regions),
                                                                  this._pref.combined.sanitizeForGDPR, annotations);
                                            });
+        this._notify.show("All tweets annotated");
         const result: CSVExportTweet[] = [];
         for (const exportedPromise of exportedPromises) {
             result.push(await exportedPromise);
         }
+        this._notify.show("Generating CSV");
         csvExporter.generateCsv(result);
+        this._notify.dismiss();
     }
 
 

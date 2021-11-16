@@ -123,11 +123,11 @@ export class TimeseriesCollectionModel {
         for (const item of mappedData) {
             const date = new Date(item[this.xField]);
             if (this._minDate === null || date.getTime() < this._minDate.getTime()) {
-                log.debug("Updating minDate from " + this._maxDate + " to " + date);
+                log.verbose("Updating minDate from " + this._maxDate + " to " + date);
                 this._minDate = date;
             }
             if (this._maxDate === null || date.getTime() > this._maxDate.getTime()) {
-                log.debug("Updating maxDate from " + this._maxDate + " to " + date);
+                log.verbose("Updating maxDate from " + this._maxDate + " to " + date);
                 this._maxDate = date;
             }
         }

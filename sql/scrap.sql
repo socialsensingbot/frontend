@@ -185,7 +185,8 @@ ALTER TABLE socialsensing.ref_region_groups
 ALTER TABLE socialsensing.ref_regions
     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
-
+ALTER TABLE socialsensing.ref_geo_virtual_regions
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 update live_text
 set source_timestamp= STR_TO_DATE((json_value(source_json, '$.created_at')), '%a %b %d %H:%i:%s +0000 %Y')

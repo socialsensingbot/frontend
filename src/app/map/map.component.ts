@@ -489,6 +489,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     // public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
     //     // this.data.downloadAggregate(aggregrationSetId, id,
+    public countries: any[];
 
     public set activeLayerGroup(value: string) {
         log.debug("set activeLayerGroup");
@@ -526,7 +527,6 @@ export class MapComponent implements OnInit, OnDestroy {
         log.debug(this.activeRegionType);
         if (this.data.hasCountryAggregates()) {
             await this._exporter.downloadAggregate(this.activeLayerGroup, "uk-countries", this.selectedCountries,
-                                                   this.activeRegionType,
                                                    await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData, this._dateMin,
                                                    this._dateMax);
         } else {
@@ -574,13 +574,13 @@ export class MapComponent implements OnInit, OnDestroy {
             this.selectedCountriesTextValue = "Download none";
         } else {
             const countryCount = this.selectedCountries.length;
-            const countryData = this.data.aggregations["uk-countries"].aggregates;
+            const countryData = this.countries;
             if (countryData.length === countryCount) {
                 this.selectedCountriesTextValue = "Download all";
             } else {
                 if (countryCount === 1) {
                     const countryTitle = countryData.filter(
-                        i => i.id === this.selectedCountries[0])[0].title;
+                        i => i.value === this.selectedCountries[0])[0].text;
                     this.selectedCountriesTextValue = `Download ${countryTitle}`;
                 } else {
                     this.selectedCountriesTextValue = `Download ${countryCount} countries`;
@@ -749,9 +749,6 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this._activeRegionType) {
             await this.data.loadGeography(this._activeRegionType);
         }
-        if (this.data.hasCountryAggregates()) {
-            this.data.aggregations["uk-countries"].aggregates.forEach(i => this.selectedCountries.push(i.id));
-        }
         const {zoom, lng, lat} = {
             ...this.data.serviceMetadata.start,
             ...this.data.mapMetadata.start,
@@ -759,7 +756,8 @@ export class MapComponent implements OnInit, OnDestroy {
             ...this._newParams
         };
         this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 4000});
-
+        this.countries = await this.data.regionsOfType(this.pref.combined.countryDownloadRegionType);
+        this.countries.forEach(i => this.selectedCountries.push(i.value));
 
         this._loggedIn = await Auth.currentAuthenticatedUser() != null;
 
