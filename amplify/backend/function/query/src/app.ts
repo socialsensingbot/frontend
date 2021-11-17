@@ -484,17 +484,22 @@ module.exports = (connection: Pool) => {
         cache(res, req.path, async () => {
             return await sql({
                                  // language=MySQL
-                                 sql: `/* app.ts: map regions */ select distinct region         as value,
-                                                                                 gr.title       as text,
-                                                                                 gr.region_type as type,
-                                                                                 gr.level       as level
-                                                                 from view_geo_regions_with_virtual gr,
-                                                                      ref_map_metadata mm
-                                                                 where not region REGEXP '^[0-9]+$'
-                                                                   and gr.map_location = mm.location
-                                                                   and mm.id = ?
-                                                                 order by level desc, text asc`,
-                                 values: [req.params.map]
+                                 sql:                            `/* app.ts: map regions for dropdown */
+                                 select distinct region         as value,
+                                                 gr.title       as text,
+                                                 gr.region_type as type,
+                                                 gr.level       as level
+                                 from ref_geo_regions gr,
+                                      ref_map_metadata mm,
+                                      (select title, max(level) as level from ref_geo_regions group by title) uniq_title
+                                 where not region REGEXP '^[0-9]+$'
+                                   and not gr.disabled
+                                   and gr.map_location = mm.location
+                                   and mm.id = ?
+                                   and gr.title = uniq_title.title
+                                   and gr.level = uniq_title.level
+                                 order by gr.level desc, text asc`,
+                                 values:                         [req.params.map]
                              });
         }, {duration: 60 * 60});
     };
