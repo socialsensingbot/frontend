@@ -139,13 +139,13 @@ export class PreferenceService {
                     let groupPrefs: any = {};
                     if (this._groupPreferences.prefs) {
                         groupPrefs = typeof this._groupPreferences.prefs !== "undefined" ?
-                            JSON.parse(this._groupPreferences.prefs) : this._groupPreferences;
+                            this._groupPreferences.prefs : this._groupPreferences;
                     }
                     log.debug("USER PREFS", this._preferences.prefs);
                     let prefs: any = {};
                     if (this._preferences.prefs) {
                         prefs = typeof this._preferences.prefs !== "undefined" ?
-                            JSON.parse(this._preferences.prefs) : this._preferences;
+                            this._preferences.prefs : this._preferences;
                     }
                     this._combined = PreferenceService.combine(this._combined, prefs, groupPrefs);
                 } catch (e) {
