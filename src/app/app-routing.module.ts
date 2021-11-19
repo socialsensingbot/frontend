@@ -14,6 +14,7 @@ import {AnalyticsComponent} from "./analytics/analytics.component";
 import {TimeseriesAnalyticsComponent} from "./analytics/time/timeseries-analytics.component";
 import {ResetPassComponent} from "./auth/reset-pass/reset-pass.component";
 import {ForgotPassComponent} from "./auth/forgot-pass/forgot-pass.component";
+import {PublicDisplayComponent} from "./public-display/public-display.component";
 
 const routes: Routes = [
     {
@@ -63,6 +64,8 @@ const routes: Routes = [
         ]
     },
     {path: "map/:map/dashboard", component: DashboardComponent, canActivate: [AuthGuard]},
+    {path: "map/:map/display", component: PublicDisplayComponent, canActivate: [AuthGuard]},
+    {path: "map/:map/display/:displayId", component: PublicDisplayComponent, canActivate: [AuthGuard]},
     {path: "", component: HomeComponent, canActivate: [AuthGuard]}
 ];
 

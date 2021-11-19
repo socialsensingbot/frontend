@@ -9,7 +9,7 @@ import * as geojson from "geojson";
 import {DateRange, DateRangeSliderOptions} from "./date-range-slider/date-range-slider.component";
 import {LayerStyleService} from "./services/layer-style.service";
 import {NotificationService} from "../services/notification.service";
-import {COUNTY, Feature, NumberLayerShortName, PolygonData, PolyLayers, STATS} from "./types";
+import {COUNTY, Feature, NumberLayerShortName, PolygonData, PolyLayers} from "./types";
 import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
 import {AppState, UIExecutionService} from "../services/uiexecution.service";
@@ -685,7 +685,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
 
         // This handles a change to the active_number value
-        this.activeStatistic = typeof active_number !== "undefined" ? active_number : STATS;
+        this.activeStatistic = active_number === "count" ? "count" : "exceedance";
 
 
         // This handles a change to the active_polygon value
@@ -854,7 +854,7 @@ export class MapComponent implements OnInit, OnDestroy {
             return;
         }
         const feature = e.target.feature;
-        const exceedanceProbability: number = Math.round(feature.properties.stats * 100) / 100;
+        const exceedanceProbability: number = Math.round(feature.properties.exceedance * 100) / 100;
         const region: string = feature.properties.title;
         const count: number = feature.properties.count;
         this.highlight(e.target, 1);
@@ -1129,11 +1129,11 @@ export class MapComponent implements OnInit, OnDestroy {
                 const regionStats = statsMap[region];
                 if (regionStats) {
                     featureProperties.count = regionStats.count;
-                    featureProperties.stats = regionStats.exceedance;
+                    featureProperties.exceedance = regionStats.exceedance;
                 } else {
                     log.verbose("No data for " + region);
                     featureProperties.count = 0;
-                    featureProperties.stats = 0;
+                    featureProperties.exceedance = 0;
                 }
                 if (feature === features[features.length - 1]) {
                     resolve();

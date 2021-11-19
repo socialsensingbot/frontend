@@ -51,6 +51,7 @@ import {TimeseriesWidgetComponent} from "./analytics/widgets/twitter-timeseries/
 import {ForgotPassComponent} from "./auth/forgot-pass/forgot-pass.component";
 import {ResetPassComponent} from "./auth/reset-pass/reset-pass.component";
 import {MAT_DATE_LOCALE} from "@angular/material/core";
+import {PublicDisplayComponent} from './public-display/public-display.component';
 
 @NgModule({
               declarations:    [
@@ -87,8 +88,9 @@ import {MAT_DATE_LOCALE} from "@angular/material/core";
                   TimeSeriesMultipleQueryChartComponent,
                   NameGraphDialogComponent,
                   TimeseriesWidgetComponent,
-                    ForgotPassComponent,
-                  ResetPassComponent
+                  ForgotPassComponent,
+                  ResetPassComponent,
+                  PublicDisplayComponent
               ],
               imports:         [
                   BrowserModule,
