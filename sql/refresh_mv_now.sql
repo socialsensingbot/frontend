@@ -225,7 +225,7 @@ BEGIN
     call debug_msg(0, 'refresh_mv', 'Refreshing Materialized Views');
     call debug_msg(1, 'refresh_mv', CONCAT('Start Date: ', start_date));
     call debug_msg(1, 'refresh_mv', CONCAT('End Date: ', end_date));
-    SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+    SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
     START TRANSACTION;
 
     #     delete from mat_view_regions where source_timestamp < NOW() - INTERVAL 1 YEAR;
