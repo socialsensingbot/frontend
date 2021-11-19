@@ -180,6 +180,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                         this.state.queries[0].regions = [queryParams.selected];
                         await this._updateGraphInternal(this.state.queries[0]);
                     }
+                    this.setEOCFromQuery(queryParams);
                 } else {
                     await this.clear(false);
                     this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
@@ -195,12 +196,13 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
-    public userChangedEOC() {
-        this._router.navigate([], {
-            queryParams:         {active_number: (this.eoc === "count" ? "count" : "stats")},
-            queryParamsHandling: "merge"
-        });
+    public userChangedEOC(type: EOC) {
+        this.eoc = type;
         this.eocChanged();
+        // this._router.navigate([], {
+        //     queryParams:         {active_number: (type === "count" ? "count" : "stats")},
+        //     queryParamsHandling: "merge"
+        // });
     }
 
     public eocChanged() {

@@ -485,87 +485,118 @@ module.exports = (connection: Pool, twitter: TwitterApi) => {
     app.post("/map/:map/region-type/:regionType/stats", async (req, res) => {
 
         cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
+
+            const firstDateInSeconds = (await sql({
+                                                      // language=MySQL
+                                                      sql: `select unix_timestamp(max(source_timestamp)) as ts
+                                                            from mat_view_first_entries
+                                                            where hazard IN (?)
+                                                              and source IN (?)`, values: [req.body.hazards, req.body.sources]
+                                                  }))[0].ts
+            console.debug("First date in seconds: " + firstDateInSeconds);
             const result = {};
 
             const lastDate: Date = (await maps)[req.params.map].last_date;
             const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
             const start = Math.floor(req.body.startDate / 1000);
-            const end = Math.floor(endDate / 1000);
-            const periodLengthInSeconds: number = end - start;
+            const end = Math.floor(endDate / 1000)
+            //Th period length is also rounded to the hour to reduce the number of possible queries.
+            const periodLengthInSeconds: number = Math.ceil(Math.min(end - start) / 3600) * 3600;
+            const maxPeriods: number = (end - firstDateInSeconds) / periodLengthInSeconds;
+
             console.debug("Period Length in Seconds: " + periodLengthInSeconds);
             console.debug("StartDate: " + new Date(req.body.startDate));
             console.debug("EndDate: " + new Date(endDate));
             console.debug("Start: " + new Date(start * 1000));
             console.debug("End: " + new Date(end * 1000));
-            let rows = await getCachedStats(end, periodLengthInSeconds, req);
 
-            if (rows.length === 0) {
-                // console.log("Test Values: ", testValues);
-                try {
-                    await sql({
-                                  // language=MySQL
-                                  sql: `insert into cache_stats_calc(exceedance, count, region, end_time, period_length, region_type,
-                                                                     hazards,
-                                                                     sources, warnings)
-                                        select (select exceedance
-                                                from (select cume_dist() OVER w * 100.0   as exceedance,
-                                                             rhs.period                   as period,
-                                                             IFNULL(lhs.count, rhs.count) as count
-                                                      from (SELECT count(source_id)                                    as count,
-                                                                   floor((? - unix_timestamp(r.source_timestamp)) / ?) as period
+            const rows = await sql({
+                                       // language=MySQL
+                                       sql: ` select (select exceedance
+                                                      from (select cume_dist() OVER w * 100.0   as exceedance,
+                                                                   rhs.period                   as period,
+                                                                   IFNULL(lhs.count, rhs.count) as count
+                                                            from (SELECT count(source_id)                                    as count,
+                                                                         floor((? - unix_timestamp(r.source_timestamp)) / ?) as period
 
-                                                            FROM mat_view_regions r
-                                                            WHERE r.region_type = ?
-                                                              and r.region = regions.region
-                                                              and r.hazard IN (?)
-                                                              and r.source IN (?)
-                                                              and r.warning IN (?)
+                                                                  FROM mat_view_regions r
+                                                                  WHERE r.region = regions.region
+                                                                    and r.region_type = ?
+                                                                    and r.hazard IN (?)
+                                                                    and r.source IN (?)
+                                                                    and r.warning IN (?)
+                                                                    and not r.deleted
+                                                                  group by period
+                                                                  order by period
+                                                                 ) lhs
+                                                                     RIGHT OUTER JOIN (select value as period, 0 as count from ref_integers where value < ?) rhs
+                                                                                      ON lhs.period = rhs.period
+                                                                WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)) x
+                                                      where period = 0
+                                                        and count > 0) as exceedance,
+                                                     (SELECT count(*) as count
+                                                      FROM mat_view_regions r
+                                                      WHERE r.region = regions.region
+                                                        and r.region_type = ?
+                                                        and r.hazard IN (?)
+                                                        and r.source IN (?)
+                                                        and r.warning IN (?)
+                                                        and not r.deleted
+                                                        and r.source_timestamp between ? and ?
+                                                     )                 as count,
+                                                     regions.region    as region
 
-                                                              and not r.deleted
-                                                            group by period
-                                                            order by period
-                                                           ) lhs
-                                                               RIGHT JOIN (select distinct floor((? - unix_timestamp(source_timestamp)) / ?) as period,
-                                                                                           0                                                 as count
-                                                                           from mat_view_regions) rhs ON lhs.period = rhs.period
-                                                          WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)) x
-                                                where period = 0 and count > 0) as exceedance,
-                                               (SELECT count(*) as count
-                                                FROM mat_view_regions r
-                                                WHERE r.region_type = ?
-                                                  and r.region = regions.region
-                                                  and r.hazard IN (?)
-                                                  and r.source IN (?)
-                                                  and r.warning IN (?)
-                                                  and not r.deleted
-                                                  and r.source_timestamp between ? and ?
-                                               )                  as count,
-                                               regions.region     as region,
-                                               ?                  as end_time,
-                                               ?                  as period_length,
-                                               ?                  as region_type,
-                                               ?                  as hazards,
-                                               ?                  as sources,
-                                               ?                  as warnings
-                                        from (select distinct region_id as region from ref_map_regions where region_type_id = ?) as regions`,
-                                  values: [end, periodLengthInSeconds,
-                                           req.params.regionType, req.body.hazards, req.body.sources,
-                                           warningsValues(req.body.warnings), end, periodLengthInSeconds,
-                                           req.params.regionType, req.body.hazards, req.body.sources,
-                                           warningsValues(req.body.warnings),
-                                           new Date(req.body.startDate), new Date(req.body.endDate),
-                                           end, periodLengthInSeconds,
-                                           req.params.regionType, req.body.hazards.join(","), req.body.sources.join(","),
-                                           req.body.warnings, req.params.regionType
-                                  ]
-                              }, true);
-                } catch (e) {
-                    console.warn(e);
-                }
-                // todo: I know this is awful but I can't figure out why the previous INSERT is not immediately available.
-                await sleep(100);
-                rows = await getCachedStats(end, periodLengthInSeconds, req);
-            }
+                                              from (select distinct region_id as region from ref_map_regions where region_type_id = ?) as regions`,
+                                       values: [end, periodLengthInSeconds,
+                                                req.params.regionType, req.body.hazards, req.body.sources,
+                                                warningsValues(req.body.warnings),
+                                                maxPeriods,
+                                                req.params.regionType, req.body.hazards, req.body.sources,
+                                                warningsValues(req.body.warnings),
+                                                new Date(req.body.startDate), new Date(req.body.endDate), req.params.regionType
+                                       ]
+                                   }, true);
+
+            // let rows = await getCachedStats(end, periodLengthInSeconds, req);
+            //
+            // if (rows.length === 0) {
+            //     // console.log("Test Values: ", testValues);
+            //     try {
+            //         await sql({
+            //                       // language=MySQL
+            //                       sql: `insert into cache_stats_calc(exceedance, count, region, end_time, period_length, region_type,
+            //                                                          hazards,
+            //                                                          sources, warnings)
+            //                             select (select exceedance
+            //                                     from (select cume_dist() OVER w * 100.0   as exceedance,
+            //                                                  rhs.period                   as period,
+            //                                                  IFNULL(lhs.count, rhs.count) as count
+            //                                           from (SELECT count(source_id)                                    as count,
+            //                                                        floor((? - unix_timestamp(r.source_timestamp)) / ?) as period
+            //
+            //                                                 FROM mat_view_regions r
+            //                                                 WHERE r.region = regions.region
+            //                                                   and r.region_type = ?
+            //                                                   and r.hazard IN (?)
+            //                                                   and r.source IN (?)
+            //                                                   and r.warning IN (?)
+            //                                                   and not r.deleted
+            //                                                 group by period
+            //                                                 order by period
+            //                                                ) lhs
+            //                                                    RIGHT OUTER JOIN (select value as period, 0 as count from ref_integers
+            // where value < ?) rhs ON lhs.period = rhs.period WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)) x where period = 0
+            // and count > 0) as exceedance, (SELECT count(*) as count FROM mat_view_regions r WHERE r.region = regions.region and
+            // r.region_type = ? and r.hazard IN (?) and r.source IN (?) and r.warning IN (?) and not r.deleted and r.source_timestamp
+            // between ? and ? )                 as count, regions.region    as region, ?                 as end_time, ?                 as
+            // period_length, ?                 as region_type, ?                 as hazards, ?                 as sources, ?
+            //   as warnings from (select distinct region_id as region from ref_map_regions where region_type_id = ?) as regions`, values:
+            // [end, periodLengthInSeconds, req.params.regionType, req.body.hazards, req.body.sources, warningsValues(req.body.warnings),
+            // maxPeriods, req.params.regionType, req.body.hazards, req.body.sources, warningsValues(req.body.warnings), new
+            // Date(req.body.startDate), new Date(req.body.endDate), end, periodLengthInSeconds, req.params.regionType,
+            // req.body.hazards.join(","), req.body.sources.join(","), req.body.warnings, req.params.regionType ] }, true); } catch (e) {
+            // console.warn(e); } // todo: I know this is awful but I can't figure out why the previous INSERT is not immediately
+            // available. await sleep(100); rows = await getCachedStats(end, periodLengthInSeconds, req); }
 
             for (const row of rows) {
                 if (req.body.debug) {
