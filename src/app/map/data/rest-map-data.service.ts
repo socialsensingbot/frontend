@@ -263,7 +263,7 @@ export class RESTMapDataService {
      * CAUTION only returns non-numeric regions/
      * @param map
      */
-    public async regions(map = this.map.id) {
+    public async regionsDropDown(map = this.map.id) {
         return await this._api.callMapAPIWithCache(map + "/regions", {}, 12 * 60 * 60, true);
     }
 

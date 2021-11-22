@@ -12,16 +12,20 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
         BEGIN
             DO RELEASE_LOCK('internal_mv_refresh');
+            call debug_msg(1, 'refresh_mv_auto', 'LOCK RELEASED');
             GET DIAGNOSTICS CONDITION 1
                 @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
             call debug_msg(-2, 'refresh_mv_auto', concat('FAILED: ', @p1, ': ', @p2));
             set @rc = @p1;
         END;
+
+
     call debug_msg(1, 'refresh_mv_auto', 'STARTING');
     set @max_id = (select max(id) from internal_mv_refresh);
+    call debug_msg(1, 'refresh_mv_auto', concat('This is iteration ', @max_id));
     IF GET_LOCK('internal_mv_refresh', 60) THEN
-
-        IF mod(@max_id, 12 * 24) = 1
+        call debug_msg(1, 'refresh_mv_auto', 'LOCK ACQUIRED');
+        IF mod(@max_id, 12 * 12) = 1
         THEN
             call debug_msg(0, 'refresh_mv_auto', 'Selected FULL');
             call refresh_mv_full(@rc);
@@ -39,6 +43,7 @@ BEGIN
     ELSE
         call debug_msg(1, 'refresh_mv_auto', 'Already running.');
     END IF;
+
     START TRANSACTION;
     INSERT INTO internal_mv_refresh (time) values (now());
     COMMIT;
@@ -122,6 +127,7 @@ CREATE PROCEDURE refresh_mv_full(
 BEGIN
 
     DECLARE dt DATE DEFAULT '2017-01-01';
+    declare counter int default 0;
     -- rollback transaction and bubble up errors if something bad happens
     DECLARE exit handler FOR SQLEXCEPTION, SQLWARNING
         BEGIN
@@ -153,15 +159,21 @@ BEGIN
     WHILE dt <= NOW()
         DO
             CALL debug_msg(1, 'refresh_mv_full', CONCAT('Refreshing week starting ', dt));
-            CALL refresh_mv(dt, DATE_ADD(dt, INTERVAL 1 WEEK), @rc);
+            CALL refresh_mv(dt, DATE_ADD(dt, INTERVAL 1 MONTH), @rc);
             CALL debug_msg(1, 'refresh_mv_full', CONCAT('Updating text count for week starting ', dt));
-            CALL update_text_count(dt, DATE_ADD(dt, INTERVAL 1 WEEK));
+            CALL update_text_count(dt, DATE_ADD(dt, INTERVAL 1 MONTH));
             CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling days for week starting ', dt));
-            CALL fill_days(dt, DATE_ADD(dt, INTERVAL 1 WEEK));
+            CALL fill_days(dt, DATE_ADD(dt, INTERVAL 1 MONTH));
             CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling hours for week starting ', dt));
-            CALL fill_hours(dt, DATE_ADD(dt, INTERVAL 1 WEEK));
-            CALL refresh_mv_now(@rc);
-            SET dt = DATE_ADD(dt, INTERVAL 1 WEEK);
+            CALL fill_hours(dt, DATE_ADD(dt, INTERVAL 1 MONTH));
+            IF MOD(counter, 12) = 1
+            THEN
+                CALL refresh_mv_map_window(@rc);
+            ELSE
+                CALL refresh_mv_now(@rc);
+            END IF;
+            SET dt = DATE_ADD(dt, INTERVAL 1 MONTH);
+            SET counter = counter + 1;
         END WHILE;
 
     START TRANSACTION;
@@ -178,7 +190,7 @@ BEGIN
     START TRANSACTION;
     call debug_msg(1, 'refresh_mv_full', 'Refreshing data day counts.');
     replace into mat_view_data_days
-    select count(*) as days, region, region_type, hazard, source, warning
+    select datediff(max(source_date), min(source_date)) as days, region, region_type, hazard, source, warning
     from mat_view_text_count tc
     group by region, region_type, hazard, source, warning;
     call debug_msg(1, 'refresh_mv_full', 'Refreshed data day counts.');
@@ -213,14 +225,15 @@ BEGIN
     call debug_msg(0, 'refresh_mv', 'Refreshing Materialized Views');
     call debug_msg(1, 'refresh_mv', CONCAT('Start Date: ', start_date));
     call debug_msg(1, 'refresh_mv', CONCAT('End Date: ', end_date));
-
+    SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
     START TRANSACTION;
 
     #     delete from mat_view_regions where source_timestamp < NOW() - INTERVAL 1 YEAR;
 
 #     SET @maxTimestamp = IFNULL((select max(source_timestamp) from mat_view_regions), NOW() - INTERVAL 20 YEAR);
-    DELETE FROM mat_view_regions WHERE source_timestamp BETWEEN start_date and end_date;
     call debug_msg(1, 'refresh_mv', 'Updating mat_view_regions');
+    DELETE FROM mat_view_regions WHERE source_timestamp BETWEEN start_date and end_date;
+    call debug_msg(1, 'refresh_mv', 'Deleted old from mat_view_regions');
 
     # Put in the fine, coarse and county stats that Rudy generates data for (the old way of doing this)
     INSERT INTO mat_view_regions
@@ -240,24 +253,46 @@ BEGIN
       AND t.hazard = tr.hazard
       AND t.source_timestamp BETWEEN start_date and end_date;
 
+    call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with live_text_regions data.');
 
     # Add in all other regions (the new way of doing this)
     REPLACE INTO mat_view_regions
     SELECT t.source_id,
            t.source,
            t.hazard,
-           t.source_timestamp          source_timestamp,
+           t.source_timestamp       as source_timestamp,
            gr.region_type,
            gr.region,
            t.warning,
            IFNULL(t.deleted, false) as deleted,
            gr.map_location
     FROM live_text t,
-         view_geo_regions_with_virtual gr
+         ref_geo_regions gr
     WHERE ST_Intersects(boundary, location)
+      AND NOT gr.disabled
+      AND t.source_timestamp BETWEEN start_date and end_date;
+    call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with boundary matches.');
+
+    REPLACE INTO mat_view_regions
+    SELECT t.source_id,
+           t.source,
+           t.hazard,
+           t.source_timestamp       as source_timestamp,
+           vr.virtual_region_type   as region_type,
+           vr.virtual_region        as region,
+           t.warning,
+           IFNULL(t.deleted, false) as deleted,
+           gr.map_location
+    FROM live_text t,
+         ref_geo_regions gr,
+         ref_geo_virtual_regions vr
+    WHERE ST_Intersects(boundary, location)
+      AND vr.geo_region = gr.region
+      AND vr.geo_region_type = gr.region_type
+      AND NOT gr.disabled
       AND t.source_timestamp BETWEEN start_date and end_date;
 
-    call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with exact matches.');
+    call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with virtual region boundary matches.');
 
 
     #     call debug_msg(1, 'refresh_mv', 'Fixing mat_view_regions for UK only');
