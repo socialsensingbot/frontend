@@ -57,6 +57,10 @@ export class TimeseriesCollectionModel {
     private map: Map<string, TimeseriesModel> = new Map<string, TimeseriesModel>();
     private _minDate: Date = null;
     private _maxDate: Date = null;
+    public minScrollbarDate: Date = null;
+    public maxScrollbarDate: Date = null;
+    public rangeChanged: EventEmitter<void> = new EventEmitter<void>();
+
 
     public get minDate(): Date {
         return this._minDate;
