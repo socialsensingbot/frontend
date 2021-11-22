@@ -9,7 +9,7 @@
 
         <mat-tab-group mat-align-tabs="center">
             <mat-tab label="Twitter">
-                <twitter-panel class="twitter-panel" [selection]="selection"
+                <twitter-panel [annotationTypes]="annotationTypes" [selection]="selection" class="twitter-panel"
                                [tweets]="tweets" [showHeaderInfo]="twitterPanelHeader"
                                [showTimeline]="showTwitterTimeline"></twitter-panel>
             </mat-tab>
@@ -62,6 +62,7 @@
                     <div class="app-date-slider-live" *ngIf="liveUpdating">live</div>
                     <div class="app-toolbar-separator"></div>
                     <mat-form-field>
+                        <mat-label>Show the last ...</mat-label>
                         <mat-select (selectionChange)="timeSliderPreset(+ $event.value)"
                                     class="map-number-layer-select">
                             <mat-option value="60">One Hour</mat-option>
@@ -111,22 +112,23 @@
                     </mat-form-field>
 
                     <div class="app-toolbar-separator"></div>
-                    <button [disabled]="selectedCountries.length === 0 && data.hasCountryAggregates()"
+                    <button [disabled]="pref.combined.downloadByCountryDisabled"
                             class="app-toolbar-btn"
                             mat-icon-button
                             (click)="downloadTweetsAsCSV()">
                         <mat-icon matTooltip="Download all Tweets as a CSV file.">cloud_download</mat-icon>
                     </button>
-                    <mat-form-field *ngIf="data.ready">
-                        <!--                    <mat-label>Countries</mat-label>-->
+                    <mat-form-field *ngIf="data.ready" appearance="standard" floatLabel="auto">
                         <mat-select (valueChange)="calculateSelectedCountriesText($event)"
                                     [(ngModel)]="selectedCountries" multiple>
                             <mat-select-trigger>
                                 <span class="country-additional-selection">{{selectedCountriesTextValue}}</span>
                             </mat-select-trigger>
-                            <mat-option *ngFor="let agg of data.aggregations['uk-countries'].aggregates"
-                                        [value]="agg.id">{{agg.title}}</mat-option>
+                            <mat-option *ngFor="let country of countries"
+                                        [value]="country.value">{{country.text}}</mat-option>
                         </mat-select>
+                        <mat-label>Countries to Download</mat-label>
+
                     </mat-form-field>
                 </mat-toolbar-row>
             </ng-container>

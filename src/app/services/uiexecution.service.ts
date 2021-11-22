@@ -13,7 +13,7 @@ const maxTaskDuration: number = 1000;
 class ExecutionTask {
     public rescheduleAttempts: number = 0;
 
-    constructor(private _resolve: (value?: any) => void, private _reject: (reason?: any) => void,
+    constructor(public resolve: (value?: any) => void, public reject: (reason?: any) => void,
                 private _task: () => any, public name: string, public waitForStates: AppState[] | null,
                 private _dedup: string, private _notify: NotificationService, public reschedule: boolean,
                 public silentFailure: boolean, public waitForUIState: UIState, public rescheduleDelay: number,
@@ -26,18 +26,18 @@ class ExecutionTask {
         return this._dedup;
     }
 
-    public execute() {
+    public async execute() {
         try {
             const start = Date.now();
             log.info("ExecutionTask: executing " + this.name + "(" + this.dedup + ")");
-            this._resolve(this._task());
+            this.resolve(this._task());
             if (Date.now() - start > maxTaskDuration) {
                 log.warn(
                     `Task exceeded maximum recommended duration: ${this.name}(${this.dedup}) max is ${maxTaskDuration} this took ${Date.now() - start}`);
             }
         } catch (e) {
             log.error("ERROR Executing " + this.name);
-            this._reject(e);
+            this.reject(e);
         }
     }
 }
@@ -91,7 +91,7 @@ export class UIExecutionService {
                 // console.log("active");
             }
         });
-        this._executionTimer = timer(0, 100).subscribe(() => {
+        this._executionTimer = timer(0, 100).subscribe(async () => {
             if (this._queue.length > 0) {
                 log.info(this._queue.length + " items in the execution queue ", this._queue);
             }
@@ -105,7 +105,12 @@ export class UIExecutionService {
                     if ((task.waitForStates === null || task.waitForStates.indexOf(
                         this._state) >= 0) && (task.waitForUIState === null || this.uistate === task.waitForUIState)) {
                         log.info(`Executing ${task.name}(${task.dedup})`);
-                        task.execute();
+                        try {
+                            await task.execute();
+                        } catch (e) {
+                            log.error(`ERROR: executing ${task.name}(${task.dedup})`, e);
+                        }
+                        log.info(`Executed ${task.name}(${task.dedup})`);
                         if (task.dedup !== null) {
                             this.dedupMap.delete(task.dedup);
                         }
@@ -192,15 +197,21 @@ export class UIExecutionService {
                             log.warn(`Replacing duplicate ${name} (${dedupKey}) on execution queue`);
                         }
                         const oldTask = this.dedupMap.get(dedupKey);
+                        executionTask.resolve = (value) => {
+                            log.info("Resolving original task " + oldTask.dedup);
+                            oldTask.resolve(value);
+                            resolve(value);
+                        };
                         this._queue = this._queue.filter(i => i.dedup !== oldTask.dedup);
                         this.dedupMap.set(dedupKey, executionTask);
                     } else {
                         if (silentFailure) {
                             resolve(null);
                         } else {
-                            log.warn(
-                                `Skipped duplicate ${name} (${dedupKey}) on execution queue as this task is already queued.`);
-                            reject(DUPLICATE_REASON);
+                            let duplicateMessage: string = `Duplicate ${name} (${dedupKey}) on execution queue as this task is already queued.`;
+                            log.error(duplicateMessage);
+                            console.trace(duplicateMessage);
+                            reject(duplicateMessage);
                         }
                         return;
                     }

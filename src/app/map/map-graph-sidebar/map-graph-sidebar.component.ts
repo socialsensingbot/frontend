@@ -6,7 +6,8 @@ import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../pref/preference.service";
 import {TimeseriesAnalyticsComponentState} from "../../analytics/timeseries";
 import {ActivatedRoute, Router} from "@angular/router";
-import {LayerGroup} from "../../types";
+import {SSMapLayer} from "../../types";
+import {MapSelectionService} from "../../map-selection.service";
 
 const log = new Logger("map-graph-sidebar");
 
@@ -21,17 +22,18 @@ export class MapGraphSidebarComponent implements OnInit {
     public regionList: string[] = [];
     public eState: TimeseriesAnalyticsComponentState;
     public cState: TimeseriesAnalyticsComponentState;
-    private layer: LayerGroup;
+    private layer: SSMapLayer;
 
     constructor(public dialog: MatDialog, public dash: DashboardService, public pref: PreferenceService,
+                public map: MapSelectionService,
                 protected _router: Router, private _route: ActivatedRoute) {
     }
 
     async ngOnInit() {
         await this.pref.waitUntilReady();
         this.layer = this.pref.defaultLayer();
-        this.eState = {queries: [], eoc: "exceedance", lob: "line"};
-        this.cState = {queries: [], eoc: "count", lob: "line"};
+        this.eState = {queries: [], eoc: "exceedance", lob: "line", timePeriod: "day"};
+        this.cState = {queries: [], eoc: "count", lob: "line", timePeriod: "day"};
         this.selection.changed.subscribe(i => {
             this.updateStatesForRegions();
         });
@@ -51,7 +53,7 @@ export class MapGraphSidebarComponent implements OnInit {
     }
 
     public async expandCountGraph() {
-        await this._router.navigate(["/analytics/time"],
+        await this._router.navigate(["map", this.map.id, "analytics", "time"],
                                     {
                                         queryParamsHandling: "merge",
                                         queryParams:         {
@@ -63,7 +65,7 @@ export class MapGraphSidebarComponent implements OnInit {
     }
 
     public async expandExceedanceGraph() {
-        await this._router.navigate(["/analytics/time"],
+        await this._router.navigate(["map", this.map.id, "analytics", "time"],
                                     {
                                         queryParamsHandling: "merge",
                                         queryParams:         {
@@ -75,7 +77,7 @@ export class MapGraphSidebarComponent implements OnInit {
     }
 
     public showDashboard() {
-        this._router.navigate(["/dashboard"]);
+        this._router.navigate(["map", this.map.id, "dashboard"]);
     }
 
     public regionText() {
@@ -84,8 +86,8 @@ export class MapGraphSidebarComponent implements OnInit {
 
     private updateStatesForRegions(): void {
         this.regionList = this.selection.regionNames();
-        this.eState = {queries: [], eoc: "exceedance", lob: "line"};
-        this.cState = {queries: [], eoc: "count", lob: "line"};
+        this.eState = {queries: [], eoc: "exceedance", lob: "line", timePeriod: "day"};
+        this.cState = {queries: [], eoc: "count", lob: "line", timePeriod: "day"};
         for (const region of this.selection.regionNames()) {
             this.cState.queries.push({textSearch: "", regions: [region], __series_id: region, layer: this.layer});
             this.eState.queries.push({textSearch: "", regions: [region], __series_id: region, layer: this.layer});

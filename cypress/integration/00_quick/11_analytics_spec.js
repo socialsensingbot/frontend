@@ -4,6 +4,7 @@ import {v4 as uuidv4} from "uuid";
 const zoomDuration = 1000;
 
 function snapshot(query = 'app-timeseries-multi-query-chart', name = "analytics-timeseries-graph-exceedance-bar") {
+    cy.wait(10000);
     cy.get(query).scrollIntoView()
         .toMatchImageSnapshot({
                                   "imageConfig": {
@@ -28,7 +29,7 @@ describe('11 Analytics: ', function () {
             cy.wait(4000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph");
 
-            cy.get('#mat-button-toggle-2-button > .mat-button-toggle-label-content').click();
+            cy.get('#mat-button-toggle-3-button > .mat-button-toggle-label-content').click();
             cy.wait(4000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph-exceedance");
             cy.get('#mat-button-toggle-5-button > .mat-button-toggle-label-content').click();
@@ -86,8 +87,9 @@ describe('11 Analytics: ', function () {
             cy.get("#mat-tab-label-0-1 > div").click();
             cy.get('.app-stats-panel-count-open-in-analytics').click();
             cy.wait(1000);
-            cy.url().should("contain",ANALYTICS_URL + "/time");
-            cy.get('.mat-chip').should("contain.text","Greater London");
+            cy.url().should("contain", ANALYTICS_URL + "/time");
+            cy.wait(4000);
+            cy.get('.mat-chip').should("contain.text", "Greater London");
             cy.wait(3000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-imported-from-map-1");
 

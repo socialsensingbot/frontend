@@ -16,81 +16,6 @@ const twitterLink = require("twitter-text")
 const log = new Logger("tweet-list");
 let loadTweets = false;
 
-setInterval(() => {
-    // todo: the use of setTimeout is very brittle, revisit.
-    // if ((window as any).twttr && (window as any).twttr.widgets) {
-    //     (window as any).twttr.widgets.load($("app-tweet-list")[0]);
-    // }
-
-}, 1000);
-
-const twitterBound = false;
-
-function twitterInit() {
-    // if ((window as any).twttr && (window as any).twttr.events) {
-    //     (window as any).twttr.events.bind(
-    //         "rendered",
-    //         (event) => {
-    //             log.debug(event);
-    //             twitterBound = true;
-    //             loadTweets = false;
-    //             $(event.target).parents(".app-tweet-page").addClass("app-tweet-page-loaded");
-    //             Hub.dispatch("twitter-panel", {message: "render", event: "render", data: event.target});
-    //             const parent = $(event.target).parent();
-    //             const atr = $(event.target).parents(".app-tweet-row");
-    //
-    //             const blockquote = atr.find("blockquote");
-    //             blockquote.addClass("tweet-rendered");
-    //             window.setTimeout(() => {
-    //                 atr.addClass("app-tweet-row-animate-in");
-    //                 atr.removeClass("app-tweet-row-animate-out");
-    //                 setTimeout(() => {
-    //                     atr.addClass("app-tweet-row-rendered");
-    //                     atr.removeClass("app-tweet-row-animate-in");
-    //                     if (atr[0]) {
-    //                         localStorage.setItem("tweet:" + atr.attr("data-tweet-id"),
-    //                                              JSON.stringify(
-    //                                                  {
-    //                                                      timestamp: Date.now(),
-    //                                                      html:      atr.find(".app-tweet-item-text").html()
-    //                                                  }));
-    //                     }
-    //                 }, 800);
-    //                 if (atr.find("blockquote.twitter-tweet-error").length > 0) {
-    //                     const error = atr.find("blockquote.twitter-tweet-error");
-    //                     error.find(".app-tweet-item-menu").hide();
-    //
-    //
-    //                     error.css("opacity", 1.0)
-    //                          .css("min-width", "516px")
-    //                          .css("display", "block")
-    //                          .css("text-align", "center");
-    //                     error.parent().addClass("app-tweet-item-card");
-    //
-    //                     error.text("Tweet no longer available");
-    //                     blockquote.removeClass("tweet-rendered");
-    //                 }
-    //                 try {
-    //                     if (atr.length > 0) {
-    //                         atr.find("mat-spinner").css("opacity", 0);
-    //                         atr.find(".app-tweet-item-menu").css("opacity", 1.0);
-    //                         // atr.find(".tweet-loading-placeholder").remove();
-    //                     }
-    //                 } catch (e) {
-    //                     log.debug(e);
-    //                 }
-    //             }, 10);
-    //
-    //         }
-    //     );
-    // } else {
-    //     setTimeout(() => twitterInit(), 500);
-    // }
-}
-
-twitterInit();
-
-
 class TweetPage {
     public loaded = false;
 
@@ -152,6 +77,9 @@ export class TweetListComponent implements OnInit, OnDestroy {
     private annotations: { [key: string]: any } = {};
     private _annotationSubscription: any;
     private _annotationRemovalSubscription: Subscription;
+
+    @Input()
+    public annotationTypes: any[] = [];
 
     constructor(private _zone: NgZone, private _dialog: MatDialog, public pref: PreferenceService,
                 public annotate: AnnotationService) {
@@ -219,7 +147,11 @@ export class TweetListComponent implements OnInit, OnDestroy {
         // we then get the authoritative version from the server
         this.annotations[tweet.id] = {...this.annotationsFor(tweet), ...annotations};
         const groupTweetAnnotations = await this.annotate.addAnnotations(tweet, annotations);
-        this.annotations[tweet.id] = JSON.parse(groupTweetAnnotations.annotations);
+        try {
+            this.annotations[tweet.id] = groupTweetAnnotations.annotations;
+        } catch (e) {
+            log.error(e);
+        }
         log.info("Emitting ", tweet);
         this.update.emit(tweet);
     }
@@ -247,7 +179,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
         this._annotationSubscription = this.annotate.tweetAnnotated.subscribe(groupTweetAnnotations => {
             if (groupTweetAnnotations.annotations) {
                 log.info("Received new annotation record of ", groupTweetAnnotations);
-                this.annotations[groupTweetAnnotations.tweetId] = JSON.parse(groupTweetAnnotations.annotations);
+                this.annotations[groupTweetAnnotations.tweetId] = groupTweetAnnotations.annotations;
             }
         });
     }
@@ -388,13 +320,21 @@ export class TweetListComponent implements OnInit, OnDestroy {
         return !this.annotationValueIs(tweet, key, value);
     }
 
-    public styleForImpact(tweet: Tweet) {
-        const impactValue = this.annotationValueFor(tweet, "impact");
-        for (const level of this.pref.combined.impact.levels) {
-            if (level.value === impactValue) {
-                return "border-left: 3px solid " + level.color;
+    public styleFor(type: string, tweet: Tweet) {
+        const value = this.annotationValueFor(tweet, type);
+        log.verbose("Annotation value is ", value);
+        let filtered: any[] = this.annotationTypes.filter(i => i.name === type);
+        log.verbose("Annotations filtered: ", filtered);
+        for (const filteredElement of filtered) {
+            for (const option of filteredElement.options) {
+                if (option.value === value) {
+                    log.verbose("Annotations selected ", option);
+                    return "border-left: 3px solid " + option.color;
+                }
             }
         }
+
+
         return "border-left: 3px solid transparent";
 
     }
@@ -473,7 +413,8 @@ export class TweetListComponent implements OnInit, OnDestroy {
             if (tweet.valid) {
                 this.annotate.getAnnotations(tweet).then(tweetAnnotationRecord => {
                     if (tweetAnnotationRecord && tweetAnnotationRecord.annotations && tweetAnnotationRecord.annotations[0] !== "u") {
-                        this.annotations[tweet.id] = JSON.parse(tweetAnnotationRecord.annotations);
+                        log.debug("Annotation record for tweet was ", tweetAnnotationRecord.annotations);
+                        this.annotations[tweet.id] = tweetAnnotationRecord.annotations;
                     } else {
                         this.annotations[tweet.id] = {};
                     }
@@ -527,7 +468,6 @@ export class TweetListComponent implements OnInit, OnDestroy {
     public tweetHtml(tweet: any): any {
         const entities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities : tweet.json.entities;
         const text = tweet.json.extended_tweet ? tweet.json.extended_tweet.full_text : tweet.json.text;
-        console.log(entities);
         let urlEntities: string[] = entities.urls;
         if (entities.media) {
             urlEntities = [...urlEntities, ...entities.media]

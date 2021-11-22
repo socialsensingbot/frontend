@@ -3,6 +3,8 @@ import {BreakpointObserver} from "@angular/cdk/layout";
 import {DashboardCard, DashboardService} from "../../pref/dashboard.service";
 import {Logger} from "@aws-amplify/core";
 import {LoadingProgressService} from "../../services/loading-progress.service";
+import {MapSelectionService} from "../../map-selection.service";
+import {ActivatedRoute} from "@angular/router";
 
 const log = new Logger("dashboard-component");
 
@@ -40,18 +42,28 @@ export class DashboardComponent implements OnInit {
     private maxRows = 2;
     private minRows = 1;
 
-    constructor(private breakpointObserver: BreakpointObserver, public dash: DashboardService,
-                public loading: LoadingProgressService) {
+    constructor(private breakpointObserver: BreakpointObserver, public dash: DashboardService, public map: MapSelectionService,
+                public loading: LoadingProgressService, private _route: ActivatedRoute) {
 
     }
 
     public async ngOnInit() {
+        this.map.id = this._route.snapshot.params.map;
+        console.log("MAP IS " + this.map.id);
         await this.dash.init();
         await this.dash.waitUntilReady();
         this.ready = true;
         log.debug("Dashboard ready with ", this.dash.dashboard);
         this.initDashboard();
         this.loading.loaded();
+
+        this._route.params.subscribe(async params => {
+            if (params.map) {
+                this.map.id = params.map;
+            }
+
+        });
+
     }
 
     public saveCard(index: number, data: any) {

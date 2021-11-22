@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import * as am4core from "@amcharts/amcharts4/core";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 import * as am4charts from "@amcharts/amcharts4/charts";
-import {ColumnSeries, LineSeries, ValueAxis, XYChart} from "@amcharts/amcharts4/charts";
+import {ColumnSeries, DateAxis, LineSeries, ValueAxis, XYChart} from "@amcharts/amcharts4/charts";
 import jt_theme from "../../../theme/jt.theme";
 import {Logger} from "@aws-amplify/core";
 import {GraphType, TimeseriesCollectionModel} from "../../timeseries";
@@ -38,6 +38,8 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
     private _ready: boolean;
     private seriesMap: { [key: string]: LineSeries | ColumnSeries } = {};
     private valueAxis: ValueAxis;
+    private _dateSpacing: number;
+    private dateAxis: DateAxis;
 
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
@@ -89,48 +91,79 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
         });
 
         this._seriesCollection.seriesAdded.subscribe(series => {
-            this.createSeriesFromData(series.label, series.data, series.id);
+            try { this.createSeriesFromData(series.label, series.data, series.id);} catch (e) {log.error(e);}
         });
 
         this._seriesCollection.seriesUpdated.subscribe(series => {
-            this.createSeriesFromData(series.label, series.data, series.id);
+            try {
+                log.debug("Series updated: ", series);
+                if (series.data.length === 0) {
+                    this.chart.series.removeValue(this.seriesMap[series.id]);
+                } else {
+                    this.createSeriesFromData(series.label, series.data, series.id);
+                }
+                this.reZoom();
+            } catch (e) {
+                log.error(e);
+            }
         });
 
         this._seriesCollection.seriesRemoved.subscribe(series => {
-            this.chart.series.removeValue(this.seriesMap[series]);
-            if (this.scrollBar) {
-                // @ts-ignore
-                this.chart.scrollbarX.series.removeValue(this.seriesMap[series]);
+            try {
+                this.chart.series.removeValue(this.seriesMap[series]);
+                if (this.scrollBar) {
+                    // @ts-ignore
+                    this.chart.scrollbarX.series.removeValue(this.seriesMap[series]);
+                }
+                delete this.seriesMap[series];
+            } catch (e) {
+                log.error(e);
             }
-            delete this.seriesMap[series];
         });
 
         this._seriesCollection.yAxisChanged.subscribe(() => {
-            this.initChart();
-            this.valueAxis.title.text = this._seriesCollection.yLabel;
-            this._seriesCollection.foreachSeries((label, data, id) => {
-                this.createSeriesFromData(label, data, id);
-            });
+            try {
+                this.initChart();
+                this.valueAxis.title.text = this._seriesCollection.yLabel;
+                this._seriesCollection.foreachSeries((label, data, id) => {
+                    this.createSeriesFromData(label, data, id);
+                });
+            } catch (e) {log.error(e); }
         });
 
+
         this._seriesCollection.graphTypeChanged.subscribe(() => {
-            this.type = this._seriesCollection.graphType;
-            this.initChart();
-            this._seriesCollection.foreachSeries((label, data, id) => {
-                this.createSeriesFromData(label, data, id);
-            });
+            try {
+                this.type = this._seriesCollection.graphType;
+                this.initChart();
+                this._seriesCollection.foreachSeries((label, data, id) => {
+                    this.createSeriesFromData(label, data, id);
+                });
+            } catch (e) {log.error(e); }
         });
 
         this._seriesCollection.cleared.subscribe(() => {
-            this.initChart();
-            this.seriesMap = {};
-            console.warn("CLEARED");
+            try {
+                this.initChart();
+                this.seriesMap = {};
+            } catch (e) {log.error(e); }
         });
 
         this.ready.emit(true);
         this._ready = true;
     }
 
+
+    private reZoom(): void {
+        log.debug("Zoom minDate: " + this._seriesCollection.minDate);
+        log.debug("Zoom maxDate: " + this._seriesCollection.maxDate);
+        if (this._seriesCollection.minDate && this._seriesCollection.maxDate) {
+            this.dateAxis.adjustMinMax(
+                this._seriesCollection.minDate.getTime(),
+                this._seriesCollection.maxDate.getTime()
+            );
+        }
+    }
 
     ngOnInit(): void {
 
@@ -152,11 +185,11 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
         this.chart.legend.scrollable = true;
 
         // Create axes
-        const dateAxis = this.chart.xAxes.push(new am4charts.DateAxis());
-        dateAxis.renderer.minGridDistance = 50;
-        dateAxis.title.text = "Date";
+        this.dateAxis = this.chart.xAxes.push(new am4charts.DateAxis());
+        this.dateAxis.renderer.minGridDistance = 50;
+        this.dateAxis.title.text = "Date";
         // dateAxis.title.fontWeight = "bold";
-        dateAxis.title.opacity = 0.5;
+        this.dateAxis.title.opacity = 0.5;
 
         this.valueAxis = this.chart.yAxes.push(new am4charts.ValueAxis());
         this.valueAxis.title.text = this._seriesCollection.yLabel;
@@ -175,18 +208,21 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
         // this.trend.tensionX = 0.75;
         // Add cursor
         this.chart.cursor = new am4charts.XYCursor();
-        this.chart.cursor.xAxis = dateAxis;
+        this.chart.cursor.xAxis = this.dateAxis;
         if (this.scrollBar) {
             this.chart.scrollbarX = new am4charts.XYChartScrollbar();
         }
         this.chart.responsive.enabled = true;
+
+
+        // dateAxis.adjustMinMax(this._seriesCollection.minDate.getTime(), this._seriesCollection.maxDate.getTime());
+
     }
 
     private createSeriesFromData(label, seriesData: any[], id: string) {
         if (typeof this.seriesMap[id] !== "undefined") {
             this.seriesMap[id].data = seriesData;
             this.seriesMap[id].name = label;
-            this.seriesMap[id].validateData();
             return this.seriesMap[id];
         }
         // Create series

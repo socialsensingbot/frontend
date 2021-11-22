@@ -69,10 +69,12 @@ export class RESTDataAPIService {
                 const key = "rest:query/" + path + ":" + JSON.stringify(payload);
                 const cachedItem = await this.cache.getCached(key);
                 if (cacheForSeconds > 0 && cachedItem && cachedItem.hasData && !cachedItem.expired) {
-                    // tslint:disable-next-line:no-console
                     log.debug("Value for " + key + "in cache");
                     // log.debug("Value for " + key + " was " + JSON.stringify(cachedItem.data));
-                    console.debug("Return cached item", JSON.stringify(cachedItem));
+                    if (!environment.production) {
+                        // tslint:disable-next-line:no-console
+                        console.debug("Return cached item", JSON.stringify(cachedItem));
+                    }
                     return cachedItem.data;
                 } else {
                     log.debug("Value for " + key + " not in cache");
@@ -89,7 +91,7 @@ export class RESTDataAPIService {
     }
 
 
-    public async callMapAPIWithCache(path: string, payload: any, cacheForSeconds: number = -1): Promise<any> {
+    public async callMapAPIWithCache(path: string, payload: any, cacheForSeconds: number = -1, useGet = false): Promise<any> {
         log.verbose("callMapAPIWithCache()");
         const key = "rest:map/" + path + ":" + JSON.stringify(payload);
         const cachedItem = await this.cache.getCached(key);
@@ -101,12 +103,13 @@ export class RESTDataAPIService {
             return cachedItem.data;
         } else {
             log.info("Value for " + key + " not in cache");
-            return await this.callAPIInternal("/map/" + path, payload, cacheForSeconds, key);
+            return await this.callAPIInternal("/map/" + path, payload, cacheForSeconds, key, useGet);
         }
     }
 
 
-    private async callAPIInternal(fullPath: string, payload: any, cacheForSeconds: number, key: string): Promise<Promise<any>> {
+    private async callAPIInternal(fullPath: string, payload: any, cacheForSeconds: number, key: string,
+                                  useGet = false): Promise<Promise<any>> {
         this.calls++;
         if (this.callsPerMinute > environment.maxCallsPerMinute) {
             console.error("Excessive api calls per minute: " + this.callsPerMinute);
@@ -120,21 +123,37 @@ export class RESTDataAPIService {
             return;
 
         }
-        return API.post("query", fullPath, {
-            body:    payload,
-            headers: {
-                Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
-            },
+        let response: Promise<any>;
+        if (useGet) {
+            response = API.get("query", fullPath, {
+                'queryStringParameters': payload,
+                headers:                 {
+                    Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+                },
 
-        }).then(data => {
+            });
+        } else {
+            response = API.post("query", fullPath, {
+                body:    payload,
+                headers: {
+                    Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+                },
+
+            });
+        }
+        return response.then(data => {
             if (typeof data !== "undefined") {
                 // tslint:disable-next-line:no-console
-                console.debug("Returning uncached item", data);
+                if (!environment.production) {
+                    console.debug("Returning uncached item", data);
+                }
                 if (cacheForSeconds > 0) {
                     this.cache.setCached(key, data, cacheForSeconds * 1000);
                 }
             } else {
-                console.debug("Returning undefined item", data);
+                if (!environment.production) {
+                    console.debug("Returning undefined item", data);
+                }
             }
             return data;
         }).catch(e => {
@@ -151,8 +170,10 @@ export class RESTDataAPIService {
                         },
                     }).then(data => this._ngZone.run(() => {
                         this._notify.show("Problem resolved", "Good", 2000);
-                        // tslint:disable-next-line:no-console
-                        console.debug("Returning uncached item", data);
+                        if (!environment.production) {
+                            // tslint:disable-next-line:no-console
+                            console.debug("Returning uncached item", data);
+                        }
                         if (cacheForSeconds > 0) {
                             this.cache.setCached(key, data, cacheForSeconds * 1000);
                         }

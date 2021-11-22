@@ -7,8 +7,8 @@ describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issu
 
   // Step 1: setup the application state
   beforeEach(function () {
-    cy.visit('http://localhost:4200/map');
-    cy.login();
+    cy.visit(MAP_URL);
+      cy.login();
   });
 
 

@@ -14,6 +14,8 @@ import {AnnotationService} from "./pref/annotation.service";
 import {UIExecutionService} from "./services/uiexecution.service";
 import {LoadingProgressService} from "./services/loading-progress.service";
 import {NgForageCache} from "ngforage";
+import {DateAdapter} from "@angular/material/core";
+import {MapSelectionService} from "./map-selection.service";
 
 
 const log = new Logger("app");
@@ -46,11 +48,13 @@ export class AppComponent {
     constructor(public auth: AuthService,
                 public pref: PreferenceService,
                 private _router: Router,
-                private _route: ActivatedRoute,
+                public route: ActivatedRoute,
                 private _notify: NotificationService,
                 private _session: SessionService,
                 private _annotation: AnnotationService,
                 private _cache: NgForageCache,
+                public map: MapSelectionService,
+                private _adapter: DateAdapter<any>,
                 @Inject(RollbarService) private _rollbar: Rollbar, private _exec: UIExecutionService,
                 public loading: LoadingProgressService) {
 
@@ -81,25 +85,9 @@ export class AppComponent {
 
     async checkSession() {
 
-        if (this._route.snapshot.queryParamMap.has("__clear_cache__")) {
+        if (this.route.snapshot.queryParamMap.has("__clear_cache__")) {
             try {
-                log.info("Clearing ngForage cache");
-                await this._cache.clear();
-                await DataStore.clear();
-                log.info("Clearing session storage");
-                sessionStorage.clear();
-                log.info("Clearing local storage");
-                localStorage.clear();
-                log.info("Clearing IndexDB");
-                ["amplify-datastore", "ngForage"].forEach(item => {
-                    window.indexedDB.deleteDatabase(item);
-                });
-                log.info("Clearing cookies");
-                document.cookie.split(";").forEach(c => {
-                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-                });
-                log.info("ALL caches cleared, logging out.");
-                await Auth.signOut();
+                await this.hardLogout();
             } finally {
                 log.info("Logged out, redirecting.");
                 window.location.href = "/";
@@ -140,6 +128,7 @@ export class AppComponent {
                 if (userInfo) {
                     try {
                         await this.pref.init(userInfo);
+
                         this.ready = true;
                     } catch (e) {
                         this._rollbar.error(e);
@@ -151,6 +140,8 @@ export class AppComponent {
                             30);
                         return;
                     }
+
+                    this._adapter.setLocale(this.pref.combined.locale);
                     try {
                         await this._session.open(userInfo);
                     } catch (e) {
@@ -214,10 +205,29 @@ export class AppComponent {
             if (environment.showLoadingMessages) {
                 this.loading.progress("Syncing data with the server ...", 3);
             }
+            let datastoreStarted = false;
+            setTimeout(async () => {
+                if (!datastoreStarted) {
+                    try {
+                        await DataStore.stop()
+                        await DataStore.clear();
+                        await DataStore.start();
+                    } catch (e) {
+                        log.error(e);
+                    } finally {
+                        setTimeout(async () => {
+                            window.location.reload();
+                        }, 2000);
+                    }
+                }
+            }, 5000);
+
             await DataStore.start();
+            datastoreStarted = true;
             if (environment.showLoadingMessages) {
                 this.loading.progress("Data synced with the server ...", 4);
             }
+
         } catch (e) {
             log.error(e);
             await DataStore.clear();
@@ -229,6 +239,7 @@ export class AppComponent {
     public async logout() {
         log.info("LOGOUT: Logout triggered by user.");
         await this._session.close();
+        this._notify.show("Clearing application data");
         if (!this.dataStoreSynced) {
             this.initiateLogout = true;
             // failsafe
@@ -241,6 +252,30 @@ export class AppComponent {
 
     }
 
+    private async hardLogout(): Promise<void> {
+        // log.info("Clearing ngForage cache");
+        // await this._cache.clear();
+        await Auth.signOut();
+        log.info("Clearing DataStore cache");
+        await DataStore.stop();
+        // await DataStore.clear();
+        log.info("Clearing IndexDB");
+        ["amplify-datastore", "ngForage"].forEach(item => {
+            window.indexedDB.deleteDatabase(item).onsuccess = async ev => {
+                log.info("Clearing session storage");
+                sessionStorage.clear();
+                log.info("Clearing local storage");
+                localStorage.clear();
+                log.info("Clearing cookies");
+                document.cookie.split(";").forEach(c => {
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                });
+                log.info("ALL caches cleared, logging out.");
+            };
+        });
+
+    }
+
     private async doLogout() {
         if (!this.initiateLogout) {
             return;
@@ -248,16 +283,18 @@ export class AppComponent {
         this.isAuthenticated = false;
         log.info("LOGOUT: Performing sign out.");
         this.loading.progress("Signing out...", 1);
+        this._exec.stop();
         try {
-            await this.auth.signOut();
+            await this.hardLogout();
             this.loading.progress("Signed out...", 4);
         } catch (e) {
             this._notify.error(e);
         }
-        this._exec.stop();
         this.initiateLogout = false;
-        await this._router.navigate(["/"], {queryParamsHandling: "merge"});
+        window.location.reload();
+
         log.info("LOGOUT: Performed sign out.");
     }
+
 
 }
