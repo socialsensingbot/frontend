@@ -83,7 +83,8 @@
       "UnauthRoleName": "amplify-socialsensing-demo-144920-unauthRole",
       "StackName": "amplify-socialsensing-demo-144920",
       "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-demo-144920/7eed7060-bf8f-11ea-9f1b-021ebf3a767c",
-      "AmplifyAppId": "dtmxl3q3i7oix"
+      "AmplifyAppId": "dtmxl3q3i7oix",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-socialsensing-demo-144920-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
     },
     "categories": {
       "auth": {
@@ -101,7 +102,8 @@
         },
         "query": {
           "deploymentBucketName": "amplify-socialsensing-demo-144920-deployment",
-          "s3Key": "amplify-builds/query-373339674b574350467a-build.zip"
+          "s3Key": "amplify-builds/query-51346e5965544741434a-build.zip",
+          "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
         }
       },
       "hosting": {
