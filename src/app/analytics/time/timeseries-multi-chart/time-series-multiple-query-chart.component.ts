@@ -131,6 +131,16 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
             } catch (e) {log.error(e); }
         });
 
+        this._seriesCollection.xAxisChanged.subscribe(() => {
+            try {
+                this.initChart();
+                this.dateAxis.title.text = this._seriesCollection.xLabel;
+                this._seriesCollection.foreachSeries((label, data, id) => {
+                    this.createSeriesFromData(label, data, id);
+                });
+            } catch (e) {log.error(e); }
+        });
+
 
         this._seriesCollection.graphTypeChanged.subscribe(() => {
             try {
