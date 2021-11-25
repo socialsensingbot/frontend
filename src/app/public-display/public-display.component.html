@@ -36,6 +36,10 @@
 
         <map-legend *ngIf="ready" [activeNumber]="activeStatistic" class="legend"></map-legend>
 
+        <div class="public-display-map-date">
+            {{minDate|date:'MMM dd'}} {{minDate|date:'HH:mm'}}
+            - {{maxDate|date:'MMM dd'}} {{maxDate|date:'HH:mm'}} {{minDate|date:'zzz'}}
+        </div>
 
         <mat-progress-bar *ngIf="activity && ready" [color]="pref.combined.toolbarColor" class="map-progress"
                           mode="indeterminate"></mat-progress-bar>

@@ -65,7 +65,7 @@ const routes: Routes = [
     },
     {path: "map/:map/dashboard", component: DashboardComponent, canActivate: [AuthGuard]},
     {path: "map/:map/display", component: PublicDisplayComponent, canActivate: [AuthGuard]},
-    {path: "map/:map/display/:displayId", component: PublicDisplayComponent, canActivate: [AuthGuard]},
+    {path: "map/:map/display/:script", component: PublicDisplayComponent, canActivate: [AuthGuard]},
     {path: "", component: HomeComponent, canActivate: [AuthGuard]}
 ];
 

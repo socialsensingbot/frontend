@@ -10,7 +10,6 @@ export interface DisplayScreen {
     data: AnimationScreenData;
     animation: DateAnimation;
     stepDurationInMilliseconds: number;
-    animationSteps: number;
     animationLoops: number;
 }
 
@@ -19,6 +18,8 @@ export interface DateAnimation {
     type: "date-animation";
     startTimeOffsetMilliseconds: number;
     endTimeOffsetMilliseconds: number;
+    windowDurationInMilliseconds: number;
+    stepDurationInMilliseconds: number;
 }
 
 export interface LocationAnimation {

@@ -1,10 +1,10 @@
 import {Component, NgZone, OnInit} from "@angular/core";
-import {GeoJSON, latLng, layerGroup, LayerGroup, Map, tileLayer} from "leaflet";
+import {GeoJSON, latLng, Layer, layerGroup, LayerGroup, Map, tileLayer} from "leaflet";
 import * as rxjs from "rxjs";
-import {Subscription, timer} from "rxjs";
+import {Subscription} from "rxjs";
 import {Tweet} from "../map/twitter/tweet";
 import {DateRangeSliderOptions} from "../map/date-range-slider/date-range-slider.component";
-import {ONE_DAY} from "../map/data/map-data";
+import {ONE_DAY, RegionTweeCount} from "../map/data/map-data";
 import {RegionSelection} from "../map/region-selection";
 import {environment} from "../../environments/environment";
 import {PolygonData} from "../map/types";
@@ -26,6 +26,7 @@ import {Logger} from "@aws-amplify/core";
 import {DisplayScriptService} from "./display-script.service";
 import {DisplayScreen, DisplayScript} from "./types";
 import {StatisticType} from "../analytics/timeseries";
+import {roundToHour} from "../common";
 
 const log = new Logger("map");
 
@@ -95,8 +96,8 @@ export class PublicDisplayComponent implements OnInit {
     // URL state management //
     private _geojson: { exceedance: GeoJSON, count: GeoJSON } = {exceedance: null, count: null};
     // ... URL parameters
-    private maxDate = 0;
-    private minDate = 0;
+    public maxDate = 0;
+    public minDate = 0;
     /**
      * True if the query parameters have been processed.
      */
@@ -127,6 +128,8 @@ export class PublicDisplayComponent implements OnInit {
     private _inFeature: boolean;
 
     private _selectedFeatureNames: string[] = [];
+    private regionTweetMap: RegionTweeCount;
+    private _script: string;
 
     public get selectedFeatureNames(): string[] {
         return this._selectedFeatureNames;
@@ -142,16 +145,7 @@ export class PublicDisplayComponent implements OnInit {
         return this._activeLayerGroup;
     }
 
-    public set activeLayerGroup(value: string) {
-        log.debug("set activeLayerGroup");
-        this._activeLayerGroup = value;
-        if (this.ready) {
-            this.resetStatisticsLayer(this.activeStatistic);
-        }
-        this._twitterIsStale = true;
-        this.updateAnnotationTypes();
-        this.load();
-    }
+    private geographyData: PolygonData;
 
     private _dataset: string;
 
@@ -199,7 +193,6 @@ export class PublicDisplayComponent implements OnInit {
         log.debug("set activeStatistic");
         if (this._activeStatistic !== value) {
             this._activeStatistic = value;
-            this.resetStatisticsLayer(value);
         }
     }
 
@@ -209,13 +202,14 @@ export class PublicDisplayComponent implements OnInit {
         return this._activeRegionType;
     }
 
-    public set activeRegionType(value: string) {
-        log.debug("activeRegionType(" + value + ")");
-
-        if (this.activeRegionType !== value) {
-            this._activeRegionType = value;
+    public set activeLayerGroup(value: string) {
+        log.debug("set activeLayerGroup");
+        if (value !== this._activeLayerGroup) {
+            this._activeLayerGroup = value;
         }
-        this.resetStatisticsLayer(this.activeStatistic);
+        this._twitterIsStale = true;
+        this.updateAnnotationTypes();
+        this.load();
     }
 
     constructor(private _router: Router,
@@ -336,6 +330,13 @@ export class PublicDisplayComponent implements OnInit {
         await this.data.load(first);
     }
 
+    public set activeRegionType(value: string) {
+        log.debug("activeRegionType(" + value + ")");
+
+        if (this._activeRegionType !== value) {
+            this._activeRegionType = value;
+        }
+    }
 
     /**
      * This method does all the heavy lifting and is called when
@@ -357,64 +358,69 @@ export class PublicDisplayComponent implements OnInit {
         } else {
             this._dataset = this.pref.combined.defaultDataSet;
         }
+
+        if (this.route.snapshot.paramMap.has("script")) {
+            this._script = this.route.snapshot.paramMap.get("script");
+        } else {
+            this._script = this.pref.combined.defaultPublicDisplayScript;
+        }
         await this.data.init(this.dataset);
 
         this._loggedIn = await Auth.currentAuthenticatedUser() != null;
-        this.displayScript = this._display.script("default");
+        // this.displayScript = this._display.script("county_ex_range_24h_step_1h_win_6h");
+        this.displayScript = this._display.script(this._script);
         await this.nextScreen();
         this.loading.loaded();
         this.ready = true;
         let animationLoopCounter = 0;
         let animationStepCounter = 0;
-        this._animationTimer = timer(0, 100).subscribe(async () => {
-            const animation = this.currentDisplayScreen.animation;
-            const timediff = animation.startTimeOffsetMilliseconds - animation.endTimeOffsetMilliseconds;
-            const timediffPerStep = timediff / this.currentDisplayScreen.animationSteps;
-            const stepsPerLoop = Math.round(this.currentDisplayScreen.stepDurationInMilliseconds / 100);
-            if (animationLoopCounter % stepsPerLoop === 0) {
-                if (animation.type === "date-animation") {
-                    this.minDate = (await this.data.now()) - animation.startTimeOffsetMilliseconds + timediffPerStep * animationStepCounter;
-                    this.maxDate = this.minDate + animation.startTimeOffsetMilliseconds + timediffPerStep * (animationStepCounter + 1);
-                    animationStepCounter++;
-                    this._map.setView(latLng([this.currentDisplayScreen.location.lat, this.currentDisplayScreen.location.lon]),
-                                      this.currentDisplayScreen.location.zoom,
-                                      {animate: true, duration: this.currentDisplayScreen.location.animationDuration});
-                    await this.resetStatisticsLayer(this.activeStatistic);
-                    await this.load();
-                    this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType,
-                                                         await this.data.regionsOfType(this.activeRegionType),
-                                                         this.minDate,
-                                                         this.maxDate);
-
+        let completedAnimations = 0;
+        await this.resetStatisticsLayer(this.activeStatistic);
+        let now: number = await this.data.now();
+        let animateFunc: () => Promise<void> = async () => {
+            try {
+                const animation = this.currentDisplayScreen.animation;
+                const stepsPerLoop = Math.round(this.currentDisplayScreen.stepDurationInMilliseconds / 100);
+                if (animationLoopCounter % stepsPerLoop === 0) {
+                    if (animation.type === "date-animation") {
+                        this.minDate = roundToHour(now - animation.startTimeOffsetMilliseconds + (
+                            animation.stepDurationInMilliseconds * animationStepCounter
+                        ))
+                        ;
+                        this.maxDate = roundToHour(this.minDate + animation.windowDurationInMilliseconds);
+                        log.warn(animationLoopCounter + ": From " + new Date(this.minDate) + " to " + new Date(this.maxDate));
+                        animationStepCounter++;
+                        if (this.maxDate >= now - animation.endTimeOffsetMilliseconds) {
+                            animationStepCounter = 0;
+                            now = await this.data.now();
+                            completedAnimations++;
+                        }
+                        await this.load();
+                        this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType,
+                                                             await this.data.regionsOfType(this.activeRegionType),
+                                                             this.minDate,
+                                                             this.maxDate);
+                        await this.updateRegionDisplay(this.activeStatistic);
+                    }
                 }
+                animationLoopCounter++;
+                if (completedAnimations > this.currentDisplayScreen.animationLoops) {
+                    animationLoopCounter = 0;
+                    animationStepCounter = 0;
+                    completedAnimations = 0;
+                    await this.nextScreen();
+                }
+            } catch (e) {
+                log.error(e);
+            } finally {
+                setTimeout(animateFunc, 100);
             }
-            animationLoopCounter++;
-            let endOfAnimation = animationLoopCounter >= stepsPerLoop * this.currentDisplayScreen.animationLoops;
-            if (endOfAnimation) {
-                await this.nextScreen();
-                animationLoopCounter = 0;
-                animationStepCounter = 0;
-            }
-
-        });
+        };
+        setTimeout(animateFunc, 100);
         // noinspection ES6MissingAwait
 
         log.debug("Init completed successfully");
 
-    }
-
-    private async nextScreen() {
-        try {
-            this.currentDisplayNumber++;
-            this.currentDisplayScreen = this.displayScript.screens[this.currentDisplayNumber % this.displayScript.screens.length];
-            this.activeLayerGroup = this.currentDisplayScreen.data.layerId;
-            this.activeStatistic = this.currentDisplayScreen.data.statistic;
-            this.activeRegionType = this.currentDisplayScreen.data.regionType;
-            await this.data.loadGeography(this.activeRegionType);
-            return this.currentDisplayScreen;
-        } catch (e) {
-            console.error(e);
-        }
     }
 
     private updateAnnotationTypes(): void {
@@ -430,6 +436,23 @@ export class PublicDisplayComponent implements OnInit {
         }
     }
 
+    private async nextScreen() {
+        try {
+            this.currentDisplayScreen = this.displayScript.screens[this.currentDisplayNumber % this.displayScript.screens.length];
+            this.activeLayerGroup = this.currentDisplayScreen.data.layerId;
+            this.activeStatistic = this.currentDisplayScreen.data.statistic;
+            this.activeRegionType = this.currentDisplayScreen.data.regionType;
+            this._map.setView(latLng([this.currentDisplayScreen.location.lat, this.currentDisplayScreen.location.lon]),
+                              this.currentDisplayScreen.location.zoom,
+                              {animate: true, duration: this.currentDisplayScreen.location.animationDuration});
+            await this.data.loadGeography(this.activeRegionType);
+            await this.resetStatisticsLayer(this.activeStatistic);
+            this.currentDisplayNumber++;
+            return this.currentDisplayScreen;
+        } catch (e) {
+            console.error(e);
+        }
+    }
 
     /**
      * Reset the polygon layers.
@@ -444,52 +467,89 @@ export class PublicDisplayComponent implements OnInit {
         log.info("Resetting " + layer);
         // this.loading.showIndeterminateSpinner();
         try {
-            const geography: PolygonData = await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData;
             // this.hideTweets();
             log.debug(layer);
             const curLayerGroup = layerGroup();
-            if (curLayerGroup != null) {
-
-                // noinspection JSUnfilteredForInLoop
-                await this.data.recentTweets(this.activeLayerGroup, this.activeRegionType).then(async regionTweetMap => {
-                    log.debug("Region Tweet Map", regionTweetMap);
-
-                    const styleFunc = (feature: geojson.Feature) => {
-                        log.verbose("styleFunc " + layer);
-
-                        const style = this._color.colorFunctions[layer].getFeatureStyle(
-                            feature);
-                        log.verbose("Style ", style, feature.properties);
-                        if (this.liveUpdating && regionTweetMap[feature.properties.name]) {
-                            log.verbose(`Adding new tweet style for ${feature.properties.name}`);
-                            style.className = style.className + " leaflet-new-tweet";
-                        }
-                        return style;
-
-                    };
-                    await this.updateRegionData(geography);
-                    this._geojson[layer] = new GeoJSON(
-                        geography as geojson.GeoJsonObject, {
-                            style: styleFunc
-                        }).addTo(curLayerGroup);
-
-                }).catch(e => log.error(e));
-
-
-            } else {
-                log.debug("Null layer " + layer);
+            this.geographyData = await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData
+            this.regionTweetMap = await this.data.recentTweets(this.activeLayerGroup, this.activeRegionType);
+            if (this.currentStatisticsLayer) {
+                this.currentStatisticsLayer.clearLayers();
+                this._map.removeLayer(this.currentStatisticsLayer);
             }
-
-            this.currentStatisticsLayer.clearLayers();
-            this._map.removeLayer(this.currentStatisticsLayer);
+            this._geojson[layer] = new GeoJSON(this.geographyData as geojson.GeoJsonObject, {
+                style: {
+                    className:   "app-map-region-geography",
+                    fillColor:   "#FFFFFF",
+                    weight:      1,
+                    opacity:     0.1,
+                    color:       "#FFFFFF",
+                    dashArray:   "",
+                    fillOpacity: 0,
+                }
+            }).addTo(curLayerGroup);
             this._map.addLayer(curLayerGroup);
             this.currentStatisticsLayer = curLayerGroup;
+            await this.updateRegionDisplay(layer);
         } catch (e) {
             console.error(e);
         } finally {
             // this.loading.hideIndeterminateSpinner();
         }
 
+    }
+
+    private async updateRegionDisplay(layer: "count" | "exceedance"): Promise<void> {
+        if (this.currentStatisticsLayer && this.currentStatisticsLayer.getLayers()[0]) {
+            const statsMap = await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this.minDate, this.maxDate);
+            let layers: Layer[] = (this.currentStatisticsLayer.getLayers()[0] as GeoJSON).getLayers();
+            console.warn(layers);
+            for (const geoLayer of layers) {
+                const feature: any = (geoLayer as GeoJSON).feature;
+                const featureProperties = feature.properties;
+                const region = featureProperties.name;
+                const regionStats = statsMap[region];
+                if (regionStats) {
+                    featureProperties.count = regionStats.count;
+                    featureProperties.exceedance = regionStats.exceedance;
+                } else {
+                    log.verbose("No data for " + region);
+                    featureProperties.count = 0;
+                    featureProperties.exceedance = 0;
+                }
+
+                const style = this._color.colorFunctions[layer].getFeatureStyle(
+                    feature);
+                log.verbose("Style ", style, feature.properties);
+                const colorData: { colors: string[]; values: number[] } = this._color.colorData[this.activeStatistic];
+
+                let color;
+                const d = featureProperties[this.activeStatistic];
+                if (d === 0) {
+                    color = "rgba(100,100,100,0.3)";
+                } else {
+                    for (let i = 0; i < colorData.values.length; i++) {
+                        if (d > colorData.values[i]) {
+                            color = colorData.colors[i];
+                            break;
+                        }
+                    }
+                    if (!color) {
+                        color = colorData.colors[colorData.colors.length - 1];
+                    }
+                }
+
+                (geoLayer as GeoJSON).setStyle({
+                                                   className:   "app-map-region-geography",
+                                                   fillColor:   color,
+                                                   weight:      1,
+                                                   opacity:     1.0,
+                                                   color:       "#FFFFFF",
+                                                   dashArray:   "",
+                                                   fillOpacity: 1.0,
+                                               });
+            }
+        }
+        this._map.invalidateSize();
     }
 
     /**

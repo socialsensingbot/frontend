@@ -30,6 +30,21 @@ $drawer-width: 500px;
 
     }
 
+    .app-map-region-geography {
+        transition: opacity 1000ms ease-in-out, fill 400ms ease-in-out;
+    }
+
+}
+
+.public-display-map-date {
+    font-size: 4vw;
+    color: white;
+    text-shadow: 0 0.2vw 1vw rgba(100, 100, 100, 0.5);
+    position: absolute;
+    top: calc(4vw);
+    left: 4vw;
+
+
 }
 
 .app-draw-close-button {
