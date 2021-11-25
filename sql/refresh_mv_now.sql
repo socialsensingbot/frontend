@@ -264,7 +264,7 @@ BEGIN
            gr.region_type,
            gr.region,
            t.warning,
-           IFNULL(t.deleted, false) as deleted,
+           IFNULL(t.deleted, false)                                         as deleted,
            gr.map_location
     FROM live_text t,
          ref_geo_regions gr
@@ -298,6 +298,7 @@ BEGIN
     #     call debug_msg(1, 'refresh_mv', 'Fixing mat_view_regions for UK only');
 
     #     # UK Locations are buffered with a 0.01 degree buffer. At present this is not done on the world map
+
 #     # If the world map is supported then this may be required to capture location just outside of the strict
 #     # boundary supplied. We only use the buffered values when the non buffered regions do not match.
 #     INSERT INTO mat_view_regions
