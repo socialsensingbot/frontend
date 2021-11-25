@@ -41,10 +41,7 @@
             - {{maxDate|date:'MMM dd'}} {{maxDate|date:'HH:mm'}} {{minDate|date:'zzz'}}
         </div>
 
-        <mat-progress-bar *ngIf="activity && ready" [color]="pref.combined.toolbarColor" class="map-progress"
-                          mode="indeterminate"></mat-progress-bar>
-        <!--    <div class="map-inset-shadow"></div>-->
     </mat-sidenav-content>
 </mat-sidenav-container>
 
-<mat-spinner *ngIf="!ready" class="map-spinner"></mat-spinner>
+<!--<mat-spinner *ngIf="!ready" class="map-spinner"></mat-spinner>-->

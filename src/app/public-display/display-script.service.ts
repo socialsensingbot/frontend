@@ -88,11 +88,11 @@ export class DisplayScriptService {
                         stepDurationInMilliseconds:   DAY,
 
                     },
-                    location:                   {
-                        lon:               -8,
-                        lat:               53,
+                    location: {
+                        lon:               -7.6,
+                        lat:               53.5,
                         zoom:              8,
-                        animationDuration: 1000,
+                        animationDuration: 1500,
                     },
                     stepDurationInMilliseconds: 1500,
                     animationLoops:             1
@@ -112,11 +112,11 @@ export class DisplayScriptService {
 
 
                     },
-                    location:                   {
+                    location: {
                         lon:               -6,
                         lat:               54,
-                        zoom:              7,
-                        animationDuration: 1000,
+                        zoom:              6,
+                        animationDuration: 1500,
                     },
                     stepDurationInMilliseconds: 1500,
                     animationLoops:             1
