@@ -26,7 +26,7 @@ import {Logger} from "@aws-amplify/core";
 import {DisplayScriptService} from "./display-script.service";
 import {DisplayScreen, DisplayScript} from "./types";
 import {StatisticType} from "../analytics/timeseries";
-import {roundToHour} from "../common";
+import {roundToHour, sleep} from "../common";
 
 const log = new Logger("map");
 
@@ -67,7 +67,7 @@ export class PublicDisplayComponent implements OnInit {
     private _animationTimer: Subscription;
     private currentDisplayScreen: DisplayScreen;
     private currentDisplayNumber = 0;
-    private currentStatisticsLayer: LayerGroup<any> = layerGroup();
+    private currentStatisticsLayer: LayerGroup<any> = null;
     private destroyed = false;
     // The Map & Map Layers
     private _statsLayer: LayerGroup = layerGroup();
@@ -388,7 +388,7 @@ export class PublicDisplayComponent implements OnInit {
                         ))
                         ;
                         this.maxDate = roundToHour(this.minDate + animation.windowDurationInMilliseconds);
-                        log.warn(animationLoopCounter + ": From " + new Date(this.minDate) + " to " + new Date(this.maxDate));
+                        log.debug(animationLoopCounter + ": From " + new Date(this.minDate) + " to " + new Date(this.maxDate));
                         animationStepCounter++;
                         if (this.maxDate >= now - animation.endTimeOffsetMilliseconds) {
                             animationStepCounter = 0;
@@ -442,9 +442,6 @@ export class PublicDisplayComponent implements OnInit {
             this.activeLayerGroup = this.currentDisplayScreen.data.layerId;
             this.activeStatistic = this.currentDisplayScreen.data.statistic;
             this.activeRegionType = this.currentDisplayScreen.data.regionType;
-            this._map.setView(latLng([this.currentDisplayScreen.location.lat, this.currentDisplayScreen.location.lon]),
-                              this.currentDisplayScreen.location.zoom,
-                              {animate: true, duration: this.currentDisplayScreen.location.animationDuration});
             await this.data.loadGeography(this.activeRegionType);
             await this.resetStatisticsLayer(this.activeStatistic);
             this.currentDisplayNumber++;
@@ -472,21 +469,25 @@ export class PublicDisplayComponent implements OnInit {
             const curLayerGroup = layerGroup();
             this.geographyData = await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData
             this.regionTweetMap = await this.data.recentTweets(this.activeLayerGroup, this.activeRegionType);
-            if (this.currentStatisticsLayer) {
-                this.currentStatisticsLayer.clearLayers();
-                this._map.removeLayer(this.currentStatisticsLayer);
-            }
             this._geojson[layer] = new GeoJSON(this.geographyData as geojson.GeoJsonObject, {
                 style: {
                     className:   "app-map-region-geography",
-                    fillColor:   "#FFFFFF",
+                    fillColor:   "rgba(100,100,100,0.3)",
                     weight:      1,
-                    opacity:     0.1,
+                    opacity:     0,
                     color:       "#FFFFFF",
                     dashArray:   "",
-                    fillOpacity: 0,
+                    fillOpacity: 1.0,
                 }
             }).addTo(curLayerGroup);
+            if (this.currentStatisticsLayer) {
+                this._map.removeLayer(this.currentStatisticsLayer);
+                this._map.flyTo(latLng([this.currentDisplayScreen.location.lat, this.currentDisplayScreen.location.lon]),
+                                this.currentDisplayScreen.location.zoom,
+                                {animate: true, duration: this.currentDisplayScreen.location.animationDuration / 1000, easeLinearity: 0.2});
+                await sleep(this.currentDisplayScreen.location.animationDuration);
+
+            }
             this._map.addLayer(curLayerGroup);
             this.currentStatisticsLayer = curLayerGroup;
             await this.updateRegionDisplay(layer);
@@ -502,7 +503,6 @@ export class PublicDisplayComponent implements OnInit {
         if (this.currentStatisticsLayer && this.currentStatisticsLayer.getLayers()[0]) {
             const statsMap = await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this.minDate, this.maxDate);
             let layers: Layer[] = (this.currentStatisticsLayer.getLayers()[0] as GeoJSON).getLayers();
-            console.warn(layers);
             for (const geoLayer of layers) {
                 const feature: any = (geoLayer as GeoJSON).feature;
                 const featureProperties = feature.properties;
