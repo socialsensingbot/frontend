@@ -541,7 +541,7 @@ export class PublicDisplayComponent implements OnInit {
                 (geoLayer as GeoJSON).setStyle({
                                                    className:   "app-map-region-geography",
                                                    fillColor:   color,
-                                                   weight:      1,
+                                                   weight:      0.5,
                                                    opacity:     1.0,
                                                    color:       "#FFFFFF",
                                                    dashArray:   "",
