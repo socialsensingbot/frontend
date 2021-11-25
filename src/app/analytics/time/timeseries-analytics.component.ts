@@ -261,6 +261,17 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
+    public async dateRangeChanged(): Promise<void> {
+        if (this.seriesCollection.minDate === null || (this.range.controls.start.value !== null && this.range.controls.start.value.getTime() > this.seriesCollection.minDate.getTime())) {
+            this.seriesCollection.minDate = this.range.controls.start.value;
+        }
+        if (this.seriesCollection.maxDate === null || (this.range.controls.end.value !== null && this.range.controls.end.value.getTime() < this.seriesCollection.maxDate.getTime())) {
+            this.seriesCollection.maxDate = this.range.controls.end.value;
+        }
+        this.seriesCollection.changeDateRange();
+        await this.refreshAllSeries();
+    }
+
     /**
      * Called to refresh (i.e. query and redisplay) each time series (this.state.queries) in the graph.
      * For example after changing the duration the graph is segmented over.
