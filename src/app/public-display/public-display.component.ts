@@ -472,7 +472,7 @@ export class PublicDisplayComponent implements OnInit {
             this._geojson[layer] = new GeoJSON(this.geographyData as geojson.GeoJsonObject, {
                 style: {
                     className:   "app-map-region-geography",
-                    fillColor:   "rgba(100,100,100,0.3)",
+                    fillColor:   "rgba(100,100,100,0.0)",
                     weight:      1,
                     opacity:     0,
                     color:       "#FFFFFF",
@@ -525,7 +525,7 @@ export class PublicDisplayComponent implements OnInit {
                 let color;
                 const d = featureProperties[this.activeStatistic];
                 if (d === 0) {
-                    color = "rgba(100,100,100,0.3)";
+                    color = "rgba(100,100,100,0.1)";
                 } else {
                     for (let i = 0; i < colorData.values.length; i++) {
                         if (d > colorData.values[i]) {
