@@ -76,7 +76,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
             }
             this.searchControl.setValue(this._data.textSearch + this.regions);
             //TODO: Remove this hardcoding
-            this.mapData.regions(this.map.id).then(
+            this.mapData.regionsDropDown(this.map.id).then(
                 regions => {
                     this.allRegions = regions;
                     log.debug(regions);

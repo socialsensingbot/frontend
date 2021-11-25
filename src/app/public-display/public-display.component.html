@@ -1,0 +1,50 @@
+<mat-sidenav-container class="map-outer">
+    <mat-sidenav #sidenav [(opened)]="tweetsVisible" class="app-tweet-drawer" disableClose mode="side">
+        <button (click)="sidenav.toggle()" aria-label="Close" class="app-draw-close-button" mat-icon-button>
+            <mat-icon>close</mat-icon>
+        </button>
+
+        <div class="drawer-main-tabs">
+
+
+            <mat-tab-group mat-align-tabs="center">
+                <mat-tab label="Twitter">
+                    <twitter-panel [annotationTypes]="annotationTypes" [selection]="selection"
+                                   [showHeaderInfo]="twitterPanelHeader"
+                                   [showTimeline]="showTwitterTimeline" [tweets]="tweets"
+                                   class="twitter-panel"></twitter-panel>
+                </mat-tab>
+                <mat-tab label="Stats">
+                    <ng-template matTabContent>
+                        <app-map-graph-sidebar [selection]="selection"></app-map-graph-sidebar>
+                    </ng-template>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+    </mat-sidenav>
+
+
+    <mat-sidenav-content style="overflow:hidden">
+        <div [class]="appToolbarExpanded ? 'map-surround map-surround-tb-expanded' : 'map-surround'">
+            <div (leafletMapReady)="onMapReady($event)" [leafletOptions]="options"
+                 aria-label="Map"
+                 class="map"
+                 leaflet
+                 style="height:100%">
+            </div>
+        </div>
+
+        <map-legend *ngIf="ready" [activeNumber]="activeStatistic" class="legend"></map-legend>
+
+        <div class="public-display-map-date">
+            {{minDate|date:'MMM dd'}} {{minDate|date:'HH:mm'}}
+            - {{maxDate|date:'MMM dd'}} {{maxDate|date:'HH:mm'}} {{minDate|date:'zzz'}}
+        </div>
+
+        <mat-progress-bar *ngIf="activity && ready" [color]="pref.combined.toolbarColor" class="map-progress"
+                          mode="indeterminate"></mat-progress-bar>
+        <!--    <div class="map-inset-shadow"></div>-->
+    </mat-sidenav-content>
+</mat-sidenav-container>
+
+<mat-spinner *ngIf="!ready" class="map-spinner"></mat-spinner>

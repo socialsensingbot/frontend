@@ -9,7 +9,7 @@ import * as geojson from "geojson";
 import {DateRange, DateRangeSliderOptions} from "./date-range-slider/date-range-slider.component";
 import {LayerStyleService} from "./services/layer-style.service";
 import {NotificationService} from "../services/notification.service";
-import {COUNTY, Feature, NumberLayerShortName, PolygonData, PolyLayers, STATS} from "./types";
+import {COUNTY, Feature, NumberLayerShortName, PolygonData, PolyLayers} from "./types";
 import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
 import {AppState, UIExecutionService} from "../services/uiexecution.service";
@@ -489,6 +489,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     // public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
     //     // this.data.downloadAggregate(aggregrationSetId, id,
+    public countries: any[];
 
     public set activeLayerGroup(value: string) {
         log.debug("set activeLayerGroup");
@@ -526,7 +527,6 @@ export class MapComponent implements OnInit, OnDestroy {
         log.debug(this.activeRegionType);
         if (this.data.hasCountryAggregates()) {
             await this._exporter.downloadAggregate(this.activeLayerGroup, "uk-countries", this.selectedCountries,
-                                                   this.activeRegionType,
                                                    await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData, this._dateMin,
                                                    this._dateMax);
         } else {
@@ -574,13 +574,13 @@ export class MapComponent implements OnInit, OnDestroy {
             this.selectedCountriesTextValue = "Download none";
         } else {
             const countryCount = this.selectedCountries.length;
-            const countryData = this.data.aggregations["uk-countries"].aggregates;
+            const countryData = this.countries;
             if (countryData.length === countryCount) {
                 this.selectedCountriesTextValue = "Download all";
             } else {
                 if (countryCount === 1) {
                     const countryTitle = countryData.filter(
-                        i => i.id === this.selectedCountries[0])[0].title;
+                        i => i.value === this.selectedCountries[0])[0].text;
                     this.selectedCountriesTextValue = `Download ${countryTitle}`;
                 } else {
                     this.selectedCountriesTextValue = `Download ${countryCount} countries`;
@@ -614,7 +614,7 @@ export class MapComponent implements OnInit, OnDestroy {
             this.activity = true;
             await this.resetStatisticsLayer(layer, clearSelected);
             this.activity = false;
-        }, layer + ":" + clearSelected, false, true, false);
+        }, layer, false, false, true);
     }
 
     /**
@@ -685,7 +685,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
 
         // This handles a change to the active_number value
-        this.activeStatistic = typeof active_number !== "undefined" ? active_number : STATS;
+        this.activeStatistic = active_number === "count" ? "count" : "exceedance";
 
 
         // This handles a change to the active_polygon value
@@ -749,9 +749,6 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this._activeRegionType) {
             await this.data.loadGeography(this._activeRegionType);
         }
-        if (this.data.hasCountryAggregates()) {
-            this.data.aggregations["uk-countries"].aggregates.forEach(i => this.selectedCountries.push(i.id));
-        }
         const {zoom, lng, lat} = {
             ...this.data.serviceMetadata.start,
             ...this.data.mapMetadata.start,
@@ -759,7 +756,8 @@ export class MapComponent implements OnInit, OnDestroy {
             ...this._newParams
         };
         this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 4000});
-
+        this.countries = await this.data.regionsOfType(this.pref.combined.countryDownloadRegionType);
+        this.countries.forEach(i => this.selectedCountries.push(i.value));
 
         this._loggedIn = await Auth.currentAuthenticatedUser() != null;
 
@@ -856,7 +854,7 @@ export class MapComponent implements OnInit, OnDestroy {
             return;
         }
         const feature = e.target.feature;
-        const exceedanceProbability: number = Math.round(feature.properties.stats * 100) / 100;
+        const exceedanceProbability: number = Math.round(feature.properties.exceedance * 100) / 100;
         const region: string = feature.properties.title;
         const count: number = feature.properties.count;
         this.highlight(e.target, 1);
@@ -1057,7 +1055,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
 
         log.info("Resetting " + layer);
-        this.loading.showIndeterminateSpinner();
+        // this.loading.showIndeterminateSpinner();
         try {
             const geography: PolygonData = await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData;
             log.debug("resetStatisticsLayer(" + clearSelected + ")");
@@ -1067,29 +1065,31 @@ export class MapComponent implements OnInit, OnDestroy {
             if (curLayerGroup != null) {
 
                 // noinspection JSUnfilteredForInLoop
-                const regionTweetMap = await this.data.recentTweets(this.activeLayerGroup, this.activeRegionType);
-                log.debug("Region Tweet Map", regionTweetMap);
+                await this.data.recentTweets(this.activeLayerGroup, this.activeRegionType).then(async regionTweetMap => {
+                    log.debug("Region Tweet Map", regionTweetMap);
 
-                const styleFunc = (feature: geojson.Feature) => {
-                    log.verbose("styleFunc " + layer);
+                    const styleFunc = (feature: geojson.Feature) => {
+                        log.verbose("styleFunc " + layer);
 
-                    const style = this._color.colorFunctions[layer].getFeatureStyle(
-                        feature);
-                    log.verbose("Style ", style, feature.properties);
-                    if (this.liveUpdating && regionTweetMap[feature.properties.name]) {
-                        log.verbose(`Adding new tweet style for ${feature.properties.name}`);
-                        style.className = style.className + " leaflet-new-tweet";
-                    }
-                    return style;
+                        const style = this._color.colorFunctions[layer].getFeatureStyle(
+                            feature);
+                        log.verbose("Style ", style, feature.properties);
+                        if (this.liveUpdating && regionTweetMap[feature.properties.name]) {
+                            log.verbose(`Adding new tweet style for ${feature.properties.name}`);
+                            style.className = style.className + " leaflet-new-tweet";
+                        }
+                        return style;
 
-                };
+                    };
+                    await this.updateRegionData(geography);
+                    this._geojson[layer] = new GeoJSON(
+                        geography as geojson.GeoJsonObject, {
+                            style:         styleFunc,
+                            onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
+                        }).addTo(curLayerGroup);
 
-                await this.updateRegionData(geography);
-                this._geojson[layer] = new GeoJSON(
-                    geography as geojson.GeoJsonObject, {
-                        style:         styleFunc,
-                        onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
-                    }).addTo(curLayerGroup);
+                }).catch(e => log.error(e));
+
 
             } else {
                 log.debug("Null layer " + layer);
@@ -1105,7 +1105,7 @@ export class MapComponent implements OnInit, OnDestroy {
         } catch (e) {
             console.error(e);
         } finally {
-            this.loading.hideIndeterminateSpinner();
+            // this.loading.hideIndeterminateSpinner();
         }
 
     }
@@ -1120,25 +1120,25 @@ export class MapComponent implements OnInit, OnDestroy {
         return new Promise<void>(async (resolve, reject) => {
             log.debug("Loading stats");
             const features = geography.features;
-            await this.data.preCacheRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax);
+            log.debug("Before stats");
+            const statsMap = await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax);
+            log.debug("After stats");
             for (const feature of features) {
                 const featureProperties = feature.properties;
                 const region = featureProperties.name;
-                await this.data.regionStats(this.activeLayerGroup, this.activeRegionType, region, this._dateMin, this._dateMax).then(
-                    mapStats => {
-                        if (mapStats !== null) {
-                            featureProperties.count = mapStats.count;
-                            featureProperties.stats = mapStats.exceedance;
-                        } else {
-                            log.verbose("No data for " + region);
-                            featureProperties.count = 0;
-                            featureProperties.stats = 0;
-                        }
-                        if (feature === features[features.length - 1]) {
-                            resolve();
-                        }
-                    }
-                );
+                const regionStats = statsMap[region];
+                if (regionStats) {
+                    featureProperties.count = regionStats.count;
+                    featureProperties.exceedance = regionStats.exceedance;
+                } else {
+                    log.verbose("No data for " + region);
+                    featureProperties.count = 0;
+                    featureProperties.exceedance = 0;
+                }
+                if (feature === features[features.length - 1]) {
+                    resolve();
+                }
+
             }
         });
 

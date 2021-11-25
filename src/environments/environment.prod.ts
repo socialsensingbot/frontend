@@ -31,7 +31,7 @@ export const environment = {
     name:             "production",
     lamdaEnvironment: "prod",
     demo:             false,
-    version:          "2.4",
+    version: "2.5",
     // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
     timezone:             "UTC",
     locale:               "en-GB",
@@ -88,5 +88,6 @@ export const environment = {
     shareTextAutocompleteInGroup: true,
     analyticsDefaultRegions:      ["uk"],
     maxCallsPerMinute:            10000,
+    countryDownloadRegionType:    "bi_country",
 
 };

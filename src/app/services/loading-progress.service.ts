@@ -14,9 +14,14 @@ export class LoadingProgressService {
     private loadingComplete = false;
     public showSpinner = false;
     public spinnerMode: ProgressSpinnerMode = "determinate";
+    private _progressPercentage = 0;
 
     public get progressPercentage(): number {
-        return this.currentStage / this.maxStages;
+        return this._progressPercentage;
+    }
+
+    public set progressPercentage(value: number) {
+        this._progressPercentage = value;
     }
 
 
@@ -28,6 +33,7 @@ export class LoadingProgressService {
             this.currentStage = stage;
             this.showSpinner = true;
         }
+        this._progressPercentage = this.currentStage / this.maxStages;
         log.info(message);
     }
 

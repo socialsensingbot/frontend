@@ -129,7 +129,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     public async download() {
-        this._exporter.exportToCSV(this.visibleTweets.filter(i => i.valid), this.selection.all());
+        await this._exporter.exportToCSV(this.visibleTweets.filter(i => i.valid), this.selection.all());
     }
 
     private updateTweets(val: Tweet[]) {
