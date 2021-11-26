@@ -1,14 +1,4 @@
-import {
-    AfterViewInit,
-    Component,
-    ElementRef,
-    EventEmitter,
-    Input,
-    NgZone,
-    OnInit,
-    Output,
-    ViewChild
-} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, EventEmitter, Input, NgZone, OnInit, Output, ViewChild} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import * as am4core from "@amcharts/amcharts4/core";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
@@ -16,6 +6,7 @@ import * as am4charts from "@amcharts/amcharts4/charts";
 import {ColumnSeries, LineSeries, ValueAxis, XYChart} from "@amcharts/amcharts4/charts";
 import jt_theme from "../../theme/jt.theme";
 import {Logger} from "@aws-amplify/core";
+
 const log = new Logger("timeseries-multi-chart");
 
 @Component({
@@ -249,7 +240,6 @@ export class TimeSeriesMultiChartComponent implements OnInit, AfterViewInit {
     private createSeriesFromMappedData(mappedKey, mappedData: any[]) {
         if (typeof this.seriesMap[mappedKey] !== "undefined") {
             this.seriesMap[mappedKey].data = this.zeroFill(mappedData);
-            this.seriesMap[mappedKey].validateData();
             return this.seriesMap[mappedKey];
         }
         // Create series

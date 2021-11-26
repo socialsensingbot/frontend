@@ -5,13 +5,13 @@ export PATH=$PATH:$(pwd)
 cd ..
 #cd amplify && git clean -fdx && cd ..
 
-
 if [[ "${AWS_BRANCH}" == staging ]]; then
   backup.sh
   amplifyPush --simple
 elif [[ "${AWS_BRANCH}" == demo ]]; then
-  backup.sh
+  envCache --set stackInfo ""
   amplifyPush --simple
+  backup.sh
 elif [[ "${AWS_BRANCH}" == master ]]; then
   amplifyPush --simple
 elif [[ "${AWS_BRANCH}" == release* ]]; then

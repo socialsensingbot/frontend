@@ -10,7 +10,8 @@ import {NotificationService} from "src/app/services/notification.service";
 import {toLabel} from "../../graph";
 import {dayInMillis, nowRoundedToHour} from "../../../common";
 import {v4 as uuidv4} from "uuid";
-import {LayerGroup} from "../../../types";
+import {SSMapLayer} from "../../../types";
+import {MapSelectionService} from "../../../map-selection.service";
 
 const log = new Logger("timeseries-ac");
 
@@ -40,6 +41,10 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
 
     private _state: TimeseriesAnalyticsComponentState = null;
 
+    public get state(): TimeseriesAnalyticsComponentState {
+        return this._state;
+    }
+
     @Input()
     public set state(value: TimeseriesAnalyticsComponentState) {
         if (JSON.stringify(value) !== JSON.stringify(this._state)) {
@@ -58,6 +63,8 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
                                                                       this._state.dateSpacing || dayInMillis,
                                                                       this._state.lob || "line"
                 );
+                this.seriesCollection.minDate = value.from ? new Date(value.from) : null;
+                this.seriesCollection.maxDate = value.to ? new Date(value.to) : null;
             } else {
                 this.seriesCollection.clear();
             }
@@ -70,6 +77,7 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
 
     constructor(public metadata: MetadataService,
                 public notify: NotificationService,
+                public map: MapSelectionService,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
                 public exec: UIExecutionService) {
     }
@@ -131,12 +139,13 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
             const payload = {
                 layer: this.pref.defaultLayer(),
                 ...query,
-                from: nowRoundedToHour() - (365.24 * dayInMillis),
-                to:   nowRoundedToHour(),
-                name: "time"
+                from:       this._state.from ? this._state.from : (nowRoundedToHour() - (365.24 * dayInMillis)),
+                to:         this._state.to ? this._state.to : nowRoundedToHour(),
+                name:       "time",
+                timePeriod: this.state.timePeriod
             };
             delete payload.__series_id;
-            const serverResults = await this._api.callQueryAPI("query", payload);
+            const serverResults = await this._api.callMapAPIWithCache(this.map.id + "/analytics/time", payload);
             this.error = false;
             return this.queryTransform(serverResults);
         } catch (e) {
@@ -155,7 +164,7 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
         return from;
     }
 
-    private layerGroup(id: string): LayerGroup {
+    private layerGroup(id: string): SSMapLayer {
         return this.pref.combined.layers.available.filter(i => i.id === id)[0];
     }
 }

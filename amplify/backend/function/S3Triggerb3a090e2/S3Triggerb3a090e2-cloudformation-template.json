@@ -10,9 +10,6 @@
     },
     "s3Key": {
       "Type": "String"
-    },
-    "secretsPathAmplifyAppId": {
-      "Type": "String"
     }
   },
   "Conditions": {

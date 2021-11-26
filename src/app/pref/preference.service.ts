@@ -6,7 +6,7 @@ import {environment} from "../../environments/environment";
 import {DataStore, OpType} from "@aws-amplify/datastore";
 import {GroupPreferences, GroupTweetIgnore, GroupTwitterUserIgnore, UserPreferences} from "../../models";
 import Auth from "@aws-amplify/auth";
-import {LayerGroup} from "../types";
+import {SSMapLayer} from "../types";
 
 const log = new Logger("pref-service");
 
@@ -139,13 +139,13 @@ export class PreferenceService {
                     let groupPrefs: any = {};
                     if (this._groupPreferences.prefs) {
                         groupPrefs = typeof this._groupPreferences.prefs !== "undefined" ?
-                            JSON.parse(this._groupPreferences.prefs) : this._groupPreferences;
+                            this._groupPreferences.prefs : this._groupPreferences;
                     }
                     log.debug("USER PREFS", this._preferences.prefs);
                     let prefs: any = {};
                     if (this._preferences.prefs) {
                         prefs = typeof this._preferences.prefs !== "undefined" ?
-                            JSON.parse(this._preferences.prefs) : this._preferences;
+                            this._preferences.prefs : this._preferences;
                     }
                     this._combined = PreferenceService.combine(this._combined, prefs, groupPrefs);
                 } catch (e) {
@@ -446,8 +446,8 @@ export class PreferenceService {
         return this.combined.features.includes(feature);
     }
 
-    public defaultLayer(): LayerGroup {
-        const defaultLayer: LayerGroup = this.combined.layers.available.filter(i => i.id === this.combined.layers.defaultLayer)[0];
+    public defaultLayer(): SSMapLayer {
+        const defaultLayer: SSMapLayer = this.combined.layers.available.filter(i => i.id === this.combined.layers.defaultLayer)[0];
         if (!defaultLayer) {
             throw new Error(
                 "Configuration specifies " + this.combined.layers.defaultLayer + " as default layer, no such layer exists in " + JSON.stringify(

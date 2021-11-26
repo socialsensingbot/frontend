@@ -202,11 +202,11 @@ export type SavedGraph = {
 };
 
 export type UpdateSavedGraphInput = {
-  id: string;
-  type?: string | null;
-  title?: string | null;
-  state?: string | null;
-  group?: string | null;
+    id: string;
+    type?: string | null;
+    title?: string | null;
+    state?: string | null;
+    group?: string | null;
     owner?: string | null;
     createdAt?: string | null;
     _version?: number | null;
@@ -276,8 +276,8 @@ export type CreateUserSessionInput = {
     owner?: string | null;
     ttl?: number | null;
     createdAt?: string | null;
-  sessionId?: string | null;
-  _version?: number | null;
+    sessionId?: string | null;
+    _version?: number | null;
 };
 
 export type ModelUserSessionConditionInput = {
@@ -601,15 +601,15 @@ export type ModelGroupDashboardConnection = {
 };
 
 export type ModelSavedGraphFilterInput = {
-  id?: ModelIDInput | null;
-  type?: ModelStringInput | null;
-  title?: ModelStringInput | null;
-  state?: ModelStringInput | null;
-  group?: ModelStringInput | null;
-  owner?: ModelStringInput | null;
-  createdAt?: ModelStringInput | null;
-  and?: Array<ModelSavedGraphFilterInput | null> | null;
-  or?: Array<ModelSavedGraphFilterInput | null> | null;
+    id?: ModelIDInput | null;
+    type?: ModelStringInput | null;
+    title?: ModelStringInput | null;
+    state?: ModelStringInput | null;
+    group?: ModelStringInput | null;
+    owner?: ModelStringInput | null;
+    createdAt?: ModelStringInput | null;
+    and?: Array<ModelSavedGraphFilterInput | null> | null;
+    or?: Array<ModelSavedGraphFilterInput | null> | null;
     not?: ModelSavedGraphFilterInput | null;
 };
 
@@ -648,10 +648,10 @@ export type ModelUserSessionFilterInput = {
     owner?: ModelStringInput | null;
     ttl?: ModelIntInput | null;
     createdAt?: ModelStringInput | null;
-  sessionId?: ModelStringInput | null;
-  and?: Array<ModelUserSessionFilterInput | null> | null;
-  or?: Array<ModelUserSessionFilterInput | null> | null;
-  not?: ModelUserSessionFilterInput | null;
+    sessionId?: ModelStringInput | null;
+    and?: Array<ModelUserSessionFilterInput | null> | null;
+    or?: Array<ModelUserSessionFilterInput | null> | null;
+    not?: ModelUserSessionFilterInput | null;
 };
 
 export type ModelUserSessionConnection = {
@@ -872,10 +872,10 @@ export type UpdateSavedGraphMutation = {
 };
 
 export type DeleteSavedGraphMutation = {
-  __typename: "SavedGraph";
-  id: string;
-  type: string;
-  title: string;
+    __typename: "SavedGraph";
+    id: string;
+    type: string;
+    title: string;
     state: string;
     group?: string | null;
     owner?: string | null;
@@ -937,12 +937,12 @@ export type CreateUserSessionMutation = {
     group: string;
     owner?: string | null;
     ttl?: number | null;
-  createdAt?: string | null;
-  sessionId?: string | null;
-  _version: number;
-  _deleted?: boolean | null;
-  _lastChangedAt: number;
-  updatedAt: string;
+    createdAt?: string | null;
+    sessionId?: string | null;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
+    updatedAt: string;
 };
 
 export type UpdateUserSessionMutation = {
@@ -1323,12 +1323,12 @@ export type ListSavedGraphsQuery = {
 export type SyncSavedGraphsQuery = {
   __typename: "ModelSavedGraphConnection";
   items?: Array<{
-    __typename: "SavedGraph";
-    id: string;
-    type: string;
-    title: string;
-    state: string;
-    group?: string | null;
+      __typename: "SavedGraph";
+      id: string;
+      type: string;
+      title: string;
+      state: string;
+      group?: string | null;
       owner?: string | null;
       createdAt?: string | null;
       _version: number;
@@ -1401,12 +1401,12 @@ export type GetUserSessionQuery = {
     group: string;
     owner?: string | null;
     ttl?: number | null;
-  createdAt?: string | null;
-  sessionId?: string | null;
-  _version: number;
-  _deleted?: boolean | null;
-  _lastChangedAt: number;
-  updatedAt: string;
+    createdAt?: string | null;
+    sessionId?: string | null;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
+    updatedAt: string;
 };
 
 export type ListUserSessionsQuery = {
@@ -1800,10 +1800,10 @@ export type OnUpdateSavedGraphSubscription = {
 };
 
 export type OnDeleteSavedGraphSubscription = {
-  __typename: "SavedGraph";
-  id: string;
-  type: string;
-  title: string;
+    __typename: "SavedGraph";
+    id: string;
+    type: string;
+    title: string;
     state: string;
     group?: string | null;
     owner?: string | null;
@@ -1865,12 +1865,12 @@ export type OnCreateUserSessionSubscription = {
     group: string;
     owner?: string | null;
     ttl?: number | null;
-  createdAt?: string | null;
-  sessionId?: string | null;
-  _version: number;
-  _deleted?: boolean | null;
-  _lastChangedAt: number;
-  updatedAt: string;
+    createdAt?: string | null;
+    sessionId?: string | null;
+    _version: number;
+    _deleted?: boolean | null;
+    _lastChangedAt: number;
+    updatedAt: string;
 };
 
 export type OnUpdateUserSessionSubscription = {
@@ -2383,37 +2383,6 @@ export class APIService {
         }
       }`;
     const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <UpdateSavedGraphMutation>response.data.updateSavedGraph;
-  }
-  async DeleteSavedGraph(
-    input: DeleteSavedGraphInput,
-    condition?: ModelSavedGraphConditionInput
-  ): Promise<DeleteSavedGraphMutation> {
-    const statement = `mutation DeleteSavedGraph($input: DeleteSavedGraphInput!, $condition: ModelSavedGraphConditionInput) {
-        deleteSavedGraph(input: $input, condition: $condition) {
-          __typename
-          id
-          type
-          title
-          state
-          group
-          owner
-          createdAt
-          _version
-          _deleted
-          _lastChangedAt
-          updatedAt
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {
         input
     };
       if (condition) {
@@ -2422,7 +2391,7 @@ export class APIService {
       const response = (await API.graphql(
           graphqlOperation(statement, gqlAPIServiceArguments)
       )) as any;
-      return <DeleteSavedGraphMutation>response.data.deleteSavedGraph;
+      return <UpdateSavedGraphMutation>response.data.updateSavedGraph;
   }
 
     OnCreateTextAutocompleteListener: Observable<SubscriptionResponse<OnCreateTextAutocompleteSubscription>> = API.graphql(
@@ -2482,13 +2451,10 @@ export class APIService {
       }`
         )
     ) as Observable<SubscriptionResponse<OnDeleteTextAutocompleteSubscription>>;
-
-    async CreateUserSession(
-        input: CreateUserSessionInput,
-        condition?: ModelUserSessionConditionInput
-    ): Promise<CreateUserSessionMutation> {
-        const statement = `mutation CreateUserSession($input: CreateUserSessionInput!, $condition: ModelUserSessionConditionInput) {
-        createUserSession(input: $input, condition: $condition) {
+    OnCreateUserSessionListener: Observable<SubscriptionResponse<OnCreateUserSessionSubscription>> = API.graphql(
+        graphqlOperation(
+            `subscription OnCreateUserSession {
+        onCreateUserSession {
           __typename
           id
           fingerprint
@@ -2504,18 +2470,41 @@ export class APIService {
           _lastChangedAt
           updatedAt
         }
+      }`
+        )
+    ) as Observable<SubscriptionResponse<OnCreateUserSessionSubscription>>;
+
+    async DeleteSavedGraph(
+        input: DeleteSavedGraphInput,
+        condition?: ModelSavedGraphConditionInput
+    ): Promise<DeleteSavedGraphMutation> {
+        const statement = `mutation DeleteSavedGraph($input: DeleteSavedGraphInput!, $condition: ModelSavedGraphConditionInput) {
+        deleteSavedGraph(input: $input, condition: $condition) {
+          __typename
+          id
+          type
+          title
+          state
+          group
+          owner
+          createdAt
+          _version
+          _deleted
+          _lastChangedAt
+          updatedAt
+        }
       }`;
-    const gqlAPIServiceArguments: any = {
-      input
-    };
-    if (condition) {
-      gqlAPIServiceArguments.condition = condition;
+        const gqlAPIServiceArguments: any = {
+            input
+        };
+        if (condition) {
+            gqlAPIServiceArguments.condition = condition;
+        }
+        const response = (await API.graphql(
+            graphqlOperation(statement, gqlAPIServiceArguments)
+        )) as any;
+        return <DeleteSavedGraphMutation>response.data.deleteSavedGraph;
     }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <CreateUserSessionMutation>response.data.createUserSession;
-  }
   async UpdateUserSession(
     input: UpdateUserSessionInput,
     condition?: ModelUserSessionConditionInput
@@ -3318,58 +3307,13 @@ export class APIService {
     if (limit) {
       gqlAPIServiceArguments.limit = limit;
     }
-    if (nextToken) {
-      gqlAPIServiceArguments.nextToken = nextToken;
-    }
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <ListSavedGraphsQuery>response.data.listSavedGraphs;
-  }
-  async SyncSavedGraphs(
-    filter?: ModelSavedGraphFilterInput,
-    limit?: number,
-    nextToken?: string,
-    lastSync?: number
-  ): Promise<SyncSavedGraphsQuery> {
-    const statement = `query SyncSavedGraphs($filter: ModelSavedGraphFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
-        syncSavedGraphs(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
-          __typename
-          items {
-            __typename
-            id
-            type
-            title
-            state
-            group
-            owner
-            createdAt
-            _version
-            _deleted
-            _lastChangedAt
-            updatedAt
-          }
-          nextToken
-          startedAt
-        }
-      }`;
-    const gqlAPIServiceArguments: any = {};
-    if (filter) {
-      gqlAPIServiceArguments.filter = filter;
-    }
-    if (limit) {
-      gqlAPIServiceArguments.limit = limit;
-    }
-    if (nextToken) {
-        gqlAPIServiceArguments.nextToken = nextToken;
-    }
-      if (lastSync) {
-          gqlAPIServiceArguments.lastSync = lastSync;
+      if (nextToken) {
+          gqlAPIServiceArguments.nextToken = nextToken;
       }
       const response = (await API.graphql(
           graphqlOperation(statement, gqlAPIServiceArguments)
       )) as any;
-      return <SyncSavedGraphsQuery>response.data.syncSavedGraphs;
+      return <ListSavedGraphsQuery>response.data.listSavedGraphs;
   }
 
     async CreateTextAutocomplete(
@@ -3465,9 +3409,12 @@ export class APIService {
         return <DeleteTextAutocompleteMutation>response.data.deleteTextAutocomplete;
     }
 
-    async GetUserSession(id: string): Promise<GetUserSessionQuery> {
-        const statement = `query GetUserSession($id: ID!) {
-        getUserSession(id: $id) {
+    async CreateUserSession(
+        input: CreateUserSessionInput,
+        condition?: ModelUserSessionConditionInput
+    ): Promise<CreateUserSessionMutation> {
+        const statement = `mutation CreateUserSession($input: CreateUserSessionInput!, $condition: ModelUserSessionConditionInput) {
+        createUserSession(input: $input, condition: $condition) {
           __typename
           id
           fingerprint
@@ -3484,20 +3431,70 @@ export class APIService {
           updatedAt
         }
       }`;
-    const gqlAPIServiceArguments: any = {
-      id
-    };
-    const response = (await API.graphql(
-      graphqlOperation(statement, gqlAPIServiceArguments)
-    )) as any;
-    return <GetUserSessionQuery>response.data.getUserSession;
-  }
-  async ListUserSessions(
-    filter?: ModelUserSessionFilterInput,
-    limit?: number,
-    nextToken?: string
-  ): Promise<ListUserSessionsQuery> {
-    const statement = `query ListUserSessions($filter: ModelUserSessionFilterInput, $limit: Int, $nextToken: String) {
+        const gqlAPIServiceArguments: any = {
+            input
+        };
+        if (condition) {
+            gqlAPIServiceArguments.condition = condition;
+        }
+        const response = (await API.graphql(
+            graphqlOperation(statement, gqlAPIServiceArguments)
+        )) as any;
+        return <CreateUserSessionMutation>response.data.createUserSession;
+    }
+
+    async SyncSavedGraphs(
+        filter?: ModelSavedGraphFilterInput,
+        limit?: number,
+        nextToken?: string,
+        lastSync?: number
+    ): Promise<SyncSavedGraphsQuery> {
+        const statement = `query SyncSavedGraphs($filter: ModelSavedGraphFilterInput, $limit: Int, $nextToken: String, $lastSync: AWSTimestamp) {
+        syncSavedGraphs(filter: $filter, limit: $limit, nextToken: $nextToken, lastSync: $lastSync) {
+          __typename
+          items {
+            __typename
+            id
+            type
+            title
+            state
+            group
+            owner
+            createdAt
+            _version
+            _deleted
+            _lastChangedAt
+            updatedAt
+          }
+          nextToken
+          startedAt
+        }
+      }`;
+        const gqlAPIServiceArguments: any = {};
+        if (filter) {
+            gqlAPIServiceArguments.filter = filter;
+        }
+        if (limit) {
+            gqlAPIServiceArguments.limit = limit;
+        }
+        if (nextToken) {
+            gqlAPIServiceArguments.nextToken = nextToken;
+        }
+        if (lastSync) {
+            gqlAPIServiceArguments.lastSync = lastSync;
+        }
+        const response = (await API.graphql(
+            graphqlOperation(statement, gqlAPIServiceArguments)
+        )) as any;
+        return <SyncSavedGraphsQuery>response.data.syncSavedGraphs;
+    }
+
+    async ListUserSessions(
+        filter?: ModelUserSessionFilterInput,
+        limit?: number,
+        nextToken?: string
+    ): Promise<ListUserSessionsQuery> {
+        const statement = `query ListUserSessions($filter: ModelUserSessionFilterInput, $limit: Int, $nextToken: String) {
         listUserSessions(filter: $filter, limit: $limit, nextToken: $nextToken) {
           __typename
           items {
@@ -4390,10 +4387,9 @@ export class APIService {
         return <SyncTextAutocompletesQuery>response.data.syncTextAutocompletes;
     }
 
-    OnCreateUserSessionListener: Observable<SubscriptionResponse<OnCreateUserSessionSubscription>> = API.graphql(
-        graphqlOperation(
-            `subscription OnCreateUserSession {
-        onCreateUserSession {
+    async GetUserSession(id: string): Promise<GetUserSessionQuery> {
+        const statement = `query GetUserSession($id: ID!) {
+        getUserSession(id: $id) {
           __typename
           id
           fingerprint
@@ -4409,9 +4405,15 @@ export class APIService {
           _lastChangedAt
           updatedAt
         }
-      }`
-    )
-  ) as Observable<SubscriptionResponse<OnCreateUserSessionSubscription>>;
+      }`;
+        const gqlAPIServiceArguments: any = {
+            id
+        };
+        const response = (await API.graphql(
+            graphqlOperation(statement, gqlAPIServiceArguments)
+        )) as any;
+        return <GetUserSessionQuery>response.data.getUserSession;
+    }
 
   OnUpdateUserSessionListener: Observable<
     SubscriptionResponse<OnUpdateUserSessionSubscription>
