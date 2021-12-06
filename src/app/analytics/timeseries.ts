@@ -52,11 +52,16 @@ export class TimeseriesCollectionModel {
     public seriesRemoved: EventEmitter<string> = new EventEmitter<string>();
     public seriesUpdated: EventEmitter<TimeseriesModel> = new EventEmitter<TimeseriesModel>();
     public yAxisChanged: EventEmitter<void> = new EventEmitter<void>();
+    public xAxisChanged: EventEmitter<void> = new EventEmitter<void>();
     public graphTypeChanged: EventEmitter<GraphType> = new EventEmitter<GraphType>();
     public cleared: EventEmitter<void> = new EventEmitter<void>();
     private map: Map<string, TimeseriesModel> = new Map<string, TimeseriesModel>();
     private _minDate: Date = null;
     private _maxDate: Date = null;
+    public minScrollbarDate: Date = null;
+    public maxScrollbarDate: Date = null;
+    public rangeChanged: EventEmitter<void> = new EventEmitter<void>();
+
 
     public get minDate(): Date {
         return this._minDate;
@@ -139,7 +144,7 @@ export class TimeseriesCollectionModel {
             for (let timestamp = this.roundDate(
                 this._minDate.getTime()); timestamp <= this._maxDate.getTime(); timestamp += this._dateSpacing) {
                 const fillRow = {};
-                fillRow[this.xField] = new Date(new Date(timestamp));
+                fillRow[this.xField] = new Date(timestamp);
                 fillRow[this.yField] = 0;
                 result.set(timestamp, fillRow);
             }
@@ -166,7 +171,7 @@ export class TimeseriesCollectionModel {
 
     public foreachSeries(fn: (label, data, id?) => void) {
         this.map.forEach(value => {
-            fn(value.label, value.data, value.id);
+            fn(value.label, this.clip(value.data), value.id);
         });
     }
 
@@ -214,6 +219,23 @@ export class TimeseriesCollectionModel {
         }
         const result = new TimeseriesModel(series.label, data, series.id);
         this.map.set(series.id, result);
+        return result;
+    }
+
+    public changeDateRange(): void {
+
+        this.xAxisChanged.emit();
+    }
+
+    private clip(data: any[]): any {
+        log.verbose("Min date", this._minDate);
+        log.verbose("Max date", this._maxDate);
+        const result = data.filter(i =>
+                                       i[this.xField].getTime() >= this._minDate.getTime() &&
+                                       i[this.xField].getTime() <= this._maxDate.getTime()
+        );
+        log.verbose("Before ", data);
+        log.verbose("After ", result);
         return result;
     }
 }

@@ -40,6 +40,7 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
     private valueAxis: ValueAxis;
     private _dateSpacing: number;
     private dateAxis: DateAxis;
+    private disableRangeEvents: boolean = false;
 
     constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
 
@@ -131,6 +132,16 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
             } catch (e) {log.error(e); }
         });
 
+        this._seriesCollection.xAxisChanged.subscribe(() => {
+            try {
+                this.initChart();
+                this.dateAxis.title.text = this._seriesCollection.xLabel;
+                this._seriesCollection.foreachSeries((label, data, id) => {
+                    this.createSeriesFromData(label, data, id);
+                });
+            } catch (e) {log.error(e); }
+        });
+
 
         this._seriesCollection.graphTypeChanged.subscribe(() => {
             try {
@@ -142,6 +153,38 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
             } catch (e) {log.error(e); }
         });
 
+
+        this._seriesCollection.rangeChanged.subscribe(() => {
+            try {
+                this.disableRangeEvents = true;
+                const minDate: Date = this._seriesCollection.minScrollbarDate;
+                const maxDate: Date = this._seriesCollection.maxScrollbarDate;
+                let zoom = true;
+                setTimeout(() => {
+                    this.disableRangeEvents = false;
+                    if (zoom) {
+                        this.dateAxis.zoomToDates(
+                            minDate ? minDate : this._seriesCollection.minDate,
+                            maxDate ? maxDate : this._seriesCollection.maxDate, true, false);
+                    }
+                }, 300);
+
+                if (minDate.getTime() <= this._seriesCollection.minDate.getTime()) {
+                    this.dateAxis.start = 0;
+                    zoom = false;
+                }
+                if (maxDate.getTime() >= this._seriesCollection.maxDate.getTime()) {
+                    this.dateAxis.end = 1;
+                    zoom = false;
+                }
+                this.dateAxis.adjustMinMax(
+                    this._seriesCollection.minDate.getTime(),
+                    this._seriesCollection.maxDate.getTime()
+                );
+
+
+            } catch (e) {log.error(e); }
+        });
         this._seriesCollection.cleared.subscribe(() => {
             try {
                 this.initChart();
@@ -184,12 +227,29 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
         this.chart.legend.maxHeight = 120;
         this.chart.legend.scrollable = true;
 
+
         // Create axes
         this.dateAxis = this.chart.xAxes.push(new am4charts.DateAxis());
         this.dateAxis.renderer.minGridDistance = 50;
         this.dateAxis.title.text = "Date";
         // dateAxis.title.fontWeight = "bold";
         this.dateAxis.title.opacity = 0.5;
+
+        const dateAxisChangedStart = (ev) => {
+            if (!this.disableRangeEvents) {
+                console.log(ev.target);
+                console.log(new Date(this.dateAxis.maxZoomed));
+                console.log("New range: " + new Date(ev.target.minZoomed) + " -- " + new Date(ev.target.maxZoomed));
+                this._seriesCollection.minScrollbarDate = new Date(ev.target.minZoomed);
+                this._seriesCollection.maxScrollbarDate = new Date(ev.target.maxZoomed);
+            } else {
+                console.log("Skipping range event : " + new Date(ev.target.minZoomed) + " -- " + new Date(ev.target.maxZoomed));
+            }
+        };
+
+
+        this.dateAxis.events.on("datarangechanged", dateAxisChangedStart);
+
 
         this.valueAxis = this.chart.yAxes.push(new am4charts.ValueAxis());
         this.valueAxis.title.text = this._seriesCollection.yLabel;
@@ -211,6 +271,16 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
         this.chart.cursor.xAxis = this.dateAxis;
         if (this.scrollBar) {
             this.chart.scrollbarX = new am4charts.XYChartScrollbar();
+
+            // const rangeChanged = (ev) => {
+            //     console.log("New range: ",ev);
+            //     // console.log("New range: " + new Date(ev.target.minZoomed) + " -- " + new Date(ev.target.maxZoomed));
+            //     // this._seriesCollection.maxScrollbarDate = new Date(ev.target.maxZoomed || this._seriesCollection.maxDate);
+            //     // this._seriesCollection.minScrollbarDate = new Date(ev.target.minZoomed || this._seriesCollection.minDate);
+            // };
+            //
+            // this.chart.scrollbarX.events.on("rangechanged", rangeChanged);
+
         }
         this.chart.responsive.enabled = true;
 

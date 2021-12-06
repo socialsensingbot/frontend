@@ -28,6 +28,7 @@ import {TextAutoCompleteService} from "../../services/text-autocomplete.service"
 import {SSMapLayer} from "../../types";
 import {FormControl, FormGroup} from "@angular/forms";
 import {MapSelectionService} from "../../map-selection.service";
+import {ONE_DAY} from "../../map/data/map-data";
 
 const log = new Logger("timeseries-ac");
 
@@ -258,6 +259,17 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             log.debug("Clear finished");
         }
 
+    }
+
+    public async dateRangeChanged(): Promise<void> {
+        if (this.seriesCollection.minDate === null || (this.range.controls.start.value !== null && this.range.controls.start.value.getTime() > this.seriesCollection.minDate.getTime())) {
+            this.seriesCollection.minDate = this.range.controls.start.value;
+        }
+        if (this.seriesCollection.maxDate === null || (this.range.controls.end.value !== null && this.range.controls.end.value.getTime() < this.seriesCollection.maxDate.getTime())) {
+            this.seriesCollection.maxDate = this.range.controls.end.value;
+        }
+        this.seriesCollection.changeDateRange();
+        await this.refreshAllSeries();
     }
 
     /**
@@ -548,6 +560,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     }
 
     public async timePeriodChanged(timePeriod: TimePeriod) {
+        const switchedToHours = timePeriod === "hour";
+
+        log.debug("Time period was " + timePeriod);
         log.debug("Time period is now " + timePeriod);
         this.state.timePeriod = timePeriod;
         const today = this.now;
@@ -555,15 +570,23 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         const month = today.getMonth();
         const year = today.getFullYear();
         let minDate: Date;
-        if (timePeriod === "day") {
-            minDate = new Date(year - 1, month, day);
+        let maxDate: Date;
+        if (switchedToHours) {
+            minDate = this.seriesCollection.minScrollbarDate ? this.seriesCollection.minScrollbarDate : new Date(Date.now() - ONE_DAY);
+            maxDate = this.seriesCollection.maxScrollbarDate ? this.seriesCollection.maxScrollbarDate : new Date();
+            log.debug("Min date is now " + minDate)
+            log.debug("Max date is now " + maxDate)
         } else {
-            minDate = new Date(this.now.getTime() - dayInMillis);
+            minDate = new Date(year - 1, month, day);
+            maxDate = new Date();
         }
         this.range.controls.start.setValue(minDate);
+        this.range.controls.end.setValue(maxDate);
         this.seriesCollection.dateSpacing = timePeriod === "day" ? dayInMillis : hourInMillis;
         this.seriesCollection.minDate = minDate;
-        this.seriesCollection.maxDate = this.range.controls.end.value;
+        this.seriesCollection.maxDate = maxDate;
+        this.seriesCollection.rangeChanged.emit();
+
         await this.refreshAllSeries();
 
     }
