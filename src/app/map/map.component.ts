@@ -1081,12 +1081,8 @@ export class MapComponent implements OnInit, OnDestroy {
                         return style;
 
                     };
-                    await this.updateRegionData(geography);
-                    this._geojson[layer] = new GeoJSON(
-                        geography as geojson.GeoJsonObject, {
-                            style:         styleFunc,
-                            onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
-                        }).addTo(curLayerGroup);
+                    await this.updateRegionData(geography, styleFunc, layer, curLayerGroup);
+
 
                 }).catch(e => log.error(e));
 
@@ -1113,7 +1109,8 @@ export class MapComponent implements OnInit, OnDestroy {
     /**
      * Updates the data stored in the polygon data of the leaflet layers.
      */
-    private async updateRegionData(geography: PolygonData) {
+    private async updateRegionData(geography: PolygonData,
+                                   styleFunc: any, layer: string, curLayerGroup: LayerGroup) {
         if (this.destroyed) {
             return;
         }
@@ -1121,25 +1118,41 @@ export class MapComponent implements OnInit, OnDestroy {
             log.debug("Loading stats");
             const features = geography.features;
             log.debug("Before stats");
-            const statsMap = await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax);
-            log.debug("After stats");
-            for (const feature of features) {
-                const featureProperties = feature.properties;
-                const region = featureProperties.name;
-                const regionStats = statsMap[region];
-                if (regionStats) {
-                    featureProperties.count = regionStats.count;
-                    featureProperties.exceedance = regionStats.exceedance;
-                } else {
-                    log.verbose("No data for " + region);
-                    featureProperties.count = 0;
-                    featureProperties.exceedance = 0;
-                }
-                if (feature === features[features.length - 1]) {
-                    resolve();
-                }
+            let newLayer = null;
+            const processStats = (statsMap): void => {
+                log.debug("After stats");
+                for (const feature of features) {
+                    const featureProperties = feature.properties;
+                    const region = featureProperties.name;
+                    const regionStats = statsMap[region];
+                    if (regionStats) {
+                        featureProperties.count = regionStats.count;
+                        featureProperties.exceedance = regionStats.exceedance;
+                    } else {
+                        log.verbose("No data for " + region);
+                        featureProperties.count = 0;
+                        featureProperties.exceedance = 0;
+                    }
+                    if (feature === features[features.length - 1]) {
+                        resolve();
+                    }
 
-            }
+                }
+                if (newLayer !== null) {
+                    curLayerGroup.removeLayer(newLayer);
+                }
+                newLayer = new GeoJSON(
+                    geography as geojson.GeoJsonObject, {
+                        style:         styleFunc,
+                        onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
+                    });
+                this._geojson[layer] = newLayer.addTo(curLayerGroup);
+            };
+            this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
+                i => processStats(i));
+            this.data.getAccurateRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
+                i => processStats(i));
+
         });
 
     }

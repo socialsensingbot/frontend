@@ -307,6 +307,20 @@ export class RESTMapDataService {
         return statsMap;
     }
 
+    public async getAccurateRegionStatsMap(layerGroupId: string, regionType: string, startDate: number,
+                                           endDate: number): Promise<RegionStatsMap> {
+        const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
+        const statsMap = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/complex-stats", {
+            hazards:   layerGroup.hazards,
+            sources:   layerGroup.sources,
+            warnings:  layerGroup.warnings,
+            startDate: roundToHour(startDate),
+            endDate:   roundToFiveMinutes(endDate)
+
+        }, 5 * 60) as RegionStatsMap;
+        return statsMap;
+    }
+
     public async regionsOfType(regionType: string): Promise<any[]> {
         const allRegions = await this.allRegions();
         return allRegions.filter(i => i.type === regionType);
