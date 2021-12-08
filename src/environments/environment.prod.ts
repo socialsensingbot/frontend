@@ -31,7 +31,7 @@ export const environment = {
     name:             "production",
     lamdaEnvironment: "prod",
     demo:             false,
-    version: "2.4.1",
+    version: "2.5",
     // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
     timezone:             "UTC",
     locale:               "en-GB",

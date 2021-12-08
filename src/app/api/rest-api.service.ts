@@ -141,6 +141,7 @@ export class RESTDataAPIService {
 
             });
         }
+        let cacheInMillis: number = cacheForSeconds * 1000 * (1 + Math.random() / 10);
         return response.then(data => {
             if (typeof data !== "undefined") {
                 // tslint:disable-next-line:no-console
@@ -148,7 +149,7 @@ export class RESTDataAPIService {
                     console.debug("Returning uncached item", data);
                 }
                 if (cacheForSeconds > 0) {
-                    this.cache.setCached(key, data, cacheForSeconds * 1000);
+                    this.cache.setCached(key, data, cacheInMillis);
                 }
             } else {
                 if (!environment.production) {
@@ -175,7 +176,7 @@ export class RESTDataAPIService {
                             console.debug("Returning uncached item", data);
                         }
                         if (cacheForSeconds > 0) {
-                            this.cache.setCached(key, data, cacheForSeconds * 1000);
+                            this.cache.setCached(key, data, cacheInMillis);
                         }
                         resolve(data);
                     }))

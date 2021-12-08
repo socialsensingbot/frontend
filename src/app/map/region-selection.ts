@@ -19,7 +19,7 @@ export class Region {
         // tslint:disable-next-line:no-string-literal
         this.title = feature.properties["title"];
         this.geometry = feature.geometry;
-        this.exceedanceProbability = Math.round(feature.properties.stats * 100) / 100;
+        this.exceedanceProbability = Math.round(feature.properties.exceedance * 100) / 100;
         this.tweetCount = feature.properties.count;
     }
 

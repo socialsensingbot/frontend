@@ -150,5 +150,6 @@ export const environment = {
     tweetCSVExportFormat:         "default",
     showAnalyticsSideMenu:        false,
     countryDownloadRegionType:    "bi_country",
+    defaultPublicDisplayScript:   "combi_example",
 
 };

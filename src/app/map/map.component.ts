@@ -9,7 +9,7 @@ import * as geojson from "geojson";
 import {DateRange, DateRangeSliderOptions} from "./date-range-slider/date-range-slider.component";
 import {LayerStyleService} from "./services/layer-style.service";
 import {NotificationService} from "../services/notification.service";
-import {COUNTY, Feature, NumberLayerShortName, PolygonData, PolyLayers, STATS} from "./types";
+import {COUNTY, Feature, NumberLayerShortName, PolygonData, PolyLayers} from "./types";
 import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
 import {AppState, UIExecutionService} from "../services/uiexecution.service";
@@ -528,7 +528,7 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this.data.hasCountryAggregates()) {
             await this._exporter.downloadAggregate(this.activeLayerGroup, "uk-countries", this.selectedCountries,
                                                    await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData, this._dateMin,
-                                                   this._dateMax);
+                                                   this._dateMax, this.activeRegionType);
         } else {
             await this._exporter.download(this.activeLayerGroup, await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData,
                                           this.activeRegionType,
@@ -685,7 +685,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
 
         // This handles a change to the active_number value
-        this.activeStatistic = typeof active_number !== "undefined" ? active_number : STATS;
+        this.activeStatistic = active_number === "count" ? "count" : "exceedance";
 
 
         // This handles a change to the active_polygon value
@@ -854,7 +854,7 @@ export class MapComponent implements OnInit, OnDestroy {
             return;
         }
         const feature = e.target.feature;
-        const exceedanceProbability: number = Math.round(feature.properties.stats * 100) / 100;
+        const exceedanceProbability: number = Math.round(feature.properties.exceedance * 100) / 100;
         const region: string = feature.properties.title;
         const count: number = feature.properties.count;
         this.highlight(e.target, 1);
@@ -1081,12 +1081,8 @@ export class MapComponent implements OnInit, OnDestroy {
                         return style;
 
                     };
-                    await this.updateRegionData(geography);
-                    this._geojson[layer] = new GeoJSON(
-                        geography as geojson.GeoJsonObject, {
-                            style:         styleFunc,
-                            onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
-                        }).addTo(curLayerGroup);
+                    await this.updateRegionData(geography, styleFunc, layer, curLayerGroup);
+
 
                 }).catch(e => log.error(e));
 
@@ -1113,7 +1109,8 @@ export class MapComponent implements OnInit, OnDestroy {
     /**
      * Updates the data stored in the polygon data of the leaflet layers.
      */
-    private async updateRegionData(geography: PolygonData) {
+    private async updateRegionData(geography: PolygonData,
+                                   styleFunc: any, layer: string, curLayerGroup: LayerGroup) {
         if (this.destroyed) {
             return;
         }
@@ -1121,25 +1118,41 @@ export class MapComponent implements OnInit, OnDestroy {
             log.debug("Loading stats");
             const features = geography.features;
             log.debug("Before stats");
-            const statsMap = await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax);
-            log.debug("After stats");
-            for (const feature of features) {
-                const featureProperties = feature.properties;
-                const region = featureProperties.name;
-                const regionStats = statsMap[region];
-                if (regionStats) {
-                    featureProperties.count = regionStats.count;
-                    featureProperties.stats = regionStats.exceedance;
-                } else {
-                    log.verbose("No data for " + region);
-                    featureProperties.count = 0;
-                    featureProperties.stats = 0;
-                }
-                if (feature === features[features.length - 1]) {
-                    resolve();
-                }
+            let newLayer = null;
+            const processStats = (statsMap): void => {
+                log.debug("After stats");
+                for (const feature of features) {
+                    const featureProperties = feature.properties;
+                    const region = featureProperties.name;
+                    const regionStats = statsMap[region];
+                    if (regionStats) {
+                        featureProperties.count = regionStats.count;
+                        featureProperties.exceedance = regionStats.exceedance;
+                    } else {
+                        log.verbose("No data for " + region);
+                        featureProperties.count = 0;
+                        featureProperties.exceedance = 0;
+                    }
+                    if (feature === features[features.length - 1]) {
+                        resolve();
+                    }
 
-            }
+                }
+                if (newLayer !== null) {
+                    curLayerGroup.removeLayer(newLayer);
+                }
+                newLayer = new GeoJSON(
+                    geography as geojson.GeoJsonObject, {
+                        style:         styleFunc,
+                        onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
+                    });
+                this._geojson[layer] = newLayer.addTo(curLayerGroup);
+            };
+            this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
+                i => processStats(i));
+            this.data.getAccurateRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
+                i => processStats(i));
+
         });
 
     }
