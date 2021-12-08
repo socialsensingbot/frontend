@@ -186,6 +186,29 @@ export class RESTMapDataService {
         return result;
     }
 
+    public async csvTweets(layerGroupId: string, regionType: string, regions: string[], startDate,
+                           endDate, byRegion: string): Promise<Tweet[]> {
+        const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
+        log.debug("requesting tweets for regions " + regions);
+        const rawResult = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/csv-export", {
+            hazards:   layerGroup.hazards,
+            sources:   layerGroup.sources,
+            warnings:  layerGroup.warnings,
+            regions,
+            byRegion,
+            startDate: roundToHour(startDate),
+            endDate:   roundToMinute(endDate)
+
+        }, 0);
+        log.debug(rawResult.length + " tweets back from server");
+        const result: Tweet[] = [];
+        for (const tweet of rawResult) {
+            result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
+                                  tweet.possibly_sensitive));
+        }
+        return result;
+    }
+
     public async now(): Promise<number> {
         return await this._api.callMapAPIWithCache(this.map.id + "/now", {}, 60, false) as Promise<number>;
     }

@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {readableTimestamp, toTitleCase} from "../../common";
+import {boundingBoxForGeoJSON, readableTimestamp, toTitleCase} from "../../common";
 import {ExportToCsv} from "export-to-csv";
 import {CSVExportTweet, Tweet} from "./tweet";
 import {AnnotationService} from "../../pref/annotation.service";
@@ -42,7 +42,7 @@ export class TwitterExporterService {
         const regions = await this._mapdata.places(regionType);
         const exportedTweets: CSVExportTweet[] = [];
         const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(layerGroupId, regionType, Array.from(regions), startDate,
-                                                                                 endDate);
+                                                                                 endDate, regionType);
         for (const i of tweetData) {
             exportedTweets.push(await i);
         }
@@ -63,7 +63,7 @@ export class TwitterExporterService {
     }
 
     public async downloadAggregate(layerGroupId: string, aggregrationSetId: string, selectedAggregates: string[],
-                                   polygonDatum: PolygonData, startDate: number, endDate: number) {
+                                   polygonDatum: PolygonData, startDate: number, endDate: number, byRegion: string) {
         log.debug(
             "downloadAggregate(aggregrationSetId=" + aggregrationSetId +
             ", selectedAggregates=" + selectedAggregates +
@@ -91,7 +91,7 @@ export class TwitterExporterService {
         const exportedTweets: CSVExportTweet[] = [];
         const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(layerGroupId,
                                                                                  this._pref.combined.countryDownloadRegionType, regions,
-                                                                                 startDate, endDate);
+                                                                                 startDate, endDate, byRegion);
         for (const i of tweetData) {
             exportedTweets.push(await i);
         }
@@ -113,35 +113,21 @@ export class TwitterExporterService {
     }
 
     public async loadDownloadData(layerGroupId: string, regionType: string, regions: string[], startDate: number,
-                                  endDate: number): Promise<Promise<CSVExportTweet>[]> {
-        return (await this._mapdata.tweets(layerGroupId, regionType, regions, startDate, endDate)).filter(
+                                  endDate: number, byRegion: string): Promise<Promise<CSVExportTweet>[]> {
+        return (await this._mapdata.csvTweets(layerGroupId, regionType, regions, startDate, endDate, byRegion)).filter(
             i => i.valid && !this._pref.isBlacklisted(i)).map(
             async (i: Tweet) => {
 
                 let region = "";
                 if (i.region.match(/\d+/)) {
-                    let minX = null;
-                    let maxX = null;
-                    let minY = null;
-                    let maxY = null;
-                    const polygon: geojson.Polygon = this._mapdata.regionGeography[region] as geojson.Polygon;
-                    for (const point of polygon.coordinates) {
-                        if (minX === null || point[0] < minX) {
-                            minX = point[0];
-                        }
-                        if (minY === null || point[1] < minY) {
-                            minY = point[1];
-                        }
-                        if (maxX === null || point[0] > maxX) {
-                            maxX = point[0];
-                        }
-                        if (maxY === null || point[1] > maxY) {
-                            maxY = point[1];
-                        }
-                    }
+                    const polygon: geojson.Polygon = this._mapdata.regionGeography[i.region] as geojson.Polygon;
+                    log.debug(this._mapdata.regionGeography);
+                    log.debug(i.region);
+                    log.debug(polygon.coordinates);
+                    let boxForGeoJSON: any = boundingBoxForGeoJSON(polygon);
                     log.verbose(
-                        `Bounding box of ${JSON.stringify(polygon)} is (${minX},${minY}) to (${maxX},${maxY})`);
-                    region = `(${minX},${minY}),(${maxX},${maxY})`;
+                        `Bounding box of ${JSON.stringify(polygon)} is ${boxForGeoJSON}`);
+                    region = `(${boxForGeoJSON[0]},${boxForGeoJSON[1]}),(${boxForGeoJSON[2]},${boxForGeoJSON[3]})`;
                 } else {
                     region = toTitleCase(i.region);
                 }
@@ -265,28 +251,11 @@ export class TwitterExporterService {
             let regionName = `${r.title}`;
 
             if (r.isNumericRegion()) {
-                let minX = null;
-                let maxX = null;
-                let minY = null;
-                let maxY = null;
-                for (const point of r.geometry.coordinates[0]) {
-                    if (minX === null || point[0] < minX) {
-                        minX = point[0];
-                    }
-                    if (minY === null || point[1] < minY) {
-                        minY = point[1];
-                    }
-                    if (maxX === null || point[0] > maxX) {
-                        maxX = point[0];
-                    }
-                    if (maxY === null || point[1] > maxY) {
-                        maxY = point[1];
-                    }
-                }
+                let boxForGeoJSON: any = boundingBoxForGeoJSON(r.geometry);
                 log.debug(
                     `Bounding box of ${JSON.stringify(
-                        r.geometry.coordinates[0])} is (${minX},${minY}) to (${maxX},${maxY})`);
-                regionName = `(${minX},${minY}),(${maxX},${maxY})`;
+                        r.geometry.coordinates[0])} is (${boxForGeoJSON})`);
+                regionName = `(${boxForGeoJSON[0]},${boxForGeoJSON[1]}),(${boxForGeoJSON[2]},${boxForGeoJSON[3]})`;
                 regionMap[r.name] = regionName;
             } else {
                 regionMap[r.name] = toTitleCase(regionName);
