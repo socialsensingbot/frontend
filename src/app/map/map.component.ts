@@ -1148,7 +1148,7 @@ export class MapComponent implements OnInit, OnDestroy {
                     });
                 this._geojson[layer] = newLayer.addTo(curLayerGroup);
             };
-            this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
+            await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
                 i => processStats(i));
             this.data.getAccurateRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
                 i => processStats(i));
