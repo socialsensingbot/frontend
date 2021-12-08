@@ -442,7 +442,7 @@ export class MapComponent implements OnInit, OnDestroy {
                     // noinspection ES6MissingAwait
                     this.updateSliderFromData();
                 } else {
-                    await this.updateLayers("Data Load", clearSelected);
+                    await this.updateLayers("Data Load", clearSelected, false);
                     await this._exec.queue("Update Slider", ["ready"],
                                            () => {
                                                this.updateSliderFromData();
@@ -605,14 +605,14 @@ export class MapComponent implements OnInit, OnDestroy {
         this._sliderIsStale = true;
     }
 
-    private async scheduleResetLayers(layer: string, clearSelected = true) {
+    private async scheduleResetLayers(layer: string, clearSelected = true, approximateFirst = true) {
         if (this.destroyed) {
             return;
         }
         log.debug("scheduleResetLayers()");
         await this._exec.queue("Reset Layers", ["ready"], async () => {
             this.activity = true;
-            await this.resetStatisticsLayer(layer, clearSelected);
+            await this.resetStatisticsLayer(layer, clearSelected, approximateFirst);
             this.activity = false;
         }, layer, false, false, true);
     }
@@ -1049,7 +1049,7 @@ export class MapComponent implements OnInit, OnDestroy {
      *
      * @param clearSelected clears the selected polygon
      */
-    private async resetStatisticsLayer(layer: string, clearSelected) {
+    private async resetStatisticsLayer(layer: string, clearSelected, approximateFirst = true) {
         if (this.destroyed) {
             return;
         }
@@ -1081,7 +1081,7 @@ export class MapComponent implements OnInit, OnDestroy {
                         return style;
 
                     };
-                    await this.updateRegionData(geography, styleFunc, layer, curLayerGroup);
+                    await this.updateRegionData(geography, styleFunc, layer, curLayerGroup, approximateFirst);
 
 
                 }).catch(e => log.error(e));
@@ -1110,7 +1110,7 @@ export class MapComponent implements OnInit, OnDestroy {
      * Updates the data stored in the polygon data of the leaflet layers.
      */
     private async updateRegionData(geography: PolygonData,
-                                   styleFunc: any, layer: string, curLayerGroup: LayerGroup) {
+                                   styleFunc: any, layer: string, curLayerGroup: LayerGroup, approximateFirst = true) {
         if (this.destroyed) {
             return;
         }
@@ -1148,8 +1148,10 @@ export class MapComponent implements OnInit, OnDestroy {
                     });
                 this._geojson[layer] = newLayer.addTo(curLayerGroup);
             };
-            await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
-                i => processStats(i));
+            if (approximateFirst) {
+                await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
+                    i => processStats(i));
+            }
             this.data.getAccurateRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
                 i => processStats(i));
 
@@ -1157,7 +1159,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
 
-    private async updateLayers(reason: string = "", clearSelected = false) {
+    private async updateLayers(reason: string = "", clearSelected = false, approximateFirst = true) {
         log.debug("updateLayers()");
         if (this.destroyed) {
             return;
@@ -1173,7 +1175,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                               this._updating = true;
                                               try {
 
-                                                  await this.scheduleResetLayers(this.activeStatistic, clearSelected);
+                                                  await this.scheduleResetLayers(this.activeStatistic, clearSelected, approximateFirst);
                                                   await this.updateTwitterPanel();
                                               } finally {
                                                   this.activity = false;
