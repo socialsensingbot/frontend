@@ -310,7 +310,7 @@ export class RESTMapDataService {
     public async getAccurateRegionStatsMap(layerGroupId: string, regionType: string, startDate: number,
                                            endDate: number): Promise<RegionStatsMap> {
         const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
-        const statsMap = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/complex-stats", {
+        const statsMap = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/accurate-stats", {
             hazards:   layerGroup.hazards,
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,

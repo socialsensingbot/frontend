@@ -822,7 +822,7 @@ module.exports = (connection: Pool) => {
      *
      *
      */
-    app.post("/map/:map/region-type/:regionType/complex-stats", async (req, res) => {
+    app.post("/map/:map/region-type/:regionType/accurate-stats", async (req, res) => {
 
         cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
 
