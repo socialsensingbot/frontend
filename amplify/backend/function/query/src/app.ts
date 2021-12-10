@@ -321,14 +321,66 @@ module.exports = (connection: Pool) => {
         }, {duration: 60});
     });
 
+    app.post("/map/:map/region-type/:regionType/csv-export", async (req, res) => {
+        const lastDate: Date = (await maps)[req.params.map].last_date;
+        const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
+        console.debug("StartDate: " + new Date(req.body.startDate));
+        console.debug("EndDate: " + new Date(endDate));
+
+        cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
+
+            return (await sql({
+                                  sql:
+                                  // language=MySQL
+                                      `/* app.ts: text_for_regions */ select t.source_json            as json,
+                                                                             t.source_html            as html,
+                                                                             r.source_timestamp       as timestamp,
+                                                                             r.source_id              as id,
+                                                                             ST_AsGeoJSON(t.location) as location,
+                                                                             r.region                 as agg_region,
+                                                                             t.possibly_sensitive     as possibly_sensitive,
+                                                                             r2.region                as region
+                                                                      FROM live_text t
+                                                                               LEFT JOIN mat_view_regions r
+                                                                                         ON t.source = r.source and t.source_id = r.source_id and t.hazard = r.hazard
+                                                                               LEFT JOIN mat_view_regions r2
+                                                                                         ON r2.source_id = r.source_id and
+                                                                                            r2.hazard = r.hazard and
+                                                                                            r2.source = r.source and
+                                                                                            r2.region_type = ?
+
+                                                                      WHERE r.source_timestamp between ? and ?
+                                                                        and r.region in (?)
+                                                                        and r.region_type = ?
+                                                                        and r.hazard IN (?)
+                                                                        and r.source IN (?)
+                                                                        and r.warning IN (?)
+                                                                        and not t.deleted
+                                                                        and r2.region is not null
+                                                                      order by r.source_timestamp desc    `,
+                                  values: [req.body.byRegion, new Date(req.body.startDate), new Date(endDate),
+                                           req.body.regions, req.params.regionType, req.body.hazards,
+                                           req.body.sources,
+                                           warningsValues(req.body.warnings),
+                                  ]
+                              })).map(i => {
+                i.json = JSON.parse(i.json);
+                return i;
+            });
+
+
+        }, {duration: 60});
+    });
+
+
     let geographyFunc: (req, res) => Promise<void> = async (req, res) => {
         cache(res, null, async () => {
             try {
 
                 const geography = await sql({
                                                 // language=MySQL
-                                                sql: `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
-                                                                              from ref_geo_regions gr,
+                                                sql:                                                             `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
+                                                                                                                                          from ref_geo_regions gr,
                                                                                    ref_map_metadata mm
                                                                               where mm.id = ?
                                                                                 and region_type = ?
