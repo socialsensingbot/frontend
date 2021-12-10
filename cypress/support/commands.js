@@ -165,7 +165,7 @@ Cypress.Commands.add("tweetCount", (vis, hid) => {
 
 
 Cypress.Commands.add("clickTweetTab", (index) => {
-    cy.get(`#mat-tab-label-1-${index-1} > .mat-tab-label-content`, {timeout: 30000}).click({force: true});
+    cy.get(`#mat-tab-label-1-${index - 1} > .mat-tab-label-content`, {timeout: 30000}).click({force: true});
 });
 
 Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
@@ -229,7 +229,7 @@ Cypress.Commands.add("multiSelectRegions", (regions) => {
     for (let region of regions) {
         const path = `div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-${region}`;
         cy.get("body").type(multipleKey, {release: false, force: true})
-        cy.get(path).click({force: true, multiple:true});
+        cy.get(path).click({force: true, multiple: true});
         cy.wait(1000);
         cy.get("body").type(multipleKey, {release: true, force: true})
     }
@@ -318,4 +318,45 @@ Cypress.Commands.add("mockGraphQL", () => {
 
               });
     cy.route("POST", "/graphql");
+});
+
+const path = require('path')
+import {parse} from 'csv';
+
+const glob = require("glob")
+
+
+/**
+ * Delete the downloads folder to make sure the test has "clean"
+ * slate before starting.
+ */
+const deleteDownloadsFolder = () => {
+    const downloadsFolder = Cypress.config('downloadsFolder')
+
+    cy.task('deleteFolder', downloadsFolder)
+}
+
+/*
+export const validateCsvList = (list) => {
+    expect(list, 'number of records').to.have.length(3)
+    expect(list[0], 'first record').to.deep.equal({
+                                                      Age:          '20',
+                                                      City:         'Boston',
+                                                      'First name': 'Joe',
+                                                      'Last name':  'Smith',
+                                                      Occupation:   'student',
+                                                      State:        'MA',
+                                                  })
+}
+
+*/
+
+/**
+ * @param {string} name File name in the downloads folder
+ */
+Cypress.Commands.add("validateCsvFile", (name, validateCsvList) => {
+    const downloadsFolder = Cypress.config('downloadsFolder')
+    const filename = path.join(downloadsFolder, name);
+// options is optional
+    return cy.readFile(glob.sync(filename)[0], 'utf8').then((csv) => parse(csv, validateCsvList));
 });
