@@ -24,6 +24,8 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
+import {parse} from 'csv-parse/lib/sync';
+
 const LONG_TIMEOUT = 60000;
 const VERY_LONG_TIMEOUT = 120000;
 const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
@@ -321,9 +323,6 @@ Cypress.Commands.add("mockGraphQL", () => {
 });
 
 const path = require('path')
-import {parse} from 'csv';
-
-const glob = require("glob")
 
 
 /**
@@ -357,6 +356,7 @@ export const validateCsvList = (list) => {
 Cypress.Commands.add("validateCsvFile", (name, validateCsvList) => {
     const downloadsFolder = Cypress.config('downloadsFolder')
     const filename = path.join(downloadsFolder, name);
-// options is optional
-    return cy.readFile(glob.sync(filename)[0], 'utf8').then((csv) => parse(csv, validateCsvList));
+    cy.task('findFiles', filename).then((file) => {
+        cy.readFile(file).then(str => validateCsvList(parse(str)));
+    });
 });
