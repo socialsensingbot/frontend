@@ -1,6 +1,5 @@
 import {MAP_URL, MAX_DATE_MILLIS, MIN_DATE_MILLIS} from "../../../support";
 
-
 //TODO move to fixtures
 const expect_3_region_csv = [
     [
