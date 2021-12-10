@@ -74,6 +74,14 @@
                             <mat-option value="4320">3 Days</mat-option>
                         </mat-select>
                     </mat-form-field>
+                    <div class="app-toolbar-separator"></div>
+                    <mat-form-field *ngIf="pref.combined.layers.available.length > 1">
+                        <mat-select [(value)]="activeLayerGroup" class="map-number-layer-select">
+                            <mat-option *ngFor="let layerGroup of pref.combined.layers.available"
+                                        [value]="layerGroup.id">{{layerGroup.title}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
                     <div class="app-toolbar-expanding-separator"></div>
                 </mat-toolbar-row>
                 <mat-toolbar-row *ngIf="appToolbarExpanded">
@@ -101,13 +109,6 @@
                         <mat-select [(value)]="activeStatistic" class="map-number-layer-select">
                             <mat-option value="stats">Exceedance</mat-option>
                             <mat-option value="count">Tweet Count</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                    <div class="app-toolbar-separator"></div>
-                    <mat-form-field *ngIf="pref.combined.layers.available.length > 1">
-                        <mat-select [(value)]="activeLayerGroup" class="map-number-layer-select">
-                            <mat-option *ngFor="let layerGroup of pref.combined.layers.available"
-                                        [value]="layerGroup.id">{{layerGroup.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>
 
@@ -142,7 +143,8 @@
             </div>
         </div>
 
-        <map-legend *ngIf="ready" class="legend" [activeNumber]="activeStatistic"></map-legend>
+        <map-legend *ngIf="ready" [activeLayerGroup]="activeLayerGroup" [activeNumber]="activeStatistic"
+                    class="legend"></map-legend>
 
 
         <mat-progress-bar *ngIf="activity && ready" class="map-progress" mode="indeterminate"
