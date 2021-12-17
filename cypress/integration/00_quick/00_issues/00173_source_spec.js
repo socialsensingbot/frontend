@@ -1,6 +1,6 @@
 import {LONDON_TWEET, LONDON_TWEET_MENU, MAP_URL} from "../../../support";
 
-const sourceOptions = "body .tweet-list-item-menu-source";
+const sourceOptions = "body .tweet-list-item-menu-source-btn";
 const twitterIdClass = LONDON_TWEET;
 const url = MAP_URL + "?selected=greater%20london&max_offset=0&min_offset=-1439";
 let clickSourceMenu = function () {
@@ -34,23 +34,23 @@ describe('00173 Source: ', function () {
       cy.get(LONDON_TWEET_MENU, {timeout: 60000});
       cy.get(LONDON_TWEET_MENU, {timeout: 60000}).should('be.visible');
       clickSourceMenu();
-      cy.get("body .tweet-list-item-menu-source-type-clear", {timeout: 30000}).click();
+      cy.get("body .tweet-list-item-menu-source-clear", {timeout: 30000}).click();
       clickSourceMenu();
-      cy.get("body .tweet-list-item-menu-source-type-coastal-not-selected", {timeout: 30000});
-      cy.get("body .tweet-list-item-menu-source-type-coastal", {timeout: 30000}).click();
+      cy.get("body .tweet-list-item-menu-source-level-coastal-not-selected", {timeout: 30000});
+      cy.get("body .tweet-list-item-menu-source-level-coastal", {timeout: 30000}).click();
       clickSourceMenu();
-      cy.get("body .tweet-list-item-menu-source-type-coastal-selected", {timeout: 30000});
-      cy.get("body .tweet-list-item-menu-source-type-river-not-selected", {timeout: 30000});
-      cy.get("body .tweet-list-item-menu-source-type-river", {timeout: 30000}).click();
+      cy.get("body .tweet-list-item-menu-source-level-coastal-selected", {timeout: 30000});
+      cy.get("body .tweet-list-item-menu-source-level-river-not-selected", {timeout: 30000});
+      cy.get("body .tweet-list-item-menu-source-level-river", {timeout: 30000}).click();
       clickSourceMenu();
-    cy.get("body .tweet-list-item-menu-source-type-coastal-not-selected", {timeout: 30000});
-    cy.get("body .tweet-list-item-menu-source-type-river-selected", {timeout: 30000});
-    cy.wait(5000);
-    cy.visitAndWait(url);
-    cy.get(".app-tweet-table", {timeout: 30000});
-    clickSourceMenu();
-    cy.get("body .tweet-list-item-menu-source-type-coastal-not-selected", {timeout: 30000});
-    cy.get("body .tweet-list-item-menu-source-type-river-selected", {timeout: 30000});
+      cy.get("body .tweet-list-item-menu-source-level-coastal-not-selected", {timeout: 30000});
+      cy.get("body .tweet-list-item-menu-source-level-river-selected", {timeout: 30000});
+      cy.wait(5000);
+      cy.visitAndWait(url);
+      cy.get(".app-tweet-table", {timeout: 30000});
+      clickSourceMenu();
+      cy.get("body .tweet-list-item-menu-source-level-coastal-not-selected", {timeout: 30000});
+      cy.get("body .tweet-list-item-menu-source-level-river-selected", {timeout: 30000});
   });
 
 

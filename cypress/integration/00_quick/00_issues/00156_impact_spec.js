@@ -1,7 +1,7 @@
 import {LONDON_TWEET, LONDON_TWEET_MENU, MAP_URL} from "../../../support";
 
 const twitterIdClass = LONDON_TWEET;
-const impactOption = "body .tweet-list-item-menu-impact";
+const impactOption = "body .tweet-list-item-menu-impact-btn";
 const url = MAP_URL + "?selected=greater%20london&max_offset=0&min_offset=-1439";
 
 let clickImpactMenu = function () {
@@ -33,7 +33,7 @@ describe('00156 Impact: ', function () {
         cy.get(LONDON_TWEET_MENU, {timeout: 60000});
         cy.get(LONDON_TWEET_MENU, {timeout: 60000}).should('be.visible');
         clickImpactMenu();
-        cy.get("body .tweet-list-item-menu-impact-level-clear", {timeout: 30000}).click();
+        cy.get("body .tweet-list-item-menu-impact-clear", {timeout: 30000}).click();
         clickImpactMenu();
         cy.get("body .tweet-list-item-menu-impact-level-minimal-not-selected", {timeout: 30000});
         cy.get("body .tweet-list-item-menu-impact-level-minimal", {timeout: 30000}).click();

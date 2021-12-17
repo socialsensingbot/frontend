@@ -58,8 +58,8 @@ describe('04: Map: ', function () {
 
             cy.get(".app-map-expand-toolbar-btn").should("be.visible").click();
             cy.wait(1000);
-            cy.get('#mat-select-value-3').click({multiple: true})
-            cy.get('#mat-option-7 > .mat-option-text').contains('Exceedance').click();
+            cy.get('.app-map-number-layer-select').click()
+            cy.get('#mat-option-13 > .mat-option-text').contains('Exceedance').click();
 
             cy.get(legendEntry).get("i").should("have.attr", "style").should("contain", statsFirstLegendColour)
             cy.get(legendEntry).should("have.text", statsFirstLegendVal);

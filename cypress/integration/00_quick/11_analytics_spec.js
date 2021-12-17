@@ -26,6 +26,7 @@ describe('11 Analytics: ', function () {
             cy.login();
             cy.url({timeout: 30000}).should("equal", url);
             cy.get("#loading-div", {timeout: 60000}).should("not.exist");
+            cy.get(".app-loading-progress", {timeout: 60000}).should("not.exist");
             cy.wait(4000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph");
 
@@ -78,7 +79,7 @@ describe('11 Analytics: ', function () {
 
 
         it('Import from Map Stats', () => {
-            let url = MAP_URL+"?active_number=stats&active_polygon=county&selected=greater%20london";
+            let url = MAP_URL + "?active_number=exceedance&active_polygon=county&selected=greater%20london";
             cy.visit(url);
             cy.login();
             cy.visitAndWait(url);

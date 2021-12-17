@@ -98,7 +98,8 @@
 
 
 </div>
-<mat-progress-bar *ngIf="loading.progressPercentage > 0" [value]="loading.progressPercentage*100"
+<mat-progress-bar *ngIf="loading.progressPercentage > 0 && loading.progressPercentage  < 99.99"
+                  [value]="loading.progressPercentage*100"
                   class="app-loading-progress"
                   mode="determinate"></mat-progress-bar>
 

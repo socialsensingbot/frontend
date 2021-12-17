@@ -77,13 +77,13 @@
                     </ng-container>
                     <button
                             (click)="annotateTweetKeyValue(tweet,annotationType.name,'', $event);"
-                            class="tweet-list-item-menu-{{annotationType.name}}-level-clear"
+                            class="tweet-list-item-menu-{{annotationType.name}}-clear"
                             mat-menu-item>Clear
                     </button>
 
                 </mat-menu>
                 <button [matMenuTriggerFor]="annotationMenu"
-                        class="tweet-list-item-menu-impact" mat-menu-item>{{annotationType.title}}
+                        class="tweet-list-item-menu-{{annotationType.name}}-btn" mat-menu-item>{{annotationType.title}}
                 </button>
             </ng-container>
             <button

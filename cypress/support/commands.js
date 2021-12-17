@@ -172,8 +172,8 @@ Cypress.Commands.add("clickTweetTab", (index) => {
 
 Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
     cy.wait(1000);
-    cy.get(tweetSelector + " .mat-icon", {timeout: 10000})
-    cy.get(tweetSelector + " .mat-icon ").click();
+    cy.get(tweetSelector + " .app-tweet-item-menu", {timeout: 10000})
+    cy.get(tweetSelector + " .app-tweet-item-menu").click();
     cy.wait(1000);
     cy.get(markAsMenu, {timeout: LONG_TIMEOUT}).click();
     cy.wait(1000);
@@ -183,8 +183,8 @@ Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
 
 Cypress.Commands.add("unignoreTweet", (tweetSelector) => {
     cy.wait(1000);
-    cy.get(tweetSelector + " .mat-icon", {timeout: 10000});
-    cy.get(tweetSelector + " .mat-icon").click();
+    cy.get(tweetSelector + " .app-tweet-item-menu", {timeout: 10000});
+    cy.get(tweetSelector + " .app-tweet-item-menu").click();
     cy.wait(1000);
     cy.get(markAsMenu, {timeout: LONG_TIMEOUT}).click();
     cy.wait(1000);
