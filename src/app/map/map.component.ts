@@ -1153,7 +1153,8 @@ export class MapComponent implements OnInit, OnDestroy {
                 try {
                     await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
                         i => processStats(i));
-                    this.data.getAccurateRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
+                    this.data.getAccurateRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax,
+                                                        true).then(
                         i => processStats(i));
                 } catch (e) {
                     log.warn(e);
@@ -1161,7 +1162,7 @@ export class MapComponent implements OnInit, OnDestroy {
             } else {
                 try {
                     await this.data.getAccurateRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin,
-                                                              this._dateMax).then(
+                                                              this._dateMax, false).then(
                         i => processStats(i));
                 } catch (e) {
                     log.warn(e);

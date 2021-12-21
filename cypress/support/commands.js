@@ -118,10 +118,10 @@ Cypress.Commands.add("tweetsVisible", (count) => {
         count);
 });
 Cypress.Commands.add("tweetCountTotal", (sum) => {
-    cy.get("#mat-tab-label-1-0 > .mat-tab-label-content", {timeout: 30000}).then(header => {
+    cy.get(".app-tweet-visible-tweets-tab-label", {timeout: 30000}).then(header => {
         const headerParts = header.text().trim().split(" ");
         const visibleCount = +headerParts[0];
-        cy.get("#mat-tab-label-1-1 > .mat-tab-label-content", {timeout: 30000})
+        cy.get(".app-tweet-hidden-tweets-tab-label", {timeout: 30000})
             .then(title => {
                       const hiddenCount = +title.text().trimLeft().split(" ")[0];
                       expect(hiddenCount + visibleCount).equals(sum);
@@ -133,10 +133,10 @@ Cypress.Commands.add("tweetCountTotal", (sum) => {
 
 Cypress.Commands.add("withTweetCounts", (callback) => {
     cy.wait(4000);
-    cy.get("#mat-tab-label-1-0 > .mat-tab-label-content").then(header => {
+    cy.get(".app-tweet-visible-tweets-tab-label").then(header => {
         const headerParts = header.text().trim().split(" ");
         const visibleCount = +headerParts[0];
-        cy.get("#mat-tab-label-1-1 > .mat-tab-label-content", {timeout: 30000})
+        cy.get(".app-tweet-hidden-tweets-tab-label", {timeout: 30000})
             .then(title => {
                       const hiddenCount = +title.text().trimLeft().split(" ")[0];
                       callback(visibleCount, hiddenCount);

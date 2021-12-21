@@ -91,7 +91,7 @@ export class RESTDataAPIService {
     }
 
 
-    public async callMapAPIWithCache(path: string, payload: any, cacheForSeconds: number = -1, useGet = false): Promise<any> {
+    public async callMapAPIWithCache(path: string, payload: any, cacheForSeconds: number = -1, useGet = false, retry = true): Promise<any> {
         log.verbose("callMapAPIWithCache()");
         const key = "rest:map/" + path + ":" + JSON.stringify(payload);
         const cachedItem = await this.cache.getCached(key);
@@ -103,13 +103,13 @@ export class RESTDataAPIService {
             return cachedItem.data;
         } else {
             log.info("Value for " + key + " not in cache");
-            return await this.callAPIInternal("/map/" + path, payload, cacheForSeconds, key, useGet);
+            return await this.callAPIInternal("/map/" + path, payload, cacheForSeconds, key, useGet, retry);
         }
     }
 
 
     private async callAPIInternal(fullPath: string, payload: any, cacheForSeconds: number, key: string,
-                                  useGet = false): Promise<Promise<any>> {
+                                  useGet = false, retry = true): Promise<Promise<any>> {
         this.calls++;
         if (this.callsPerMinute > environment.maxCallsPerMinute) {
             console.error("Excessive api calls per minute: " + this.callsPerMinute);
@@ -160,32 +160,36 @@ export class RESTDataAPIService {
         }).catch(e => {
             this.calls++;
             log.error(e);
-            this._notify.show("No response from the server, maybe a network problem or a slow query.",
-                              "Retrying ...", retryPeriod);
-            return new Promise<any>((resolve, reject) => {
-                setTimeout(async () => {
-                    API.post("query", fullPath, {
-                        body:    payload,
-                        headers: {
-                            Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
-                        },
-                    }).then(data => this._ngZone.run(() => {
-                        this._notify.show("Problem resolved", "Good", 2000);
-                        if (!environment.production) {
-                            // tslint:disable-next-line:no-console
-                            console.debug("Returning uncached item", data);
-                        }
-                        if (cacheForSeconds > 0) {
-                            this.cache.setCached(key, data, cacheInMillis);
-                        }
-                        resolve(data);
-                    }))
-                       .catch(e2 => {
-                           this._notify.show("Error running" + " query, please check your network connection");
-                           reject(e2);
-                       });
-                }, retryPeriod);
-            });
+            if (retry) {
+                this._notify.show("No response from the server, maybe a network problem or a slow query.",
+                                  "Retrying ...", retryPeriod);
+                return new Promise<any>((resolve, reject) => {
+                    setTimeout(async () => {
+                        API.post("query", fullPath, {
+                            body:    payload,
+                            headers: {
+                                Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+                            },
+                        }).then(data => this._ngZone.run(() => {
+                            this._notify.show("Problem resolved", "Good", 2000);
+                            if (!environment.production) {
+                                // tslint:disable-next-line:no-console
+                                console.debug("Returning uncached item", data);
+                            }
+                            if (cacheForSeconds > 0) {
+                                this.cache.setCached(key, data, cacheInMillis);
+                            }
+                            resolve(data);
+                        }))
+                           .catch(e2 => {
+                               this._notify.show("Error running" + " query, please check your network connection");
+                               reject(e2);
+                           });
+                    }, retryPeriod);
+                });
+            } else {
+                return null;
+            }
         });
     }
 }

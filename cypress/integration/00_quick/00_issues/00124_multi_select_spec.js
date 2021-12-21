@@ -25,8 +25,7 @@ describe('#124 Region multi select : https://github.com/socialsensingbot/fronten
                  cy.tweetCountTotal(6);
                  cy.url().should("equal",
                                  MAP_URL + "?active_number=exceedance&active_polygon=county&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&zoom=5&selected=west%20yorkshire&selected=hertfordshire")
-                 cy.get(`div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-hertfordshire[stroke-width=3]`).click(
-                     {force: true});
+                 cy.multiSelectRegions(["hertfordshire"]);
                  cy.url().should("equal", url);
                  cy.twitterPanelHeader("West Yorkshire");
              });

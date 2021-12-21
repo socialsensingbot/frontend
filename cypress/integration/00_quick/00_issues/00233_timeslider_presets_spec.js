@@ -1,6 +1,6 @@
 import {MAP_URL, MAX_DATE_MILLIS, MIN_DATE_MILLIS} from "../../../support";
 
-describe('#233 Timeslide presets: ', function () {
+describe('#233 Timeslide presets: : https://github.com/socialsensingbot/frontend/issues/233', function () {
     // Step 1: setup the application state
     beforeEach(function () {
         cy.visit(MAP_URL);

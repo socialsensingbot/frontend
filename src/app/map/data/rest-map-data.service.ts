@@ -308,7 +308,7 @@ export class RESTMapDataService {
     }
 
     public async getAccurateRegionStatsMap(layerGroupId: string, regionType: string, startDate: number,
-                                           endDate: number): Promise<RegionStatsMap> {
+                                           endDate: number, retry: boolean): Promise<RegionStatsMap> {
         const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
         const statsMap = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/accurate-stats", {
             hazards:   layerGroup.hazards,
@@ -317,7 +317,7 @@ export class RESTMapDataService {
             startDate: roundToHour(startDate),
             endDate:   roundToFiveMinutes(endDate)
 
-        }, 5 * 60) as RegionStatsMap;
+        }, 5 * 60, false, retry) as RegionStatsMap;
         return statsMap;
     }
 
