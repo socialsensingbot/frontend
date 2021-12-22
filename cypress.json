@@ -3,7 +3,8 @@
     "RETRIES": 0
   },
   "retries" : {
-    "runMode" : 3, "openMode": 0
+    "runMode": 3,
+    "openMode": 1
   },
   "numTestsKeptInMemory" : 0,
   "projectId": "zxxo89",

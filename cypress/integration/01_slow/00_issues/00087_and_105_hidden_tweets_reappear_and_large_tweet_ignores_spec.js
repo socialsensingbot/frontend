@@ -1,4 +1,4 @@
-import {LONDON_TWEET, LONDON_URL, MAP_URL} from "../../../support";
+import {LONDON_URL} from "../../../support";
 
 const url = LONDON_URL;
 
@@ -66,7 +66,12 @@ describe('#87 & #105', function () {
     });
 
 
-    it('#87 Hidden Tweets Reappear : https://github.com/socialsensingbot/frontend/issues/87 : ', () => {
+    it('#87 Hidden Tweets Reappear : https://github.com/socialsensingbot/frontend/issues/87 : ', {
+        retries: {
+            runMode:  8,
+            openMode: 1,
+        }
+    }, () => {
         cy.get(".app-tweet-drawer", {timeout: 30000});
         cy.log("Cleaning up.");
         cy.clickTweetTab(2);
