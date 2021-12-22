@@ -29,7 +29,7 @@ const testUnhide = (refresh, count, fail) => {
         } else {
             cy.get(tweetHidden).scrollIntoView().should('be.visible');
             cy.unignoreTweet(tweetHidden);
-            cy.wait(500);
+            cy.wait(2000);
         }
     })
 };
@@ -45,7 +45,7 @@ const testHide = (refresh, count) => {
             const index = t.first().parents(".atr-visible").attr("data-index");
             cy.get(`.atr-visible.atr-${index}`, {timeout: 60000}).scrollIntoView().should('be.visible');
             cy.ignoreTweet(`.atr-visible.atr-${index}`);
-            cy.wait(500);
+            cy.wait(2000);
         });
 
 
