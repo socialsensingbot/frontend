@@ -51,7 +51,12 @@ const testHide = (refresh, count) => {
 
 };
 
-describe('#87 & #105', function () {
+describe('#87 & #105', {
+    retries: {
+        runMode:  8,
+        openMode: 1,
+    }
+}, function () {
 
     beforeEach(() => {
         cy.visit(url);
@@ -66,12 +71,7 @@ describe('#87 & #105', function () {
     });
 
 
-    it('#87 Hidden Tweets Reappear : https://github.com/socialsensingbot/frontend/issues/87 : ', {
-        retries: {
-            runMode:  8,
-            openMode: 1,
-        }
-    }, () => {
+    it('#87 Hidden Tweets Reappear : https://github.com/socialsensingbot/frontend/issues/87 : ', () => {
         cy.get(".app-tweet-drawer", {timeout: 30000});
         cy.log("Cleaning up.");
         cy.clickTweetTab(2);
