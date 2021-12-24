@@ -238,11 +238,11 @@ export class MapComponent implements OnInit, OnDestroy {
 
     public set activeRegionType(value: string) {
         log.debug("activeRegionType(" + value + ")");
-        if (!this.activeRegionType) {
-            this.updateSearch({active_polygon: value});
-        } else {
+        if (this.activeRegionType && this.activeRegionType !== value) {
             log.debug("Removing selected region(s) as we have changed region type");
             this.updateSearch({active_polygon: value, selected: null});
+        } else {
+            this.updateSearch({active_polygon: value});
         }
 
         if (this.activeRegionType !== value) {
@@ -809,12 +809,17 @@ export class MapComponent implements OnInit, OnDestroy {
                                  }, null, false, false, true, null, 1000, 3);
             } else {
                 if (this._popState) {
-                    log.debug("POP STATE detected before URL query params change.");
+                    log.debug("POP STATE detected before URL query params change ", params);
+                    log.debug("POP STATE detected before URL query params change previous URL was: ", window.history.state.prevUrl);
                     this._popState = false;
                     this.activity = true;
                     await this.updateMapFromQueryParams(params);
-                    return this.updateLayers("Pop State", true)
-                               .then(() => this._twitterIsStale = true)
+                    this.selection.clearWithoutEmitting();
+                    return this.updateLayers("Pop State", false)
+                               .then(() => {
+
+                                   this._twitterIsStale = true;
+                               })
                                .finally(() => this.activity = false);
                 }
             }

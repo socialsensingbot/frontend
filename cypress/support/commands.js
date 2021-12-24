@@ -213,17 +213,31 @@ Cypress.Commands.add("unhideTweets", (num) => {
 });
 
 
-Cypress.Commands.add("moveMinDateSliderLeft", (times) => {
+Cypress.Commands.add("moveMinDateSliderLeft", (times, expectURLChange = false) => {
     for (let i = 0; i < times; i++) {
-        cy.get(".ng5-slider-pointer-min").type('{pagedown}');
-        cy.wait(2000);
+        cy.url().then(url => {
+            cy.get(".ng5-slider-pointer-min").type('{pagedown}', {force: true});
+            cy.log("Grace period to allow the URL to change")
+            if (expectURLChange) {
+                cy.url({timeout: 20000}).should("not.equal", url);
+            } else {
+                cy.wait(3000);
+            }
+        })
     }
 });
 
-Cypress.Commands.add("moveMinDateSliderRight", (times) => {
+Cypress.Commands.add("moveMinDateSliderRight", (times, expectURLChange = false) => {
     for (let i = 0; i < times; i++) {
-        cy.get(".ng5-slider-pointer-min").type('{pageup}');
-        cy.wait(1000);
+        cy.url().then(url => {
+            cy.get(".ng5-slider-pointer-min").type('{pageup}', {force: true});
+            cy.log("Grace period to allow the URL to change")
+            if (expectURLChange) {
+                cy.url({timeout: 20000}).should("not.equal", url);
+            } else {
+                cy.wait(3000);
+            }
+        })
     }
 });
 
