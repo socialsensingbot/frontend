@@ -17,7 +17,7 @@ describe('#212 Deselect by clicking on non-region: : https://github.com/socialse
       cy.get(".map").click(128,128);
                      cy.wait(2000);
                      cy.url({timeout: 30000}).should("equal",
-                                                     MAP_URL + "?active_number=exceedance&active_polygon=county&");
+                                                     MAP_URL + "?active_number=exceedance&active_polygon=county");
                      cy.logout();
     });
 
