@@ -27,6 +27,7 @@ import {ONE_DAY} from "./data/map-data";
 import {RESTMapDataService} from "./data/rest-map-data.service";
 import {TwitterExporterService} from "./twitter/twitter-exporter.service";
 import {MapSelectionService} from "../map-selection.service";
+import {MatSidenav} from "@angular/material/sidenav";
 
 
 const log = new Logger("map");
@@ -528,11 +529,11 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this.data.hasCountryAggregates()) {
             await this._exporter.downloadAggregate(this.activeLayerGroup, "uk-countries", this.selectedCountries,
                                                    await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData, this._dateMin,
-                                                   this._dateMax, this.activeRegionType);
+                                                   this._dateMax, this.activeRegionType, this.annotationTypes);
         } else {
             await this._exporter.download(this.activeLayerGroup, await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData,
                                           this.activeRegionType,
-                                          this._dateMin, this._dateMax);
+                                          this._dateMin, this._dateMax, this.annotationTypes);
         }
     }
 
@@ -1073,66 +1074,8 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
 
-    /**
-     * Reset the polygon layers.
-     *
-     * @param clearSelected clears the selected polygon
-     */
-    private async resetStatisticsLayer(layer: string, clearSelected, approximateFirst = true) {
-        if (this.destroyed) {
-            return;
-        }
-
-        log.info("Resetting " + layer);
-        // this.loading.showIndeterminateSpinner();
-        try {
-            const geography: PolygonData = await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData;
-            log.debug("resetStatisticsLayer(" + clearSelected + ")");
-            // this.hideTweets();
-            log.debug(layer);
-            const curLayerGroup = layerGroup();
-            if (curLayerGroup != null) {
-
-                // noinspection JSUnfilteredForInLoop
-                await this.data.recentTweets(this.activeLayerGroup, this.activeRegionType).then(async regionTweetMap => {
-                    log.debug("Region Tweet Map", regionTweetMap);
-
-                    const styleFunc = (feature: geojson.Feature) => {
-                        log.verbose("styleFunc " + layer);
-
-                        const style = this._color.colorFunctions[layer].getFeatureStyle(
-                            feature);
-                        log.verbose("Style ", style, feature.properties);
-                        if (this.liveUpdating && regionTweetMap[feature.properties.name]) {
-                            log.verbose(`Adding new tweet style for ${feature.properties.name}`);
-                            style.className = style.className + " leaflet-new-tweet";
-                        }
-                        return style;
-
-                    };
-                    await this.updateRegionData(geography, styleFunc, layer, curLayerGroup, approximateFirst);
-
-
-                }).catch(e => log.error(e));
-
-
-            } else {
-                log.debug("Null layer " + layer);
-            }
-            if (clearSelected) {
-                this.selection.clear();
-                this.hideTweets();
-            }
-            this.currentStatisticsLayer.clearLayers();
-            this._map.removeLayer(this.currentStatisticsLayer);
-            this._map.addLayer(curLayerGroup);
-            this.currentStatisticsLayer = curLayerGroup;
-        } catch (e) {
-            console.error(e);
-        } finally {
-            // this.loading.hideIndeterminateSpinner();
-        }
-
+    public closeTwitterPanel(sidenav: MatSidenav): void {
+        this.clearSelectedRegions();
     }
 
     /**
@@ -1328,5 +1271,68 @@ export class MapComponent implements OnInit, OnDestroy {
             // noinspection ES6MissingAwait
             this.updateTwitterPanel();
         }, "", false, true, true, null, 1000, 5);
+    }
+
+    /**
+     * Reset the polygon layers.
+     *
+     * @param clearSelected clears the selected polygon
+     */
+    private async resetStatisticsLayer(layer: string, clearSelected, approximateFirst = true) {
+        if (this.destroyed) {
+            return;
+        }
+
+        log.info("Resetting " + layer);
+        // this.loading.showIndeterminateSpinner();
+        try {
+            const geography: PolygonData = await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData;
+            log.debug("resetStatisticsLayer(" + clearSelected + ")");
+            // this.hideTweets();
+            log.debug(layer);
+            const curLayerGroup = layerGroup();
+            if (curLayerGroup != null) {
+
+                // noinspection JSUnfilteredForInLoop
+                await this.data.recentTweets(this.activeLayerGroup, this.activeRegionType).then(async regionTweetMap => {
+                    log.debug("Region Tweet Map", regionTweetMap);
+
+                    const styleFunc = (feature: geojson.Feature) => {
+                        log.verbose("styleFunc " + layer);
+
+                        const style = this._color.colorFunctions[layer].getFeatureStyle(
+                            feature);
+                        log.verbose("Style ", style, feature.properties);
+                        if (this.liveUpdating && regionTweetMap[feature.properties.name]) {
+                            log.verbose(`Adding new tweet style for ${feature.properties.name}`);
+                            style.className = style.className + " leaflet-new-tweet";
+                        }
+                        return style;
+
+                    };
+                    await this.updateRegionData(geography, styleFunc, layer, curLayerGroup, approximateFirst);
+
+
+                }).catch(e => log.error(e));
+
+
+            } else {
+                log.debug("Null layer " + layer);
+            }
+            if (clearSelected) {
+                log.warn("CLEARING SELECTED")
+                this.selection.clear();
+                this.hideTweets();
+            }
+            this.currentStatisticsLayer.clearLayers();
+            this._map.removeLayer(this.currentStatisticsLayer);
+            this._map.addLayer(curLayerGroup);
+            this.currentStatisticsLayer = curLayerGroup;
+        } catch (e) {
+            console.error(e);
+        } finally {
+            // this.loading.hideIndeterminateSpinner();
+        }
+
     }
 }

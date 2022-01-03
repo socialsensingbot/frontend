@@ -1,11 +1,15 @@
 import {environment} from "../../../environments/environment";
 import * as geojson from "geojson";
 
-export class CSVExportTweet {
-    constructor(public region: string, public impact: string = "", public source: string = "", public id: string, public date: string,
-                public url: string, public text: string, public location: string) {
-
-    }
+export interface CSVExportTweet {
+    region: string;
+    impact: string;
+    id: string;
+    date: string;
+    url: string;
+    text: string;
+    location: string;
+    source?: string;
 
 }
 

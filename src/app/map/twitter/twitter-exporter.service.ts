@@ -24,7 +24,7 @@ export class TwitterExporterService {
 
 
     public async download(layerGroupId: string, polygonDatum: PolygonData, regionType: string, startDate: number,
-                          endDate: number): Promise<void> {
+                          endDate: number, annotationTypes: any[]): Promise<void> {
         const options = {
             fieldSeparator:   ",",
             quoteStrings:     "\"",
@@ -42,7 +42,7 @@ export class TwitterExporterService {
         const regions = await this._mapdata.places(regionType);
         const exportedTweets: CSVExportTweet[] = [];
         const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(layerGroupId, regionType, Array.from(regions), startDate,
-                                                                                 endDate, regionType);
+                                                                                 endDate, regionType, annotationTypes);
         for (const i of tweetData) {
             exportedTweets.push(await i);
         }
@@ -63,7 +63,8 @@ export class TwitterExporterService {
     }
 
     public async downloadAggregate(layerGroupId: string, aggregrationSetId: string, selectedAggregates: string[],
-                                   polygonDatum: PolygonData, startDate: number, endDate: number, byRegion: string) {
+                                   polygonDatum: PolygonData, startDate: number, endDate: number, byRegion: string,
+                                   annotationTypes: any[]) {
         log.debug(
             "downloadAggregate(aggregrationSetId=" + aggregrationSetId +
             ", selectedAggregates=" + selectedAggregates +
@@ -91,7 +92,7 @@ export class TwitterExporterService {
         const exportedTweets: CSVExportTweet[] = [];
         const tweetData: Promise<CSVExportTweet>[] = await this.loadDownloadData(layerGroupId,
                                                                                  this._pref.combined.countryDownloadRegionType, regions,
-                                                                                 startDate, endDate, byRegion);
+                                                                                 startDate, endDate, byRegion, annotationTypes);
         for (const i of tweetData) {
             exportedTweets.push(await i);
         }
@@ -113,7 +114,7 @@ export class TwitterExporterService {
     }
 
     public async loadDownloadData(layerGroupId: string, regionType: string, regions: string[], startDate: number,
-                                  endDate: number, byRegion: string): Promise<Promise<CSVExportTweet>[]> {
+                                  endDate: number, byRegion: string, annotationTypes: any[]): Promise<Promise<CSVExportTweet>[]> {
         return (await this._mapdata.csvTweets(layerGroupId, regionType, regions, startDate, endDate, byRegion)).filter(
             i => i.valid && !this._pref.isBlacklisted(i)).map(
             async (i: Tweet) => {
@@ -138,22 +139,23 @@ export class TwitterExporterService {
                     annotations = annotationRecord.annotations;
                 }
                 let impact = "";
-                if (annotations.impact) {
+                if (annotations.impact && annotationTypes.filter(i => i.name === "impact").length > 0) {
                     impact = annotations.impact;
                 }
                 let source = "";
-                if (annotations.source) {
+                let includeSource: boolean = annotationTypes.filter(i => i.name === "source").length > 0;
+                if (annotations.source && includeSource) {
                     source = annotations.source;
                 }
                 if (this._pref.combined.sanitizeForGDPR) {
-                    return this.createCSVExportTweet(region, impact, source, i.id, i.date.toUTCString(),
+                    return this.createCSVExportTweet(includeSource, region, impact, source, i.id, i.date.toUTCString(),
                                                      "https://twitter.com/username_removed/status/" + i.id,
                                                      this.sanitizeForGDPR($("<div>").html(i.html).text()), JSON.stringify(i.location));
 
                 } else {
-                    return this.createCSVExportTweet(region, impact, source, i.id, i.date.toUTCString(),
-                                                     "https://twitter.com/username_removed/status/" + i.id,
-                                                     $("<div>").html(i.html).text(), JSON.stringify(i.location));
+                    return this.createCSVExportTweet(includeSource, region, impact, source, i.id, i.date.toUTCString(),
+                                                     "https://twitter.com/username_removed/status/" + i.id, $("<div>").html(i.html).text(),
+                                                     JSON.stringify(i.location));
                 }
             });
 
@@ -167,7 +169,7 @@ export class TwitterExporterService {
             .replace(/— .+ \(@USERNAME_REMOVED\).*$/g, "");
     }
 
-    public async exportToCSV(tweets: Tweet[], regions: Region[]) {
+    public async exportToCSV(tweets: Tweet[], regions: Region[], annotationTypes: any[]) {
         this._notify.show("Preparing CSV download");
         let filename;
         if (regions.length === 1) {
@@ -199,8 +201,9 @@ export class TwitterExporterService {
                                                if (annotationRecord && annotationRecord.annotations) {
                                                    annotations = annotationRecord.annotations;
                                                }
-                                               return this.asCSV(i, this.regionMap(regions),
-                                                                 this._pref.combined.sanitizeForGDPR, annotations);
+                                               let includeSource: boolean = annotationTypes.filter(i => i.name === "source").length > 0;
+                                               return this.asCSV(i, this.regionMap(regions), this._pref.combined.sanitizeForGDPR,
+                                                                 annotations, includeSource);
                                            });
         this._notify.show("All tweets annotated");
         const result: CSVExportTweet[] = [];
@@ -213,7 +216,7 @@ export class TwitterExporterService {
     }
 
 
-    public asCSV(tweet: Tweet, regionMap: any, sanitize: boolean, annotations: any = {}): CSVExportTweet {
+    public asCSV(tweet: Tweet, regionMap: any, sanitize: boolean, annotations: any = {}, includeSource: boolean): CSVExportTweet {
         let impact = "";
         if (annotations.impact) {
             impact = annotations.impact;
@@ -224,23 +227,25 @@ export class TwitterExporterService {
         }
         tweet.lazyInit();
         if (sanitize) {
-            return this.createCSVExportTweet(regionMap[tweet.region], impact, source, tweet.id, tweet.date.toUTCString(),
+            return this.createCSVExportTweet(includeSource, regionMap[tweet.region], impact, source, tweet.id, tweet.date.toUTCString(),
                                              "https://twitter.com/username_removed/status/" + tweet.id,
                                              this.sanitizeForGDPR($("<div>").html(tweet.html).text()), JSON.stringify(tweet.location));
 
         } else {
-            return this.createCSVExportTweet(regionMap[tweet.region], impact, source, tweet.id, tweet.date.toUTCString(), tweet.url,
-                                             $("<div>").html(tweet.html).text(), JSON.stringify(tweet.location));
+            return this.createCSVExportTweet(includeSource, regionMap[tweet.region], impact, source, tweet.id, tweet.date.toUTCString(),
+                                             tweet.url, $("<div>").html(tweet.html).text(), JSON.stringify(tweet.location));
         }
     }
 
-    createCSVExportTweet(region: string, impact: string = "", source: string = "", id: string, date: string, url: string, text: string,
-                         location: string) {
-        if (this._pref.combined.tweetCSVExportFormat === "pws") {
-            return {region, impact, source, id, date, url, text, location};
-        } else {
+    createCSVExportTweet(includeSource: boolean, region: string, impact: string = "", source: string = "", id: string, date: string,
+                         url: string,
+                         text: string, location: string) {
+        // if (this._pref.combined.tweetCSVExportFormat === "pws") {
+        if (includeSource) {
             return {region, impact, source, id, date, url, text, location};
 
+        } else {
+            return {region, impact, id, date, url, text, location};
         }
 
     }
