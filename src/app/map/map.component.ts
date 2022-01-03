@@ -589,19 +589,42 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    public async timeSliderPreset(mins: number) {
+    public async timeSliderPreset(mins: number | string) {
         log.debug("timeSliderPreset()");
         if (this.destroyed) {
             return;
         }
         const now: number = await this.data.now();
-        await this.sliderChange({lower: roundToHour(now - mins * ONE_MINUTE_IN_MILLIS), upper: roundToMinute(now)});
-        this.sliderOptions = {
-            max:      roundToMinute(now),
-            min:      roundToHour(await this.data.minDate()),
-            startMin: roundToHour(now - mins * ONE_MINUTE_IN_MILLIS),
-            startMax: roundToMinute(now)
-        };
+        const nowDate = new Date();
+        const today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
+        const yesterday = new Date(today.getTime() - ONE_DAY);
+
+        if (typeof mins === "number") {
+            await this.sliderChange({lower: roundToHour(now - mins * ONE_MINUTE_IN_MILLIS), upper: roundToMinute(now)});
+            this.sliderOptions = {
+                max:      roundToMinute(now),
+                min:      roundToHour(await this.data.minDate()),
+                startMin: roundToHour(now - mins * ONE_MINUTE_IN_MILLIS),
+                startMax: roundToMinute(now)
+            };
+        } else if (mins === "yesterday") {
+            await this.sliderChange({lower: yesterday.getTime(), upper: today.getTime() - 1});
+            this.sliderOptions = {
+                max:      roundToMinute(now),
+                min:      roundToHour(await this.data.minDate()),
+                startMin: yesterday.getTime(),
+                startMax: today.getTime() - 1
+            };
+
+        } else if (mins === "today") {
+            await this.sliderChange({lower: today.getTime(), upper: roundToMinute(now)});
+            this.sliderOptions = {
+                max:      roundToMinute(now),
+                min:      roundToHour(await this.data.minDate()),
+                startMin: today.getTime(),
+                startMax: roundToMinute(now)
+            };
+        }
         this._sliderIsStale = true;
     }
 

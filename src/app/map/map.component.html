@@ -1,4 +1,4 @@
-<mat-sidenav-container class="map-outer"  [ngClass]="blinkOn ? 'blink-on' : 'blink-off'">
+<mat-sidenav-container [ngClass]="blinkOn ? 'blink-on' : 'blink-off'" class="map-outer">
     <mat-sidenav class="app-tweet-drawer" #sidenav [(opened)]="tweetsVisible" disableClose mode="side">
         <button mat-icon-button class="app-draw-close-button" aria-label="Close" (click)="sidenav.toggle()">
             <mat-icon>close</mat-icon>
@@ -7,18 +7,19 @@
         <div class="drawer-main-tabs">
 
 
-        <mat-tab-group mat-align-tabs="center">
-            <mat-tab label="Twitter">
-                <twitter-panel [annotationTypes]="annotationTypes" [selection]="selection" class="twitter-panel"
-                               [tweets]="tweets" [showHeaderInfo]="twitterPanelHeader"
-                               [showTimeline]="showTwitterTimeline"></twitter-panel>
-            </mat-tab>
-            <mat-tab label="Stats">
-                <ng-template matTabContent>
-                    <app-map-graph-sidebar [selection]="selection"></app-map-graph-sidebar>
-                </ng-template>
-            </mat-tab>
-        </mat-tab-group>
+            <mat-tab-group mat-align-tabs="center">
+                <mat-tab label="Twitter">
+                    <twitter-panel [annotationTypes]="annotationTypes" [selection]="selection"
+                                   [showHeaderInfo]="twitterPanelHeader"
+                                   [showTimeline]="showTwitterTimeline" [tweets]="tweets"
+                                   class="twitter-panel"></twitter-panel>
+                </mat-tab>
+                <mat-tab label="Stats">
+                    <ng-template matTabContent>
+                        <app-map-graph-sidebar [selection]="selection"></app-map-graph-sidebar>
+                    </ng-template>
+                </mat-tab>
+            </mat-tab-group>
         </div>
     </mat-sidenav>
 
@@ -62,16 +63,18 @@
                     <div class="app-date-slider-live" *ngIf="liveUpdating">live</div>
                     <div class="app-toolbar-separator"></div>
                     <mat-form-field>
-                        <mat-label>Show the last ...</mat-label>
-                        <mat-select (selectionChange)="timeSliderPreset(+ $event.value)"
+                        <mat-label>Show ...</mat-label>
+                        <mat-select (selectionChange)="timeSliderPreset($event.value)"
                                     class="app-map-timer-preset-select">
-                            <mat-option value="60">One Hour</mat-option>
-                            <mat-option value="120">Two Hours</mat-option>
-                            <mat-option value="180">Three Hours</mat-option>
-                            <mat-option value="720">12 Hours</mat-option>
-                            <mat-option value="1440">24 Hours</mat-option>
-                            <mat-option value="2880">2 Days</mat-option>
-                            <mat-option value="4320">3 Days</mat-option>
+                            <mat-option value="today">Today</mat-option>
+                            <mat-option value="yesterday">Yesterday</mat-option>
+                            <mat-option value="60">Last 1 Hour</mat-option>
+                            <mat-option value="120">Last 2 Hours</mat-option>
+                            <mat-option value="180">Last 3 Hours</mat-option>
+                            <mat-option value="720">Last 12 Hours</mat-option>
+                            <mat-option value="1440">Last 24 Hours</mat-option>
+                            <mat-option value="2880">Last 2 Days</mat-option>
+                            <mat-option value="4320">Last 3 Days</mat-option>
                         </mat-select>
                     </mat-form-field>
                     <div class="app-toolbar-separator"></div>
