@@ -596,7 +596,7 @@ export class MapComponent implements OnInit, OnDestroy {
             return;
         }
         const now: number = await this.data.now();
-        const nowDate = new Date();
+        const nowDate = new Date(now);
         const today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
         const yesterday = new Date(today.getTime() - ONE_DAY);
 
