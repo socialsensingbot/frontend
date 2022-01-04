@@ -590,7 +590,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    public async timeSliderPreset(mins: number | string) {
+    public async timeSliderPreset(mins: string) {
         log.debug("timeSliderPreset()");
         if (this.destroyed) {
             return;
@@ -600,12 +600,12 @@ export class MapComponent implements OnInit, OnDestroy {
         const today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
         const yesterday = new Date(today.getTime() - ONE_DAY);
 
-        if (typeof mins === "number") {
-            await this.sliderChange({lower: roundToHour(now - mins * ONE_MINUTE_IN_MILLIS), upper: roundToMinute(now)});
+        if (/\d+/.test(mins)) {
+            await this.sliderChange({lower: roundToHour(now - +mins * ONE_MINUTE_IN_MILLIS), upper: roundToMinute(now)});
             this.sliderOptions = {
                 max:      roundToMinute(now),
                 min:      roundToHour(await this.data.minDate()),
-                startMin: roundToHour(now - mins * ONE_MINUTE_IN_MILLIS),
+                startMin: roundToHour(now - +mins * ONE_MINUTE_IN_MILLIS),
                 startMax: roundToMinute(now)
             };
         } else if (mins === "yesterday") {

@@ -20,7 +20,8 @@ describe('#233 Timeslide presets: : https://github.com/socialsensingbot/frontend
             cy.get('#mat-tab-label-1-0 > .mat-tab-label-content').should("have.text", "172 Tweets");
             cy.url().should("equal", url);
             cy.get('.mat-select-placeholder').click();
-            cy.get('#mat-option-2 > .mat-option-text').click();
+            cy.get('#mat-option-4 > .mat-option-text').click();
+            cy.wait(4000);
             cy.get(".slider-date-time-min .slider-date").should("contain.text", "14-Sept-21");
             cy.get(".slider-date-time-min .slider-time").should("contain.text", "10 pm");
             cy.log("Checking for Drop down time range issues. #275")
