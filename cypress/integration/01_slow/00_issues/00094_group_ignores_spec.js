@@ -1,4 +1,4 @@
-import {LONDON_URL, MAP_URL} from "../../../support";
+import {LONDON_URL} from "../../../support";
 
 const url = LONDON_URL;
 
@@ -50,8 +50,8 @@ describe('#94 Group Ignore Prefs : https://github.com/socialsensingbot/frontend/
 
   it('Reproduce issue ', () => {
     cy.visit(url);
-    cy.login("cypress1@example.com");
-    cy.wait(4000);
+      cy.login("cypress1@example.com");
+      cy.wait(10000);
 
     cy.get(".app-tweet-drawer", {timeout: 30000});
 
