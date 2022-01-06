@@ -35,17 +35,21 @@ const testHide = (refresh, count) => {
 
 };
 
-describe('#94 Group Ignore Prefs : https://github.com/socialsensingbot/frontend/issues/94 :', function () {
+describe('#94 Group Ignore Prefs : https://github.com/socialsensingbot/frontend/issues/94 :', {
+    retries: {
+        runMode:  8,
+        openMode: 1,
+    }, function() {
 
-    beforeEach(() => {
-        cy.stubLiveJson("live-old");
+        beforeEach(() => {
+            cy.stubLiveJson("live-old");
 
-    });
+        });
 
-    afterEach(() => {
-        cy.log("Cleaning up.");
-        cy.logout();
-    });
+        afterEach(() => {
+            cy.log("Cleaning up.");
+            cy.logout();
+        });
 
 
     it('Reproduce issue ', () => {
