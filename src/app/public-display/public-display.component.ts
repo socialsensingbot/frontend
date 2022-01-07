@@ -381,13 +381,12 @@ export class PublicDisplayComponent implements OnInit {
         let animateFunc: () => Promise<void> = async () => {
             try {
                 const animation = this.currentDisplayScreen.animation;
-                this.title = this.currentDisplayScreen.title;
                 const stepsPerLoop = Math.round(this.currentDisplayScreen.stepDurationInMilliseconds / 100);
                 if (animationLoopCounter % stepsPerLoop === 0) {
                     if (animation.type === "date-animation") {
                         this.minDate = roundToHour(now - animation.startTimeOffsetMilliseconds + (
                             animation.stepDurationInMilliseconds * animationStepCounter
-                        ))
+                        ));
                         this.maxDate = roundToHour(this.minDate + animation.windowDurationInMilliseconds);
                         log.debug(animationLoopCounter + ": From " + new Date(this.minDate) + " to " + new Date(this.maxDate));
                         animationStepCounter++;
@@ -443,6 +442,7 @@ export class PublicDisplayComponent implements OnInit {
             this.activeLayerGroup = this.currentDisplayScreen.data.layerId;
             this.activeStatistic = this.currentDisplayScreen.data.statistic;
             this.activeRegionType = this.currentDisplayScreen.data.regionType;
+            this.title = this.currentDisplayScreen.title;
             await this.data.loadGeography(this.activeRegionType);
             await this.resetStatisticsLayer(this.activeStatistic);
             this.currentDisplayNumber++;
