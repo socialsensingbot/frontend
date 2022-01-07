@@ -377,11 +377,11 @@ export class PublicDisplayComponent implements OnInit {
         let animationStepCounter = 0;
         let completedAnimations = 0;
         await this.resetStatisticsLayer(this.activeStatistic);
-        let now: number = await this.data.now();
+        let now: number = roundToHour(await this.data.now());
         let animateFunc: () => Promise<void> = async () => {
             try {
                 const animation = this.currentDisplayScreen.animation;
-                const stepsPerLoop = Math.round(this.currentDisplayScreen.stepDurationInMilliseconds / 100);
+                const stepsPerLoop = Math.round(this.currentDisplayScreen.stepDurationInMilliseconds / 100) - 1;
                 if (animationLoopCounter % stepsPerLoop === 0) {
                     if (animation.type === "date-animation") {
                         this.minDate = roundToHour(now - animation.startTimeOffsetMilliseconds + (
@@ -404,6 +404,12 @@ export class PublicDisplayComponent implements OnInit {
                     }
                 }
                 animationLoopCounter++;
+                this.sliderOptions = {
+                    min:      now - animation.startTimeOffsetMilliseconds,
+                    max:      now,
+                    startMin: this.minDate,
+                    startMax: this.maxDate
+                };
                 if (completedAnimations > this.currentDisplayScreen.animationLoops) {
                     animationLoopCounter = 0;
                     animationStepCounter = 0;

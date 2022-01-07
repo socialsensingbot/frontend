@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from "@angular/core";
-import {ChangeContext, LabelType, Options} from "ng5-slider";
+import {LabelType, Options} from "ng5-slider";
 import {Subscription, timer} from "rxjs";
 import {Logger} from "@aws-amplify/core";
 import {environment} from "../../../environments/environment";
@@ -9,16 +9,16 @@ import {roundToHour, roundToMinute} from "../../common";
 const log = new Logger("date-range");
 
 @Component({
-               selector:    "date-range-slider",
-               templateUrl: "./date-range-slider.component.html",
-               styleUrls:   ["./date-range-slider.component.scss"]
+               selector:    "date-range-display",
+               templateUrl: "./date-range-display.component.html",
+               styleUrls:   ["./date-range-display.component.scss"]
            })
 
 /**
  * This component provides a date range slider which periodically emits change
  * events.
  */
-export class DateRangeSliderComponent implements OnInit, OnDestroy {
+export class DateRangeDisplayComponent implements OnInit, OnDestroy {
 
 
     @Output()
@@ -73,11 +73,9 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
 
         }
     };
+    public ready = false;
     private cache: any = {};
     private updateTimerSub: Subscription;
-
-    constructor(private _pref: PreferenceService) {
-    }
 
     private _lowerValue = -1;
 
@@ -123,7 +121,6 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
      * These are the options for *this* component, not the ng5-slider.
      */
     private _options: DateRangeSliderOptions;
-    public ready = false;
 
     /**
      * These are the options for *this* component, not the ng5-slider.
@@ -160,6 +157,9 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
 
     }
 
+    constructor(private _pref: PreferenceService) {
+    }
+
     ngOnInit() {
         this.updateTimerSub = timer(0, 60 * 1000).subscribe(i => {
                                                                 log.debug("Received new time-keyed data");
@@ -193,19 +193,6 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
 
     }
 
-    public changeEvent($event: ChangeContext) {
-        log.debug("changeEvent()");
-        if (this.ready) {
-            this.dateRange.emit(new DateRange(this._lowerValue, this._upperValue));
-        }
-    }
-
-    public onEndEvent($event: ChangeContext) {
-        log.debug("onEndEvent()");
-        if (this.ready) {
-            this.onEnd.emit(new DateRange(this._lowerValue, this._upperValue));
-        }
-    }
 
     private updateTicks() {
         log.debug("updateTicks()");
