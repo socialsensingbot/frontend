@@ -17,6 +17,7 @@ export class DisplayScriptService {
             screens: [
                 {
                     type:                       "map-by-date",
+                    title:                      "UK Flood Last 24 Hours",
                     data:                       {
                         layerId:    "flood",
                         regionType: "county",
@@ -45,6 +46,7 @@ export class DisplayScriptService {
         county_ex_range_24h_step_1h_win_6h: {
             screens: [
                 {
+                    title:                      "UK Flood Last 24 Hours",
                     type:                       "map-by-date",
                     data:                       {
                         layerId:    "flood",
@@ -76,6 +78,7 @@ export class DisplayScriptService {
             screens: [
                 {
                     type:                       "map-by-date",
+                    title:                      "Eire Tweet Count Coarse Grid, Last 24 Hours",
                     data:                       {
                         layerId:    "flood",
                         regionType: "coarse",
@@ -88,7 +91,7 @@ export class DisplayScriptService {
                         stepDurationInMilliseconds:   DAY,
 
                     },
-                    location: {
+                    location:                   {
                         lon:               -7.6,
                         lat:               53.5,
                         zoom:              8,
@@ -99,6 +102,7 @@ export class DisplayScriptService {
                 },
                 {
                     type:                       "map-by-date",
+                    title:                      "UK Flood Last 24 Hours",
                     data:                       {
                         layerId:    "flood",
                         regionType: "county",
@@ -112,7 +116,34 @@ export class DisplayScriptService {
 
 
                     },
-                    location: {
+                    location:                   {
+                        lon:               -6,
+                        lat:               54,
+                        zoom:              6,
+                        animationDuration: 1500,
+                    },
+                    stepDurationInMilliseconds: 1500,
+                    animationLoops:             1
+
+
+                },
+                {
+                    type:                       "map-by-date",
+                    title:                      "UK Snow Last 24 Hours",
+                    data:                       {
+                        layerId:    "snow",
+                        regionType: "county",
+                        statistic:  "exceedance"
+                    }, animation:               {
+                        type:                         "date-animation",
+                        startTimeOffsetMilliseconds:  DAY,
+                        endTimeOffsetMilliseconds:    0,
+                        windowDurationInMilliseconds: 6 * HOUR,
+                        stepDurationInMilliseconds:   3 * HOUR,
+
+
+                    },
+                    location:                   {
                         lon:               -6,
                         lat:               54,
                         zoom:              6,

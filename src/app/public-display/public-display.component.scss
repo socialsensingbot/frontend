@@ -37,15 +37,25 @@ $drawer-width: 500px;
 }
 
 .public-display-map-date {
-    font-size: 4vw;
+    font-size: 2.5vw;
     color: white;
-    text-shadow: 0 0.2vw 1vw rgba(100, 100, 100, 0.5);
+    text-shadow: 0 0 0.3vw rgba(100, 100, 100, 0.7);
     position: absolute;
-    top: calc(4vw);
+    top: calc(8vw);
     left: 4vw;
 
 
 }
+
+.public-display-map-title {
+    font-size: 3vw;
+    color: white;
+    text-shadow: 0 0 0.3vw rgba(100, 100, 100, 0.7);
+    position: absolute;
+    top: calc(4vw);
+    left: 4vw;
+}
+
 
 .app-draw-close-button {
     position: absolute;

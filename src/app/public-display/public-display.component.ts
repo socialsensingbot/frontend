@@ -130,6 +130,7 @@ export class PublicDisplayComponent implements OnInit {
     private _selectedFeatureNames: string[] = [];
     private regionTweetMap: RegionTweeCount;
     private _script: string;
+    public title: string;
 
     public get selectedFeatureNames(): string[] {
         return this._selectedFeatureNames;
@@ -380,13 +381,13 @@ export class PublicDisplayComponent implements OnInit {
         let animateFunc: () => Promise<void> = async () => {
             try {
                 const animation = this.currentDisplayScreen.animation;
+                this.title = this.currentDisplayScreen.title;
                 const stepsPerLoop = Math.round(this.currentDisplayScreen.stepDurationInMilliseconds / 100);
                 if (animationLoopCounter % stepsPerLoop === 0) {
                     if (animation.type === "date-animation") {
                         this.minDate = roundToHour(now - animation.startTimeOffsetMilliseconds + (
                             animation.stepDurationInMilliseconds * animationStepCounter
                         ))
-                        ;
                         this.maxDate = roundToHour(this.minDate + animation.windowDurationInMilliseconds);
                         log.debug(animationLoopCounter + ": From " + new Date(this.minDate) + " to " + new Date(this.maxDate));
                         animationStepCounter++;
