@@ -78,7 +78,7 @@ export class DisplayScriptService {
             screens: [
                 {
                     type:                       "map-by-date",
-                    title:                      "Eire Tweet Count Coarse Grid, Last 24 Hours",
+                    title:                      "Eire Flood Tweet Count, Coarse Grid, Last 24 Hours",
                     data:                       {
                         layerId:    "flood",
                         regionType: "coarse",
