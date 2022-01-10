@@ -105,7 +105,7 @@ export class Tweet {
     }
 
     public get html(): string {
-        return this._html;
+        return z
     }
 
     public get text(): string {
