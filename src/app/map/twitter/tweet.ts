@@ -109,7 +109,7 @@ export class Tweet {
     }
 
     public get html(): string {
-        return this._html;
+        return this._json.extended_tweet ? this._json.extended_tweet.full_text : this._json.text;
     }
 
     public get text(): string {
