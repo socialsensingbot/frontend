@@ -44,12 +44,11 @@
             - {{maxDate|date:'MMM dd'}} {{maxDate|date:'HH:mm'}} {{minDate|date:'zzz'}}
         </div>
 
-        <div class="custom-slider" style="left:4vw; right:4vw; position:absolute; bottom:4vw;">
+        <div class="app-pd-date-range-display">
             <date-range-display [options]="sliderOptions"></date-range-display>
 
         </div>
-        <app-pd-tweet-list [annotationTypes]="annotationTypes" [tweets]="tweets"
-                           style="position:absolute; top:calc(10vh + 64px);left:5vw;bottom:10vh;min-width:25vw;"></app-pd-tweet-list>
+        <app-pd-tweet-list [annotationTypes]="annotationTypes" [tweets]="tweets"></app-pd-tweet-list>
     </mat-sidenav-content>
 
 </mat-sidenav-container>
