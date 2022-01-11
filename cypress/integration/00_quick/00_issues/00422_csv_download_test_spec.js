@@ -19,10 +19,11 @@ describe('#422 CSV Download Tests : https://github.com/socialsensingbot/frontend
                  cy.twitterPanelHeader("West Yorkshire");
                  cy.get(".app-tweet-export-btn").click();
                  cy.validateCsvFile("west_yorkshire*.csv", (list) => {
-                     console.log(JSON.stringify(list));
-                     console.log("list", list)
-                     cy.log(list);
+                     console.log(list);
+                     console.log("list", JSON.stringify(list));
+                     cy.log(JSON.stringify(list));
                      cy.fixture("csv_download_west_yorkshire.json").then((json) => {
+                         expect(JSON.stringify(list)).to.equal(JSON.stringify(west_yorkshire));
                          expect(list).to.deep.equal(west_yorkshire);
                      })
 
