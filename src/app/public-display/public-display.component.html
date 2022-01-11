@@ -34,7 +34,7 @@
             </div>
         </div>
 
-        <map-legend *ngIf="ready" [activeNumber]="activeStatistic" class="legend"></map-legend>
+<!--        <map-legend *ngIf="ready" [activeNumber]="activeStatistic" class="legend"></map-legend>-->
 
         <div class="public-display-map-title">
             {{title}}
@@ -48,7 +48,10 @@
             <date-range-display [options]="sliderOptions"></date-range-display>
 
         </div>
+        <app-pd-tweet-list [annotationTypes]="annotationTypes" [tweets]="tweets"
+                           style="position:absolute; top:calc(10vh + 64px);left:5vw;bottom:10vh;min-width:25vw;"></app-pd-tweet-list>
     </mat-sidenav-content>
+
 </mat-sidenav-container>
 
 <!--<mat-spinner *ngIf="!ready" class="map-spinner"></mat-spinner>-->

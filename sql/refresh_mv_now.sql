@@ -232,8 +232,8 @@ BEGIN
 
 #     SET @maxTimestamp = IFNULL((select max(source_timestamp) from mat_view_regions), NOW() - INTERVAL 20 YEAR);
     call debug_msg(1, 'refresh_mv', 'Updating mat_view_regions');
-    DELETE FROM mat_view_regions WHERE source_timestamp BETWEEN start_date and end_date;
-    call debug_msg(1, 'refresh_mv', 'Deleted old from mat_view_regions');
+    #     DELETE FROM mat_view_regions WHERE source_timestamp BETWEEN start_date and end_date;
+#     call debug_msg(1, 'refresh_mv', 'Deleted old from mat_view_regions');
 
     # Put in the fine, coarse and county stats that Rudy generates data for (the old way of doing this)
     START TRANSACTION;

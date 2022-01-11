@@ -397,9 +397,10 @@ export class PublicDisplayComponent implements OnInit {
                         }
                         await this.load();
                         this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType,
-                                                             await this.data.regionsOfType(this.activeRegionType),
+                                                             (await this.data.regionsOfType(this.activeRegionType)).map(i => i.value),
                                                              this.minDate,
                                                              this.maxDate);
+                        log.warn(this.tweets);
                         await this.updateRegionDisplay(this.activeStatistic);
                     }
                 }
