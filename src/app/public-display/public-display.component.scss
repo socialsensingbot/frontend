@@ -36,18 +36,18 @@ $bottom-margin: 1vw;
 }
 
 .public-display-map-date {
-    font-size: 2vw;
+    font-size: 2vh;
     color: white;
     text-shadow: 0 0 0.3vw rgba(100, 100, 100, 0.7);
     position: absolute;
-    top: 7vh;
+    top: 5vh;
     left: 2vw;
 
 
 }
 
 .public-display-map-title {
-    font-size: 2.5vw;
+    font-size: 2.5vh;
     color: white;
     text-shadow: 0 0 0.3vw rgba(100, 100, 100, 0.7);
     position: absolute;
@@ -65,7 +65,7 @@ $bottom-margin: 1vw;
 
 app-pd-tweet-list {
     position: absolute;
-    top: 12vh;
+    top: 10vh;
     left: 2vw;
     bottom: 6vh;
     min-width: 25vw;
