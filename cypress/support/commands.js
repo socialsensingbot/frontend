@@ -24,6 +24,8 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
+import {parse} from 'csv-parse/lib/sync';
+
 const LONG_TIMEOUT = 60000;
 const VERY_LONG_TIMEOUT = 120000;
 const menu2ndOpt = "body .mat-menu-item:nth-child(2)";
@@ -116,10 +118,10 @@ Cypress.Commands.add("tweetsVisible", (count) => {
         count);
 });
 Cypress.Commands.add("tweetCountTotal", (sum) => {
-    cy.get("#mat-tab-label-1-0 > .mat-tab-label-content", {timeout: 30000}).then(header => {
+    cy.get(".app-tweet-visible-tweets-tab-label", {timeout: 30000}).then(header => {
         const headerParts = header.text().trim().split(" ");
         const visibleCount = +headerParts[0];
-        cy.get("#mat-tab-label-1-1 > .mat-tab-label-content", {timeout: 30000})
+        cy.get(".app-tweet-hidden-tweets-tab-label", {timeout: 30000})
             .then(title => {
                       const hiddenCount = +title.text().trimLeft().split(" ")[0];
                       expect(hiddenCount + visibleCount).equals(sum);
@@ -131,10 +133,10 @@ Cypress.Commands.add("tweetCountTotal", (sum) => {
 
 Cypress.Commands.add("withTweetCounts", (callback) => {
     cy.wait(4000);
-    cy.get("#mat-tab-label-1-0 > .mat-tab-label-content").then(header => {
+    cy.get(".app-tweet-visible-tweets-tab-label").then(header => {
         const headerParts = header.text().trim().split(" ");
         const visibleCount = +headerParts[0];
-        cy.get("#mat-tab-label-1-1 > .mat-tab-label-content", {timeout: 30000})
+        cy.get(".app-tweet-hidden-tweets-tab-label", {timeout: 30000})
             .then(title => {
                       const hiddenCount = +title.text().trimLeft().split(" ")[0];
                       callback(visibleCount, hiddenCount);
@@ -165,14 +167,14 @@ Cypress.Commands.add("tweetCount", (vis, hid) => {
 
 
 Cypress.Commands.add("clickTweetTab", (index) => {
-    cy.get(`#mat-tab-label-1-${index-1} > .mat-tab-label-content`, {timeout: 30000}).click({force: true});
+    cy.get(`#mat-tab-label-1-${index - 1} > .mat-tab-label-content`, {timeout: 30000}).click({force: true});
 });
 
 Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
     cy.wait(1000);
-    cy.get(tweetSelector + " .mat-icon", {timeout: 10000})
-    cy.get(tweetSelector + " .mat-icon ").click();
-    cy.wait(1000);
+    cy.get(tweetSelector + " .app-tweet-item-menu", {timeout: 10000})
+    cy.get(tweetSelector + " .app-tweet-item-menu").click();
+    cy.wait(3000);
     cy.get(markAsMenu, {timeout: LONG_TIMEOUT}).click();
     cy.wait(1000);
     cy.get(markAsIgnoredMenu).click();
@@ -181,9 +183,9 @@ Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
 
 Cypress.Commands.add("unignoreTweet", (tweetSelector) => {
     cy.wait(1000);
-    cy.get(tweetSelector + " .mat-icon", {timeout: 10000});
-    cy.get(tweetSelector + " .mat-icon").click();
-    cy.wait(1000);
+    cy.get(tweetSelector + " .app-tweet-item-menu", {timeout: 10000});
+    cy.get(tweetSelector + " .app-tweet-item-menu").click();
+    cy.wait(3000);
     cy.get(markAsMenu, {timeout: LONG_TIMEOUT}).click();
     cy.wait(1000);
     cy.get(markAsUnignoredMenu).click();
@@ -211,17 +213,31 @@ Cypress.Commands.add("unhideTweets", (num) => {
 });
 
 
-Cypress.Commands.add("moveMinDateSliderLeft", (times) => {
+Cypress.Commands.add("moveMinDateSliderLeft", (times, expectURLChange = false) => {
     for (let i = 0; i < times; i++) {
-        cy.get(".ng5-slider-pointer-min").type('{pagedown}');
-        cy.wait(2000);
+        cy.url().then(url => {
+            cy.get(".ng5-slider-pointer-min").type('{pagedown}', {force: true});
+            cy.log("Grace period to allow the URL to change")
+            if (expectURLChange) {
+                cy.url({timeout: 20000}).should("not.equal", url);
+            } else {
+                cy.wait(3000);
+            }
+        })
     }
 });
 
-Cypress.Commands.add("moveMinDateSliderRight", (times) => {
+Cypress.Commands.add("moveMinDateSliderRight", (times, expectURLChange = false) => {
     for (let i = 0; i < times; i++) {
-        cy.get(".ng5-slider-pointer-min").type('{pageup}');
-        cy.wait(1000);
+        cy.url().then(url => {
+            cy.get(".ng5-slider-pointer-min").type('{pageup}', {force: true});
+            cy.log("Grace period to allow the URL to change")
+            if (expectURLChange) {
+                cy.url({timeout: 20000}).should("not.equal", url);
+            } else {
+                cy.wait(3000);
+            }
+        })
     }
 });
 
@@ -229,7 +245,7 @@ Cypress.Commands.add("multiSelectRegions", (regions) => {
     for (let region of regions) {
         const path = `div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-${region}`;
         cy.get("body").type(multipleKey, {release: false, force: true})
-        cy.get(path).click({force: true, multiple:true});
+        cy.get(path).click({force: true, multiple: true});
         cy.wait(1000);
         cy.get("body").type(multipleKey, {release: true, force: true})
     }
@@ -318,4 +334,43 @@ Cypress.Commands.add("mockGraphQL", () => {
 
               });
     cy.route("POST", "/graphql");
+});
+
+const path = require('path')
+
+
+/**
+ * Delete the downloads folder to make sure the test has "clean"
+ * slate before starting.
+ */
+const deleteDownloadsFolder = () => {
+    const downloadsFolder = Cypress.config('downloadsFolder')
+
+    cy.task('deleteFolder', downloadsFolder)
+}
+
+/*
+export const validateCsvList = (list) => {
+    expect(list, 'number of records').to.have.length(3)
+    expect(list[0], 'first record').to.deep.equal({
+                                                      Age:          '20',
+                                                      City:         'Boston',
+                                                      'First name': 'Joe',
+                                                      'Last name':  'Smith',
+                                                      Occupation:   'student',
+                                                      State:        'MA',
+                                                  })
+}
+
+*/
+
+/**
+ * @param {string} name File name in the downloads folder
+ */
+Cypress.Commands.add("validateCsvFile", (name, validateCsvList) => {
+    const downloadsFolder = Cypress.config('downloadsFolder')
+    const filename = path.join(downloadsFolder, name);
+    cy.task('findFiles', filename).then((file) => {
+        cy.readFile(file).then(str => validateCsvList(parse(str)));
+    });
 });

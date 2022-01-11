@@ -6,6 +6,7 @@ export interface DisplayScript {
 
 export interface DisplayScreen {
     type: "map-by-date";
+    title: string;
     location: AnimationLocation;
     data: AnimationScreenData;
     animation: DateAnimation;

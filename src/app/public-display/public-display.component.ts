@@ -130,6 +130,7 @@ export class PublicDisplayComponent implements OnInit {
     private _selectedFeatureNames: string[] = [];
     private regionTweetMap: RegionTweeCount;
     private _script: string;
+    public title: string;
 
     public get selectedFeatureNames(): string[] {
         return this._selectedFeatureNames;
@@ -376,17 +377,16 @@ export class PublicDisplayComponent implements OnInit {
         let animationStepCounter = 0;
         let completedAnimations = 0;
         await this.resetStatisticsLayer(this.activeStatistic);
-        let now: number = await this.data.now();
+        let now: number = roundToHour(await this.data.now());
         let animateFunc: () => Promise<void> = async () => {
             try {
                 const animation = this.currentDisplayScreen.animation;
-                const stepsPerLoop = Math.round(this.currentDisplayScreen.stepDurationInMilliseconds / 100);
+                const stepsPerLoop = Math.round(this.currentDisplayScreen.stepDurationInMilliseconds / 100) - 1;
                 if (animationLoopCounter % stepsPerLoop === 0) {
                     if (animation.type === "date-animation") {
                         this.minDate = roundToHour(now - animation.startTimeOffsetMilliseconds + (
                             animation.stepDurationInMilliseconds * animationStepCounter
-                        ))
-                        ;
+                        ));
                         this.maxDate = roundToHour(this.minDate + animation.windowDurationInMilliseconds);
                         log.debug(animationLoopCounter + ": From " + new Date(this.minDate) + " to " + new Date(this.maxDate));
                         animationStepCounter++;
@@ -397,13 +397,20 @@ export class PublicDisplayComponent implements OnInit {
                         }
                         await this.load();
                         this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType,
-                                                             await this.data.regionsOfType(this.activeRegionType),
+                                                             (await this.data.regionsOfType(this.activeRegionType)).map(i => i.value),
                                                              this.minDate,
                                                              this.maxDate);
+                        log.warn(this.tweets);
                         await this.updateRegionDisplay(this.activeStatistic);
                     }
                 }
                 animationLoopCounter++;
+                this.sliderOptions = {
+                    min:      now - animation.startTimeOffsetMilliseconds,
+                    max:      now,
+                    startMin: this.minDate,
+                    startMax: this.maxDate
+                };
                 if (completedAnimations > this.currentDisplayScreen.animationLoops) {
                     animationLoopCounter = 0;
                     animationStepCounter = 0;
@@ -442,6 +449,7 @@ export class PublicDisplayComponent implements OnInit {
             this.activeLayerGroup = this.currentDisplayScreen.data.layerId;
             this.activeStatistic = this.currentDisplayScreen.data.statistic;
             this.activeRegionType = this.currentDisplayScreen.data.regionType;
+            this.title = this.currentDisplayScreen.title;
             await this.data.loadGeography(this.activeRegionType);
             await this.resetStatisticsLayer(this.activeStatistic);
             this.currentDisplayNumber++;

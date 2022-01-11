@@ -50,19 +50,25 @@
 
 
     <mat-tab-group (selectedTabChange)="update(null)">
-      <mat-tab label="{{ready ? visibleTweets.length: ''}} Tweets">
-        <ng-template matTabContent>
-          <app-tweet-list (update)="update($event)" [annotationTypes]="annotationTypes" [tweets]="visibleTweets"
-                          group="visible"
-                          [style.visibility]="tweetsReady ? 'visible' : 'hidden'"></app-tweet-list>
-        </ng-template>
-      </mat-tab>
-      <mat-tab label="{{ready ? hiddenTweets.length: ''}} Ignored">
-        <ng-template matTabContent>
-          <app-tweet-list group="hidden" [tweets]="hiddenTweets" (update)="update($event)"
-                          [style.visibility]="tweetsReady ? 'visible' : 'hidden'"></app-tweet-list>
-        </ng-template>
-      </mat-tab>
+        <mat-tab>
+            <ng-template mat-tab-label>
+                <span class="app-tweet-visible-tweets-tab-label">{{ready ? visibleTweets.length : ''}} Tweets</span>
+            </ng-template>
+            <ng-template matTabContent>
+                <app-tweet-list (update)="update($event)" [annotationTypes]="annotationTypes" [tweets]="visibleTweets"
+                                group="visible"
+                                [style.visibility]="tweetsReady ? 'visible' : 'hidden'"></app-tweet-list>
+            </ng-template>
+        </mat-tab>
+        <mat-tab>
+            <ng-template mat-tab-label>
+                <span class="app-tweet-hidden-tweets-tab-label">{{ready ? hiddenTweets.length : ''}} Ignored</span>
+            </ng-template>
+            <ng-template matTabContent>
+                <app-tweet-list group="hidden" [tweets]="hiddenTweets" (update)="update($event)"
+                                [style.visibility]="tweetsReady ? 'visible' : 'hidden'"></app-tweet-list>
+            </ng-template>
+        </mat-tab>
     </mat-tab-group>
 
 

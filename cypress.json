@@ -2,10 +2,13 @@
   "env": {
     "RETRIES": 0
   },
-  "retries" : {
-    "runMode" : 3, "openMode": 0
+  "retries": {
+    "runMode": 3,
+    "openMode": 1
   },
-  "numTestsKeptInMemory" : 0,
+  "viewportWidth": 1280,
+  "viewportHeight": 720,
+  "numTestsKeptInMemory": 0,
   "projectId": "zxxo89",
   "ignoreTestFiles": [
     "**/__snapshots__/*",

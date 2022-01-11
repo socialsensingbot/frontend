@@ -1,24 +1,25 @@
-<mat-sidenav-container class="map-outer"  [ngClass]="blinkOn ? 'blink-on' : 'blink-off'">
+<mat-sidenav-container [ngClass]="blinkOn ? 'blink-on' : 'blink-off'" class="map-outer">
     <mat-sidenav class="app-tweet-drawer" #sidenav [(opened)]="tweetsVisible" disableClose mode="side">
-        <button mat-icon-button class="app-draw-close-button" aria-label="Close" (click)="sidenav.toggle()">
+        <button (click)="closeTwitterPanel(sidenav)" aria-label="Close" class="app-draw-close-button" mat-icon-button>
             <mat-icon>close</mat-icon>
         </button>
 
         <div class="drawer-main-tabs">
 
 
-        <mat-tab-group mat-align-tabs="center">
-            <mat-tab label="Twitter">
-                <twitter-panel [annotationTypes]="annotationTypes" [selection]="selection" class="twitter-panel"
-                               [tweets]="tweets" [showHeaderInfo]="twitterPanelHeader"
-                               [showTimeline]="showTwitterTimeline"></twitter-panel>
-            </mat-tab>
-            <mat-tab label="Stats">
-                <ng-template matTabContent>
-                    <app-map-graph-sidebar [selection]="selection"></app-map-graph-sidebar>
-                </ng-template>
-            </mat-tab>
-        </mat-tab-group>
+            <mat-tab-group mat-align-tabs="center">
+                <mat-tab label="Twitter">
+                    <twitter-panel [annotationTypes]="annotationTypes" [selection]="selection"
+                                   [showHeaderInfo]="twitterPanelHeader"
+                                   [showTimeline]="showTwitterTimeline" [tweets]="tweets"
+                                   class="twitter-panel"></twitter-panel>
+                </mat-tab>
+                <mat-tab label="Stats">
+                    <ng-template matTabContent>
+                        <app-map-graph-sidebar [selection]="selection"></app-map-graph-sidebar>
+                    </ng-template>
+                </mat-tab>
+            </mat-tab-group>
         </div>
     </mat-sidenav>
 
@@ -62,18 +63,29 @@
                     <div class="app-date-slider-live" *ngIf="liveUpdating">live</div>
                     <div class="app-toolbar-separator"></div>
                     <mat-form-field>
-                        <mat-label>Show the last ...</mat-label>
-                        <mat-select (selectionChange)="timeSliderPreset(+ $event.value)"
-                                    class="map-number-layer-select">
-                            <mat-option value="60">One Hour</mat-option>
-                            <mat-option value="120">Two Hours</mat-option>
-                            <mat-option value="180">Three Hours</mat-option>
-                            <mat-option value="720">12 Hours</mat-option>
-                            <mat-option value="1440">24 Hours</mat-option>
-                            <mat-option value="2880">2 Days</mat-option>
-                            <mat-option value="4320">3 Days</mat-option>
+                        <mat-label>Show ...</mat-label>
+                        <mat-select (selectionChange)="timeSliderPreset($event.value)"
+                                    class="app-map-timer-preset-select">
+                            <mat-option value="today">Today</mat-option>
+                            <mat-option value="yesterday">Yesterday</mat-option>
+                            <mat-option value="60">Last 1 Hour</mat-option>
+                            <mat-option value="120">Last 2 Hours</mat-option>
+                            <mat-option value="180">Last 3 Hours</mat-option>
+                            <mat-option value="720">Last 12 Hours</mat-option>
+                            <mat-option value="1440">Last 24 Hours</mat-option>
+                            <mat-option value="2880">Last 2 Days</mat-option>
+                            <mat-option value="4320">Last 3 Days</mat-option>
                         </mat-select>
                     </mat-form-field>
+                    <div class="app-toolbar-separator"></div>
+                    <mat-form-field *ngIf="pref.combined.layers.available.length > 1">
+                        <mat-select [(value)]="activeLayerGroup" class="app-map-active-layer-select">
+                            <mat-option *ngFor="let layerGroup of pref.combined.layers.available"
+                                        [class]="'app-map-als-option-'+layerGroup.id"
+                                        [value]="layerGroup.id">{{layerGroup.title}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
                     <div class="app-toolbar-expanding-separator"></div>
                 </mat-toolbar-row>
                 <mat-toolbar-row *ngIf="appToolbarExpanded">
@@ -91,23 +103,16 @@
                     <mat-form-field>
                         <mat-select (valueChange)="updateLayers('Layer Changed', false)"
                                     *ngIf="data.mapMetadata.regionTypes" [(ngModel)]="activeRegionType"
-                                    class="map-polygon-layer-select">
+                                    class="app-map-polygon-layer-select">
                             <mat-option *ngFor="let regionType of data.mapMetadata.regionTypes"
                                         [value]="regionType.id">{{regionType.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>
                     <div class="app-toolbar-separator"></div>
                     <mat-form-field>
-                        <mat-select [(value)]="activeStatistic" class="map-number-layer-select">
-                            <mat-option value="exceedance">Exceedance</mat-option>
-                            <mat-option value="count">Tweet Count</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                    <div class="app-toolbar-separator"></div>
-                    <mat-form-field *ngIf="pref.combined.layers.available.length > 1">
-                        <mat-select [(value)]="activeLayerGroup" class="map-number-layer-select">
-                            <mat-option *ngFor="let layerGroup of pref.combined.layers.available"
-                                        [value]="layerGroup.id">{{layerGroup.title}}</mat-option>
+                        <mat-select [(value)]="activeStatistic" class="app-map-number-layer-select">
+                            <mat-option class="app-map-nls-exceedance" value="exceedance">Exceedance</mat-option>
+                            <mat-option class="app-map-nls-count" value="count">Tweet Count</mat-option>
                         </mat-select>
                     </mat-form-field>
 
@@ -142,8 +147,10 @@
             </div>
         </div>
 
-        <map-legend *ngIf="ready" class="legend" [activeNumber]="activeStatistic"></map-legend>
+        <map-legend *ngIf="ready" [activeLayerGroup]="activeLayerGroup" [activeNumber]="activeStatistic"
+                    class="legend"></map-legend>
 
+        <div class="app-map-last-updated">Last updated {{data.lastUpdated| date:"long"}}</div>
 
         <mat-progress-bar *ngIf="activity && ready" class="map-progress" mode="indeterminate"
                           [color]="pref.combined.toolbarColor"></mat-progress-bar>

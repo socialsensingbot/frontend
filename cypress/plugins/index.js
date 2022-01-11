@@ -11,13 +11,35 @@
 
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
+const glob = require("glob-promise")
 
-const { initPlugin } = require('cypress-plugin-snapshots/plugin');
+const {initPlugin} = require('cypress-plugin-snapshots/plugin');
 
 /**
  * @type {Cypress.PluginConfig}
  */
 module.exports = (on, config) => {
+    on('task', {  // a task to find one file matching the given mask
+        // returns just the first matching file
+        async findFiles(mask) {
+            if (!mask) {
+                throw new Error('Missing a file mask to search')
+            }
+
+            console.log('searching for files %s', mask)
+
+            const list = await glob(mask);
+            if (!list.length) {
+                console.log('found no files')
+
+                return null
+            }
+
+            console.log('found %d files, first one %s', list.length, list[0])
+
+            return list[0]
+        }
+    });
     initPlugin(on, config);
     return config;
 };

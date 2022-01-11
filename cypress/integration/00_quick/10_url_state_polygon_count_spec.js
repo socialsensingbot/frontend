@@ -11,10 +11,10 @@ describe('05 URL State (polygon): ', function () {
       cy.url({timeout: 30000}).should("equal", url);
       cy.noSpinner();
       cy.wait(4000);
-      cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 60000}).should("have.attr", "fill").should(
-        "eq",
-        "#2B8CBE");
-      cy.twitterPanelHeader("123");
+        cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 60000}).should("have.attr", "fill").should(
+            "eq",
+            "#F1EEF6");
+        cy.twitterPanelHeader("123");
       cy.logout();
     });
     it('when authorized and load state', () => {

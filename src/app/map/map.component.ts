@@ -27,6 +27,7 @@ import {ONE_DAY} from "./data/map-data";
 import {RESTMapDataService} from "./data/rest-map-data.service";
 import {TwitterExporterService} from "./twitter/twitter-exporter.service";
 import {MapSelectionService} from "../map-selection.service";
+import {MatSidenav} from "@angular/material/sidenav";
 
 
 const log = new Logger("map");
@@ -238,11 +239,11 @@ export class MapComponent implements OnInit, OnDestroy {
 
     public set activeRegionType(value: string) {
         log.debug("activeRegionType(" + value + ")");
-        if (!this.activeRegionType) {
-            this.updateSearch({active_polygon: value});
-        } else {
+        if (this.activeRegionType && this.activeRegionType !== value) {
             log.debug("Removing selected region(s) as we have changed region type");
             this.updateSearch({active_polygon: value, selected: null});
+        } else {
+            this.updateSearch({active_polygon: value});
         }
 
         if (this.activeRegionType !== value) {
@@ -528,11 +529,11 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this.data.hasCountryAggregates()) {
             await this._exporter.downloadAggregate(this.activeLayerGroup, "uk-countries", this.selectedCountries,
                                                    await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData, this._dateMin,
-                                                   this._dateMax, this.activeRegionType);
+                                                   this._dateMax, this.activeRegionType, this.annotationTypes);
         } else {
             await this._exporter.download(this.activeLayerGroup, await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData,
                                           this.activeRegionType,
-                                          this._dateMin, this._dateMax);
+                                          this._dateMin, this._dateMax, this.annotationTypes);
         }
     }
 
@@ -589,19 +590,42 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    public async timeSliderPreset(mins: number) {
+    public async timeSliderPreset(mins: string) {
         log.debug("timeSliderPreset()");
         if (this.destroyed) {
             return;
         }
         const now: number = await this.data.now();
-        await this.sliderChange({lower: roundToHour(now - mins * ONE_MINUTE_IN_MILLIS), upper: roundToMinute(now)});
-        this.sliderOptions = {
-            max:      roundToMinute(now),
-            min:      roundToHour(await this.data.minDate()),
-            startMin: roundToHour(now - mins * ONE_MINUTE_IN_MILLIS),
-            startMax: roundToMinute(now)
-        };
+        const nowDate = new Date(now);
+        const today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
+        const yesterday = new Date(today.getTime() - ONE_DAY);
+
+        if (/\d+/.test(mins)) {
+            await this.sliderChange({lower: roundToHour(now - +mins * ONE_MINUTE_IN_MILLIS), upper: roundToMinute(now)});
+            this.sliderOptions = {
+                max:      roundToMinute(now),
+                min:      roundToHour(await this.data.minDate()),
+                startMin: roundToHour(now - +mins * ONE_MINUTE_IN_MILLIS),
+                startMax: roundToMinute(now)
+            };
+        } else if (mins === "yesterday") {
+            await this.sliderChange({lower: yesterday.getTime(), upper: today.getTime() - 1});
+            this.sliderOptions = {
+                max:      roundToMinute(now),
+                min:      roundToHour(await this.data.minDate()),
+                startMin: yesterday.getTime(),
+                startMax: today.getTime() - 1
+            };
+
+        } else if (mins === "today") {
+            await this.sliderChange({lower: today.getTime(), upper: roundToMinute(now)});
+            this.sliderOptions = {
+                max:      roundToMinute(now),
+                min:      roundToHour(await this.data.minDate()),
+                startMin: today.getTime(),
+                startMax: roundToMinute(now)
+            };
+        }
         this._sliderIsStale = true;
     }
 
@@ -645,6 +669,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this._newParams = params;
         this._absoluteTime = await this.data.now();
         this.sliderOptions.min = await this.data.minDate();
+        this.sliderOptions.max = await this.data.now();
         // These handle the date slider min_time & max_time values
         if (typeof min_time !== "undefined") {
             this._dateMin = roundToHour(Math.max(+min_time, this.sliderOptions.min));
@@ -808,12 +833,17 @@ export class MapComponent implements OnInit, OnDestroy {
                                  }, null, false, false, true, null, 1000, 3);
             } else {
                 if (this._popState) {
-                    log.debug("POP STATE detected before URL query params change.");
+                    log.debug("POP STATE detected before URL query params change ", params);
+                    log.debug("POP STATE detected before URL query params change previous URL was: ", window.history.state.prevUrl);
                     this._popState = false;
                     this.activity = true;
                     await this.updateMapFromQueryParams(params);
-                    return this.updateLayers("Pop State", true)
-                               .then(() => this._twitterIsStale = true)
+                    this.selection.clearWithoutEmitting();
+                    return this.updateLayers("Pop State", false)
+                               .then(() => {
+
+                                   this._twitterIsStale = true;
+                               })
                                .finally(() => this.activity = false);
                 }
             }
@@ -1044,66 +1074,8 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
 
-    /**
-     * Reset the polygon layers.
-     *
-     * @param clearSelected clears the selected polygon
-     */
-    private async resetStatisticsLayer(layer: string, clearSelected, approximateFirst = true) {
-        if (this.destroyed) {
-            return;
-        }
-
-        log.info("Resetting " + layer);
-        // this.loading.showIndeterminateSpinner();
-        try {
-            const geography: PolygonData = await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData;
-            log.debug("resetStatisticsLayer(" + clearSelected + ")");
-            // this.hideTweets();
-            log.debug(layer);
-            const curLayerGroup = layerGroup();
-            if (curLayerGroup != null) {
-
-                // noinspection JSUnfilteredForInLoop
-                await this.data.recentTweets(this.activeLayerGroup, this.activeRegionType).then(async regionTweetMap => {
-                    log.debug("Region Tweet Map", regionTweetMap);
-
-                    const styleFunc = (feature: geojson.Feature) => {
-                        log.verbose("styleFunc " + layer);
-
-                        const style = this._color.colorFunctions[layer].getFeatureStyle(
-                            feature);
-                        log.verbose("Style ", style, feature.properties);
-                        if (this.liveUpdating && regionTweetMap[feature.properties.name]) {
-                            log.verbose(`Adding new tweet style for ${feature.properties.name}`);
-                            style.className = style.className + " leaflet-new-tweet";
-                        }
-                        return style;
-
-                    };
-                    await this.updateRegionData(geography, styleFunc, layer, curLayerGroup, approximateFirst);
-
-
-                }).catch(e => log.error(e));
-
-
-            } else {
-                log.debug("Null layer " + layer);
-            }
-            if (clearSelected) {
-                this.selection.clear();
-                this.hideTweets();
-            }
-            this.currentStatisticsLayer.clearLayers();
-            this._map.removeLayer(this.currentStatisticsLayer);
-            this._map.addLayer(curLayerGroup);
-            this.currentStatisticsLayer = curLayerGroup;
-        } catch (e) {
-            console.error(e);
-        } finally {
-            // this.loading.hideIndeterminateSpinner();
-        }
-
+    public closeTwitterPanel(sidenav: MatSidenav): void {
+        this.clearSelectedRegions();
     }
 
     /**
@@ -1149,11 +1121,24 @@ export class MapComponent implements OnInit, OnDestroy {
                 this._geojson[layer] = newLayer.addTo(curLayerGroup);
             };
             if (approximateFirst) {
-                await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
-                    i => processStats(i));
+                try {
+                    await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
+                        i => processStats(i));
+                    this.data.getAccurateRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax,
+                                                        true).then(
+                        i => processStats(i));
+                } catch (e) {
+                    log.warn(e);
+                }
+            } else {
+                try {
+                    await this.data.getAccurateRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin,
+                                                              this._dateMax, false).then(
+                        i => processStats(i));
+                } catch (e) {
+                    log.warn(e);
+                }
             }
-            this.data.getAccurateRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
-                i => processStats(i));
 
         });
 
@@ -1286,5 +1271,68 @@ export class MapComponent implements OnInit, OnDestroy {
             // noinspection ES6MissingAwait
             this.updateTwitterPanel();
         }, "", false, true, true, null, 1000, 5);
+    }
+
+    /**
+     * Reset the polygon layers.
+     *
+     * @param clearSelected clears the selected polygon
+     */
+    private async resetStatisticsLayer(layer: string, clearSelected, approximateFirst = true) {
+        if (this.destroyed) {
+            return;
+        }
+
+        log.info("Resetting " + layer);
+        // this.loading.showIndeterminateSpinner();
+        try {
+            const geography: PolygonData = await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData;
+            log.debug("resetStatisticsLayer(" + clearSelected + ")");
+            // this.hideTweets();
+            log.debug(layer);
+            const curLayerGroup = layerGroup();
+            if (curLayerGroup != null) {
+
+                // noinspection JSUnfilteredForInLoop
+                await this.data.recentTweets(this.activeLayerGroup, this.activeRegionType).then(async regionTweetMap => {
+                    log.debug("Region Tweet Map", regionTweetMap);
+
+                    const styleFunc = (feature: geojson.Feature) => {
+                        log.verbose("styleFunc " + layer);
+
+                        const style = this._color.colorFunctions[layer].getFeatureStyle(
+                            feature);
+                        log.verbose("Style ", style, feature.properties);
+                        if (this.liveUpdating && regionTweetMap[feature.properties.name]) {
+                            log.verbose(`Adding new tweet style for ${feature.properties.name}`);
+                            style.className = style.className + " leaflet-new-tweet";
+                        }
+                        return style;
+
+                    };
+                    await this.updateRegionData(geography, styleFunc, layer, curLayerGroup, approximateFirst);
+
+
+                }).catch(e => log.error(e));
+
+
+            } else {
+                log.debug("Null layer " + layer);
+            }
+            if (clearSelected) {
+                log.warn("CLEARING SELECTED")
+                this.selection.clear();
+                this.hideTweets();
+            }
+            this.currentStatisticsLayer.clearLayers();
+            this._map.removeLayer(this.currentStatisticsLayer);
+            this._map.addLayer(curLayerGroup);
+            this.currentStatisticsLayer = curLayerGroup;
+        } catch (e) {
+            console.error(e);
+        } finally {
+            // this.loading.hideIndeterminateSpinner();
+        }
+
     }
 }

@@ -29,6 +29,7 @@ import {SSMapLayer} from "../../types";
 import {FormControl, FormGroup} from "@angular/forms";
 import {MapSelectionService} from "../../map-selection.service";
 import {ONE_DAY} from "../../map/data/map-data";
+import {LoadingProgressService} from "../../services/loading-progress.service";
 
 const log = new Logger("timeseries-ac");
 
@@ -147,7 +148,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 public notify: NotificationService, public map: MapSelectionService,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
                 public exec: UIExecutionService, public saves: SavedGraphService, public dialog: MatDialog,
-                public dash: DashboardService, public auto: TextAutoCompleteService) {
+                public dash: DashboardService, public auto: TextAutoCompleteService, private loading: LoadingProgressService) {
         this.seriesCollection = new TimeseriesCollectionModel(this.xField, this.yField, this.yLabel, "Date");
         this.updateSavedGraphs();
         this.pref.waitUntilReady().then(() => this.dash.waitUntilReady().then(async () => {
@@ -188,6 +189,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     async ngOnInit() {
         // Always wait until the preference service is ready.
         await this.pref.waitUntilReady();
+        this.loading.loaded();
 
         /**
          * Listen for changes to the query (i.e. after ? ) part of the URL. This can be
@@ -222,7 +224,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             }
 
         });
-
 
     }
 

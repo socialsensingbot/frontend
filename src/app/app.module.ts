@@ -20,6 +20,7 @@ import {MatSliderModule} from "@angular/material/slider";
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {TwitterPanelComponent} from "./map/twitter/twitter-panel.component";
 import {DateRangeSliderComponent} from "./map/date-range-slider/date-range-slider.component";
+import {DateRangeDisplayComponent} from "./map/date-range-display/date-range-display.component";
 import {Ng5SliderModule} from "ng5-slider";
 import {LegendComponent} from "./map/legend/legend.component";
 import {NewPassComponent} from "./auth/new-pass/new-pass.component";
@@ -52,6 +53,7 @@ import {ForgotPassComponent} from "./auth/forgot-pass/forgot-pass.component";
 import {ResetPassComponent} from "./auth/reset-pass/reset-pass.component";
 import {MAT_DATE_LOCALE} from "@angular/material/core";
 import {PublicDisplayComponent} from './public-display/public-display.component';
+import {PublicDisplayTweetListComponent} from "./map/twitter/public-display-tweet-list/public-display-tweet-list.component";
 
 @NgModule({
               declarations:    [
@@ -90,7 +92,9 @@ import {PublicDisplayComponent} from './public-display/public-display.component'
                   TimeseriesWidgetComponent,
                   ForgotPassComponent,
                   ResetPassComponent,
-                  PublicDisplayComponent
+                  PublicDisplayComponent,
+                  DateRangeDisplayComponent,
+                  PublicDisplayTweetListComponent
               ],
               imports:         [
                   BrowserModule,

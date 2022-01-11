@@ -58,8 +58,8 @@ describe('04: Map: ', function () {
 
             cy.get(".app-map-expand-toolbar-btn").should("be.visible").click();
             cy.wait(1000);
-            cy.get('#mat-select-value-3').click({multiple: true})
-            cy.get('#mat-option-7 > .mat-option-text').contains('Exceedance').click();
+            cy.get('.app-map-number-layer-select').click()
+            cy.get('.app-map-nls-exceedance > .mat-option-text').contains('Exceedance').click();
 
             cy.get(legendEntry).get("i").should("have.attr", "style").should("contain", statsFirstLegendColour)
             cy.get(legendEntry).should("have.text", statsFirstLegendVal);
@@ -74,6 +74,7 @@ describe('04: Map: ', function () {
             cy.twitterPanelVisible();
             cy.get(".app-draw-close-button > .mat-button-wrapper > .mat-icon", {timeout: 30000}).should("be.visible");
             cy.get(".app-draw-close-button > .mat-button-wrapper > .mat-icon", {timeout: 30000}).click();
+            cy.wait(10000);
             cy.twitterPanelNotVisible();
             cy.logout();
         });

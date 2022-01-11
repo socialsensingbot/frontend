@@ -20,17 +20,17 @@
       "function": {
         "S3Triggerb3a090e2": {
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
-          "s3Key": "amplify-builds/S3Triggerb3a090e2-34614f6e574c74506878-build.zip",
+          "s3Key": "amplify-builds/S3Triggerb3a090e2-754e48743050344b787a-build.zip",
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
         },
         "query": {
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
-          "s3Key": "amplify-builds/query-334735647938434a644f-build.zip",
+          "s3Key": "amplify-builds/query-39667376446850584e74-build.zip",
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
         },
         "twitterCompliance": {
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
-          "s3Key": "amplify-builds/twitterCompliance-345744665841366d6969-build.zip",
+          "s3Key": "amplify-builds/twitterCompliance-5877644a425561383271-build.zip",
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
         }
       },

@@ -1,5 +1,6 @@
 @import "../../styles";
 
+$left-hand-margin: 24px;
 $right-hand-margin: 24px;
 $top-margin: 24px;
 $bottom-margin: 36px;
@@ -9,6 +10,7 @@ $drawer-width: 500px;
     .leaflet-control-container {
         display: none;
     }
+
     .leaflet-new-tweet {
         transition: stroke 100ms ease-in-out ;
     }
@@ -186,6 +188,21 @@ $drawer-width: 500px;
     right: $right-hand-margin;
 
 
+}
+
+.app-map-last-updated {
+    min-height: 1.3em;
+    position: absolute;
+    background: none;
+    color: white;
+    opacity: 0.8;
+    text-shadow: 0px 0px 1.5px rgba(50, 50, 50, 1);
+    //border: 3px solid red;
+    z-index: 0;
+    max-width: 40em;
+    min-width: 40em;
+    left: $left-hand-margin;
+    bottom: $bottom-margin;
 }
 
 .map-spinner {

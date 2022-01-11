@@ -49,6 +49,7 @@ export class RESTMapDataService {
     private initialized: boolean;
     private _regionGeographyGeoJSON: geojson.FeatureCollection;
     public ready = false;
+    public lastUpdated: Date;
 
 
     constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
@@ -87,7 +88,7 @@ export class RESTMapDataService {
      * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
      */
     public async loadGeography(regionType: string): Promise<geojson.FeatureCollection> {
-        let key: string = "geography-cache-v2:" + regionType;
+        const key: string = "geography-cache-v2:" + regionType;
         const cachedItem = await this.cache.getCached(key);
         if (cachedItem && cachedItem.hasData && !cachedItem.expired) {
             // tslint:disable-next-line:no-console
@@ -98,10 +99,10 @@ export class RESTMapDataService {
             this.regionGeography = (cachedItem.data as any).regionGeography as RegionGeography;
         } else {
             log.debug("Loading Geography");
-            let allRegions: any = await this.allRegions();
+            const allRegions: any = await this.allRegions();
             log.debug(allRegions);
             const regions = allRegions.filter(i => i.type === regionType).map(i => i.value);
-            let lotsOfRegions: boolean = regions.length > 50;
+            const lotsOfRegions: boolean = regions.length > 50;
             if (lotsOfRegions) {
                 this._notify.show("Loading Geographic data ...", "OK", 20000);
             }
@@ -304,11 +305,12 @@ export class RESTMapDataService {
             endDate:   roundToFiveMinutes(endDate)
 
         }, 5 * 60) as RegionStatsMap;
+        this.lastUpdated = new Date(await this.now());
         return statsMap;
     }
 
     public async getAccurateRegionStatsMap(layerGroupId: string, regionType: string, startDate: number,
-                                           endDate: number): Promise<RegionStatsMap> {
+                                           endDate: number, retry: boolean): Promise<RegionStatsMap> {
         const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
         const statsMap = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/accurate-stats", {
             hazards:   layerGroup.hazards,
@@ -317,7 +319,8 @@ export class RESTMapDataService {
             startDate: roundToHour(startDate),
             endDate:   roundToFiveMinutes(endDate)
 
-        }, 5 * 60) as RegionStatsMap;
+        }, 5 * 60, false, retry) as RegionStatsMap;
+        this.lastUpdated = new Date(await this.now());
         return statsMap;
     }
 
