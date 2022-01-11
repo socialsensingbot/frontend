@@ -36,25 +36,40 @@ $bottom-margin: 1vw;
 }
 
 .public-display-map-date {
-    font-size: 2.5vw;
+    font-size: 2vw;
     color: white;
     text-shadow: 0 0 0.3vw rgba(100, 100, 100, 0.7);
     position: absolute;
-    top: calc(8vw);
-    left: 4vw;
+    top: 7vh;
+    left: 2vw;
 
 
 }
 
 .public-display-map-title {
-    font-size: 3vw;
+    font-size: 2.5vw;
     color: white;
     text-shadow: 0 0 0.3vw rgba(100, 100, 100, 0.7);
     position: absolute;
-    top: calc(4vw);
-    left: 4vw;
+    top: 2vh;
+    left: 2vw;
 }
 
+
+.app-pd-date-range-display {
+    left: 2vw;
+    right: 2vw;
+    position: absolute;
+    bottom: 2vh;
+}
+
+app-pd-tweet-list {
+    position: absolute;
+    top: 12vh;
+    left: 2vw;
+    bottom: 6vh;
+    min-width: 25vw;
+}
 
 //The Map
 .map-surround {
