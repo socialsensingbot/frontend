@@ -1,9 +1,8 @@
 @import "../../styles";
 
-$right-hand-margin: 24px;
-$top-margin: 24px;
-$bottom-margin: 36px;
-$drawer-width: 500px;
+$right-hand-margin: 1vw;
+$top-margin: 1vw;
+$bottom-margin: 1vw;
 
 ::ng-deep {
     .leaflet-control-container {
@@ -17,7 +16,7 @@ $drawer-width: 500px;
     .blink-on {
         .leaflet-new-tweet {
             stroke: rgba(255, 255, 255, 1.0);
-            stroke-width: 2px;
+            stroke-width: 0.07vw;
         }
 
     }
@@ -25,7 +24,7 @@ $drawer-width: 500px;
     .blink-off {
         .leaflet-new-tweet {
             stroke: rgba(0, 0, 0, 0.8);
-            stroke-width: 2px;
+            stroke-width: 0.07vw;
         }
 
     }
@@ -57,45 +56,22 @@ $drawer-width: 500px;
 }
 
 
-.app-draw-close-button {
-    position: absolute;
-    right: -4px;
-    top: -4px;
-    z-index: 100;
-    opacity: 0.5;
-
-    .mat-icon {
-        font-size: 1em;
-        //width: 0.3em;
-        //height:0.3em;
-        transition: opacity 2s ease-in-out;
-
-        &:hover {
-            opacity: 1.0;
-        }
-    }
-}
-
 //The Map
 .map-surround {
     overflow: hidden;
     width: 100%;
-    height: calc(100% - 64px);
+    height: 100%;
     position: relative;
     pointer-events: none;
-    box-shadow: inset 0px 0px 4px 1px rgba(0, 0, 0, 0.3);
-}
-
-.map-surround-tb-expanded {
-    height: calc(100% - 128px);
+    box-shadow: inset 0 0 0.15vw 0.05vw rgba(0, 0, 0, 0.3);
 }
 
 .map {
     overflow: hidden;
-    top: 0px;
-    left: 0px;
-    bottom: 0px;
-    right: 0px;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
     position: absolute !important;
     z-index: -10;
     pointer-events: all;
@@ -108,110 +84,13 @@ $drawer-width: 500px;
     display: block;
     position: absolute;
 
-    top: 0px;
-    left: 0px;
-    bottom: 0px;
-    right: 0px;
-}
-
-::ng-deep {
-    .mat-tab-body-wrapper, .mat-tab-group {
-        height: 100%;
-        max-height: 100%;
-        min-height: 100%;
-        display: block;
-    }
-
-    .mat-tab-body.mat-tab-body-active {
-        overflow: hidden !important;
-        background-color: #f4f4f4;
-    }
-
-
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
 }
 
 
-.app-toolbar {
-
-    .date-slider {
-        display: flex;
-        z-index: 10;
-        //border: 1px solid red;
-        margin-right: 2em;
-        //margin: 2em auto;
-        date-range-slider {
-            max-width: 40em;
-            min-width: 30em;
-            display: block;
-            margin: 0em auto;
-            min-height: 1em
-        }
-    }
-
-    .app-date-slider-live {
-        background: #e91e63;
-        border-radius: 3px;
-        font-size: 80%;
-        color: white;
-        top: -0.3em;
-        line-height: 1.2em;
-        padding: 3px;
-        margin: 2px;
-    }
-
-}
-
-.app-tweet-drawer {
-    max-width: $drawer-width;
-    width: $drawer-width;
-    min-width: $drawer-width;
-    max-height: 100%;
-    overflow: hidden;
-    background: rgb(250, 250, 250);
-    //box-shadow: 0px 0px 4px rgba(17, 17, 17, 0.63);;
-    //overflow: hidden;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: stretch;
-    @media screen and (max-width: 768px) {
-
-    }
-
-}
-
-
-.map-actions {
-    top: 2em;
-    max-height: 3em;
-    min-height: 3em;
-    position: absolute;
-    background: none;
-    z-index: 10;
-    max-width: 3em;
-    min-width: 3em;
-    right: $right-hand-margin;
-
-    .mat-card {
-        padding: 4px !important;
-    }
-}
-
-.legend {
-    max-height: 8em;
-    min-height: 6em;
-    top: 7em;
-    position: absolute;
-    background: none;
-    //border: 3px solid red;
-    z-index: 0;
-    max-width: 6em;
-    min-width: 3em;
-    right: $right-hand-margin;
-
-
-}
 
 .map-spinner {
     top: 50vh;
@@ -238,21 +117,6 @@ $drawer-width: 500px;
 .country-additional-selection {
     opacity: 0.75;
     font-size: 0.75em;
-}
-
-
-.drawer-main-tabs {
-    height: calc(100vh - 114px);
-    //border: 1px solid green;
-    display: block;
-    max-height: 100%;
-    //height: 100%;
-    overflow: visible;
-    font-size: 16px;
-    margin: 0;
-    padding: 0;
-
-
 }
 
 
