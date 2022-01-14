@@ -664,7 +664,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this._absoluteTime = await this.data.now();
         // These handle the date slider min_time & max_time values
         if (typeof min_time !== "undefined") {
-            this._dateMin = roundToHour(Math.max(+min_time, this.sliderOptions.min));
+            this._dateMin = roundToHour(Math.max(+min_time, await this.data.minDate()));
         } else {
             this._dateMin = roundToHour(await this.data.now() - (ONE_DAY));
         }
