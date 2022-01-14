@@ -45,7 +45,7 @@ describe('#422 CSV Download Tests : https://github.com/socialsensingbot/frontend
                  cy.get(".app-map-als-option-wind").click();
 
                  cy.multiSelectRegions(["cambridgeshire", "hertfordshire", "west-yorkshire", "greater-london"]);
-
+                 cy.wait(4000);
                  cy.tweetCountTotal(36);
 
                  cy.get(".app-tweet-export-btn").click();
