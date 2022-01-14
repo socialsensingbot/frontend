@@ -601,31 +601,25 @@ export class MapComponent implements OnInit, OnDestroy {
         const yesterday = new Date(today.getTime() - ONE_DAY);
 
         if (/\d+/.test(mins)) {
-            await this.sliderChange({lower: roundToHour(now - +mins * ONE_MINUTE_IN_MILLIS), upper: roundToMinute(now)});
-            this.sliderOptions = {
-                max:      roundToMinute(now),
-                min:      roundToHour(await this.data.minDate()),
-                startMin: roundToHour(now - +mins * ONE_MINUTE_IN_MILLIS),
-                startMax: roundToMinute(now)
-            };
+            this._dateMin = roundToHour(now - (+mins * ONE_MINUTE_IN_MILLIS));
+            this._dateMax = roundToMinute(now);
+            this.liveUpdating = true;
         } else if (mins === "yesterday") {
-            await this.sliderChange({lower: yesterday.getTime(), upper: today.getTime() - 1});
-            this.sliderOptions = {
-                max:      roundToMinute(now),
-                min:      roundToHour(await this.data.minDate()),
-                startMin: yesterday.getTime(),
-                startMax: today.getTime() - 1
-            };
-
+            this._dateMin = yesterday.getTime();
+            this._dateMax = today.getTime();
+            this.liveUpdating = false;
         } else if (mins === "today") {
-            await this.sliderChange({lower: today.getTime(), upper: roundToMinute(now)});
-            this.sliderOptions = {
-                max:      roundToMinute(now),
-                min:      roundToHour(await this.data.minDate()),
-                startMin: today.getTime(),
-                startMax: roundToMinute(now)
-            };
+            this._dateMin = today.getTime();
+            this._dateMax = roundToMinute(now);
+            this.liveUpdating = true;
         }
+        this.sliderOptions = {
+            max:      roundToMinute(now),
+            min:      roundToHour(await this.data.minDate()),
+            startMin: this._dateMin,
+            startMax: this._dateMax
+        };
+        await this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
         this._sliderIsStale = true;
     }
 
@@ -668,24 +662,18 @@ export class MapComponent implements OnInit, OnDestroy {
         } = params;
         this._newParams = params;
         this._absoluteTime = await this.data.now();
-        this.sliderOptions.min = await this.data.minDate();
-        this.sliderOptions.max = await this.data.now();
         // These handle the date slider min_time & max_time values
         if (typeof min_time !== "undefined") {
             this._dateMin = roundToHour(Math.max(+min_time, this.sliderOptions.min));
         } else {
             this._dateMin = roundToHour(await this.data.now() - (ONE_DAY));
         }
-        this.sliderOptions = {
-            ...this.sliderOptions,
-            startMin: this._dateMin
-        };
         if (typeof max_time !== "undefined") {
             this._dateMax = roundToMinute(Math.min(+max_time, await this.data.now()));
         } else {
             this._dateMax = roundToMinute(await this.data.now());
         }
-        this.sliderOptions = {...this.sliderOptions, startMax: this._dateMax};
+        this.sliderOptions = {min: await this.data.minDate(), max: await this.data.now(), startMin: this._dateMin, startMax: this._dateMax};
         if (typeof active_layer !== "undefined") {
             this.activeLayerGroup = active_layer;
         }

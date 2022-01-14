@@ -134,7 +134,6 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     public set options(value: DateRangeSliderOptions) {
         log.debug("Options: " + JSON.stringify(value));
         this._options = value;
-        this._lowerValue = roundToHour(value.startMin);
         if (value.min <= 0) {
             throw new Error("Min value must be positive");
         }
@@ -148,12 +147,13 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
             throw new Error("Upper value must be positive");
         }
         this._pref.waitUntilReady().then(() => {
+            this.sliderOptions = {...this.sliderOptions, ceil: roundToMinute(value.max), floor: roundToHour(value.min)};
+            this._lowerValue = roundToHour(value.startMin);
             if (value.max - value.startMax < this._pref.combined.continuousUpdateThresholdInMinutes * 60 * 1000) {
                 this._upperValue = roundToMinute(value.startMax);
             } else {
                 this._upperValue = roundToHour(value.startMax);
             }
-            this.sliderOptions = {...this.sliderOptions, ceil: roundToMinute(value.max), floor: roundToHour(value.min)};
             this.ready = true;
             this.updateTicks();
         });
