@@ -7,8 +7,8 @@ export interface DisplayScript {
 export interface DisplayScreen {
     type: "map-by-date";
     title: string;
-    location: AnimationLocation;
-    data: AnimationScreenData;
+    location?: AnimationLocation;
+    data?: AnimationScreenData;
     animation: DateAnimation;
     stepDurationInMilliseconds: number;
     animationLoops: number;
@@ -30,9 +30,9 @@ export interface LocationAnimation {
 }
 
 export interface AnimationScreenData {
-    layerId: string;
-    statistic: StatisticType;
-    regionType: string;
+    layerId?: string;
+    statistic?: StatisticType;
+    regionType?: string;
 
 }
 

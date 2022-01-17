@@ -13,6 +13,28 @@ export class DisplayScriptService {
     }
 
     private _scripts: { [key: string]: DisplayScript } = {
+
+        default_script:                     {
+            screens: [
+                {
+                    title:                      "",
+                    type:                       "map-by-date",
+                    data:                       {}, animation: {
+                        type:                         "date-animation",
+                        startTimeOffsetMilliseconds:  DAY,
+                        endTimeOffsetMilliseconds:    0,
+                        windowDurationInMilliseconds: 6 * HOUR,
+                        stepDurationInMilliseconds:   1 * HOUR,
+
+
+                    },
+                    stepDurationInMilliseconds: 1500,
+                    animationLoops:             10
+
+
+                }
+            ]
+        },
         county_ex_range_4d_step_3h_win_24h: {
             screens: [
                 {

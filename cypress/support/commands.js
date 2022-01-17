@@ -371,6 +371,28 @@ Cypress.Commands.add("validateCsvFile", (name, validateCsvList) => {
     const downloadsFolder = Cypress.config('downloadsFolder')
     const filename = path.join(downloadsFolder, name);
     cy.task('findFiles', filename).then((file) => {
-        cy.readFile(file).then(str => validateCsvList(parse(str)));
+        cy.readFile(file, 'utf8').then(str => validateCsvList(parse(str.charAt(0) === '\ufeff' ? str.substring(1,
+                                                                                                               str.length) : str)));
     });
+});
+
+
+const Diff = require('diff');
+
+
+Cypress.Commands.add("diff", (src, dest) => {
+    const diff = Diff.diffChars(src, dest);
+
+    let result = "DIFF: "
+    diff.forEach((part) => {
+        if (part.added) {
+            result += ">>>" + part.value + ">>>\n"
+        } else if (part.removed) {
+            result += "<<<" + part.value + "<<<\n"
+        } else {
+        }
+    });
+    console.log(result);
+    cy.log(result);
+    expect(src).to.equal(dest);
 });

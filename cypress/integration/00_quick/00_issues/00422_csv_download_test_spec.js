@@ -23,7 +23,7 @@ describe('#422 CSV Download Tests : https://github.com/socialsensingbot/frontend
                      console.log("list", JSON.stringify(list));
                      cy.log(JSON.stringify(list));
                      cy.fixture("csv_download_west_yorkshire.json").then((json) => {
-                         expect(JSON.stringify(list)).to.equal(JSON.stringify(west_yorkshire));
+                         cy.diff(JSON.stringify(list), JSON.stringify(west_yorkshire));
                          expect(list).to.deep.equal(west_yorkshire);
                      })
 
@@ -45,7 +45,7 @@ describe('#422 CSV Download Tests : https://github.com/socialsensingbot/frontend
                  cy.get(".app-map-als-option-wind").click();
 
                  cy.multiSelectRegions(["cambridgeshire", "hertfordshire", "west-yorkshire", "greater-london"]);
-
+                 cy.wait(4000);
                  cy.tweetCountTotal(36);
 
                  cy.get(".app-tweet-export-btn").click();

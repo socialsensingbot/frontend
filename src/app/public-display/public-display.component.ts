@@ -123,7 +123,7 @@ export class PublicDisplayComponent implements OnInit {
      * A subscription to the UI execution state.
      */
     private _stateSub: Subscription;
-    private DEFAULT_LAYER_GROUP = "flood-group";
+    private DEFAULT_LAYER_GROUP = "flood";
     private _blinkTimer: Subscription;
     private _inFeature: boolean;
 
@@ -131,6 +131,9 @@ export class PublicDisplayComponent implements OnInit {
     private regionTweetMap: RegionTweeCount;
     private _script: string;
     public title: string;
+    private _lat: number;
+    private _lon: number;
+    private _zoom: number;
 
     public get selectedFeatureNames(): string[] {
         return this._selectedFeatureNames;
@@ -243,11 +246,6 @@ export class PublicDisplayComponent implements OnInit {
 
 
     async ngOnInit() {
-        // Because of the impact on the user experience we prevent overlapping events from occurring
-        // and throttle those events also. The prevention of overlapping events is done by the use
-        // of a flag and queued events. The throttling is acheived by the the periodicity of the
-        // schedulers execution.
-
         if (this.destroyed) {
             return;
         }
@@ -366,7 +364,28 @@ export class PublicDisplayComponent implements OnInit {
             this._script = this.pref.combined.defaultPublicDisplayScript;
         }
         await this.data.init(this.dataset);
+        let queryParams = this.route.snapshot.queryParamMap;
+        if (queryParams.has("active_number")) {
+            this._activeStatistic = queryParams.get("active_number") as StatisticType;
+        }
+        if (queryParams.has("active_polygon")) {
+            this._activeRegionType = queryParams.get("active_polygon") as string;
+        }
+        if (queryParams.has("layer_group")) {
+            this._activeLayerGroup = queryParams.get("layer_group") as string;
+        }
+        if (queryParams.has("lat")) {
+            this._lat = +queryParams.get("lat");
+        }
+        if (queryParams.has("lng")) {
+            this._lon = +queryParams.get("lng");
+            this._map.setView([this._lat, this._lon]);
+        }
+        if (queryParams.has("zoom")) {
+            this._zoom = +queryParams.get("zoom");
+            this._map.setZoom(this._zoom);
 
+        }
         this._loggedIn = await Auth.currentAuthenticatedUser() != null;
         // this.displayScript = this._display.script("county_ex_range_24h_step_1h_win_6h");
         this.displayScript = this._display.script(this._script);
@@ -376,7 +395,7 @@ export class PublicDisplayComponent implements OnInit {
         let animationLoopCounter = 0;
         let animationStepCounter = 0;
         let completedAnimations = 0;
-        await this.resetStatisticsLayer(this.activeStatistic);
+        await this.resetStatisticsLayer(this._activeStatistic);
         let now: number = roundToHour(await this.data.now());
         let animateFunc: () => Promise<void> = async () => {
             try {
@@ -395,7 +414,6 @@ export class PublicDisplayComponent implements OnInit {
                             now = await this.data.now();
                             completedAnimations++;
                         }
-                        await this.load();
                         this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType,
                                                              (await this.data.regionsOfType(this.activeRegionType)).map(i => i.value),
                                                              this.minDate,
@@ -446,9 +464,24 @@ export class PublicDisplayComponent implements OnInit {
     private async nextScreen() {
         try {
             this.currentDisplayScreen = this.displayScript.screens[this.currentDisplayNumber % this.displayScript.screens.length];
-            this.activeLayerGroup = this.currentDisplayScreen.data.layerId;
-            this.activeStatistic = this.currentDisplayScreen.data.statistic;
-            this.activeRegionType = this.currentDisplayScreen.data.regionType;
+            if (this.currentDisplayScreen.data?.layerId) {
+                this.activeLayerGroup = this.currentDisplayScreen.data.layerId;
+            }
+            if (this.currentDisplayScreen.data?.statistic) {
+                this.activeStatistic = this.currentDisplayScreen.data.statistic;
+            }
+            if (this.currentDisplayScreen.data?.regionType) {
+                this.activeRegionType = this.currentDisplayScreen.data.regionType;
+            }
+            if (this.currentDisplayScreen.location?.lat) {
+                this._lat = this.currentDisplayScreen.location.lat;
+            }
+            if (this.currentDisplayScreen.location?.lon) {
+                this._lon = this.currentDisplayScreen.location.lon;
+            }
+            if (this.currentDisplayScreen.location?.zoom) {
+                this._zoom = this.currentDisplayScreen.location.zoom;
+            }
             this.title = this.currentDisplayScreen.title;
             await this.data.loadGeography(this.activeRegionType);
             await this.resetStatisticsLayer(this.activeStatistic);
@@ -475,8 +508,8 @@ export class PublicDisplayComponent implements OnInit {
             // this.hideTweets();
             log.debug(layer);
             const curLayerGroup = layerGroup();
-            this.geographyData = await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData
-            this.regionTweetMap = await this.data.recentTweets(this.activeLayerGroup, this.activeRegionType);
+            this.geographyData = await this.data.geoJsonGeographyFor(this._activeRegionType) as PolygonData
+            this.regionTweetMap = await this.data.recentTweets(this._activeLayerGroup, this._activeRegionType);
             this._geojson[layer] = new GeoJSON(this.geographyData as geojson.GeoJsonObject, {
                 style: {
                     className:   "app-map-region-geography",
@@ -490,10 +523,11 @@ export class PublicDisplayComponent implements OnInit {
             }).addTo(curLayerGroup);
             if (this.currentStatisticsLayer) {
                 this._map.removeLayer(this.currentStatisticsLayer);
-                this._map.flyTo(latLng([this.currentDisplayScreen.location.lat, this.currentDisplayScreen.location.lon]),
-                                this.currentDisplayScreen.location.zoom,
-                                {animate: true, duration: this.currentDisplayScreen.location.animationDuration / 1000, easeLinearity: 0.2});
-                await sleep(this.currentDisplayScreen.location.animationDuration);
+                const locationChangeAnimationDuration: number = this.currentDisplayScreen.location?.animationDuration || 1000;
+                this._map.flyTo(latLng([this._lat, this._lon]),
+                                this._zoom,
+                                {animate: true, duration: locationChangeAnimationDuration / 1000, easeLinearity: 0.2});
+                await sleep(locationChangeAnimationDuration);
 
             }
             this._map.addLayer(curLayerGroup);
@@ -509,7 +543,7 @@ export class PublicDisplayComponent implements OnInit {
 
     private async updateRegionDisplay(layer: "count" | "exceedance"): Promise<void> {
         if (this.currentStatisticsLayer && this.currentStatisticsLayer.getLayers()[0]) {
-            const statsMap = await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this.minDate, this.maxDate);
+            const statsMap = await this.data.getRegionStatsMap(this._activeLayerGroup, this._activeRegionType, this.minDate, this.maxDate);
             let layers: Layer[] = (this.currentStatisticsLayer.getLayers()[0] as GeoJSON).getLayers();
             for (const geoLayer of layers) {
                 const feature: any = (geoLayer as GeoJSON).feature;
