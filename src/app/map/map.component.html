@@ -87,6 +87,9 @@
                     </mat-form-field>
 
                     <div class="app-toolbar-expanding-separator"></div>
+                    <button (click)="openPublicDisplay()" class="app-toolbar-btn map-zoom-in" mat-icon-button>
+                        <mat-icon matTooltip="Public Display">tv</mat-icon>
+                    </button>
                 </mat-toolbar-row>
                 <mat-toolbar-row *ngIf="appToolbarExpanded">
                     <ng-container *ngIf="data.availableDataSets && data.availableDataSets.length > 1">

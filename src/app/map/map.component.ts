@@ -1323,4 +1323,9 @@ export class MapComponent implements OnInit, OnDestroy {
         }
 
     }
+
+    public async openPublicDisplay() {
+        await this._router.navigate(["display"], {queryParams: [], queryParamsHandling: "merge", relativeTo: this.route});
+
+    }
 }

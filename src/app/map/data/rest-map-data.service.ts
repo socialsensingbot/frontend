@@ -88,17 +88,19 @@ export class RESTMapDataService {
      * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
      */
     public async loadGeography(regionType: string): Promise<geojson.FeatureCollection> {
+        log.debug("Loading Geography for " + regionType);
         const key: string = "geography-cache-v2:" + regionType;
         const cachedItem = await this.cache.getCached(key);
         if (cachedItem && cachedItem.hasData && !cachedItem.expired) {
             // tslint:disable-next-line:no-console
+            log.debug("Loading Geography FROM CACHE for " + regionType);
             log.verbose("Value for " + key + "in cache");
             // log.debug("Value for " + key + " was " + JSON.stringify(cachedItem.data));
             // console.debug("Return cached item", JSON.stringify(cachedItem));
             this._regionGeographyGeoJSON = (cachedItem.data as any).geojson as geojson.FeatureCollection;
             this.regionGeography = (cachedItem.data as any).regionGeography as RegionGeography;
         } else {
-            log.debug("Loading Geography");
+            log.debug("Loading Geography NOT FROM CACHE for " + regionType);
             const allRegions: any = await this.allRegions();
             log.debug(allRegions);
             const regions = allRegions.filter(i => i.type === regionType).map(i => i.value);
