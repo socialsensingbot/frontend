@@ -125,7 +125,7 @@ export const environment = {
     ],
 
     // features: ["impact", "source", "map"],
-    features: ["impact", "source", "map", "dashboard", "analytics"],
+    features: ["impact", "source", "map", "dashboard", "analytics", "display"],
 
     showErrors:                          false,
     showLoadingMessages:                 true,
