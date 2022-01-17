@@ -38,15 +38,15 @@ export class Tweet {
                 private _date: Date, private _region: string, private _possibly_sensitive = false) {
     }
 
-    get json(): any {
+    public get json(): any {
         return this._json;
     }
 
-    get location(): geojson.GeometryCollection {
+    public get location(): geojson.GeometryCollection {
         return this._location as geojson.GeometryCollection;
     }
 
-    get region(): string {
+    public get region(): string {
         return this._region;
     }
 
