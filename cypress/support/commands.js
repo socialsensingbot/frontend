@@ -375,3 +375,24 @@ Cypress.Commands.add("validateCsvFile", (name, validateCsvList) => {
                                                                                                                str.length) : str)));
     });
 });
+
+
+const Diff = require('diff');
+
+
+Cypress.Commands.add("diff", (src, dest) => {
+    const diff = Diff.diffChars(src, dest);
+
+    let result = "DIFF: "
+    diff.forEach((part) => {
+        if (part.added) {
+            result += ">>>" + part.value + ">>>\n"
+        } else if (part.removed) {
+            result += "<<<" + part.value + "<<<\n"
+        } else {
+        }
+    });
+    console.log(result);
+    cy.log(result);
+    expect(src).to.equal(dest);
+});
