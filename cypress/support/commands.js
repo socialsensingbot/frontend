@@ -371,7 +371,7 @@ Cypress.Commands.add("validateCsvFile", (name, validateCsvList) => {
     const downloadsFolder = Cypress.config('downloadsFolder')
     const filename = path.join(downloadsFolder, name);
     cy.task('findFiles', filename).then((file) => {
-        cy.readFile(file, 'utf8').then(str => validateCsvList(parse(str.charAt(0) === ' \ufeff' ? str.substring(1,
-                                                                                                                str.length) : str)));
+        cy.readFile(file, 'utf8').then(str => validateCsvList(parse(str.charAt(0) === '\ufeff' ? str.substring(1,
+                                                                                                               str.length) : str)));
     });
 });
