@@ -68,8 +68,8 @@
                 display: inline-block;
                 font-family: "Helvetica Neue", Roboto, "Segoe UI", Calibri, sans-serif;
                 font-size: 1.2vw;
-                border-radius: 0.5vw;
-                border: 0.05vw solid rgb(225, 232, 237);
+                //border-radius: 0.5vw;
+                border-bottom: 0.05vw solid rgb(225, 232, 237);
                 margin-left: 0;
                 margin-right: 0;
                 padding-top: 0.6vw;
@@ -169,12 +169,24 @@
 
                 }
 
-                .app-twitter-date {
+                .app-pd-twitter-date {
+                    float: left;
+                    display: inline-block;
                     font-weight: normal;
                     font-size: 0.6vw;
                     text-align: left;
                     color: rgba(83, 100, 113, 0.6);
-                    margin: 0.5vw;
+                    margin: 0.2vw;
+                }
+
+                .app-pd-twitter-region {
+                    float: right;
+                    display: inline-block;
+                    font-weight: normal;
+                    font-size: 0.6vw;
+                    text-align: left;
+                    color: rgba(83, 100, 113, 0.6);
+                    margin: 0.2vw;
                 }
 
 
