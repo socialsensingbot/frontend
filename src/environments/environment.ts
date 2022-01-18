@@ -152,6 +152,6 @@ export const environment = {
     showAnalyticsSideMenu:        false,
     countryDownloadRegionType:    "bi_country",
     exceedanceThreshold:          20,
-    countThreshold:               1
+    countThreshold: 2
 
 };
