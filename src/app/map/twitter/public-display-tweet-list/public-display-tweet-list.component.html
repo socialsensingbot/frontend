@@ -21,8 +21,9 @@
                     <div [innerHTML]="tweetHtml(tweet)|safeHtml" class="app-twitter-text">
                     </div>
                     <!--                    <div [innerHTML]="tweet.text | safeHtml" class="app-twitter-text"></div>-->
-                    <div class="app-twitter-date">{{tweet.date | date:"shortTime"}}
+                    <div class="app-pd-twitter-date">{{tweet.date | date:"shortTime"}}
                         - {{tweet.date | date:"mediumDate"}}</div>
+                    <div class="app-pd-twitter-region">{{tweet.region}}</div>
                     <!--                    {{tweet.json.extended_tweet.entities.media|json}}-->
                     <div *ngIf="!tweet.json.possibly_sensitive">
                         <div *ngFor="let media of mediaEntities(tweet)">

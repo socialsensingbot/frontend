@@ -89,5 +89,7 @@ export const environment = {
     analyticsDefaultRegions:      ["uk"],
     maxCallsPerMinute:            10000,
     countryDownloadRegionType:    "bi_country",
+    exceedanceThreshold:          20,
+    countThreshold:               0
 
 };

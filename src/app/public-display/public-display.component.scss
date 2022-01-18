@@ -40,8 +40,8 @@ $bottom-margin: 1vw;
     color: white;
     text-shadow: 0 0 0.3vw rgba(100, 100, 100, 0.7);
     position: absolute;
-    top: 5vh;
-    left: 2vw;
+    bottom: 5vh;
+    right: 2vw;
 
 
 }
@@ -65,9 +65,9 @@ $bottom-margin: 1vw;
 
 app-pd-tweet-list {
     position: absolute;
-    top: 10vh;
+    top: 8vh;
     left: 2vw;
-    bottom: 6vh;
+    bottom: 8vh;
     min-width: 25vw;
 }
 

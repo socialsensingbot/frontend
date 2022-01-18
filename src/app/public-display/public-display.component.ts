@@ -4,7 +4,7 @@ import * as rxjs from "rxjs";
 import {Subscription} from "rxjs";
 import {Tweet} from "../map/twitter/tweet";
 import {DateRangeSliderOptions} from "../map/date-range-slider/date-range-slider.component";
-import {ONE_DAY, RegionTweeCount} from "../map/data/map-data";
+import {ONE_DAY, RegionStatsMap, RegionTweeCount} from "../map/data/map-data";
 import {RegionSelection} from "../map/region-selection";
 import {environment} from "../../environments/environment";
 import {PolygonData} from "../map/types";
@@ -134,6 +134,7 @@ export class PublicDisplayComponent implements OnInit {
     private _lat: number;
     private _lon: number;
     private _zoom: number;
+    private _statsMap: RegionStatsMap;
 
     public get selectedFeatureNames(): string[] {
         return this._selectedFeatureNames;
@@ -371,8 +372,8 @@ export class PublicDisplayComponent implements OnInit {
         if (queryParams.has("active_polygon")) {
             this._activeRegionType = queryParams.get("active_polygon") as string;
         }
-        if (queryParams.has("layer_group")) {
-            this._activeLayerGroup = queryParams.get("layer_group") as string;
+        if (queryParams.has("active_layer")) {
+            this._activeLayerGroup = queryParams.get("active_layer") as string;
         }
         if (queryParams.has("lat")) {
             this._lat = +queryParams.get("lat");
@@ -414,10 +415,17 @@ export class PublicDisplayComponent implements OnInit {
                             now = await this.data.now();
                             completedAnimations++;
                         }
+                        this._statsMap = await this.data.getRegionStatsMap(this._activeLayerGroup, this._activeRegionType, this.minDate,
+                                                                           this.maxDate);
                         this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType,
                                                              (await this.data.regionsOfType(this.activeRegionType)).map(i => i.value),
                                                              this.minDate,
                                                              this.maxDate);
+                        //Sort tweets by region exceedance
+                        this.tweets.sort((i, j) => {
+                            return this.sortOrderForTweet(i) - this.sortOrderForTweet(j);
+                        });
+                        this.tweets = this.tweets.filter(i => this.filterTweet(i))
                         log.warn(this.tweets);
                         await this.updateRegionDisplay(this.activeStatistic);
                     }
@@ -446,6 +454,10 @@ export class PublicDisplayComponent implements OnInit {
 
         log.debug("Init completed successfully");
 
+    }
+
+    private sortOrderForTweet(i: Tweet): number {
+        return this._statsMap[i.region] ? (this._statsMap[i.region].exceedance / (i.mediaCount + 2)) * (1.0 + Math.random() / 10) : Infinity;
     }
 
     private updateAnnotationTypes(): void {
@@ -543,13 +555,12 @@ export class PublicDisplayComponent implements OnInit {
 
     private async updateRegionDisplay(layer: "count" | "exceedance"): Promise<void> {
         if (this.currentStatisticsLayer && this.currentStatisticsLayer.getLayers()[0]) {
-            const statsMap = await this.data.getRegionStatsMap(this._activeLayerGroup, this._activeRegionType, this.minDate, this.maxDate);
             let layers: Layer[] = (this.currentStatisticsLayer.getLayers()[0] as GeoJSON).getLayers();
             for (const geoLayer of layers) {
                 const feature: any = (geoLayer as GeoJSON).feature;
                 const featureProperties = feature.properties;
                 const region = featureProperties.name;
-                const regionStats = statsMap[region];
+                const regionStats = (this._statsMap)[region];
                 if (regionStats) {
                     featureProperties.count = regionStats.count;
                     featureProperties.exceedance = regionStats.exceedance;
@@ -628,4 +639,7 @@ export class PublicDisplayComponent implements OnInit {
 
     }
 
+    private filterTweet(i: Tweet): any {
+        return typeof this._statsMap[i.region] !== "undefined";
+    }
 }

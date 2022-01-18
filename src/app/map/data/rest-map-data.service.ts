@@ -298,13 +298,16 @@ export class RESTMapDataService {
     }
 
     public async getRegionStatsMap(layerGroupId: string, regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {
+        log.debug("getRegionStatsMap()", {layerGroupId, regionType, startDate, endDate})
         const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
         const statsMap = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/stats", {
-            hazards:   layerGroup.hazards,
-            sources:   layerGroup.sources,
-            warnings:  layerGroup.warnings,
-            startDate: roundToHour(startDate),
-            endDate:   roundToFiveMinutes(endDate)
+            hazards:             layerGroup.hazards,
+            sources:             layerGroup.sources,
+            warnings:            layerGroup.warnings,
+            startDate:           roundToHour(startDate),
+            endDate:             roundToFiveMinutes(endDate),
+            exceedanceThreshold: this._pref.combined.exceedanceThreshold,
+            countThreshold:      this._pref.combined.countThreshold
 
         }, 5 * 60) as RegionStatsMap;
         this.lastUpdated = new Date(await this.now());
@@ -315,11 +318,13 @@ export class RESTMapDataService {
                                            endDate: number, retry: boolean): Promise<RegionStatsMap> {
         const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
         const statsMap = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/accurate-stats", {
-            hazards:   layerGroup.hazards,
-            sources:   layerGroup.sources,
-            warnings:  layerGroup.warnings,
-            startDate: roundToHour(startDate),
-            endDate:   roundToFiveMinutes(endDate)
+            hazards:             layerGroup.hazards,
+            sources:             layerGroup.sources,
+            warnings:            layerGroup.warnings,
+            startDate:           roundToHour(startDate),
+            endDate:             roundToFiveMinutes(endDate),
+            exceedanceThreshold: this._pref.combined.exceedanceThreshold,
+            countThreshold:      this._pref.combined.countThreshold
 
         }, 5 * 60, false, retry) as RegionStatsMap;
         this.lastUpdated = new Date(await this.now());

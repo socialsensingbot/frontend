@@ -19,7 +19,19 @@ export interface CSVExportTweet {
  * The class is lazily initialized on various data accesses as the full construction of this object includes some CPU intensive tasks.
  */
 export class Tweet {
+    private _mediaCount: number;
+
+
     private _init: boolean;
+
+    public get mediaCount(): number {
+        const mediaEntities = this.json.extended_tweet ? this.json.extended_tweet.entities.media : this.json.entities.media;
+        if (mediaEntities) {
+            return mediaEntities.length;
+        } else {
+            return 0;
+        }
+    }
 
     get potentiallySensitive(): boolean {
         return this._possibly_sensitive;

@@ -151,5 +151,7 @@ export const environment = {
     showAnalyticsSideMenu:        false,
     countryDownloadRegionType:    "bi_country",
     defaultPublicDisplayScript:   "combi_example",
+    exceedanceThreshold:          20,
+    countThreshold:               0
 
 };

@@ -71,7 +71,7 @@
 
 ::ng-deep {
 
-    .date-range-slider-surround {
+    .date-range-display-surround {
         margin-top: 5px;
         font-size: 60%;
         min-height: 1em;
@@ -96,11 +96,11 @@
         }
 
         .ng5-slider-floor {
-            display: none;
+            display: none !important;
         }
 
         .ng5-slider-ceil {
-            display: none;
+            display: none !important;
         }
 
         .ng5-slider .ng5-slider-bubble {
@@ -137,16 +137,18 @@
         .slider-date-time {
             .slider-date {
                 color: white;
-                font-size: 0.7vw;
+                font-size: 1.5vw;
                 font-weight: bold;
-                display: none;
+                text-shadow: 0 0 0.2vw 0.1vw rgba(0, 0, 0, 0.8);
+                //display: none;
             }
 
             .slider-time {
                 color: white;
-                font-size: 0.7vw;
+                font-size: 1.5vw;
                 font-weight: lighter;
-                display: none;
+                text-shadow: 0 0 0.2vw 0.1vw rgba(0, 0, 0, 0.8);
+                //display: none;
             }
         }
     }
