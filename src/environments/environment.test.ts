@@ -111,6 +111,8 @@ export const environment = {
     maxCallsPerMinute:            10000,
     analyticsDefaultRegions:      ["uk"],
     countryDownloadRegionType:    "bi_country",
+    exceedanceThreshold:          20,
+    countThreshold:               0
 
 
 };

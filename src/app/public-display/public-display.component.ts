@@ -425,6 +425,7 @@ export class PublicDisplayComponent implements OnInit {
                         this.tweets.sort((i, j) => {
                             return this.sortOrderForTweet(i) - this.sortOrderForTweet(j);
                         });
+                        this.tweets = this.tweets.filter(i => this.filterTweet(i))
                         log.warn(this.tweets);
                         await this.updateRegionDisplay(this.activeStatistic);
                     }
@@ -456,7 +457,7 @@ export class PublicDisplayComponent implements OnInit {
     }
 
     private sortOrderForTweet(i: Tweet): number {
-        return this._statsMap[i.region].exceedance / (i.mediaCount + 1);
+        return this._statsMap[i.region] ? (this._statsMap[i.region].exceedance / (i.mediaCount + 2)) * (1.0 + Math.random() / 10) : Infinity;
     }
 
     private updateAnnotationTypes(): void {
@@ -638,4 +639,7 @@ export class PublicDisplayComponent implements OnInit {
 
     }
 
+    private filterTweet(i: Tweet): any {
+        return typeof this._statsMap[i.region] !== "undefined";
+    }
 }
