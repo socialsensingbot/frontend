@@ -365,6 +365,19 @@ export class PublicDisplayComponent implements OnInit {
             this._script = this.pref.combined.defaultPublicDisplayScript;
         }
         await this.data.init(this.dataset);
+        const {zoom, lng, lat} = {
+            ...this.data.serviceMetadata.start,
+            ...this.data.mapMetadata.start,
+            ...this.route.snapshot.queryParams,
+        };
+
+
+        this._lat = +lat;
+        this._lon = +lng;
+        this._zoom = +zoom;
+        this._map.setView([this._lat, this._lon]);
+        this._map.setZoom(this._zoom);
+
         let queryParams = this.route.snapshot.queryParamMap;
         if (queryParams.has("active_number")) {
             this._activeStatistic = queryParams.get("active_number") as StatisticType;
@@ -375,18 +388,8 @@ export class PublicDisplayComponent implements OnInit {
         if (queryParams.has("active_layer")) {
             this._activeLayerGroup = queryParams.get("active_layer") as string;
         }
-        if (queryParams.has("lat")) {
-            this._lat = +queryParams.get("lat");
-        }
-        if (queryParams.has("lng")) {
-            this._lon = +queryParams.get("lng");
-            this._map.setView([this._lat, this._lon]);
-        }
-        if (queryParams.has("zoom")) {
-            this._zoom = +queryParams.get("zoom");
-            this._map.setZoom(this._zoom);
 
-        }
+
         this._loggedIn = await Auth.currentAuthenticatedUser() != null;
         // this.displayScript = this._display.script("county_ex_range_24h_step_1h_win_6h");
         this.displayScript = this._display.script(this._script);
