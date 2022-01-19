@@ -1108,25 +1108,30 @@ export class MapComponent implements OnInit, OnDestroy {
                     });
                 this._geojson[layer] = newLayer.addTo(curLayerGroup);
             };
-            if (approximateFirst) {
-                try {
-                    await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
-                        i => processStats(i));
-                    this.data.getAccurateRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax,
-                                                        true).then(
-                        i => processStats(i));
-                } catch (e) {
-                    log.warn(e);
-                }
-            } else {
-                try {
-                    await this.data.getAccurateRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin,
-                                                              this._dateMax, false).then(
-                        i => processStats(i));
-                } catch (e) {
-                    log.warn(e);
-                }
-            }
+            await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
+                i => i ? processStats(i) : null);
+
+            /*
+             *  Discontinued as unreliable
+             if (approximateFirst) {
+             try {
+
+             this.data.getAccurateRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax,
+             false).then(
+             i => i ? processStats(i) : null);
+             } catch (e) {
+             log.warn(e);
+             }
+             } else {
+             try {
+             await this.data.getAccurateRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin,
+             this._dateMax, false).then(
+             i => i ? processStats(i) : null);
+             } catch (e) {
+             log.warn(e);
+             }
+             }
+             */
 
         });
 

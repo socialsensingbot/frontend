@@ -159,8 +159,9 @@ export class RESTDataAPIService {
             return data;
         }).catch(e => {
             this.calls++;
-            log.error(e);
+            log.info(e);
             if (retry) {
+                log.error(e);
                 this._notify.show("No response from the server, maybe a network problem or a slow query.",
                                   "Retrying ...", retryPeriod);
                 return new Promise<any>((resolve, reject) => {
