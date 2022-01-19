@@ -241,9 +241,7 @@ export class PublicDisplayTweetListComponent implements OnInit, OnDestroy {
                 this._tweets[i] = tweet;
             }
         }
-        log.warn(this.annotations);
-
-
+        log.debug(this.annotations);
         log.debug(this.tweets);
 
         this.pref.waitUntilReady().then(i => this.ready = true);

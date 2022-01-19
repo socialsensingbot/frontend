@@ -426,7 +426,6 @@ export class PublicDisplayComponent implements OnInit {
                             return this.sortOrderForTweet(i) - this.sortOrderForTweet(j);
                         });
                         this.tweets = this.tweets.filter(i => this.filterTweet(i))
-                        log.warn(this.tweets);
                         await this.updateRegionDisplay(this.activeStatistic);
                     }
                 }
@@ -544,7 +543,6 @@ export class PublicDisplayComponent implements OnInit {
             }
             this._map.addLayer(curLayerGroup);
             this.currentStatisticsLayer = curLayerGroup;
-            await this.updateRegionDisplay(layer);
         } catch (e) {
             console.error(e);
         } finally {
