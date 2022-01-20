@@ -49,6 +49,7 @@
 
         </div>
         <app-pd-tweet-list [annotationTypes]="annotationTypes" [style.opacity]="tweets?.length ? 1 : 0"
+                           [style.top]="title?.length ? '8vh' : '3vh'"
                            [tweets]="tweets"></app-pd-tweet-list>
     </mat-sidenav-content>
 

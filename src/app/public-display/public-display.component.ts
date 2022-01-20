@@ -459,7 +459,7 @@ export class PublicDisplayComponent implements OnInit {
     }
 
     private sortOrderForTweet(i: Tweet): number {
-        return this._statsMap[i.region] ? (this._statsMap[i.region].exceedance / (i.mediaCount + 2)) * (1.0 + Math.random() / 10) : Infinity;
+        return this._statsMap[i.region] ? (this._statsMap[i.region].exceedance / (i.mediaCount + 0.5)) * (1.0 + Math.random() / 10) : Infinity;
     }
 
     private updateAnnotationTypes(): void {
