@@ -48,7 +48,8 @@
             <date-range-display [options]="sliderOptions"></date-range-display>
 
         </div>
-        <app-pd-tweet-list [annotationTypes]="annotationTypes" [tweets]="tweets"></app-pd-tweet-list>
+        <app-pd-tweet-list [annotationTypes]="annotationTypes" [style.opacity]="tweets?.length ? 1 : 0"
+                           [tweets]="tweets"></app-pd-tweet-list>
     </mat-sidenav-content>
 
 </mat-sidenav-container>
