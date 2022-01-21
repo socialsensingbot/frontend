@@ -1,0 +1,21 @@
+<h2 mat-dialog-title>Open Public Display</h2>
+<mat-dialog-content>
+    <form [formGroup]="form">
+        <mat-form-field appearance="fill">
+            <mat-label>Step duration in hours</mat-label>
+            <input formControlName="step" matInput placeholder="1" required>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Window duration in hours</mat-label>
+            <input formControlName="window" matInput placeholder="6" required>
+        </mat-form-field>
+        <mat-label>Playback Speed (in seconds per step)</mat-label>
+        <mat-slider [displayWith]="speedLabel" [formControl]="form.controls.speed" invert max="30" min="3" step="0.5"
+                    thumbLabel tickInterval="auto"></mat-slider>
+        <mat-error *ngIf="form.invalid">{{getErrorMessage()}}</mat-error>
+    </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button [mat-dialog-close]="form.value" cdkFocusInitial mat-button>Open</button>
+</mat-dialog-actions>

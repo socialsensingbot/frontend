@@ -135,6 +135,9 @@ export class PublicDisplayComponent implements OnInit {
     private _lon: number;
     private _zoom: number;
     private _statsMap: RegionStatsMap;
+    private step: number;
+    private window: number;
+    private speed: number;
 
     public get selectedFeatureNames(): string[] {
         return this._selectedFeatureNames;
@@ -388,7 +391,16 @@ export class PublicDisplayComponent implements OnInit {
         if (queryParams.has("active_layer")) {
             this._activeLayerGroup = queryParams.get("active_layer") as string;
         }
+        if (queryParams.has("step")) {
+            this.step = +queryParams.get("step") * 60 * 60 * 1000;
+        }
+        if (queryParams.has("window")) {
+            this.window = +queryParams.get("window") * 60 * 60 * 1000;
+        }
 
+        if (queryParams.has("speed")) {
+            this.speed = +queryParams.get("speed") * 1000;
+        }
 
         this._loggedIn = await Auth.currentAuthenticatedUser() != null;
         // this.displayScript = this._display.script("county_ex_range_24h_step_1h_win_6h");
@@ -404,13 +416,17 @@ export class PublicDisplayComponent implements OnInit {
         let animateFunc: () => Promise<void> = async () => {
             try {
                 const animation = this.currentDisplayScreen.animation;
-                const stepsPerLoop = Math.round(this.currentDisplayScreen.stepDurationInMilliseconds / 100) - 1;
+                let windowDurationMillis: number = this.window ? this.window : animation.windowDurationInMilliseconds;
+                let stepDurationMillis: number = this.step ? this.step : animation.stepDurationInMilliseconds;
+                let speedInMillis: number = this.speed ? this.speed : this.currentDisplayScreen.stepDurationInMilliseconds;
+
+                const stepsPerLoop = Math.round(speedInMillis / 100) - 1;
                 if (animationLoopCounter % stepsPerLoop === 0) {
                     if (animation.type === "date-animation") {
                         this.minDate = roundToHour(now - animation.startTimeOffsetMilliseconds + (
-                            animation.stepDurationInMilliseconds * animationStepCounter
+                            stepDurationMillis * animationStepCounter
                         ));
-                        this.maxDate = roundToHour(this.minDate + animation.windowDurationInMilliseconds);
+                        this.maxDate = roundToHour(this.minDate + windowDurationMillis);
                         log.debug(animationLoopCounter + ": From " + new Date(this.minDate) + " to " + new Date(this.maxDate));
                         animationStepCounter++;
                         if (this.maxDate >= now - animation.endTimeOffsetMilliseconds) {

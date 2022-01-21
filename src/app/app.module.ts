@@ -54,6 +54,7 @@ import {ResetPassComponent} from "./auth/reset-pass/reset-pass.component";
 import {MAT_DATE_LOCALE} from "@angular/material/core";
 import {PublicDisplayComponent} from './public-display/public-display.component';
 import {PublicDisplayTweetListComponent} from "./map/twitter/public-display-tweet-list/public-display-tweet-list.component";
+import {OpenPublicDisplayComponent} from './public-display/open-public-display/open-public-display.component';
 
 @NgModule({
               declarations:    [
@@ -94,7 +95,8 @@ import {PublicDisplayTweetListComponent} from "./map/twitter/public-display-twee
                   ResetPassComponent,
                   PublicDisplayComponent,
                   DateRangeDisplayComponent,
-                  PublicDisplayTweetListComponent
+                  PublicDisplayTweetListComponent,
+                  OpenPublicDisplayComponent
               ],
               imports:         [
                   BrowserModule,

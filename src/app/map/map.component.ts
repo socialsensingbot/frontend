@@ -28,6 +28,8 @@ import {RESTMapDataService} from "./data/rest-map-data.service";
 import {TwitterExporterService} from "./twitter/twitter-exporter.service";
 import {MapSelectionService} from "../map-selection.service";
 import {MatSidenav} from "@angular/material/sidenav";
+import {MatDialog} from "@angular/material/dialog";
+import {OpenPublicDisplayComponent} from "../public-display/open-public-display/open-public-display.component";
 
 
 const log = new Logger("map");
@@ -203,6 +205,7 @@ export class MapComponent implements OnInit, OnDestroy {
                 private _http: HttpClient,
                 private _exec: UIExecutionService,
                 private _color: ColorCodeService,
+                public dialog: MatDialog,
                 public data: RESTMapDataService,
                 public _exporter: TwitterExporterService,
                 public pref: PreferenceService,
@@ -1330,7 +1333,18 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     public async openPublicDisplay() {
-        await this._router.navigate(["display"], {queryParams: [], queryParamsHandling: "merge", relativeTo: this.route});
+        const dialogRef = this.dialog.open(OpenPublicDisplayComponent, {
+            width: "500px",
+            data:  {}
+        });
+
+        dialogRef.afterClosed().subscribe(async result => {
+            console.log(`Dialog result: ${result}`);
+            if (result) {
+                await this._router.navigate(["display"], {queryParams: result, queryParamsHandling: "merge", relativeTo: this.route});
+
+            }
+        });
 
     }
 }
