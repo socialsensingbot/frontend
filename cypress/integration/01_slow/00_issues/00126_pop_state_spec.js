@@ -15,12 +15,12 @@ describe('#126 Pop state : https://github.com/socialsensingbot/frontend/issues/1
                  cy.tweetCountTotal(193);
                  cy.url({timeout: 20000}).should("equal", url);
                  cy.log("Click out of London in any other county");
-                 cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-cork").click();
+                 cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-cambridgeshire").click();
                  cy.wait(10000);
-                 cy.twitterPanelHeader("Cork");
-                 cy.tweetCountTotal(2);
+                 cy.twitterPanelHeader("Cambridgeshire");
+                 cy.tweetCountTotal(20);
                  cy.url({timeout: 20000}).should("equal",
-                                                 MAP_URL + "?max_time=1631664000000&min_time=1631354400000&active_number=exceedance&active_polygon=county&selected=cork");
+                                                 MAP_URL + "?max_time=1631664000000&min_time=1631354400000&active_number=exceedance&active_polygon=county&selected=cambridgeshire");
                  cy.log("Go back into London.");
                  cy.go('back');
                  cy.wait(10000);

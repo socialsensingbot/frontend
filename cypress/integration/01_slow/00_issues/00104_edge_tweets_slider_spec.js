@@ -18,9 +18,9 @@ describe('#104 Slider and tweet interaction : https://github.com/socialsensingbo
                  cy.url({timeout: 20000}).should("equal",
                                                  MAP_URL + "?zoom=5&max_time=1631664000000&min_time=1631314800000&active_number=exceedance&active_polygon=county&selected=greater%20london");
                  cy.log("Click out of London in any other county (1)");
-                 cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-cork").click();
+                 cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-cambridgeshire").click();
                  cy.wait(10000);
-                 cy.tweetCountTotal(2);
+                 cy.tweetCountTotal(20);
                  cy.log("Click back into London (1)");
                  cy.get(".app-draw-close-button > .mat-button-wrapper > .mat-icon", {timeout: 30000}).click();
                  cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-greater-london").click({force: true});
@@ -33,9 +33,9 @@ describe('#104 Slider and tweet interaction : https://github.com/socialsensingbo
                  cy.tweetCountTotal(174);
                  cy.wait(10000);
                  cy.log("Click out of London in any other county (2)");
-                 cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-louth").click({force: true});
+                 cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-wiltshire").click({force: true});
                  cy.wait(10000);
-                 cy.tweetCountTotal(1);
+                 cy.tweetCountTotal(3);
                  cy.log("Click back into London (2)");
                  cy.get(".app-draw-close-button > .mat-button-wrapper > .mat-icon", {timeout: 30000}).click();
                  cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-greater-london").click({force: true});
