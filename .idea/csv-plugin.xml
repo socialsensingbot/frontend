@@ -3,6 +3,13 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="/cypress/downloads/greater_london-tweet-export-2022_01_17@04.34.33.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/cypress/downloads/greater_london-tweet-export-2022_01_17@04.35.13.csv">
           <value>
             <Attribute>

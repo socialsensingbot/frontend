@@ -29,13 +29,30 @@ describe('11 Analytics: ', function () {
             cy.get(".app-loading-progress", {timeout: 60000}).should("not.exist");
             cy.wait(4000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph");
-
-            cy.get('#mat-button-toggle-3-button > .mat-button-toggle-label-content').click();
+            cy.get('.epp-timeseries-eoc-exceedance').click();
             cy.wait(4000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph-exceedance");
-            cy.get('#mat-button-toggle-5-button > .mat-button-toggle-label-content').click();
+            cy.get('.epp-timeseries-eoc-exceedance').click();
+            cy.get('.epp-timeseries-lob-line').click();
             cy.wait(4000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph-exceedance-bar");
+            cy.get('.epp-timeseries-eoc-exceedance').click();
+            cy.get('.epp-timeseries-lob-bar').click();
+            cy.wait(4000);
+            snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph-exceedance-bar");
+            cy.get('.epp-timeseries-eoc-count').click();
+            cy.get('.epp-timeseries-lob-line').click();
+            cy.wait(4000);
+            snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph-count");
+            cy.get('.epp-timeseries-eoc-count').click();
+            cy.get('.epp-timeseries-lob-bar').click();
+            cy.wait(4000);
+            snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph-count-bar");
+            cy.get('.epp-timeseries-eoc-count').click();
+            cy.get('.epp-timeseries-lob-bar').click();
+            cy.get('.epp-timeseries-period-hour').click();
+            cy.wait(20000);
+            snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph-hour-bar-count");
         });
 
         it('Search Criteria & Save', () => {

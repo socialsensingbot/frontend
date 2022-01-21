@@ -573,13 +573,14 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         let minDate: Date;
         let maxDate: Date;
         if (switchedToHours) {
-            minDate = this.seriesCollection.minScrollbarDate ? this.seriesCollection.minScrollbarDate : new Date(Date.now() - ONE_DAY);
-            maxDate = this.seriesCollection.maxScrollbarDate ? this.seriesCollection.maxScrollbarDate : new Date();
+            minDate = this.seriesCollection.minScrollbarDate ? this.seriesCollection.minScrollbarDate : new Date(
+                this.now.getTime() - ONE_DAY);
+            maxDate = this.seriesCollection.maxScrollbarDate ? this.seriesCollection.maxScrollbarDate : this.now;
             log.debug("Min date is now " + minDate)
             log.debug("Max date is now " + maxDate)
         } else {
             minDate = new Date(year - 1, month, day);
-            maxDate = new Date();
+            maxDate = this.now;
         }
         this.range.controls.start.setValue(minDate);
         this.range.controls.end.setValue(maxDate);
