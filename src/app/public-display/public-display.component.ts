@@ -138,6 +138,7 @@ export class PublicDisplayComponent implements OnInit {
     private step: number;
     private window: number;
     private speed: number;
+    private offset: number;
 
     public get selectedFeatureNames(): string[] {
         return this._selectedFeatureNames;
@@ -401,6 +402,9 @@ export class PublicDisplayComponent implements OnInit {
         if (queryParams.has("speed")) {
             this.speed = +queryParams.get("speed") * 1000;
         }
+        if (queryParams.has("offset")) {
+            this.offset = +queryParams.get("offset") * 24 * 60 * 60 * 1000;
+        }
 
         this._loggedIn = await Auth.currentAuthenticatedUser() != null;
         // this.displayScript = this._display.script("county_ex_range_24h_step_1h_win_6h");
@@ -416,6 +420,7 @@ export class PublicDisplayComponent implements OnInit {
         let animateFunc: () => Promise<void> = async () => {
             try {
                 const animation = this.currentDisplayScreen.animation;
+                let startTimeOffsetMilliseconds = this.offset ? this.offset : animation.startTimeOffsetMilliseconds;
                 let windowDurationMillis: number = this.window ? this.window : animation.windowDurationInMilliseconds;
                 let stepDurationMillis: number = this.step ? this.step : animation.stepDurationInMilliseconds;
                 let speedInMillis: number = this.speed ? this.speed : this.currentDisplayScreen.stepDurationInMilliseconds;
@@ -423,7 +428,7 @@ export class PublicDisplayComponent implements OnInit {
                 const stepsPerLoop = Math.round(speedInMillis / 100) - 1;
                 if (animationLoopCounter % stepsPerLoop === 0) {
                     if (animation.type === "date-animation") {
-                        this.minDate = roundToHour(now - animation.startTimeOffsetMilliseconds + (
+                        this.minDate = roundToHour(now - startTimeOffsetMilliseconds + (
                             stepDurationMillis * animationStepCounter
                         ));
                         this.maxDate = roundToHour(this.minDate + windowDurationMillis);
@@ -450,12 +455,12 @@ export class PublicDisplayComponent implements OnInit {
                 }
                 animationLoopCounter++;
                 this.sliderOptions = {
-                    min:      now - animation.startTimeOffsetMilliseconds,
+                    min:      now - startTimeOffsetMilliseconds,
                     max:      now,
                     startMin: this.minDate,
                     startMax: this.maxDate
                 };
-                if (completedAnimations > this.currentDisplayScreen.animationLoops) {
+                if (completedAnimations >= this.currentDisplayScreen.animationLoops) {
                     animationLoopCounter = 0;
                     animationStepCounter = 0;
                     completedAnimations = 0;

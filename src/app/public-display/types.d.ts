@@ -1,6 +1,8 @@
 import {StatisticType} from "../analytics/timeseries";
 
 export interface DisplayScript {
+    id: string;
+    title: string;
     screens: DisplayScreen[];
 }
 

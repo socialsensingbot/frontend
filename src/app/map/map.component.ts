@@ -1341,7 +1341,9 @@ export class MapComponent implements OnInit, OnDestroy {
         dialogRef.afterClosed().subscribe(async result => {
             console.log(`Dialog result: ${result}`);
             if (result) {
-                await this._router.navigate(["display"], {queryParams: result, queryParamsHandling: "merge", relativeTo: this.route});
+                let commands: (string | any)[] = result.script ? ["display", result.script] : ["display"];
+                await this._router.navigate(commands,
+                                            {queryParams: result, queryParamsHandling: "merge", relativeTo: this.route});
 
             }
         });
