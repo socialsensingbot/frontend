@@ -39,7 +39,7 @@ export class DisplayScriptService {
                 {
 
                     type:                       "map-by-date",
-                    title:                      "UK Flood Last 4 Days",
+                    title:                      "UK Last 4 Days",
                     data:                       {
                         layerId:    "flood",
                         regionType: "county",
@@ -70,7 +70,7 @@ export class DisplayScriptService {
                                              title:   "UK County, Flood, Exceedance - Last 24 Hours",
                                              screens: [
                                                  {
-                                                     title:                      "UK Flood Last 24 Hours",
+                                                     title:                      "UK Last 24 Hours",
                                                      type:                       "map-by-date",
                                                      data:                       {
                                                          layerId:    "flood",
@@ -104,7 +104,7 @@ export class DisplayScriptService {
                                              screens: [
                                                  {
                                                      type:                       "map-by-date",
-                                                     title:                      "Eire Flood Tweet Count, Coarse Grid, Last Week",
+                                                     title:                      "Eire Tweets, Coarse Grid, Last Week",
                                                      data:                       {
                                                          layerId:    "flood",
                                                          regionType: "coarse",

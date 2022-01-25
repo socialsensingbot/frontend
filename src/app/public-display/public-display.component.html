@@ -37,6 +37,10 @@
 <!--        <map-legend *ngIf="ready" [activeNumber]="activeStatistic" class="legend"></map-legend>-->
 
         <div class="public-display-map-title">
+            <ng-container *ngIf="!!layer">
+                <i *ngFor="let icon of layer.icons" class="wi wi-{{icon}}"
+                   style="font-size:120%; margin-right:0.5em;"></i>
+            </ng-container>
             {{title}}
         </div>
         <!--        <div class="public-display-map-date">-->
@@ -49,7 +53,7 @@
 
         </div>
         <app-pd-tweet-list [annotationTypes]="annotationTypes" [style.opacity]="tweets?.length ? 1 : 0"
-                           [style.top]="title?.length ? '8vh' : '3vh'"
+                           [style.top]="title?.length ? '7.5vh' : '7.5vh'"
                            [tweets]="tweets"></app-pd-tweet-list>
     </mat-sidenav-content>
 

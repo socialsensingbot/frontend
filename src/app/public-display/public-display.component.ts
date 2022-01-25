@@ -27,6 +27,7 @@ import {DisplayScriptService} from "./display-script.service";
 import {DisplayScreen, DisplayScript} from "./types";
 import {StatisticType} from "../analytics/timeseries";
 import {roundToHour, sleep} from "../common";
+import {SSMapLayer} from "../types";
 
 const log = new Logger("map");
 
@@ -139,6 +140,7 @@ export class PublicDisplayComponent implements OnInit {
     private window: number;
     private speed: number;
     private offset: number;
+    public layer: SSMapLayer;
 
     public get selectedFeatureNames(): string[] {
         return this._selectedFeatureNames;
@@ -216,9 +218,7 @@ export class PublicDisplayComponent implements OnInit {
         if (value !== this._activeLayerGroup) {
             this._activeLayerGroup = value;
         }
-        this._twitterIsStale = true;
-        this.updateAnnotationTypes();
-        this.load();
+
     }
 
     constructor(private _router: Router,
@@ -485,10 +485,9 @@ export class PublicDisplayComponent implements OnInit {
 
     private updateAnnotationTypes(): void {
         log.debug("Finding annotations for layer ", this._activeLayerGroup);
-        const currentLayer: any = this.pref.combined.layers.available.filter(i => i.id == this._activeLayerGroup)[0];
-        log.debug("Finding annotations for layer ", currentLayer);
-        if (currentLayer) {
-            const activeAnnotationTypes: any = currentLayer.annotations;
+        log.debug("Finding annotations for layer ", this.layer);
+        if (this.layer) {
+            const activeAnnotationTypes: any = this.layer.annotations;
             log.debug("Available annotations are ", activeAnnotationTypes);
             this.annotationTypes = this.pref.combined.annotations.filter(
                 i => typeof activeAnnotationTypes === "undefined" || activeAnnotationTypes.includes(i.name));
@@ -517,6 +516,11 @@ export class PublicDisplayComponent implements OnInit {
             if (this.currentDisplayScreen.location?.zoom) {
                 this._zoom = this.currentDisplayScreen.location.zoom;
             }
+            await this.pref.waitUntilReady();
+            this.layer = this.pref.combined.layers.available.filter(i => i.id === this._activeLayerGroup)[0];
+            this._twitterIsStale = true;
+            this.updateAnnotationTypes();
+            await this.load();
             this.title = this.currentDisplayScreen.title;
             await this.data.loadGeography(this.activeRegionType);
             await this.resetStatisticsLayer(this.activeStatistic);
