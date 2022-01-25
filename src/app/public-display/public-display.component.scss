@@ -4,6 +4,28 @@ $right-hand-margin: 1vw;
 $top-margin: 1vw;
 $bottom-margin: 1vw;
 
+.logo-button {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 1vh;
+}
+
+.app-public-display-toolbar {
+    position: absolute;
+    top: 0.5vh;
+    right: 0.5vh;
+    left: 0.5vh;
+    z-index: 1000;
+    color: white;
+
+    .app-public-display-close-btn {
+        position: absolute;
+        font-size: 4vh;
+        width: 4vh;
+        right: 0px;
+        text-shadow: 0.1vw 0.1vw rgba(100, 100, 100, 0.4);
+    }
+}
+
 ::ng-deep {
     .leaflet-control-container {
         display: none;
@@ -38,7 +60,7 @@ $bottom-margin: 1vw;
 .public-display-map-date {
     font-size: 2vh;
     color: white;
-    text-shadow: 0 0 0.3vw rgba(100, 100, 100, 0.7);
+    text-shadow: 0.1vw 0.1vw rgba(100, 100, 100, 0.7);
     position: absolute;
     bottom: 5vh;
     right: 2vw;
@@ -51,7 +73,7 @@ $bottom-margin: 1vw;
     color: white;
     text-shadow: 0 0 0.3vw rgba(100, 100, 100, 0.7);
     position: absolute;
-    top: 1.6vh;
+    top: 3vh;
     left: 2vw;
 }
 

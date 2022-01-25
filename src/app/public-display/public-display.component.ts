@@ -235,7 +235,8 @@ export class PublicDisplayComponent implements OnInit {
                 public pref: PreferenceService,
                 public dash: DashboardService,
                 public loading: LoadingProgressService,
-                private _display: DisplayScriptService
+                private _display: DisplayScriptService,
+                public map: MapSelectionService
     ) {
 
     }

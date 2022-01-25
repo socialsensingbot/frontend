@@ -45,6 +45,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/cypress/downloads/west_yorkshire-tweet-export-2022_01_17@04.40.17.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/ref_data/region-groupings.csv">
           <value>
             <Attribute>

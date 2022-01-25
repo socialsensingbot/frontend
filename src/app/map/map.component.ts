@@ -1,5 +1,5 @@
 import {Component, NgZone, OnDestroy, OnInit} from "@angular/core";
-import {Logger} from "@aws-amplify/core";
+import {Hub, Logger} from "@aws-amplify/core";
 import {Browser, GeoJSON, latLng, LayerGroup, layerGroup, LeafletMouseEvent, Map, tileLayer} from "leaflet";
 import "jquery-ui/ui/widgets/slider.js";
 import {ActivatedRoute, NavigationStart, Params, Router} from "@angular/router";
@@ -494,6 +494,7 @@ export class MapComponent implements OnInit, OnDestroy {
     // public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
     //     // this.data.downloadAggregate(aggregrationSetId, id,
     public countries: any[];
+    public isDev: boolean = !environment.production;
 
     public set activeLayerGroup(value: string) {
         log.debug("set activeLayerGroup");
@@ -1348,5 +1349,9 @@ export class MapComponent implements OnInit, OnDestroy {
             }
         });
 
+    }
+
+    public logout(): void {
+        Hub.dispatch("app.logout", {event: "map.logout"});
     }
 }

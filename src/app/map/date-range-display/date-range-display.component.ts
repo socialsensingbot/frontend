@@ -189,7 +189,7 @@ export class DateRangeDisplayComponent implements OnInit, OnDestroy {
                                            {hour: "2-digit", hour12: true, timeZone: environment.timezone}).format(
             date);
 
-        return `<span class="slider-date-time slider-date-time-${label}"><span class='slider-time'>${hr}</span> <span class='slider-date'>${da}-${mo}-${ye}</span></span>`;
+        return `<span class="slider-date-time slider-date-time-${label}"><span class='slider-time'>${hr}</span> <span class='slider-date'>${da}-${mo}</span></span>`;
 
     }
 

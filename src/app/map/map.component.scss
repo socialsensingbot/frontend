@@ -6,13 +6,19 @@ $top-margin: 24px;
 $bottom-margin: 36px;
 $drawer-width: 500px;
 
+.expanded-toolbar {
+    box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.3);
+    overflow: visible;
+    position: absolute;
+}
+
 ::ng-deep {
     .leaflet-control-container {
         display: none;
     }
 
     .leaflet-new-tweet {
-        transition: stroke 100ms ease-in-out ;
+        transition: stroke 100ms ease-in-out;
     }
 
     .blink-on {
@@ -106,10 +112,15 @@ $drawer-width: 500px;
 
 }
 
-
+.content {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    top: 64px;
+}
 
 .app-toolbar {
-
     .date-slider {
         display: flex;
         z-index: 10;

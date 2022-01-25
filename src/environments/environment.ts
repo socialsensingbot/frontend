@@ -157,7 +157,7 @@ export const environment = {
     tweetCSVExportFormat:         "default",
     showAnalyticsSideMenu:        false,
     countryDownloadRegionType:    "bi_country",
-    exceedanceThreshold:          20,
-    countThreshold: 2
+    exceedanceThreshold:          100,
+    countThreshold:               0
 
 };
