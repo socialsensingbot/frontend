@@ -48,7 +48,7 @@
 </mat-toolbar>
 <div class="content">
     <mat-sidenav-container [ngClass]="blinkOn ? 'blink-on' : 'blink-off'" class="map-outer">
-        <mat-sidenav class="app-tweet-drawer" #sidenav [(opened)]="tweetsVisible" disableClose mode="side">
+        <mat-sidenav #sidenav [(opened)]="tweetsVisible" class="app-tweet-drawer" disableClose mode="side">
             <button (click)="closeTwitterPanel(sidenav)" aria-label="Close" class="app-draw-close-button"
                     mat-icon-button>
                 <mat-icon>close</mat-icon>

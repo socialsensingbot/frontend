@@ -18,11 +18,10 @@ describe('04: Map: ', function () {
 
         });
 
-        it('with a tooltip', () => {
+        it.only('with a tooltip', () => {
             cy.visitAndWait(MAP_URL);
-            cy.get(
-                'body > app-root > div > div > app-map > mat-sidenav-container > mat-sidenav-content > div.map-surround > div > div.leaflet-pane.leaflet-map-pane > div.leaflet-pane.leaflet-overlay-pane > svg > g > path:nth-child(174)',
-                {timeout: 60000}).trigger("mouseover", {force: true});
+            cy.get(".x-feature-name-cambridgeshire",
+                   {timeout: 60000}).trigger("mouseover", {force: true});
             cy.get(".leaflet-tooltip-pane").get("div");
             // cy.get('.leaflet-interactive:nth-child(174)').click();
 
