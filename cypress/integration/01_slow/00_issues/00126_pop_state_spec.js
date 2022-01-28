@@ -50,7 +50,7 @@ describe('#126 Pop state : https://github.com/socialsensingbot/frontend/issues/1
                  cy.url({timeout: 20000}).should("equal",
                                                  url);
                  cy.go(4);
-                 cy.wait(4000);
+                 cy.wait(10000);
                  cy.url({timeout: 20000}).should("equal",
                                                  slideLeftUrl);
                  cy.tweetCountTotal(177);
