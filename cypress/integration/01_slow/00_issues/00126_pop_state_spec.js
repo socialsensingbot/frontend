@@ -29,7 +29,7 @@ describe('#126 Pop state : https://github.com/socialsensingbot/frontend/issues/1
                  cy.url({timeout: 20000}).should("equal", url);
                  cy.log("Set slider to the left 3 times");
                  cy.moveMinDateSliderRight(4, true);
-                 cy.wait(4000);
+                 cy.wait(10000);
                  cy.tweetCountTotal(177);
                  cy.url({timeout: 20000}).should("equal",
                                                  slideLeftUrl);
