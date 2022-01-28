@@ -7,6 +7,41 @@ $bottom-margin: 1vw;
 .logo-button {
     font-family: 'Josefin Sans', sans-serif;
     font-size: 1vh;
+    max-width: 1.5vh;
+    max-height: 1.5vh;
+    min-width: 1.5vh;
+    min-height: 1.5vh;
+    margin-top: -0.15vh;
+    margin-right: 0.25vh;
+
+    img {
+        width: 1.5vh;
+        height: 1.5vh;
+        max-width: 1.5vh;
+        max-height: 1.5vh;
+        min-width: 1.5vh;
+        min-height: 1.5vh;
+    }
+
+    //Wide
+    @media (min-aspect-ratio: 1/1) {
+        font-size: 1vw;
+        max-width: 1.5vw;
+        max-height: 1.5vw;
+        min-width: 1.5vw;
+        min-height: 1.5vw;
+        margin-top: -0.15vw;
+        margin-right: 0.25vw;
+        img {
+            width: 1.5vw;
+            height: 1.5vw;
+            max-width: 1.5vw;
+            max-height: 1.5vw;
+            min-width: 1.5vw;
+            min-height: 1.5vw;
+        }
+    }
+
 }
 
 .app-public-display-toolbar {
@@ -22,7 +57,19 @@ $bottom-margin: 1vw;
         font-size: 4vh;
         width: 4vh;
         right: 0px;
-        text-shadow: 0.1vw 0.1vw rgba(100, 100, 100, 0.4);
+        text-shadow: 0.1vh 0.1vh rgba(100, 100, 100, 0.4);
+    }
+
+    //Wide
+    @media (min-aspect-ratio: 1/1) {
+        top: 0.5vw;
+        right: 0.5vw;
+        left: 0.5vw;
+        .app-public-display-close-btn {
+            font-size: 4vw;
+            width: 4vw;
+            text-shadow: 0.1vw 0.1vw rgba(100, 100, 100, 0.4);
+        }
     }
 }
 
@@ -57,24 +104,31 @@ $bottom-margin: 1vw;
 
 }
 
-.public-display-map-date {
-    font-size: 2vh;
-    color: white;
-    text-shadow: 0.1vw 0.1vw rgba(100, 100, 100, 0.7);
-    position: absolute;
-    bottom: 5vh;
-    right: 2vw;
-
-
-}
+//.public-display-map-date {
+//    font-size: 2vh;
+//    color: white;
+//    text-shadow: 0.1vw 0.1vw rgba(100, 100, 100, 0.7);
+//    position: absolute;
+//    bottom: 5vh;
+//    right: 2vw;
+//
+//
+//}
 
 .public-display-map-title {
     font-size: 3vh;
     color: white;
     text-shadow: 0 0 0.3vw rgba(100, 100, 100, 0.7);
     position: absolute;
-    top: 3vh;
-    left: 2vw;
+    top: 3.5vh;
+    left: 2.2vw;
+
+    @media (min-aspect-ratio: 1/1) {
+        font-size: 3vw;
+        top: 3.5vw;
+    }
+
+
 }
 
 
@@ -83,15 +137,25 @@ $bottom-margin: 1vw;
     right: 2vw;
     position: absolute;
     bottom: 2vh;
+
+    //Wide
+    @media (min-aspect-ratio: 1/1) {
+        bottom: 2vw;
+    }
 }
 
 app-pd-tweet-list {
     position: absolute;
-    top: 6vh;
+    top: 8vh;
     left: 2vw;
     bottom: 6vh;
     min-width: 25vw;
     transition: opacity 400ms ease-in;
+
+    @media (min-aspect-ratio: 1/1) {
+        top: 8vw;
+        bottom: 6vw;
+    }
 }
 
 //The Map

@@ -194,7 +194,7 @@ export class PublicDisplayComponent implements OnInit {
         }
     }
 
-    private _activeStatistic: StatisticType;
+    private _activeStatistic: StatisticType = "exceedance";
 
     public get activeStatistic(): StatisticType {
         return this._activeStatistic;
@@ -207,7 +207,7 @@ export class PublicDisplayComponent implements OnInit {
         }
     }
 
-    private _activeRegionType: string;
+    private _activeRegionType: string = "county";
 
     public get activeRegionType(): string {
         return this._activeRegionType;

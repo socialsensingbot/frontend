@@ -1,27 +1,27 @@
 <mat-sidenav-container class="map-outer">
-    <mat-sidenav #sidenav [(opened)]="tweetsVisible" class="app-tweet-drawer" disableClose mode="side">
-        <button (click)="sidenav.toggle()" aria-label="Close" class="app-draw-close-button" mat-icon-button>
-            <mat-icon>close</mat-icon>
-        </button>
+    <!--    <mat-sidenav #sidenav [(opened)]="tweetsVisible" class="app-tweet-drawer" disableClose mode="side">-->
+    <!--        <button (click)="sidenav.toggle()" aria-label="Close" class="app-draw-close-button"  mat-icon-button>-->
+    <!--            <mat-icon>close</mat-icon>-->
+    <!--        </button>-->
 
-        <div class="drawer-main-tabs">
+    <!--        <div class="drawer-main-tabs">-->
 
 
-            <mat-tab-group mat-align-tabs="center">
-                <mat-tab label="Twitter">
-                    <twitter-panel [annotationTypes]="annotationTypes" [selection]="selection"
-                                   [showHeaderInfo]="twitterPanelHeader"
-                                   [showTimeline]="showTwitterTimeline" [tweets]="tweets"
-                                   class="twitter-panel"></twitter-panel>
-                </mat-tab>
-                <mat-tab label="Stats">
-                    <ng-template matTabContent>
-                        <app-map-graph-sidebar [selection]="selection"></app-map-graph-sidebar>
-                    </ng-template>
-                </mat-tab>
-            </mat-tab-group>
-        </div>
-    </mat-sidenav>
+    <!--            <mat-tab-group mat-align-tabs="center">-->
+    <!--                <mat-tab label="Twitter">-->
+    <!--                    <twitter-panel [annotationTypes]="annotationTypes" [selection]="selection"-->
+    <!--                                   [showHeaderInfo]="twitterPanelHeader"-->
+    <!--                                   [showTimeline]="showTwitterTimeline" [tweets]="tweets"-->
+    <!--                                   class="twitter-panel"></twitter-panel>-->
+    <!--                </mat-tab>-->
+    <!--                <mat-tab label="Stats">-->
+    <!--                    <ng-template matTabContent>-->
+    <!--                        <app-map-graph-sidebar [selection]="selection"></app-map-graph-sidebar>-->
+    <!--                    </ng-template>-->
+    <!--                </mat-tab>-->
+    <!--            </mat-tab-group>-->
+    <!--        </div>-->
+    <!--    </mat-sidenav>-->
 
 
     <mat-sidenav-content style="overflow:hidden">
@@ -53,7 +53,8 @@
 
         </div>
         <app-pd-tweet-list [annotationTypes]="annotationTypes" [style.opacity]="tweets?.length ? 1 : 0"
-                           [style.top]="title?.length ? '7.5vh' : '7.5vh'"
+
+
                            [tweets]="tweets"></app-pd-tweet-list>
     </mat-sidenav-content>
 
