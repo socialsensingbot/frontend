@@ -492,11 +492,11 @@ export class PublicDisplayComponent implements OnInit {
     }
 
     private allTweetSortOrderForTweet(i: Tweet): number {
-        const mediaBonus: number = i.mediaCount + 0.2;
-        const ageBonus: number = i.date.getTime() - this.sliderOptions.min;
+        const mediaBonus: number = i.mediaCount + 0.1;
+        const ageBonus: number = (i.date.getTime() - this.sliderOptions.min) / 60 * 60 * 1000;
         const sensitivePenalty: number = i.potentiallySensitive ? 1000 : 1;
         const tokens: string[] = i.tokens;
-        const greyListPenalty = greylist.some(v => tokens.includes(v)) ? 100 : 1;
+        const greyListPenalty = greylist.some(v => tokens.includes(v)) ? 1000 : 1;
         return (this._statsMap && this._statsMap[i.region]) ? ((this._statsMap[i.region].exceedance / mediaBonus) / ageBonus) * sensitivePenalty * greyListPenalty : Infinity;
     }
 
