@@ -24,6 +24,10 @@ export class Tweet {
 
     private _init: boolean;
 
+    public get tokens(): string[] {
+        return this.html.toLowerCase().split(/[\s(?:;|$)]+/);
+    }
+
     public get mediaCount(): number {
         const mediaEntities = this.json.extended_tweet ? this.json.extended_tweet.entities.media : this.json.entities.media;
         if (mediaEntities) {

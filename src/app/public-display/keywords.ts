@@ -28,7 +28,6 @@ export const blacklist = [
     "#bidensilence",
     "#bidensrioters",
     "#bidensriots",
-    "#bigmike",
     "#billclintonisapedo",
     "#billclintonisarapist",
     "#blacksupremacist",
@@ -219,9 +218,6 @@ export const blacklist = [
     "#thegreatreset",
     "#thejoebidenriots",
     "#theresistance",
-    "#thestorm",
-    "#thestormiscoming",
-    "#thestormisuponus",
     "#thewokenpeople",
     "#thinblueline",
     "#thisistruth",
@@ -374,7 +370,6 @@ export const blacklist = [
     "decepticrat",
     "dick_hole",
     "dirty_sanchez",
-    "disappointee",
     "dog_fucker",
     "doggie_style",
     "doggiestyle",
@@ -588,8 +583,8 @@ export const blacklist = [
     "#prayforgandja",
     "#amerikkka",
     "#trumparmy",
-    "#ReleaseTheKraken",
-    "#Kraken",
+    "#releasethekraken",
+    "#kraken",
     "sheeple"
 ];
 

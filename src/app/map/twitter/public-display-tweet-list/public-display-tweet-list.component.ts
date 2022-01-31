@@ -90,10 +90,10 @@ export class PublicDisplayTweetListComponent implements OnInit, OnDestroy {
             if (this.tweetEl) {
                 if (this.tweetEl.get(this.scrollPosition)) {
                     this.tweetEl.get(this.scrollPosition).nativeElement.scrollIntoView({behavior: "smooth", block: "start"});
-                    this.scrollPosition++;
-                    if (this.scrollPosition > this.tweets.length) {
-                        this.scrollPosition = 0;
-                    }
+                }
+                this.scrollPosition++;
+                if (this.scrollPosition >= this.tweetEl.length) {
+                    this.scrollPosition = 0;
                 }
             }
         });

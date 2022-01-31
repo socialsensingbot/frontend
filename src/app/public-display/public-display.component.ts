@@ -486,15 +486,17 @@ export class PublicDisplayComponent implements OnInit {
     }
 
     private windowedSortOrderForTweet(i: Tweet): number {
-        let greyListPenalty = greylist.some(v => i.html.includes(v)) ? 100 : 1;
+        const tokens: string[] = i.tokens;
+        const greyListPenalty = greylist.some(v => tokens.includes(v)) ? 100 : 1;
         return this._statsMap[i.region] ? ((this._statsMap[i.region].exceedance / (i.mediaCount + 0.5)) * (1.0 + Math.random() / 10)) * greyListPenalty * (i.potentiallySensitive ? 1000 : 1) : Infinity;
     }
 
     private allTweetSortOrderForTweet(i: Tweet): number {
-        let mediaBonus: number = i.mediaCount + 0.2;
-        let ageBonus: number = i.date.getTime() - this.sliderOptions.min;
-        let sensitivePenalty: number = i.potentiallySensitive ? 1000 : 1;
-        let greyListPenalty = greylist.some(v => i.html.includes(v)) ? 100 : 1;
+        const mediaBonus: number = i.mediaCount + 0.2;
+        const ageBonus: number = i.date.getTime() - this.sliderOptions.min;
+        const sensitivePenalty: number = i.potentiallySensitive ? 1000 : 1;
+        const tokens: string[] = i.tokens;
+        const greyListPenalty = greylist.some(v => tokens.includes(v)) ? 100 : 1;
         return (this._statsMap && this._statsMap[i.region]) ? ((this._statsMap[i.region].exceedance / mediaBonus) / ageBonus) * sensitivePenalty * greyListPenalty : Infinity;
     }
 
@@ -693,6 +695,11 @@ export class PublicDisplayComponent implements OnInit {
     }
 
     private filterTweet(i: Tweet): any {
-        return !this._statsMap || typeof this._statsMap[i.region] !== "undefined" || blacklist.some(v => i.html.includes(v));
+        const tokens: string[] = i.tokens;
+        let blacklistedWords: string[] = blacklist.filter(i => tokens.includes(i));
+        if (blacklistedWords.length > 0) {
+            console.warn(i.html + " BLACKLISTED because of ", blacklistedWords);
+        }
+        return !this._statsMap || typeof this._statsMap[i.region] !== "undefined" || blacklistedWords;
     }
 }
