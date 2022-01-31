@@ -14,18 +14,18 @@
     left: 0;
     right: 0;
     max-height: calc(100vh - 164px);
-    outline: 1px solid red;
+    //outline: 1px solid red;
 
     .app-tweet-paged {
         display: block;
         height: auto;
         margin-bottom: 16px;
-        outline: 1px solid red;
+        //outline: 1px solid red;
     }
 
 
     .app-tweet-row {
-        outline: 1px solid red;
+        //outline: 1px solid red;
         flex-direction: row;
         flex-wrap: nowrap;
         align-items: flex-start;

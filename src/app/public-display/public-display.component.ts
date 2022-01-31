@@ -28,6 +28,7 @@ import {DisplayScreen, DisplayScript} from "./types";
 import {StatisticType} from "../analytics/timeseries";
 import {roundToHour, sleep} from "../common";
 import {SSMapLayer} from "../types";
+import {blacklist, greylist} from "./keywords";
 
 const log = new Logger("map");
 
@@ -485,11 +486,16 @@ export class PublicDisplayComponent implements OnInit {
     }
 
     private windowedSortOrderForTweet(i: Tweet): number {
-        return this._statsMap[i.region] ? ((this._statsMap[i.region].exceedance / (i.mediaCount + 0.5)) * (1.0 + Math.random() / 10)) * (i.potentiallySensitive ? 1000 : 1) : Infinity;
+        let greyListPenalty = greylist.some(v => i.html.includes(v)) ? 100 : 1;
+        return this._statsMap[i.region] ? ((this._statsMap[i.region].exceedance / (i.mediaCount + 0.5)) * (1.0 + Math.random() / 10)) * greyListPenalty * (i.potentiallySensitive ? 1000 : 1) : Infinity;
     }
 
     private allTweetSortOrderForTweet(i: Tweet): number {
-        return this._statsMap[i.region] ? ((this._statsMap[i.region].exceedance / (i.mediaCount + 0.2)) * (i.date.getTime() - this.sliderOptions.min)) * (i.potentiallySensitive ? 1000 : 1) : Infinity;
+        let mediaBonus: number = i.mediaCount + 0.2;
+        let ageBonus: number = i.date.getTime() - this.sliderOptions.min;
+        let sensitivePenalty: number = i.potentiallySensitive ? 1000 : 1;
+        let greyListPenalty = greylist.some(v => i.html.includes(v)) ? 100 : 1;
+        return (this._statsMap && this._statsMap[i.region]) ? ((this._statsMap[i.region].exceedance / mediaBonus) / ageBonus) * sensitivePenalty * greyListPenalty : Infinity;
     }
 
     private updateAnnotationTypes(): void {
@@ -687,6 +693,6 @@ export class PublicDisplayComponent implements OnInit {
     }
 
     private filterTweet(i: Tweet): any {
-        return typeof this._statsMap[i.region] !== "undefined";
+        return !this._statsMap || typeof this._statsMap[i.region] !== "undefined" || blacklist.some(v => i.html.includes(v));
     }
 }

@@ -83,8 +83,9 @@ export class PublicDisplayTweetListComponent implements OnInit, OnDestroy {
     }
 
 
-    ngOnInit(): void {
+    async ngOnInit() {
         this.scrollPosition = 0;
+        await this.pref.waitUntilReady();
         this._scrollTimer = timer(0, this.pref.combined.publicDisplayTweetScrollRate).subscribe(async () => {
             if (this.tweetEl) {
                 if (this.tweetEl.get(this.scrollPosition)) {
