@@ -11,6 +11,7 @@ $tweetHeaderOffset: 16px;
         .mat-tab-body.mat-tab-body-active {
             overflow: hidden !important;
             background-color: #f4f4f4;
+            min-height: calc(100vh - 164px);
         }
 
     }
@@ -41,13 +42,7 @@ $tweetHeaderOffset: 16px;
         //margin-top: 8px;
         //outline: 1px solid blue;
 
-        .app-tweet-paged {
-            display: flex;
-            align-items: stretch;
-            flex-direction: column;
-            height: 100%;
 
-        }
 
 
     }

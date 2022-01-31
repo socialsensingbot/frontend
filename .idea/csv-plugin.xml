@@ -3,62 +3,6 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="/cypress/downloads/greater_london-tweet-export-2022_01_17@04.34.33.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/greater_london-tweet-export-2022_01_17@04.35.13.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/greater_london-tweet-export-2022_01_17@04.40.33.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/multiple-regions-tweet-export-2022_01_17@04.31.34.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/multiple-regions-tweet-export-2022_01_17@04.40.22.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/multiple-regions-tweet-export-2022_01_27@02.47.49.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/west_yorkshire-tweet-export-2022_01_17@04.29.21.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/west_yorkshire-tweet-export-2022_01_17@04.40.17.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
         <entry key="/ref_data/region-groupings.csv">
           <value>
             <Attribute>

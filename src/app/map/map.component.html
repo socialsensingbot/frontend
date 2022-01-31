@@ -60,7 +60,7 @@
                 <mat-tab-group mat-align-tabs="center">
                     <mat-tab label="Twitter">
                         <twitter-panel [annotationTypes]="annotationTypes" [selection]="selection"
-                                       [showHeaderInfo]="twitterPanelHeader"
+                                       [layer]="activeLayerGroup" [showHeaderInfo]="twitterPanelHeader"
                                        [showTimeline]="showTwitterTimeline" [tweets]="tweets"
                                        class="twitter-panel"></twitter-panel>
                     </mat-tab>
