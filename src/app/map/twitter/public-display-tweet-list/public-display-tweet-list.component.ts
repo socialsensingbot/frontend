@@ -1,8 +1,8 @@
-import {Component, Input, NgZone, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {Component, ElementRef, Input, NgZone, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren} from "@angular/core";
 import {Tweet} from "../tweet";
 import {PreferenceService} from "../../../pref/preference.service";
 import {Logger} from "@aws-amplify/core";
-import {Subscription} from "rxjs";
+import {Subscription, timer} from "rxjs";
 import {environment} from "../../../../environments/environment";
 import {AnnotationService} from "../../../pref/annotation.service";
 import {MatDialog} from "@angular/material/dialog";
@@ -24,7 +24,7 @@ let loadTweets = false;
                styleUrls:   ["./public-display-tweet-list.component.scss"]
            })
 export class PublicDisplayTweetListComponent implements OnInit, OnDestroy {
-
+    @ViewChildren("tweet") tweetEl: QueryList<ElementRef>;
     @Input()
     public annotationTypes: any[] = [];
 
@@ -39,6 +39,8 @@ export class PublicDisplayTweetListComponent implements OnInit, OnDestroy {
     private _annotationRemovalSubscription: Subscription;
 
     private _tweets: Tweet[] | null = [];
+    private scrollPosition: number;
+    private _scrollTimer: Subscription;
 
     public get tweets(): Tweet[] {
         return this._tweets;
@@ -55,7 +57,8 @@ export class PublicDisplayTweetListComponent implements OnInit, OnDestroy {
             // this.ready = false;
             this._tweets = [];
             this.ready = false;
-            this.tweetCount = 0;
+            this.tweetCount = 0
+            this.scrollPosition = 0;
             log.debug("Tweets reset");
             return;
         }
@@ -81,10 +84,24 @@ export class PublicDisplayTweetListComponent implements OnInit, OnDestroy {
 
 
     ngOnInit(): void {
-
+        this.scrollPosition = 0;
+        this._scrollTimer = timer(0, this.pref.combined.publicDisplayTweetScrollRate).subscribe(async () => {
+            if (this.tweetEl) {
+                if (this.tweetEl.get(this.scrollPosition)) {
+                    this.tweetEl.get(this.scrollPosition).nativeElement.scrollIntoView({behavior: "smooth", block: "start"});
+                    this.scrollPosition++;
+                    if (this.scrollPosition > this.tweets.length) {
+                        this.scrollPosition = 0;
+                    }
+                }
+            }
+        });
     }
 
     public ngOnDestroy(): void {
+        if (this._scrollTimer) {
+            this._scrollTimer.unsubscribe();
+        }
         this._destroyed = true;
 
     }

@@ -441,16 +441,20 @@ export class PublicDisplayComponent implements OnInit {
                             completedAnimations++;
                         }
                         this._statsMap = await this.data.getRegionStatsMap(this._activeLayerGroup, this._activeRegionType, this.minDate,
+
                                                                            this.maxDate);
-                        this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType,
-                                                             (await this.data.regionsOfType(this.activeRegionType)).map(i => i.value),
-                                                             this.minDate,
-                                                             this.maxDate);
-                        //Sort tweets by region exceedance
-                        this.tweets.sort((i, j) => {
-                            return this.sortOrderForTweet(i) - this.sortOrderForTweet(j);
-                        });
-                        this.tweets = this.tweets.filter(i => this.filterTweet(i))
+                        if (this.pref.combined.publicDisplayTweetScroll === "window") {
+                            this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType,
+                                                                 (await this.data.regionsOfType(this.activeRegionType)).map(i => i.value),
+                                                                 this.minDate,
+                                                                 this.maxDate);
+                            //Sort tweets by region exceedance
+                            this.tweets.sort((i, j) => {
+                                return this.windowedSortOrderForTweet(i) - this.windowedSortOrderForTweet(j);
+                            });
+                            this.tweets = this.tweets.filter(i => this.filterTweet(i))
+                        }
+
                         await this.updateRegionDisplay(this.activeStatistic);
                     }
                 }
@@ -480,8 +484,12 @@ export class PublicDisplayComponent implements OnInit {
 
     }
 
-    private sortOrderForTweet(i: Tweet): number {
-        return this._statsMap[i.region] ? (this._statsMap[i.region].exceedance / (i.mediaCount + 0.5)) * (1.0 + Math.random() / 10) : Infinity;
+    private windowedSortOrderForTweet(i: Tweet): number {
+        return this._statsMap[i.region] ? ((this._statsMap[i.region].exceedance / (i.mediaCount + 0.5)) * (1.0 + Math.random() / 10)) * (i.potentiallySensitive ? 1000 : 1) : Infinity;
+    }
+
+    private allTweetSortOrderForTweet(i: Tweet): number {
+        return this._statsMap[i.region] ? ((this._statsMap[i.region].exceedance / (i.mediaCount + 0.2)) * (i.date.getTime() - this.sliderOptions.min)) * (i.potentiallySensitive ? 1000 : 1) : Infinity;
     }
 
     private updateAnnotationTypes(): void {
@@ -498,6 +506,7 @@ export class PublicDisplayComponent implements OnInit {
 
     private async nextScreen() {
         try {
+
             this.currentDisplayScreen = this.displayScript.screens[this.currentDisplayNumber % this.displayScript.screens.length];
             if (this.currentDisplayScreen.data?.layerId) {
                 this.activeLayerGroup = this.currentDisplayScreen.data.layerId;
@@ -525,6 +534,17 @@ export class PublicDisplayComponent implements OnInit {
             this.title = this.currentDisplayScreen.title;
             await this.data.loadGeography(this.activeRegionType);
             await this.resetStatisticsLayer(this.activeStatistic);
+            if (this.pref.combined.publicDisplayTweetScroll === "all") {
+                this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType,
+                                                     (await this.data.regionsOfType(this.activeRegionType)).map(i => i.value),
+                                                     this.sliderOptions.min,
+                                                     this.sliderOptions.max);
+                //Sort tweets by region exceedance
+                this.tweets.sort((i, j) => {
+                    return this.allTweetSortOrderForTweet(i) - this.allTweetSortOrderForTweet(j);
+                });
+                this.tweets = this.tweets.filter(i => this.filterTweet(i));
+            }
             this.currentDisplayNumber++;
             return this.currentDisplayScreen;
         } catch (e) {

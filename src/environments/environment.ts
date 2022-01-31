@@ -158,6 +158,8 @@ export const environment = {
     showAnalyticsSideMenu:        false,
     countryDownloadRegionType:    "bi_country",
     exceedanceThreshold:          100,
-    countThreshold:               0
+    countThreshold:               0,
+    publicDisplayTweetScroll:     "all",
+    publicDisplayTweetScrollRate: 3000
 
 };

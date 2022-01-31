@@ -1,5 +1,5 @@
-<div
-        class="app-public-display-tweet-list">
+<div #scrollContainer
+     class="app-public-display-tweet-list">
 
 
     <ng-template #tweetEntry let-si="senderIgnore" let-ti="tweetIgnore" let-tweet="tweet">
@@ -72,7 +72,7 @@
         </div>
 
     </ng-template>
-    <ng-container *ngFor="let tweet of tweets; let i = index">
+    <div #tweet *ngFor="let tweet of tweets; let i = index">
         <div class="app-tweet-row">
             <!--          <div class="app-tweet-date-separator"-->
             <!--               *ngIf="isNewDate(i + page.start)">{{tweet.date | date:"mediumDate"}}</div>-->
@@ -83,7 +83,7 @@
                 </ng-container>
             </div>
         </div>
-    </ng-container>
+    </div>
 
 
 </div>
