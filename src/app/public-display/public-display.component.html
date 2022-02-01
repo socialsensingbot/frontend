@@ -48,11 +48,11 @@
         <!--            - {{maxDate|date:'MMM dd'}} {{maxDate|date:'HH:mm'}} {{minDate|date:'zzz'}}-->
         <!--        </div>-->
 
-        <div class="app-pd-date-range-display">
+        <div *ngIf="ready" class="app-pd-date-range-display">
             <date-range-display [options]="sliderOptions"></date-range-display>
 
         </div>
-        <app-pd-tweet-list [annotationTypes]="annotationTypes" [style.opacity]="tweets?.length ? 1 : 0"
+        <app-pd-tweet-list [annotationTypes]="annotationTypes" [style.opacity]="tweets?.length && ready ? 1 : 0"
 
 
                            [tweets]="tweets"></app-pd-tweet-list>

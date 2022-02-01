@@ -28,7 +28,7 @@ import {DisplayScreen, DisplayScript} from "./types";
 import {StatisticType} from "../analytics/timeseries";
 import {roundToHour, sleep} from "../common";
 import {SSMapLayer} from "../types";
-import {blacklist, greylist} from "./keywords";
+import {blacklist} from "./keywords";
 
 const log = new Logger("map");
 
@@ -411,9 +411,10 @@ export class PublicDisplayComponent implements OnInit {
         this._loggedIn = await Auth.currentAuthenticatedUser() != null;
         // this.displayScript = this._display.script("county_ex_range_24h_step_1h_win_6h");
         this.displayScript = this._display.script(this._script);
-        await this.nextScreen();
+        this._notify.show("Loading data please wait")
         this.loading.loaded();
-        this.ready = true;
+        await this.nextScreen();
+        this._notify.dismiss();
         let animationLoopCounter = 0;
         let animationStepCounter = 0;
         let completedAnimations = 0;
@@ -445,18 +446,19 @@ export class PublicDisplayComponent implements OnInit {
 
                                                                            this.maxDate);
                         if (this.pref.combined.publicDisplayTweetScroll === "window") {
-                            this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType,
-                                                                 (await this.data.regionsOfType(this.activeRegionType)).map(i => i.value),
-                                                                 this.minDate,
-                                                                 this.maxDate);
+                            this.tweets = await this.data.publicDisplayTweets(this.activeLayerGroup, this.activeRegionType,
+                                                                              this.minDate,
+                                                                              this.maxDate);
                             //Sort tweets by region exceedance
                             this.tweets.sort((i, j) => {
                                 return this.windowedSortOrderForTweet(i) - this.windowedSortOrderForTweet(j);
                             });
                             this.tweets = this.tweets.filter(i => this.filterTweet(i))
+                            this.tweets.slice(0, this.pref.combined.publicDisplayMaxTweets);
                         }
 
                         await this.updateRegionDisplay(this.activeStatistic);
+
                     }
                 }
                 animationLoopCounter++;
@@ -466,6 +468,7 @@ export class PublicDisplayComponent implements OnInit {
                     startMin: this.minDate,
                     startMax: this.maxDate
                 };
+                this.ready = true;
                 if (completedAnimations >= this.currentDisplayScreen.animationLoops) {
                     animationLoopCounter = 0;
                     animationStepCounter = 0;
@@ -487,7 +490,7 @@ export class PublicDisplayComponent implements OnInit {
 
     private windowedSortOrderForTweet(i: Tweet): number {
         const tokens: string[] = i.tokens;
-        const greyListPenalty = greylist.some(v => tokens.includes(v)) ? 100 : 1;
+        const greyListPenalty = i.greylisted ? 100 : 1;
         return this._statsMap[i.region] ? ((this._statsMap[i.region].exceedance / (i.mediaCount + 0.5)) * (1.0 + Math.random() / 10)) * greyListPenalty * (i.potentiallySensitive ? 1000 : 1) : Infinity;
     }
 
@@ -496,7 +499,7 @@ export class PublicDisplayComponent implements OnInit {
         const ageBonus: number = (i.date.getTime() - this.sliderOptions.min) / 60 * 60 * 1000;
         const sensitivePenalty: number = i.potentiallySensitive ? 1000 : 1;
         const tokens: string[] = i.tokens;
-        const greyListPenalty = greylist.some(v => tokens.includes(v)) ? 1000 : 1;
+        const greyListPenalty = i.greylisted ? 1000 : 1;
         return (this._statsMap && this._statsMap[i.region]) ? ((this._statsMap[i.region].exceedance / mediaBonus) / ageBonus) * sensitivePenalty * greyListPenalty : Infinity;
     }
 
@@ -515,6 +518,7 @@ export class PublicDisplayComponent implements OnInit {
     private async nextScreen() {
         try {
 
+            this.ready = false;
             this.currentDisplayScreen = this.displayScript.screens[this.currentDisplayNumber % this.displayScript.screens.length];
             if (this.currentDisplayScreen.data?.layerId) {
                 this.activeLayerGroup = this.currentDisplayScreen.data.layerId;
@@ -543,15 +547,27 @@ export class PublicDisplayComponent implements OnInit {
             await this.data.loadGeography(this.activeRegionType);
             await this.resetStatisticsLayer(this.activeStatistic);
             if (this.pref.combined.publicDisplayTweetScroll === "all") {
-                this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType,
-                                                     (await this.data.regionsOfType(this.activeRegionType)).map(i => i.value),
-                                                     this.sliderOptions.min,
-                                                     this.sliderOptions.max);
+                let tweets = await this.data.publicDisplayTweets(this.activeLayerGroup, this.activeRegionType,
+                                                                 this.sliderOptions.min,
+                                                                 this.sliderOptions.max, 100,
+                                                                 (this.pref.combined.publicDisplayMaxTweets / 100) * 2);
+                tweets = tweets.filter(i => this.filterTweet(i));
                 //Sort tweets by region exceedance
-                this.tweets.sort((i, j) => {
+                tweets.sort((i, j) => {
                     return this.allTweetSortOrderForTweet(i) - this.allTweetSortOrderForTweet(j);
                 });
-                this.tweets = this.tweets.filter(i => this.filterTweet(i));
+                if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
+                    tweets = tweets.filter(i => !i.greylisted);
+                }
+                if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
+                    tweets = tweets.filter(i => !i.potentiallySensitive);
+                }
+                if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
+                    tweets = tweets.filter(i => i.mediaCount > 1);
+                }
+                tweets = tweets.slice(0, this.pref.combined.publicDisplayMaxTweets);
+                this.tweets = tweets;
+
             }
             this.currentDisplayNumber++;
             return this.currentDisplayScreen;
@@ -700,6 +716,6 @@ export class PublicDisplayComponent implements OnInit {
         if (blacklistedWords.length > 0) {
             console.warn(i.html + " BLACKLISTED because of ", blacklistedWords);
         }
-        return !this._statsMap || typeof this._statsMap[i.region] !== "undefined" || blacklistedWords;
+        return !this._statsMap || typeof this._statsMap[i.region] !== "undefined" || i.blacklisted;
     }
 }

@@ -160,6 +160,7 @@ export const environment = {
     exceedanceThreshold:          100,
     countThreshold:               0,
     publicDisplayTweetScroll:     "all",
-    publicDisplayTweetScrollRate: 3000
+    publicDisplayTweetScrollRate: 3000,
+    publicDisplayMaxTweets:       200
 
 };

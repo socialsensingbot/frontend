@@ -1,5 +1,6 @@
 import {environment} from "../../../environments/environment";
 import * as geojson from "geojson";
+import {blacklist, greylist} from "../../public-display/keywords";
 
 export interface CSVExportTweet {
     region: string;
@@ -35,6 +36,14 @@ export class Tweet {
         } else {
             return 0;
         }
+    }
+
+    public get greylisted(): boolean {
+        return greylist.some(v => this.tokens.includes(v))
+    }
+
+    public get blacklisted(): boolean {
+        return blacklist.some(v => this.tokens.includes(v))
     }
 
     get potentiallySensitive(): boolean {
