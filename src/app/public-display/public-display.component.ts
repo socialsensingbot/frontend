@@ -547,26 +547,10 @@ export class PublicDisplayComponent implements OnInit {
             await this.data.loadGeography(this.activeRegionType);
             await this.resetStatisticsLayer(this.activeStatistic);
             if (this.pref.combined.publicDisplayTweetScroll === "all") {
-                let tweets = await this.data.publicDisplayTweets(this.activeLayerGroup, this.activeRegionType,
-                                                                 this.sliderOptions.min,
-                                                                 this.sliderOptions.max, 100,
-                                                                 (this.pref.combined.publicDisplayMaxTweets / 100) * 2);
-                tweets = tweets.filter(i => this.filterTweet(i));
-                //Sort tweets by region exceedance
-                tweets.sort((i, j) => {
-                    return this.allTweetSortOrderForTweet(i) - this.allTweetSortOrderForTweet(j);
-                });
-                if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
-                    tweets = tweets.filter(i => !i.greylisted);
-                }
-                if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
-                    tweets = tweets.filter(i => !i.potentiallySensitive);
-                }
-                if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
-                    tweets = tweets.filter(i => i.mediaCount > 1);
-                }
-                tweets = tweets.slice(0, this.pref.combined.publicDisplayMaxTweets);
-                this.tweets = tweets;
+                this.tweets = this.cleanTweetsAndLimit(await this.data.publicDisplayTweets(this.activeLayerGroup, this.activeRegionType,
+                                                                                           this.sliderOptions.min,
+                                                                                           this.sliderOptions.max, 100,
+                                                                                           (this.pref.combined.publicDisplayMaxTweets / 100) * 2));
 
             }
             this.currentDisplayNumber++;
@@ -574,6 +558,35 @@ export class PublicDisplayComponent implements OnInit {
         } catch (e) {
             console.error(e);
         }
+    }
+
+    private cleanTweetsAndLimit(tweets: Tweet[]): Tweet[] {
+        tweets = tweets.filter(i => this.filterTweet(i));
+        //Sort tweets by region exceedance
+        tweets.sort((i, j) => {
+            return this.allTweetSortOrderForTweet(i) - this.allTweetSortOrderForTweet(j);
+        });
+        if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
+            tweets = tweets.filter(i => !i.greylisted);
+        }
+        // Filter out more spammy users
+        if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
+            tweets = tweets.filter(i => i.json.user.followers_count / (i.json.user.friends_count || 1) > 1);
+        }
+        if (tweets.length > this.pref.combined.publicDisplayMaxTweets && tweets.filter(
+            i => i.mediaCount > 1).length > this.pref.combined.publicDisplayMaxTweets / 2) {
+            tweets = this.pref.combined.publicDisplayMaxTweets;
+        }
+        if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
+            tweets = tweets.filter(i => !i.potentiallySensitive);
+        }
+        if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
+            tweets = tweets.filter(i => !(i.json.entities?.user_mentions?.length > 2));
+        }
+        if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
+            tweets = tweets.filter(i => !i.json.user.verified);
+        }
+        return tweets.slice(0, this.pref.combined.publicDisplayMaxTweets);
     }
 
     /**
