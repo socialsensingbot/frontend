@@ -24,9 +24,11 @@ export class Tweet {
 
 
     private _init: boolean;
+    private _tokens: string[];
 
     public get tokens(): string[] {
-        return this.html.toLowerCase().split(/[\s(?:;|$)]+/);
+        this.lazyInit();
+        return this._tokens;
     }
 
     public get mediaCount(): number {
@@ -137,6 +139,7 @@ export class Tweet {
         return this._json.extended_tweet ? this._json.extended_tweet.full_text : this._json.text;
     }
 
+
     public get text(): string {
         this.lazyInit();
         const paragraphElement: HTMLParagraphElement = $(this.html).find("p")[0];
@@ -186,6 +189,8 @@ export class Tweet {
      */
     public lazyInit() {
         if (!this._init) {
+            this._tokens = this.html.replace(/https?:\/\/[^\s]+/g, "").toLowerCase().split(/[^#@a-zA-Z_’'\u00C0-\u024F\u1E00-\u1EFF]+/);
+            console.warn("" + this._tokens);
             this._sender = this._json.user.screen_name;
             this._url = "https://twitter.com/" + this._sender + "/status/" + this._id;
 
