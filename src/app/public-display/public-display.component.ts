@@ -419,8 +419,8 @@ export class PublicDisplayComponent implements OnInit {
         let animationStepCounter = 0;
         let completedAnimations = 0;
         await this.resetStatisticsLayer(this._activeStatistic);
-        let now: number = roundToHour(await this.data.now());
         let animateFunc: () => Promise<void> = async () => {
+            let now: number = roundToHour(await this.data.now());
             try {
                 const animation = this.currentDisplayScreen.animation;
                 let startTimeOffsetMilliseconds = this.offset ? this.offset : animation.startTimeOffsetMilliseconds;
@@ -435,7 +435,7 @@ export class PublicDisplayComponent implements OnInit {
                             stepDurationMillis * animationStepCounter
                         ));
                         this.maxDate = roundToHour(this.minDate + windowDurationMillis);
-                        log.debug(animationLoopCounter + ": From " + new Date(this.minDate) + " to " + new Date(this.maxDate));
+                        log.debug(`${animationLoopCounter}: From ${new Date(this.minDate)} to ${new Date(this.maxDate)}`);
                         animationStepCounter++;
                         if (this.maxDate >= now - animation.endTimeOffsetMilliseconds) {
                             animationStepCounter = 0;
@@ -496,18 +496,25 @@ export class PublicDisplayComponent implements OnInit {
 
     private allTweetSortOrderForTweet(i: Tweet): number {
         const mediaBonus: number = (i.mediaCount ** 2) + 0.1;
-        const ageBonus: number = (i.date.getTime() - this.sliderOptions.min) / 60 * 60 * 1000;
+        const agepenalty: number = (i.date.getTime() - this.sliderOptions.min) / 60 * 60 * 1000 > 1 ? 8 : 1;
         const sensitivePenalty: number = i.potentiallySensitive ? 1024 : 1;
         const greyListPenalty = i.greylisted ? 1024 : 1;
         // Filter out more spammy users
-        const followerPenalty = i.json.user.followers_count / (i.json.user.friends_count || 1) > 1 ? 1 : 2;
+        let ratio: number = i.json.user.followers_count / (i.json.user.friends_count || 1);
+        // This penalises spammy users
+        const followerRatioPenalty = ratio <= 1 ? 32 : 1;
+        // This penalises broadcast (news like) accounts.
+        const followerPenalty = i.json.user.followers_count > 256 ? 4 : 1;
+        // This heavily penalises non-interactive accounts (following too many people)
+        const friendsPenalty = i.json.user.friends_count > 1000 ? 128 : 1;
         const mentionsPenalty = (i.json.entities?.user_mentions?.length > 2) ? 2 : 1;
         const hashtagsPenalty = (i.json.entities?.hashtags?.length > 2) ? 16 : 1;
         const urlPenalty = (i.json.entities?.urls?.length > 0 && i.mediaCount === 0) ? 64 : 1;
-        const verifiedBonus = !i.json.user.verified ? 2 : 1;
-        const lengthPenalty = i.html.length < 10 ? 2 : 1;
-        return this._statsMap && this._statsMap[i.region] ? (this._statsMap[i.region].exceedance / mediaBonus / ageBonus / verifiedBonus)
-            * sensitivePenalty * greyListPenalty * followerPenalty * mentionsPenalty * hashtagsPenalty * urlPenalty * lengthPenalty : Infinity;
+        const verifiedPenalty = i.json.user.verified ? 4 : 1;
+        const lengthPenalty = i.tokens.length < 20 ? 2 : 1;
+        return this._statsMap && this._statsMap[i.region] ? (this._statsMap[i.region].exceedance / mediaBonus)
+            * sensitivePenalty * greyListPenalty * followerRatioPenalty * mentionsPenalty
+            * hashtagsPenalty * urlPenalty * lengthPenalty * agepenalty * verifiedPenalty * followerPenalty * friendsPenalty : Infinity;
     }
 
     private updateAnnotationTypes(): void {

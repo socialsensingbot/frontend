@@ -190,7 +190,6 @@ export class Tweet {
     public lazyInit() {
         if (!this._init) {
             this._tokens = this.html.replace(/https?:\/\/[^\s]+/g, "").toLowerCase().split(/[^#@a-zA-Z_’'\u00C0-\u024F\u1E00-\u1EFF]+/);
-            console.warn("" + this._tokens);
             this._sender = this._json.user.screen_name;
             this._url = "https://twitter.com/" + this._sender + "/status/" + this._id;
 
