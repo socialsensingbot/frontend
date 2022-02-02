@@ -497,16 +497,16 @@ export class PublicDisplayComponent implements OnInit {
     private allTweetSortOrderForTweet(i: Tweet): number {
         const mediaBonus: number = (i.mediaCount ** 2) + 0.1;
         const ageBonus: number = (i.date.getTime() - this.sliderOptions.min) / 60 * 60 * 1000;
-        const sensitivePenalty: number = i.potentiallySensitive ? 1000 : 1;
-        const greyListPenalty = i.greylisted ? 1000 : 1;
+        const sensitivePenalty: number = i.potentiallySensitive ? 1024 : 1;
+        const greyListPenalty = i.greylisted ? 1024 : 1;
         // Filter out more spammy users
         const followerPenalty = i.json.user.followers_count / (i.json.user.friends_count || 1) > 1 ? 1 : 2;
         const mentionsPenalty = (i.json.entities?.user_mentions?.length > 2) ? 2 : 1;
-        const hashtagsPenalty = (i.json.entities?.hashtags?.length > 2) ? 2 : 1;
-        const urlPenalty = (i.json.entities?.urls?.length > 0 && i.mediaCount === 0) ? 100 : 1;
+        const hashtagsPenalty = (i.json.entities?.hashtags?.length > 2) ? 16 : 1;
+        const urlPenalty = (i.json.entities?.urls?.length > 0 && i.mediaCount === 0) ? 64 : 1;
         const verifiedBonus = !i.json.user.verified ? 2 : 1;
         const lengthPenalty = i.html.length < 10 ? 2 : 1;
-        return (this._statsMap && this._statsMap[i.region]) ? ((this._statsMap[i.region].exceedance / mediaBonus) / ageBonus / verifiedBonus)
+        return this._statsMap && this._statsMap[i.region] ? (this._statsMap[i.region].exceedance / mediaBonus / ageBonus / verifiedBonus)
             * sensitivePenalty * greyListPenalty * followerPenalty * mentionsPenalty * hashtagsPenalty * urlPenalty * lengthPenalty : Infinity;
     }
 
@@ -568,11 +568,19 @@ export class PublicDisplayComponent implements OnInit {
     }
 
     private cleanTweetsAndLimit(tweets: Tweet[]): Tweet[] {
+        // remove blacklisted
         tweets = tweets.filter(i => this.filterTweet(i));
-        //Sort tweets by region exceedance
+        // remove duplicates
+        const map = {};
+        tweets.forEach(i => {
+            return map[JSON.stringify(i.tokens)] = i;
+        });
+        tweets = Object.values(map);
+        // sort tweets
         tweets.sort((i, j) => {
             return this.allTweetSortOrderForTweet(i) - this.allTweetSortOrderForTweet(j);
         });
+        // if there are spare tweets, clean out the rubbish ones
         if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
             tweets = tweets.filter(i => !i.greylisted);
         }
