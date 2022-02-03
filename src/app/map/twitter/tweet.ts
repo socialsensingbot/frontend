@@ -86,6 +86,9 @@ export class Tweet {
     }
 
     public get json(): any {
+        if (typeof this._json === "string") {
+            this._json = JSON.parse(this._json);
+        }
         return this._json;
     }
 
@@ -156,7 +159,7 @@ export class Tweet {
     }
 
     public get text(): string {
-        return this._json.extended_tweet ? this._json.extended_tweet.full_text : this._json.text;
+        return this.json.extended_tweet ? this.json.extended_tweet.full_text : this.json.text;
     }
 
 
@@ -210,7 +213,7 @@ export class Tweet {
     public lazyInit() {
         if (!this._init) {
             this._tokens = this.text.replace(/https?:\/\/[^\s]+/g, "").toLowerCase().split(/[^#@a-zA-Z_’'\u00C0-\u024F\u1E00-\u1EFF]+/);
-            this._sender = this._json.user.screen_name;
+            this._sender = this.json.user.screen_name;
             this._url = "https://twitter.com/" + this._sender + "/status/" + this._id;
 
             this._year = new Intl.DateTimeFormat(environment.locale,

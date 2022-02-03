@@ -189,7 +189,6 @@ export class PublicDisplayComponent implements OnInit {
                     this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 6000});
                 }
                 this.ready = true;
-                await this.load(false);
             }).finally(() => {
             });
         }
@@ -326,15 +325,6 @@ export class PublicDisplayComponent implements OnInit {
 
     }
 
-    /**
-     * Read the live.json data file and process contents.
-     */
-    async load(first: boolean = false) {
-        if (this.destroyed) {
-            return;
-        }
-        await this.data.load(first);
-    }
 
     public set activeRegionType(value: string) {
         log.debug("activeRegionType(" + value + ")");
@@ -566,15 +556,16 @@ export class PublicDisplayComponent implements OnInit {
             this.layer = this.pref.combined.layers.available.filter(i => i.id === this._activeLayerGroup)[0];
             this._twitterIsStale = true;
             this.updateAnnotationTypes();
-            await this.load();
             this.title = this.currentDisplayScreen.title;
             await this.data.loadGeography(this.activeRegionType);
             await this.resetStatisticsLayer(this.activeStatistic);
             if (this.pref.combined.publicDisplayTweetScroll === "all") {
+                log.info("Before tweet load");
                 this.tweets = this.cleanTweetsAndLimit(await this.data.publicDisplayTweets(this.activeLayerGroup, this.activeRegionType,
                                                                                            this.sliderOptions.min,
                                                                                            this.sliderOptions.max, 100,
-                                                                                           (this.pref.combined.publicDisplayMaxTweets / 100) * 3));
+                                                                                           (this.pref.combined.publicDisplayMaxTweetsRetrieved / 100)));
+                log.info("After tweet load");
 
             }
             this.currentDisplayNumber++;

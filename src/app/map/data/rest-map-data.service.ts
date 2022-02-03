@@ -164,8 +164,7 @@ export class RESTMapDataService {
 
     }
 
-    public async load(first: boolean) {
-    }
+
 
     public async tweets(layerGroupId: string, regionType: string, regions: string[], startDate,
                         endDate): Promise<Tweet[]> {
@@ -183,7 +182,7 @@ export class RESTMapDataService {
         log.debug(rawResult.length + " tweets back from server");
         const result: Tweet[] = [];
         for (const tweet of rawResult) {
-            result.push(new Tweet(tweet.id, tweet.html, JSON.parse(tweet.json), tweet.location, new Date(tweet.timestamp), tweet.region,
+            result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
                                   tweet.possibly_sensitive));
         }
         return result;
@@ -208,7 +207,7 @@ export class RESTMapDataService {
             }, 60 * 60);
             log.debug(rawResult.length + " tweets back from server");
             for (const tweet of rawResult) {
-                result.push(new Tweet(tweet.id, null, JSON.parse(tweet.json), null, new Date(tweet.timestamp), tweet.region,
+                result.push(new Tweet(tweet.id, null, tweet.json, null, new Date(tweet.timestamp), tweet.region,
                                       tweet.possibly_sensitive));
             }
             if (rawResult.length < pageSize || page === maxPages - 1) {

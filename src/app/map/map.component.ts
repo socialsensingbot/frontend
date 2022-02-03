@@ -439,7 +439,6 @@ export class MapComponent implements OnInit, OnDestroy {
         return this._exec.queue("Map Load", null, async () => {
             try {
 
-                await this.data.load(first);
 
                 if (first) {
                     this._exec.changeState("no-params");
