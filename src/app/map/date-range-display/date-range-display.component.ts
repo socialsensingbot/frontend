@@ -129,9 +129,8 @@ export class DateRangeDisplayComponent implements OnInit, OnDestroy {
      */
     @Input()
     public set options(value: DateRangeSliderOptions) {
-        log.debug("Options: " + JSON.stringify(value));
         this._options = value;
-        this._lowerValue = roundToHour(value.startMin);
+        log.verbose(`Options: ${JSON.stringify(value)}`);
         if (value.min <= 0) {
             throw new Error("Min value must be positive");
         }
@@ -144,16 +143,21 @@ export class DateRangeDisplayComponent implements OnInit, OnDestroy {
         if (value.startMax < 0) {
             throw new Error("Upper value must be positive");
         }
-        this._pref.waitUntilReady().then(() => {
-            if (value.max - value.startMax < this._pref.combined.continuousUpdateThresholdInMinutes * 60 * 1000) {
-                this._upperValue = roundToMinute(value.startMax);
-            } else {
-                this._upperValue = roundToHour(value.startMax);
-            }
-            this.sliderOptions = {...this.sliderOptions, ceil: roundToMinute(value.max), floor: roundToHour(value.min)};
-            this.ready = true;
-            this.updateTicks();
-        });
+        if (this._upperValue !== value.startMax || this._lowerValue !== value.startMin) {
+            this._lowerValue = roundToHour(value.startMin);
+            this._pref.waitUntilReady().then(() => {
+                if (value.max - value.startMax < this._pref.combined.continuousUpdateThresholdInMinutes * 60 * 1000) {
+                    this._upperValue = roundToMinute(value.startMax);
+                } else {
+                    this._upperValue = roundToHour(value.startMax);
+                }
+                if (value.max !== this.sliderOptions.ceil || value.min !== this.sliderOptions.floor) {
+                    this.sliderOptions = {...this.sliderOptions, ceil: roundToMinute(value.max), floor: roundToHour(value.min)};
+                }
+                this.ready = true;
+                this.updateTicks();
+            });
+        }
 
     }
 

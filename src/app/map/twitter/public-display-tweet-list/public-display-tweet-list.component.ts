@@ -8,11 +8,8 @@ import {AnnotationService} from "../../../pref/annotation.service";
 import {MatDialog} from "@angular/material/dialog";
 import {MatMenuTrigger} from "@angular/material/menu";
 
-const twitterLink = require("twitter-text")
 
 const log = new Logger("pd-tweet-list");
-let loadTweets = false;
-
 /**
  * The TweetListComponent is responsible for managing an invisibly
  * paged infinite scroll collection of tweets. At present all
@@ -27,6 +24,7 @@ export class PublicDisplayTweetListComponent implements OnInit, OnDestroy {
     @ViewChildren("tweet") tweetEl: QueryList<ElementRef>;
     @Input()
     public annotationTypes: any[] = [];
+    public styles: { [id: string]: string; } = {};
 
     public loaded: boolean[] = [];
     public tweetCount = 0;
@@ -35,8 +33,6 @@ export class PublicDisplayTweetListComponent implements OnInit, OnDestroy {
     @ViewChild("appMenu") menuTrigger: MatMenuTrigger;
     private _destroyed = false;
     private annotations: { [key: string]: any } = {};
-    private _annotationSubscription: any;
-    private _annotationRemovalSubscription: Subscription;
 
     private _tweets: Tweet[] | null = [];
     private scrollPosition: number;
@@ -70,18 +66,6 @@ export class PublicDisplayTweetListComponent implements OnInit, OnDestroy {
                 public annotate: AnnotationService) {
     }
 
-    public show($event: any) {
-        log.debug($event);
-    }
-
-    public sender(tweet) {
-        return tweet.sender;
-    }
-
-    public isPlaceholder(tweet) {
-        return !tweet.valid;
-    }
-
 
     async ngOnInit() {
         this.scrollPosition = 0;
@@ -107,56 +91,16 @@ export class PublicDisplayTweetListComponent implements OnInit, OnDestroy {
 
     }
 
-    public isNewDate(i: number) {
-        return i > 0 && this.tweets.length > i && this.tweets[i - 1].day !== this.tweets[i].day;
-    }
-
-
-    public isCached(id: string) {
-        if (!localStorage.getItem("tweet:" + id)) {
-            return false;
-
-        }
-        const item = JSON.parse(localStorage.getItem("tweet:" + id));
-
-        if (item && item.timestamp > Date.now() - 60 * 50 * 1000) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public cached(id: string) {
-        log.debug("From cache " + id);
-        return JSON.parse(localStorage.getItem("tweet:" + id)).html;
-    }
-
-    public annotationsFor(tweet: Tweet) {
-        return this.annotations[tweet.id] || {};
-    }
-
-    public annotationValueFor(tweet: Tweet, key: string) {
-        return (this.annotationsFor(tweet))[key];
-    }
-
-    public annotationValueIs(tweet: Tweet, key: string, value) {
-        return (this.annotationValueFor(tweet, key)) === value;
-    }
-
-    public annotationValueIsNot(tweet: Tweet, key: string, value) {
-        return !this.annotationValueIs(tweet, key, value);
-    }
-
     public styleFor(type: string, tweet: Tweet) {
-        const value = this.annotationValueFor(tweet, type);
-        log.verbose("Annotation value is ", value);
+        const value = (this.annotations[tweet.id] || {})[type];
+        log.debug("Annotation value is ", value);
         let filtered: any[] = this.annotationTypes.filter(i => i.name === type);
-        log.verbose("Annotations filtered: ", filtered);
+        log.debug("Annotations filtered: ", filtered);
         for (const filteredElement of filtered) {
             for (const option of filteredElement.options) {
                 if (option.value === value) {
                     log.verbose("Annotations selected ", option);
-                    return "border-left: 3px solid " + option.color;
+                    this.styles[tweet.id] = "border-left: 3px solid " + option.color;
                 }
             }
         }
@@ -166,51 +110,15 @@ export class PublicDisplayTweetListComponent implements OnInit, OnDestroy {
 
     }
 
-    public styleForPhoto(media: any): any {
-        const width: number = 23;
-        const height = (width / media.sizes.small.w) * media.sizes.small.h;
-
-        return {
-            "object-fit": media.sizes.small.resize === "fit" ? "contain" : "cover",
-            "width.vw":   width,
-            "height.vw":  height
-        };
-    }
-
-    public entities(tweet: any): any {
-        const entities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities : tweet.json.entities;
-        return typeof entities !== "undefined" ? entities : {};
-    }
-
-    public tweetHtml(tweet: any): any {
-        const entities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities : tweet.json.entities;
-        const text = tweet.json.extended_tweet ? tweet.json.extended_tweet.full_text : tweet.json.text;
-        let urlEntities: string[] = entities.urls;
-        if (entities.media) {
-            urlEntities = [...urlEntities, ...entities.media]
-        }
-        return "<p>" + twitterLink.default.autoLink(text, {urlEntities, targetBlank: true, title: false}) + "</p>";
-    }
-
-    public mediaEntities(tweet: any): any[] {
-        const mediaEntities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities.media : tweet.json.entities.media;
-        return typeof mediaEntities !== "undefined" ? mediaEntities : [];
-    }
-
-    public videoVariant(media: any): any {
-        for (const variant of media.video_info.variants) {
-            if (variant.content_type === "video/mp4") {
-                return variant;
-            }
-        }
-        return null;
-    }
 
     /**
      * Update the tweets stored in this list.
      * @param val an array of {@link Tweet}s
      */
     private updateTweets(val: Tweet[]) {
+        for (const tweet of val) {
+            this.styleFor("impact", tweet);
+        }
         this.tweetCount = val.length;
         log.debug("updateTweets()");
         if (this._destroyed) {

@@ -150,11 +150,11 @@ export class TwitterExporterService {
                 if (this._pref.combined.sanitizeForGDPR) {
                     return this.createCSVExportTweet(includeSource, region, impact, source, i.id, i.date.toUTCString(),
                                                      "https://twitter.com/username_removed/status/" + i.id,
-                                                     this.sanitizeForGDPR($("<div>").html(i.html).text()), JSON.stringify(i.location));
+                                                     this.sanitizeForGDPR($("<div>").html(i.text).text()), JSON.stringify(i.location));
 
                 } else {
                     return this.createCSVExportTweet(includeSource, region, impact, source, i.id, i.date.toUTCString(),
-                                                     "https://twitter.com/username_removed/status/" + i.id, $("<div>").html(i.html).text(),
+                                                     "https://twitter.com/username_removed/status/" + i.id, $("<div>").html(i.text).text(),
                                                      JSON.stringify(i.location));
                 }
             });
@@ -229,11 +229,11 @@ export class TwitterExporterService {
         if (sanitize) {
             return this.createCSVExportTweet(includeSource, regionMap[tweet.region], impact, source, tweet.id, tweet.date.toUTCString(),
                                              "https://twitter.com/username_removed/status/" + tweet.id,
-                                             this.sanitizeForGDPR($("<div>").html(tweet.html).text()), JSON.stringify(tweet.location));
+                                             this.sanitizeForGDPR($("<div>").html(tweet.text).text()), JSON.stringify(tweet.location));
 
         } else {
             return this.createCSVExportTweet(includeSource, regionMap[tweet.region], impact, source, tweet.id, tweet.date.toUTCString(),
-                                             tweet.url, $("<div>").html(tweet.html).text(), JSON.stringify(tweet.location));
+                                             tweet.url, $("<div>").html(tweet.text).text(), JSON.stringify(tweet.location));
         }
     }
 

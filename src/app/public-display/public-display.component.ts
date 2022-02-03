@@ -208,7 +208,7 @@ export class PublicDisplayComponent implements OnInit {
         }
     }
 
-    private _activeRegionType: string = "county";
+    private _activeRegionType = "county";
 
     public get activeRegionType(): string {
         return this._activeRegionType;
@@ -359,6 +359,8 @@ export class PublicDisplayComponent implements OnInit {
         log.debug("init");
         // map.zoomControl.remove();
         await this.pref.waitUntilReady();
+        this._notify.show("Loading data please wait");
+
         if (this.route.snapshot.paramMap.has("map")) {
             this._dataset = this.route.snapshot.paramMap.get("map");
         } else {
@@ -384,7 +386,7 @@ export class PublicDisplayComponent implements OnInit {
         this._map.setView([this._lat, this._lon]);
         this._map.setZoom(this._zoom);
 
-        let queryParams = this.route.snapshot.queryParamMap;
+        const queryParams = this.route.snapshot.queryParamMap;
         if (queryParams.has("active_number")) {
             this._activeStatistic = queryParams.get("active_number") as StatisticType;
         }
@@ -411,27 +413,28 @@ export class PublicDisplayComponent implements OnInit {
         this._loggedIn = await Auth.currentAuthenticatedUser() != null;
         // this.displayScript = this._display.script("county_ex_range_24h_step_1h_win_6h");
         this.displayScript = this._display.script(this._script);
-        this._notify.show("Loading data please wait")
+
         this.loading.loaded();
+        this._notify.show("Loading map data please wait");
+
         await this.nextScreen();
         this._notify.dismiss();
         let animationLoopCounter = 0;
         let animationStepCounter = 0;
         let completedAnimations = 0;
         await this.resetStatisticsLayer(this._activeStatistic);
-        let animateFunc: () => Promise<void> = async () => {
+        const animateFunc: () => Promise<void> = async () => {
             let now: number = roundToHour(await this.data.now());
             try {
                 const animation = this.currentDisplayScreen.animation;
-                let startTimeOffsetMilliseconds = this.offset ? this.offset : animation.startTimeOffsetMilliseconds;
-                let windowDurationMillis: number = this.window ? this.window : animation.windowDurationInMilliseconds;
-                let stepDurationMillis: number = this.step ? this.step : animation.stepDurationInMilliseconds;
-                let speedInMillis: number = this.speed ? this.speed : this.currentDisplayScreen.stepDurationInMilliseconds;
+                const windowDurationMillis: number = this.window ? this.window : animation.windowDurationInMilliseconds;
+                const stepDurationMillis: number = this.step ? this.step : animation.stepDurationInMilliseconds;
+                const speedInMillis: number = this.speed ? this.speed : this.currentDisplayScreen.stepDurationInMilliseconds;
 
                 const stepsPerLoop = Math.round(speedInMillis / 100) - 1;
                 if (animationLoopCounter % stepsPerLoop === 0) {
                     if (animation.type === "date-animation") {
-                        this.minDate = roundToHour(now - startTimeOffsetMilliseconds + (
+                        this.minDate = roundToHour(this.sliderOptions.min + (
                             stepDurationMillis * animationStepCounter
                         ));
                         this.maxDate = roundToHour(this.minDate + windowDurationMillis);
@@ -449,11 +452,11 @@ export class PublicDisplayComponent implements OnInit {
                             this.tweets = await this.data.publicDisplayTweets(this.activeLayerGroup, this.activeRegionType,
                                                                               this.minDate,
                                                                               this.maxDate);
-                            //Sort tweets by region exceedance
+                            // Sort tweets by region exceedance
                             this.tweets.sort((i, j) => {
                                 return this.windowedSortOrderForTweet(i) - this.windowedSortOrderForTweet(j);
                             });
-                            this.tweets = this.tweets.filter(i => this.filterTweet(i))
+                            this.tweets = this.tweets.filter(i => this.filterTweet(i));
                             this.tweets.slice(0, this.pref.combined.publicDisplayMaxTweets);
                         }
 
@@ -463,8 +466,7 @@ export class PublicDisplayComponent implements OnInit {
                 }
                 animationLoopCounter++;
                 this.sliderOptions = {
-                    min:      now - startTimeOffsetMilliseconds,
-                    max:      now,
+                    ...this.sliderOptions,
                     startMin: this.minDate,
                     startMax: this.maxDate
                 };
@@ -500,7 +502,7 @@ export class PublicDisplayComponent implements OnInit {
         const sensitivePenalty: number = i.potentiallySensitive ? 1024 : 1;
         const greyListPenalty = i.greylisted ? 1024 : 1;
         // Filter out more spammy users
-        let ratio: number = i.json.user.followers_count / (i.json.user.friends_count || 1);
+        const ratio: number = i.json.user.followers_count / (i.json.user.friends_count || 1);
         // This penalises spammy users
         const followerRatioPenalty = ratio <= 1 ? 32 : 1;
         // This penalises broadcast (news like) accounts.
@@ -531,9 +533,17 @@ export class PublicDisplayComponent implements OnInit {
 
     private async nextScreen() {
         try {
-
             this.ready = false;
             this.currentDisplayScreen = this.displayScript.screens[this.currentDisplayNumber % this.displayScript.screens.length];
+            const now: number = roundToHour(await this.data.now());
+            const startTimeOffsetMilliseconds = this.offset ? this.offset : this.currentDisplayScreen.animation.startTimeOffsetMilliseconds;
+
+            this.sliderOptions = {
+                min:      now - startTimeOffsetMilliseconds,
+                max:      now,
+                startMin: this.minDate,
+                startMax: this.maxDate
+            };
             if (this.currentDisplayScreen.data?.layerId) {
                 this.activeLayerGroup = this.currentDisplayScreen.data.layerId;
             }
@@ -633,7 +643,7 @@ export class PublicDisplayComponent implements OnInit {
             // this.hideTweets();
             log.debug(layer);
             const curLayerGroup = layerGroup();
-            this.geographyData = await this.data.geoJsonGeographyFor(this._activeRegionType) as PolygonData
+            this.geographyData = await this.data.geoJsonGeographyFor(this._activeRegionType) as PolygonData;
             this.regionTweetMap = await this.data.recentTweets(this._activeLayerGroup, this._activeRegionType);
             this._geojson[layer] = new GeoJSON(this.geographyData as geojson.GeoJsonObject, {
                 style: {
@@ -667,7 +677,7 @@ export class PublicDisplayComponent implements OnInit {
 
     private async updateRegionDisplay(layer: "count" | "exceedance"): Promise<void> {
         if (this.currentStatisticsLayer && this.currentStatisticsLayer.getLayers()[0]) {
-            let layers: Layer[] = (this.currentStatisticsLayer.getLayers()[0] as GeoJSON).getLayers();
+            const layers: Layer[] = (this.currentStatisticsLayer.getLayers()[0] as GeoJSON).getLayers();
             for (const geoLayer of layers) {
                 const feature: any = (geoLayer as GeoJSON).feature;
                 const featureProperties = feature.properties;
@@ -753,9 +763,9 @@ export class PublicDisplayComponent implements OnInit {
 
     private filterTweet(i: Tweet): any {
         const tokens: string[] = i.tokens;
-        let blacklistedWords: string[] = blacklist.filter(i => tokens.includes(i));
+        const blacklistedWords: string[] = blacklist.filter(i => tokens.includes(i));
         if (blacklistedWords.length > 0) {
-            console.warn(i.html + " BLACKLISTED because of ", blacklistedWords);
+            console.warn(i.text + " BLACKLISTED because of ", blacklistedWords);
         }
         return !this._statsMap || typeof this._statsMap[i.region] !== "undefined" || i.blacklisted;
     }
