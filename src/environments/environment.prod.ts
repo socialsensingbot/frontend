@@ -5,25 +5,26 @@ import {SSLayerConfiguration} from "../app/types";
 const layers: SSLayerConfiguration = {
     "available":    [
         {
-            "id":       "flood",
-            "title":    "Floods",
-            "sources":  ["twitter"],
-            "hazards":  ["flood"],
-            "warnings": "exclude",
-            "annotations": ["source", "impact"]
+            "id":          "flood",
+            "title":       "Floods",
+            "sources":     ["twitter"],
+            "hazards":     ["flood"],
+            "warnings":    "exclude",
+            "annotations": ["source", "impact"],
+            "icons":       ["flood"]
         }
     ],
     "defaultLayer": "flood"
 };
 
 const defaultDashboard: Dashboard = {
-  boards: [{
-    deviceType: "all",
-    pages:      [{
-      title: "First Page",
-      cards: []
+    boards: [{
+        deviceType: "all",
+        pages:      [{
+            title: "First Page",
+            cards: []
+        }]
     }]
-  }]
 };
 
 export const environment = {
@@ -31,7 +32,7 @@ export const environment = {
     name:             "production",
     lamdaEnvironment: "prod",
     demo:             false,
-    version:          "2.4.4",
+    version:          "2.5",
     // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
     timezone:             "UTC",
     locale:               "en-GB",
@@ -89,5 +90,10 @@ export const environment = {
     analyticsDefaultRegions:      ["uk"],
     maxCallsPerMinute:            10000,
     countryDownloadRegionType:    "bi_country",
+    exceedanceThreshold:          100,
+    countThreshold:               0,
+    publicDisplayTweetScroll:     "all",
+    publicDisplayTweetScrollRate: 3000
+
 
 };

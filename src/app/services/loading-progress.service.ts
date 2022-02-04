@@ -32,8 +32,8 @@ export class LoadingProgressService {
         if (!this.loadingComplete && stage > 0 && stage > this.currentStage) {
             this.currentStage = stage;
             this.showSpinner = true;
+            this._progressPercentage = this.currentStage / this.maxStages;
         }
-        this._progressPercentage = this.currentStage / this.maxStages;
         log.info(message);
     }
 
@@ -42,6 +42,7 @@ export class LoadingProgressService {
         this.currentStage = 0;
         this.loadingComplete = true;
         this.showSpinner = false;
+        this._progressPercentage = 100;
         $("#loading-div").css("opacity", 0.0);
         setTimeout(() => $("#loading-div").remove(), 1000);
     }

@@ -3,43 +3,49 @@
       <mat-toolbar-row>
           <mat-button-toggle-group name="eoc" class="eoc"
                                    [ngModel]="statType" aria-label="Return Period or Count">
-              <mat-button-toggle (click)="userChangedStatisticType('exceedance')" value="exceedance">Return Period
+              <mat-button-toggle (click)="userChangedStatisticType('exceedance')" class="epp-timeseries-eoc-exceedance"
+                                 value="exceedance">Return Period
               </mat-button-toggle>
-              <mat-button-toggle (click)="userChangedStatisticType('count')" value="count">Count</mat-button-toggle>
+              <mat-button-toggle (click)="userChangedStatisticType('count')" class="epp-timeseries-eoc-count"
+                                 value="count">Count
+              </mat-button-toggle>
           </mat-button-toggle-group>
 
           <div class="app-toolbar-separator"></div>
           <mat-button-toggle-group (click)="graphTypeChanged(state.lob)" class="lob" name="lob"
                                    [(ngModel)]="state.lob" aria-label="Line or Bar">
-              <mat-button-toggle value="line">Line</mat-button-toggle>
-              <mat-button-toggle value="bar">Bar</mat-button-toggle>
+              <mat-button-toggle class="epp-timeseries-lob-line" value="line">Line</mat-button-toggle>
+              <mat-button-toggle class="epp-timeseries-lob-bar" value="bar">Bar</mat-button-toggle>
           </mat-button-toggle-group>
           <div class="app-toolbar-separator"></div>
           <mat-button-toggle-group [(ngModel)]="state.timePeriod"
                                    aria-label="Time Period"
                                    class="timeperiod-btn-group" name="timeperiod">
-              <mat-button-toggle (click)="timePeriodChanged('day')" value="day">Day</mat-button-toggle>
-              <mat-button-toggle (click)="timePeriodChanged('hour')" value="hour">Hour</mat-button-toggle>
+              <mat-button-toggle (click)="timePeriodChanged('day')" class="epp-timeseries-period-day" value="day">Day
+              </mat-button-toggle>
+              <mat-button-toggle (click)="timePeriodChanged('hour')" class="epp-timeseries-period-hour" value="hour">
+                  Hour
+              </mat-button-toggle>
           </mat-button-toggle-group>
           <div class="app-toolbar-expanding-separator"></div>
-          <button (click)="saveGraph();" class="app-analytics-timeseries-toolbar-save" color="primary"
+          <button (click)="saveGraph();" class="app-timeseries-toolbar-save" color="primary"
                   mat-stroked-button>Save
           </button>
           <div class="app-toolbar-separator"></div>
-          <button [queryParams]="{__clear_ui__:true}" class="app-analytics-timeseries-toolbar-new" color="warn"
+          <button [queryParams]="{__clear_ui__:true}" class="app-timeseries-toolbar-new" color="warn"
                   mat-stroked-button
                   routerLink="/analytics/time">New
           </button>
           <ng-container *ngIf="this.graphId">
               <div class="app-toolbar-separator"></div>
               <button (click)="saveGraph(true);"
-                      class="app-analytics-timeseries-toolbar-duplicate" mat-stroked-button>Duplicate
+                      class="app-timeseries-toolbar-duplicate" mat-stroked-button>Duplicate
               </button>
           </ng-container>
 
           <div class="app-toolbar-separator"></div>
           <button mat-stroked-button *ngIf="this.pref.featureSupported('dashboard')"
-                  (click)="addToDashboard()" class="app-analytics-timeseries-toolbar-add-to-dashboard">Add to
+                  (click)="addToDashboard()" class="app-timeseries-toolbar-add-to-dashboard">Add to
               Dashboard
           </button>
           <div class="app-toolbar-separator"></div>

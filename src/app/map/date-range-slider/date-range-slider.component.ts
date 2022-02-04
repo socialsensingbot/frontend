@@ -134,7 +134,6 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     public set options(value: DateRangeSliderOptions) {
         log.debug("Options: " + JSON.stringify(value));
         this._options = value;
-        this._lowerValue = roundToHour(value.startMin);
         if (value.min <= 0) {
             throw new Error("Min value must be positive");
         }
@@ -147,14 +146,18 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
         if (value.startMax < 0) {
             throw new Error("Upper value must be positive");
         }
-        if (value.max - value.startMax < this._pref.combined.continuousUpdateThresholdInMinutes * 60 * 1000) {
-            this._upperValue = roundToMinute(value.startMax);
-        } else {
-            this._upperValue = roundToHour(value.startMax);
-        }
-        this.sliderOptions = {...this.sliderOptions, ceil: roundToMinute(value.max), floor: roundToHour(value.min)};
-        this.ready = true;
-        this.updateTicks();
+        this._pref.waitUntilReady().then(() => {
+            this.sliderOptions = {...this.sliderOptions, ceil: roundToMinute(value.max), floor: roundToHour(value.min)};
+            this._lowerValue = roundToHour(value.startMin);
+            if (value.max - value.startMax < this._pref.combined.continuousUpdateThresholdInMinutes * 60 * 1000) {
+                this._upperValue = roundToMinute(value.startMax);
+            } else {
+                this._upperValue = roundToHour(value.startMax);
+            }
+            this.ready = true;
+            this.updateTicks();
+        });
+
     }
 
     ngOnInit() {
@@ -211,7 +214,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
             for (let step = this.sliderOptions.floor;
                  step < this.sliderOptions.ceil;
                  step = step + 60 * 60 * 1000) {
-                 log.verbose(step);
+                log.verbose(step);
                 this.sliderOptions.stepsArray.push({value: step});
             }
             if (this.sliderOptions.stepsArray[this.sliderOptions.stepsArray.length - 1].value !== this.sliderOptions.ceil) {

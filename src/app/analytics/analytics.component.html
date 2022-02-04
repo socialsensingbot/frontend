@@ -1,22 +1,64 @@
-<mat-sidenav-container class="app-analytics-outer " >
-    <mat-sidenav #sidenav *ngIf="pref.ready && pref.combined.showAnalyticsSideMenu" [(opened)]="sidebarVisible"
-                 class="app-analytics-sidenav" disableClose mode="side">
-        <button mat-icon-button class="app-draw-close-button" aria-label="Close" (click)="sidenav.toggle()">
-            <mat-icon>close</mat-icon>
+<mat-toolbar [color]="pref.environment.toolbarColor" class="expanded-toolbar">
+    <span>
+      <button class="logo-button" mat-button routerLink="/"><img src="/assets/icon-white/Icon24@2x.png"/> SOCIAL SENSING</button>
+        <!--      <button mat-button routerLink="/"><mat-icon>home</mat-icon></button>-->
+    </span>
+    <span *ngIf="isDev">(development)</span>
+    <span class="menu-spacer">&nbsp;</span>
+    <div fxLayout="row" fxShow="false" fxShow.gt-sm id="login">
+        <button *ngIf="pref.ready && pref.featureSupported('dashboard')"
+                [routerLink]="'/map/' + map.id + '/dashboard'"
+                mat-button>
+            <!--       <mat-icon>power_settings_new</mat-icon>-->
+            Dashboard
         </button>
-        <mat-nav-list>
-            <a mat-list-item routerLink="/analytics/time">Timeseries</a>
-        </mat-nav-list>
-    </mat-sidenav>
+        <button *ngIf="pref.ready &&pref.featureSupported('map')" [queryParamsHandling]="'merge'"
+                [routerLink]="'/map/'+map.id"
+                mat-button>
+            <!--       <mat-icon>power_settings_new</mat-icon>-->
+            Map
+        </button>
+        <help-button></help-button>
+        <button (click)="logout()" id="logout" mat-button>
+            <mat-icon>exit_to_app</mat-icon>
+            Logout
+        </button>
 
 
-    <mat-sidenav-content >
+        <!--      <button mat-button *ngIf="isAuthenticated" routerLink="/map">-->
+        <!--        <mat-icon>map</mat-icon>-->
+        <!--        Map-->
+        <!--      </button>-->
+        <!--      <button id="signup" mat-button routerLink="/auth/signup" *ngIf="isSignup">-->
+        <!--        Signup (Dev Only)-->
+        <!--      </button>-->
 
-        <div class="app-analytics-main-area">
-            <router-outlet></router-outlet>
-        </div>
+    </div>
+    <!--    <button mat-button [mat-menu-trigger-for]="menu" fxHide="false" fxHide.gt-sm>-->
+    <!--      <mat-icon>menu</mat-icon>-->
+    <!--    </button>-->
+</mat-toolbar>
+<div class="content">
+    <mat-sidenav-container class="app-analytics-outer ">
+        <mat-sidenav #sidenav *ngIf="pref.ready && pref.combined.showAnalyticsSideMenu" [(opened)]="sidebarVisible"
+                     class="app-analytics-sidenav" disableClose mode="side">
+            <button (click)="sidenav.toggle()" aria-label="Close" class="app-draw-close-button" mat-icon-button>
+                <mat-icon>close</mat-icon>
+            </button>
+            <mat-nav-list>
+                <a mat-list-item routerLink="/analytics/time">Timeseries</a>
+            </mat-nav-list>
+        </mat-sidenav>
 
 
-        <!--    <div class="map-inset-shadow"></div>-->
-    </mat-sidenav-content>
-</mat-sidenav-container>
+        <mat-sidenav-content>
+
+            <div class="app-analytics-main-area">
+                <router-outlet></router-outlet>
+            </div>
+
+
+            <!--    <div class="map-inset-shadow"></div>-->
+        </mat-sidenav-content>
+    </mat-sidenav-container>
+</div>

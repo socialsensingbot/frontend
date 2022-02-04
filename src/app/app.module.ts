@@ -20,6 +20,7 @@ import {MatSliderModule} from "@angular/material/slider";
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {TwitterPanelComponent} from "./map/twitter/twitter-panel.component";
 import {DateRangeSliderComponent} from "./map/date-range-slider/date-range-slider.component";
+import {DateRangeDisplayComponent} from "./map/date-range-display/date-range-display.component";
 import {Ng5SliderModule} from "ng5-slider";
 import {LegendComponent} from "./map/legend/legend.component";
 import {NewPassComponent} from "./auth/new-pass/new-pass.component";
@@ -51,6 +52,9 @@ import {TimeseriesWidgetComponent} from "./analytics/widgets/twitter-timeseries/
 import {ForgotPassComponent} from "./auth/forgot-pass/forgot-pass.component";
 import {ResetPassComponent} from "./auth/reset-pass/reset-pass.component";
 import {MAT_DATE_LOCALE} from "@angular/material/core";
+import {PublicDisplayComponent} from './public-display/public-display.component';
+import {PublicDisplayTweetListComponent} from "./map/twitter/public-display-tweet-list/public-display-tweet-list.component";
+import {OpenPublicDisplayComponent} from './public-display/open-public-display/open-public-display.component';
 
 @NgModule({
               declarations:    [
@@ -87,8 +91,12 @@ import {MAT_DATE_LOCALE} from "@angular/material/core";
                   TimeSeriesMultipleQueryChartComponent,
                   NameGraphDialogComponent,
                   TimeseriesWidgetComponent,
-                    ForgotPassComponent,
-                  ResetPassComponent
+                  ForgotPassComponent,
+                  ResetPassComponent,
+                  PublicDisplayComponent,
+                  DateRangeDisplayComponent,
+                  PublicDisplayTweetListComponent,
+                  OpenPublicDisplayComponent
               ],
               imports:         [
                   BrowserModule,

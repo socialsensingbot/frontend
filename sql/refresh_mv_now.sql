@@ -74,7 +74,7 @@ BEGIN
             call debug_msg(-2, 'refresh_mv_now', concat('FAILED: ', @p1, ': ', @p2));
         END;
     call debug_msg(0, 'refresh_mv_now', 'Refreshing (Latest) Materialized Views');
-    call refresh_mv(DATE_SUB(NOW(), INTERVAL 1 HOUR), NOW(), @rc);
+    call refresh_mv(DATE_SUB(NOW(), INTERVAL 12 HOUR), NOW(), @rc);
     call fill_hours(DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY));
     call debug_msg(0, 'refresh_mv', 'Updated mat_view_hours');
     SET rc = 0;
@@ -232,11 +232,12 @@ BEGIN
 
 #     SET @maxTimestamp = IFNULL((select max(source_timestamp) from mat_view_regions), NOW() - INTERVAL 20 YEAR);
     call debug_msg(1, 'refresh_mv', 'Updating mat_view_regions');
-    DELETE FROM mat_view_regions WHERE source_timestamp BETWEEN start_date and end_date;
-    call debug_msg(1, 'refresh_mv', 'Deleted old from mat_view_regions');
+    #     DELETE FROM mat_view_regions WHERE source_timestamp BETWEEN start_date and end_date;
+#     call debug_msg(1, 'refresh_mv', 'Deleted old from mat_view_regions');
 
     # Put in the fine, coarse and county stats that Rudy generates data for (the old way of doing this)
-    INSERT INTO mat_view_regions
+    START TRANSACTION;
+    REPLACE INTO mat_view_regions
     SELECT t.source_id,
            t.source,
            t.hazard,
@@ -252,10 +253,11 @@ BEGIN
       AND t.source = tr.source
       AND t.hazard = tr.hazard
       AND t.source_timestamp BETWEEN start_date and end_date;
-
+    COMMIT;
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with live_text_regions data.');
 
     # Add in all other regions (the new way of doing this)
+    START TRANSACTION;
     REPLACE INTO mat_view_regions
     SELECT t.source_id,
            t.source,
@@ -271,8 +273,10 @@ BEGIN
     WHERE ST_Intersects(boundary, location)
       AND NOT gr.disabled
       AND t.source_timestamp BETWEEN start_date and end_date;
+    COMMIT;
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with boundary matches.');
 
+    START TRANSACTION;
     REPLACE INTO mat_view_regions
     SELECT t.source_id,
            t.source,
@@ -291,13 +295,14 @@ BEGIN
       AND vr.geo_region_type = gr.region_type
       AND NOT gr.disabled
       AND t.source_timestamp BETWEEN start_date and end_date;
-
+    COMMIT;
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with virtual region boundary matches.');
 
 
     #     call debug_msg(1, 'refresh_mv', 'Fixing mat_view_regions for UK only');
 
     #     # UK Locations are buffered with a 0.01 degree buffer. At present this is not done on the world map
+
 #     # If the world map is supported then this may be required to capture location just outside of the strict
 #     # boundary supplied. We only use the buffered values when the non buffered regions do not match.
 #     INSERT INTO mat_view_regions
@@ -317,15 +322,14 @@ BEGIN
 #       AND (select count(*) from ref_geo_regions where st_intersects(boundary, t.location) and map_location = 'uk') = 0
 #       AND t.source_timestamp BETWEEN start_date and end_date;
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions');
-    COMMIT;
 
 
     START TRANSACTION;
     call debug_msg(1, 'refresh_mv', 'Updating mat_view_timeseries_date');
 
-#     SET @maxTimestampTSD = IFNULL((select max(source_date) from mat_view_timeseries_date), NOW() - INTERVAL 20 YEAR);
-    DELETE FROM mat_view_timeseries_date WHERE source_date BETWEEN start_date and end_date;
-    INSERT INTO mat_view_timeseries_date
+    #     SET @maxTimestampTSD = IFNULL((select max(source_date) from mat_view_timeseries_date), NOW() - INTERVAL 20 YEAR);
+#     DELETE FROM mat_view_timeseries_date WHERE source_date BETWEEN start_date and end_date;
+    REPLACE INTO mat_view_timeseries_date
     SELECT r.region                 as region_group_name,
            t.source                 as source,
            t.hazard                 as hazard,
@@ -506,13 +510,12 @@ BEGIN
         END;
 
     call debug_msg(0, 'daily_housekeeping', 'Optimizing tables');
-
-    optimize table live_text;
-    optimize table mat_view_regions;
-    optimize table mat_view_timeseries_date;
-    optimize table mat_view_timeseries_hour;
-    optimize table mat_view_first_entries;
-    optimize table mat_view_text_count;
+    #     optimize table live_text;
+#     optimize table mat_view_regions;
+#     optimize table mat_view_timeseries_date;
+#     optimize table mat_view_timeseries_hour;
+#     optimize table mat_view_first_entries;
+#     optimize table mat_view_text_count;
     call debug_msg(0, 'daily_housekeeping', 'Optimized tables');
     set @rc = 0;
 

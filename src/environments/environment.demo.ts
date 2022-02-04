@@ -32,7 +32,8 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["flood"],
             "warnings":    "exclude",
-            "annotations": ["source", "impact"]
+            "annotations": ["source", "impact"],
+            "icons":       ["flood"]
         },
         {
             "id":          "flood-with-warnings",
@@ -40,7 +41,9 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["flood"],
             "warnings":    "include",
-            "annotations": ["source", "impact"]
+            "annotations": ["source", "impact"],
+            "icons":       ["flood", "storm-warning"]
+
         },
         {
             "id":          "flood-warnings-only",
@@ -48,7 +51,8 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["flood"],
             "warnings":    "only",
-            "annotations": ["source", "impact"]
+            "annotations": ["source", "impact"],
+            "icons":       ["storm-warning"]
         },
         {
             "id":          "wind",
@@ -56,7 +60,9 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["wind"],
             "warnings":    "exclude",
-            "annotations": ["impact"]
+            "annotations": ["impact"],
+            "icons":       ["strong-wind"]
+
         },
         {
             "id":          "wind-and-flood",
@@ -64,8 +70,8 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["wind", "flood"],
             "warnings":    "exclude",
-            "annotations": ["source", "impact"]
-
+            "annotations": ["source", "impact"],
+            "icons":       ["flood", "strong-wind"]
         },
         {
             "id":          "snow",
@@ -73,8 +79,8 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["snow"],
             "warnings":    "exclude",
-            "annotations": ["impact"]
-
+            "annotations": ["impact"],
+            "icons":       ["snow"]
         },
 
     ],
@@ -150,5 +156,11 @@ export const environment = {
     tweetCSVExportFormat:         "default",
     showAnalyticsSideMenu:        false,
     countryDownloadRegionType:    "bi_country",
+    defaultPublicDisplayScript:   "combi_example",
+    exceedanceThreshold:          100,
+    countThreshold:               0,
+    publicDisplayTweetScroll:     "all",
+    publicDisplayTweetScrollRate: 3000
+
 
 };

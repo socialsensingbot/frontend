@@ -4,76 +4,74 @@ $tweetHeaderOffset: 16px;
 
 
 ::ng-deep {
-  .app-tweet-table {
-    .mat-tab-body-wrapper {
-    }
+    .app-tweet-table {
+        .mat-tab-body-wrapper {
+        }
 
-    .mat-tab-body.mat-tab-body-active {
-      overflow: hidden !important;
-      background-color: #f4f4f4;
-    }
+        .mat-tab-body.mat-tab-body-active {
+            overflow: hidden !important;
+            background-color: #f4f4f4;
+            min-height: calc(100vh - 164px);
+        }
 
-  }
+    }
 }
 
 .app-tweet-outer {
- overflow: hidden;
-  height:100%;
-  min-height:100%;
-  .app-tweet-area-loading-spinner {
-    margin: 2em auto;
-    margin-top: 24px;
-    margin-left: $drawer-width/2;
-    opacity: 0.3;
-  }
+    bottom: 0;
+    overflow: hidden;
+    height: 100%;
+    min-height: 100%;
+    //outline: 4px solid yellow;
 
-
-
-
-  .app-tweet-table {
-    display: block;
-    position: relative;
-    overflow: visible;
-    //height: calc(100% - 48px);
-    //margin-top: 8px;
-    //border: 1px solid blue;
-
-    .app-tweet-paged {
-      display: flex;
-      align-items: stretch;
-      flex-direction: column;
-      height: 100%;
-
+    .app-tweet-area-loading-spinner {
+        margin: 2em auto;
+        margin-top: 24px;
+        margin-left: $drawer-width/2;
+        opacity: 0.3;
     }
 
 
-  }
+    .app-tweet-table {
+        top: 64px;
+        bottom: 0;
+        display: block;
+        position: relative;
+        overflow: visible;
+        //height: calc(100% - 48px);
+        //margin-top: 8px;
+        //outline: 1px solid blue;
+
+
+
+
+    }
 
 
 }
 
 .app-tweet-heading {
-  font-size: 16px;
-  margin-top: -8px;
-  text-align: left;
+    font-size: 16px;
+    margin-top: -8px;
+    text-align: left;
 }
 
 .app-tweet-sub-heading {
-  font-size: 12px;
-  margin-top: -8px;
-  font-weight: lighter;
+    font-size: 12px;
+    margin-top: -8px;
+    font-weight: lighter;
 }
 
 .app-tweet-date-separator {
-  opacity: 0.4;
-  margin-top: 1em;
-  margin-bottom: 1em;
+    opacity: 0.4;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 
 .app-tweet-heading-text {
-  margin-top: 0px;
-  max-height: 40px;
+    margin-top: 0px;
+    max-height: 40px;
 }
 
 .app-tweet-scroll-spinner-outer {
@@ -81,18 +79,18 @@ $tweetHeaderOffset: 16px;
 }
 
 mat-spinner.app-tweet-scroll-spinner {
-  height: 24px;
-  width: 24px;
-  opacity:0.3;
-  left: ( $drawer-width / 2 - 12px );
-  display: none !important;
-  position:absolute;
+    height: 24px;
+    width: 24px;
+    opacity: 0.3;
+    left: ($drawer-width / 2 - 12px);
+    display: none !important;
+    position: absolute;
 }
 
 .mat-tab-label, .mat-tab-link {
-  font-weight: lighter !important;
+    font-weight: lighter !important;
 }
 
 .mat-tab-label-active {
-  font-weight: normal !important;
+    font-weight: normal !important;
 }

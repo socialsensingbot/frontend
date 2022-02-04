@@ -18,12 +18,13 @@ import {SSLayerConfiguration} from "../app/types"; // Included with Angular CLI.
 const layers: SSLayerConfiguration = {
     "available":    [
         {
-            "id":       "flood",
-            "title":    "Floods",
-            "sources":  ["twitter"],
-            "hazards":  ["flood"],
-            "warnings": "exclude",
-            "annotations": ["source", "impact"]
+            "id":          "flood",
+            "title":       "Floods",
+            "sources":     ["twitter"],
+            "hazards":     ["flood"],
+            "warnings":    "exclude",
+            "annotations": ["source", "impact"],
+            "icons":       ["flood"]
         },
         {
             "id":          "wind",
@@ -31,7 +32,8 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["wind"],
             "warnings":    "exclude",
-            "annotations": ["impact"]
+            "annotations": ["impact"],
+            "icons":       ["strong-wind"]
         }
     ],
     "defaultLayer": "flood"
@@ -111,6 +113,10 @@ export const environment = {
     maxCallsPerMinute:            10000,
     analyticsDefaultRegions:      ["uk"],
     countryDownloadRegionType:    "bi_country",
+    exceedanceThreshold:          100,
+    countThreshold:               0,
+    publicDisplayTweetScroll:     "all",
+    publicDisplayTweetScrollRate: 3000
 
 
 };

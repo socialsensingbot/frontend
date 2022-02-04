@@ -13,7 +13,7 @@ describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issu
 
 
   describe('scroll', () => {
-    const url = MAP_URL + "?selected=greater%20london&zoom=5&max_time=1629131100000&min_time=1628784000000&active_number=stats&active_polygon=county";
+    const url = MAP_URL + "?selected=greater%20london&zoom=5&max_time=1629131100000&min_time=1628784000000&active_number=exceedance&active_polygon=county";
 
     it.only('row changes', () => {
       cy.visitAndWait(url);

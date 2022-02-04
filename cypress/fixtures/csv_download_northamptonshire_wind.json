@@ -1,0 +1,38 @@
+[
+  [
+    "region",
+    "impact",
+    "id",
+    "date",
+    "url",
+    "text",
+    "location"
+  ],
+  [
+    "Northamptonshire",
+    "",
+    "1437848660008742916",
+    "Tue, 14 Sep 2021 18:40:09 GMT",
+    "https://twitter.com/username_removed/status/1437848660008742916",
+    "I blame the Glaziers, time to storm the stadium again #newplayersSameunited",
+    "\"{\\\"type\\\": \\\"GeometryCollection\\\", \\\"geometries\\\": [{\\\"type\\\": \\\"Point\\\", \\\"coordinates\\\": [-0.72571, 52.39836]}]}\""
+  ],
+  [
+    "Northamptonshire",
+    "",
+    "1437845906234220551",
+    "Tue, 14 Sep 2021 18:29:12 GMT",
+    "https://twitter.com/username_removed/status/1437845906234220551",
+    "@USERNAME_REMOVED Hmmmm, polar vortex spinning up, within the hurricane season. Could have a massive gearing effect causing a big wind to blow. A very big wind.",
+    "\"{\\\"type\\\": \\\"GeometryCollection\\\", \\\"geometries\\\": [{\\\"type\\\": \\\"Point\\\", \\\"coordinates\\\": [-0.99057, 52.13359]}]}\""
+  ],
+  [
+    "Northamptonshire",
+    "",
+    "1437662069126467585",
+    "Tue, 14 Sep 2021 06:18:42 GMT",
+    "https://twitter.com/username_removed/status/1437662069126467585",
+    "Job vacancies have hit a record high as the economic recovery continues and the furlough scheme starts to wind down, according to official figures.\n\nhttps://t.co/yr94KLSIu2",
+    "\"{\\\"type\\\": \\\"GeometryCollection\\\", \\\"geometries\\\": [{\\\"type\\\": \\\"Point\\\", \\\"coordinates\\\": [-0.8812, 52.23439]}]}\""
+  ]
+]

@@ -4,7 +4,7 @@ const zoomDuration = 1000;
 describe('06 URL State (zoom): ', function () {
 
     describe('select zoom', () => {
-        const url = MAP_URL + "?max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=stats&active_polygon=county";
+        const url = MAP_URL + "?max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=exceedance&active_polygon=county";
         const urlZoom6 = url + "&zoom=6"; //default zoom
         const urlZoom7 = url + "&zoom=7";
         const urlZoom8 = url + "&zoom=8";
