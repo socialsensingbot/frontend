@@ -584,37 +584,48 @@ export class PublicDisplayComponent implements OnInit {
             return map[JSON.stringify(i.tokens)] = i;
         });
         tweets = Object.values(map);
-        // sort tweets
-        tweets.sort((i, j) => {
-            return this.allTweetSortOrderForTweet(i) - this.allTweetSortOrderForTweet(j);
-        });
+
         // if there are spare tweets, clean out the rubbish ones
+        // this is done at each stage until we get to `publicDisplayMaxTweets` tweets
+        // so these filters are conditional and not always applied
+        // the order is important. the earlier the rule the more important it is
+
+        // filter out greylisted (contains low quality words)
         if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
             tweets = tweets.filter(i => !i.greylisted);
         }
-        // Filter out more spammy users
+        // filter out more spammy users
         if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
             tweets = tweets.filter(i => i.json.user.followers_count / (i.json.user.friends_count || 1) > 1);
         }
+        // filter out all tweets without a photo
         if (tweets.length > this.pref.combined.publicDisplayMaxTweets && tweets.filter(
             i => i.mediaCount !== 0).length > this.pref.combined.publicDisplayMaxTweets / 2) {
             tweets = tweets.filter(i => i.mediaCount !== 0);
         }
+        // filter out tweets with urls but don't contain images (usually promotional tweets)
         if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
             tweets = tweets.filter(i => !(i.mediaCount === 0 && i.json.entities?.urls?.length > 0));
         }
-        if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
-            tweets = tweets.filter(i => !i.potentiallySensitive);
-        }
+        // filter out tweets with oo many mentions (3+) usually promotional/activism tweets
         if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
             tweets = tweets.filter(i => !(i.json.entities?.user_mentions?.length > 2));
         }
+        // filter out tweets with too many hashtags (3+) usually promotional/activism tweets
         if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
             tweets = tweets.filter(i => !(i.json.entities?.hashtags?.length > 2));
         }
+        // filter out tweets from verified users, usually news/broadcast tweets
+        // they rarely contain direct eyewitness reporting
         if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
             tweets = tweets.filter(i => !i.json.user.verified);
         }
+        // sort tweets so that when we slice them we slice off the least relevant
+        tweets.sort((i, j) => {
+            return this.allTweetSortOrderForTweet(i) - this.allTweetSortOrderForTweet(j);
+        });
+
+        // okay now slice off any remaining excess tweets
         return tweets.slice(0, this.pref.combined.publicDisplayMaxTweets);
     }
 
@@ -758,6 +769,6 @@ export class PublicDisplayComponent implements OnInit {
         if (blacklistedWords.length > 0) {
             console.warn(i.text + " BLACKLISTED because of ", blacklistedWords);
         }
-        return !this._statsMap || typeof this._statsMap[i.region] !== "undefined" || i.blacklisted;
+        return !this._statsMap || typeof this._statsMap[i.region] !== "undefined" || i.blacklisted || i.potentiallySensitive;
     }
 }
