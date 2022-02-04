@@ -131,7 +131,7 @@ export const environment = {
     ],
 
     // features: ["impact", "source", "map"],
-    features: ["impact", "source", "map", "dashboard", "analytics"],
+    features: ["impact", "source", "map", "dashboard", "analytics", "display"],
 
     showErrors:                          false,
     showLoadingMessages:                 true,
@@ -149,18 +149,20 @@ export const environment = {
     blinkRateInMilliseconds:             1000,
     // mapTileUrlTemplate:
     // "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"
-    shareTextAutocompleteInGroup: true,
-    useRestMapData:               true,
-    maxCallsPerMinute:            10000,
-    analyticsDefaultRegions:      ["uk"],
-    tweetCSVExportFormat:         "default",
-    showAnalyticsSideMenu:        false,
-    countryDownloadRegionType:    "bi_country",
-    defaultPublicDisplayScript:   "combi_example",
-    exceedanceThreshold:          100,
-    countThreshold:               0,
-    publicDisplayTweetScroll:     "all",
-    publicDisplayTweetScrollRate: 3000
+    shareTextAutocompleteInGroup:    true,
+    useRestMapData:                  true,
+    maxCallsPerMinute:               10000,
+    analyticsDefaultRegions:         ["uk"],
+    tweetCSVExportFormat:            "default",
+    showAnalyticsSideMenu:           false,
+    countryDownloadRegionType:       "bi_country",
+    exceedanceThreshold:             100,
+    countThreshold:                  0,
+    publicDisplayTweetScroll:        "all",
+    publicDisplayTweetScrollRate:    3000,
+    publicDisplayMaxTweets:          60,
+    publicDisplayMaxTweetsRetrieved: 200,
+    defaultPublicDisplayScript:      "default_script",
 
 
 };
