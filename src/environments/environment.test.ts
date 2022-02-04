@@ -92,7 +92,7 @@ export const environment = {
             ]
         },
     ],
-    features:                            ["impact", "source", "map", "dashboard", "analytics"],
+    features:                            ["impact", "source", "map", "dashboard", "analytics", "display"],
     showErrors:                          true,
     showLoadingMessages:                 true,
     mostRecentDateIsNow:                 true,
@@ -109,14 +109,17 @@ export const environment = {
     blinkRateInMilliseconds:             1000,
     // mapTileUrlTemplate:
     // "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"
-    shareTextAutocompleteInGroup: true,
-    maxCallsPerMinute:            10000,
-    analyticsDefaultRegions:      ["uk"],
-    countryDownloadRegionType:    "bi_country",
-    exceedanceThreshold:          100,
-    countThreshold:               0,
-    publicDisplayTweetScroll:     "all",
-    publicDisplayTweetScrollRate: 3000
+    shareTextAutocompleteInGroup:    true,
+    maxCallsPerMinute:               10000,
+    analyticsDefaultRegions:         ["uk"],
+    countryDownloadRegionType:       "bi_country",
+    exceedanceThreshold:             100,
+    countThreshold:                  0,
+    publicDisplayTweetScroll:        "all",
+    publicDisplayTweetScrollRate:    3000,
+    publicDisplayMaxTweets:          60,
+    publicDisplayMaxTweetsRetrieved: 200,
+    defaultPublicDisplayScript:      "default_script",
 
 
 };
