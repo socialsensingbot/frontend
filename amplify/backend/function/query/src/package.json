@@ -12,6 +12,7 @@
     "aws-serverless-express": "^3.4.0",
     "body-parser": "^1.19.1",
     "express": "^4.17.2",
+    "geojson": "^0.5.0",
     "md5": "^2.3.0",
     "mysql": "^2.18.1",
     "mysql-connection-pool-manager": "^1.5.9",
