@@ -1,13 +1,16 @@
 import {StatisticType} from "../analytics/timeseries";
 
 export interface DisplayScript {
+    id: string;
+    title: string;
     screens: DisplayScreen[];
 }
 
 export interface DisplayScreen {
     type: "map-by-date";
-    location: AnimationLocation;
-    data: AnimationScreenData;
+    title: string;
+    location?: AnimationLocation;
+    data?: AnimationScreenData;
     animation: DateAnimation;
     stepDurationInMilliseconds: number;
     animationLoops: number;
@@ -29,9 +32,9 @@ export interface LocationAnimation {
 }
 
 export interface AnimationScreenData {
-    layerId: string;
-    statistic: StatisticType;
-    regionType: string;
+    layerId?: string;
+    statistic?: StatisticType;
+    regionType?: string;
 
 }
 

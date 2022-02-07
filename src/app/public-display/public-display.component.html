@@ -1,27 +1,27 @@
 <mat-sidenav-container class="map-outer">
-    <mat-sidenav #sidenav [(opened)]="tweetsVisible" class="app-tweet-drawer" disableClose mode="side">
-        <button (click)="sidenav.toggle()" aria-label="Close" class="app-draw-close-button" mat-icon-button>
-            <mat-icon>close</mat-icon>
-        </button>
+    <!--    <mat-sidenav #sidenav [(opened)]="tweetsVisible" class="app-tweet-drawer" disableClose mode="side">-->
+    <!--        <button (click)="sidenav.toggle()" aria-label="Close" class="app-draw-close-button"  mat-icon-button>-->
+    <!--            <mat-icon>close</mat-icon>-->
+    <!--        </button>-->
 
-        <div class="drawer-main-tabs">
+    <!--        <div class="drawer-main-tabs">-->
 
 
-            <mat-tab-group mat-align-tabs="center">
-                <mat-tab label="Twitter">
-                    <twitter-panel [annotationTypes]="annotationTypes" [selection]="selection"
-                                   [showHeaderInfo]="twitterPanelHeader"
-                                   [showTimeline]="showTwitterTimeline" [tweets]="tweets"
-                                   class="twitter-panel"></twitter-panel>
-                </mat-tab>
-                <mat-tab label="Stats">
-                    <ng-template matTabContent>
-                        <app-map-graph-sidebar [selection]="selection"></app-map-graph-sidebar>
-                    </ng-template>
-                </mat-tab>
-            </mat-tab-group>
-        </div>
-    </mat-sidenav>
+    <!--            <mat-tab-group mat-align-tabs="center">-->
+    <!--                <mat-tab label="Twitter">-->
+    <!--                    <twitter-panel [annotationTypes]="annotationTypes" [selection]="selection"-->
+    <!--                                   [showHeaderInfo]="twitterPanelHeader"-->
+    <!--                                   [showTimeline]="showTwitterTimeline" [tweets]="tweets"-->
+    <!--                                   class="twitter-panel"></twitter-panel>-->
+    <!--                </mat-tab>-->
+    <!--                <mat-tab label="Stats">-->
+    <!--                    <ng-template matTabContent>-->
+    <!--                        <app-map-graph-sidebar [selection]="selection"></app-map-graph-sidebar>-->
+    <!--                    </ng-template>-->
+    <!--                </mat-tab>-->
+    <!--            </mat-tab-group>-->
+    <!--        </div>-->
+    <!--    </mat-sidenav>-->
 
 
     <mat-sidenav-content style="overflow:hidden">
@@ -34,14 +34,53 @@
             </div>
         </div>
 
-        <map-legend *ngIf="ready" [activeNumber]="activeStatistic" class="legend"></map-legend>
+<!--        <map-legend *ngIf="ready" [activeNumber]="activeStatistic" class="legend"></map-legend>-->
 
-        <div class="public-display-map-date">
-            {{minDate|date:'MMM dd'}} {{minDate|date:'HH:mm'}}
-            - {{maxDate|date:'MMM dd'}} {{maxDate|date:'HH:mm'}} {{minDate|date:'zzz'}}
+        <div class="public-display-map-title">
+            <ng-container *ngIf="!!layer">
+                <i *ngFor="let icon of layer.icons" class="wi wi-{{icon}}"
+                   style="font-size:120%; margin-right:0.5em;"></i>
+            </ng-container>
+            {{title}}
         </div>
+        <!--        <div class="public-display-map-date">-->
+        <!--            {{minDate|date:'MMM dd'}} {{minDate|date:'HH:mm'}}-->
+        <!--            - {{maxDate|date:'MMM dd'}} {{maxDate|date:'HH:mm'}} {{minDate|date:'zzz'}}-->
+        <!--        </div>-->
 
+        <div *ngIf="ready" class="app-pd-date-range-display">
+            <date-range-display [options]="sliderOptions"></date-range-display>
+
+        </div>
+        <app-pd-tweet-list [annotationTypes]="annotationTypes" [style.opacity]="tweets?.length && ready ? 1 : 0"
+
+
+                           [tweets]="tweets"></app-pd-tweet-list>
     </mat-sidenav-content>
+
 </mat-sidenav-container>
+<div class="app-public-display-toolbar">
+      <span>
+      <button class="logo-button" mat-button routerLink="/"><img src="/assets/icon-white/Icon24@2x.png"/> SOCIAL SENSING</button>
+          <!--      <button mat-button routerLink="/"><mat-icon>home</mat-icon></button>-->
+    </span>
+    <button *ngIf="pref.ready &&pref.featureSupported('map')" [queryParamsHandling]="'merge'"
+            [routerLink]="'/map/'+map.id"
+            class="app-public-display-close-btn"
+            mat-button>
+        <!--       <mat-icon>power_settings_new</mat-icon>-->
+        <mat-icon>close</mat-icon>
+    </button>
+
+
+    <!--      <button mat-button *ngIf="isAuthenticated" routerLink="/map">-->
+    <!--        <mat-icon>map</mat-icon>-->
+    <!--        Map-->
+    <!--      </button>-->
+    <!--      <button id="signup" mat-button routerLink="/auth/signup" *ngIf="isSignup">-->
+    <!--        Signup (Dev Only)-->
+    <!--      </button>-->
+
+</div>
 
 <!--<mat-spinner *ngIf="!ready" class="map-spinner"></mat-spinner>-->

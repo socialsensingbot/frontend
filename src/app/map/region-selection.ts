@@ -111,4 +111,8 @@ export class RegionSelection {
 
 
     }
+
+    public clearWithoutEmitting(): void {
+        this.regions = {};
+    }
 }

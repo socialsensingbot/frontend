@@ -49,6 +49,7 @@ export class RESTMapDataService {
     private initialized: boolean;
     private _regionGeographyGeoJSON: geojson.FeatureCollection;
     public ready = false;
+    public lastUpdated: Date;
 
 
     constructor(private _http: HttpClient, private _zone: NgZone, private _exec: UIExecutionService,
@@ -87,21 +88,23 @@ export class RESTMapDataService {
      * Fetches the (nearly) static JSON files (see the src/assets/data directory in this project)
      */
     public async loadGeography(regionType: string): Promise<geojson.FeatureCollection> {
-        let key: string = "geography-cache-v2:" + regionType;
+        log.debug("Loading Geography for " + regionType);
+        const key: string = "geography-cache-v2:" + regionType;
         const cachedItem = await this.cache.getCached(key);
         if (cachedItem && cachedItem.hasData && !cachedItem.expired) {
             // tslint:disable-next-line:no-console
+            log.debug("Loading Geography FROM CACHE for " + regionType);
             log.verbose("Value for " + key + "in cache");
             // log.debug("Value for " + key + " was " + JSON.stringify(cachedItem.data));
             // console.debug("Return cached item", JSON.stringify(cachedItem));
             this._regionGeographyGeoJSON = (cachedItem.data as any).geojson as geojson.FeatureCollection;
             this.regionGeography = (cachedItem.data as any).regionGeography as RegionGeography;
         } else {
-            log.debug("Loading Geography");
-            let allRegions: any = await this.allRegions();
+            log.debug("Loading Geography NOT FROM CACHE for " + regionType);
+            const allRegions: any = await this.allRegions();
             log.debug(allRegions);
             const regions = allRegions.filter(i => i.type === regionType).map(i => i.value);
-            let lotsOfRegions: boolean = regions.length > 50;
+            const lotsOfRegions: boolean = regions.length > 50;
             if (lotsOfRegions) {
                 this._notify.show("Loading Geographic data ...", "OK", 20000);
             }
@@ -161,8 +164,7 @@ export class RESTMapDataService {
 
     }
 
-    public async load(first: boolean) {
-    }
+
 
     public async tweets(layerGroupId: string, regionType: string, regions: string[], startDate,
                         endDate): Promise<Tweet[]> {
@@ -173,6 +175,59 @@ export class RESTMapDataService {
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,
             regions,
+            startDate: roundToHour(startDate),
+            endDate:   roundToMinute(endDate)
+
+        }, 0);
+        log.debug(rawResult.length + " tweets back from server");
+        const result: Tweet[] = [];
+        for (const tweet of rawResult) {
+            result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
+                                  tweet.possibly_sensitive));
+        }
+        return result;
+    }
+
+    public async publicDisplayTweets(layerGroupId: string, regionType: string, startDate,
+                                     endDate, pageSize = 100, maxPages = 10): Promise<Tweet[]> {
+        const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
+        log.debug("Requesting tweets for all regions ");
+        const result: Tweet[] = [];
+        let page = 0;
+        do {
+            const rawResult = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/text-for-public-display", {
+                hazards:   layerGroup.hazards,
+                sources:   layerGroup.sources,
+                warnings:  layerGroup.warnings,
+                pageSize:  pageSize,
+                page:      page,
+                startDate: roundToHour(startDate),
+                endDate:   roundToHour(endDate)
+
+            }, 60 * 60);
+            log.debug(rawResult.length + " tweets back from server");
+            for (const tweet of rawResult) {
+                result.push(new Tweet(tweet.id, null, tweet.json, null, new Date(tweet.timestamp), tweet.region,
+                                      tweet.possibly_sensitive));
+            }
+            if (rawResult.length < pageSize || page === maxPages - 1) {
+                return result;
+            } else {
+                page++;
+            }
+        } while (true);
+    }
+
+    public async csvTweets(layerGroupId: string, regionType: string, regions: string[], startDate,
+                           endDate, byRegion: string): Promise<Tweet[]> {
+        const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
+        log.debug("requesting tweets for regions " + regions);
+        const rawResult = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/csv-export", {
+            hazards:   layerGroup.hazards,
+            sources:   layerGroup.sources,
+            warnings:  layerGroup.warnings,
+            regions,
+            byRegion,
             startDate: roundToHour(startDate),
             endDate:   roundToMinute(endDate)
 
@@ -272,15 +327,36 @@ export class RESTMapDataService {
     }
 
     public async getRegionStatsMap(layerGroupId: string, regionType: string, startDate: number, endDate: number): Promise<RegionStatsMap> {
+        log.debug("getRegionStatsMap()", {layerGroupId, regionType, startDate, endDate})
         const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
         const statsMap = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/stats", {
-            hazards:   layerGroup.hazards,
-            sources:   layerGroup.sources,
-            warnings:  layerGroup.warnings,
-            startDate: roundToHour(startDate),
-            endDate:   roundToFiveMinutes(endDate)
+            hazards:             layerGroup.hazards,
+            sources:             layerGroup.sources,
+            warnings:            layerGroup.warnings,
+            startDate:           roundToHour(startDate),
+            endDate:             roundToFiveMinutes(endDate),
+            exceedanceThreshold: this._pref.combined.exceedanceThreshold,
+            countThreshold:      this._pref.combined.countThreshold
 
         }, 5 * 60) as RegionStatsMap;
+        this.lastUpdated = new Date(await this.now());
+        return statsMap;
+    }
+
+    public async getAccurateRegionStatsMap(layerGroupId: string, regionType: string, startDate: number,
+                                           endDate: number, retry: boolean): Promise<RegionStatsMap> {
+        const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
+        const statsMap = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/accurate-stats", {
+            hazards:             layerGroup.hazards,
+            sources:             layerGroup.sources,
+            warnings:            layerGroup.warnings,
+            startDate:           roundToHour(startDate),
+            endDate:             roundToFiveMinutes(endDate),
+            exceedanceThreshold: this._pref.combined.exceedanceThreshold,
+            countThreshold:      this._pref.combined.countThreshold
+
+        }, 5 * 60, false, retry) as RegionStatsMap;
+        this.lastUpdated = new Date(await this.now());
         return statsMap;
     }
 

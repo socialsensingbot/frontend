@@ -1,4 +1,11 @@
 $drawer-width: 300px;
+.content {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    top: 64px;
+}
 
 .app-analytics-sidenav{
     max-width: $drawer-width;

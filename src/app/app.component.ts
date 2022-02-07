@@ -77,6 +77,10 @@ export class AppComponent {
                 this.pref.clear();
             }
         });
+        Hub.listen('app.logout', async (data) => {
+            const {payload} = data;
+            await this.logout();
+        });
 
 
         this._router.events.subscribe((val) => log.verbose("Router Event: ", val));

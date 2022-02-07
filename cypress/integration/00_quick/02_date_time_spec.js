@@ -7,11 +7,11 @@ describe('02 Date time: ', function () {
         cy.login();
     });
 
-    //http://localhost:4200/map/uk-flood-test?active_number=stats&zoom=6&max_time=1628812800000&min_time=1628726400000
+    //http://localhost:4200/map/uk-flood-test?active_number=exceedance&zoom=6&max_time=1628812800000&min_time=1628726400000
 
     describe('select county and date range', () => {
         console.debug("Tests https://github.com/socialsensingbot/frontend/issues/67");
-        const url = MAP_URL + "?selected=scottish%20borders&zoom=5&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=stats&active_polygon=county";
+        const url = MAP_URL + "?zoom=5&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=exceedance&active_polygon=county&selected=scottish%20borders";
         it('with no tweets', () => {
             cy.visitAndWait(url);
             cy.get(".slider-date-time", {timeout: 20000});

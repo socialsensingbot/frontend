@@ -1,5 +1,5 @@
 import {Component, NgZone, OnDestroy, OnInit} from "@angular/core";
-import {Logger} from "@aws-amplify/core";
+import {Hub, Logger} from "@aws-amplify/core";
 import {Browser, GeoJSON, latLng, LayerGroup, layerGroup, LeafletMouseEvent, Map, tileLayer} from "leaflet";
 import "jquery-ui/ui/widgets/slider.js";
 import {ActivatedRoute, NavigationStart, Params, Router} from "@angular/router";
@@ -27,6 +27,9 @@ import {ONE_DAY} from "./data/map-data";
 import {RESTMapDataService} from "./data/rest-map-data.service";
 import {TwitterExporterService} from "./twitter/twitter-exporter.service";
 import {MapSelectionService} from "../map-selection.service";
+import {MatSidenav} from "@angular/material/sidenav";
+import {MatDialog} from "@angular/material/dialog";
+import {OpenPublicDisplayComponent} from "../public-display/open-public-display/open-public-display.component";
 
 
 const log = new Logger("map");
@@ -202,6 +205,7 @@ export class MapComponent implements OnInit, OnDestroy {
                 private _http: HttpClient,
                 private _exec: UIExecutionService,
                 private _color: ColorCodeService,
+                public dialog: MatDialog,
                 public data: RESTMapDataService,
                 public _exporter: TwitterExporterService,
                 public pref: PreferenceService,
@@ -238,11 +242,11 @@ export class MapComponent implements OnInit, OnDestroy {
 
     public set activeRegionType(value: string) {
         log.debug("activeRegionType(" + value + ")");
-        if (!this.activeRegionType) {
-            this.updateSearch({active_polygon: value});
-        } else {
+        if (this.activeRegionType && this.activeRegionType !== value) {
             log.debug("Removing selected region(s) as we have changed region type");
             this.updateSearch({active_polygon: value, selected: null});
+        } else {
+            this.updateSearch({active_polygon: value});
         }
 
         if (this.activeRegionType !== value) {
@@ -435,14 +439,13 @@ export class MapComponent implements OnInit, OnDestroy {
         return this._exec.queue("Map Load", null, async () => {
             try {
 
-                await this.data.load(first);
 
                 if (first) {
                     this._exec.changeState("no-params");
                     // noinspection ES6MissingAwait
                     this.updateSliderFromData();
                 } else {
-                    await this.updateLayers("Data Load", clearSelected);
+                    await this.updateLayers("Data Load", clearSelected, false);
                     await this._exec.queue("Update Slider", ["ready"],
                                            () => {
                                                this.updateSliderFromData();
@@ -490,6 +493,7 @@ export class MapComponent implements OnInit, OnDestroy {
     // public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
     //     // this.data.downloadAggregate(aggregrationSetId, id,
     public countries: any[];
+    public isDev: boolean = !environment.production;
 
     public set activeLayerGroup(value: string) {
         log.debug("set activeLayerGroup");
@@ -528,11 +532,11 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this.data.hasCountryAggregates()) {
             await this._exporter.downloadAggregate(this.activeLayerGroup, "uk-countries", this.selectedCountries,
                                                    await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData, this._dateMin,
-                                                   this._dateMax);
+                                                   this._dateMax, this.activeRegionType, this.annotationTypes, this.activeLayerGroup);
         } else {
             await this._exporter.download(this.activeLayerGroup, await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData,
                                           this.activeRegionType,
-                                          this._dateMin, this._dateMax);
+                                          this._dateMin, this._dateMax, this.annotationTypes, this.activeLayerGroup);
         }
     }
 
@@ -589,30 +593,47 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    public async timeSliderPreset(mins: number) {
+    public async timeSliderPreset(mins: string) {
         log.debug("timeSliderPreset()");
         if (this.destroyed) {
             return;
         }
         const now: number = await this.data.now();
-        await this.sliderChange({lower: roundToHour(now - mins * ONE_MINUTE_IN_MILLIS), upper: roundToMinute(now)});
+        const nowDate = new Date(now);
+        const today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
+        const yesterday = new Date(today.getTime() - ONE_DAY);
+
+        if (/\d+/.test(mins)) {
+            this._dateMin = roundToHour(now - (+mins * ONE_MINUTE_IN_MILLIS));
+            this._dateMax = roundToMinute(now);
+            this.liveUpdating = true;
+        } else if (mins === "yesterday") {
+            this._dateMin = yesterday.getTime();
+            this._dateMax = today.getTime();
+            this.liveUpdating = false;
+        } else if (mins === "today") {
+            this._dateMin = today.getTime();
+            this._dateMax = roundToMinute(now);
+            this.liveUpdating = true;
+        }
         this.sliderOptions = {
             max:      roundToMinute(now),
             min:      roundToHour(await this.data.minDate()),
-            startMin: roundToHour(now - mins * ONE_MINUTE_IN_MILLIS),
-            startMax: roundToMinute(now)
+            startMin: this._dateMin,
+            startMax: this._dateMax
         };
+        await this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
         this._sliderIsStale = true;
     }
 
-    private async scheduleResetLayers(layer: string, clearSelected = true) {
+    private async scheduleResetLayers(layer: string, clearSelected = true, approximateFirst = true) {
         if (this.destroyed) {
             return;
         }
         log.debug("scheduleResetLayers()");
         await this._exec.queue("Reset Layers", ["ready"], async () => {
             this.activity = true;
-            await this.resetStatisticsLayer(layer, clearSelected);
+            await this.resetStatisticsLayer(layer, clearSelected, approximateFirst);
             this.activity = false;
         }, layer, false, false, true);
     }
@@ -644,23 +665,18 @@ export class MapComponent implements OnInit, OnDestroy {
         } = params;
         this._newParams = params;
         this._absoluteTime = await this.data.now();
-        this.sliderOptions.min = await this.data.minDate();
         // These handle the date slider min_time & max_time values
         if (typeof min_time !== "undefined") {
-            this._dateMin = roundToHour(Math.max(+min_time, this.sliderOptions.min));
+            this._dateMin = roundToHour(Math.max(+min_time, await this.data.minDate()));
         } else {
             this._dateMin = roundToHour(await this.data.now() - (ONE_DAY));
         }
-        this.sliderOptions = {
-            ...this.sliderOptions,
-            startMin: this._dateMin
-        };
         if (typeof max_time !== "undefined") {
             this._dateMax = roundToMinute(Math.min(+max_time, await this.data.now()));
         } else {
             this._dateMax = roundToMinute(await this.data.now());
         }
-        this.sliderOptions = {...this.sliderOptions, startMax: this._dateMax};
+        this.sliderOptions = {min: await this.data.minDate(), max: await this.data.now(), startMin: this._dateMin, startMax: this._dateMax};
         if (typeof active_layer !== "undefined") {
             this.activeLayerGroup = active_layer;
         }
@@ -808,12 +824,17 @@ export class MapComponent implements OnInit, OnDestroy {
                                  }, null, false, false, true, null, 1000, 3);
             } else {
                 if (this._popState) {
-                    log.debug("POP STATE detected before URL query params change.");
+                    log.debug("POP STATE detected before URL query params change ", params);
+                    log.debug("POP STATE detected before URL query params change previous URL was: ", window.history.state.prevUrl);
                     this._popState = false;
                     this.activity = true;
                     await this.updateMapFromQueryParams(params);
-                    return this.updateLayers("Pop State", true)
-                               .then(() => this._twitterIsStale = true)
+                    this.selection.clearWithoutEmitting();
+                    return this.updateLayers("Pop State", false)
+                               .then(() => {
+
+                                   this._twitterIsStale = true;
+                               })
                                .finally(() => this.activity = false);
                 }
             }
@@ -1044,76 +1065,15 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
 
-    /**
-     * Reset the polygon layers.
-     *
-     * @param clearSelected clears the selected polygon
-     */
-    private async resetStatisticsLayer(layer: string, clearSelected) {
-        if (this.destroyed) {
-            return;
-        }
-
-        log.info("Resetting " + layer);
-        // this.loading.showIndeterminateSpinner();
-        try {
-            const geography: PolygonData = await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData;
-            log.debug("resetStatisticsLayer(" + clearSelected + ")");
-            // this.hideTweets();
-            log.debug(layer);
-            const curLayerGroup = layerGroup();
-            if (curLayerGroup != null) {
-
-                // noinspection JSUnfilteredForInLoop
-                await this.data.recentTweets(this.activeLayerGroup, this.activeRegionType).then(async regionTweetMap => {
-                    log.debug("Region Tweet Map", regionTweetMap);
-
-                    const styleFunc = (feature: geojson.Feature) => {
-                        log.verbose("styleFunc " + layer);
-
-                        const style = this._color.colorFunctions[layer].getFeatureStyle(
-                            feature);
-                        log.verbose("Style ", style, feature.properties);
-                        if (this.liveUpdating && regionTweetMap[feature.properties.name]) {
-                            log.verbose(`Adding new tweet style for ${feature.properties.name}`);
-                            style.className = style.className + " leaflet-new-tweet";
-                        }
-                        return style;
-
-                    };
-                    await this.updateRegionData(geography);
-                    this._geojson[layer] = new GeoJSON(
-                        geography as geojson.GeoJsonObject, {
-                            style:         styleFunc,
-                            onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
-                        }).addTo(curLayerGroup);
-
-                }).catch(e => log.error(e));
-
-
-            } else {
-                log.debug("Null layer " + layer);
-            }
-            if (clearSelected) {
-                this.selection.clear();
-                this.hideTweets();
-            }
-            this.currentStatisticsLayer.clearLayers();
-            this._map.removeLayer(this.currentStatisticsLayer);
-            this._map.addLayer(curLayerGroup);
-            this.currentStatisticsLayer = curLayerGroup;
-        } catch (e) {
-            console.error(e);
-        } finally {
-            // this.loading.hideIndeterminateSpinner();
-        }
-
+    public closeTwitterPanel(sidenav: MatSidenav): void {
+        this.clearSelectedRegions();
     }
 
     /**
      * Updates the data stored in the polygon data of the leaflet layers.
      */
-    private async updateRegionData(geography: PolygonData) {
+    private async updateRegionData(geography: PolygonData,
+                                   styleFunc: any, layer: string, curLayerGroup: LayerGroup, approximateFirst = true) {
         if (this.destroyed) {
             return;
         }
@@ -1121,30 +1081,66 @@ export class MapComponent implements OnInit, OnDestroy {
             log.debug("Loading stats");
             const features = geography.features;
             log.debug("Before stats");
-            const statsMap = await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax);
-            log.debug("After stats");
-            for (const feature of features) {
-                const featureProperties = feature.properties;
-                const region = featureProperties.name;
-                const regionStats = statsMap[region];
-                if (regionStats) {
-                    featureProperties.count = regionStats.count;
-                    featureProperties.exceedance = regionStats.exceedance;
-                } else {
-                    log.verbose("No data for " + region);
-                    featureProperties.count = 0;
-                    featureProperties.exceedance = 0;
-                }
-                if (feature === features[features.length - 1]) {
-                    resolve();
-                }
+            let newLayer = null;
+            const processStats = (statsMap): void => {
+                log.debug("After stats");
+                for (const feature of features) {
+                    const featureProperties = feature.properties;
+                    const region = featureProperties.name;
+                    const regionStats = statsMap[region];
+                    if (regionStats) {
+                        featureProperties.count = regionStats.count;
+                        featureProperties.exceedance = regionStats.exceedance;
+                    } else {
+                        log.verbose("No data for " + region);
+                        featureProperties.count = 0;
+                        featureProperties.exceedance = 0;
+                    }
+                    if (feature === features[features.length - 1]) {
+                        resolve();
+                    }
 
-            }
+                }
+                if (newLayer !== null) {
+                    curLayerGroup.removeLayer(newLayer);
+                }
+                newLayer = new GeoJSON(
+                    geography as geojson.GeoJsonObject, {
+                        style:         styleFunc,
+                        onEachFeature: (f, l) => this.onEachFeature(f, l as GeoJSON)
+                    });
+                this._geojson[layer] = newLayer.addTo(curLayerGroup);
+            };
+            await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
+                i => i ? processStats(i) : null);
+
+            /*
+             *  Discontinued as unreliable
+             if (approximateFirst) {
+             try {
+
+             this.data.getAccurateRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax,
+             false).then(
+             i => i ? processStats(i) : null);
+             } catch (e) {
+             log.warn(e);
+             }
+             } else {
+             try {
+             await this.data.getAccurateRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin,
+             this._dateMax, false).then(
+             i => i ? processStats(i) : null);
+             } catch (e) {
+             log.warn(e);
+             }
+             }
+             */
+
         });
 
     }
 
-    private async updateLayers(reason: string = "", clearSelected = false) {
+    private async updateLayers(reason: string = "", clearSelected = false, approximateFirst = true) {
         log.debug("updateLayers()");
         if (this.destroyed) {
             return;
@@ -1160,7 +1156,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                               this._updating = true;
                                               try {
 
-                                                  await this.scheduleResetLayers(this.activeStatistic, clearSelected);
+                                                  await this.scheduleResetLayers(this.activeStatistic, clearSelected, approximateFirst);
                                                   await this.updateTwitterPanel();
                                               } finally {
                                                   this.activity = false;
@@ -1271,5 +1267,90 @@ export class MapComponent implements OnInit, OnDestroy {
             // noinspection ES6MissingAwait
             this.updateTwitterPanel();
         }, "", false, true, true, null, 1000, 5);
+    }
+
+    /**
+     * Reset the polygon layers.
+     *
+     * @param clearSelected clears the selected polygon
+     */
+    private async resetStatisticsLayer(layer: string, clearSelected, approximateFirst = true) {
+        if (this.destroyed) {
+            return;
+        }
+
+        log.info("Resetting " + layer);
+        // this.loading.showIndeterminateSpinner();
+        try {
+            const geography: PolygonData = await this.data.geoJsonGeographyFor(this.activeRegionType) as PolygonData;
+            log.debug("resetStatisticsLayer(" + clearSelected + ")");
+            // this.hideTweets();
+            log.debug(layer);
+            const curLayerGroup = layerGroup();
+            if (curLayerGroup != null) {
+
+                // noinspection JSUnfilteredForInLoop
+                await this.data.recentTweets(this.activeLayerGroup, this.activeRegionType).then(async regionTweetMap => {
+                    log.debug("Region Tweet Map", regionTweetMap);
+
+                    const styleFunc = (feature: geojson.Feature) => {
+                        log.verbose("styleFunc " + layer);
+
+                        const style = this._color.colorFunctions[layer].getFeatureStyle(
+                            feature);
+                        log.verbose("Style ", style, feature.properties);
+                        if (this.liveUpdating && regionTweetMap[feature.properties.name]) {
+                            log.verbose(`Adding new tweet style for ${feature.properties.name}`);
+                            style.className = style.className + " leaflet-new-tweet";
+                        }
+                        return style;
+
+                    };
+                    await this.updateRegionData(geography, styleFunc, layer, curLayerGroup, approximateFirst);
+
+
+                }).catch(e => log.error(e));
+
+
+            } else {
+                log.debug("Null layer " + layer);
+            }
+            if (clearSelected) {
+                log.warn("CLEARING SELECTED")
+                this.selection.clear();
+                this.hideTweets();
+            }
+            this.currentStatisticsLayer.clearLayers();
+            this._map.removeLayer(this.currentStatisticsLayer);
+            this._map.addLayer(curLayerGroup);
+            this.currentStatisticsLayer = curLayerGroup;
+        } catch (e) {
+            console.error(e);
+        } finally {
+            // this.loading.hideIndeterminateSpinner();
+        }
+
+    }
+
+    public async openPublicDisplay() {
+        const dialogRef = this.dialog.open(OpenPublicDisplayComponent, {
+            width: "500px",
+            data:  {}
+        });
+
+        dialogRef.afterClosed().subscribe(async result => {
+            console.log(`Dialog result: ${result}`);
+            if (result) {
+                let commands: (string | any)[] = result.script ? ["display", result.script] : ["display"];
+                await this._router.navigate(commands,
+                                            {queryParams: result, queryParamsHandling: "merge", relativeTo: this.route});
+
+            }
+        });
+
+    }
+
+    public logout(): void {
+        Hub.dispatch("app.logout", {event: "map.logout"});
     }
 }

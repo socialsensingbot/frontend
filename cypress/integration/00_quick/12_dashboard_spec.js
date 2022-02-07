@@ -42,7 +42,7 @@ describe('11 Analytics: ', function () {
             cy.get('.mat-chip').should("contain.text","Cardiff")
             cy.get(':nth-child(1) > .mat-card-actions > .mat-focus-indicator > .mat-button-wrapper').click();
             cy.wait(1000);
-            cy.get('.app-analytics-timeseries-toolbar-add-to-dashboard').click();
+            cy.get('.app-timeseries-toolbar-add-to-dashboard').click();
             cy.wait(1000);
             const title=uuidv4();
             cy.get('input[name=title]').type(title);
@@ -67,7 +67,7 @@ describe('11 Analytics: ', function () {
 
 
         it('Export from Map Stats', () => {
-            let url = MAP_URL + "?active_number=stats&active_polygon=county&selected=greater%20london";
+            let url = MAP_URL + "?active_number=exceedance&active_polygon=county&selected=greater%20london";
             cy.visit(url);
             cy.login();
             cy.visitAndWait(url);

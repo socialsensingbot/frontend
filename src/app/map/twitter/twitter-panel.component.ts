@@ -36,6 +36,8 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
     @Input()
     public annotationTypes: any[];
+    @Input()
+    private layer: string;
 
     public get tweets(): Tweet[] | null {
         return this._tweets != null ? this._tweets : [];
@@ -129,7 +131,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     public async download() {
-        await this._exporter.exportToCSV(this.visibleTweets.filter(i => i.valid), this.selection.all());
+        await this._exporter.exportToCSV(this.visibleTweets.filter(i => i.valid), this.selection.all(), this.annotationTypes, this.layer);
     }
 
     private updateTweets(val: Tweet[]) {

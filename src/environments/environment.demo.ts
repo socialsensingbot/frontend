@@ -32,7 +32,8 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["flood"],
             "warnings":    "exclude",
-            "annotations": ["source", "impact"]
+            "annotations": ["source", "impact"],
+            "icons":       ["flood"]
         },
         {
             "id":          "flood-with-warnings",
@@ -40,7 +41,9 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["flood"],
             "warnings":    "include",
-            "annotations": ["source", "impact"]
+            "annotations": ["source", "impact"],
+            "icons":       ["flood", "storm-warning"]
+
         },
         {
             "id":          "flood-warnings-only",
@@ -48,7 +51,8 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["flood"],
             "warnings":    "only",
-            "annotations": ["source", "impact"]
+            "annotations": ["source", "impact"],
+            "icons":       ["storm-warning"]
         },
         {
             "id":          "wind",
@@ -56,7 +60,9 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["wind"],
             "warnings":    "exclude",
-            "annotations": ["impact"]
+            "annotations": ["impact"],
+            "icons":       ["strong-wind"]
+
         },
         {
             "id":          "wind-and-flood",
@@ -64,8 +70,8 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["wind", "flood"],
             "warnings":    "exclude",
-            "annotations": ["source", "impact"]
-
+            "annotations": ["source", "impact"],
+            "icons":       ["flood", "strong-wind"]
         },
         {
             "id":          "snow",
@@ -73,8 +79,8 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["snow"],
             "warnings":    "exclude",
-            "annotations": ["impact"]
-
+            "annotations": ["impact"],
+            "icons":       ["snow"]
         },
 
     ],
@@ -125,7 +131,7 @@ export const environment = {
     ],
 
     // features: ["impact", "source", "map"],
-    features: ["impact", "source", "map", "dashboard", "analytics"],
+    features: ["impact", "source", "map", "dashboard", "analytics", "display"],
 
     showErrors:                          false,
     showLoadingMessages:                 true,
@@ -143,13 +149,20 @@ export const environment = {
     blinkRateInMilliseconds:             1000,
     // mapTileUrlTemplate:
     // "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"
-    shareTextAutocompleteInGroup: true,
-    useRestMapData:               true,
-    maxCallsPerMinute:            10000,
-    analyticsDefaultRegions:      ["uk"],
-    tweetCSVExportFormat:         "default",
-    showAnalyticsSideMenu:        false,
-    countryDownloadRegionType:    "bi_country",
-    defaultPublicDisplayScript:   "combi_example",
+    shareTextAutocompleteInGroup:    true,
+    useRestMapData:                  true,
+    maxCallsPerMinute:               10000,
+    analyticsDefaultRegions:         ["uk"],
+    tweetCSVExportFormat:            "default",
+    showAnalyticsSideMenu:           false,
+    countryDownloadRegionType:       "bi_country",
+    exceedanceThreshold:             100,
+    countThreshold:                  0,
+    publicDisplayTweetScroll:        "all",
+    publicDisplayTweetScrollRate:    3000,
+    publicDisplayMaxTweets:          60,
+    publicDisplayMaxTweetsRetrieved: 200,
+    defaultPublicDisplayScript:      "default_script",
+
 
 };
