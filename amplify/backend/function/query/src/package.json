@@ -4,24 +4,24 @@
   "description": "",
   "main": "index.ts",
   "dependencies": {
-    "@types/body-parser": "^1.19.0",
+    "@types/body-parser": "^1.19.2",
     "@types/es6-promise": "^3.3.0",
-    "@types/express": "^4.17.8",
-    "@types/mysql": "^2.15.15",
-    "aws-sdk": "^2.982.0",
-    "aws-serverless-express": "^3.3.3",
-    "body-parser": "^1.17.1",
-    "express": "^4.15.2",
+    "@types/express": "^4.17.13",
+    "@types/mysql": "^2.15.20",
+    "aws-sdk": "^2.1069.0",
+    "aws-serverless-express": "^3.4.0",
+    "body-parser": "^1.19.1",
+    "express": "^4.17.2",
     "md5": "^2.3.0",
     "mysql": "^2.18.1",
     "mysql-connection-pool-manager": "^1.5.9",
     "node-cache": "^5.1.2"
   },
   "devDependencies": {
-    "@types/node": "^12.11.1",
+    "@types/node": "^16.11.22",
     "ts-node": "~7.0.0",
     "tslint": "~6.1.0",
-    "typescript": "~3.9.7"
+    "typescript": "^3.9.10"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
