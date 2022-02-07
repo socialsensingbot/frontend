@@ -201,7 +201,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 await this._router.navigate([], {});
             }
             if (queryParams.active_layer) {
-                this.mapLayer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
+                this.mapLayer = this.pref.enabledLayers.filter(i => i.id === queryParams.active_layer)[0];
             }
 
         });
@@ -397,7 +397,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             try {
                 const queryParams = this._route.snapshot.queryParams;
                 if (queryParams.active_layer) {
-                    this.mapLayer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
+                    this.mapLayer = this.pref.enabledLayers.filter(i => i.id === queryParams.active_layer)[0];
                 } else {
                     this.mapLayer = this.pref.defaultLayer();
                 }

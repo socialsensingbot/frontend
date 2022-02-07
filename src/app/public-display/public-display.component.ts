@@ -553,7 +553,7 @@ export class PublicDisplayComponent implements OnInit {
                 this._zoom = this.currentDisplayScreen.location.zoom;
             }
             await this.pref.waitUntilReady();
-            this.layer = this.pref.combined.layers.available.filter(i => i.id === this._activeLayerGroup)[0];
+            this.layer = this.pref.enabledLayers.filter(i => i.id === this._activeLayerGroup)[0];
             this._twitterIsStale = true;
             this.updateAnnotationTypes();
             this.title = this.currentDisplayScreen.title;
