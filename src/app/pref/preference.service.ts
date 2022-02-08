@@ -49,6 +49,7 @@ export class PreferenceService {
         setTimeout(loop, 50);
     });
     public environment: any;
+    public enabledLayers: any = [];
 
     constructor(private _notify: NotificationService) {
         this._combined = {...environment};
@@ -156,6 +157,14 @@ export class PreferenceService {
 
 
                 log.info("Combined preferences are: ", this._combined);
+            }
+            try {
+                this.enabledLayers = this._combined.layers.available.filter(i => this._combined.layersEnabled.includes(i.id));
+            } catch (e) {
+                log.error(e);
+                this._notify.show(
+                    "Failed to load the available hazard layers. Refresh the page and try" +
+                    " again.", "OK", 60);
             }
 
             try {
@@ -447,7 +456,7 @@ export class PreferenceService {
     }
 
     public defaultLayer(): SSMapLayer {
-        const defaultLayer: SSMapLayer = this.combined.layers.available.filter(i => i.id === this.combined.layers.defaultLayer)[0];
+        const defaultLayer: SSMapLayer = this.enabledLayers.filter(i => i.id === this.combined.layers.defaultLayer)[0];
         if (!defaultLayer) {
             throw new Error(
                 "Configuration specifies " + this.combined.layers.defaultLayer + " as default layer, no such layer exists in " + JSON.stringify(

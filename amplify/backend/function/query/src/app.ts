@@ -47,7 +47,7 @@ module.exports = (connection: Pool) => {
 
     // declare a new express app
     const app = express();
-    app.use(bodyParser.json());
+    app.use(bodyParser.json() as any);
     app.use(awsServerlessExpressMiddleware.eventContext());
 
     app.use((req, res, next) => {

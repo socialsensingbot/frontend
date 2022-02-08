@@ -82,7 +82,7 @@ var handler = function (event, context) { return __awaiter(void 0, void 0, void 
     return __generator(this, function (_c) {
         switch (_c.label) {
             case 0:
-                console.log("EVENT DATA: " + JSON.stringify(event));
+                console.log("EVENT DATA: ".concat(JSON.stringify(event)));
                 context.stage = stage;
                 context.dev = dev;
                 _b = (_a = awsServerlessExpress).proxy;

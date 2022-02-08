@@ -90,7 +90,7 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
     }
 
     private layerGroup(id: string): SSMapLayer {
-        return this.pref.combined.layers.available.filter(i => i.id === id)[0];
+        return this.pref.enabledLayers.filter(i => i.id === id)[0];
     }
 
     constructor(public zone: NgZone, public router: Router,
