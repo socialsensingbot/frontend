@@ -9,7 +9,7 @@ function snapshot(query = 'app-timeseries-multi-query-chart', name = "analytics-
         .toMatchImageSnapshot({
                                   "imageConfig": {
                                       "createDiffImage": true,                // Should a "diff image" be created, can be disabled for performance
-                                      "threshold":       0.05,                      // Amount in pixels or percentage before snapshot image is invalid
+                                      "threshold":       0.1,                      // Amount in pixels or percentage before snapshot image is invalid
                                       "thresholdType":   "percent",             // Can be either "pixel" or "percent"
                                   },
                                   "name":        name,            // Naming resulting image file with a custom name rather than concatenating test titles
@@ -26,15 +26,33 @@ describe('11 Analytics: ', function () {
             cy.login();
             cy.url({timeout: 30000}).should("equal", url);
             cy.get("#loading-div", {timeout: 60000}).should("not.exist");
+            cy.get(".app-loading-progress", {timeout: 60000}).should("not.exist");
             cy.wait(4000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph");
-
-            cy.get('#mat-button-toggle-3-button > .mat-button-toggle-label-content').click();
+            cy.get('.epp-timeseries-eoc-exceedance').click();
             cy.wait(4000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph-exceedance");
-            cy.get('#mat-button-toggle-5-button > .mat-button-toggle-label-content').click();
+            cy.get('.epp-timeseries-eoc-exceedance').click();
+            cy.get('.epp-timeseries-lob-line').click();
             cy.wait(4000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph-exceedance-bar");
+            cy.get('.epp-timeseries-eoc-exceedance').click();
+            cy.get('.epp-timeseries-lob-bar').click();
+            cy.wait(4000);
+            snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph-exceedance-bar");
+            cy.get('.epp-timeseries-eoc-count').click();
+            cy.get('.epp-timeseries-lob-line').click();
+            cy.wait(4000);
+            snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph-count");
+            cy.get('.epp-timeseries-eoc-count').click();
+            cy.get('.epp-timeseries-lob-bar').click();
+            cy.wait(4000);
+            snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph-count-bar");
+            cy.get('.epp-timeseries-eoc-count').click();
+            cy.get('.epp-timeseries-lob-bar').click();
+            cy.get('.epp-timeseries-period-hour').click();
+            cy.wait(20000);
+            snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph-hour-bar-count");
         });
 
         it('Search Criteria & Save', () => {
@@ -78,7 +96,7 @@ describe('11 Analytics: ', function () {
 
 
         it('Import from Map Stats', () => {
-            let url = MAP_URL+"?active_number=stats&active_polygon=county&selected=greater%20london";
+            let url = MAP_URL + "?active_number=exceedance&active_polygon=county&selected=greater%20london";
             cy.visit(url);
             cy.login();
             cy.visitAndWait(url);

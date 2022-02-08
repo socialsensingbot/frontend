@@ -68,9 +68,9 @@ export class MapGraphSidebarComponent implements OnInit {
         await this._router.navigate(["map", this.map.id, "analytics", "time"],
                                     {
                                         queryParamsHandling: "merge",
-                                        queryParams:         {
+                                        queryParams: {
                                             selected:      this.regionList,
-                                            active_number: "stats",
+                                            active_number: "exceedance",
                                             active_layer:  this.layer.id
                                         }
                                     });

@@ -14,7 +14,7 @@ describe('#77 Missing tweets : https://github.com/socialsensingbot/frontend/issu
     });
 
 
-    const url = MAP_URL + "?selected=roscommon&max_time=1588538940000&min_time=1588452540000&active_number=stats&active_polygon=county";
+    const url = MAP_URL + "?selected=roscommon&max_time=1588538940000&min_time=1588452540000&active_number=exceedance&active_polygon=county";
 
   it('Should be two tweets both removed', () => {
       console.log("Disabled until stable test data exists.")

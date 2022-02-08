@@ -21,7 +21,7 @@ describe('11 Analytics: ', function () {
         const url = ANALYTICS_URL + "/time"
 
         it('Import from Map Stats', () => {
-            let url = MAP_URL + "?active_number=stats&active_polygon=county&selected=greater%20london";
+            let url = MAP_URL + "?active_number=exceedance&active_polygon=county&selected=greater%20london";
             cy.visit(url);
             cy.login();
             cy.visitAndWait(url);

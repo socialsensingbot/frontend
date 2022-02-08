@@ -2,12 +2,18 @@
   margin: 20px;
 }
 
+.app-dashboard-toolbar {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
 .dashboard-card {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  right: 15px;
-  bottom: 15px;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
 }
 
 .more-button {
@@ -30,13 +36,20 @@
 .mat-icon-button.add-card-button  {
 
   width: 128px;
-  height: 128px;
-  line-height: 128px;
-
-  .mat-icon {
-    font-size: 128px;
-    width: 128px;
     height: 128px;
     line-height: 128px;
-  }
+
+    .mat-icon {
+        font-size: 128px;
+        width: 128px;
+        height: 128px;
+        line-height: 128px;
+    }
+}
+
+.app-dashboard-title-bar {
+    left: 0;
+    right: 0;
+    top: 0;
+    max-height: 64px;
 }

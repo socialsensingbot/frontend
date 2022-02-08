@@ -1,82 +1,114 @@
 <div *ngIf="ready" class="grid-container">
-    <h1 class="mat-h1">Dashboard
-        <button mat-button (click)="reset()">reset</button>
-
-    </h1>
+    <div class="app-dashboard-title-bar">
+        <h1>Dashboard
+            <button (click)="reset()" mat-button>reset</button>
+        </h1>
+    </div>
     <mat-grid-list cols="2" rowHeight="500px">
         <ng-container *ngFor="let card of cards; let i=index ">
             <mat-grid-tile *ngIf="!card.hidden" [colspan]="card.cols" [rowspan]="card.rows">
                 <mat-card class="dashboard-card  dashboard-card-{{card.cols}}x{{card.rows}} dasboard-card-number-{{i}}
                     dashboard-card-cols-{{card.cols}} dashboard-card-rows-{{card.rows}}">
                     <mat-card-header>
-            <mat-card-title>
-                <span class="dashboard-card-number-{{i}}-title dashboard-card-title">{{card.title}}</span>
-              <button mat-icon-button class="more-button dasboard-card-number-{{i}}-menu-btn dashboard-card-menu-btn" [matMenuTriggerFor]="menu"
-                      aria-label="Toggle menu">
-                <mat-icon>more_vert</mat-icon>
-              </button>
-              <mat-menu #menu="matMenu" xPosition="before">
-                <button mat-menu-item class="dashboard-card-menu-item-expand" (click)="expand(card)">Expand</button>
-                <button mat-menu-item class="dashboard-card-menu-item-shrink" (click)="shrink(card)">Shrink</button>
-                <button mat-menu-item class="dashboard-card-menu-item-hide" (click)="hide(card)">Hide</button>
-                <button mat-menu-item class="dashboard-card-menu-item-debug"  (click)="debug(card)">Debug</button>
-                <button mat-menu-item class="dashboard-card-menu-item-remove" (click)="remove(card)">Remove</button>
-                <!--                                <button *ngIf="card.variant !== 'bar'" mat-menu-item-->
-                <!--                                        (click)="card.variant='bar'">Switch to Bar-->
-                <!--                                </button>-->
-                <!--                                <button *ngIf="card.variant !== 'line'" mat-menu-item (click)="card.variant='line'">-->
-                <!--                                    Switch to Line-->
-                <!--                                </button>-->
-              </mat-menu>
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content class="dashboard-card-content">
-            <ng-container [ngSwitch]="card.type">
-              <ng-container *ngSwitchCase="'timeseries'">
-                <app-widget-timeseries [height]="card.rows*400" [id]="card.id"
-                                       [state]="card.state"></app-widget-timeseries>
-              </ng-container>
-              <ng-container *ngSwitchCase="'blank'"><h3>This card is intentionally blank</h3>
-              </ng-container>
-            </ng-container>
-          </mat-card-content>
-        </mat-card>
-      </mat-grid-tile>
+                        <mat-card-title>
+                            <span class="dashboard-card-number-{{i}}-title dashboard-card-title">{{card.title}}</span>
+                            <button [matMenuTriggerFor]="menu"
+                                    aria-label="Toggle menu"
+                                    class="more-button dasboard-card-number-{{i}}-menu-btn dashboard-card-menu-btn"
+                                    mat-icon-button>
+                                <mat-icon>more_vert</mat-icon>
+                            </button>
+                            <mat-menu #menu="matMenu" xPosition="before">
+                                <button (click)="expand(card)" class="dashboard-card-menu-item-expand" mat-menu-item>
+                                    Expand
+                                </button>
+                                <button (click)="shrink(card)" class="dashboard-card-menu-item-shrink" mat-menu-item>
+                                    Shrink
+                                </button>
+                                <button (click)="hide(card)" class="dashboard-card-menu-item-hide" mat-menu-item>Hide
+                                </button>
+                                <button (click)="debug(card)" class="dashboard-card-menu-item-debug" mat-menu-item>
+                                    Debug
+                                </button>
+                                <button (click)="remove(card)" class="dashboard-card-menu-item-remove" mat-menu-item>
+                                    Remove
+                                </button>
+                                <!--                                <button *ngIf="card.variant !== 'bar'" mat-menu-item-->
+                                <!--                                        (click)="card.variant='bar'">Switch to Bar-->
+                                <!--                                </button>-->
+                                <!--                                <button *ngIf="card.variant !== 'line'" mat-menu-item (click)="card.variant='line'">-->
+                                <!--                                    Switch to Line-->
+                                <!--                                </button>-->
+                            </mat-menu>
+                        </mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content class="dashboard-card-content">
+                        <ng-container [ngSwitch]="card.type">
+                            <ng-container *ngSwitchCase="'timeseries'">
+                                <app-widget-timeseries [height]="card.rows*400" [id]="card.id"
+                                                       [state]="card.state"></app-widget-timeseries>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'blank'"><h3>This card is intentionally blank</h3>
+                            </ng-container>
+                        </ng-container>
+                    </mat-card-content>
+                </mat-card>
+            </mat-grid-tile>
 
-    </ng-container>
-    <mat-grid-tile *ngIf="false && !readonly" [colspan]="1" [rowspan]="1">
-      <mat-card class="dashboard-card  dashboard-card-1x1}
+        </ng-container>
+        <mat-grid-tile *ngIf="false && !readonly" [colspan]="1" [rowspan]="1">
+            <mat-card class="dashboard-card  dashboard-card-1x1}
                     dashboard-card-cols-1 dashboard-card-rows-1">
-        <mat-card-header>
-          <mat-card-title>
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content class="dashboard-card-content">
+                <mat-card-header>
+                    <mat-card-title>
+                    </mat-card-title>
+                </mat-card-header>
+                <mat-card-content class="dashboard-card-content">
 
-          <ng-container>
-            <button mat-icon-button class="add-card-button" (click)="addCard()"
-                    aria-label="Add Card to Dashboard">
-              <mat-icon>add</mat-icon>
-            </button>
-          </ng-container>
-          <form name="new-widget-form">
-            <mat-form-field appearance="fill">
-              <mat-label>Widget Type</mat-label>
-              <mat-select [(ngModel)]="newWidgetType" name="newWidgetType">
-                <mat-option *ngFor="let type of types" [value]="type">
-                  {{type.title}}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field appearance="fill">
-              <mat-label>Widget Title</mat-label>
-              <input matInput placeholder="Ex. Graph of Counts" [value]="newWidgetTitle"
-                     name="newWidgetTitle"
-                     [(ngModel)]="newWidgetTitle">
-            </mat-form-field>
-          </form>
-        </mat-card-content>
-      </mat-card>
-    </mat-grid-tile>
-  </mat-grid-list>
+                    <ng-container>
+                        <button (click)="addCard()" aria-label="Add Card to Dashboard" class="add-card-button"
+                                mat-icon-button>
+                            <mat-icon>add</mat-icon>
+                        </button>
+                    </ng-container>
+                    <form name="new-widget-form">
+                        <mat-form-field appearance="fill">
+                            <mat-label>Widget Type</mat-label>
+                            <mat-select [(ngModel)]="newWidgetType" name="newWidgetType">
+                                <mat-option *ngFor="let type of types" [value]="type">
+                                    {{type.title}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field appearance="fill">
+                            <mat-label>Widget Title</mat-label>
+                            <input [(ngModel)]="newWidgetTitle" [value]="newWidgetTitle" matInput
+                                   name="newWidgetTitle"
+                                   placeholder="Ex. Graph of Counts">
+                        </mat-form-field>
+                    </form>
+                </mat-card-content>
+            </mat-card>
+        </mat-grid-tile>
+    </mat-grid-list>
+</div>
+
+<div class="app-dashboard-toolbar">
+    <button *ngIf="pref.ready &&pref.featureSupported('map')" [queryParamsHandling]="'merge'"
+            [routerLink]="'/map/'+map.id"
+            mat-button
+            style="font-size:2vh">
+        <!--       <mat-icon>power_settings_new</mat-icon>-->
+        <mat-icon>close</mat-icon>
+    </button>
+
+
+    <!--      <button mat-button *ngIf="isAuthenticated" routerLink="/map">-->
+    <!--        <mat-icon>map</mat-icon>-->
+    <!--        Map-->
+    <!--      </button>-->
+    <!--      <button id="signup" mat-button routerLink="/auth/signup" *ngIf="isSignup">-->
+    <!--        Signup (Dev Only)-->
+    <!--      </button>-->
+
 </div>

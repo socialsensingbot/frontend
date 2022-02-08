@@ -1,9 +1,9 @@
 import * as geojson from "geojson";
 
 export interface Properties {
-  name: string;
-  count: number;
-  stats?: number;
+    name: string;
+    count: number;
+    exceedance?: number;
 }
 
 export interface Geometry {
@@ -31,14 +31,14 @@ export interface PolyLayers {
 }
 
 export interface NumberLayers {
-  "stats": any;
-  "count": any;
+    "exceedance": any;
+    "count": any;
 }
 
 export interface RegionData<R, S, T> {
-  stats: R;
-  count: S;
-  embed?: T;
+    exceedance: R;
+    count: S;
+    embed?: T;
 }
 
 export interface ColorFunctionObject {
@@ -54,12 +54,11 @@ export interface ByRegionType<T> {
 }
 export type Stats = ByRegionType<RegionData<any, any, any>>;
 
-export type NumberLayerShortName = "stats" | "count" ;
+export type NumberLayerShortName = "exceedance" | "count";
 
-export const numberLayerShortNames: NumberLayerShortName[] = ["stats", "count"];
+export const numberLayerShortNames: NumberLayerShortName[] = ["exceedance", "count"];
 
 
-export const STATS = "stats";
 export const COUNTY = "county";
 
 // TODO: types for the data
@@ -68,4 +67,3 @@ export class TimeSlice {
 
   tweets: string[];
 }
-
