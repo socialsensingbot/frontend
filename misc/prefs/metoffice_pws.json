@@ -1,0 +1,24 @@
+{
+  "continuousUpdateThresholdInMinutes": 5,
+  "maxUsers": 10,
+  "exceedanceThreshold": 100,
+  "countThreshold": 0,
+  "publicDisplayTweetScroll": "all",
+  "publicDisplayTweetScrollRate": 3000,
+  "publicDisplayMaxTweets": 60,
+  "publicDisplayMaxTweetsRetrieved": 200,
+  "features": [
+    "impact",
+    "source",
+    "map",
+    "dashboard",
+    "analytics",
+    "display"
+  ],
+  "layersEnabled": [
+    "flood",
+    "wind",
+    "snow"
+  ],
+  "defaultPublicDisplayScript": "default_script"
+}

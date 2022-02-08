@@ -165,7 +165,6 @@ export class RESTMapDataService {
     }
 
 
-
     public async tweets(layerGroupId: string, regionType: string, regions: string[], startDate,
                         endDate): Promise<Tweet[]> {
         const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
@@ -219,26 +218,35 @@ export class RESTMapDataService {
     }
 
     public async csvTweets(layerGroupId: string, regionType: string, regions: string[], startDate,
-                           endDate, byRegion: string): Promise<Tweet[]> {
+                           endDate, byRegion: string, pageSize = 100, maxPages = 10000): Promise<Tweet[]> {
         const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
         log.debug("requesting tweets for regions " + regions);
-        const rawResult = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/csv-export", {
-            hazards:   layerGroup.hazards,
-            sources:   layerGroup.sources,
-            warnings:  layerGroup.warnings,
-            regions,
-            byRegion,
-            startDate: roundToHour(startDate),
-            endDate:   roundToMinute(endDate)
-
-        }, 0);
-        log.debug(rawResult.length + " tweets back from server");
         const result: Tweet[] = [];
-        for (const tweet of rawResult) {
-            result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
-                                  tweet.possibly_sensitive));
-        }
-        return result;
+        let page = 0;
+        do {
+            const rawResult = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/csv-export", {
+                hazards:   layerGroup.hazards,
+                sources:   layerGroup.sources,
+                warnings:  layerGroup.warnings,
+                regions,
+                byRegion,
+                pageSize:  pageSize,
+                page:      page,
+                startDate: roundToHour(startDate),
+                endDate:   roundToMinute(endDate)
+
+            }, 0);
+            log.debug(rawResult.length + " tweets back from server");
+            for (const tweet of rawResult) {
+                result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
+                                      tweet.possibly_sensitive));
+            }
+            if (rawResult.length < pageSize || page === maxPages - 1) {
+                return result;
+            } else {
+                page++;
+            }
+        } while (true);
     }
 
     public async now(): Promise<number> {

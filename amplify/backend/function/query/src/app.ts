@@ -336,8 +336,8 @@ module.exports = (connection: Pool) => {
         try {
             const lastDate: Date = (await maps)[req.params.map].last_date;
             const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
-            const pageSize: number = +req.body.pageSize;
-            const page: number = +req.body.page;
+            const pageSize: number = +req.body.pageSize || 100;
+            const page: number = +req.body.page || 0;
             const from = page * pageSize;
             console.debug("StartDate: " + new Date(req.body.startDate));
             console.debug("EndDate: " + new Date(endDate));
@@ -347,7 +347,7 @@ module.exports = (connection: Pool) => {
                 return (await sql({
                                       sql:
                                       // language=MySQL
-                                              `/* app.ts: text-for-public-display */ select t.source_json        as json,
+                                          `/* app.ts: text-for-public-display */ select t.source_json            as json,
                                                                                             r.source_timestamp   as timestamp,
                                                                                             r.source_id          as id,
                                                                                             r.region             as region,
@@ -383,6 +383,10 @@ module.exports = (connection: Pool) => {
     app.post("/map/:map/region-type/:regionType/csv-export", async (req, res) => {
         const lastDate: Date = (await maps)[req.params.map].last_date;
         const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
+        const pageSize: number = +req.body.pageSize || 1000;
+        const page: number = +req.body.page || 0;
+        const from = page * pageSize;
+
         console.debug("StartDate: " + new Date(req.body.startDate));
         console.debug("EndDate: " + new Date(endDate));
 
@@ -416,19 +420,17 @@ module.exports = (connection: Pool) => {
                                                                         AND r.warning IN (?)
                                                                         AND not t.deleted
                                                                         AND r2.region is not null
-                                                                      order by r.source_timestamp desc    `,
+                                                                      order by r.source_timestamp desc
+                                                                      LIMIT ?,?`,
                                   values: [req.body.byRegion, new Date(req.body.startDate), new Date(endDate),
                                            req.body.regions, req.params.regionType, req.body.hazards,
                                            req.body.sources,
-                                           warningsValues(req.body.warnings),
+                                           warningsValues(req.body.warnings), from, pageSize
                                   ]
-                              })).map(i => {
-                i.json = JSON.parse(i.json);
-                return i;
-            });
+                              }));
 
 
-        }, {duration: 60});
+        }, {duration: 60 * 60});
     });
 
 
