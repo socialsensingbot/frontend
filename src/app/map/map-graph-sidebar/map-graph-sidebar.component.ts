@@ -39,7 +39,7 @@ export class MapGraphSidebarComponent implements OnInit {
         });
         this._route.queryParams.subscribe(async queryParams => {
             if (queryParams.active_layer) {
-                this.layer = this.pref.combined.layers.available.filter(i => i.id === queryParams.active_layer)[0];
+                this.layer = this.pref.enabledLayers.filter(i => i.id === queryParams.active_layer)[0];
             }
             this.regionList = this.selection.regionNames();
             this.updateStatesForRegions();

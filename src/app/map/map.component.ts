@@ -846,7 +846,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     private updateAnnotationTypes(): void {
         log.debug("Finding annotations for layer ", this._activeLayerGroup);
-        const currentLayer: any = this.pref.combined.layers.available.filter(i => i.id == this._activeLayerGroup)[0];
+        const currentLayer: any = this.pref.enabledLayers.filter(i => i.id == this._activeLayerGroup)[0];
         log.debug("Finding annotations for layer ", currentLayer);
         if (currentLayer) {
             let activeAnnotationTypes: any = currentLayer.annotations;

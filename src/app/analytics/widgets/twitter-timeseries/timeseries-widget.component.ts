@@ -165,6 +165,6 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     private layerGroup(id: string): SSMapLayer {
-        return this.pref.combined.layers.available.filter(i => i.id === id)[0];
+        return this.pref.enabledLayers.filter(i => i.id === id)[0];
     }
 }

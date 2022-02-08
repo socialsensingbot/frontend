@@ -311,7 +311,7 @@ export class RESTMapDataService {
 
 
     private layerGroup(id: string): SSMapLayer {
-        return this._pref.combined.layers.available.filter(i => i.id === id)[0];
+        return this._pref.enabledLayers.filter(i => i.id === id)[0];
     }
 
     /**

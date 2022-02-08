@@ -18,7 +18,7 @@ export class LegendComponent implements OnInit {
     @Input()
     public set activeLayerGroup(value: string) {
         this._activeLayerGroup = value;
-        this.activeLayerGroupTitle = this._pref.combined.layers.available.filter(i => i.id === value)[0].title;
+        this.activeLayerGroupTitle = this._pref.enabledLayers.filter(i => i.id === value)[0].title;
     }
 
     private _activeNumber: string = "stats";
