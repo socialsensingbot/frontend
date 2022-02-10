@@ -2,6 +2,8 @@
 cd $(dirname $0)
 cd ..
 
+npx browserslist@latest --update-db
+
 if [[ "${AWS_BRANCH}" == staging ]]; then
   npm run-script build-prod
 elif [[ "${AWS_BRANCH}" == demo ]]; then
