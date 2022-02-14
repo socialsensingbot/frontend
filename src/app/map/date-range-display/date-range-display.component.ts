@@ -5,6 +5,7 @@ import {Logger} from "@aws-amplify/core";
 import {environment} from "../../../environments/environment";
 import {PreferenceService} from "../../pref/preference.service";
 import {roundToHour, roundToMinute} from "../../common";
+import {DateRangeSliderOptions} from "../types";
 
 const log = new Logger("date-range");
 
@@ -216,12 +217,6 @@ export class DateRangeDisplayComponent implements OnInit, OnDestroy {
     }
 }
 
-export class DateRangeSliderOptions {
-    min: number;
-    max: number;
-    startMin: number;
-    startMax: number;
-}
 
 export class DateRange {
     constructor(public lower: number, public upper: number) {

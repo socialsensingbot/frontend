@@ -1,4 +1,4 @@
-import {Component, NgZone, OnDestroy, OnInit} from "@angular/core";
+import {Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {Hub, Logger} from "@aws-amplify/core";
 import {Browser, GeoJSON, latLng, LayerGroup, layerGroup, LeafletMouseEvent, Map, tileLayer} from "leaflet";
 import "jquery-ui/ui/widgets/slider.js";
@@ -6,10 +6,10 @@ import {ActivatedRoute, NavigationStart, Params, Router} from "@angular/router";
 import * as rxjs from "rxjs";
 import {Subscription, timer} from "rxjs";
 import * as geojson from "geojson";
-import {DateRange, DateRangeSliderOptions} from "./date-range-slider/date-range-slider.component";
+import {DateRange} from "./date-range-slider/date-range-slider.component";
 import {LayerStyleService} from "./services/layer-style.service";
 import {NotificationService} from "../services/notification.service";
-import {COUNTY, Feature, NumberLayerShortName, PolygonData, PolyLayers} from "./types";
+import {COUNTY, DateRangeSliderOptions, Feature, NumberLayerShortName, PolygonData, PolyLayers} from "./types";
 import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
 import {AppState, UIExecutionService} from "../services/uiexecution.service";
@@ -56,6 +56,8 @@ export class MapComponent implements OnInit, OnDestroy {
         return this._selectedFeatureNames;
     }
 
+    @ViewChild("chart") newTimeslider: ElementRef;
+
     // The UI state fields
     public tweets: Tweet[] = null;
     public tweetsVisible = false;
@@ -66,7 +68,8 @@ export class MapComponent implements OnInit, OnDestroy {
         max:      Date.now(),
         min:      Date.now() - 7 * ONE_DAY,
         startMin: Date.now() - ONE_DAY,
-        startMax: Date.now()
+        startMax: Date.now(),
+        now:      Date.now(),
     };
     public selection = new RegionSelection();
     public showTwitterTimeline: boolean;
@@ -138,7 +141,7 @@ export class MapComponent implements OnInit, OnDestroy {
      * A subscription to the UI execution state.
      */
     private _stateSub: Subscription;
-    private DEFAULT_LAYER_GROUP = "flood-group";
+    private DEFAULT_LAYER_GROUP = "flood";
     private _blinkTimer: Subscription;
     private _inFeature: boolean;
     public selectedCountriesTextValue = "";
@@ -197,7 +200,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     constructor(private _router: Router,
                 private route: ActivatedRoute,
-                private _mapSelectionService: MapSelectionService,
+                public mapSelectionService: MapSelectionService,
                 private _zone: NgZone,
                 private _layerStyles: LayerStyleService,
                 private _notify: NotificationService,
@@ -273,7 +276,7 @@ export class MapComponent implements OnInit, OnDestroy {
      * @param params the parameter values to merge into the current URL.
      */
     async updateSearch(params: Partial<Params>) {
-        log.debug("updateSearch(", params, ")");
+        log.debug("updateSearch()", params);
 
         // Merge the params to change into _newParams which holds the
         // next set of parameters to add to the URL state.
@@ -283,7 +286,7 @@ export class MapComponent implements OnInit, OnDestroy {
             Object.keys(keys).sort().forEach((key) => {
                 this._newParams[key] = keys[key];
             });
-            await this._router.navigate(["map", this._mapSelectionService.id], {
+            await this._router.navigate(["map", this.mapSelectionService.id], {
                 queryParams:         this._newParams,
                 queryParamsHandling: "merge"
             });
@@ -303,14 +306,14 @@ export class MapComponent implements OnInit, OnDestroy {
 
         // Avoids race condition with access to this.pref.combined
         await this.pref.waitUntilReady();
-        if (!this._mapSelectionService.id && this.route.snapshot.params.map === "undefined") {
+        if (!this.mapSelectionService.id && this.route.snapshot.params.map === "undefined") {
             log.debug("Redirecting to /map/" + this.pref.combined.defaultDataSet);
-            this._mapSelectionService.id = this.pref.combined.defaultDataSet;
+            this.mapSelectionService.id = this.pref.combined.defaultDataSet;
             await this._router.navigate(["map", this.pref.combined.defaultDataSet], {queryParamsHandling: "preserve"});
         }
-        if (this._mapSelectionService.id && this.route.snapshot.params.map === "undefined") {
-            log.debug("Redirecting to /map/" + this._mapSelectionService.id);
-            await this._router.navigate(["map", this._mapSelectionService.id], {queryParamsHandling: "preserve"});
+        if (this.mapSelectionService.id && this.route.snapshot.params.map === "undefined") {
+            log.debug("Redirecting to /map/" + this.mapSelectionService.id);
+            await this._router.navigate(["map", this.mapSelectionService.id], {queryParamsHandling: "preserve"});
         }
         this._stateSub = this._exec.state.subscribe((state: AppState) => {
             if (state === "ready") {
@@ -490,6 +493,27 @@ export class MapComponent implements OnInit, OnDestroy {
 
     }
 
+
+    /**
+     * Triggered by a change to the date range slider.
+     *
+     * @see DateRangeSliderComponent
+     * @param range the user selected upper and lower date range.
+     */
+    public async sliderExtentChange(range: DateRange) {
+        if (this.destroyed) {
+            return;
+        }
+        // tslint:disable-next-line:prefer-const
+        let {lower, upper} = range;
+        log.debug("sliderExtentChange(" + lower + "->" + upper + ")");
+        this._dateMax = upper;
+        this._dateMin = lower;
+        this.sliderOptions = {...this.sliderOptions, min: lower, max: upper, startMin: lower, startMax: upper, now: await this.data.now()};
+        await this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
+        this.liveUpdating = (this.sliderOptions.startMax >= await this.data.now() - this.pref.combined.continuousUpdateThresholdInMinutes * 60_000);
+    }
+
     // public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
     //     // this.data.downloadAggregate(aggregrationSetId, id,
     public countries: any[];
@@ -620,7 +644,8 @@ export class MapComponent implements OnInit, OnDestroy {
             max:      roundToMinute(now),
             min:      roundToHour(await this.data.minDate()),
             startMin: this._dateMin,
-            startMax: this._dateMax
+            startMax: this._dateMax,
+            now:      roundToMinute(now),
         };
         await this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
         this._sliderIsStale = true;
@@ -676,7 +701,15 @@ export class MapComponent implements OnInit, OnDestroy {
         } else {
             this._dateMax = roundToMinute(await this.data.now());
         }
-        this.sliderOptions = {min: await this.data.minDate(), max: await this.data.now(), startMin: this._dateMin, startMax: this._dateMax};
+        this.sliderOptions = {
+            min:              await this.data.minDate(),
+            max:              await this.data.now(),
+            startMin:         this._dateMin,
+            startMax:         this._dateMax,
+            currentWindowMin: await this.data.minDate(),
+            currentWindowMax: await this.data.now(),
+            now:              await this.data.now()
+        };
         if (typeof active_layer !== "undefined") {
             this.activeLayerGroup = active_layer;
         }
@@ -1230,8 +1263,9 @@ export class MapComponent implements OnInit, OnDestroy {
 
         this.sliderOptions = {
             ...this.sliderOptions,
-            max: await this.data.now(),
-            min: await this.data.minDate() - 60 * 1000,
+            startMin: this._dateMin || await this.data.minDate() - 60 * 1000,
+            startMax: this._dateMax || await this.data.now(),
+            now:      await this.data.now(),
         };
         await this.checkForLiveUpdating();
 

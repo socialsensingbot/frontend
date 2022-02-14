@@ -5,6 +5,7 @@ import {Logger} from "@aws-amplify/core";
 import {environment} from "../../../environments/environment";
 import {PreferenceService} from "../../pref/preference.service";
 import {roundToHour, roundToMinute} from "../../common";
+import {DateRangeSliderOptions} from "../types";
 
 const log = new Logger("date-range");
 
@@ -54,7 +55,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
         translate:            (value: number, label: LabelType): string => {
             log.verbose("translate value " + value + " for " + label);
 
-            if (value === this.sliderOptions.ceil && this._pref.combined.mostRecentDateIsNow) {
+            if (value >= this._options.now && this._pref.combined.mostRecentDateIsNow) {
                 return `<span class="slider-date-time slider-date-time-max"><span class='slider-time'></span> <span class='slider-date'>now</span></span>`;
 
             }
@@ -225,12 +226,6 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     }
 }
 
-export class DateRangeSliderOptions {
-    min: number;
-    max: number;
-    startMin: number;
-    startMax: number;
-}
 
 export class DateRange {
     constructor(public lower: number, public upper: number) {

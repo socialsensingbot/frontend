@@ -63,7 +63,18 @@ export const COUNTY = "county";
 
 // TODO: types for the data
 export class TimeSlice {
-  [index: string]: any;
+    [index: string]: any;
 
-  tweets: string[];
+    tweets: string[];
+}
+
+
+export class DateRangeSliderOptions {
+    min: number;
+    max: number;
+    currentWindowMin?: number;
+    currentWindowMax?: number;
+    startMin: number;
+    startMax: number;
+    now: number;
 }

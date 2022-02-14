@@ -202,7 +202,14 @@
                         class="legend"></map-legend>
 
             <div class="app-map-last-updated">Last updated {{data.lastUpdated| date:"long"}}</div>
-
+            <div *ngIf="this.mapSelectionService.id"
+                 style="position:absolute;left:1vw;right:1vw;bottom:1vh;height:20vh;">
+                <app-historical-date-range-slider (dateRange)="sliderExtentChange($event)" *ngIf="ready"
+                                                  [layer]="activeLayerGroup"
+                                                  [map]="this.mapSelectionService.id"
+                                                  [options]="sliderOptions"
+                                                  [regions]="'uk'"></app-historical-date-range-slider>
+            </div>
             <mat-progress-bar *ngIf="activity && ready" class="map-progress" mode="indeterminate"
                               [color]="pref.combined.toolbarColor"></mat-progress-bar>
             <!--    <div class="map-inset-shadow"></div>-->
