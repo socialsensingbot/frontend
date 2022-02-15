@@ -38,10 +38,12 @@ describe('00173 Source: : https://github.com/socialsensingbot/frontend/issues/17
       clickSourceMenu();
       cy.get("body .tweet-list-item-menu-source-level-coastal-not-selected", {timeout: 30000});
       cy.get("body .tweet-list-item-menu-source-level-coastal", {timeout: 30000}).click();
+      cy.wait(4000);
       clickSourceMenu();
       cy.get("body .tweet-list-item-menu-source-level-coastal-selected", {timeout: 30000});
       cy.get("body .tweet-list-item-menu-source-level-river-not-selected", {timeout: 30000});
       cy.get("body .tweet-list-item-menu-source-level-river", {timeout: 30000}).click();
+      cy.wait(4000);
       clickSourceMenu();
       cy.get("body .tweet-list-item-menu-source-level-coastal-not-selected", {timeout: 30000});
       cy.get("body .tweet-list-item-menu-source-level-river-selected", {timeout: 30000});

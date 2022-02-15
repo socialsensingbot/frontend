@@ -1,7 +1,7 @@
 import {MAP_URL, MAX_DATE_MILLIS, MIN_DATE_MILLIS} from "../../../support";
 import west_yorkshire from "../../../fixtures/csv_download_west_yorkshire.json";
 import basic_3_region_csv from "../../../fixtures/csv_download_3_region.json";
-import london_wind from "../../../fixtures/csv_download_london_wind.json";
+import nh_wind from "../../../fixtures/csv_download_northamptonshire_wind.json";
 
 describe('#422 CSV Download Tests : https://github.com/socialsensingbot/frontend/issues/422',
          function () {
@@ -18,6 +18,7 @@ describe('#422 CSV Download Tests : https://github.com/socialsensingbot/frontend
                  cy.wait(2000);
                  cy.twitterPanelHeader("West Yorkshire");
                  cy.get(".app-tweet-export-btn").click();
+                 cy.wait(4000);
                  cy.validateCsvFile("west_yorkshire*.csv", (list) => {
                      console.log(list);
                      console.log("list", JSON.stringify(list));
@@ -33,6 +34,7 @@ describe('#422 CSV Download Tests : https://github.com/socialsensingbot/frontend
                  cy.tweetCountTotal(24);
 
                  cy.get(".app-tweet-export-btn").click();
+                 cy.wait(4000);
                  cy.validateCsvFile("multiple-regions*.csv", (list) => {
                      console.log(JSON.stringify(list));
                      console.log("list", list)
@@ -44,17 +46,17 @@ describe('#422 CSV Download Tests : https://github.com/socialsensingbot/frontend
                  cy.get(".app-map-active-layer-select").click();
                  cy.get(".app-map-als-option-wind").click();
 
-                 cy.multiSelectRegions(["cambridgeshire", "hertfordshire", "west-yorkshire", "greater-london"]);
-                 cy.wait(4000);
-                 cy.tweetCountTotal(36);
+                 cy.multiSelectRegions(["cambridgeshire", "hertfordshire", "west-yorkshire", "northamptonshire"]);
+                 cy.wait(10000);
+                 cy.tweetCountTotal(3);
 
                  cy.get(".app-tweet-export-btn").click();
 
-                 cy.validateCsvFile("greater_london*.csv", (list) => {
+                 cy.validateCsvFile("northamptonshire*.csv", (list) => {
                      console.log(JSON.stringify(list));
                      console.log("list", list)
                      cy.log(list);
-                     expect(list).to.deep.equal(london_wind);
+                     expect(list).to.deep.equal(nh_wind);
                  })
              });
 

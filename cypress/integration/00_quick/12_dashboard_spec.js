@@ -42,7 +42,7 @@ describe('11 Analytics: ', function () {
             cy.get('.mat-chip').should("contain.text","Cardiff")
             cy.get(':nth-child(1) > .mat-card-actions > .mat-focus-indicator > .mat-button-wrapper').click();
             cy.wait(1000);
-            cy.get('.app-analytics-timeseries-toolbar-add-to-dashboard').click();
+            cy.get('.app-timeseries-toolbar-add-to-dashboard').click();
             cy.wait(1000);
             const title=uuidv4();
             cy.get('input[name=title]').type(title);

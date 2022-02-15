@@ -5,6 +5,7 @@ import {Logger} from "@aws-amplify/core";
 import {environment} from "../../../environments/environment";
 import {PreferenceService} from "../../pref/preference.service";
 import {roundToHour, roundToMinute} from "../../common";
+import {DateRangeSliderOptions} from "../types";
 
 const log = new Logger("date-range");
 
@@ -129,9 +130,8 @@ export class DateRangeDisplayComponent implements OnInit, OnDestroy {
      */
     @Input()
     public set options(value: DateRangeSliderOptions) {
-        log.debug("Options: " + JSON.stringify(value));
         this._options = value;
-        this._lowerValue = roundToHour(value.startMin);
+        log.verbose(`Options: ${JSON.stringify(value)}`);
         if (value.min <= 0) {
             throw new Error("Min value must be positive");
         }
@@ -144,16 +144,21 @@ export class DateRangeDisplayComponent implements OnInit, OnDestroy {
         if (value.startMax < 0) {
             throw new Error("Upper value must be positive");
         }
-        this._pref.waitUntilReady().then(() => {
-            if (value.max - value.startMax < this._pref.combined.continuousUpdateThresholdInMinutes * 60 * 1000) {
-                this._upperValue = roundToMinute(value.startMax);
-            } else {
-                this._upperValue = roundToHour(value.startMax);
-            }
-            this.sliderOptions = {...this.sliderOptions, ceil: roundToMinute(value.max), floor: roundToHour(value.min)};
-            this.ready = true;
-            this.updateTicks();
-        });
+        if (this._upperValue !== value.startMax || this._lowerValue !== value.startMin) {
+            this._lowerValue = roundToHour(value.startMin);
+            this._pref.waitUntilReady().then(() => {
+                if (value.max - value.startMax < this._pref.combined.continuousUpdateThresholdInMinutes * 60 * 1000) {
+                    this._upperValue = roundToMinute(value.startMax);
+                } else {
+                    this._upperValue = roundToHour(value.startMax);
+                }
+                if (value.max !== this.sliderOptions.ceil || value.min !== this.sliderOptions.floor) {
+                    this.sliderOptions = {...this.sliderOptions, ceil: roundToMinute(value.max), floor: roundToHour(value.min)};
+                }
+                this.ready = true;
+                this.updateTicks();
+            });
+        }
 
     }
 
@@ -189,7 +194,7 @@ export class DateRangeDisplayComponent implements OnInit, OnDestroy {
                                            {hour: "2-digit", hour12: true, timeZone: environment.timezone}).format(
             date);
 
-        return `<span class="slider-date-time slider-date-time-${label}"><span class='slider-time'>${hr}</span> <span class='slider-date'>${da}-${mo}-${ye}</span></span>`;
+        return `<span class="slider-date-time slider-date-time-${label}"><span class='slider-time'>${hr}</span> <span class='slider-date'>${da}-${mo}</span></span>`;
 
     }
 
@@ -212,12 +217,6 @@ export class DateRangeDisplayComponent implements OnInit, OnDestroy {
     }
 }
 
-export class DateRangeSliderOptions {
-    min: number;
-    max: number;
-    startMin: number;
-    startMax: number;
-}
 
 export class DateRange {
     constructor(public lower: number, public upper: number) {

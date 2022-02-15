@@ -164,8 +164,6 @@ export class RESTMapDataService {
 
     }
 
-    public async load(first: boolean) {
-    }
 
     public async tweets(layerGroupId: string, regionType: string, regions: string[], startDate,
                         endDate): Promise<Tweet[]> {
@@ -189,27 +187,66 @@ export class RESTMapDataService {
         return result;
     }
 
+    public async publicDisplayTweets(layerGroupId: string, regionType: string, startDate,
+                                     endDate, pageSize = 100, maxPages = 10): Promise<Tweet[]> {
+        const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
+        log.debug("Requesting tweets for all regions ");
+        const result: Tweet[] = [];
+        let page = 0;
+        do {
+            const rawResult = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/text-for-public-display", {
+                hazards:   layerGroup.hazards,
+                sources:   layerGroup.sources,
+                warnings:  layerGroup.warnings,
+                pageSize:  pageSize,
+                page:      page,
+                startDate: roundToHour(startDate),
+                endDate:   roundToHour(endDate)
+
+            }, 60 * 60);
+            log.debug(rawResult.length + " tweets back from server");
+            for (const tweet of rawResult) {
+                result.push(new Tweet(tweet.id, null, tweet.json, null, new Date(tweet.timestamp), tweet.region,
+                                      tweet.possibly_sensitive));
+            }
+            if (rawResult.length < pageSize || page === maxPages - 1) {
+                return result;
+            } else {
+                page++;
+            }
+        } while (true);
+    }
+
     public async csvTweets(layerGroupId: string, regionType: string, regions: string[], startDate,
-                           endDate, byRegion: string): Promise<Tweet[]> {
+                           endDate, byRegion: string, pageSize = 100, maxPages = 10000): Promise<Tweet[]> {
         const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
         log.debug("requesting tweets for regions " + regions);
-        const rawResult = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/csv-export", {
-            hazards:   layerGroup.hazards,
-            sources:   layerGroup.sources,
-            warnings:  layerGroup.warnings,
-            regions,
-            byRegion,
-            startDate: roundToHour(startDate),
-            endDate:   roundToMinute(endDate)
-
-        }, 0);
-        log.debug(rawResult.length + " tweets back from server");
         const result: Tweet[] = [];
-        for (const tweet of rawResult) {
-            result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
-                                  tweet.possibly_sensitive));
-        }
-        return result;
+        let page = 0;
+        do {
+            const rawResult = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/csv-export", {
+                hazards:   layerGroup.hazards,
+                sources:   layerGroup.sources,
+                warnings:  layerGroup.warnings,
+                regions,
+                byRegion,
+                pageSize:  pageSize,
+                page:      page,
+                startDate: roundToHour(startDate),
+                endDate:   roundToMinute(endDate)
+
+            }, 0);
+            log.debug(rawResult.length + " tweets back from server");
+            for (const tweet of rawResult) {
+                result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
+                                      tweet.possibly_sensitive));
+            }
+            if (rawResult.length < pageSize || page === maxPages - 1) {
+                return result;
+            } else {
+                page++;
+            }
+        } while (true);
     }
 
     public async now(): Promise<number> {
@@ -257,7 +294,7 @@ export class RESTMapDataService {
 
 
     public async minDate(): Promise<number> {
-        return roundToHour(await this.now() - 4 * ONE_DAY);
+        return roundToHour(await this.now() - 365 * ONE_DAY);
     }
 
     public async regionStats(layerGroupId: string, regionType: string, region: string, startDate: number,
@@ -282,7 +319,7 @@ export class RESTMapDataService {
 
 
     private layerGroup(id: string): SSMapLayer {
-        return this._pref.combined.layers.available.filter(i => i.id === id)[0];
+        return this._pref.enabledLayers.filter(i => i.id === id)[0];
     }
 
     /**

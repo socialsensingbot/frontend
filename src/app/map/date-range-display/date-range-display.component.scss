@@ -1,82 +1,19 @@
 @import '~@angular/material/theming';
 @import "../../../styles";
 
-//
-//// We need to use ::ng-deep to overcome view encapsulation
-//::ng-deep {
-//  .custom-slider {
-//    .ng5-slider {
-//      .ng5-slider-bar {
-//        background: #333333;
-//        height: 1px;
-//      }
-//
-//      .ng5-slider-selection {
-//        background-color: #888888;
-//      }
-//
-//      .ng5-slider-pointer {
-//        background-color: #444444;
-//      }
-//
-//      //.custom-slider .ng5-slider .ng5-slider-pointer:after {
-//      //  display: none;
-//      //}
-//
-//      .ng5-slider-bubble {
-//        bottom: 0.5em;
-//      }
-//
-//      .ng5-slider-limit {
-//        font-weight: bold;
-//        color: mat-color(mat-palette($mat-light-blue, 400));
-//      }
-//
-//      .ng5-slider-tick {
-//        //width: 1px;
-//        //height: 10px;
-//        //margin-left: 4px;
-//        //border-radius: 0;
-//        background: mat-color(mat-palette($mat-light-blue, 400), default, 0.5);
-//        //top: -1px;
-//      }
-//
-//      .ng5-slider-tick.ng5-slider-selected {
-//        background: mat-color(mat-palette($mat-light-blue, 400));
-//      }
-//
-//      .slider-date-time {
-//        .slider-date {
-//          font-size: 0.8em;
-//          font-weight: bolder;
-//        }
-//
-//        .slider-time {
-//          font-size: 0.6em;
-//          font-weight: lighter;
-//        }
-//      }
-//
-//      .ng5-slider-floor {
-//        display: none;
-//      }
-//
-//      .ng5-slider-ceil {
-//        display: none;
-//      }
-//    }
-//
-//  }
-//}
 
 ::ng-deep {
 
     .date-range-display-surround {
-        margin-top: 5px;
+        margin-top: 0.2vh;
         font-size: 60%;
-        min-height: 1em;
-        //border:1px solid red;
+        min-height: 1vh;
 
+        .ng5-slider {
+            margin-top: 1.5vh;
+            margin-bottom: 0.7vh;
+            height: 0.17vh;
+        }
 
         .ng5-slider .ng5-slider-bar {
             background: white;
@@ -104,17 +41,11 @@
         }
 
         .ng5-slider .ng5-slider-bubble {
-            bottom: 14px;
+            bottom: 0.6vh;
         }
 
 
         .ng5-slider .ng5-slider-pointer {
-            width: 16px;
-            height: 16px;
-            top: -8px;
-            bottom: 0;
-            background-color: $blackish;
-            border-radius: 0.2vw;
             display: none;
         }
 
@@ -137,18 +68,53 @@
         .slider-date-time {
             .slider-date {
                 color: white;
-                font-size: 1.5vw;
+                font-size: 1.1vh;
                 font-weight: bold;
-                text-shadow: 0 0 0.2vw 0.1vw rgba(0, 0, 0, 0.8);
+                text-shadow: 0 0 0.1vh rgba(0, 0, 0, 0.4);
                 //display: none;
             }
 
             .slider-time {
                 color: white;
-                font-size: 1.5vw;
+                font-size: 1.3vh;
                 font-weight: lighter;
-                text-shadow: 0 0 0.2vw 0.1vw rgba(0, 0, 0, 0.8);
+                text-shadow: 0 0 0.1vh rgba(0, 0, 0, 0.4);
                 //display: none;
+            }
+        }
+
+        //Wide
+        @media (min-aspect-ratio: 1/1) {
+            margin-top: 0.2vw;
+            min-height: 1vw;
+
+            .ng5-slider {
+                margin-top: 1.5vw;
+                margin-bottom: 0.7vw;
+                height: 0.17vw;
+            }
+
+            .ng5-slider .ng5-slider-bar {
+                height: 1.5vw;
+                border-radius: 0.2vw;
+            }
+
+            .ng5-slider .ng5-slider-selection {
+                height: 1.5vw;
+                border-radius: 0.2vw;
+
+            }
+
+            .slider-date-time {
+                .slider-date {
+                    font-size: 1.1vw;
+                    text-shadow: 0 0 0.1vw rgba(0, 0, 0, 0.4);
+                }
+
+                .slider-time {
+                    text-shadow: 0 0 0.1vw rgba(0, 0, 0, 0.4);
+                    font-size: 1.3vw;
+                }
             }
         }
     }

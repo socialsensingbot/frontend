@@ -1,5 +1,8 @@
 import {environment} from "../../../environments/environment";
 import * as geojson from "geojson";
+import {blacklist, greylist} from "../../public-display/keywords";
+
+const twitterLink = require("twitter-text");
 
 export interface CSVExportTweet {
     region: string;
@@ -19,12 +22,27 @@ export interface CSVExportTweet {
  * The class is lazily initialized on various data accesses as the full construction of this object includes some CPU intensive tasks.
  */
 export class Tweet {
+
+    private _media: any[];
+
     private _mediaCount: number;
 
 
     private _init: boolean;
+    private _tokens: string[];
+
+    public get media(): any[] {
+        this.lazyInit();
+        return this._media;
+    }
+
+    public get tokens(): string[] {
+        this.lazyInit();
+        return this._tokens;
+    }
 
     public get mediaCount(): number {
+        this.lazyInit();
         const mediaEntities = this.json.extended_tweet ? this.json.extended_tweet.entities.media : this.json.entities.media;
         if (mediaEntities) {
             return mediaEntities.length;
@@ -33,8 +51,25 @@ export class Tweet {
         }
     }
 
+    public get greylisted(): boolean {
+        this.lazyInit();
+        return greylist.some(v => this.tokens.includes(v))
+    }
+
+    public get blacklisted(): boolean {
+        this.lazyInit();
+        return blacklist.some(v => this.tokens.includes(v))
+    }
+
     get potentiallySensitive(): boolean {
+        this.lazyInit();
         return this._possibly_sensitive;
+    }
+
+
+    get html(): string {
+        this.lazyInit();
+        return this._html;
     }
 
     /**
@@ -51,6 +86,9 @@ export class Tweet {
     }
 
     public get json(): any {
+        if (typeof this._json === "string") {
+            this._json = JSON.parse(this._json);
+        }
         return this._json;
     }
 
@@ -120,13 +158,14 @@ export class Tweet {
         return this._id;
     }
 
-    public get html(): string {
-        return this._json.extended_tweet ? this._json.extended_tweet.full_text : this._json.text;
+    public get text(): string {
+        return this.json.extended_tweet ? this.json.extended_tweet.full_text : this.json.text;
     }
 
-    public get text(): string {
+
+    public get oldText(): string {
         this.lazyInit();
-        const paragraphElement: HTMLParagraphElement = $(this.html).find("p")[0];
+        const paragraphElement: HTMLParagraphElement = $(this.text).find("p")[0];
         if (paragraphElement) {
             return paragraphElement.innerHTML;
         } else {
@@ -173,7 +212,8 @@ export class Tweet {
      */
     public lazyInit() {
         if (!this._init) {
-            this._sender = this._json.user.screen_name;
+            this._tokens = this.text.replace(/https?:\/\/[^\s]+/g, "").toLowerCase().split(/[^#@a-zA-Z_’'\u00C0-\u024F\u1E00-\u1EFF]+/);
+            this._sender = this.json.user.screen_name;
             this._url = "https://twitter.com/" + this._sender + "/status/" + this._id;
 
             this._year = new Intl.DateTimeFormat(environment.locale,
@@ -185,7 +225,16 @@ export class Tweet {
             this._hour = new Intl.DateTimeFormat(environment.locale,
                                                  {hour: "2-digit", hour12: true, timeZone: environment.timezone}).format(
                 this._date);
-            this._init = true;
+            const entities = this.json.extended_tweet ? this.json.extended_tweet.entities : this.json.entities;
+            const text = this.text;
+            let urlEntities: string[] = entities.urls;
+            if (entities.media) {
+                urlEntities = [...urlEntities, ...entities.media]
+            }
+            this._html = "<p>" + twitterLink.default.autoLink(text, {urlEntities, targetBlank: true, title: false}) + "</p>";
+            const mediaEntities = this.json.extended_tweet ? this.json.extended_tweet.entities.media : this.json.entities.media;
+            this._media = typeof mediaEntities !== "undefined" ? mediaEntities : [];
         }
+        this._init = true;
     }
 }

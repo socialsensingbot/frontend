@@ -36,6 +36,9 @@ export interface TimeseriesRESTQuery {
     textSearch?: string;
     __series_id?: string;
     layer?: SSMapLayer
+    page?: number;
+    pageSize?: number;
+    timePeriod?: "day" | "hour";
 }
 
 

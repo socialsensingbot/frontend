@@ -13,7 +13,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "amplify-modelgen": "node amplify/scripts/amplify-modelgen.js",
-    "amplify:query": "cp src/app/map/data/map-data.ts amplify/backend/function/query/src && cd amplify/backend/function/query/src && npx tsc --project tsconfig.json",
+    "amplify:query": "cp src/app/map/data/map-data.ts amplify/backend/function/query/src && cd amplify/backend/function/query/src && npm install && tsc --project tsconfig.json",
     "amplify-push": "node amplify/scripts/amplify-push.js"
   },
   "private": true,

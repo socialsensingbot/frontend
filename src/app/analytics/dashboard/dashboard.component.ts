@@ -5,6 +5,8 @@ import {Logger} from "@aws-amplify/core";
 import {LoadingProgressService} from "../../services/loading-progress.service";
 import {MapSelectionService} from "../../map-selection.service";
 import {ActivatedRoute} from "@angular/router";
+import {PreferenceService} from "../../pref/preference.service";
+import {environment} from "../../../environments/environment";
 
 const log = new Logger("dashboard-component");
 
@@ -41,8 +43,10 @@ export class DashboardComponent implements OnInit {
     private minCols = 1;
     private maxRows = 2;
     private minRows = 1;
+    public isDev: boolean = !environment.production;
 
     constructor(private breakpointObserver: BreakpointObserver, public dash: DashboardService, public map: MapSelectionService,
+                public pref: PreferenceService,
                 public loading: LoadingProgressService, private _route: ActivatedRoute) {
 
     }

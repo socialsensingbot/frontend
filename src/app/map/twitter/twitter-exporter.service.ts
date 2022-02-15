@@ -24,7 +24,7 @@ export class TwitterExporterService {
 
 
     public async download(layerGroupId: string, polygonDatum: PolygonData, regionType: string, startDate: number,
-                          endDate: number, annotationTypes: any[]): Promise<void> {
+                          endDate: number, annotationTypes: any[], layer: string): Promise<void> {
         const options = {
             fieldSeparator:   ",",
             quoteStrings:     "\"",
@@ -35,7 +35,7 @@ export class TwitterExporterService {
             useTextFile:      false,
             useBom:           true,
             useKeysAsHeaders: true,
-            filename:         `global-tweet-export-${readableTimestamp()}`
+            filename:         `global-${layer}-tweet-export-${readableTimestamp()}`
             // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
         };
 
@@ -64,7 +64,7 @@ export class TwitterExporterService {
 
     public async downloadAggregate(layerGroupId: string, aggregrationSetId: string, selectedAggregates: string[],
                                    polygonDatum: PolygonData, startDate: number, endDate: number, byRegion: string,
-                                   annotationTypes: any[]) {
+                                   annotationTypes: any[], layer: string) {
         log.debug(
             "downloadAggregate(aggregrationSetId=" + aggregrationSetId +
             ", selectedAggregates=" + selectedAggregates +
@@ -80,11 +80,11 @@ export class TwitterExporterService {
             useTextFile:      false,
             useBom:           true,
             useKeysAsHeaders: true,
-            filename:         `${aggregrationSetId}-tweet-export-${selectedAggregates.join("-")}-${readableTimestamp()}`
+            filename:         `${aggregrationSetId}-${layer}-tweet-export-${selectedAggregates.join("-")}-${readableTimestamp()}`
             // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
         };
         if (selectedAggregates.length === this._mapdata.aggregations[aggregrationSetId].aggregates.length) {
-            options.filename = `${aggregrationSetId}-tweet-export-all-${readableTimestamp()}`;
+            options.filename = `${aggregrationSetId}-${layer}-tweet-export-all-${readableTimestamp()}`;
         }
         const allRegions = await this._mapdata.regionsOfType(this._pref.combined.countryDownloadRegionType);
         const regions = allRegions.filter(i => selectedAggregates.includes(i.value)).map(i => i.value);
@@ -150,11 +150,11 @@ export class TwitterExporterService {
                 if (this._pref.combined.sanitizeForGDPR) {
                     return this.createCSVExportTweet(includeSource, region, impact, source, i.id, i.date.toUTCString(),
                                                      "https://twitter.com/username_removed/status/" + i.id,
-                                                     this.sanitizeForGDPR($("<div>").html(i.html).text()), JSON.stringify(i.location));
+                                                     this.sanitizeForGDPR($("<div>").html(i.text).text()), JSON.stringify(i.location));
 
                 } else {
                     return this.createCSVExportTweet(includeSource, region, impact, source, i.id, i.date.toUTCString(),
-                                                     "https://twitter.com/username_removed/status/" + i.id, $("<div>").html(i.html).text(),
+                                                     "https://twitter.com/username_removed/status/" + i.id, $("<div>").html(i.text).text(),
                                                      JSON.stringify(i.location));
                 }
             });
@@ -169,13 +169,13 @@ export class TwitterExporterService {
             .replace(/— .+ \(@USERNAME_REMOVED\).*$/g, "");
     }
 
-    public async exportToCSV(tweets: Tweet[], regions: Region[], annotationTypes: any[]) {
+    public async exportToCSV(tweets: Tweet[], regions: Region[], annotationTypes: any[], layer: string) {
         this._notify.show("Preparing CSV download");
         let filename;
         if (regions.length === 1) {
-            filename = `${regions[0].name}-tweet-export-${readableTimestamp()}`;
+            filename = `${regions[0].name}-${layer}-tweet-export-${readableTimestamp()}`;
         } else {
-            filename = `multiple-regions-tweet-export-${readableTimestamp()}`;
+            filename = `multiple-regions-${layer}-tweet-export-${readableTimestamp()}`;
         }
 
         const options = {
@@ -229,11 +229,11 @@ export class TwitterExporterService {
         if (sanitize) {
             return this.createCSVExportTweet(includeSource, regionMap[tweet.region], impact, source, tweet.id, tweet.date.toUTCString(),
                                              "https://twitter.com/username_removed/status/" + tweet.id,
-                                             this.sanitizeForGDPR($("<div>").html(tweet.html).text()), JSON.stringify(tweet.location));
+                                             this.sanitizeForGDPR($("<div>").html(tweet.text).text()), JSON.stringify(tweet.location));
 
         } else {
             return this.createCSVExportTweet(includeSource, regionMap[tweet.region], impact, source, tweet.id, tweet.date.toUTCString(),
-                                             tweet.url, $("<div>").html(tweet.html).text(), JSON.stringify(tweet.location));
+                                             tweet.url, $("<div>").html(tweet.text).text(), JSON.stringify(tweet.location));
         }
     }
 
