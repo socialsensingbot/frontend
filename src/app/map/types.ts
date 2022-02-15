@@ -72,8 +72,6 @@ export class TimeSlice {
 export class DateRangeSliderOptions {
     min: number;
     max: number;
-    currentWindowMin?: number;
-    currentWindowMax?: number;
     startMin: number;
     startMax: number;
     now: number;

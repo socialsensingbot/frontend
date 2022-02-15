@@ -294,7 +294,7 @@ export class RESTMapDataService {
 
 
     public async minDate(): Promise<number> {
-        return roundToHour(await this.now() - 365 * ONE_DAY);
+        return roundToHour(await this.now() - 7 * ONE_DAY);
     }
 
     public async regionStats(layerGroupId: string, regionType: string, region: string, startDate: number,

@@ -512,6 +512,9 @@ export class MapComponent implements OnInit, OnDestroy {
         this.sliderOptions = {...this.sliderOptions, min: lower, max: upper, startMin: lower, startMax: upper, now: await this.data.now()};
         await this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
         this.liveUpdating = (this.sliderOptions.startMax >= await this.data.now() - this.pref.combined.continuousUpdateThresholdInMinutes * 60_000);
+        if (this.ready) {
+            await this.scheduleResetLayers(this.activeStatistic, false);
+        }
     }
 
     // public downloadAggregateAsCSV(aggregrationSetId: string, id: string, $event: MouseEvent) {
@@ -706,8 +709,6 @@ export class MapComponent implements OnInit, OnDestroy {
             max:              await this.data.now(),
             startMin:         this._dateMin,
             startMax:         this._dateMax,
-            currentWindowMin: await this.data.minDate(),
-            currentWindowMax: await this.data.now(),
             now:              await this.data.now()
         };
         if (typeof active_layer !== "undefined") {
