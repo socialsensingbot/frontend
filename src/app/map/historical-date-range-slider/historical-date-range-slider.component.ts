@@ -21,6 +21,7 @@ import {DateRangeSliderOptions} from "../types";
 const log = new Logger("historical-date-range");
 
 const MAX_HISTORICAL_WINDOW: number = 60 * 24 * 60 * 60 * 1000;
+const MAX_HISTORICAL: number = 365 * 24 * 60 * 60 * 1000;
 const MAX_CURRENT_HOUR_WINDOW: number = 7 * 24 * 60 * 60 * 1000;
 const INITIAL_HISTORICAL_WINDOW: number = 30 * 24 * 60 * 60 * 1000;
 const MAX_CURRENT_WINDOW: number = 7 * 24 * 60 * 60 * 1000;
@@ -152,8 +153,8 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
         if (this._options.currentWindowMax - this._options.currentWindowMin > INITIAL_HISTORICAL_WINDOW) {
             this._options.currentWindowMin = this._options.currentWindowMax - INITIAL_HISTORICAL_WINDOW;
         }
-        if (this.historicalChart && (!oldValue || oldValue.min !== value.min || oldValue.max !== value.max)) {
-            this.getData(roundToHour(this._options.min), roundToHour(this._options.max), "day").then(
+        if (this.historicalChart && (!oldValue || oldValue.now !== value.now)) {
+            this.getData(roundToHour(this._options.now - MAX_HISTORICAL), roundToHour(this._options.now), "day").then(
                 data => this.historicalChart.data = data);
             this.zoomHistorical();
 
@@ -224,13 +225,6 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
 
     private async createHistoricalChart() {
         this.historicalChart = am4core.create(this.historicalRef.nativeElement, am4charts.XYChart);
-        // const dataPromise = this.getData(roundToHour(this._options.min), roundToHour(this._options.max), "day").then(
-        //     data => {
-        //         this.historicalChart.data = data;
-        //         this.historicalChart.events.on("ready", () => {
-        //             this.zoomHistorical();
-        //         });
-        //     });
 
         this.historicalDateAxis = this.historicalChart.xAxes.push(new am4charts.DateAxis());
         (this.historicalDateAxis.dataFields as any).category = "Date";
