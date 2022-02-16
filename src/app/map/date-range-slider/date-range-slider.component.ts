@@ -136,16 +136,20 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
         log.debug("Options: " + JSON.stringify(value));
         this._options = value;
         if (value.min <= 0) {
-            throw new Error("Min value must be positive");
+            log.warn("Min value must be positive");
+            return;
         }
         if (value.max <= 0) {
-            throw new Error("Max value must be positive");
+            log.warn("Max value must be positive");
+            return;
         }
-        if (value.startMin < 0) {
-            throw new Error("Lower value must be positive");
+        if (value.startMin <= 0) {
+            log.warn("Lower value must be > 0");
+            return;
         }
-        if (value.startMax < 0) {
-            throw new Error("Upper value must be positive");
+        if (value.startMax <= 0) {
+            log.warn("Upper value must be > 0");
+            return;
         }
         this._pref.waitUntilReady().then(() => {
             this.sliderOptions = {...this.sliderOptions, ceil: roundToMinute(value.max), floor: roundToHour(value.min)};
