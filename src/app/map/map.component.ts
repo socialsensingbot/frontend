@@ -482,7 +482,7 @@ export class MapComponent implements OnInit, OnDestroy {
         let {lower, upper} = range;
         log.debug("sliderChange(" + lower + "->" + upper + ")");
         this._dateMax = upper;
-        this._dateMin = roundToHour(Math.max(this.sliderOptions.min, lower));
+        this._dateMin = Math.max(this.sliderOptions.min, lower);
         this.sliderOptions.startMin = this._dateMin;
         this.sliderOptions.startMax = this._dateMax;
 

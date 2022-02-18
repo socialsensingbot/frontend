@@ -202,7 +202,7 @@
                         class="legend"></map-legend>
 
             <div class="app-map-last-updated">Last updated {{data.lastUpdated| date:"long"}}</div>
-            <div *ngIf="this.mapSelectionService.id"
+            <div *ngIf="this.mapSelectionService.id && pref.ready &&pref.featureSupported('historical')"
                  style="position:absolute;left:1vw;right:1vw;bottom:1vh;height:20vh;">
                 <app-historical-date-range-slider (dateRange)="sliderExtentChange($event)" *ngIf="ready"
                                                   [layer]="activeLayerGroup"

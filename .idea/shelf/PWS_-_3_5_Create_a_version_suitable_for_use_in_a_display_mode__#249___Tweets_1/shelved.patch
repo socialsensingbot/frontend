@@ -1,0 +1,1106 @@
+Index: amplify/team-provider-info.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{\n  \"dev\": {\n    \"awscloudformation\": {\n      \"AuthRoleName\": \"amplify-socialsensing-dev-183906-authRole\",\n      \"UnauthRoleArn\": \"arn:aws:iam::686957444051:role/amplify-socialsensing-dev-183906-unauthRole\",\n      \"AuthRoleArn\": \"arn:aws:iam::686957444051:role/amplify-socialsensing-dev-183906-authRole\",\n      \"Region\": \"eu-west-2\",\n      \"DeploymentBucketName\": \"amplify-socialsensing-dev-183906-deployment\",\n      \"UnauthRoleName\": \"amplify-socialsensing-dev-183906-unauthRole\",\n      \"StackName\": \"amplify-socialsensing-dev-183906\",\n      \"StackId\": \"arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-dev-183906/6da31140-62fe-11ea-a0c9-060e4e394d84\",\n      \"AmplifyAppId\": \"dtmxl3q3i7oix\",\n      \"APIGatewayAuthURL\": \"https://s3.amazonaws.com/amplify-socialsensing-dev-183906-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json\"\n    },\n    \"categories\": {\n      \"auth\": {\n        \"socialsensingf07a871c\": {},\n        \"userPoolGroups\": {}\n      },\n      \"function\": {\n        \"S3Triggerb3a090e2\": {\n          \"deploymentBucketName\": \"amplify-socialsensing-dev-183906-deployment\",\n          \"s3Key\": \"amplify-builds/S3Triggerb3a090e2-754e48743050344b787a-build.zip\",\n          \"secretsPathAmplifyAppId\": \"dtmxl3q3i7oix\"\n        },\n        \"query\": {\n          \"deploymentBucketName\": \"amplify-socialsensing-dev-183906-deployment\",\n          \"s3Key\": \"amplify-builds/query-334735647938434a644f-build.zip\",\n          \"secretsPathAmplifyAppId\": \"dtmxl3q3i7oix\"\n        },\n        \"twitterCompliance\": {\n          \"deploymentBucketName\": \"amplify-socialsensing-dev-183906-deployment\",\n          \"s3Key\": \"amplify-builds/twitterCompliance-5877644a425561383271-build.zip\",\n          \"secretsPathAmplifyAppId\": \"dtmxl3q3i7oix\"\n        }\n      },\n      \"hosting\": {\n        \"amplifyhosting\": {\n          \"appId\": \"dtmxl3q3i7oix\",\n          \"type\": \"cicd\"\n        }\n      }\n    }\n  },\n  \"prod\": {\n    \"awscloudformation\": {\n      \"AuthRoleName\": \"amplify-socialsensing-prod-224245-authRole\",\n      \"UnauthRoleArn\": \"arn:aws:iam::686957444051:role/amplify-socialsensing-prod-224245-unauthRole\",\n      \"AuthRoleArn\": \"arn:aws:iam::686957444051:role/amplify-socialsensing-prod-224245-authRole\",\n      \"Region\": \"eu-west-2\",\n      \"DeploymentBucketName\": \"amplify-socialsensing-prod-224245-deployment\",\n      \"UnauthRoleName\": \"amplify-socialsensing-prod-224245-unauthRole\",\n      \"StackName\": \"amplify-socialsensing-prod-224245\",\n      \"StackId\": \"arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-prod-224245/76208f10-6320-11ea-9f6c-06bdd06f2a66\",\n      \"AmplifyAppId\": \"dtmxl3q3i7oix\"\n    },\n    \"categories\": {\n      \"auth\": {\n        \"socialsensingf07a871c\": {},\n        \"userPoolGroups\": {}\n      },\n      \"function\": {\n        \"S3Triggerb3a090e2\": {\n          \"deploymentBucketName\": \"amplify-socialsensing-prod-224245-deployment\",\n          \"s3Key\": \"amplify-builds/S3Triggerb3a090e2-754e48743050344b787a-build.zip\",\n          \"secretsPathAmplifyAppId\": \"dtmxl3q3i7oix\"\n        },\n        \"query\": {\n          \"deploymentBucketName\": \"amplify-socialsensing-prod-224245-deployment\",\n          \"s3Key\": \"amplify-builds/query-5276587138396670516d-build.zip\",\n          \"secretsPathAmplifyAppId\": \"dtmxl3q3i7oix\"\n        },\n        \"twitterCompliance\": {}\n      },\n      \"hosting\": {\n        \"amplifyhosting\": {\n          \"type\": \"cicd\"\n        }\n      }\n    }\n  },\n  \"demo\": {\n    \"awscloudformation\": {\n      \"AuthRoleName\": \"amplify-socialsensing-demo-144920-authRole\",\n      \"UnauthRoleArn\": \"arn:aws:iam::686957444051:role/amplify-socialsensing-demo-144920-unauthRole\",\n      \"AuthRoleArn\": \"arn:aws:iam::686957444051:role/amplify-socialsensing-demo-144920-authRole\",\n      \"Region\": \"eu-west-2\",\n      \"DeploymentBucketName\": \"amplify-socialsensing-demo-144920-deployment\",\n      \"UnauthRoleName\": \"amplify-socialsensing-demo-144920-unauthRole\",\n      \"StackName\": \"amplify-socialsensing-demo-144920\",\n      \"StackId\": \"arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-demo-144920/7eed7060-bf8f-11ea-9f1b-021ebf3a767c\",\n      \"AmplifyAppId\": \"dtmxl3q3i7oix\",\n      \"APIGatewayAuthURL\": \"https://s3.amazonaws.com/amplify-socialsensing-demo-144920-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json\"\n    },\n    \"categories\": {\n      \"auth\": {\n        \"socialsensingf07a871c\": {},\n        \"userPoolGroups\": {}\n      },\n      \"function\": {\n        \"S3Triggerb3a090e2\": {\n          \"deploymentBucketName\": \"amplify-socialsensing-demo-144920-deployment\",\n          \"s3Key\": \"amplify-builds/S3Triggerb3a090e2-34614f6e574c74506878-build.zip\",\n          \"secretsPathAmplifyAppId\": \"dtmxl3q3i7oix\"\n        },\n        \"twitterCompliance\": {\n          \"deploymentBucketName\": \"amplify-socialsensing-demo-144920-deployment\",\n          \"s3Key\": \"amplify-builds/twitterCompliance-345744665841366d6969-build.zip\",\n          \"secretsPathAmplifyAppId\": \"dtmxl3q3i7oix\"\n        },\n        \"query\": {\n          \"deploymentBucketName\": \"amplify-socialsensing-demo-144920-deployment\",\n          \"s3Key\": \"amplify-builds/query-51346e5965544741434a-build.zip\",\n          \"secretsPathAmplifyAppId\": \"dtmxl3q3i7oix\"\n        }\n      },\n      \"hosting\": {\n        \"amplifyhosting\": {\n          \"appId\": \"dtmxl3q3i7oix\",\n          \"type\": \"cicd\"\n        }\n      }\n    }\n  },\n  \"test\": {\n    \"awscloudformation\": {\n      \"AuthRoleName\": \"amplify-socialsensing-test-151705-authRole\",\n      \"UnauthRoleArn\": \"arn:aws:iam::686957444051:role/amplify-socialsensing-test-151705-unauthRole\",\n      \"AuthRoleArn\": \"arn:aws:iam::686957444051:role/amplify-socialsensing-test-151705-authRole\",\n      \"Region\": \"eu-west-2\",\n      \"DeploymentBucketName\": \"amplify-socialsensing-test-151705-deployment\",\n      \"UnauthRoleName\": \"amplify-socialsensing-test-151705-unauthRole\",\n      \"StackName\": \"amplify-socialsensing-test-151705\",\n      \"StackId\": \"arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-test-151705/47ba2900-0fe6-11ec-9580-0a2c5646913c\",\n      \"AmplifyAppId\": \"dtmxl3q3i7oix\"\n    },\n    \"categories\": {\n      \"auth\": {\n        \"socialsensingf07a871c\": {},\n        \"userPoolGroups\": {}\n      },\n      \"function\": {\n        \"S3Triggerb3a090e2\": {\n          \"deploymentBucketName\": \"amplify-socialsensing-test-151705-deployment\",\n          \"s3Key\": \"amplify-builds/S3Triggerb3a090e2-34614f6e574c74506878-build.zip\",\n          \"secretsPathAmplifyAppId\": \"dtmxl3q3i7oix\"\n        },\n        \"query\": {\n          \"deploymentBucketName\": \"amplify-socialsensing-test-151705-deployment\",\n          \"s3Key\": \"amplify-builds/query-663656596f3637716450-build.zip\",\n          \"secretsPathAmplifyAppId\": \"dtmxl3q3i7oix\"\n        },\n        \"mvrefresh\": {\n          \"deploymentBucketName\": \"amplify-socialsensing-test-151705-deployment\",\n          \"s3Key\": \"amplify-builds/mvrefresh-4a54385966567a474b67-build.zip\",\n          \"secretsPathAmplifyAppId\": \"dtmxl3q3i7oix\"\n        },\n        \"twitterCompliance\": {\n          \"deploymentBucketName\": \"amplify-socialsensing-test-151705-deployment\",\n          \"s3Key\": \"amplify-builds/twitterCompliance-5631444c4c744d6d316e-build.zip\",\n          \"secretsPathAmplifyAppId\": \"dtmxl3q3i7oix\"\n        }\n      },\n      \"hosting\": {\n        \"amplifyhosting\": {\n          \"appId\": \"dtmxl3q3i7oix\",\n          \"type\": \"cicd\"\n        }\n      }\n    }\n  }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/amplify/team-provider-info.json b/amplify/team-provider-info.json
+--- a/amplify/team-provider-info.json	(revision 4c5991e9327561946d7326f4251bc549ffc7afbf)
++++ b/amplify/team-provider-info.json	(date 1641837402153)
+@@ -25,7 +25,7 @@
+         },
+         "query": {
+           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
+-          "s3Key": "amplify-builds/query-334735647938434a644f-build.zip",
++          "s3Key": "amplify-builds/query-39667376446850584e74-build.zip",
+           "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
+         },
+         "twitterCompliance": {
+@@ -169,4 +169,4 @@
+       }
+     }
+   }
+-}
+\ No newline at end of file
++}
+Index: src/app/public-display/public-display-tweet-list/public-display-tweet-list.component.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/public-display/public-display-tweet-list/public-display-tweet-list.component.html b/src/app/public-display/public-display-tweet-list/public-display-tweet-list.component.html
+new file mode 100644
+--- /dev/null	(date 1641837402165)
++++ b/src/app/public-display/public-display-tweet-list/public-display-tweet-list.component.html	(date 1641837402165)
+@@ -0,0 +1,223 @@
++<div *ngIf="firstVisibleDate" [style.opacity]="showDateHeader ? '0.8':'0'" class="app-tweet-list-date-float">
++    <div class="app-tweet-list-date-float-inner">{{firstVisibleDate.toUTCString()}}</div>
++</div>
++
++<div (scroll)="calcFirstVisibleDate()"
++     (scrolled)="onScrollDown($event)"
++     (scrolledUp)="onUp($event)"
++     [infiniteScrollDistance]="scrollDistance"
++     [infiniteScrollThrottle]="throttle"
++     [infiniteScrollUpDistance]="scrollUpDistance"
++     [scrollWindow]="false"
++     alwaysCallback="true"
++     class="app-tweet-list app-tweet-list-{{group}}"
++     infinite-scroll>
++    <ng-template #toggleAnnotation let-key="key" let-negativeTitle="negativeTitle" let-positiveTitle="positiveTitle"
++                 let-tweet="tweet">
++        <button
++                (click)="annotateTweetKeyValue(tweet,key, true, $event);"
++                *ngIf="annotationValueIsNot(tweet,
++        key,true)"
++                class="tweet-list-item-menu-{{key}}"
++                mat-menu-item>{{positiveTitle}}
++        </button>
++        <button
++                (click)="annotateTweetKeyValue(tweet,key,false, $event);"
++                *ngIf="annotationValueIs(tweet,key,true)"
++                class="tweet-list-item-menu-not-{{key}}"
++                mat-menu-item>{{negativeTitle}}
++        </button>
++    </ng-template>
++
++
++    <ng-template #tweetEntry let-si="senderIgnore" let-ti="tweetIgnore" let-tweet="tweet">
++
++        <mat-menu #markAs="matMenu">
++            <button (click)="ignoreSender(tweet,$event);" *ngIf="!si" class="tweet-menu-ignore-sender"
++                    mat-menu-item>Ignored Sender
++                @{{sender(tweet)}}</button>
++            <button (click)="unIgnoreSender(tweet,$event);" *ngIf="si" class="tweet-menu-unignore-sender"
++                    mat-menu-item>Unignored Sender
++                @{{sender(tweet)}}</button>
++            <button (click)="ignoreTweet(tweet,$event);" *ngIf="!ti" class="tweet-menu-ignore-tweet"
++                    mat-menu-item>Ignored Tweet
++
++            </button>
++            <button (click)="unIgnoreTweet(tweet,$event);" *ngIf="ti" class="tweet-menu-unignore-tweet"
++                    mat-menu-item>Unignored Tweet
++            </button>
++            <ng-container
++                    *ngTemplateOutlet="toggleAnnotation; context: {tweet:tweet,key:'relevant', positiveTitle:'Relevant',
++              negativeTitle:'Not Relevant'}"></ng-container>
++            <ng-container
++                    *ngTemplateOutlet="toggleAnnotation; context: {tweet:tweet,key:'mislocated', positiveTitle:'Mis-located',
++              negativeTitle:'Location Correct'}"></ng-container>
++
++        </mat-menu>
++
++        <mat-menu #appMenu="matMenu">
++
++            <button [matMenuTriggerFor]="markAs"
++                    class="tweet-list-item-menu-mark-as" mat-menu-item>Mark As ...
++            </button>
++            <ng-container *ngFor="let annotationType of annotationTypes">
++                <mat-menu #annotationMenu="matMenu">
++                    <ng-container *ngFor="let level of annotationType.options">
++                        <button
++                                *ngIf="annotationValueIs(tweet,
++        annotationType.name,level.value)"
++                                class="tweet-list-item-menu-{{annotationType.name}}-level-{{level.value}} tweet-list-item-menu-{{annotationType.name}}-level-{{level.value}}-selected"
++                                mat-menu-item><strong>{{level.title}}</strong>
++                        </button>
++                        <button (click)="annotateTweetKeyValue(tweet,annotationType.name,level.value, $event);"
++                                *ngIf="annotationValueIsNot(tweet, annotationType.name,level.value)"
++                                class="tweet-list-item-menu-{{annotationType.name}}-level-{{level.value}} tweet-list-item-menu-{{annotationType.name}}-level-{{level.value}}-not-selected"
++                                mat-menu-item>{{level.title}}
++                        </button>
++                    </ng-container>
++                    <button
++                            (click)="annotateTweetKeyValue(tweet,annotationType.name,'', $event);"
++                            class="tweet-list-item-menu-{{annotationType.name}}-clear"
++                            mat-menu-item>Clear
++                    </button>
++
++                </mat-menu>
++                <button [matMenuTriggerFor]="annotationMenu"
++                        class="tweet-list-item-menu-{{annotationType.name}}-btn" mat-menu-item>{{annotationType.title}}
++                </button>
++            </ng-container>
++            <button
++                    (click)="copy(tweet,$event);"
++                    class="tweet-list-item-menu-copy"
++                    mat-menu-item>Copy
++            </button>
++
++            <!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
++
++        </mat-menu>
++        <div [ngClass]="tweet.json.possibly_sensitive  ? 'sensitive': 'non-sensitive'"
++             [style]="styleFor('impact',tweet)"
++             class="app-tweet-item app-tweet-row-active">
++            <div class="app-tweet-item-text">
++                <div class="app-twitter-tweet">
++                    <img [src]="tweet.json.user.profile_image_url" class="app-twitter-profile-image"
++                         onerror="this.style.opacity = 0">
++                    <div class="app-twitter-user-name">{{tweet.json.user.name}}
++                        <span *ngIf="tweet.json.user.verified"
++                              class="app-twitter-verified"><svg aria-label="Verified account" viewBox="0 0 24 24"><g
++                                style=""><path
++                                d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"></path></g></svg></span>
++                    </div>
++                    <div class="app-twitter-screen-name">@{{tweet.json.user.screen_name}}</div>
++                    <div [innerHTML]="tweetHtml(tweet)|safeHtml" class="app-twitter-text">
++                    </div>
++                    <!--                    <div [innerHTML]="tweet.text | safeHtml" class="app-twitter-text"></div>-->
++                    <div class="app-twitter-date">{{tweet.date | date:"shortTime"}}
++                        - {{tweet.date | date:"mediumDate"}}</div>
++                    <!--                    {{tweet.json.extended_tweet.entities.media|json}}-->
++                    <div *ngIf="!tweet.json.possibly_sensitive">
++                        <div *ngFor="let media of mediaEntities(tweet)">
++                            <!--                            {{media|json}}-->
++                            <ng-container *ngIf="media?.additional_media_info?.embeddable === false">
++                            </ng-container>
++                            <ng-container *ngIf="media?.additional_media_info?.embeddable !== false">
++                                <div *ngIf="media.type === 'photo'">
++                                    <!-- Image cannot be embedded -->
++                                    <a [href]="media.media_url" target="_blank"><img [ngStyle]="styleForPhoto(media)"
++                                                                                     [src]="media.media_url"
++
++                                                                                     alt="photo"/></a>
++                                </div>
++                                <div *ngIf="media.type === 'animated_gif'">
++                                    <!-- Image cannot be embedded -->
++                                    <a [href]="media.media_url"><img [ngStyle]="styleForPhoto(media)"
++                                                                     [src]="media.media_url"
++
++                                                                     alt="photo"/></a>
++                                </div>
++                                <div *ngIf="media.type === 'video'">
++                                    <video *ngIf="videoVariant(media) !== null" [ngStyle]="styleForPhoto(media)"
++                                           controls>
++                                        <source [src]="videoVariant(media).url"
++                                                [type]="videoVariant(media).content_type">
++                                        Your browser does not support the video tag.
++                                    </video>
++
++                                </div>
++                            </ng-container>
++                        </div>
++                    </div>
++                    <div class="app-twitter-line"></div>
++                    <div class="app-twitter-stats">
++                        <span *ngIf="pref.combined.showTwitterLikes" class="app-twitter-likes"><mat-icon>favorite_border</mat-icon>
++                            {{tweet.json.favorite_count > 0 ? tweet.json.favorite_count : " "}}</span>
++                        <span *ngIf="pref.combined.showTwitterRTs" class="app-twitter-rt"><mat-icon>cached</mat-icon>
++                            {{tweet.json.retweet_count > 0 ? tweet.json.retweet_count : " "}}</span>
++                        <span class="app-twitter-open"><a [href]="tweet.url" aria-label="View on Twitter"
++                                                          rel="noopener noreferrer" role="link" target="_blank"><mat-icon>open_in_new</mat-icon>
++                            Open in Twitter</a></span>
++                    </div>
++                    <div class="app-twitter-logo"><a [href]="tweet.url" aria-label="View on Twitter"
++                                                     rel="noopener noreferrer" role="link" target="_blank">
++                        <svg aria-hidden="true"
++                             class="r-13gxpu9 r-4qtqp9 r-yyyyoo r-6zzn7w r-19fsva8 r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-q1j0wu"
++                             viewBox="0 0 24 24">
++                            <g>
++                                <path d="M23.643 4.937c-.835.37-1.732.62-2.675.733.962-.576 1.7-1.49 2.048-2.578-.9.534-1.897.922-2.958 1.13-.85-.904-2.06-1.47-3.4-1.47-2.572 0-4.658 2.086-4.658 4.66 0 .364.042.718.12 1.06-3.873-.195-7.304-2.05-9.602-4.868-.4.69-.63 1.49-.63 2.342 0 1.616.823 3.043 2.072 3.878-.764-.025-1.482-.234-2.11-.583v.06c0 2.257 1.605 4.14 3.737 4.568-.392.106-.803.162-1.227.162-.3 0-.593-.028-.877-.082.593 1.85 2.313 3.198 4.352 3.234-1.595 1.25-3.604 1.995-5.786 1.995-.376 0-.747-.022-1.112-.065 2.062 1.323 4.51 2.093 7.14 2.093 8.57 0 13.255-7.098 13.255-13.254 0-.2-.005-.402-.014-.602.91-.658 1.7-1.477 2.323-2.41z"></path>
++                            </g>
++                        </svg>
++                    </a></div>
++                </div>
++            </div>
++        </div>
++        <div class="app-tweet-item-menu">
++            <button [matMenuTriggerData]="{tweet:tweet,si:si,ti:ti}" [matMenuTriggerFor]="appMenu" mat-icon-button>
++                <mat-icon>more_vert</mat-icon>
++            </button>
++        </div>
++    </ng-template>
++
++
++    <div *ngFor="let page of pages; let p= index" class="app-tweet-paged app-tweet-page-{{p}}">
++        <ng-container *ngIf="page">
++            <div *ngIf="p == 0 && p < minPage" class="app-tweet-scroll-
++      -outer">
++                <!--        <mat-spinner diameter="24" class="app-tweet-load-spinner"></mat-spinner>-->
++            </div>
++            <ng-container *ngFor="let tweet of page.tweets; let i = index">
++                <div [attr.data-i]="i"
++                     [attr.data-index]="i+ page.start"
++                     [attr.data-page]="p"
++                     [attr.data-tweet-id]="tweet.id"
++                     class="app-tweet-row atr-{{group}} atr-{{i+ page.start}} app-twitter-id-{{tweet.id}}"
++                >
++                    <!--          <div class="app-tweet-date-separator"-->
++                    <!--               *ngIf="isNewDate(i + page.start)">{{tweet.date | date:"mediumDate"}}</div>-->
++                    <ng-container *ngIf="page.page <= maxPage">
++                        <div *ngIf="!isPlaceholder(tweet)" class="app-tweet-item-card-surround">
++                            <ng-container>
++                                <ng-container
++                                        *ngTemplateOutlet="tweetEntry; context: {tweet:tweet,i:i + page.start,senderIgnore:pref.isSenderIgnored(tweet),tweetIgnore:pref.isTweetIgnored(tweet)}"></ng-container>
++                            </ng-container>
++                        </div>
++                        <div *ngIf="isPlaceholder(tweet)" class="app-tweet-item-card-surround">
++                            <div class="app-tweet-item-card">
++                                <div class="app-tweet-item-placeholder app-tweet-row-active">
++                                    <span class="app-tweet-item-no-longer-available">Tweet no longer available</span>
++                                </div>
++                            </div>
++                        </div>
++                    </ng-container>
++                </div>
++            </ng-container>
++            <ng-container *ngIf="p == pages.length -1">
++                <div *ngIf="p > maxPage" class="app-tweet-scroll-spinner-outer">
++                    <!--          <mat-spinner diameter="24" class="app-tweet-load-spinner"></mat-spinner>-->
++                </div>
++                <div *ngIf="p == maxPage" class="app-tweet-scroll-spinner-outer">
++                    <span class="app-tweet-list-end-tilde"> ~ </span>
++                </div>
++            </ng-container>
++        </ng-container>
++    </div>
++</div>
+Index: src/app/public-display/public-display-tweet-list/public-display-tweet-list.component.scss
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/public-display/public-display-tweet-list/public-display-tweet-list.component.scss b/src/app/public-display/public-display-tweet-list/public-display-tweet-list.component.scss
+new file mode 100644
+--- /dev/null	(date 1641837402158)
++++ b/src/app/public-display/public-display-tweet-list/public-display-tweet-list.component.scss	(date 1641837402158)
+@@ -0,0 +1,318 @@
++@import "../../map.component";
++
++.app-tweet-list {
++    display: block;
++    max-height: 100%;
++    height: 100%;
++    overflow-x: hidden;
++    overflow-y: auto;
++    font-size: 16px;
++    margin: 0;
++    padding: 0;
++    position: relative;
++    max-height: calc(100vh - 228px);
++
++
++    .app-tweet-paged {
++        display: block;
++        height: auto;
++
++    }
++
++
++    .app-tweet-row {
++        flex-direction: row;
++        flex-wrap: nowrap;
++        align-items: flex-start;
++        //border: 1px solid blue;
++        position: relative;
++        max-width: $drawer-width - 64px;
++        min-width: $drawer-width - 64px;
++        //background-color: #eee;
++        transform: scaleY(1);
++        transform-origin: top;
++        opacity: 1.0;
++        transition: height 0.4s ease-in-out 0.1s;
++
++
++        //max-height: 0;
++
++        .app-tweet-item-menu {
++            position: absolute;
++            left: ($drawer-width - 48px);
++            top: 0px;
++            z-index: 10;
++            transition: opacity 0.1s ease-in-out 0.1s;
++            //border: 1px solid red;
++        }
++
++        .app-tweet-item {
++            //display: flex;
++            //flex-direction: column;
++            //border: 1px solid green;
++            width: 100%;
++            min-height: 32px;
++
++            border-left: 2px none;
++            border-radius: 6px;
++
++            padding-left: 4px;
++
++            &.sensitive {
++                .app-twitter-tweet {
++                    opacity: 0.3;
++                }
++            }
++
++            .app-twitter-tweet p {
++                font-size: 16px;
++                font-weight: normal;
++                line-height: 20px;
++            }
++
++            .app-twitter-tweet a {
++                color: inherit;
++                font-weight: normal;
++                text-decoration: none;
++                outline: 0 none;
++            }
++
++            .app-twitter-tweet a:hover,
++            .app-twitter-tweet a:focus {
++                text-decoration: underline;
++            }
++
++
++            .app-twitter-tweet {
++                display: inline-block;
++                font-family: "Helvetica Neue", Roboto, "Segoe UI", Calibri, sans-serif;
++                font-size: 18px;
++                border-radius: 10px;
++                border: 1px solid rgb(225, 232, 237);
++                //box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
++                margin-left: 0px;
++                margin-right: 0px;
++                padding-top: 16px;
++                padding-right: 16px;
++                padding-left: 16px;
++                padding-bottom: 16px;
++                max-width: $drawer-width - 96px;
++                min-width: $drawer-width - 96px;
++                width: $drawer-width - 96px;
++                background: white !important;
++                position: relative;
++
++
++                .app-twitter-profile-image {
++                    border-radius: 100%;
++                    margin: 8px;
++                    float: left;
++                }
++
++                .app-twitter-user-name {
++                    font-weight: bold;
++                    font-size: 18px;
++                    text-align: left;
++                    margin-top: 8px;
++
++                }
++
++                .app-twitter-verified {
++                    svg {
++                        width: 18px;
++                        height: 18px;
++                        color: rgb(29, 161, 242);
++                        fill: currentcolor;
++                        display: inline-block;
++                        //vertical-align: text-bottom;
++                        max-width: 100%;
++                    }
++                }
++
++                .app-twitter-logo {
++                    position: absolute;
++                    top: 14px;
++                    right: 14px;
++
++                    a {
++                        svg {
++                            width: 24px;
++                            height: 24px;
++                            color: rgb(29, 161, 242);
++                            fill: currentcolor;
++                            display: inline-block;
++                            //vertical-align: text-bottom;
++                            max-width: 100%;
++                        }
++                    }
++                }
++
++                .app-twitter-screen-name {
++                    font-weight: normal;
++                    font-size: 16px;
++                    text-align: left;
++                }
++
++                .app-twitter-text {
++                    font-weight: normal;
++                    font-size: 20px;
++                    text-align: left;
++                    clear: both;
++                    //display: none;
++                    //opacity: 0.0;
++                    margin: 12px;
++                    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
++                    //background-color: rgba(0, 0, 0, 0);
++                    list-style: none;
++                    line-height: 1.3125;
++                    min-width: 0px;
++                    overflow-wrap: break-word;
++
++                    ::ng-deep {
++                        a {
++                            text-decoration: none;
++                            cursor: pointer;
++                            color: rgb(27, 149, 224);
++                        }
++
++                        .twitter-tweet {
++                            display: none;
++
++                            p {
++                                display: inline;
++                            }
++                        }
++                    }
++
++
++                }
++
++                .app-twitter-date {
++                    font-weight: normal;
++                    font-size: 16px;
++                    text-align: left;
++                    color: rgb(83, 100, 113);
++                    margin: 12px;
++                }
++
++                .app-twitter-line {
++                    height: 1px;
++                    width: 100%;
++                    border-top: 1px solid;
++                    border-top-color: rgb(207, 217, 222);
++                    margin-top: 8px;
++                    margin-bottom: 6px;
++
++                }
++
++                .app-twitter-stats {
++                    text-align: left;
++                    margin-left: 12px;
++                    color: rgb(83, 100, 113);
++                    font-weight: 400;
++                    font-size: 16px;
++
++                    .mat-icon {
++                        position: relative;
++                        top: 4px;
++                        margin-right: 12px;
++                    }
++
++                    .app-twitter-likes {
++                        margin-right: 16px;
++
++                    }
++                }
++
++
++            }
++
++        }
++
++
++    }
++
++
++    .app-tweet-item-placeholder {
++        opacity: 1.0;
++        margin: 16px;
++        display: block;
++        min-width: $drawer-width - 64px;
++        max-width: $drawer-width - 64px;
++        width: $drawer-width - 64px;
++    }
++
++    .app-tweet-item-card-surround {
++        margin: 16px;
++        width: 100%;
++
++        mat-spinner {
++            display: block;
++            margin: 10px auto;
++            opacity: 0.2;
++        }
++    }
++
++    .app-tweet-item-card {
++        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
++        box-sizing: border-box;
++        display: block;
++        margin: 0;
++        min-height: 48px;
++        padding: 0px;
++        position: relative;
++        z-index: 0;
++        border-radius: 5px;
++        border: 1px solid rgb(225, 232, 237);
++        overflow-x: hidden;
++        overflow-y: hidden;
++        max-width: 516px;
++        background-color: white;
++        width: 100%;
++
++
++    }
++
++    .EmbeddedTweet-tweet {
++        margin: 0;
++        padding: 0;
++    }
++
++}
++
++.app-tweet-list-end-tilde {
++    opacity: 0.4;
++}
++
++.app-tweet-list-date-float {
++    display: block;
++    position: absolute;
++    width: 100%;
++    height: 1.5em;
++    background: none;
++    z-index: 10;
++    transition: opacity 0.8s ease-out 0.3s;
++    pointer-events: none;
++
++    .app-tweet-list-date-float-inner {
++        //background: mat-color($app-accent);
++        background: #999999;
++        color: white;
++        display: block;
++        width: 240px;
++        text-align: center;
++        padding: 4px;
++        border-radius: 2px;
++        margin: 4px auto;
++        margin-top: 12px;
++    }
++}
++
++.app-tweet-load-spinner {
++    position: absolute;
++    left: ($drawer-width)/2 - 16px;
++    top: 32px;
++    opacity: 0.2;
++    z-index: 10;
++    transition: opacity 0.4s ease-in-out;
++}
+Index: src/app/public-display/public-display-tweet-list/public-display-tweet-list.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/public-display/public-display-tweet-list/public-display-tweet-list.component.ts b/src/app/public-display/public-display-tweet-list/public-display-tweet-list.component.ts
+new file mode 100644
+--- /dev/null	(date 1641837402143)
++++ b/src/app/public-display/public-display-tweet-list/public-display-tweet-list.component.ts	(date 1641837402143)
+@@ -0,0 +1,488 @@
++import {Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild} from "@angular/core";
++import {Tweet} from "../tweet";
++import {PreferenceService} from "../../../pref/preference.service";
++import {Logger} from "@aws-amplify/core";
++import * as $ from "jquery";
++import {IInfiniteScrollEvent} from "ngx-infinite-scroll";
++import {Subscription, timer} from "rxjs";
++import {environment} from "../../../../environments/environment";
++import {AnnotationService} from "../../../pref/annotation.service";
++import {MatDialog} from "@angular/material/dialog";
++import {MatMenuTrigger} from "@angular/material/menu";
++import {TweetCopyDialogComponent} from "./tweet-copy-dialog/tweet-copy-dialog.component";
++
++const twitterLink = require("twitter-text")
++
++const log = new Logger("tweet-list");
++let loadTweets = false;
++
++class TweetPage {
++    public loaded = false;
++
++    constructor(public page: number, public start: number, public tweets: Tweet[]) {
++    }
++
++    public is(other: TweetPage) {
++        return other.page === this.page
++            && other.start === this.start
++            && this.tweets.length === other.tweets.length
++            && this.tweets.every((tweet, i) => this.tweets[i].id === other.tweets[i].id);
++    }
++}
++
++/**
++ * The TweetListComponent is responsible for managing an invisibly
++ * paged infinite scroll collection of tweets. At present all
++ * tweets are stored in memory but their rendering is scrolled for browser performance.
++ */
++@Component({
++               selector:    "app-tweet-list",
++               templateUrl: "./public-display-tweet-list.component.html",
++               styleUrls:   ["./public-display-tweet-list.component.scss"]
++           })
++export class PublicDisplayTweetListComponent implements OnInit, OnDestroy {
++
++
++    public loaded: boolean[] = [];
++    public tweetCount = 0;
++    public ready: boolean;
++    public scrollDistance = 4;
++    public scrollUpDistance = 4;
++    public throttle = 300;
++    public direction: string;
++    public minPage = 0;
++    public moreToShow: boolean;
++    public pages: TweetPage[] = [];
++    /**
++     * If the set of tweets have been updated (by an ignore/unignore for example) this will emit an event to the parent component.
++     */
++    @Output() public update: EventEmitter<Tweet> = new EventEmitter();
++    /**
++     * A name for this group of tweets presently only "hidden" or "visible" is allowed.
++     */
++    @Input() public group: "hidden" | "visible";
++    public firstVisibleDate: Date;
++    // Infinite Scroll End
++    public showDateHeader: boolean;
++    public utc: boolean = environment.timezone === "UTC";
++    public cache: any = {};
++    @ViewChild("appMenu") menuTrigger: MatMenuTrigger;
++    @Input()
++    public annotationTypes: any[] = [];
++    private _destroyed = false;
++    // Infinite scroll start: https://github.com/socialsensingbot/frontend/issues/10
++    private readonly PAGE_SIZE = 5;
++    private readonly INITIAL_PAGES = 3;
++    public maxPage = this.INITIAL_PAGES - 1;
++    private lastDateShow: number;
++    private _dateHeaderTimer: Subscription;
++    private annotations: { [key: string]: any } = {};
++    private _annotationSubscription: any;
++    private _annotationRemovalSubscription: Subscription;
++
++    private _tweets: Tweet[] | null = [];
++
++    public get tweets(): Tweet[] {
++        return this._tweets;
++    }
++
++    /**
++     * The tweets to render or null if not yet ready.
++     *
++     * @param val the tweets or null
++     */
++    @Input()
++    public set tweets(val: Tweet[] | null) {
++        if (val === null) {
++            // this.ready = false;
++            this._tweets = [];
++            this.ready = false;
++            this.tweetCount = 0;
++            log.debug("Tweets reset");
++            return;
++        }
++        this.updateTweets(val);
++
++    }
++
++    constructor(private _zone: NgZone, private _dialog: MatDialog, public pref: PreferenceService,
++                public annotate: AnnotationService) {
++    }
++
++    public show($event: any) {
++        log.debug($event);
++    }
++
++    public sender(tweet) {
++        return tweet.sender;
++    }
++
++    public isPlaceholder(tweet) {
++        return !tweet.valid;
++    }
++
++    public async ignoreSender(tweet, $event: MouseEvent) {
++        await this.pref.groupIgnoreSender(tweet);
++        this.update.emit(tweet);
++    }
++
++    public async unIgnoreSender(tweet, $event: MouseEvent) {
++        await this.pref.groupUnIgnoreSender(tweet);
++        this.update.emit(tweet);
++    }
++
++    public async ignoreTweet(tweet, $event: MouseEvent) {
++        await this.pref.groupIgnoreTweet(tweet);
++        this.update.emit(tweet);
++    }
++
++    public async unIgnoreTweet(tweet, $event: MouseEvent) {
++        await this.pref.groupUnIgnoreTweet(tweet);
++        this.update.emit(tweet);
++    }
++
++    public async annotateTweet(tweet, annotations, $event: MouseEvent) {
++        // This is a simple optimization, that changes our local version of the annotations first
++        // we then get the authoritative version from the server
++        this.annotations[tweet.id] = {...this.annotationsFor(tweet), ...annotations};
++        const groupTweetAnnotations = await this.annotate.addAnnotations(tweet, annotations);
++        try {
++            this.annotations[tweet.id] = groupTweetAnnotations.annotations;
++        } catch (e) {
++            log.error(e);
++        }
++        log.info("Emitting ", tweet);
++        this.update.emit(tweet);
++    }
++
++    public async annotateTweetKeyValue(tweet, annotationKey, annotationValue, $event: MouseEvent) {
++        const annotations = {};
++        annotations[annotationKey] = annotationValue;
++        await this.annotateTweet(tweet, annotations, $event);
++    }
++
++    public async removeTweetAnnotations(tweet, $event: MouseEvent) {
++        await this.annotate.removeAllAnnotations(tweet);
++        this.annotations[tweet.id] = {};
++        this.update.emit(tweet);
++    }
++
++    ngOnInit(): void {
++        this._dateHeaderTimer = timer(1000, 1000).subscribe(() => {
++            if (Date.now() - this.lastDateShow > 1 * 1000) {
++                this.showDateHeader = false;
++            }
++        });
++        this._annotationRemovalSubscription = this.annotate.tweetAnnotationsRemoved.subscribe(
++            groupTweetAnnotations => delete this.annotations[groupTweetAnnotations.tweetId]);
++        this._annotationSubscription = this.annotate.tweetAnnotated.subscribe(groupTweetAnnotations => {
++            if (groupTweetAnnotations.annotations) {
++                log.info("Received new annotation record of ", groupTweetAnnotations);
++                this.annotations[groupTweetAnnotations.tweetId] = groupTweetAnnotations.annotations;
++            }
++        });
++    }
++
++    public ngOnDestroy(): void {
++        this._destroyed = true;
++        this._dateHeaderTimer.unsubscribe();
++        if (this._annotationSubscription) {
++            this._annotationSubscription.unsubscribe();
++            this._annotationSubscription = null;
++        }
++        if (this._annotationRemovalSubscription) {
++            this._annotationRemovalSubscription.unsubscribe();
++            this._annotationRemovalSubscription = null;
++        }
++    }
++
++    public isNewDate(i: number) {
++        return i > 0 && this.tweets.length > i && this.tweets[i - 1].day !== this.tweets[i].day;
++    }
++
++    onScrollDown(ev) {
++        log.debug("scrolled down!!", ev);
++        // add items
++        this.direction = "down";
++        const oldMax = this.maxPage;
++        if (this.maxPage < this.pages.length - 1) {
++            this.moreToShow = true;
++            this.maxPage += 1;
++        } else {
++            this.moreToShow = false;
++            this.maxPage = this.pages.length - 1;
++        }
++        if (this.minPage <= this.pages.length - this.INITIAL_PAGES) {
++            this.minPage += 1;
++        } else {
++            this.minPage = Math.max(this.pages.length - this.INITIAL_PAGES, 0);
++        }
++        log.debug(this.maxPage);
++        if (oldMax !== this.maxPage) {
++            this.loadPagesOfTweets();
++        }
++        log.debug("New max page " + this.maxPage);
++        log.debug("New min page " + this.minPage);
++    }
++
++    onUp($event: IInfiniteScrollEvent) {
++        log.debug("scrolled up!", $event);
++
++        this.direction = "up";
++        const oldMin = this.minPage;
++        if ($event.currentScrollPosition === 0) {
++            this.maxPage = this.INITIAL_PAGES - 1;
++            this.minPage = 0;
++        }
++        if (this.maxPage >= this.INITIAL_PAGES) {
++            this.maxPage -= 1;
++
++        }
++        if (this.minPage > 0) {
++            this.minPage -= 1;
++        }
++        if (oldMin !== this.minPage) {
++            this.loadPagesOfTweets();
++        }
++        log.debug("New max page " + this.maxPage);
++        log.debug("New min page " + this.minPage);
++
++        // if (this.maxTweets > 100) {
++        //   this.maxTweets -= this.PAGE_SIZE;
++        // }
++    }
++
++    public calcFirstVisibleDate() {
++        const checkInView = (elem, partial) => {
++            const container = $(".app-tweet-list");
++            const contHeight = container.height();
++            const contTop = container.scrollTop();
++            const contBottom = contTop + contHeight;
++
++            const elemTop = $(elem).offset().top - container.offset().top;
++            const elemBottom = elemTop + $(elem).height();
++
++            const isTotal = (elemTop >= 0 && elemBottom <= contHeight);
++            const isPart = ((elemTop < 0 && elemBottom > 0) || (elemTop > 0 && elemTop <= container.height())) && partial;
++
++            return isTotal || isPart;
++        };
++
++        let firstEl;
++
++        for (const el of $(".app-tweet-row")) {
++            if (checkInView(el, true)) {
++                firstEl = $(el);
++                break;
++            }
++        }
++        if (firstEl) {
++            const i = +firstEl.attr("data-index");
++            this.firstVisibleDate = this.tweets[i].date;
++            this.showDateHeader = true;
++            this.lastDateShow = Date.now();
++        }
++    }
++
++    public isCached(id: string) {
++        if (!localStorage.getItem("tweet:" + id)) {
++            return false;
++
++        }
++        const item = JSON.parse(localStorage.getItem("tweet:" + id));
++
++        if (item && item.timestamp > Date.now() - 60 * 50 * 1000) {
++            return true;
++        } else {
++            return false;
++        }
++    }
++
++    public cached(id: string) {
++        log.debug("From cache " + id);
++        return JSON.parse(localStorage.getItem("tweet:" + id)).html;
++    }
++
++    public annotationsFor(tweet: Tweet) {
++        return this.annotations[tweet.id] || {};
++    }
++
++    public annotationValueFor(tweet: Tweet, key: string) {
++        return (this.annotationsFor(tweet))[key];
++    }
++
++    public annotationValueIs(tweet: Tweet, key: string, value) {
++        return (this.annotationValueFor(tweet, key)) === value;
++    }
++
++    public annotationValueIsNot(tweet: Tweet, key: string, value) {
++        return !this.annotationValueIs(tweet, key, value);
++    }
++
++    public styleFor(type: string, tweet: Tweet) {
++        const value = this.annotationValueFor(tweet, type);
++        log.verbose("Annotation value is ", value);
++        let filtered: any[] = this.annotationTypes.filter(i => i.name === type);
++        log.verbose("Annotations filtered: ", filtered);
++        for (const filteredElement of filtered) {
++            for (const option of filteredElement.options) {
++                if (option.value === value) {
++                    log.verbose("Annotations selected ", option);
++                    return "border-left: 3px solid " + option.color;
++                }
++            }
++        }
++
++
++        return "border-left: 3px solid transparent";
++
++    }
++
++    public copy(tweet: Tweet, $event: MouseEvent) {
++        const dialogRef = this._dialog.open(TweetCopyDialogComponent, {data: {tweet}});
++        dialogRef.afterClosed().subscribe(result => {
++            log.debug(`Dialog result: ${result}`);
++        });
++    }
++
++    public styleForPhoto(media: any): any {
++        const width: number = Math.min(media.sizes.small.w, 400);
++        const height = (width / media.sizes.small.w) * media.sizes.small.h;
++
++        return {
++            "object-fit": media.sizes.small.resize === "fit" ? "contain" : "cover",
++            "width.px":   width,
++            "height.px":  height
++        };
++    }
++
++    public entities(tweet: any): any {
++        const entities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities : tweet.json.entities;
++        return typeof entities !== "undefined" ? entities : {};
++    }
++
++    public tweetHtml(tweet: any): any {
++        const entities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities : tweet.json.entities;
++        const text = tweet.json.extended_tweet ? tweet.json.extended_tweet.full_text : tweet.json.text;
++        let urlEntities: string[] = entities.urls;
++        if (entities.media) {
++            urlEntities = [...urlEntities, ...entities.media]
++        }
++        return "<p>" + twitterLink.default.autoLink(text, {urlEntities, targetBlank: true, title: false}) + "</p>";
++    }
++
++    public mediaEntities(tweet: any): any[] {
++        const mediaEntities = tweet.json.extended_tweet ? tweet.json.extended_tweet.entities.media : tweet.json.entities.media;
++        return typeof mediaEntities !== "undefined" ? mediaEntities : [];
++    }
++
++    public videoVariant(media: any): any {
++        for (const variant of media.video_info.variants) {
++            if (variant.content_type === "video/mp4") {
++                return variant;
++            }
++        }
++        return null;
++    }
++
++    /**
++     * Update the tweets stored in this list.
++     * @param val an array of {@link Tweet}s
++     */
++    private updateTweets(val: Tweet[]) {
++        this.tweetCount = val.length;
++        log.debug("updateTweets()");
++        if (this._destroyed) {
++            return;
++        }
++        let changed = false;
++        if (val.length !== this._tweets.length) {
++            changed = true;
++        } else {
++            for (let i = 0; i < val.length; i++) {
++                if (this._tweets[i].id !== val[i].id) {
++                    changed = true;
++                }
++
++            }
++        }
++        if (!changed) {
++            log.debug("No change, returning from updateTweets()");
++            this.ready = true;
++            return;
++        }
++
++        if (this.pages.length !== Math.ceil(val.length / this.PAGE_SIZE)) {
++            this.pages.length = Math.ceil(val.length / this.PAGE_SIZE);
++        }
++        if (val.length !== this._tweets.length) {
++            this._tweets.length = val.length;
++        }
++        if (this.loaded.length !== val.length) {
++            this.loaded.length = val.length;
++        }
++        let currPage = new TweetPage(0, 0, []);
++        this.pages.length = Math.ceil(val.length / this.PAGE_SIZE);
++        for (let i = 0; i < val.length; i++) {
++            const page = Math.floor(i / this.PAGE_SIZE);
++            const tweetOnPage = i % this.PAGE_SIZE;
++            if (this.isCached(val[i].id)) {
++                this.cache[val[i].id] = this.cached(val[i].id);
++            }
++            if (tweetOnPage === 0) {
++                currPage = new TweetPage(page, i, []);
++            }
++            const tweet = val[i];
++            if (tweetOnPage >= currPage.tweets.length) {
++                currPage.tweets.push(tweet);
++            } else {
++                currPage.tweets[tweetOnPage] = tweet;
++            }
++
++            const lastEntryOnPage = i === (val.length - 1) || ((i + 1) % this.PAGE_SIZE) === 0;
++            if (lastEntryOnPage) {
++                // Do not change/reload unchanged pages.
++                if (typeof this.pages[page] === "undefined" || !this.pages[page].is(currPage)) {
++                    log.debug(`Pages are different for page ${page}: `, this.pages[page], currPage);
++                    this.pages[page] = currPage;
++                }
++            }
++
++            this._tweets[i] = tweet;
++            if (tweet.valid) {
++                this.annotate.getAnnotations(tweet).then(tweetAnnotationRecord => {
++                    if (tweetAnnotationRecord && tweetAnnotationRecord.annotations && tweetAnnotationRecord.annotations[0] !== "u") {
++                        log.debug("Annotation record for tweet was ", tweetAnnotationRecord.annotations);
++                        this.annotations[tweet.id] = tweetAnnotationRecord.annotations;
++                    } else {
++                        this.annotations[tweet.id] = {};
++                    }
++                });
++            }
++            if (this._tweets[i] && this._tweets[i].id !== tweet.id) {
++                this._tweets[i] = tweet;
++            }
++        }
++        log.warn(this.annotations);
++
++
++        log.debug(this.tweets);
++        this.loadPagesOfTweets();
++        this.moreToShow = this.maxPage < this.pages.length;
++        this.pref.waitUntilReady().then(i => this.ready = true);
++    }
++
++    private loadPagesOfTweets() {
++        for (let i = 0; i <= this.maxPage; i++) {
++            this.animateTweetAppearance(i);
++        }
++    }
++
++    private async animateTweetAppearance(page: number) {
++        if (this.pages[page] && !this.pages[page].loaded) {
++            log.debug("Loading tweets by page " + page);
++            loadTweets = true;
++            this.pages[page].loaded = true;
++        }
++    }
++}
+Index: sql/refresh_mv_now.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># https://fromdual.com/mysql-materialized-views\n\n\nDROP PROCEDURE IF EXISTS refresh_mv_auto;\nDELIMITER $$\nCREATE PROCEDURE refresh_mv_auto(\n    OUT rc INT\n)\nBEGIN\n\n    -- rollback transaction and bubble up errors if something bad happens\n    DECLARE EXIT HANDLER FOR SQLEXCEPTION\n        BEGIN\n            DO RELEASE_LOCK('internal_mv_refresh');\n            call debug_msg(1, 'refresh_mv_auto', 'LOCK RELEASED');\n            GET DIAGNOSTICS CONDITION 1\n                @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;\n            call debug_msg(-2, 'refresh_mv_auto', concat('FAILED: ', @p1, ': ', @p2));\n            set @rc = @p1;\n        END;\n\n\n    call debug_msg(1, 'refresh_mv_auto', 'STARTING');\n    set @max_id = (select max(id) from internal_mv_refresh);\n    call debug_msg(1, 'refresh_mv_auto', concat('This is iteration ', @max_id));\n    IF GET_LOCK('internal_mv_refresh', 60) THEN\n        call debug_msg(1, 'refresh_mv_auto', 'LOCK ACQUIRED');\n        IF mod(@max_id, 12 * 12) = 1\n        THEN\n            call debug_msg(0, 'refresh_mv_auto', 'Selected FULL');\n            call refresh_mv_full(@rc);\n            call debug_msg(0, 'refresh_mv_auto', 'Completed FULL');\n        ELSEIF mod(@max_id, 12) = 1\n        THEN\n            call debug_msg(0, 'refresh_mv_auto', 'Selected WINDOW');\n            call refresh_mv_map_window(@rc);\n            call debug_msg(0, 'refresh_mv_auto', 'Completed WINDOW');\n        ELSE\n            call debug_msg(0, 'refresh_mv_auto', 'Selected NOW');\n            call refresh_mv_now(@rc);\n            call debug_msg(0, 'refresh_mv_auto', 'Completed NOW');\n        END IF;\n    ELSE\n        call debug_msg(1, 'refresh_mv_auto', 'Already running.');\n    END IF;\n\n    START TRANSACTION;\n    INSERT INTO internal_mv_refresh (time) values (now());\n    COMMIT;\n    call debug_msg(1, 'refresh_mv_auto', 'COMPLETED');\n    DO RELEASE_LOCK('internal_mv_refresh');\n    SET rc = 0;\nEND;\n$$\n\nDELIMITER ;\n\n# This will update the materialized view's last hour of data every 5 minutes. Effectively keeping the view 'live'\n# Note that some Twitter retractions will be missed in this but caught in refresh_mv_map_window\nDROP PROCEDURE IF EXISTS refresh_mv_now;\nDELIMITER $$\nCREATE PROCEDURE refresh_mv_now(\n    OUT rc INT\n)\nBEGIN\n\n    -- rollback transaction and bubble up errors if something bad happens\n    DECLARE exit handler FOR SQLEXCEPTION, SQLWARNING\n        BEGIN\n            GET DIAGNOSTICS CONDITION 1\n                @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;\n            ROLLBACK;\n            set @rc = @p1;\n            call debug_msg(-2, 'refresh_mv_now', concat('FAILED: ', @p1, ': ', @p2));\n        END;\n    call debug_msg(0, 'refresh_mv_now', 'Refreshing (Latest) Materialized Views');\n    call refresh_mv(DATE_SUB(NOW(), INTERVAL 12 HOUR), NOW(), @rc);\n    call fill_hours(DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY));\n    call debug_msg(0, 'refresh_mv', 'Updated mat_view_hours');\n    SET rc = 0;\nEND;\n$$\n\nDELIMITER ;\n\n# This makes sure that any deletions performed for Twitter compliance are reflected in the materialzed view for\n# the time window displayed on the map (4 days).\n\nDROP PROCEDURE IF EXISTS refresh_mv_map_window;\nDELIMITER $$\nCREATE PROCEDURE refresh_mv_map_window(\n    OUT rc INT\n)\nBEGIN\n\n\n    -- rollback transaction and bubble up errors if something bad happens\n    DECLARE exit handler FOR SQLEXCEPTION, SQLWARNING\n        BEGIN\n            GET DIAGNOSTICS CONDITION 1\n                @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;\n            ROLLBACK;\n            set @rc = @p1;\n            call debug_msg(-2, 'refresh_mv_map_window', concat('FAILED: ', @p1, ': ', @p2));\n        END;\n    call debug_msg(0, 'refresh_mv_map_window', 'Refreshing (Window Duration) Materialized Views');\n    call refresh_mv(DATE_SUB(CURDATE(), INTERVAL 4 DAY), DATE_ADD(CURDATE(), INTERVAL 1 DAY), @rc);\n    call fill_days(DATE_SUB(CURDATE(), INTERVAL 4 DAY), DATE_ADD(CURDATE(), INTERVAL 1 DAY));\n    call fill_hours(DATE_SUB(CURDATE(), INTERVAL 4 DAY), DATE_ADD(CURDATE(), INTERVAL 1 DAY));\n    call update_text_count(DATE_SUB(CURDATE(), INTERVAL 4 DAY), DATE_ADD(CURDATE(), INTERVAL 1 DAY));\n    call debug_msg(0, 'refresh_mv', 'Updated mat_view_days');\n    SET rc = 0;\nEND;\n$$\n\nDELIMITER ;\n\n\n#This does a daily historical refresh of the materialized view to include new regions / region types that\n#have been added in the last day. Because this is such a long process it is done in 1 MONTH segments.\nDROP PROCEDURE IF EXISTS refresh_mv_full;\n\nDELIMITER $$\nCREATE PROCEDURE refresh_mv_full(\n    OUT rc INT\n)\nBEGIN\n\n    DECLARE dt DATE DEFAULT '2017-01-01';\n    declare counter int default 0;\n    -- rollback transaction and bubble up errors if something bad happens\n    DECLARE exit handler FOR SQLEXCEPTION, SQLWARNING\n        BEGIN\n            GET DIAGNOSTICS CONDITION 1\n                @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;\n            ROLLBACK;\n            set @rc = @p1;\n            call debug_msg(-2, 'refresh_mv_full', concat('FAILED: ', @p1, ': ', @p2));\n        END;\n\n    call debug_msg(0, 'refresh_mv_full', 'Refreshing (Full) Materialized Views');\n\n    START TRANSACTION;\n    call debug_msg(1, 'refresh_mv_full', 'Refreshing map criteria.');\n    # noinspection SqlWithoutWhere\n    delete from mat_view_map_criteria;\n    insert into mat_view_map_criteria\n    SELECT distinct region,\n                    region_type,\n                    hazard,\n                    source,\n                    warning,\n                    deleted,\n                    map_location\n    FROM mat_view_regions;\n    call debug_msg(1, 'refresh_mv_full', 'Refreshed map criteria.');\n    COMMIT;\n\n    WHILE dt <= NOW()\n        DO\n            CALL debug_msg(1, 'refresh_mv_full', CONCAT('Refreshing week starting ', dt));\n            CALL refresh_mv(dt, DATE_ADD(dt, INTERVAL 1 MONTH), @rc);\n            CALL debug_msg(1, 'refresh_mv_full', CONCAT('Updating text count for week starting ', dt));\n            CALL update_text_count(dt, DATE_ADD(dt, INTERVAL 1 MONTH));\n            CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling days for week starting ', dt));\n            CALL fill_days(dt, DATE_ADD(dt, INTERVAL 1 MONTH));\n            CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling hours for week starting ', dt));\n            CALL fill_hours(dt, DATE_ADD(dt, INTERVAL 1 MONTH));\n            IF MOD(counter, 12) = 1\n            THEN\n                CALL refresh_mv_map_window(@rc);\n            ELSE\n                CALL refresh_mv_now(@rc);\n            END IF;\n            SET dt = DATE_ADD(dt, INTERVAL 1 MONTH);\n            SET counter = counter + 1;\n        END WHILE;\n\n    START TRANSACTION;\n\n    call debug_msg(1, 'refresh_mv_full', 'Refreshing first entries.');\n\n    REPLACE INTO mat_view_first_entries\n    SELECT min(source_timestamp) as source_timestamp, hazard, source\n    FROM mat_view_regions\n    GROUP BY hazard, source;\n    call debug_msg(1, 'refresh_mv_full', 'Refreshed first entries.');\n    COMMIT;\n\n    START TRANSACTION;\n    call debug_msg(1, 'refresh_mv_full', 'Refreshing data day counts.');\n    replace into mat_view_data_days\n    select datediff(max(source_date), min(source_date)) as days, region, region_type, hazard, source, warning\n    from mat_view_text_count tc\n    group by region, region_type, hazard, source, warning;\n    call debug_msg(1, 'refresh_mv_full', 'Refreshed data day counts.');\n    COMMIT;\n\n    SET rc = 0;\nEND;\n$$\n\nDELIMITER ;\n\n\nDROP PROCEDURE IF EXISTS refresh_mv;\n\nDELIMITER $$\nCREATE PROCEDURE refresh_mv(\n    IN start_date DATETIME,\n    IN end_date DATETIME,\n    OUT rc INT\n)\nBEGIN\n\n    -- rollback transaction and bubble up errors if something bad happens\n    DECLARE exit handler FOR SQLEXCEPTION, SQLWARNING\n        BEGIN\n            GET DIAGNOSTICS CONDITION 1\n                @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;\n            ROLLBACK;\n            set @rc = @p1;\n            call debug_msg(-2, 'refresh_mv', concat('FAILED: ', @p1, ': ', @p2));\n        END;\n    call debug_msg(0, 'refresh_mv', 'Refreshing Materialized Views');\n    call debug_msg(1, 'refresh_mv', CONCAT('Start Date: ', start_date));\n    call debug_msg(1, 'refresh_mv', CONCAT('End Date: ', end_date));\n    SET TRANSACTION ISOLATION LEVEL READ COMMITTED;\n    START TRANSACTION;\n\n    #     delete from mat_view_regions where source_timestamp < NOW() - INTERVAL 1 YEAR;\n\n#     SET @maxTimestamp = IFNULL((select max(source_timestamp) from mat_view_regions), NOW() - INTERVAL 20 YEAR);\n    call debug_msg(1, 'refresh_mv', 'Updating mat_view_regions');\n    DELETE FROM mat_view_regions WHERE source_timestamp BETWEEN start_date and end_date;\n    call debug_msg(1, 'refresh_mv', 'Deleted old from mat_view_regions');\n\n    # Put in the fine, coarse and county stats that Rudy generates data for (the old way of doing this)\n    START TRANSACTION;\n    REPLACE INTO mat_view_regions\n    SELECT t.source_id,\n           t.source,\n           t.hazard,\n           t.source_timestamp          source_timestamp,\n           tr.region_type,\n           tr.region,\n           t.warning,\n           IFNULL(t.deleted, false) as deleted,\n           'uk'\n    FROM live_text t,\n         live_text_regions tr\n    WHERE t.source_id = tr.source_id\n      AND t.source = tr.source\n      AND t.hazard = tr.hazard\n      AND t.source_timestamp BETWEEN start_date and end_date;\n    COMMIT;\n    call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with live_text_regions data.');\n\n    # Add in all other regions (the new way of doing this)\n    START TRANSACTION;\n    REPLACE INTO mat_view_regions\n    SELECT t.source_id,\n           t.source,\n           t.hazard,\n           t.source_timestamp       as source_timestamp,\n           gr.region_type,\n           gr.region,\n           t.warning,\n           IFNULL(t.deleted, false) as deleted,\n           gr.map_location\n    FROM live_text t,\n         ref_geo_regions gr\n    WHERE ST_Intersects(boundary, location)\n      AND NOT gr.disabled\n      AND t.source_timestamp BETWEEN start_date and end_date;\n    COMMIT;\n    call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with boundary matches.');\n\n    START TRANSACTION;\n    REPLACE INTO mat_view_regions\n    SELECT t.source_id,\n           t.source,\n           t.hazard,\n           t.source_timestamp       as source_timestamp,\n           vr.virtual_region_type   as region_type,\n           vr.virtual_region        as region,\n           t.warning,\n           IFNULL(t.deleted, false) as deleted,\n           gr.map_location\n    FROM live_text t,\n         ref_geo_regions gr,\n         ref_geo_virtual_regions vr\n    WHERE ST_Intersects(boundary, location)\n      AND vr.geo_region = gr.region\n      AND vr.geo_region_type = gr.region_type\n      AND NOT gr.disabled\n      AND t.source_timestamp BETWEEN start_date and end_date;\n    COMMIT;\n    call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with virtual region boundary matches.');\n\n\n    #     call debug_msg(1, 'refresh_mv', 'Fixing mat_view_regions for UK only');\n\n    #     # UK Locations are buffered with a 0.01 degree buffer. At present this is not done on the world map\n\n#     # If the world map is supported then this may be required to capture location just outside of the strict\n#     # boundary supplied. We only use the buffered values when the non buffered regions do not match.\n#     INSERT INTO mat_view_regions\n#     SELECT t.source_id,\n#            t.source,\n#            t.hazard,\n#            t.source_timestamp,\n#            gr.region_type,\n#            gr.region,\n#            t.warning,\n#            IFNULL(t.deleted, false) as deleted,\n#            gr.map_location\n#     FROM live_text t,\n#          ref_geo_regions gr\n#     WHERE ST_Intersects(buffered, location)\n#       AND map_location = 'uk'\n#       AND (select count(*) from ref_geo_regions where st_intersects(boundary, t.location) and map_location = 'uk') = 0\n#       AND t.source_timestamp BETWEEN start_date and end_date;\n    call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions');\n\n\n    START TRANSACTION;\n    call debug_msg(1, 'refresh_mv', 'Updating mat_view_timeseries_date');\n\n    #     SET @maxTimestampTSD = IFNULL((select max(source_date) from mat_view_timeseries_date), NOW() - INTERVAL 20 YEAR);\n#     DELETE FROM mat_view_timeseries_date WHERE source_date BETWEEN start_date and end_date;\n    REPLACE INTO mat_view_timeseries_date\n    SELECT r.region                 as region_group_name,\n           t.source                 as source,\n           t.hazard                 as hazard,\n           t.warning                as warning,\n           t.source_date            as source_date,\n           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',\n                  t.source_text)    as source_text,\n           r.region_type            as region_type,\n           IFNULL(t.deleted, false) as deleted,\n           t.source_id              as source_id,\n           r.map_location\n    FROM mat_view_regions r,\n         live_text t\n    WHERE t.source_id = r.source_id\n      AND t.source = r.source\n      AND t.hazard = r.hazard\n      and not r.region REGEXP '^[0-9]+$'\n      AND source_date BETWEEN start_date and end_date;\n    call debug_msg(1, 'refresh_mv', 'Updated mat_view_timeseries_date');\n    COMMIT;\n\n    START TRANSACTION;\n    call debug_msg(1, 'refresh_mv', 'Updating mat_view_timeseries_hour');\n\n#     SET @maxTimestampTSH = IFNULL((select max(source_date) from mat_view_timeseries_hour), NOW() - INTERVAL 20 YEAR);\n    DELETE FROM mat_view_timeseries_hour WHERE source_date BETWEEN start_date and end_date;\n    REPLACE INTO mat_view_timeseries_hour\n    SELECT r.region                                                         as region_group_name,\n           t.source                                                         as source,\n           t.hazard                                                         as hazard,\n           t.warning                                                        as warning,\n           cast(date_format(t.source_timestamp, '%Y-%m-%d %H') as DATETIME) as source_date,\n           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',\n                  t.source_text)                                            as source_text,\n           r.region_type                                                    as region_type,\n           IFNULL(t.deleted, false)                                         as deleted,\n           t.source_id                                                      as source_id,\n           r.map_location\n    FROM mat_view_regions r,\n         live_text t\n    WHERE t.source_id = r.source_id\n      AND t.source = r.source\n      AND t.hazard = r.hazard\n      and not r.region REGEXP '^[0-9]+$'\n      AND t.source_timestamp BETWEEN start_date and end_date;\n    call debug_msg(1, 'refresh_mv', 'Updated mat_view_timeseries_hour');\n    COMMIT;\n\n\n    START TRANSACTION;\n    call debug_msg(1, 'refresh_mv', 'Fixing XY swapped data');\n    #This swaps XY on broken UK data, this is a temporary solution and should be removed.\n    UPDATE live_text\n    SET location = st_swapxy(location)\n    WHERE NOT st_contains(ST_GeomFromText('POLYGON((65 -15, 40 -15, 40 5, 65 5, 65 -15))', 4326), location)\n      AND source_date BETWEEN start_date and end_date;\n    call debug_msg(1, 'refresh_mv', 'Fixed XY swapped data');\n    COMMIT;\n\n    call debug_msg(0, 'refresh_mv', 'SUCCESS');\n\n\n    SET rc = 0;\nEND;\n$$\n\nDELIMITER ;\n\n\nDROP PROCEDURE IF EXISTS fill_days;\n\nDELIMITER $$\nCREATE PROCEDURE fill_days(start_date DATETIME, end_date DATETIME)\n\nBEGIN\n    START TRANSACTION;\n    SET start_date = cast(date_format(start_date, '%Y-%m-%d') as DATETIME);\n    SET end_date = cast(date_format(end_date, '%Y-%m-%d') as DATETIME);\n    call debug_msg(1, 'fill_days', CONCAT('Filling mat_view_days from ', start_date, ' to ', end_date));\n    WHILE start_date <= end_date\n        DO\n            REPLACE INTO mat_view_days (date) VALUES (start_date);\n            SET start_date = date_add(start_date, INTERVAL 1 DAY);\n        END WHILE;\n    COMMIT;\nEND;\n$$\n\nDROP PROCEDURE IF EXISTS fill_hours;\n\nDELIMITER $$\nCREATE PROCEDURE fill_hours(start_date DATETIME, end_date DATETIME)\n\nBEGIN\n    START TRANSACTION;\n    SET start_date = cast(date_format(start_date, '%Y-%m-%d %H') as DATETIME);\n    SET end_date = cast(date_format(end_date, '%Y-%m-%d %H') as DATETIME);\n    call debug_msg(1, 'fill_hours', CONCAT('Filling mat_view_hours from ', start_date, ' to ', end_date));\n    WHILE start_date <= end_date\n        DO\n            REPLACE INTO mat_view_hours (date) VALUES (start_date);\n            SET start_date = date_add(start_date, INTERVAL 1 HOUR);\n        END WHILE;\n    COMMIT;\nEND;\n$$\n\nDROP PROCEDURE IF EXISTS update_text_count;\n\nDELIMITER $$\nCREATE PROCEDURE update_text_count(start_date DATE, end_date DATE)\n\nBEGIN\n    -- rollback transaction and bubble up errors if something bad happens\n    DECLARE exit handler FOR SQLEXCEPTION, SQLWARNING\n        BEGIN\n            GET DIAGNOSTICS CONDITION 1\n                @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;\n            ROLLBACK;\n            set @rc = @p1;\n            call debug_msg(-2, 'update_text_count', concat('FAILED: ', @p1, ': ', @p2));\n        END;\n    call debug_msg(0, 'update_text_count', CONCAT('Updating mat_view_text_count from ', start_date, ' to ', end_date));\n    START TRANSACTION;\n    DELETE FROM mat_view_text_count WHERE source_date BETWEEN start_date and end_date;\n\n    # This zeros out all daily counts for ALL the days in the range. So that when the actual values are\n    # placed in the table, any missing days (i.e. with no data) still get these zero values.\n    INSERT INTO mat_view_text_count\n    SELECT distinct 0    as text_count,\n                    t.source,\n                    t.hazard,\n                    date as source_date,\n                    t.region_type,\n                    t.region,\n                    t.warning,\n                    t.deleted,\n                    t.map_location\n    FROM mat_view_map_criteria t,\n         (select date from mat_view_days where date BETWEEN start_date and end_date) days;\n\n    #Now replace all non-zero days.\n    REPLACE INTO mat_view_text_count\n    SELECT count(t.source)                                               as text_count,\n           t.source,\n           t.hazard,\n           cast(date_format(t.source_timestamp, '%Y-%m-%d') as DATETIME) as source_date,\n           t.region_type,\n           t.region,\n           t.warning,\n           t.deleted,\n           t.map_location\n    FROM mat_view_regions t\n    WHERE t.source_timestamp BETWEEN start_date and end_date\n    GROUP BY region, region_type, hazard, source, t.map_location, warning, deleted, source_date;\n    COMMIT;\n    call debug_msg(0, 'update_text_count', CONCAT('Updated mat_view_text_count from ', start_date, ' to ', end_date));\n\nEND;\n$$\n\n\n\nDROP PROCEDURE IF EXISTS daily_housekeeping;\n\nDELIMITER $$\nCREATE PROCEDURE daily_housekeeping(OUT rc INT)\n\nBEGIN\n    -- rollback transaction and bubble up errors if something bad happens\n    DECLARE exit handler FOR SQLEXCEPTION, SQLWARNING\n        BEGIN\n            GET DIAGNOSTICS CONDITION 1\n                @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;\n            ROLLBACK;\n            set @rc = @p1;\n            call debug_msg(-2, 'daily_housekeeping', concat('FAILED: ', @p1, ': ', @p2));\n        END;\n\n    call debug_msg(0, 'daily_housekeeping', 'Optimizing tables');\n    #     optimize table live_text;\n#     optimize table mat_view_regions;\n#     optimize table mat_view_timeseries_date;\n#     optimize table mat_view_timeseries_hour;\n#     optimize table mat_view_first_entries;\n#     optimize table mat_view_text_count;\n    call debug_msg(0, 'daily_housekeeping', 'Optimized tables');\n    set @rc = 0;\n\nEND;\n$$\n\n\nDROP EVENT IF EXISTS daily_housekeeping_event;\nCREATE EVENT daily_housekeeping_event\n    ON SCHEDULE EVERY 1 DAY\n        STARTS '2021-01-01 04:17:17'\n    DO CALL daily_housekeeping(@rc);\n\nDROP EVENT IF EXISTS mv_full_refresh_event;\nDROP EVENT IF EXISTS mv_map_window_refresh_event;\nDROP EVENT IF EXISTS mv_latest_refresh_event;\n\nDROP EVENT IF EXISTS mv_refresh_event;\nCREATE EVENT mv_refresh_event\n    ON SCHEDULE EVERY 5 MINUTE\n        STARTS '2021-01-01 00:00:00'\n    DO CALL refresh_mv_auto(@rc);\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/sql/refresh_mv_now.sql b/sql/refresh_mv_now.sql
+--- a/sql/refresh_mv_now.sql	(revision 4c5991e9327561946d7326f4251bc549ffc7afbf)
++++ b/sql/refresh_mv_now.sql	(date 1641837402124)
+@@ -232,8 +232,8 @@
+ 
+ #     SET @maxTimestamp = IFNULL((select max(source_timestamp) from mat_view_regions), NOW() - INTERVAL 20 YEAR);
+     call debug_msg(1, 'refresh_mv', 'Updating mat_view_regions');
+-    DELETE FROM mat_view_regions WHERE source_timestamp BETWEEN start_date and end_date;
+-    call debug_msg(1, 'refresh_mv', 'Deleted old from mat_view_regions');
++    #     DELETE FROM mat_view_regions WHERE source_timestamp BETWEEN start_date and end_date;
++#     call debug_msg(1, 'refresh_mv', 'Deleted old from mat_view_regions');
+ 
+     # Put in the fine, coarse and county stats that Rudy generates data for (the old way of doing this)
+     START TRANSACTION;

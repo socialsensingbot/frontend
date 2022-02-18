@@ -1,0 +1,14 @@
+{
+  "continuousUpdateThresholdInMinutes": 5,
+  "maxUsers": 3,
+  "features": [
+    "impact",
+    "source",
+    "map"
+  ],
+  "layersEnabled": [
+    "flood",
+    "wind",
+    "snow"
+  ]
+}

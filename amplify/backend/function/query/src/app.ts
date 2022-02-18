@@ -560,19 +560,22 @@ module.exports = (connection: Pool) => {
         const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
 
         cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
+            if (lastDate !== null) {
+                // We don't display recent texts for historical data
+                return [];
+            }
             const rows = await sql({
                                        // language=MySQL
                                        sql:    `/* app.ts: recent-text-count */ SELECT r.region AS region, count(*) AS count
                                                                                 FROM mat_view_regions r
                                                                                 WHERE r.region_type = ?
-                                                                                  AND r.source_timestamp between ? AND ?
+                                                                                  AND r.source_timestamp > ?
                                                                                   AND r.hazard IN (?)
                                                                                   AND r.source IN (?)
                                                                                   AND r.warning IN (?)
                                                                                 GROUP BY r.region
                                                `,
-                                       values: [req.params.regionType, new Date(req.body.startDate),
-                                                new Date(endDate), req.body.hazards, req.body.sources,
+                                       values: [req.params.regionType, new Date(req.body.startDate), req.body.hazards, req.body.sources,
                                                 warningsValues(req.body.warnings),]
                                    });
             const result = {};
