@@ -166,7 +166,7 @@ export class RESTMapDataService {
 
 
     public async tweets(layerGroupId: string, regionType: string, regions: string[], startDate,
-                        endDate, pageSize = 100, maxPages = 50): Promise<Tweet[]> {
+                        endDate, pageSize = 200, maxPages = 100): Promise<Tweet[]> {
         try {
             const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
             log.debug("requesting tweets for regions " + regions);
@@ -183,7 +183,7 @@ export class RESTMapDataService {
                     endDate:   roundToMinute(endDate),
                     regions,
 
-                }, 5 * 60);
+                }, 1 * 60);
                 log.debug(rawResult.length + " tweets back from server");
                 for (const tweet of rawResult) {
                     result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,

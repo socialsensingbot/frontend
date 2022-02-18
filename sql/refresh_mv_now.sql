@@ -276,27 +276,27 @@ BEGIN
     COMMIT;
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with boundary matches.');
 
-    START TRANSACTION;
-    REPLACE INTO mat_view_regions
-    SELECT t.source_id,
-           t.source,
-           t.hazard,
-           t.source_timestamp       as source_timestamp,
-           vr.virtual_region_type   as region_type,
-           vr.virtual_region        as region,
-           t.warning,
-           IFNULL(t.deleted, false) as deleted,
-           gr.map_location
-    FROM live_text t,
-         ref_geo_regions gr,
-         ref_geo_virtual_regions vr
-    WHERE ST_Intersects(boundary, location)
-      AND vr.geo_region = gr.region
-      AND vr.geo_region_type = gr.region_type
-      AND NOT gr.disabled
-      AND t.source_timestamp BETWEEN start_date and end_date;
-    COMMIT;
-    call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with virtual region boundary matches.');
+    #     START TRANSACTION;
+#     REPLACE INTO mat_view_regions
+#     SELECT t.source_id,
+#            t.source,
+#            t.hazard,
+#            t.source_timestamp       as source_timestamp,
+#            vr.virtual_region_type   as region_type,
+#            vr.virtual_region        as region,
+#            t.warning,
+#            IFNULL(t.deleted, false) as deleted,
+#            gr.map_location
+#     FROM live_text t,
+#          ref_geo_regions gr,
+#          ref_geo_virtual_regions vr
+#     WHERE ST_Intersects(boundary, location)
+#       AND vr.geo_region = gr.region
+#       AND vr.geo_region_type = gr.region_type
+#       AND NOT gr.disabled
+#       AND t.source_timestamp BETWEEN start_date and end_date;
+#     COMMIT;
+#     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with virtual region boundary matches.');
 
 
     #     call debug_msg(1, 'refresh_mv', 'Fixing mat_view_regions for UK only');
