@@ -183,7 +183,7 @@ export class RESTMapDataService {
                     endDate:   roundToMinute(endDate),
                     regions,
 
-                }, 1 * 60);
+                }, 1 * 60, false, false);
                 log.debug(rawResult.length + " tweets back from server");
                 for (const tweet of rawResult) {
                     result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
