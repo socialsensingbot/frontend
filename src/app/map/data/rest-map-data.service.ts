@@ -189,7 +189,11 @@ export class RESTMapDataService {
                     result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
                                           tweet.possibly_sensitive));
                 }
+                if (page > 0) {
+                    this._loading.showIndeterminateSpinner();
+                }
                 if (rawResult.length < pageSize || page === maxPages - 1) {
+                    this._loading.hideIndeterminateSpinner();
                     return result;
                 } else {
                     page++;
@@ -222,7 +226,11 @@ export class RESTMapDataService {
                 result.push(new Tweet(tweet.id, null, tweet.json, null, new Date(tweet.timestamp), tweet.region,
                                       tweet.possibly_sensitive));
             }
+            if (page > 0) {
+                this._loading.showIndeterminateSpinner();
+            }
             if (rawResult.length < pageSize || page === maxPages - 1) {
+                this._loading.hideIndeterminateSpinner();
                 return result;
             } else {
                 page++;
@@ -254,7 +262,11 @@ export class RESTMapDataService {
                 result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
                                       tweet.possibly_sensitive));
             }
+            if (page > 0) {
+                this._loading.showIndeterminateSpinner();
+            }
             if (rawResult.length < pageSize || page === maxPages - 1) {
+                this._loading.hideIndeterminateSpinner();
                 return result;
             } else {
                 page++;
