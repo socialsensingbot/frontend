@@ -8,6 +8,7 @@ backend:
       commands:
         - '# Execute Amplify CLI with the helper script'
         - wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && chmod +x ./jq && mv jq ./bin
+        - npm install -g typescript
         - ./bin/backend-deploy.sh
 frontend:
   phases:
