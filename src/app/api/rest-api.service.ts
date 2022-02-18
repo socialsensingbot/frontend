@@ -11,6 +11,7 @@ import {API} from "@aws-amplify/api";
 import {Logger} from "@aws-amplify/core";
 import {NgForageCache} from "ngforage";
 import {timer} from "rxjs";
+import {LoadingProgressService} from "../services/loading-progress.service";
 
 const useLambda = false;
 
@@ -25,7 +26,8 @@ export class RESTDataAPIService {
     private calls = 0;
     private lastCPMCount = 0;
 
-    constructor(private _notify: NotificationService, private _ngZone: NgZone, private readonly cache: NgForageCache) {
+    constructor(private _notify: NotificationService, private _ngZone: NgZone, private readonly cache: NgForageCache,
+                private _loading: LoadingProgressService) {
         timer(0, 10000).subscribe(() => {
             if (this.lastCPMCount === 0) {
                 this.lastCPMCount = Date.now() - 10000;
@@ -104,6 +106,33 @@ export class RESTDataAPIService {
         } else {
             log.info("Value for " + key + " not in cache");
             return await this.callAPIInternal("/map/" + path, payload, cacheForSeconds, key, useGet, retry);
+        }
+    }
+
+    public async callMapAPIWithCacheAndPaging(path: string, payload: any, transform: (any) => any, cacheForSeconds: number = -1,
+                                              pageSize = 300,
+                                              maxPages = 100) {
+        try {
+            const result: any[] = [];
+            let page = 0;
+            do {
+                const rawResult = await this.callMapAPIWithCache(path, {...payload, pageSize, page,}, cacheForSeconds, false, false);
+                log.debug(rawResult.length + " tweets back from server");
+                for (const item of rawResult) {
+                    result.push(transform(item));
+                }
+                if (page > 0) {
+                    this._loading.showIndeterminateSpinner();
+                }
+                if (rawResult.length < pageSize || page === maxPages - 1) {
+                    this._loading.hideIndeterminateSpinner();
+                    return result;
+                } else {
+                    page++;
+                }
+            } while (true);
+        } catch (e) {
+            log.error(e);
         }
     }
 
