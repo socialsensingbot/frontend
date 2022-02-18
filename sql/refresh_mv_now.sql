@@ -74,7 +74,7 @@ BEGIN
             call debug_msg(-2, 'refresh_mv_now', concat('FAILED: ', @p1, ': ', @p2));
         END;
     call debug_msg(0, 'refresh_mv_now', 'Refreshing (Latest) Materialized Views');
-    call refresh_mv(DATE_SUB(NOW(), INTERVAL 12 HOUR), NOW(), @rc);
+    call refresh_mv(DATE_SUB(NOW(), INTERVAL 2 HOUR), NOW(), @rc);
     call fill_hours(DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY));
     call debug_msg(0, 'refresh_mv', 'Updated mat_view_hours');
     SET rc = 0;
