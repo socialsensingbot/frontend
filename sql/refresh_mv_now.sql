@@ -276,7 +276,7 @@ BEGIN
     COMMIT;
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with boundary matches.');
 
-    #     START TRANSACTION;
+#     START TRANSACTION;
 #     REPLACE INTO mat_view_regions
 #     SELECT t.source_id,
 #            t.source,
