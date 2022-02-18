@@ -296,6 +296,9 @@ module.exports = (connection: Pool) => {
         const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
         console.debug("StartDate: " + new Date(req.body.startDate));
         console.debug("EndDate: " + new Date(endDate));
+        const pageSize: number = +req.body.pageSize || 100;
+        const page: number = +req.body.page || 0;
+        const from = page * pageSize;
 
         cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
 
@@ -319,11 +322,13 @@ module.exports = (connection: Pool) => {
                                                                         AND r.source IN (?)
                                                                         AND r.warning IN (?)
                                                                         AND not t.deleted
-                                                                      order by r.source_timestamp desc    `,
+                                                                      order by r.source_timestamp desc
+                                                                      LIMIT ?,?`,
                                   values: [new Date(req.body.startDate), new Date(endDate),
                                            req.body.regions, req.params.regionType, req.body.hazards,
                                            req.body.sources,
                                            warningsValues(req.body.warnings),
+                                           from, pageSize
                                   ]
                               }));
 

@@ -189,6 +189,7 @@ export class RESTDataAPIService {
                     }, retryPeriod);
                 });
             } else {
+                log.warn(e);
                 return null;
             }
         });
