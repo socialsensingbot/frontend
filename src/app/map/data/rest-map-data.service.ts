@@ -166,7 +166,7 @@ export class RESTMapDataService {
 
 
     public async tweets(layerGroupId: string, regionType: string, regions: string[], startDate,
-                        endDate, pageSize = 200, maxPages = 100): Promise<Tweet[]> {
+                        endDate, pageSize = 100, maxPages = 100): Promise<Tweet[]> {
         try {
             const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
             log.debug("requesting tweets for regions " + regions);
