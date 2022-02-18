@@ -165,27 +165,39 @@ export class RESTMapDataService {
     }
 
 
-
     public async tweets(layerGroupId: string, regionType: string, regions: string[], startDate,
-                        endDate): Promise<Tweet[]> {
-        const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
-        log.debug("requesting tweets for regions " + regions);
-        const rawResult = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/text-for-regions", {
-            hazards:   layerGroup.hazards,
-            sources:   layerGroup.sources,
-            warnings:  layerGroup.warnings,
-            regions,
-            startDate: roundToHour(startDate),
-            endDate:   roundToMinute(endDate)
+                        endDate, pageSize = 100, maxPages = 50): Promise<Tweet[]> {
+        try {
+            const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
+            log.debug("requesting tweets for regions " + regions);
+            const result: Tweet[] = [];
+            let page = 0;
+            do {
+                const rawResult = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/text-for-regions", {
+                    hazards:   layerGroup.hazards,
+                    sources:   layerGroup.sources,
+                    warnings:  layerGroup.warnings,
+                    pageSize:  pageSize,
+                    page:      page,
+                    startDate: roundToHour(startDate),
+                    endDate:   roundToMinute(endDate),
+                    regions,
 
-        }, 0);
-        log.debug(rawResult.length + " tweets back from server");
-        const result: Tweet[] = [];
-        for (const tweet of rawResult) {
-            result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
-                                  tweet.possibly_sensitive));
+                }, 5 * 60);
+                log.debug(rawResult.length + " tweets back from server");
+                for (const tweet of rawResult) {
+                    result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
+                                          tweet.possibly_sensitive));
+                }
+                if (rawResult.length < pageSize || page === maxPages - 1) {
+                    return result;
+                } else {
+                    page++;
+                }
+            } while (true);
+        } catch (e) {
+            log.error(e);
         }
-        return result;
     }
 
     public async publicDisplayTweets(layerGroupId: string, regionType: string, startDate,
