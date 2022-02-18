@@ -3,7 +3,7 @@ import {Dashboard} from "../app/pref/dashboard.service";
 import {SSLayerConfiguration} from "../app/types";
 
 const layers: SSLayerConfiguration = {
-    "available":    [
+    "available": [
         {
             "id":          "flood",
             "title":       "Floods",
@@ -12,7 +12,55 @@ const layers: SSLayerConfiguration = {
             "warnings":    "exclude",
             "annotations": ["source", "impact"],
             "icons":       ["flood"]
-        }
+        },
+        {
+            "id":          "flood-with-warnings",
+            "title":       "Floods (includes warnings)",
+            "sources":     ["twitter"],
+            "hazards":     ["flood"],
+            "warnings":    "include",
+            "annotations": ["source", "impact"],
+            "icons":       ["flood", "storm-warning"]
+
+        },
+        {
+            "id":          "flood-warnings-only",
+            "title":       "Floods (only warnings)",
+            "sources":     ["twitter"],
+            "hazards":     ["flood"],
+            "warnings":    "only",
+            "annotations": ["source", "impact"],
+            "icons":       ["storm-warning"]
+        },
+        {
+            "id":          "wind",
+            "title":       "Wind",
+            "sources":     ["twitter"],
+            "hazards":     ["wind"],
+            "warnings":    "exclude",
+            "annotations": ["impact"],
+            "icons":       ["strong-wind"]
+
+        },
+        {
+            "id":          "wind-and-flood",
+            "title":       "Wind & Flood",
+            "sources":     ["twitter"],
+            "hazards":     ["wind", "flood"],
+            "warnings":    "exclude",
+            "annotations": ["source", "impact"],
+            "icons":       ["flood", "strong-wind"]
+        },
+        {
+            "id":          "snow",
+            "title":       "Snow",
+            "sources":     ["twitter"],
+            "hazards":     ["snow"],
+            "warnings":    "exclude",
+            "annotations": ["impact"],
+            "icons":       ["snow"]
+        },
+
     ],
     "defaultLayer": "flood"
 };
@@ -32,7 +80,7 @@ export const environment = {
     name:             "production",
     lamdaEnvironment: "prod",
     demo:             false,
-    version:          "2.5",
+    version: "2.5.1",
     // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
     timezone:             "UTC",
     locale:               "en-GB",
@@ -82,10 +130,12 @@ export const environment = {
     animateOnTimeSliderChange:           false,
     recentTweetHighlightOffsetInSeconds: 1200,
 
-    mapTileUrlTemplate:              "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
-    blinkRateInMilliseconds:         1000,
+    mapTileUrlTemplate:      "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
+    blinkRateInMilliseconds: 1000,
     defaultDashboard,
-    layers:                          layers,
+    layers:                  layers,
+    layersEnabled:           ["flood"],
+
     shareTextAutocompleteInGroup:    true,
     analyticsDefaultRegions:         ["uk"],
     maxCallsPerMinute:               10000,
