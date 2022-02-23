@@ -22,14 +22,14 @@ describe('07 URL State (lat/lng): ', function () {
 
 
   describe('select county and date range', () => {
-      const url = MAP_URL + "?max_time=1539392400000&min_time=1539234000000&active_number=exceedance&active_polygon=county&selected=powys";
+      const url = MAP_URL + "?max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=exceedance&active_polygon=county&selected=powys";
     it('when authorized and load state', () => {
         cy.visit("http://localhost:4200/map");
         cy.login();
         cy.visitAndWait(url);
         cy.get(".slider-date-time", {timeout: 20000});
         cy.url({timeout: 30000}).should("equal", url);
-        cy.get(".slider-date-time-min .slider-date", {timeout: 20000}).should("contain.text", "11-Sept-21");
+        cy.get(".slider-date-time-min .slider-date", {timeout: 20000}).should("contain.text", "14-Sept-21");
         cy.get(".slider-date-time-min .slider-time").should("contain.text", "01 am");
         cy.get(".app-tweet-drawer", {timeout: 20000}).should("be.visible");
         cy.url({timeout: 30000}).should("equal", url);

@@ -88,35 +88,35 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
     public set options(value: DateRangeSliderOptions) {
         log.debug("Options: " + JSON.stringify(value));
         const oldValue = this._options;
-        this._options = value;
-        if (value.min <= 0) {
+        this._options = JSON.parse(JSON.stringify(this._options));
+        if (this._options.min <= 0) {
             console.trace("Min value must be > 0");
             log.warn("Min value must be positive");
             return;
         }
-        if (value.max <= 0) {
+        if (this._options.max <= 0) {
             console.trace("Max value must be > 0");
             log.warn("Max value must be positive");
             return;
         }
-        if (value.startMin <= 0) {
+        if (this._options.startMin <= 0) {
             console.trace("Lower value must be > 0");
             log.warn("Lower value must be > 0");
             return;
         }
-        if (value.startMax <= 0) {
+        if (this._options.startMax <= 0) {
             console.trace("Lower value must be > 0");
             log.warn("Upper value must be > 0");
             return;
         }
 
         if (!this.userHasInteracted) {
-            this.currentWindowMin = roundToHour(value.min);
-            this.currentWindowMax = roundToMinute(value.max);
-            this.min = roundToHour(value.min);
-            this.max = roundToMinute(value.max);
+            this.currentWindowMin = roundToHour(this._options.min);
+            this.currentWindowMax = roundToMinute(this._options.max);
+            this.min = roundToHour(this._options.min);
+            this.max = roundToMinute(this._options.max);
         }
-        if (this.historicalChart && (!this.userHasInteracted || oldValue.now !== value.now)) {
+        if (this.historicalChart && (!this.userHasInteracted || oldValue.now !== this._options.now)) {
             this.initHistoricalSlider();
             // this.updateCurrentChartSelection= true;
         }
