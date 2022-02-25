@@ -74,7 +74,7 @@ BEGIN
             call debug_msg(-2, 'refresh_mv_now', concat('FAILED: ', @p1, ': ', @p2));
         END;
     call debug_msg(0, 'refresh_mv_now', 'Refreshing (Latest) Materialized Views');
-    call refresh_mv(DATE_SUB(NOW(), INTERVAL 12 HOUR), NOW(), @rc);
+    call refresh_mv(DATE_SUB(NOW(), INTERVAL 2 HOUR), NOW(), @rc);
     call fill_hours(DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY));
     call debug_msg(0, 'refresh_mv', 'Updated mat_view_hours');
     SET rc = 0;
@@ -276,27 +276,27 @@ BEGIN
     COMMIT;
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with boundary matches.');
 
-    START TRANSACTION;
-    REPLACE INTO mat_view_regions
-    SELECT t.source_id,
-           t.source,
-           t.hazard,
-           t.source_timestamp       as source_timestamp,
-           vr.virtual_region_type   as region_type,
-           vr.virtual_region        as region,
-           t.warning,
-           IFNULL(t.deleted, false) as deleted,
-           gr.map_location
-    FROM live_text t,
-         ref_geo_regions gr,
-         ref_geo_virtual_regions vr
-    WHERE ST_Intersects(boundary, location)
-      AND vr.geo_region = gr.region
-      AND vr.geo_region_type = gr.region_type
-      AND NOT gr.disabled
-      AND t.source_timestamp BETWEEN start_date and end_date;
-    COMMIT;
-    call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with virtual region boundary matches.');
+#     START TRANSACTION;
+#     REPLACE INTO mat_view_regions
+#     SELECT t.source_id,
+#            t.source,
+#            t.hazard,
+#            t.source_timestamp       as source_timestamp,
+#            vr.virtual_region_type   as region_type,
+#            vr.virtual_region        as region,
+#            t.warning,
+#            IFNULL(t.deleted, false) as deleted,
+#            gr.map_location
+#     FROM live_text t,
+#          ref_geo_regions gr,
+#          ref_geo_virtual_regions vr
+#     WHERE ST_Intersects(boundary, location)
+#       AND vr.geo_region = gr.region
+#       AND vr.geo_region_type = gr.region_type
+#       AND NOT gr.disabled
+#       AND t.source_timestamp BETWEEN start_date and end_date;
+#     COMMIT;
+#     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with virtual region boundary matches.');
 
 
     #     call debug_msg(1, 'refresh_mv', 'Fixing mat_view_regions for UK only');
