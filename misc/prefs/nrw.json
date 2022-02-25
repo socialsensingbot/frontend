@@ -4,7 +4,9 @@
   "features": [
     "impact",
     "source",
-    "map"
+    "map",
+    "analytics",
+    "dashboard"
   ],
   "layersEnabled": [
     "flood",
