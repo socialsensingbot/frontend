@@ -33,13 +33,40 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda",
-      "dependsOn": []
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "socialsensingapilayer",
+          "attributes": [
+            "Arn"
+          ]
+        }
+      ]
     },
     "twitterCompliance": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda",
       "dependsOn": []
+    },
+    "api": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "socialsensingapilayer",
+          "attributes": [
+            "Arn"
+          ]
+        }
+      ]
+    },
+    "socialsensingapilayer": {
+      "providerPlugin": "awscloudformation",
+      "service": "LambdaLayer",
+      "build": true
     }
   },
   "storage": {
@@ -132,6 +159,20 @@
         {
           "category": "function",
           "resourceName": "query",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        }
+      ]
+    },
+    "api": {
+      "service": "API Gateway",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "api",
           "attributes": [
             "Name",
             "Arn"

@@ -15,7 +15,8 @@ describe('#126 Pop state : https://github.com/socialsensingbot/frontend/issues/1
                  cy.tweetCountTotal(193);
                  cy.url({timeout: 20000}).should("equal", url);
                  cy.log("Click out of London in any other county");
-                 cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-cambridgeshire").click();
+                 cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-cambridge" +
+                            "shire").click();
                  cy.wait(10000);
                  cy.twitterPanelHeader("Cambridgeshire");
                  cy.tweetCountTotal(20);

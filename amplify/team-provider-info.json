@@ -32,6 +32,9 @@
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
           "s3Key": "amplify-builds/twitterCompliance-5877644a425561383271-build.zip",
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
+        },
+        "api": {
+          "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
         }
       },
       "hosting": {
@@ -170,6 +173,56 @@
           "appId": "dtmxl3q3i7oix",
           "type": "cicd"
         }
+      }
+    }
+  },
+  "temp": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-socialsensing-temp-192328-authRole",
+      "UnauthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-temp-192328-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-temp-192328-authRole",
+      "Region": "eu-west-2",
+      "DeploymentBucketName": "amplify-socialsensing-temp-192328-deployment",
+      "UnauthRoleName": "amplify-socialsensing-temp-192328-unauthRole",
+      "StackName": "amplify-socialsensing-temp-192328",
+      "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-temp-192328/e89d51d0-98cb-11ec-9fc1-0a1b3838b1aa",
+      "AmplifyAppId": "dtmxl3q3i7oix"
+    },
+    "categories": {
+      "function": {
+        "S3Triggerb3a090e2": {
+          "deploymentBucketName": "amplify-socialsensing-temp-192328-deployment",
+          "s3Key": "amplify-builds/S3Triggerb3a090e2-754e48743050344b787a-build.zip"
+        },
+        "query": {
+          "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
+          "deploymentBucketName": "amplify-socialsensing-temp-192328-deployment",
+          "s3Key": "amplify-builds/query-6c37374f324d2b61492f-build.zip"
+        },
+        "twitterCompliance": {
+          "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
+          "deploymentBucketName": "amplify-socialsensing-temp-192328-deployment",
+          "s3Key": "amplify-builds/twitterCompliance-5877644a425561383271-build.zip"
+        },
+        "api": {
+          "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
+          "deploymentBucketName": "amplify-socialsensing-temp-192328-deployment",
+          "s3Key": "amplify-builds/api-5951443764456f667074-build.zip"
+        },
+        "socialsensingapilayer": {
+          "deploymentBucketName": "amplify-socialsensing-temp-192328-deployment",
+          "s3Key": "amplify-builds/socialsensingapilayer-LambdaLayerVersionb9d892cc-build.zip"
+        }
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "dtmxl3q3i7oix",
+          "type": "cicd"
+        }
+      },
+      "auth": {
+        "socialsensingf07a871c": {},
+        "userPoolGroups": {}
       }
     }
   }

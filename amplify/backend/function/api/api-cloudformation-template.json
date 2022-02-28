@@ -54,12 +54,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "query",
+            "api",
             {
               "Fn::Join": [
                 "",
                 [
-                  "query",
+                  "api",
                   "-",
                   {
                     "Ref": "env"
@@ -91,7 +91,7 @@
                         "env": {
                           "Ref": "env"
                         },
-                        "functionName": "query"
+                        "functionName": "api"
                       }
                     ]
                   },
@@ -113,7 +113,7 @@
                         "env": {
                           "Ref": "env"
                         },
-                        "functionName": "query"
+                        "functionName": "api"
                       }
                     ]
                   },
@@ -135,7 +135,7 @@
             "Ref": "functionsocialsensingapilayerArn"
           }
         ],
-        "Timeout": "300"
+        "Timeout": 25
       }
     },
     "LambdaExecutionRole": {
@@ -144,12 +144,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "socialsensingLambdaRole8e725c47",
+            "socialsensingLambdaRole99fa0ff9",
             {
               "Fn::Join": [
                 "",
                 [
-                  "socialsensingLambdaRole8e725c47",
+                  "socialsensingLambdaRole99fa0ff9",
                   "-",
                   {
                     "Ref": "env"
@@ -192,15 +192,6 @@
         "PolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "ec2:CreateNetworkInterface",
-                "ec2:DescribeNetworkInterfaces",
-                "ec2:DeleteNetworkInterface"
-              ],
-              "Resource": "*"
-            },
             {
               "Effect": "Allow",
               "Action": [
@@ -270,7 +261,7 @@
                           "env": {
                             "Ref": "env"
                           },
-                          "functionName": "query"
+                          "functionName": "api"
                         }
                       ]
                     },
