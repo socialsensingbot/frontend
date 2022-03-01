@@ -2,7 +2,10 @@ import {Pool} from "mysql";
 
 const aws = require("aws-sdk");
 const mysql = require("mysql");
-const stage = process.env.AWS_LAMBDA_FUNCTION_NAME.split("-")[1];
+let stage = process.env.AWS_LAMBDA_FUNCTION_NAME.split("-")[1];
+if (stage === "temp") {
+    stage = "dev";
+}
 
 console.log("STAGE: " + stage);
 const dev = stage === "dev";

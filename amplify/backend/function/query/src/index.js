@@ -40,6 +40,9 @@ exports.handler = void 0;
 var aws = require("aws-sdk");
 var mysql = require("mysql");
 var stage = process.env.AWS_LAMBDA_FUNCTION_NAME.split("-")[1];
+if (stage === "temp") {
+    stage = "dev";
+}
 console.log("STAGE: " + stage);
 var dev = stage === "dev";
 var awsServerlessExpress = require("aws-serverless-express");
