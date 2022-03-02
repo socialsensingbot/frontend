@@ -16,7 +16,8 @@
     "md5": "^2.3.0",
     "mysql": "^2.18.1",
     "mysql-connection-pool-manager": "^1.5.9",
-    "node-cache": "^5.1.2"
+    "node-cache": "^5.1.2",
+    "socialsensing-api": "file:../../../../../api"
   },
   "devDependencies": {
     "@types/node": "^16.11.22",

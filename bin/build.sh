@@ -1,6 +1,7 @@
 # Script to run the for the Amplify Console CI Cypress testing
 cd $(dirname $0)
 cd ..
+cp src/app/map/data/map-data.ts api/
 
 npx browserslist@latest --update-db
 
