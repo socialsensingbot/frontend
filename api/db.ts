@@ -1,30 +1,29 @@
 import {Pool} from "mysql";
+import * as NodeCache from "node-cache";
 
 const mysql = require("mysql");
-
-import * as NodeCache from "node-cache";
 
 export class SSDatabase {
 
     private queryCache = new NodeCache({stdTTL: 60 * 60, checkperiod: 60 * 60, useClones: true});
-    private connection: Pool = mysql.createPool({
-                                                    connectionLimit: 5,
-                                                    host:            "database-" + this.stage + ".cxsscwdzsrae.eu-west-2.rds.amazonaws.com",
-                                                    user:            "admin",
-                                                    password:        dbPassword,
-                                                    database:        "socialsensing",
-                                                    charset:         "utf8mb4",
-                                                    // multipleStatements: true,
-                                                    // connectTimeout: 15000,
-                                                    // acquireTimeout: 10000,
-                                                    waitForConnections: true,
-                                                    queueLimit:         5000,
-                                                    debug:              false
-                                                });
+    private connection: Pool;
     private disabled: boolean;
 
     constructor(private stage: string, private dbPassword: string) {
-
+        this.connection = mysql.createPool({
+                                               connectionLimit: 5,
+                                               host:            "database-" + this.stage + ".cxsscwdzsrae.eu-west-2.rds.amazonaws.com",
+                                               user:            "admin",
+                                               password:        this.dbPassword,
+                                               database:        "socialsensing",
+                                               charset:         "utf8mb4",
+                                               // multipleStatements: true,
+                                               // connectTimeout: 15000,
+                                               // acquireTimeout: 10000,
+                                               waitForConnections: true,
+                                               queueLimit:         5000,
+                                               debug:              false
+                                           });
     }
 
     cache(res, key: string, value: () => Promise<any>, options: { duration: number } = {duration: 60}) {
@@ -67,10 +66,20 @@ export class SSDatabase {
         console.error(e);
         try {
             res.status(500).json(
-                {error: JSON.stringify(e), errorMessage: e.message, errorAsString: e.toString(), errorStack: dev ? e.stack : "n/a"});
+                {
+                    error:         JSON.stringify(e),
+                    errorMessage:  e.message,
+                    errorAsString: e.toString(),
+                    errorStack:    this.stage === "dev" ? e.stack : "n/a"
+                });
         } catch (e) {
             res.status(500).json(
-                {error: e.message, errorMessage: e.message, errorAsString: e.toString(), errorStack: dev ? e.stack : "n/a"});
+                {
+                    error:         e.message,
+                    errorMessage:  e.message,
+                    errorAsString: e.toString(),
+                    errorStack:    this.stage === "dev" ? e.stack : "n/a"
+                });
 
         }
     }

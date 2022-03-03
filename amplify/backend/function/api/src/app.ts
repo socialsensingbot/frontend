@@ -35,42 +35,42 @@ module.exports = () => {
     });
 
 
-    app.post("/v1/map/metadata", mapMetadataFunc);
-    app.get("/v1/map/metadata", mapMetadataFunc);
+    app.post("/map/metadata", mapMetadataFunc);
+    app.get("/map/metadata", mapMetadataFunc);
 
-    app.get("/v1/map/:map/metadata", metadataForMapByIDFunc);
-    app.post("/v1/map/:map/metadata", metadataForMapByIDFunc);
+    app.get("/map/:map/metadata", metadataForMapByIDFunc);
+    app.post("/map/:map/metadata", metadataForMapByIDFunc);
 
-    app.post("/v1/map/:map/region-type/:regionType/text-for-regions", textForRegionsFunc);
+    app.post("/map/:map/region-type/:regionType/text-for-regions", textForRegionsFunc);
 
-    app.get("/v1/map/:map/region-type/:regionType/geography", geographyFunc);
-    app.post("/v1/map/:map/region-type/:regionType/geography", geographyFunc);
+    app.get("/map/:map/region-type/:regionType/geography", geographyFunc);
+    app.post("/map/:map/region-type/:regionType/geography", geographyFunc);
 
-    app.post("/v1/map/:map/region-type/:regionType/region/:region/geography", regionGeographyFunc);
-    app.get("/v1/map/:map/region-type/:regionType/region/:region/geography", regionGeographyFunc);
+    app.post("/map/:map/region-type/:regionType/region/:region/geography", regionGeographyFunc);
+    app.get("/map/:map/region-type/:regionType/region/:region/geography", regionGeographyFunc);
 
-    app.post("/v1/map/:map/region-type/:regionType/recent-text-count", recentTextCountFunc);
+    app.post("/map/:map/region-type/:regionType/recent-text-count", recentTextCountFunc);
 
 
-    app.post("/v1/map/:map/now", nowFunc);
-
-    /**
-     * Returns all the regions for a given map, regardless of region type.
-     * IMPORTANT: this screens out numerically named regions.
-     */
-    app.post("/v1/map/:map/regions", mapRegionsFunc);
-    app.get("/v1/map/:map/regions", mapRegionsFunc);
-
+    app.post("/map/:map/now", nowFunc);
 
     /**
      * Returns all the regions for a given map, regardless of region type.
      * IMPORTANT: this screens out numerically named regions.
      */
-    app.get("/v1/map/:map/all-regions", allMapRegionsFunc);
-    app.post("/v1/map/:map/all-regions", allMapRegionsFunc);
+    app.post("/map/:map/regions", mapRegionsFunc);
+    app.get("/map/:map/regions", mapRegionsFunc);
 
-    app.post("/v1/map/:map/region-type/:regionType/regions", regionsForRegionTypeFunc);
-    app.get("/v1/map/:map/region-type/:regionType/regions", regionsForRegionTypeFunc);
+
+    /**
+     * Returns all the regions for a given map, regardless of region type.
+     * IMPORTANT: this screens out numerically named regions.
+     */
+    app.get("/map/:map/all-regions", allMapRegionsFunc);
+    app.post("/map/:map/all-regions", allMapRegionsFunc);
+
+    app.post("/map/:map/region-type/:regionType/regions", regionsForRegionTypeFunc);
+    app.get("/map/:map/region-type/:regionType/regions", regionsForRegionTypeFunc);
 
     /**
      * Returns the data to show the exceedance AND counts on the main map. This is a highly optimized version
@@ -91,7 +91,7 @@ module.exports = () => {
      *
      *
      */
-    app.post("/v1/map/:map/region-type/:regionType/stats", statsFunc);
+    app.post("/map/:map/region-type/:regionType/stats", statsFunc);
 
 
     /**
@@ -110,7 +110,7 @@ module.exports = () => {
      *
      *
      */
-    app.post("/v1/map/:map/region-type/:regionType/accurate-stats", accurateStatsFunc);
+    app.post("/map/:map/region-type/:regionType/accurate-stats", accurateStatsFunc);
 
 
 
@@ -130,7 +130,7 @@ module.exports = () => {
      *
      *
      */
-    app.post("/v1/map/:map/analytics/time", timeseriesFunc);
+    app.post("/map/:map/analytics/time", timeseriesFunc);
 
 
     function sleep(ms) {
