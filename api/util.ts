@@ -4,7 +4,7 @@ export const dateFromMillis = (time: number) => {
     const dateTime = new Date(time);
     return new Date(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDate());
 };
-export const stage = process.env.AWS_LAMBDA_FUNCTION_NAME.substring("query-".length);
+export const stage = process.env.AWS_LAMBDA_FUNCTION_NAME.split("-")[1];
 console.log("STAGE: " + stage);
 const dev = stage === "dev";
 // Load modules
@@ -33,18 +33,6 @@ export const roundTo15Minute = (timestamp: number): any => {
 };
 
 
-const {Parameters} = await ((new aws.SSM())
-    .getParameters({
-                       Names:          ["DB_PASSWORD", "TWITTER_BEARER_TOKEN"].map(secretName => process.env[secretName]),
-                       WithDecryption: true,
-                   })
-    .promise());
-
-
-console.log("Parameters:", Parameters);
-export const dbPassword = Parameters.filter(i => i.Name.endsWith("DB_PASSWORD")).pop().Value;
-console.log("DB Password: " + dbPassword);
-// Initialising the MySQL connection
 
 
 export const handleError = (res, e) => {

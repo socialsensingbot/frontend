@@ -17,6 +17,7 @@ import {
     timeseriesFunc
 } from "socialsensing-api/map-queries";
 
+//bump 4
 const awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
 module.exports = () => {
 

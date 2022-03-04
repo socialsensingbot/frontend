@@ -23,6 +23,8 @@ import {
 } from "socialsensing-api/map-queries";
 import {Pool} from "mysql";
 
+//bump 6
+
 const awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
 module.exports = (connection: Pool) => {
 

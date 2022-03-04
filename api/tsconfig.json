@@ -1,23 +1,13 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "noImplicitAny": false,
-    "allowJs": true,
-    "types": [
-      "node"
-    ],
+    "allowSyntheticDefaultImports": true,
     "lib": [
+      "es2020",
       "dom",
-      "es5",
-      "scripthost",
-      "es2015.promise"
-    ]
-  },
-  "include": [
-    "."
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.spec.ts"
-  ]
+      "scripthost"
+    ],
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "es2020"
+  }
 }

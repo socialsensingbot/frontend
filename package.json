@@ -13,8 +13,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "amplify-modelgen": "node amplify/scripts/amplify-modelgen.js",
-    "amplify:query": "cd amplify/backend/function/query/src && npm install && tsc --project tsconfig.json",
-    "amplify:api": "cd amplify/backend/function/api/src && npm install && tsc --project tsconfig.json",
+    "amplify:query": "cd amplify/backend/function/query && ./build.sh",
+    "amplify:api": "cd amplify/backend/function/api && ./build.sh",
     "amplify-push": "node amplify/scripts/amplify-push.js"
   },
   "private": true,

@@ -1,6 +1,8 @@
 import {Pool} from "mysql";
 import * as NodeCache from "node-cache";
 
+const aws = require("aws-sdk");
+
 const mysql = require("mysql");
 
 export class SSDatabase {
@@ -8,25 +10,42 @@ export class SSDatabase {
     private queryCache = new NodeCache({stdTTL: 60 * 60, checkperiod: 60 * 60, useClones: true});
     private connection: Pool;
     private disabled: boolean;
+    private dbPassword: string;
+    private readyPromise: Promise<void>;
 
-    constructor(private stage: string, private dbPassword: string) {
-        this.connection = mysql.createPool({
-                                               connectionLimit: 5,
-                                               host:            "database-" + this.stage + ".cxsscwdzsrae.eu-west-2.rds.amazonaws.com",
-                                               user:            "admin",
-                                               password:        this.dbPassword,
-                                               database:        "socialsensing",
-                                               charset:         "utf8mb4",
-                                               // multipleStatements: true,
-                                               // connectTimeout: 15000,
-                                               // acquireTimeout: 10000,
-                                               waitForConnections: true,
-                                               queueLimit:         5000,
-                                               debug:              false
-                                           });
+    constructor(private stage: string) {
+        this.readyPromise = ((new aws.SSM())
+            .getParameters({
+                               Names:          ["DB_PASSWORD", "TWITTER_BEARER_TOKEN"].map(secretName => process.env[secretName]),
+                               WithDecryption: true,
+                           })
+            .promise().then(result => {
+                console.log("Parameters:", result.Parameters);
+                this.dbPassword = result.Parameters.filter(i => i.Name.endsWith("DB_PASSWORD")).pop().Value;
+                console.log("DB Password: " + this.dbPassword);
+                // Initialising the MySQL connection
+
+                this.connection = mysql.createPool({
+                                                       connectionLimit: 5,
+                                                       host:            "database-" + this.stage + ".cxsscwdzsrae.eu-west-2.rds.amazonaws.com",
+                                                       user:            "admin",
+                                                       password:        this.dbPassword,
+                                                       database:        "socialsensing",
+                                                       charset:         "utf8mb4",
+                                                       // multipleStatements: true,
+                                                       // connectTimeout: 15000,
+                                                       // acquireTimeout: 10000,
+                                                       waitForConnections: true,
+                                                       queueLimit:         5000,
+                                                       debug:              false
+                                                   });
+            }));
+
+
     }
 
-    cache(res, key: string, value: () => Promise<any>, options: { duration: number } = {duration: 60}) {
+    async cache(res, key: string, value: () => Promise<any>, options: { duration: number } = {duration: 60}) {
+        await this.readyPromise;
         try {
             if (this.disabled) {
                 res.setHeader("X-SocialSensing-API-Disabled");
@@ -47,7 +66,7 @@ export class SSDatabase {
                 console.log("Retrieving query for " + key);
 
                 res.setHeader("X-SocialSensing-CachedQuery", "false");
-                value().then(result => {
+                return value().then(result => {
                     if (key !== null) {
                         setTimeout(() => {
                             this.queryCache.set(key, result, options.duration);
@@ -86,6 +105,7 @@ export class SSDatabase {
 
 
     public async sql(options: { sql: string; values?: any; }, tx = false): Promise<any[]> {
+        await this.readyPromise;
         return new Promise((resolve, reject) => {
             this.connection.getConnection((err, poolConnection) => {
                 if (err) {

@@ -24,6 +24,13 @@
     "tslint": "~6.1.0",
     "typescript": "^3.9.10"
   },
+  "exports": {
+    ".": "./index.js",
+    "./db": "./db.js",
+    "./map-data": "./map-data.js",
+    "./map-queries": "./map-queries.js",
+    "./util": "./util.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
