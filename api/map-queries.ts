@@ -47,6 +47,15 @@ export const warningsValues = (warning: string) => {
     throw new Error("Unrecognized warning option: " + warning);
 };
 
+//
+// export const regionsFunc : (req, res) => Promise<void> = async (req, res) => {
+//         await db.cache(res, req.path, async () => {
+//             return  await db.sql({
+//                                           sql:    `SELECT title as text, id as value, aggregate_level as level FROM ref_regions`,
+//                                           values: {}
+//                                       });
+//         });
+// }
 
 // Map Related Queries
 export const mapMetadataFunc: (req, res) => Promise<void> = async (req, res) => {

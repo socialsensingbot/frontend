@@ -8,7 +8,7 @@ const mysql = require("mysql");
 export class SSDatabase {
 
     private queryCache = new NodeCache({stdTTL: 60 * 60, checkperiod: 60 * 60, useClones: true});
-    private connection: Pool;
+    public connection: Pool;
     private disabled: boolean;
     private dbPassword: string;
     private readyPromise: Promise<void>;

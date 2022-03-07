@@ -164,7 +164,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
         );
     }
 
-    constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
+    constructor(protected _zone: NgZone, protected _router: Router,
                 public notify: NotificationService,
                 private _route: ActivatedRoute, private _api: RESTDataAPIService, public pref: PreferenceService,
                 public exec: UIExecutionService,
