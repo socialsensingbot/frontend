@@ -17,7 +17,7 @@
     "mysql": "^2.18.1",
     "mysql-connection-pool-manager": "^1.5.9",
     "node-cache": "^5.1.2",
-    "socialsensing-api": "file:../../../../../api/socialsensing-api-1.0.0.tgz"
+    "socialsensing-api": "file:socialsensing-api-1.0.0.tgz"
   },
   "devDependencies": {
     "@types/node": "^16.11.22",

@@ -70,3 +70,4 @@ amplifytools.xcconfig
 .secret-*
 **.sample
 #amplify-do-not-edit-end
+socialsensing-api-1.0.0.tgz

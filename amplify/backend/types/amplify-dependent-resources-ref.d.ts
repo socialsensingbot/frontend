@@ -44,9 +44,6 @@ export type AmplifyDependentResourcesAttributes = {
             "Arn": "string",
             "Region": "string",
             "LambdaExecutionRole": "string"
-        },
-        "socialsensingapilayer": {
-            "Arn": "string"
         }
     },
     "storage": {

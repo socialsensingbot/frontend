@@ -33,15 +33,7 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "function",
-          "resourceName": "socialsensingapilayer",
-          "attributes": [
-            "Arn"
-          ]
-        }
-      ]
+      "dependsOn": []
     },
     "twitterCompliance": {
       "build": true,
@@ -53,20 +45,7 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "function",
-          "resourceName": "socialsensingapilayer",
-          "attributes": [
-            "Arn"
-          ]
-        }
-      ]
-    },
-    "socialsensingapilayer": {
-      "providerPlugin": "awscloudformation",
-      "service": "LambdaLayer",
-      "build": true
+      "dependsOn": []
     }
   },
   "storage": {
