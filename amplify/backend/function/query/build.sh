@@ -7,5 +7,6 @@ npm pack
 cd - || exit
 cd src || exit
 cp ../../../../../api/socialsensing-api*.tgz .
+npm install socialsensing-api*.tgz
 npm install
 tsc --project tsconfig.json
