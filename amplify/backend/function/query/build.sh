@@ -4,6 +4,7 @@ tsc --project tsconfig.json
 npm pack
 cd - || exit
 cd src || exit
-npm install ../../../../../api/socialsensing-api*.tgz
+cp ../../../../../api/socialsensing-api*.tgz
+npm ci socialsensing-api*.tgz
 npm ci
 tsc --project tsconfig.json
