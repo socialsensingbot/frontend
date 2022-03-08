@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@aws-amplify/cli-extensibility-helper": "^2.0.0",
-    "socialsensing-api": "file:../../api/socialsensing-api-1.0.0.tgz"
   },
   "devDependencies": {
     "typescript": "^4.2.4"
