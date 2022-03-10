@@ -6,7 +6,6 @@ import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import {ColumnSeries, DateAxis, LineSeries, XYChart, XYChartScrollbar} from "@amcharts/amcharts4/charts";
 import jt_theme from "../../theme/jt.theme";
-import {MetadataService} from "../../api/metadata.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {NotificationService} from "../../services/notification.service";
 import {RESTDataAPIService} from "../../api/rest-api.service";
@@ -88,7 +87,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
     public set options(value: DateRangeSliderOptions) {
         log.debug("Options: " + JSON.stringify(value));
         const oldValue = this._options;
-        this._options = JSON.parse(JSON.stringify(this._options));
+        this._options = JSON.parse(JSON.stringify(value));
         if (this._options.min <= 0) {
             console.trace("Min value must be > 0");
             log.warn("Min value must be positive");
