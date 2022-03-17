@@ -1,0 +1,347 @@
+openapi: 3.0.1
+info:
+  title: Social Sensing API
+  description: Social Sensing API
+  version: 1.0.0
+servers:
+  - url: https://api-dev.socialsensing.com/
+security:
+  - ApiKeyAuth: [ ]
+paths:
+  /v1/map/metadata:
+    get:
+      summary: Returns metadata regarding all available maps
+      description: Returns metadata regarding all available maps
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                    description: The version of this metadata
+                    example: "1.0.0"
+                  maps:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MapMetadata'
+                  start:
+                    $ref: '#/components/schemas/StartMetadata'
+  /v1/map/{map}/metadata:
+    get:
+      summary: Returns metadata for the specified map
+      description: Returns metadata  for the specified map
+      parameters:
+        - $ref: '#/components/parameters/Map'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/MapMetadata'
+
+  /v1/map/{map}/now:
+    get:
+      summary: Returns the latest date for which there is data for the specified map.
+      description: "
+      Returns the latest date for which there is data for the specified map. For archived map data this will be a fixed date, otherwise it's the last time data was processed.
+      "
+      parameters:
+        - $ref: '#/components/parameters/Map'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: integer
+                example: 1425744000000
+
+  /v1/map/{map}/text:
+    post:
+      summary: Returns related Tweets for the specified regions.
+      description: "Returns related Tweets for the specified regions."
+      parameters:
+        - $ref: '#/components/parameters/Map'
+      requestBody:
+        description: Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TextRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TextResponseItem'
+  /v1/map/{map}/stats:
+    post:
+      summary: Returns related Tweets for the specified regions.
+      description: "Returns related Tweets for the specified regions."
+      parameters:
+        - $ref: '#/components/parameters/Map'
+      requestBody:
+        description: Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatsRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StatsResponseItem'
+  /v1/map/{map}/recent-text-count:
+    post:
+      description: "Returns the number of messages, i.e. tweets, since a specific time. This is provided so that recently active regions can be flagged."
+      parameters:
+        - $ref: '#/components/parameters/Map'
+      requestBody:
+        description: Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecentCountRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/RecentCountResponseItem'
+
+components:
+  parameters:
+    Map:
+      in: path
+      name: map
+      required: true
+      schema:
+        type: string
+      description: The map to get the text for.
+      example: uk-flood-live
+    RegionType:
+      in: path
+      name: regionType
+      required: true
+      schema:
+        type: string
+      description: The region type of the regions which are specified in the request body.
+      example: county
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+  schemas:
+    RegionDataRequest:
+      type: object
+      properties:
+        regionType:
+          type: string
+          description: "The type of the regions specified by the regions property"
+          example: county
+        regions:
+          type: array
+          description: "A set of regions to retrieve texts for. These regions must be of the type specified by the property regionType."
+          items:
+            type: string
+            example: hertfordshire
+        hazards:
+          type: array
+          items:
+            type: string
+            example: flood
+        sources:
+          type: array
+          items:
+            type: string
+            example: twitter
+        warnings:
+          type: string
+          pattern: "(only|include|exclude)"
+    PagedRequest:
+      type: object
+      properties:
+        page:
+          type: integer
+          description: "For paged results, the page to return. This means results will be from pageSize * page to pageSize * (page+1) - 1 ."
+          example: 0
+        pageSize:
+          type: integer
+          description: "For paged results, the number of results per page."
+          example: 100
+    DateRangeRequest:
+      type: object
+      properties:
+        startDate:
+          type: integer
+          example: 1425744000000
+        endDate:
+          type: integer
+          example: 1425822000000
+    TextRequest:
+      allOf:
+        - $ref: '#/components/schemas/RegionDataRequest'
+        - $ref: '#/components/schemas/PagedRequest'
+        - $ref: '#/components/schemas/DateRangeRequest'
+    StatsRequest:
+      allOf:
+        - $ref: '#/components/schemas/RegionDataRequest'
+        - $ref: '#/components/schemas/DateRangeRequest'
+    RecentCountRequest:
+      allOf:
+        - $ref: '#/components/schemas/RegionDataRequest'
+        - type: object
+          properties:
+            startDate:
+              type: integer
+              example: 1425744000000
+
+    RecentCountResponseItem:
+      type: object
+      additionalProperties:
+        type: integer
+      example:
+        powys: 3
+        devon: 20
+        dorset: 23
+    StatsResponseItem:
+      type: object
+      description: "The statistics for a given region."
+      properties:
+        region:
+          type: string
+          example: hertfordshire
+          description: "The region the statistics are for."
+        count:
+          type: integer
+          example: 195
+          description: "The number of messages counted for this region."
+        exceedance:
+          type: number
+          example: 35.2
+          minimum: 0.0
+          maximum: 100.0
+          description: "The exceedance value for the region as a percentage. Lower is more unusual, higher is more usual."
+    TextResponseItem:
+      type: object
+      properties:
+        json:
+          type: object
+          description: "The full JSON object supplied by the source service, i.e. Twitter"
+          additionalProperties: true
+        timestamp:
+          type: integer
+          example: 1425822000000
+        source:
+          type: string
+          example: twitter
+          description: "The originating service, e.g. Twitter, for the message"
+        id:
+          type: string
+          example: "200434034030"
+          description: "The identifier given by the source service, i.e. Twitter, for the message"
+        location:
+          type: object
+          description: "A GeoJSON object representing the location of the message."
+          additionalProperties: true
+        region_type:
+          type: string
+          example: county
+          description: "The region type of the region this message belongs to"
+        region:
+          type: string
+          example: hertfordshire
+          description: "The region this message relates to."
+        hazard:
+          type: string
+          example: flood
+          description: "The hazard this message relates to."
+        possibly_sensitive:
+          type: boolean
+          description: "TRUE if the message may contain inappropriate text or images."
+          example: false
+        warning:
+          type: boolean
+          description: "TRUE if the message comes from an automated warning."
+          example: false
+    StartMetadata:
+      type: object
+      properties:
+        lat:
+          type: number
+          example: 53.0
+        lng:
+          type: number
+          example: -0.1
+        zoom:
+          type: integer
+          example: 12
+    RegionMetadata:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "county"
+        title:
+          type: string
+          example: "Local Authority"
+      description: Region metadata
+    MapMetadata:
+      required:
+        - defaultRegionType
+        - hazards
+        - id
+        - location
+        - regionAggregations
+        - start
+      type: object
+      properties:
+        id:
+          type: string
+          example: "uk-flood-live"
+        title:
+          type: string
+          example: "UK Flood"
+        version:
+          type: string
+          example: "1.0.0"
+        regionTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/RegionMetadata'
+        regionAggregations:
+          type: array
+          items:
+            type: string
+            example: "countries"
+        start:
+          $ref: '#/components/schemas/StartMetadata'
+        location:
+          type: string
+          example: "uk"
+        hazards:
+          type: array
+          items:
+            type: string
+            example: "flood"
+        defaultRegionType:
+          type: string
+          example: "county"
+      description: Map metadata

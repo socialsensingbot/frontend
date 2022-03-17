@@ -2,11 +2,8 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import {
-    accurateStatsFunc,
     allMapRegionsFunc,
-    geographyFunc,
     mapMetadataFunc,
-    mapRegionsFunc,
     metadataForMapByIDFunc,
     nowFunc,
     recentTextCountFunc,
@@ -36,63 +33,54 @@ app.use((req, res, next) => {
 });
 
 
-app.post("/map/metadata", mapMetadataFunc);
-app.get("/map/metadata", mapMetadataFunc);
-
-app.get("/map/:map/metadata", metadataForMapByIDFunc);
-app.post("/map/:map/metadata", metadataForMapByIDFunc);
-
-app.post("/map/:map/region-type/:regionType/text-for-regions", textForRegionsFunc);
-
-app.get("/map/:map/region-type/:regionType/geography", geographyFunc);
-app.post("/map/:map/region-type/:regionType/geography", geographyFunc);
-
-app.post("/map/:map/region-type/:regionType/region/:region/geography", regionGeographyFunc);
-app.get("/map/:map/region-type/:regionType/region/:region/geography", regionGeographyFunc);
-
-app.post("/map/:map/region-type/:regionType/recent-text-count", recentTextCountFunc);
-
-
-app.post("/map/:map/now", nowFunc);
+/**
+ * Returns the global metadata. Including all the metadata for individual maps.
+ */
+app.post("/v1/map/metadata", mapMetadataFunc);
+app.get("/v1/map/metadata", mapMetadataFunc);
 
 /**
- * Returns all the regions for a given map, regardless of region type.
- * IMPORTANT: this screens out numerically named regions.
+ * Returns the time according to the API. I.e. the date of the last processed data. Kept for completeness/testing, probably not going to be
+ * used by customers.
  */
-app.post("/map/:map/regions", mapRegionsFunc);
-app.get("/map/:map/regions", mapRegionsFunc);
+app.get("/v1/map/:map/now", nowFunc);
+app.post("/v1/map/:map/now", nowFunc);
 
 
 /**
- * Returns all the regions for a given map, regardless of region type.
- * IMPORTANT: this screens out numerically named regions.
+ * Returns the metadata for a given map.
  */
-app.get("/map/:map/all-regions", allMapRegionsFunc);
-app.post("/map/:map/all-regions", allMapRegionsFunc);
+app.get("/v1/map/:map/metadata", metadataForMapByIDFunc);
+app.post("/v1/map/:map/metadata", metadataForMapByIDFunc);
 
-app.post("/map/:map/region-type/:regionType/regions", regionsForRegionTypeFunc);
-app.get("/map/:map/region-type/:regionType/regions", regionsForRegionTypeFunc);
+/**
+ * Returns the Tweets (or any other form of text based message) for a given region and regionType.
+ */
+app.post("/v1/map/:map/text", textForRegionsFunc);
+
 
 /**
  * Returns the data to show the exceedance AND counts on the main map. This is a highly optimized version
  * of the 'complex-stats' call. It makes a lot of assumptions AND allows only the simple enumerated AND boolean
  * criteria of hazards, sources AND warning.
  *
- * @example JSON body
- *
- * {
- *     "layer" : {
- *         "hazards" : ["flood","wind"]
- *         "sources" :["twitter"]
- *         "warnings": "include"
- *     },
- *     "from": 1634911245041,
- *     "to": 1634911245041,
- * }
- *
- *
  */
-app.post("/map/:map/region-type/:regionType/stats", statsFunc);
+app.post("/v1/map/:map/stats", statsFunc);
+
+/**
+ * Returns the geography in GeoJSON for a given region of a regionType.
+ */
+app.get("/v1/map/:map/region-type/:regionType/region/:region/geography", regionGeographyFunc);
+
+app.post("/v1/map/:map/recent-text-count", recentTextCountFunc);
+
+/**
+ * Returns all the regions for a given map, regardless of region type.
+ * IMPORTANT: this screens out numerically named regions.
+ */
+app.get("/v1/map/:map/regions", allMapRegionsFunc);
+
+app.get("/v1/map/:map/region-type/:regionType/regions", regionsForRegionTypeFunc);
 
 
 /**
@@ -100,10 +88,8 @@ app.post("/map/:map/region-type/:regionType/stats", statsFunc);
  * @example JSON body
  *
  * {
- *     "layer" : {
- *         "hazards" : ["flood","wind"]
- *         "sources" :["twitter"]
- *     },
+ *     "hazards" : ["flood","wind"]
+ *     "sources" :["twitter"]
  *     "regions":["wales","england"],
  *     "from": 1634911245041,
  *     "to": 1634911245041,
@@ -111,26 +97,7 @@ app.post("/map/:map/region-type/:regionType/stats", statsFunc);
  *
  *
  */
-app.post("/map/:map/region-type/:regionType/accurate-stats", accurateStatsFunc);
-
-
-/**
- * Returns the data for a timeseries graph on the give map.
- * @example JSON body
- *
- * {
- *     "layer" : {
- *         "hazards" : ["flood","wind"]
- *         "sources" :["twitter"]
- *     },
- *     "regions":["wales","england"],
- *     "from": 1634911245041,
- *     "to": 1634911245041,
- * }
- *
- *
- */
-app.post("/map/:map/analytics/time", timeseriesFunc);
+app.post("/v1/map/:map/analytics/time", timeseriesFunc);
 
 
 function sleep(ms) {

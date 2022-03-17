@@ -143,6 +143,7 @@ export const textForRegionsFunc: (req, res) => Promise<void> = async (req, res) 
     const pageSize: number = +req.body.pageSize || 100;
     const page: number = +req.body.page || 0;
     const from = page * pageSize;
+    let regionType: any = req.params.regionType || req.body.regionType;
 
     await db.cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
 
@@ -150,12 +151,15 @@ export const textForRegionsFunc: (req, res) => Promise<void> = async (req, res) 
                                  sql:
                                  // language=MySQL
                                      `/* app.ts: text_for_regions */ select t.source_json            as json,
-                                                                            t.source_html            as html,
                                                                             r.source_timestamp       as timestamp,
                                                                             r.source_id              as id,
                                                                             ST_AsGeoJSON(t.location) as location,
                                                                             r.region                 as region,
-                                                                            t.possibly_sensitive     as possibly_sensitive
+                                                                            t.possibly_sensitive     as possibly_sensitive,
+                                                                            r.source                 as source,
+                                                                            r.region_type            as region_type,
+                                                                            r.hazard                 as hazard,
+                                                                            r.warning                as warning
                                                                      FROM live_text t
                                                                               LEFT JOIN mat_view_regions r
                                                                                         ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
@@ -169,7 +173,7 @@ export const textForRegionsFunc: (req, res) => Promise<void> = async (req, res) 
                                                                      order by r.source_timestamp desc
                                                                      LIMIT ?,?`,
                                  values: [new Date(req.body.startDate), new Date(endDate),
-                                          req.body.regions, req.params.regionType, req.body.hazards,
+                                          req.body.regions, regionType, req.body.hazards,
                                           req.body.sources,
                                           warningsValues(req.body.warnings),
                                           from, pageSize
@@ -396,7 +400,7 @@ export const mapAggregationsFunc: (req, res) => Promise<void> = async (req, res)
 };
 export const recentTextCountFunc: (req, res) => Promise<void> = async (req, res) => {
     const lastDate: Date = (await getMaps())[req.params.map].last_date;
-    const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
+    const regionType: any = req.params.regionType || req.body.regionType;
 
     await db.cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
         if (lastDate !== null) {
@@ -414,7 +418,7 @@ export const recentTextCountFunc: (req, res) => Promise<void> = async (req, res)
                                                                                  AND r.warning IN (?)
                                                                                GROUP BY r.region
                                               `,
-                                      values: [req.params.regionType, new Date(req.body.startDate), req.body.hazards, req.body.sources,
+                                      values: [regionType, new Date(req.body.startDate), req.body.hazards, req.body.sources,
                                                warningsValues(req.body.warnings),]
                                   });
         const result = {};
@@ -535,6 +539,8 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
         console.debug("StartDate: " + new Date(req.body.startDate));
         console.debug("EndDate: " + new Date(endDate));
         const periodInDays = (endDate - req.body.startDate) / (24 * 60 * 60 * 1000);
+        const regionType: any = req.params.regionType || req.body.regionType;
+
         const rows = await db.sql({
                                       /* language=MySQL*/ sql: `/* app.ts: stats */ select *
                                                                                     from (select region,
@@ -575,14 +581,14 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
                                                                `,
 
                                       values: [
-                                          req.params.regionType, req.body.hazards, req.body.sources,
+                                          regionType, req.body.hazards, req.body.sources,
                                           warningsValues(req.body.warnings),
                                           periodInDays,
 
-                                          req.params.regionType, req.body.hazards, req.body.sources,
+                                          regionType, req.body.hazards, req.body.sources,
                                           warningsValues(req.body.warnings),
 
-                                          req.params.regionType, req.body.hazards, req.body.sources,
+                                          regionType, req.body.hazards, req.body.sources,
                                           warningsValues(req.body.warnings),
                                           new Date(req.body.startDate), new Date(req.body.endDate),
                                           exceedanceThreshold, countThreshold
@@ -746,18 +752,17 @@ export const timesliderFunc: (req, res) => Promise<void> = async (req, res) => {
     const lastDateInDB: any = (await getMaps())[req.params.map].last_date;
     const location: any = (await getMaps())[req.params.map].location;
     const key = req.params.map + ":" + JSON.stringify(req.body);
-    const params: any = req.body;
     const pageSize: number = +req.body.pageSize || 4 * 365 * 24;
     const page: number = +req.body.page || 0;
     const fromItem = page * pageSize;
     await db.cache(res, key, async () => {
-        const dayTimePeriod: boolean = params.timePeriod === "day";
+        const dayTimePeriod: boolean = req.body.timePeriod === "day";
         const timeSeriesTable = dayTimePeriod ? "mat_view_timeseries_date" : "mat_view_timeseries_hour";
         const dateTable = dayTimePeriod ? "mat_view_days" : "mat_view_hours";
-        const from: Date = dateFromMillis(params.from);
-        const to: Date = lastDateInDB ? dateFromMillis(Math.min(params.to, lastDateInDB.getTime())) : dateFromMillis(params.to);
-        const hazards: string[] = params.layer.hazards;
-        const sources: string[] = params.layer.sources;
+        const from: Date = dateFromMillis(req.body.from);
+        const to: Date = lastDateInDB ? dateFromMillis(Math.min(req.body.to, lastDateInDB.getTime())) : dateFromMillis(req.body.to);
+        const hazards: string[] = req.body.hazards || req.body.layer.hazards;
+        const sources: string[] = req.body.sources || req.body.layer.sources;
         return await db.sql({
                                 // language=MySQL
                                 sql: `SELECT count(*)        as count,
@@ -798,20 +803,19 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
     const lastDateInDB: any = (await getMaps())[req.params.map].last_date;
     const location: any = (await getMaps())[req.params.map].location;
     const key = req.params.map + ":" + JSON.stringify(req.body);
-    const params: any = req.body;
     const pageSize: number = +req.body.pageSize || 4 * 365 * 24;
     const page: number = +req.body.page || 0;
     const fromItem = page * pageSize;
     await db.cache(res, key, async () => {
         let fullText = "";
-        let textSearch: string = params.textSearch;
+        let textSearch: string = req.body.textSearch;
         //           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',
         if (typeof textSearch !== "undefined" && textSearch.length > 0) {
             fullText = " AND MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
             let additionalQuery = "+(";
-            for (const source of params.layer.sources) {
-                for (const hazard of params.layer.hazards) {
-                    for (const region of params.regions) {
+            for (const source of req.body.layer.sources) {
+                for (const hazard of req.body.layer.hazards) {
+                    for (const region of req.body.regions) {
                         additionalQuery += md5(source + ":" + hazard + ":" + region) + " ";
                     }
                 }
@@ -820,14 +824,14 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
             textSearch = additionalQuery + "+(" + textSearch + ")";
             console.log("Ammended text search is '" + textSearch + "'");
         }
-        const dayTimePeriod: boolean = params.timePeriod === "day";
+        const dayTimePeriod: boolean = req.body.timePeriod === "day";
         const timeSeriesTable = dayTimePeriod ? "mat_view_timeseries_date" : "mat_view_timeseries_hour";
         const dateTable = dayTimePeriod ? "mat_view_days" : "mat_view_hours";
-        const from: Date = dateFromMillis(params.from);
-        const to: Date = lastDateInDB ? dateFromMillis(Math.min(params.to, lastDateInDB.getTime())) : dateFromMillis(params.to);
-        const hazards: string[] = params.layer.hazards;
-        const sources: string[] = params.layer.sources;
-        const regions: string[] = params.regions;
+        const from: Date = dateFromMillis(req.body.from);
+        const to: Date = lastDateInDB ? dateFromMillis(Math.min(req.body.to, lastDateInDB.getTime())) : dateFromMillis(req.body.to);
+        const hazards: string[] = req.body.hazards || req.body.layer.hazards;
+        const sources: string[] = req.body.sources || req.body.layer.sources;
+        const regions: string[] = req.body.regions;
         if (!regions || regions.length === 0) {
             const values = fullText ? [hazards, sources, location, textSearch, from, to, fromItem, pageSize] : [hazards, sources,
                                                                                                                 location, from, to,

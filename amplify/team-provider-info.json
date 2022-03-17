@@ -25,7 +25,7 @@
         },
         "query": {
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
-          "s3Key": "amplify-builds/query-4864685442454270736a-build.zip",
+          "s3Key": "amplify-builds/query-62685333674748337641-build.zip",
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
         },
         "twitterCompliance": {
@@ -36,7 +36,7 @@
         "api": {
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
-          "s3Key": "amplify-builds/api-78524479493044723562-build.zip"
+          "s3Key": "amplify-builds/api-3562664450616b376576-build.zip"
         }
       },
       "hosting": {
@@ -175,57 +175,6 @@
           "appId": "dtmxl3q3i7oix",
           "type": "cicd"
         }
-      }
-    }
-  },
-  "temp": {
-    "awscloudformation": {
-      "AuthRoleName": "amplify-socialsensing-temp-192328-authRole",
-      "UnauthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-temp-192328-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::686957444051:role/amplify-socialsensing-temp-192328-authRole",
-      "Region": "eu-west-2",
-      "DeploymentBucketName": "amplify-socialsensing-temp-192328-deployment",
-      "UnauthRoleName": "amplify-socialsensing-temp-192328-unauthRole",
-      "StackName": "amplify-socialsensing-temp-192328",
-      "StackId": "arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-temp-192328/e89d51d0-98cb-11ec-9fc1-0a1b3838b1aa",
-      "AmplifyAppId": "dtmxl3q3i7oix",
-      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-socialsensing-temp-192328-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
-    },
-    "categories": {
-      "function": {
-        "S3Triggerb3a090e2": {
-          "deploymentBucketName": "amplify-socialsensing-temp-192328-deployment",
-          "s3Key": "amplify-builds/S3Triggerb3a090e2-754e48743050344b787a-build.zip"
-        },
-        "query": {
-          "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
-          "deploymentBucketName": "amplify-socialsensing-temp-192328-deployment",
-          "s3Key": "amplify-builds/query-4a4d4a4653722f454363-build.zip"
-        },
-        "twitterCompliance": {
-          "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
-          "deploymentBucketName": "amplify-socialsensing-temp-192328-deployment",
-          "s3Key": "amplify-builds/twitterCompliance-5877644a425561383271-build.zip"
-        },
-        "api": {
-          "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
-          "deploymentBucketName": "amplify-socialsensing-temp-192328-deployment",
-          "s3Key": "amplify-builds/api-456b2f6a463035587073-build.zip"
-        },
-        "socialsensingapilayer": {
-          "deploymentBucketName": "amplify-socialsensing-temp-192328-deployment",
-          "s3Key": "amplify-builds/socialsensingapilayer-LambdaLayerVersionb9d892cc-build.zip"
-        }
-      },
-      "hosting": {
-        "amplifyhosting": {
-          "appId": "dtmxl3q3i7oix",
-          "type": "cicd"
-        }
-      },
-      "auth": {
-        "socialsensingf07a871c": {},
-        "userPoolGroups": {}
       }
     }
   }
