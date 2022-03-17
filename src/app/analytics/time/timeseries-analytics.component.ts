@@ -144,7 +144,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this._state = value;
     }
 
-    constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
+    constructor(protected _zone: NgZone, protected _router: Router,
                 public notify: NotificationService, public map: MapSelectionService,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
                 public exec: UIExecutionService, public saves: SavedGraphService, public dialog: MatDialog,

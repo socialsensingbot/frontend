@@ -166,87 +166,54 @@ export class RESTMapDataService {
 
 
     public async tweets(layerGroupId: string, regionType: string, regions: string[], startDate,
-                        endDate): Promise<Tweet[]> {
+                        endDate, pageSize = 300, maxPages = 100): Promise<Tweet[]> {
         const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
-        log.debug("requesting tweets for regions " + regions);
-        const rawResult = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/text-for-regions", {
+
+        return await this._api.callMapAPIWithCacheAndPaging(this.map.id + "/region-type/" + regionType + "/text-for-regions", {
             hazards:   layerGroup.hazards,
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,
-            regions,
             startDate: roundToHour(startDate),
-            endDate:   roundToMinute(endDate)
+            endDate:   roundToMinute(endDate),
+            regions,
 
-        }, 0);
-        log.debug(rawResult.length + " tweets back from server");
-        const result: Tweet[] = [];
-        for (const tweet of rawResult) {
-            result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
-                                  tweet.possibly_sensitive));
-        }
-        return result;
+        }, (tweet) => new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
+                                tweet.possibly_sensitive), 1 * 60, pageSize, maxPages);
     }
 
     public async publicDisplayTweets(layerGroupId: string, regionType: string, startDate,
                                      endDate, pageSize = 100, maxPages = 10): Promise<Tweet[]> {
-        const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
-        log.debug("Requesting tweets for all regions ");
-        const result: Tweet[] = [];
-        let page = 0;
-        do {
-            const rawResult = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/text-for-public-display", {
-                hazards:   layerGroup.hazards,
-                sources:   layerGroup.sources,
-                warnings:  layerGroup.warnings,
-                pageSize:  pageSize,
-                page:      page,
-                startDate: roundToHour(startDate),
-                endDate:   roundToHour(endDate)
 
-            }, 60 * 60);
-            log.debug(rawResult.length + " tweets back from server");
-            for (const tweet of rawResult) {
-                result.push(new Tweet(tweet.id, null, tweet.json, null, new Date(tweet.timestamp), tweet.region,
-                                      tweet.possibly_sensitive));
-            }
-            if (rawResult.length < pageSize || page === maxPages - 1) {
-                return result;
-            } else {
-                page++;
-            }
-        } while (true);
+        const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
+
+        return await this._api.callMapAPIWithCacheAndPaging(this.map.id + "/region-type/" + regionType + "/text-for-public-display", {
+            hazards:   layerGroup.hazards,
+            sources:   layerGroup.sources,
+            warnings:  layerGroup.warnings,
+            startDate: roundToHour(startDate),
+            endDate:   roundToHour(endDate)
+
+        }, (tweet) => new Tweet(tweet.id, null, tweet.json, null, new Date(tweet.timestamp), tweet.region,
+                                tweet.possibly_sensitive), 60 * 60, pageSize, maxPages);
+
     }
 
     public async csvTweets(layerGroupId: string, regionType: string, regions: string[], startDate,
-                           endDate, byRegion: string, pageSize = 100, maxPages = 10000): Promise<Tweet[]> {
-        const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
-        log.debug("requesting tweets for regions " + regions);
-        const result: Tweet[] = [];
-        let page = 0;
-        do {
-            const rawResult = await this._api.callMapAPIWithCache(this.map.id + "/region-type/" + regionType + "/csv-export", {
-                hazards:   layerGroup.hazards,
-                sources:   layerGroup.sources,
-                warnings:  layerGroup.warnings,
-                regions,
-                byRegion,
-                pageSize:  pageSize,
-                page:      page,
-                startDate: roundToHour(startDate),
-                endDate:   roundToMinute(endDate)
+                           endDate, byRegion: string, pageSize = 100, maxPages = 1000): Promise<Tweet[]> {
 
-            }, 0);
-            log.debug(rawResult.length + " tweets back from server");
-            for (const tweet of rawResult) {
-                result.push(new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
-                                      tweet.possibly_sensitive));
-            }
-            if (rawResult.length < pageSize || page === maxPages - 1) {
-                return result;
-            } else {
-                page++;
-            }
-        } while (true);
+        const layerGroup: SSMapLayer = this.layerGroup(layerGroupId);
+
+        return await this._api.callMapAPIWithCacheAndPaging(this.map.id + "/region-type/" + regionType + "/csv-export", {
+            hazards:   layerGroup.hazards,
+            sources:   layerGroup.sources,
+            warnings:  layerGroup.warnings,
+            regions,
+            byRegion,
+            startDate: roundToHour(startDate),
+            endDate:   roundToMinute(endDate),
+
+        }, (tweet) => new Tweet(tweet.id, tweet.html, tweet.json, tweet.location, new Date(tweet.timestamp), tweet.region,
+                                tweet.possibly_sensitive), 1 * 60, pageSize, maxPages);
     }
 
     public async now(): Promise<number> {

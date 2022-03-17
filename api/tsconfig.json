@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "lib": [
+      "es2020",
+      "dom",
+      "scripthost"
+    ],
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "es2020"
+  }
+}

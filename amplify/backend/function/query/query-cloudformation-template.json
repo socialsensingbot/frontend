@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Lambda Function resource stack creation using Amplify CLI",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"7.6.22\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",
@@ -18,6 +18,10 @@
     },
     "secretsPathAmplifyAppId": {
       "Type": "String"
+    },
+    "functionsocialsensingapilayerArn": {
+      "Type": "String",
+      "Default": "functionsocialsensingapilayerArn"
     }
   },
   "Conditions": {

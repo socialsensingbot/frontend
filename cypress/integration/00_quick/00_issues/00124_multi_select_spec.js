@@ -16,7 +16,6 @@ describe('#124 Region multi select : https://github.com/socialsensingbot/fronten
                  cy.twitterPanelHeader("West Yorkshire");
                  cy.multiSelectRegions(["cambridgeshire", "hertfordshire"]);
                  cy.twitterPanelHeader("3 regions selected");
-                 cy.wait(10000);
                  cy.tweetCountTotal(24);
                  cy.url().should("equal",
                                  MAP_URL + "?active_number=exceedance&active_polygon=county&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&zoom=5&selected=west%20yorkshire&selected=cambridgeshire&selected=hertfordshire")

@@ -2,12 +2,10 @@ import {AfterViewInit, Component, ElementRef, EventEmitter, Input, NgZone, OnDes
 import {Subscription, timer} from "rxjs";
 import {Logger} from "@aws-amplify/core";
 import {PreferenceService} from "../../pref/preference.service";
-import {roundToHour, roundToMinute} from "../../common";
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import {ColumnSeries, DateAxis, LineSeries, XYChart, XYChartScrollbar} from "@amcharts/amcharts4/charts";
 import jt_theme from "../../theme/jt.theme";
-import {MetadataService} from "../../api/metadata.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {NotificationService} from "../../services/notification.service";
 import {RESTDataAPIService} from "../../api/rest-api.service";
@@ -16,6 +14,7 @@ import {TextAutoCompleteService} from "../../services/text-autocomplete.service"
 import {TimePeriod, TimeseriesRESTQuery} from "../../analytics/timeseries";
 import {SSMapLayer} from "../../types";
 import {DateRangeSliderOptions} from "../types";
+import {roundToHour, roundToMinute} from "../../common";
 
 const log = new Logger("historical-date-range");
 
@@ -88,35 +87,35 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
     public set options(value: DateRangeSliderOptions) {
         log.debug("Options: " + JSON.stringify(value));
         const oldValue = this._options;
-        this._options = value;
-        if (value.min <= 0) {
+        this._options = JSON.parse(JSON.stringify(value));
+        if (this._options.min <= 0) {
             console.trace("Min value must be > 0");
             log.warn("Min value must be positive");
             return;
         }
-        if (value.max <= 0) {
+        if (this._options.max <= 0) {
             console.trace("Max value must be > 0");
             log.warn("Max value must be positive");
             return;
         }
-        if (value.startMin <= 0) {
+        if (this._options.startMin <= 0) {
             console.trace("Lower value must be > 0");
             log.warn("Lower value must be > 0");
             return;
         }
-        if (value.startMax <= 0) {
+        if (this._options.startMax <= 0) {
             console.trace("Lower value must be > 0");
             log.warn("Upper value must be > 0");
             return;
         }
 
         if (!this.userHasInteracted) {
-            this.currentWindowMin = value.min;
-            this.currentWindowMax = value.max;
-            this.min = value.min;
-            this.max = value.max;
+            this.currentWindowMin = roundToHour(this._options.min);
+            this.currentWindowMax = roundToMinute(this._options.max);
+            this.min = roundToHour(this._options.min);
+            this.max = roundToMinute(this._options.max);
         }
-        if (this.historicalChart && (!this.userHasInteracted || oldValue.now !== value.now)) {
+        if (this.historicalChart && (!this.userHasInteracted || oldValue.now !== this._options.now)) {
             this.initHistoricalSlider();
             // this.updateCurrentChartSelection= true;
         }
@@ -131,8 +130,8 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                                                if (this.updateCurrentChartExtent) {
                                                                                    if (this.currentWindowMin && this.currentWindowMax) {
                                                                                        await this.getData(
-                                                                                           roundToHour(this.currentWindowMin),
-                                                                                           roundToHour(this.currentWindowMax),
+                                                                                           this.currentWindowMin,
+                                                                                           this.currentWindowMax,
                                                                                            ((this.currentWindowMax - this.currentWindowMin) < MAX_CURRENT_HOUR_WINDOW) ? "hour" : "day").then(
                                                                                            data => this.currentSeries.data = data);
                                                                                        this.min = this.currentWindowMin;
@@ -147,6 +146,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                                                }
                                                                                if (this.updateCurrentChartSelection && this.min && this.max) {
                                                                                    this.updateCurrentChartSelection = false;
+                                                                                   log.warn("Min & Max the same ", new Date(this.min));
                                                                                    this.currentDateAxis.zoomToDates(
                                                                                        new Date(this.min), new Date(this.max),
                                                                                        true,
@@ -163,7 +163,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
         );
     }
 
-    constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
+    constructor(protected _zone: NgZone, protected _router: Router,
                 public notify: NotificationService,
                 private _route: ActivatedRoute, private _api: RESTDataAPIService, public pref: PreferenceService,
                 public exec: UIExecutionService,
@@ -194,7 +194,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
     }
 
     private initHistoricalSlider(): void {
-        this.getData(roundToHour(this._options.now - MAX_HISTORICAL), roundToMinute(this._options.now), "day").then(
+        this.getData(this._options.now - MAX_HISTORICAL, this._options.now, "day").then(
             data => {
                 this.historicalSeries.data = data;
                 setTimeout(() => {
@@ -244,8 +244,8 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
             this._zone.run(() => {
                 if (this.ready) {
                     // this._options = {...this._options, currentWindowMin: +ev.target.minZoomed, currentWindowMax: +ev.target.maxZoomed};
-                    this.currentWindowMin = +ev.target.minZoomed;
-                    this.currentWindowMax = +ev.target.maxZoomed;
+                    this.currentWindowMin = roundToHour(+ev.target.minZoomed);
+                    this.currentWindowMax = roundToMinute(+ev.target.maxZoomed);
                     this.updateCurrentChartExtent = true;
                     this.userHasInteracted = true;
                     this.exec.uiActivity();
@@ -290,9 +290,10 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
         this.currentDateAxis.events.on("datarangechanged", (ev) => {
             this._zone.run(() => {
                 // this._options = {...this._options, currentWindowMin: +ev.target.minZoomed, currentWindowMax: +ev.target.maxZoomed};
-                if (this.ready) {
-                    this.min = ev.target.minZoomed;
-                    this.max = +ev.target.maxZoomed;
+                // tslint:disable-next-line:triple-equals
+                if (this.ready && ev.target.minZoomed != ev.target.maxZoomed) {
+                    this.min = roundToHour(ev.target.minZoomed);
+                    this.max = roundToMinute(+ev.target.maxZoomed);
                     this.updateCurrentChartSelection = true;
                     this.exec.uiActivity();
                     this.userHasInteracted = true;
