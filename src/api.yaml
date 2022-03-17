@@ -61,6 +61,75 @@ paths:
                 type: integer
                 example: 1425744000000
 
+  /v1/map/{map}/region-type/{regionType}/regions:
+    get:
+      description: Returns the regions for a given region type and map.
+      parameters:
+        - $ref: '#/components/parameters/Map'
+        - $ref: '#/components/parameters/RegionType'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: array
+                example:
+                  - dorset
+                  - powys
+                  - devon
+                items:
+                  type: string
+
+  /v1/map/{map}/regions:
+    get:
+      description: Returns all the region and region type combinations for a given map.
+      parameters:
+        - $ref: '#/components/parameters/Map'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    text:
+                      type: string
+                      description: A human-readable string describing the region
+                      example: Dorset
+                    value:
+                      description: An identifier for the region.
+                      type: string
+                      example: dorset
+                    type:
+                      type: string
+                      description: The region type.
+                      example: county
+                    level:
+                      type: integer
+                      description: The aggregation level of the region.
+                      example: 1
+
+  /v1/map/{map}/region-type/{regionType}/region/{region}/geography:
+    get:
+      summary: Returns the GeoJSON for the region on a map
+      description: "Returns the GeoJSON for the region on a map."
+      parameters:
+        - $ref: '#/components/parameters/Map'
+        - $ref: '#/components/parameters/RegionType'
+        - $ref: '#/components/parameters/Region'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: object
+                additionalProperties: true
+
   /v1/map/{map}/text:
     post:
       summary: Returns related Tweets for the specified regions.
@@ -68,7 +137,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/Map'
       requestBody:
-        description: Optional description in *Markdown*
+        description: ""
         required: true
         content:
           application/json:
@@ -83,6 +152,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TextResponseItem'
+
   /v1/map/{map}/stats:
     post:
       summary: Returns related Tweets for the specified regions.
@@ -90,7 +160,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/Map'
       requestBody:
-        description: Optional description in *Markdown*
+        description: ""
         required: true
         content:
           application/json:
@@ -105,13 +175,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/StatsResponseItem'
+
   /v1/map/{map}/recent-text-count:
     post:
       description: "Returns the number of messages, i.e. tweets, since a specific time. This is provided so that recently active regions can be flagged."
       parameters:
         - $ref: '#/components/parameters/Map'
       requestBody:
-        description: Optional description in *Markdown*
+        description: ""
         required: true
         content:
           application/json:
@@ -125,6 +196,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/RecentCountResponseItem'
 
+  /v1/map/{map}/analytics/time:
+    post:
+      description: Returns data for a time series graph.
+      parameters:
+        - $ref: '#/components/parameters/Map'
+      requestBody:
+        description: ""
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeSeriesRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TimeSeriesResponseItem'
+
 components:
   parameters:
     Map:
@@ -133,7 +226,7 @@ components:
       required: true
       schema:
         type: string
-      description: The map to get the text for.
+      description: The map.
       example: uk-flood-live
     RegionType:
       in: path
@@ -141,8 +234,16 @@ components:
       required: true
       schema:
         type: string
-      description: The region type of the regions which are specified in the request body.
+      description: The region type.
       example: county
+    Region:
+      in: path
+      name: region
+      required: true
+      schema:
+        type: string
+      description: A region.
+      example: dorset
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
@@ -204,6 +305,23 @@ components:
       allOf:
         - $ref: '#/components/schemas/RegionDataRequest'
         - $ref: '#/components/schemas/DateRangeRequest'
+    TimeSeriesRequest:
+      allOf:
+        - $ref: '#/components/schemas/RegionDataRequest'
+        - $ref: '#/components/schemas/PagedRequest'
+        - $ref: '#/components/schemas/DateRangeRequest'
+        - type: object
+          properties:
+            textSearch:
+              type: string
+              description: "Additional BOOLEAN (MySQL) query string matched against the text of each message."
+              example: "windy AND cold"
+            timePeriod:
+              type: string
+              pattern: "(day|hour)"
+              description: "Aggregate over either day or hour."
+              example: day
+
     RecentCountRequest:
       allOf:
         - $ref: '#/components/schemas/RegionDataRequest'
@@ -239,6 +357,30 @@ components:
           minimum: 0.0
           maximum: 100.0
           description: "The exceedance value for the region as a percentage. Lower is more unusual, higher is more usual."
+
+    TimeSeriesResponseItem:
+      type: object
+      description: "Stats for a given day/hour window per region"
+      properties:
+        region:
+          type: string
+          example: hertfordshire
+          description: "The region the statistics are for."
+        date:
+          type: string
+          example: "2021-02-22T00:00:00.000Z"
+          description: "UTC date string for the data."
+        count:
+          type: integer
+          example: 195
+          description: "The number of messages counted for this region."
+        exceedance:
+          type: number
+          example: 35.2
+          minimum: 0.0
+          maximum: 100.0
+          description: "The exceedance value for the region as a percentage. Lower is more unusual, higher is more usual."
+
     TextResponseItem:
       type: object
       properties:
