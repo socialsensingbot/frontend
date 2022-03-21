@@ -46,7 +46,7 @@
               "src/site.webmanifest",
               "src/assets",
               "src/apidoc.html",
-              "src/api.yaml"
+              "src/api-docs"
             ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",

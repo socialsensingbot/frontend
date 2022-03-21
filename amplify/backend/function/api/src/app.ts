@@ -2,7 +2,7 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import {
-    allMapRegionsFunc,
+    allMapRegionsAPIVersionFunc,
     mapMetadataFunc,
     metadataForMapByIDFunc,
     nowFunc,
@@ -78,7 +78,7 @@ app.post("/v1/map/:map/recent-text-count", recentTextCountFunc);
  * Returns all the regions for a given map, regardless of region type.
  * IMPORTANT: this screens out numerically named regions.
  */
-app.get("/v1/map/:map/regions", allMapRegionsFunc);
+app.get("/v1/map/:map/regions", allMapRegionsAPIVersionFunc);
 
 app.get("/v1/map/:map/region-type/:regionType/regions", regionsForRegionTypeFunc);
 

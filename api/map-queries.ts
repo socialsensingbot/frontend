@@ -178,7 +178,10 @@ export const textForRegionsFunc: (req, res) => Promise<void> = async (req, res) 
                                           warningsValues(req.body.warnings),
                                           from, pageSize
                                  ]
-                             }));
+                             })).map(i => {
+            i.json = JSON.parse(i.json);
+            return i
+        });
 
 
     }, {duration: 60});
@@ -484,14 +487,40 @@ export const allMapRegionsFunc: (req, res) => Promise<void> = async (req, res) =
 };
 
 
+/**
+ * This version of allMapRegionsFunc has been modified for the API as the returned keys make less sense for an API.
+ * @param req
+ * @param res
+ */
+export const allMapRegionsAPIVersionFunc: (req, res) => Promise<void> = async (req, res) => {
+    await db.cache(res, req.path, async () => {
+        return await db.sql({
+                                // language=MySQL
+                                sql: `/* app.ts: map regions */ select distinct gr.region      as id,
+                                                                                gr.title       as title,
+                                                                                gr.region_type as type,
+                                                                                gr.level       as level
+                                                                from view_geo_regions_with_virtual gr,
+                                                                     ref_map_metadata mm
+                                                                where gr.map_location = mm.location
+                                                                  AND gr.disabled = false
+                                                                  AND mm.id = ?
+                                                                order by level desc, title asc`,
+                                values: [req.params.map]
+                            });
+    }, {duration: 12 * 60 * 60});
+
+};
+
+
 export const regionsForRegionTypeFunc: (req, res) => Promise<void> = async (req, res) => {
     await db.cache(res, req.path, async () => {
         const rows = await db.sql({
                                       // language=MySQL
-                                      sql: `/* app.ts: regionType regions */ select region
+                                      sql:                                                  `/* app.ts: regionType regions */ select region
 
-                                                                             from view_geo_regions_with_virtual gr,
-                                                                                  ref_map_metadata mm
+                                                                                                                              from view_geo_regions_with_virtual gr,
+                                                                                                                                   ref_map_metadata mm
                                                                              where gr.region_type = ?
                                                                                AND gr.map_location = mm.location
                                                                                AND mm.id = ?`,
