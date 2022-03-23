@@ -353,6 +353,404 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/StatsResponseItem"
+                  },
+                  "example": {
+                    "west yorkshire": {
+                      "count": 109,
+                      "exceedance": 0.4697
+                    },
+                    "shropshire": {
+                      "count": 71,
+                      "exceedance": 0.4697
+                    },
+                    "lancashire": {
+                      "count": 20,
+                      "exceedance": 2.0355
+                    },
+                    "greater manchester": {
+                      "count": 114,
+                      "exceedance": 0.4175
+                    },
+                    "hertfordshire": {
+                      "count": 6,
+                      "exceedance": 3.1837
+                    },
+                    "north yorkshire": {
+                      "count": 118,
+                      "exceedance": 0.3653
+                    },
+                    "kent": {
+                      "count": 22,
+                      "exceedance": 1.7223
+                    },
+                    "south yorkshire": {
+                      "count": 153,
+                      "exceedance": 0.3132
+                    },
+                    "stirling": {
+                      "count": 4,
+                      "exceedance": 1.6701
+                    },
+                    "nottingham": {
+                      "count": 10,
+                      "exceedance": 1.2004
+                    },
+                    "nottinghamshire": {
+                      "count": 12,
+                      "exceedance": 1.9311
+                    },
+                    "derbyshire": {
+                      "count": 142,
+                      "exceedance": 0.3653
+                    },
+                    "dublin": {
+                      "count": 5,
+                      "exceedance": 4.6451
+                    },
+                    "norfolk": {
+                      "count": 5,
+                      "exceedance": 5.167
+                    },
+                    "staffordshire": {
+                      "count": 21,
+                      "exceedance": 1.7223
+                    },
+                    "ceredigion": {
+                      "count": 3,
+                      "exceedance": 2.0355
+                    },
+                    "cork": {
+                      "count": 1,
+                      "exceedance": 31.8894
+                    },
+                    "derby": {
+                      "count": 35,
+                      "exceedance": 0.3132
+                    },
+                    "merseyside": {
+                      "count": 7,
+                      "exceedance": 3.5491
+                    },
+                    "medway": {
+                      "count": 5,
+                      "exceedance": 0.4697
+                    },
+                    "cheshire": {
+                      "count": 17,
+                      "exceedance": 1.2004
+                    },
+                    "powys": {
+                      "count": 22,
+                      "exceedance": 0.5741
+                    },
+                    "aberdeen city": {
+                      "count": 5,
+                      "exceedance": 1.2526
+                    },
+                    "kingston upon hull, city of": {
+                      "count": 4,
+                      "exceedance": 0.7307
+                    },
+                    "donegal": {
+                      "count": 6,
+                      "exceedance": 1.357
+                    },
+                    "tyne and wear": {
+                      "count": 6,
+                      "exceedance": 1.9833
+                    },
+                    "denbighshire": {
+                      "count": 2,
+                      "exceedance": 1.357
+                    },
+                    "down": {
+                      "count": 6,
+                      "exceedance": 1.0438
+                    },
+                    "greater london": {
+                      "count": 50,
+                      "exceedance": 4.3319
+                    },
+                    "cumbria": {
+                      "count": 8,
+                      "exceedance": 3.3925
+                    },
+                    "armagh": {
+                      "count": 6,
+                      "exceedance": 1.4092
+                    },
+                    "dorset": {
+                      "count": 3,
+                      "exceedance": 7.9854
+                    },
+                    "monmouthshire": {
+                      "count": 4,
+                      "exceedance": 1.5658
+                    },
+                    "city of edinburgh": {
+                      "count": 5,
+                      "exceedance": 4.3841
+                    },
+                    "herefordshire": {
+                      "count": 16,
+                      "exceedance": 0.9395
+                    },
+                    "stockton-on-tees": {
+                      "count": 3,
+                      "exceedance": 0.9916
+                    },
+                    "leicestershire": {
+                      "count": 14,
+                      "exceedance": 2.5052
+                    },
+                    "leicester": {
+                      "count": 6,
+                      "exceedance": 2.2965
+                    },
+                    "buckinghamshire": {
+                      "count": 6,
+                      "exceedance": 1.4092
+                    },
+                    "warrington": {
+                      "count": 2,
+                      "exceedance": 3.9144
+                    },
+                    "angus": {
+                      "count": 1,
+                      "exceedance": 6.5762
+                    },
+                    "lincolnshire": {
+                      "count": 4,
+                      "exceedance": 5.428
+                    },
+                    "leitrim": {
+                      "count": 2,
+                      "exceedance": 1.3048
+                    },
+                    "northamptonshire": {
+                      "count": 5,
+                      "exceedance": 3.4447
+                    },
+                    "darlington": {
+                      "count": 3,
+                      "exceedance": 0.6785
+                    },
+                    "aberdeenshire": {
+                      "count": 2,
+                      "exceedance": 4.4885
+                    },
+                    "oxfordshire": {
+                      "count": 4,
+                      "exceedance": 6.6806
+                    },
+                    "shetland islands": {
+                      "count": 1,
+                      "exceedance": 3.5491
+                    },
+                    "worcestershire": {
+                      "count": 19,
+                      "exceedance": 2.0355
+                    },
+                    "york": {
+                      "count": 11,
+                      "exceedance": 1.2004
+                    },
+                    "dumfries and galloway": {
+                      "count": 3,
+                      "exceedance": 2.4008
+                    },
+                    "east riding of yorkshire": {
+                      "count": 4,
+                      "exceedance": 1.5658
+                    },
+                    "rhondda, cynon, taff": {
+                      "count": 1,
+                      "exceedance": 15.7098
+                    },
+                    "durham": {
+                      "count": 2,
+                      "exceedance": 5.5324
+                    },
+                    "longford": {
+                      "count": 1,
+                      "exceedance": 2.9228
+                    },
+                    "essex": {
+                      "count": 5,
+                      "exceedance": 6.0021
+                    },
+                    "northumberland": {
+                      "count": 4,
+                      "exceedance": 3.6013
+                    },
+                    "west sussex": {
+                      "count": 4,
+                      "exceedance": 4.2797
+                    },
+                    "brighton and hove": {
+                      "count": 1,
+                      "exceedance": 13.8309
+                    },
+                    "glasgow city": {
+                      "count": 3,
+                      "exceedance": 12.3173
+                    },
+                    "pembrokeshire": {
+                      "count": 1,
+                      "exceedance": 7.5678
+                    },
+                    "telford and wrekin": {
+                      "count": 8,
+                      "exceedance": 0.7829
+                    },
+                    "west midlands": {
+                      "count": 8,
+                      "exceedance": 5.0104
+                    },
+                    "west berkshire": {
+                      "count": 1,
+                      "exceedance": 14.9791
+                    },
+                    "north lanarkshire": {
+                      "count": 1,
+                      "exceedance": 8.4551
+                    },
+                    "north lincolnshire": {
+                      "count": 1,
+                      "exceedance": 6.4718
+                    },
+                    "milton keynes": {
+                      "count": 3,
+                      "exceedance": 3.0793
+                    },
+                    "cardiff": {
+                      "count": 2,
+                      "exceedance": 9.9165
+                    },
+                    "bristol, city of": {
+                      "count": 2,
+                      "exceedance": 13.2568
+                    },
+                    "londonderry": {
+                      "count": 4,
+                      "exceedance": 1.2004
+                    },
+                    "wiltshire": {
+                      "count": 4,
+                      "exceedance": 2.6618
+                    },
+                    "warwickshire": {
+                      "count": 5,
+                      "exceedance": 4.3841
+                    },
+                    "blackburn with darwen": {
+                      "count": 2,
+                      "exceedance": 1.7223
+                    },
+                    "blaenau gwent": {
+                      "count": 3,
+                      "exceedance": 0.4697
+                    },
+                    "isle of wight": {
+                      "count": 1,
+                      "exceedance": 14.9791
+                    },
+                    "swansea": {
+                      "count": 1,
+                      "exceedance": 12.5783
+                    },
+                    "slough": {
+                      "count": 1,
+                      "exceedance": 5.2192
+                    },
+                    "southampton": {
+                      "count": 1,
+                      "exceedance": 11.1169
+                    },
+                    "wrexham": {
+                      "count": 5,
+                      "exceedance": 1.0438
+                    },
+                    "galway": {
+                      "count": 1,
+                      "exceedance": 13.4656
+                    },
+                    "suffolk": {
+                      "count": 7,
+                      "exceedance": 3.6013
+                    },
+                    "gloucestershire": {
+                      "count": 2,
+                      "exceedance": 12.4217
+                    },
+                    "swindon": {
+                      "count": 2,
+                      "exceedance": 1.7223
+                    },
+                    "hampshire": {
+                      "count": 2,
+                      "exceedance": 16.023
+                    },
+                    "newport": {
+                      "count": 1,
+                      "exceedance": 13.1524
+                    },
+                    "conwy": {
+                      "count": 4,
+                      "exceedance": 2.3486
+                    },
+                    "surrey": {
+                      "count": 4,
+                      "exceedance": 11.0125
+                    },
+                    "peterborough": {
+                      "count": 1,
+                      "exceedance": 9.4468
+                    },
+                    "somerset": {
+                      "count": 2,
+                      "exceedance": 14.3006
+                    },
+                    "scottish borders": {
+                      "count": 1,
+                      "exceedance": 7.5678
+                    },
+                    "carmarthenshire": {
+                      "count": 1,
+                      "exceedance": 8.5073
+                    },
+                    "stoke-on-trent": {
+                      "count": 2,
+                      "exceedance": 3.2881
+                    },
+                    "east sussex": {
+                      "count": 1,
+                      "exceedance": 19.6242
+                    },
+                    "caerphilly": {
+                      "count": 2,
+                      "exceedance": 2.5052
+                    },
+                    "fife": {
+                      "count": 1,
+                      "exceedance": 16.3361
+                    },
+                    "roscommon": {
+                      "count": 1,
+                      "exceedance": 3.2359
+                    },
+                    "antrim": {
+                      "count": 1,
+                      "exceedance": 18.0063
+                    },
+                    "perth and kinross": {
+                      "count": 1,
+                      "exceedance": 8.8205
+                    },
+                    "east ayrshire": {
+                      "count": 1,
+                      "exceedance": 5.5846
+                    }
                   }
                 }
               }
@@ -474,21 +872,13 @@
       }
     },
     "schemas": {
-      "RegionDataRequest": {
+      "AllRegionsDataRequest": {
         "type": "object",
         "properties": {
           "regionType": {
             "type": "string",
             "description": "The type of the regions specified by the regions property",
             "example": "county"
-          },
-          "regions": {
-            "type": "array",
-            "description": "A set of regions to retrieve texts for. These regions must be of the type specified by the property regionType.",
-            "items": {
-              "type": "string",
-              "example": "hertfordshire"
-            }
           },
           "hazards": {
             "type": "array",
@@ -506,9 +896,30 @@
           },
           "warnings": {
             "type": "string",
+            "example": "exclude",
             "pattern": "(only|include|exclude)"
           }
         }
+      },
+      "RegionDataRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AllRegionsDataRequest"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "regions": {
+                "type": "array",
+                "description": "A set of regions to retrieve texts for. These regions must be of the type specified by the property regionType.",
+                "items": {
+                  "type": "string",
+                  "example": "hertfordshire"
+                }
+              }
+            }
+          }
+        ]
       },
       "PagedRequest": {
         "type": "object",
@@ -530,11 +941,11 @@
         "properties": {
           "startDate": {
             "type": "integer",
-            "example": 1425744000000
+            "example": 1645394400000
           },
           "endDate": {
             "type": "integer",
-            "example": 1425822000000
+            "example": 1645488000000
           }
         }
       },
@@ -562,21 +973,33 @@
           "page": 0,
           "startDate": 1645394400000,
           "endDate": 1645488000000,
-          "regionType": "county",
-          "regions": [
-            "north yorkshire"
-          ]
+          "regionType": "county"
         }
       },
       "StatsRequest": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/RegionDataRequest"
+            "$ref": "#/components/schemas/AllRegionsDataRequest"
           },
           {
             "$ref": "#/components/schemas/DateRangeRequest"
           }
-        ]
+        ],
+        "example": {
+          "regionType": "county",
+          "regions": [
+            "greater london"
+          ],
+          "hazards": [
+            "flood"
+          ],
+          "sources": [
+            "twitter"
+          ],
+          "warnings": "exclude",
+          "startDate": 1645394400000,
+          "endDate": 1645488000000
+        }
       },
       "TimeSeriesRequest": {
         "allOf": [
@@ -610,14 +1033,14 @@
       "RecentCountRequest": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/RegionDataRequest"
+            "$ref": "#/components/schemas/AllRegionsDataRequest"
           },
           {
             "type": "object",
             "properties": {
               "startDate": {
                 "type": "integer",
-                "example": 1425744000000
+                "example": 1645394400000
               }
             }
           }

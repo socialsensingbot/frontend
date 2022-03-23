@@ -107,31 +107,36 @@ export class SSDatabase {
     public async sql(options: { sql: string; values?: any; }, tx = false): Promise<any[]> {
         await this.readyPromise;
         return new Promise((resolve, reject) => {
-            this.connection.getConnection((err, poolConnection) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                if (tx) {
-                    poolConnection.beginTransaction();
-                }
-                poolConnection.query(options, (error, results) => {
-                    if (error) {
-                        console.error(error);
-                        reject(error);
-                    } else {
-                        let s: string = JSON.stringify(results);
-                        console.log(options.sql, options.values, s.substring(0, s.length > 1000 ? 1000 : s.length));
-                        console.log("Returned " + results.length + " rows");
-                        resolve(results);
-                        if (tx) {
-                            poolConnection.commit();
-                        }
+            try {
+                this.connection.getConnection((err, poolConnection) => {
+                    if (err) {
+                        reject(err);
+                        return;
                     }
-                    poolConnection.release();
+                    if (tx) {
+                        poolConnection.beginTransaction();
+                    }
+                    console.log("Ready to execute query", options.sql);
+                    poolConnection.query(options, (error, results) => {
+                        if (error) {
+                            console.error(error);
+                            reject(error);
+                        } else {
+                            let s: string = JSON.stringify(results);
+                            console.log(options.sql, options.values, s.substring(0, s.length > 1000 ? 1000 : s.length));
+                            console.log("Returned " + results.length + " rows");
+                            resolve(results);
+                            if (tx) {
+                                poolConnection.commit();
+                            }
+                        }
+                        poolConnection.release();
+                    });
                 });
-            });
-
+            } catch (e) {
+                console.error(e);
+                reject(e);
+            }
         });
     }
 

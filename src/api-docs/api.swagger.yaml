@@ -232,6 +232,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/StatsResponseItem'
+                example:
+                  $ref: "./examples/stats-response.yaml"
+
 
   /v1/map/{map}/recent-text-count:
     post:
@@ -311,19 +314,13 @@ components:
       in: header
       name: x-api-key
   schemas:
-    RegionDataRequest:
+    AllRegionsDataRequest:
       type: object
       properties:
         regionType:
           type: string
           description: "The type of the regions specified by the regions property"
           example: county
-        regions:
-          type: array
-          description: "A set of regions to retrieve texts for. These regions must be of the type specified by the property regionType."
-          items:
-            type: string
-            example: hertfordshire
         hazards:
           type: array
           items:
@@ -336,7 +333,19 @@ components:
             example: twitter
         warnings:
           type: string
+          example: exclude
           pattern: "(only|include|exclude)"
+    RegionDataRequest:
+      allOf:
+        - $ref: '#/components/schemas/AllRegionsDataRequest'
+        - type: object
+          properties:
+            regions:
+              type: array
+              description: "A set of regions to retrieve texts for. These regions must be of the type specified by the property regionType."
+              items:
+                type: string
+                example: hertfordshire
     PagedRequest:
       type: object
       properties:
@@ -353,10 +362,10 @@ components:
       properties:
         startDate:
           type: integer
-          example: 1425744000000
+          example: 1645394400000
         endDate:
           type: integer
-          example: 1425822000000
+          example: 1645488000000
     TextRequest:
       allOf:
         - $ref: '#/components/schemas/RegionDataRequest'
@@ -373,13 +382,23 @@ components:
         startDate: 1645394400000
         endDate: 1645488000000
         regionType: county
-        regions:
-          - north yorkshire
 
     StatsRequest:
       allOf:
-        - $ref: '#/components/schemas/RegionDataRequest'
+        - $ref: '#/components/schemas/AllRegionsDataRequest'
         - $ref: '#/components/schemas/DateRangeRequest'
+      example:
+        regionType: county
+        regions:
+          - greater london
+        hazards:
+          - flood
+        sources:
+          - twitter
+        warnings: exclude
+        startDate: 1645394400000
+        endDate: 1645488000000
+
     TimeSeriesRequest:
       allOf:
         - $ref: '#/components/schemas/RegionDataRequest'
@@ -399,12 +418,12 @@ components:
 
     RecentCountRequest:
       allOf:
-        - $ref: '#/components/schemas/RegionDataRequest'
+        - $ref: '#/components/schemas/AllRegionsDataRequest'
         - type: object
           properties:
             startDate:
               type: integer
-              example: 1425744000000
+              example: 1645394400000
 
     RecentCountResponseItem:
       type: object

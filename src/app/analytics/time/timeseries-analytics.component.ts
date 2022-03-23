@@ -1,5 +1,4 @@
 import {Component, Input, NgZone, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
-import {MetadataService} from "../../api/metadata.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {RESTDataAPIService} from "../../api/rest-api.service";
 import {Logger} from "@aws-amplify/core";
@@ -536,19 +535,21 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
         try {
             const payload = {
-                layer: this.mapLayer,
-                ...query,
-                from: this.range.controls.start.value !== null ? roundToHour(
+                layer:      query.layer,
+                location:   query.location,
+                regions:    query.regions,
+                textSearch: query.textSearch,
+                startDate:  this.range.controls.start.value !== null ? roundToHour(
                     this.range.controls.start.value.getTime()) : (nowRoundedToHour() - (365.24 * dayInMillis)),
-                to:   this.range.controls.end.value !== null ? roundToHour(this.range.controls.end.value.getTime()) : nowRoundedToHour(),
-                name: "time",
+                endDate:    this.range.controls.end.value !== null ? roundToHour(
+                    this.range.controls.end.value.getTime()) : nowRoundedToHour(),
+                name:       "time",
                 timePeriod
             };
             if (payload.regions.length === 0) {
                 payload.regions = this.pref.combined.analyticsDefaultRegions;
             }
-            delete payload.__series_id;
-            const serverResults = await this._api.callMapAPIWithCache(this.map.id + "/analytics/time", payload, 60 * 60);
+            const serverResults = await this._api.callMapAPIWithCacheAndDatePaging(this.map.id + "/analytics/time", payload);
             log.debug("Server result was ", serverResults);
             this.error = false;
             return this.queryTransform(serverResults);

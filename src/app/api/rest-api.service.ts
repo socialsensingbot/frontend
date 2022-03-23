@@ -136,6 +136,41 @@ export class RESTDataAPIService {
         }
     }
 
+    public async callMapAPIWithCacheAndDatePaging(path: string, payload: any, showSpinner = false, transform: (any) => any = (i) => i,
+                                                  cacheForSeconds: number = -1,
+                                                  pageDurationInHours = 30 * 24,
+                                                  maxPages = 100) {
+        try {
+            const result: any[] = [];
+            let startDate = payload.startDate;
+            let currEndDate = payload.startDate + pageDurationInHours * 60 * 60 * 1000 - 1;
+            do {
+                const endDate = payload.endDate < currEndDate ? payload.endDate : currEndDate;
+                const rawResult = await this.callMapAPIWithCache(path, {...payload, startDate, endDate}, cacheForSeconds, false, false);
+                log.debug(rawResult.length + " results back from server");
+                for (const item of rawResult) {
+                    result.push(transform(item));
+                }
+                if (endDate < payload.endDate) {
+                    if (showSpinner) {
+                        this._loading.showIndeterminateSpinner();
+                    }
+                    currEndDate += pageDurationInHours * 60 * 60 * 1000;
+                    startDate += pageDurationInHours * 60 * 60 * 1000;
+                } else {
+                    if (showSpinner) {
+                        this._loading.hideIndeterminateSpinner();
+                    }
+                    log.debug("Aggregated Result", result);
+                    log.debug("Aggregated Result Size", result.length);
+                    return result;
+                }
+            } while (true);
+        } catch (e) {
+            log.error(e);
+        }
+    }
+
 
     private async callAPIInternal(fullPath: string, payload: any, cacheForSeconds: number, key: string,
                                   useGet = false, retry = true): Promise<Promise<any>> {

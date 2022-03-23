@@ -832,39 +832,37 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
     const lastDateInDB: any = (await getMaps())[req.params.map].last_date;
     const location: any = (await getMaps())[req.params.map].location;
     const key = req.params.map + ":" + JSON.stringify(req.body);
-    const pageSize: number = +req.body.pageSize || 4 * 365 * 24;
-    const page: number = +req.body.page || 0;
-    const fromItem = page * pageSize;
+    //They can either be grouped into a notional layer or top level properties
+    const hazards: string[] = req.body.hazards || req.body.layer.hazards;
+    const sources: string[] = req.body.sources || req.body.layer.sources;
+    const regions: string[] = req.body.regions;
     await db.cache(res, key, async () => {
         let fullText = "";
         let textSearch: string = req.body.textSearch;
         //           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',
         if (typeof textSearch !== "undefined" && textSearch.length > 0) {
             fullText = " AND MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
-            let additionalQuery = "+(";
-            for (const source of req.body.layer.sources) {
-                for (const hazard of req.body.layer.hazards) {
-                    for (const region of req.body.regions) {
+            let additionalQuery = "(";
+            for (const source of sources) {
+                for (const hazard of hazards) {
+                    for (const region of regions) {
                         additionalQuery += md5(source + ":" + hazard + ":" + region) + " ";
                     }
                 }
             }
             additionalQuery += ") ";
             textSearch = additionalQuery + "+(" + textSearch + ")";
-            console.log("Ammended text search is '" + textSearch + "'");
+            console.log("Amended text search is '" + textSearch + "'");
         }
         const dayTimePeriod: boolean = req.body.timePeriod === "day";
         const timeSeriesTable = dayTimePeriod ? "mat_view_timeseries_date" : "mat_view_timeseries_hour";
         const dateTable = dayTimePeriod ? "mat_view_days" : "mat_view_hours";
-        const from: Date = dateFromMillis(req.body.from);
-        const to: Date = lastDateInDB ? dateFromMillis(Math.min(req.body.to, lastDateInDB.getTime())) : dateFromMillis(req.body.to);
-        const hazards: string[] = req.body.hazards || req.body.layer.hazards;
-        const sources: string[] = req.body.sources || req.body.layer.sources;
-        const regions: string[] = req.body.regions;
+        const from: Date = dateFromMillis(req.body.startDate || req.body.from);
+        const to: Date = lastDateInDB ? dateFromMillis(Math.min(req.body.endDate || req.body.to, lastDateInDB.getTime())) : dateFromMillis(
+            req.body.endDate || req.body.to);
         if (!regions || regions.length === 0) {
-            const values = fullText ? [hazards, sources, location, textSearch, from, to, fromItem, pageSize] : [hazards, sources,
-                                                                                                                location, from, to,
-                                                                                                                fromItem, pageSize];
+            const values = fullText ? [hazards, sources, location, textSearch, from, to] : [hazards, sources,
+                                                                                            location, from, to];
             return await db.sql({
                                     // language=MySQL
                                     sql: `select *
@@ -887,17 +885,17 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
                                                     WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)
                                                 order by date) x
                                           where date between ? AND ?
-                                          order by date
-                                          LIMIT ?,? `,
+                                          order by date`,
                                     values
                                 });
         } else {
-            const values = fullText ? [regions, hazards, sources, location, textSearch, from, to, fromItem, pageSize] : [regions,
-                                                                                                                         hazards,
-                                                                                                                         sources,
-                                                                                                                         location, from,
-                                                                                                                         to, fromItem,
-                                                                                                                         pageSize];
+            console.log("Regions specified", regions);
+            const values = fullText ? [regions, hazards, sources, location, textSearch, from, to] : [regions,
+                                                                                                     hazards,
+                                                                                                     sources,
+                                                                                                     location, from,
+                                                                                                     to];
+            console.log("Values, values");
             return await db.sql({
                                     // language=MySQL
                                     sql: `select *
@@ -921,8 +919,7 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
                                                     WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)
                                                ) x
                                           where date between ? AND ?
-                                          order by date
-                                          LIMIT ?,?`, values
+                                          order by date`, values
 
                                 });
         }
