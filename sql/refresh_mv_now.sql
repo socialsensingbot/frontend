@@ -162,12 +162,12 @@ BEGIN
             CALL fill_days(dt, DATE_ADD(dt, INTERVAL 1 MONTH));
             CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling hours for week starting ', dt));
             CALL fill_hours(dt, DATE_ADD(dt, INTERVAL 1 MONTH));
-            IF MOD(counter, 12) = 1
-            THEN
-                CALL refresh_mv_map_window(@rc);
-            ELSE
-                CALL refresh_mv_now(@rc);
-            END IF;
+            #             IF MOD(counter, 12) = 1
+#             THEN
+#                 CALL refresh_mv_map_window(@rc);
+#             ELSE
+#                 CALL refresh_mv_now(@rc);
+#             END IF;
             SET dt = DATE_ADD(dt, INTERVAL 1 MONTH);
             SET counter = counter + 1;
         END WHILE;

@@ -15,7 +15,7 @@ import {LoadingProgressService} from "../services/loading-progress.service";
 
 const useLambda = false;
 
-const retryPeriod = 60000;
+const retryPeriod = 20000;
 const log = new Logger("rest-api-service");
 
 @Injectable({
@@ -136,17 +136,18 @@ export class RESTDataAPIService {
         }
     }
 
-    public async callMapAPIWithCacheAndDatePaging(path: string, payload: any, showSpinner = false, transform: (any) => any = (i) => i,
+    public async callMapAPIWithCacheAndDatePaging(path: string, payload: any, showSpinner = false,
+                                                  transform: (any) => any = (i) => i,
                                                   cacheForSeconds: number = -1,
                                                   pageDurationInHours = 30 * 24,
-                                                  maxPages = 100) {
+                                                  retry = true) {
         try {
             const result: any[] = [];
             let startDate = payload.startDate;
             let currEndDate = payload.startDate + pageDurationInHours * 60 * 60 * 1000 - 1;
             do {
                 const endDate = payload.endDate < currEndDate ? payload.endDate : currEndDate;
-                const rawResult = await this.callMapAPIWithCache(path, {...payload, startDate, endDate}, cacheForSeconds, false, false);
+                const rawResult = await this.callMapAPIWithCache(path, {...payload, startDate, endDate}, cacheForSeconds, false, retry);
                 log.debug(rawResult.length + " results back from server");
                 for (const item of rawResult) {
                     result.push(transform(item));

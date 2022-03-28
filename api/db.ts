@@ -13,7 +13,7 @@ export class SSDatabase {
     private dbPassword: string;
     private readyPromise: Promise<void>;
 
-    constructor(private stage: string) {
+    constructor(private stage: string, readonly = true) {
         this.readyPromise = ((new aws.SSM())
             .getParameters({
                                Names:          ["DB_PASSWORD", "TWITTER_BEARER_TOKEN"].map(secretName => process.env[secretName]),
@@ -25,9 +25,10 @@ export class SSDatabase {
                 console.log("DB Password: " + this.dbPassword);
                 // Initialising the MySQL connection
 
+                let hostname: string = "database-" + this.stage;
                 this.connection = mysql.createPool({
                                                        connectionLimit: 5,
-                                                       host:            "database-" + this.stage + ".cxsscwdzsrae.eu-west-2.rds.amazonaws.com",
+                                                       host:            hostname + ".cxsscwdzsrae.eu-west-2.rds.amazonaws.com",
                                                        user:            "admin",
                                                        password:        this.dbPassword,
                                                        database:        "socialsensing",
