@@ -10,5 +10,5 @@ cp ../../../../../api/socialsensing-api*.tgz .
 npm install socialsensing-api*.tgz
 npm install
 tsc --project tsconfig.json
-npm test
+env TZ='UTC' npm test
 echo "Completed Build OK"
