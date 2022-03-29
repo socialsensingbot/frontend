@@ -15,13 +15,15 @@ import {
 } from "socialsensing-api/map-queries";
 
 //bump 9
-const awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
 
 
 // declare a new express app
 const app = express();
 app.use(bodyParser.json() as any);
-app.use(awsServerlessExpressMiddleware.eventContext());
+if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    const awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
+    app.use(awsServerlessExpressMiddleware.eventContext());
+}
 
 app.use((req, res, next) => {
     // Enable CORS for all methods
@@ -107,9 +109,12 @@ function sleep(ms) {
 }
 
 
-app.listen(3000, () => {
-    console.log("App started");
-});
+if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    app.listen(3000, () => {
+        console.log("App started");
+    });
+}
+
 
 // Export the app object. When executing the application local this does nothing. However,
 // to port it to AWS Lambda we will create a wrapper around that will load the app from

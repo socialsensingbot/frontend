@@ -107,8 +107,6 @@ paths:
         - $ref: '#/components/parameters/Map'
         - $ref: '#/components/parameters/RegionType'
       responses:
-        200:
-          description: OK
           content:
             'application/json':
               schema:

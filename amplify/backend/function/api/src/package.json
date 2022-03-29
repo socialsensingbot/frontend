@@ -21,12 +21,15 @@
   },
   "devDependencies": {
     "@types/node": "^16.11.22",
+    "chai": "*",
+    "mocha": "*",
+    "supertest": "*",
     "ts-node": "~7.0.0",
     "tslint": "~6.1.0",
     "typescript": "^3.9.10"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npx mocha -b --exit --trace-warnings test/**/*.test.js",
     "build": "tsc"
   },
   "author": "",

@@ -4,7 +4,7 @@ export const dateFromMillis = (time: number) => {
     const dateTime = new Date(time);
     return new Date(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDate());
 };
-export const stage = process.env.AWS_LAMBDA_FUNCTION_NAME.split("-")[1];
+export const stage = (process.env.AWS_LAMBDA_FUNCTION_NAME || "-_test").split("-")[1];
 console.log("STAGE: " + stage);
 const dev = stage === "dev";
 // Load modules

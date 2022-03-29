@@ -10,3 +10,5 @@ cp ../../../../../api/socialsensing-api*.tgz .
 npm install socialsensing-api*.tgz
 npm install
 tsc --project tsconfig.json
+npm test
+echo "Completed Build OK"

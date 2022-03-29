@@ -6,6 +6,10 @@ import {dateFromMillis, handleError, stage} from "./util.js";
 const md5 = require('md5');
 const db = new SSDatabase(stage);
 
+process.on('exit', () => {
+    console.info("Closing down DB");
+    db.end();
+});
 
 export const getMap = async (mapId: string): Promise<any> => {
     return (await db.sql({

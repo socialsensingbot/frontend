@@ -14,35 +14,67 @@ export class SSDatabase {
     private readyPromise: Promise<void>;
 
     constructor(private stage: string, readonly = true) {
-        this.readyPromise = ((new aws.SSM())
-            .getParameters({
-                               Names:          ["DB_PASSWORD", "TWITTER_BEARER_TOKEN"].map(secretName => process.env[secretName]),
-                               WithDecryption: true,
-                           })
-            .promise().then(result => {
-                console.log("Parameters:", result.Parameters);
-                this.dbPassword = result.Parameters.filter(i => i.Name.endsWith("DB_PASSWORD")).pop().Value;
-                console.log("DB Password: " + this.dbPassword);
-                // Initialising the MySQL connection
+        if (stage === "_test") {
+            console.log("DB Running in test mode.")
+            this.readyPromise = new Promise((resolve, reject) => {
+                try {
+                    this.connection = mysql.createPool({
+                                                           connectionLimit: 5,
+                                                           host:            "database-dev.cxsscwdzsrae.eu-west-2.rds.amazonaws.com",
+                                                           user:            "admin",
+                                                           password:        process.env.SS_TEST_DB_PASSWORD,
+                                                           database:        "socialsensing",
+                                                           charset:         "utf8mb4",
+                                                           // multipleStatements: true,
+                                                           // connectTimeout: 15000,
+                                                           // acquireTimeout: 10000,
+                                                           waitForConnections: true,
+                                                           queueLimit:         5000,
+                                                           debug:              false
+                                                       });
+                    resolve();
+                } catch (e) {
+                    reject(e);
+                }
 
-                let hostname: string = "database-" + this.stage;
-                this.connection = mysql.createPool({
-                                                       connectionLimit: 5,
-                                                       host:            hostname + ".cxsscwdzsrae.eu-west-2.rds.amazonaws.com",
-                                                       user:            "admin",
-                                                       password:        this.dbPassword,
-                                                       database:        "socialsensing",
-                                                       charset:         "utf8mb4",
-                                                       // multipleStatements: true,
-                                                       // connectTimeout: 15000,
-                                                       // acquireTimeout: 10000,
-                                                       waitForConnections: true,
-                                                       queueLimit:         5000,
-                                                       debug:              false
-                                                   });
-            }));
+            });
 
+        } else {
+            console.log("DB Running in Lambda mode.")
 
+            this.readyPromise = ((new aws.SSM())
+                .getParameters({
+                                   Names:          ["DB_PASSWORD", "TWITTER_BEARER_TOKEN"].map(secretName => process.env[secretName]),
+                                   WithDecryption: true,
+                               })
+                .promise().then(result => {
+                    console.log("Parameters:", result.Parameters);
+                    this.dbPassword = result.Parameters.filter(i => i.Name.endsWith("DB_PASSWORD")).pop().Value;
+                    console.log("DB Password: " + this.dbPassword);
+                    // Initialising the MySQL connection
+
+                    let hostname: string = "database-" + this.stage;
+                    this.connection = mysql.createPool({
+                                                           connectionLimit: 5,
+                                                           host:            hostname + ".cxsscwdzsrae.eu-west-2.rds.amazonaws.com",
+                                                           user:            "admin",
+                                                           password:        this.dbPassword,
+                                                           database:        "socialsensing",
+                                                           charset:         "utf8mb4",
+                                                           // multipleStatements: true,
+                                                           // connectTimeout: 15000,
+                                                           // acquireTimeout: 10000,
+                                                           waitForConnections: true,
+                                                           queueLimit:         5000,
+                                                           debug:              false
+                                                       });
+                }));
+        }
+
+    }
+
+    end() {
+        this.connection.end();
     }
 
     async cache(res, key: string, value: () => Promise<any>, options: { duration: number } = {duration: 60}) {
