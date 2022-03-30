@@ -43,11 +43,11 @@ function test() {
   export NODE_OPTIONS="--max-old-space-size=4096"
   for file in $(find ${tests} -name "*.js" | sort); do
     echo "Running tests in ${file} with a timeout of ${timeoutDuration} seconds."
-    npx cypress run $record -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} \
-      --browser ${browser} \
-      --headless --reporter mochawesome \
-      --reporter-options "reportDir=cypress/report/mochawesome-report-${browser},overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" \
-      --spec "${file}"
+    TZ=UTC npx cypress run $record -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} \
+  --browser ${browser} \
+  --headless --reporter mochawesome \
+  --reporter-options "reportDir=cypress/report/mochawesome-report-${browser},overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" \
+  --spec "${file}"
   done
   #npx cypress run  -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} --browser firefox --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report-firefox,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"
 done
