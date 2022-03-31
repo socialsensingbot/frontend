@@ -13,6 +13,7 @@ describe('07 URL State (lat/lng): ', function () {
           cy.url({timeout: 30000}).should("equal", url);
           cy.noSpinner();
           cy.get(".map").should("be.visible");
+          cy.wait(10000);
           cy.get(".x-feature-name-cambridgeshire").click(100, 100, {force: true});
           cy.twitterPanelHeader("Cambridgeshire");
           cy.url({timeout: 30000}).should("equal", newUrl);
