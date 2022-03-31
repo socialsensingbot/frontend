@@ -8,7 +8,7 @@ let clickImpactMenu = function () {
     cy.get(LONDON_TWEET_MENU, {timeout: 60000}).click({force: true});
     cy.get(impactOption).contains("Impact");
     cy.get(impactOption).click();
-    cy.wait(3000);
+    cy.wait(10000);
 
 };
 describe('00156 Impact: : https://github.com/socialsensingbot/frontend/issues/156', function () {
