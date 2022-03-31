@@ -14,6 +14,7 @@ describe('#422 CSV Download Tests : https://github.com/socialsensingbot/frontend
              it('Select manually', () => {
                  const url = MAP_URL + "?active_number=exceedance&active_polygon=county&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&zoom=5&selected=west%20yorkshire";
                  cy.visitAndWait(url);
+                 cy.wait(10000);
                  cy.get(`div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-west-yorkshire[stroke-width=3]`);
                  cy.wait(2000);
                  cy.twitterPanelHeader("West Yorkshire");
