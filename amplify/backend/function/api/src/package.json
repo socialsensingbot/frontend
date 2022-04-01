@@ -20,6 +20,7 @@
     "socialsensing-api": "file:socialsensing-api-1.0.0.tgz"
   },
   "devDependencies": {
+    "@types/mocha": "^9.1.0",
     "@types/node": "^16.11.22",
     "chai": "*",
     "mocha": "*",
@@ -29,7 +30,7 @@
     "typescript": "^3.9.10"
   },
   "scripts": {
-    "test": "npx mocha -b --exit --trace-warnings test/**/*.test.js",
+    "test": "npx mocha -b --timeout 26s --exit --trace-warnings test/**/*.test.js",
     "build": "tsc"
   },
   "author": "",

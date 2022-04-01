@@ -145,20 +145,17 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "example": [
-                    "dorset",
-                    "powys",
-                    "devon"
-                  ],
-                  "items": {
-                    "type": "string"
-                  }
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "example": [
+                  "dorset",
+                  "powys",
+                  "devon"
+                ],
+                "items": {
+                  "type": "string"
                 }
               }
             }
@@ -968,13 +965,24 @@
           "sources": [
             "twitter"
           ],
+          "regions": [
+            "hertfordshire"
+          ],
           "warnings": "exclude",
           "pageSize": 300,
           "page": 0,
           "startDate": 1645394400000,
           "endDate": 1645488000000,
           "regionType": "county"
-        }
+        },
+        "required": [
+          "hazards",
+          "sources",
+          "regions",
+          "startDate",
+          "regionType",
+          "warnings"
+        ]
       },
       "StatsRequest": {
         "allOf": [

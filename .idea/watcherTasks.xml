@@ -16,7 +16,7 @@
       <option name="outputFromStdout" value="false" />
       <option name="program" value="swagger-cli" />
       <option name="runOnExternalChanges" value="true" />
-      <option name="scopeName" value="Swagger YAML include files" />
+      <option name="scopeName" value="Swagger YAML API Files" />
       <option name="trackOnlyRoot" value="false" />
       <option name="workingDir" value="$FileDir$" />
       <envs />

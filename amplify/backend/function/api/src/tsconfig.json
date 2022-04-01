@@ -4,7 +4,8 @@
     "noImplicitAny": false,
     "allowJs": true,
     "types": [
-      "node"
+      "node",
+      "mocha"
     ],
     "lib": [
       "dom",
@@ -18,7 +19,6 @@
   ],
   "exclude": [
     "node_modules",
-    "**/*.spec.ts",
-    "test/**"
+    "**/*.spec.ts"
   ]
 }

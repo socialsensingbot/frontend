@@ -11,6 +11,7 @@
     "@aws-amplify/cli-extensibility-helper": "^2.0.0"
   },
   "devDependencies": {
+    "@types/mocha": "^9.1.0",
     "mocha": "^9.2.2",
     "supertest": "^6.2.2",
     "typescript": "^4.2.4"

@@ -374,13 +374,21 @@ components:
           - flood
         sources:
           - twitter
+        regions:
+          - hertfordshire
         warnings: exclude
         pageSize: 300
         page: 0
         startDate: 1645394400000
         endDate: 1645488000000
         regionType: county
-
+      required:
+        - hazards
+        - sources
+        - regions
+        - startDate
+        - regionType
+        - warnings
     StatsRequest:
       allOf:
         - $ref: '#/components/schemas/AllRegionsDataRequest'

@@ -33,8 +33,6 @@ export const roundTo15Minute = (timestamp: number): any => {
 };
 
 
-
-
 export const handleError = (res, e) => {
     console.error(e);
     try {
@@ -45,4 +43,10 @@ export const handleError = (res, e) => {
             {error: e.message, errorMessage: e.message, errorAsString: e.toString(), errorStack: dev ? e.stack : "n/a"});
 
     }
+}
+
+export const invalidParameter = (res, parameter, message) => {
+    const errorMessage = `Error with paramater ${parameter}: ${message}`
+    console.warn(errorMessage);
+    res.status(400).json({error: "Invalid Parameter", errorMessage, parameter});
 }
