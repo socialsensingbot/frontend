@@ -620,7 +620,48 @@ export const regionsForRegionTypeFunc: (req, res) => Promise<void> = async (req,
  *
  */
 export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
-
+    let map = (await getMaps())[req.params.map];
+    if (!map) {
+        invalidParameter(res, "map", `Unrecognized map ${req.params.map}`);
+        return;
+    }
+    if (typeof req.body.startDate !== "number" || req.body.startDate < 0 || req.body.startDate > Date.now()) {
+        invalidParameter(res, "startDate",
+                         `Invalid start date, startDate=${req.body.startDate}, startDate must be supplied, numeric, positive and less than the current time in milliseconds`);
+        return;
+    }
+    if (typeof req.body.endDate !== "undefined") {
+        if (typeof req.body.endDate !== "number" || req.body.endDate < 0 || req.body.endDate > Date.now()) {
+            invalidParameter(res, "endDate",
+                             `Invalid end date, endDate=${req.body.endDate}, endDate must be numeric, positive and less than the current time in milliseconds`);
+            return;
+        }
+    }
+    if (req.body.endDate < req.body.startDate) {
+        invalidParameter(res, "endDate", `Invalid end date, endDate=${req.body.endDate} (${new Date(
+            req.body.endDate)}, endDate is less than startDate=${req.body.startDate} (${new Date(req.body.startDate)}`);
+        return;
+    }
+    if (!Array.isArray(req.body.hazards) || req.body.hazards.some(i => typeof i !== "string") || req.body.hazards.length === 0) {
+        invalidParameter(res, "hazards",
+                         `Invalid hazards, hazards=${req.body.hazards}, hazards must be supplied as a non-empty array of strings`);
+        return;
+    }
+    if (!Array.isArray(req.body.sources) || req.body.sources.some(i => typeof i !== "string") || req.body.sources.length === 0) {
+        invalidParameter(res, "sources",
+                         `Invalid sources, sources=${req.body.sources}, sources must be supplied as a non-empty array of strings`);
+        return;
+    }
+    if (typeof req.body.warnings !== "string" || !["include", "exclude", "only"].includes(req.body.warnings)) {
+        invalidParameter(res, "warnings",
+                         `Invalid value for warnings, warnings=${req.body.warnings}, warnings must be a string with the value one of 'include', 'exclude' or 'only'`);
+        return;
+    }
+    if (typeof req.body.regionType !== "string") {
+        invalidParameter(res, "regionType",
+                         `Invalid value for regionType, regionType=${req.body.regionType}, regionType must supplied as a string value`);
+        return;
+    }
     await db.cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
 
         const result = {};
@@ -629,7 +670,7 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
         const exceedanceThreshold = req.body.exceedanceThreshold || 90;
         const countThreshold = req.body.countThreshold || 0;
 
-        const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
+        const endDate: number = (lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime())) || Date.now();
         console.debug("StartDate: " + new Date(req.body.startDate));
         console.debug("EndDate: " + new Date(endDate));
         const periodInDays = (endDate - req.body.startDate) / (24 * 60 * 60 * 1000);
@@ -684,7 +725,7 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
 
                                           regionType, req.body.hazards, req.body.sources,
                                           warningsValues(req.body.warnings),
-                                          new Date(req.body.startDate), new Date(req.body.endDate),
+                                          new Date(req.body.startDate), new Date(endDate),
                                           exceedanceThreshold, countThreshold
 
                                       ]
