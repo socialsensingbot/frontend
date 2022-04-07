@@ -2,7 +2,7 @@ import * as request from "supertest";
 import {expect} from "chai";
 import {MAX_DATE_MILLIS, MIN_DATE_MILLIS} from "../../constants";
 import * as app from "../../../app";
-import {singleRegion} from "./data/single_region";
+import {singleRegion} from "./data/single-region";
 
 const reqBody = {
     hazards:    [

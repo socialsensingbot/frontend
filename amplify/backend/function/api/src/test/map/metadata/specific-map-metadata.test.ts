@@ -17,7 +17,7 @@ const metadataResponse =
     };
 
 
-describe("GET /v1/map/uk-flood-test/metadata", () => {
+describe("GET /v1/map/:map/metadata", () => {
     it("responds with json", async () => {
         const response = await request(app)
             .get("/v1/map/uk-flood-test/metadata")

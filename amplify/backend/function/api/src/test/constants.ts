@@ -6,7 +6,9 @@ export const MAX_DATE_MILLIS = 1631664000000;
 export const ONE_DAY_MILLIS = 24 * 60 * 60 * 1000;
 export const MIN_DATE_MILLIS = MAX_DATE_MILLIS - ONE_DAY_MILLIS;
 
+import * as Diff from "diff";
 
+require('colors');
 export const sortedStringify = (unordered) => {
     const ordered = Object.keys(unordered).sort().reduce(
         (obj, key) => {
@@ -17,3 +19,17 @@ export const sortedStringify = (unordered) => {
     );
     return JSON.stringify(ordered);
 };
+
+
+export const diffStrings = (a, b) => {
+    const diff = Diff.diffChars(a, b);
+    diff.forEach((part) => {
+        // green for additions, red for deletions
+        // grey for common parts
+        const color = part.added ? 'green' :
+            part.removed ? 'red' : 'grey';
+        process.stderr.write(part.value[color]);
+    });
+
+    console.log();
+}
