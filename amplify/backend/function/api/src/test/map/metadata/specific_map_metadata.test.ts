@@ -6,14 +6,14 @@ import * as app from "../../../app";
 
 const metadataResponse =
     {
-        "id":                 "uk-flood-test",
-        "title":              "UK Flood (Integration Tests)",
-        "location":           "uk",
-        "regionTypes":        [{"id": "county", "title": "Local Authority"}, {"id": "fine", "title": "Fine Grid"},
-                               {"id": "coarse", "title": "Coarse Grid"}],
-        "regionAggregations": ["uk-countries"],
-        "defaultRegionType":  "county",
-        "start":              {"lat": 53, "lng": -2, "zoom": 6}
+        id:                 "uk-flood-test",
+        title:              "UK Flood (Integration Tests)",
+        location:           "uk",
+        regionTypes:        [{id: "county", title: "Local Authority"}, {id: "fine", title: "Fine Grid"},
+                             {id: "coarse", title: "Coarse Grid"}],
+        regionAggregations: ["uk-countries"],
+        defaultRegionType:  "county",
+        start:              {lat: 53, lng: -2, zoom: 6}
     };
 
 
