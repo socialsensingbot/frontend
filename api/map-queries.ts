@@ -539,6 +539,11 @@ export const nowFunc: (req, res) => Promise<void> = async (req, res) => {
 };
 
 export const mapRegionsFunc: (req, res) => Promise<void> = async (req, res) => {
+    let map = (await getMaps())[req.params.map];
+    if (!map) {
+        invalidParameter(res, "map", `Unrecognized map ${req.params.map}`);
+        return;
+    }
     await db.cache(res, req.path, async () => {
         return await db.sql({
                                 // language=MySQL
@@ -563,6 +568,11 @@ export const mapRegionsFunc: (req, res) => Promise<void> = async (req, res) => {
 };
 
 export const allMapRegionsFunc: (req, res) => Promise<void> = async (req, res) => {
+    let map = (await getMaps())[req.params.map];
+    if (!map) {
+        invalidParameter(res, "map", `Unrecognized map ${req.params.map}`);
+        return;
+    }
     await db.cache(res, req.path, async () => {
         return await db.sql({
                                 // language=MySQL
@@ -589,6 +599,11 @@ export const allMapRegionsFunc: (req, res) => Promise<void> = async (req, res) =
  * @param res
  */
 export const allMapRegionsAPIVersionFunc: (req, res) => Promise<void> = async (req, res) => {
+    let map = (await getMaps())[req.params.map];
+    if (!map) {
+        invalidParameter(res, "map", `Unrecognized map ${req.params.map}`);
+        return;
+    }
     await db.cache(res, req.path, async () => {
         return await db.sql({
                                 // language=MySQL
@@ -610,6 +625,16 @@ export const allMapRegionsAPIVersionFunc: (req, res) => Promise<void> = async (r
 
 
 export const regionsForRegionTypeFunc: (req, res) => Promise<void> = async (req, res) => {
+    let map = (await getMaps())[req.params.map];
+    if (!map) {
+        invalidParameter(res, "map", `Unrecognized map ${req.params.map}`);
+        return;
+    }
+    if (typeof req.params.regionType !== "string") {
+        invalidParameter(res, "regionType",
+                         `Invalid value for path parameter regionType, regionType=${req.params.regionType}, regionType must supplied as a string value`);
+        return;
+    }
     await db.cache(res, req.path, async () => {
         const rows = await db.sql({
                                       // language=MySQL
