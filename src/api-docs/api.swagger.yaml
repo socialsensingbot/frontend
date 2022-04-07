@@ -40,21 +40,17 @@ paths:
                 example:
                   version: '1.0'
                   maps:
-                    - version: 1
-                      id: uk-flood-live
+                    - id: uk-flood-live
                       title: UK Flood and Related
                       location: uk
-                      default_layer_group: flood-only
                       start_lat: 53
                       start_lng: -2
                       start_zoom: 6
                       default_region_type: county
                       last_date:
-                    - version: 1
-                      id: uk-flood-historical
+                    - id: uk-flood-historical
                       title: UK Flood (Historical)
                       location: uk
-                      default_layer_group: flood
                       start_lat: 53
                       start_lng: -2
                       start_zoom: 6
@@ -592,9 +588,6 @@ components:
         title:
           type: string
           example: "UK Flood"
-        version:
-          type: string
-          example: 1
         regionTypes:
           type: array
           items:
@@ -621,7 +614,6 @@ components:
       example:
         id: uk-flood-live
         title: UK Flood
-        version: 1
         location: uk
         regionTypes:
           - id: county

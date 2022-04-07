@@ -5,3 +5,15 @@ export const MIN_DATE = "11-Sept-21";
 export const MAX_DATE_MILLIS = 1631664000000;
 export const ONE_DAY_MILLIS = 24 * 60 * 60 * 1000;
 export const MIN_DATE_MILLIS = MAX_DATE_MILLIS - ONE_DAY_MILLIS;
+
+
+export const sortedStringify = (unordered) => {
+    const ordered = Object.keys(unordered).sort().reduce(
+        (obj, key) => {
+            obj[key] = unordered[key];
+            return obj;
+        },
+        {}
+    );
+    return JSON.stringify(ordered);
+};
