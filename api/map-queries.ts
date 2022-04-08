@@ -193,9 +193,10 @@ export const textForRegionsFunc: (req, res) => Promise<void> = async (req, res) 
                 return;
             }
         }
-        if (typeof req.body.regionType !== "string") {
+        const regionType: any = req.params.regionType || req.body.regionType;
+        if (typeof regionType !== "string") {
             invalidParameter(res, "regionType",
-                             `Invalid value for regionType, regionType=${req.body.regionType}, regionType must supplied as a string value`);
+                             `Invalid value for regionType, regionType=${regionType}, regionType must supplied as a string value`);
             return;
         }
         const lastDate: Date = map.last_date;
@@ -205,7 +206,6 @@ export const textForRegionsFunc: (req, res) => Promise<void> = async (req, res) 
         const pageSize: number = +req.body.pageSize || 100;
         const page: number = +req.body.page || 0;
         const from = page * pageSize;
-        let regionType: any = typeof req.params.regionType !== "undefined" ? req.params.regionType : req.body.regionType;
 
         await db.cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
 
