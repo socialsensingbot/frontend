@@ -21,7 +21,7 @@ import {
     timesliderFunc
 } from "socialsensing-api/map-queries";
 
-//bump 14
+//bump 16
 
 const awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
 

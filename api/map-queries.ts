@@ -474,9 +474,9 @@ export const recentTextCountFunc: (req, res) => Promise<void> = async (req, res)
         invalidParameter(res, "map", `Unrecognized map ${req.params.map}`);
         return;
     }
-    if (typeof req.body.regionType !== "string") {
+    if (typeof regionType !== "string") {
         invalidParameter(res, "regionType",
-                         `Invalid value for regionType, regionType=${req.body.regionType}, regionType must supplied as a string value`);
+                         `Invalid value for regionType, regionType=${regionType}, regionType must supplied as a string value`);
         return;
     }
     if (!Array.isArray(req.body.hazards) || req.body.hazards.some(i => typeof i !== "string") || req.body.hazards.length === 0) {
@@ -729,11 +729,15 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
                          `Invalid value for warnings, warnings=${req.body.warnings}, warnings must be a string with the value one of 'include', 'exclude' or 'only'`);
         return;
     }
-    if (typeof req.body.regionType !== "string") {
+
+    const regionType: any = req.params.regionType || req.body.regionType;
+
+    if (typeof regionType !== "string") {
         invalidParameter(res, "regionType",
-                         `Invalid value for regionType, regionType=${req.body.regionType}, regionType must supplied as a string value`);
+                         `Invalid value for regionType, regionType=${regionType}, regionType must supplied as a string value`);
         return;
     }
+
     await db.cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
 
         const result = {};
@@ -746,7 +750,6 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
         console.debug("StartDate: " + new Date(req.body.startDate));
         console.debug("EndDate: " + new Date(endDate));
         const periodInDays = (endDate - req.body.startDate) / (24 * 60 * 60 * 1000);
-        const regionType: any = req.params.regionType || req.body.regionType;
 
         const rows = await db.sql({
                                       /* language=MySQL*/ sql: `/* app.ts: stats */ select *
@@ -1054,11 +1057,6 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
                              `Invalid value for timePeriod, timePeriod=${req.body.timePeriod}, timePeriod is a string with the value one of 'day' or 'hour'`);
             return;
         }
-    }
-    if (typeof req.body.regionType !== "string") {
-        invalidParameter(res, "regionType",
-                         `Invalid value for regionType, regionType=${req.body.regionType}, regionType must supplied as a string value`);
-        return;
     }
     if (typeof req.body.textSearch !== "undefined") {
         if (typeof req.body.textSearch !== "string" || req.body.textSearch === "") {

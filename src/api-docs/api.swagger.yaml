@@ -400,6 +400,13 @@ components:
         warnings: exclude
         startDate: 1645394400000
         endDate: 1645488000000
+      required:
+        - hazards
+        - sources
+        - regions
+        - startDate
+        - regionType
+        - warnings
 
     TimeSeriesRequest:
       allOf:
@@ -416,6 +423,13 @@ components:
               pattern: "(day|hour)"
               description: "Aggregate over either day or hour."
               example: day
+      required:
+        - hazards
+        - sources
+        - regions
+        - startDate
+        - regionType
+        - warnings
 
     RecentCountRequest:
       allOf:
@@ -425,6 +439,12 @@ components:
             startDate:
               type: integer
               example: 1645394400000
+      required:
+        - hazards
+        - sources
+        - regions
+        - warnings
+        - regionType
 
     RecentCountResponseItem:
       type: object

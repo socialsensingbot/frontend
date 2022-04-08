@@ -17,7 +17,7 @@ const reqBody = {
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
 };
 const invalidHazard1 = {
     hazards:    [1],
@@ -30,7 +30,7 @@ const invalidHazard1 = {
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
 };
 const invalidHazard2 = {
     hazards:    [],
@@ -43,7 +43,7 @@ const invalidHazard2 = {
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
 };
 const invalidSources1 = {
     hazards:    [
@@ -56,7 +56,7 @@ const invalidSources1 = {
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
 };
 const invalidSources2 = {
     hazards:    [
@@ -69,7 +69,7 @@ const invalidSources2 = {
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
 };
 const invalidSources3 = {
     hazards:    [
@@ -82,7 +82,37 @@ const invalidSources3 = {
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
+};
+const regionCountry = {
+    hazards:   [
+        "flood"
+    ],
+    sources:   [
+        "twitter"
+    ],
+    regions:   [
+        "england"
+    ],
+    warnings:  "exclude",
+    startDate: MIN_DATE_MILLIS,
+    endDate:   MAX_DATE_MILLIS,
+
+};
+const regionArea = {
+    hazards:   [
+        "flood"
+    ],
+    sources:   [
+        "twitter"
+    ],
+    regions:   [
+        "south east england"
+    ],
+    warnings:  "exclude",
+    startDate: MIN_DATE_MILLIS,
+    endDate:   MAX_DATE_MILLIS,
+
 };
 const invalidRegions1 = {
     hazards:    [
@@ -97,7 +127,7 @@ const invalidRegions1 = {
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
 };
 const invalidRegions2 = {
     hazards:    [
@@ -110,7 +140,7 @@ const invalidRegions2 = {
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
 };
 const invalidRegions3 = {
     hazards:    [
@@ -123,7 +153,7 @@ const invalidRegions3 = {
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
 };
 const invalidWarnings1 = {
     hazards:    [
@@ -136,7 +166,7 @@ const invalidWarnings1 = {
     warnings:   "excluded",
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
 };
 const invalidWarnings2 = {
     hazards:    [
@@ -149,7 +179,7 @@ const invalidWarnings2 = {
     warnings:   ["exclude"],
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
 };
 const invalidWarnings3 = {
     hazards:    [
@@ -162,7 +192,7 @@ const invalidWarnings3 = {
     warnings:   [],
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
 };
 const invalidWarnings4 = {
     hazards:    [
@@ -175,7 +205,7 @@ const invalidWarnings4 = {
     warnings:   true,
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
 };
 
 const invalidStartDate1 = {
@@ -191,7 +221,7 @@ const invalidStartDate1 = {
     warnings:   "exclude",
     startDate:  -1,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
 };
 const invalidStartDate2 = {
     hazards:    [
@@ -206,7 +236,7 @@ const invalidStartDate2 = {
     warnings:   "exclude",
     startDate:  "Wed Apr  6 18:11:20 BST 2022",
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
 };
 const invalidStartDate3 = {
     hazards:    [
@@ -220,7 +250,7 @@ const invalidStartDate3 = {
     ],
     warnings:   "exclude",
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
 };
 const invalidStartDate4 = {
     hazards:    [
@@ -235,7 +265,7 @@ const invalidStartDate4 = {
     warnings:   "exclude",
     startDate:  4796668800000,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
+
 };
 
 
@@ -252,7 +282,7 @@ const invalidEndDate1 = {
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
     endDate:    -1,
-    regionType: "county"
+
 };
 const invalidEndDate2 = {
     hazards:    [
@@ -267,7 +297,7 @@ const invalidEndDate2 = {
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
     endDate:    "Wed Apr  6 18:11:20 BST 2022",
-    regionType: "county"
+
 };
 const invalidEndDate3 = {
     hazards:    [
@@ -282,7 +312,7 @@ const invalidEndDate3 = {
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
     endDate:    4796668800000,
-    regionType: "county"
+
 };
 const invalidEndDate4 = {
     hazards:    [
@@ -297,7 +327,7 @@ const invalidEndDate4 = {
     warnings:   "exclude",
     startDate:  MAX_DATE_MILLIS,
     endDate:    MIN_DATE_MILLIS,
-    regionType: "county"
+
 };
 const noEndDate = {
     hazards:    [
@@ -311,7 +341,7 @@ const noEndDate = {
     ],
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
-    regionType: "county"
+
 };
 const invalidRegionType1 = {
     hazards:    [
@@ -385,7 +415,7 @@ const textSearch = {
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county",
+
     textSearch: "wet AND windy"
 };
 const invalidTextSearch1 = {
@@ -401,7 +431,7 @@ const invalidTextSearch1 = {
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county",
+
     textSearch: ""
 };
 const invalidTextSearch2 = {
@@ -417,7 +447,7 @@ const invalidTextSearch2 = {
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county",
+
     textSearch: 0
 };
 const byHour = {
@@ -433,7 +463,7 @@ const byHour = {
     warnings:   "exclude",
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
-    regionType: "county",
+
     timePeriod: "hour"
 };
 describe("POST /v1/map/:map/analytics/time", () => {
@@ -443,10 +473,15 @@ describe("POST /v1/map/:map/analytics/time", () => {
             .set("Accept", "application/json")
             .send(reqBody);
         console.log(JSON.stringify(response.body));
-        expect(JSON.stringify(response.body)).to.equal(JSON.stringify(
-            [{"count": 1, "region": "hertfordshire", "exceedance": 32.85, "date": "2021-09-14T07:00:00.000Z"},
-             {"count": 1, "region": "hertfordshire", "exceedance": 32.85, "date": "2021-09-14T10:00:00.000Z"}]
-        ));
+        expect(response.body.length).equal(2);
+        expect(response.body[0].count).equal(1);
+        expect(response.body[0].region).equal("hertfordshire");
+        expect(response.body[0].date).equal("2021-09-14T07:00:00.000Z");
+
+        expect(response.body[1].count).equal(1);
+        expect(response.body[1].region).equal("hertfordshire");
+        expect(response.body[1].date).equal("2021-09-14T10:00:00.000Z");
+
     });
     it("invalid map", async () => {
         const response = await request(app)
@@ -624,38 +659,23 @@ describe("POST /v1/map/:map/analytics/time", () => {
         expect(response.status).equals(200);
         expect(response.body.length).equals(19);
     });
-    it("invalid region type 1", async () => {
+    it("for a region which is a country", async () => {
         const response = await request(app)
             .post("/v1/map/uk-flood-test/analytics/time")
             .set("Accept", "application/json")
-            .send(invalidRegionType1);
-        expect(response.status).equals(400);
-        expect(response.body.parameter).equals("regionType");
+            .send(regionCountry);
+        expect(response.status).equals(200);
+        expect(response.body.length).equals(19);
     });
-    it("invalid region type 2", async () => {
+    it("for a region which is an area", async () => {
         const response = await request(app)
             .post("/v1/map/uk-flood-test/analytics/time")
             .set("Accept", "application/json")
-            .send(invalidRegionType2);
-        expect(response.status).equals(400);
-        expect(response.body.parameter).equals("regionType");
+            .send(regionArea);
+        expect(response.status).equals(200);
+        expect(response.body.length).equals(5);
     });
-    it("invalid region type 3", async () => {
-        const response = await request(app)
-            .post("/v1/map/uk-flood-test/analytics/time")
-            .set("Accept", "application/json")
-            .send(invalidRegionType3);
-        expect(response.status).equals(400);
-        expect(response.body.parameter).equals("regionType");
-    });
-    it("invalid region type 4", async () => {
-        const response = await request(app)
-            .post("/v1/map/uk-flood-test/analytics/time")
-            .set("Accept", "application/json")
-            .send(invalidRegionType4);
-        expect(response.status).equals(400);
-        expect(response.body.parameter).equals("regionType");
-    });
+
     it("supply a text search criteria", async () => {
         const response = await request(app)
             .post("/v1/map/uk-flood-test/analytics/time")
