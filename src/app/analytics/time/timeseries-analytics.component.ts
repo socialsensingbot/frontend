@@ -535,7 +535,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
         try {
             const payload = {
-                layer:      query.layer,
+                ...query.layer,
                 location:   query.location,
                 regions:    query.regions,
                 textSearch: query.textSearch,

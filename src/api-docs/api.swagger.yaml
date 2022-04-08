@@ -404,7 +404,6 @@ components:
     TimeSeriesRequest:
       allOf:
         - $ref: '#/components/schemas/RegionDataRequest'
-        - $ref: '#/components/schemas/PagedRequest'
         - $ref: '#/components/schemas/DateRangeRequest'
         - type: object
           properties:
