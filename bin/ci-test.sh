@@ -31,8 +31,8 @@ if [[ "${AWS_BRANCH}" == master ]]; then
   exit 1
 fi
 
-export TZ=Europe/London
-
+export TZ=UTC
+export CYPRESS_VERIFY_TIMEOUT=60000
 set -e
 function test() {
   echo "Running ${tests} on branch ${AWS_BRANCH} against ${browsers}"
@@ -43,7 +43,7 @@ function test() {
   export NODE_OPTIONS="--max-old-space-size=4096"
   for file in $(find ${tests} -name "*.js" | sort); do
     echo "Running tests in ${file} with a timeout of ${timeoutDuration} seconds."
-    TZ=UTC npx cypress run $record -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} \
+    npx cypress run $record -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS} \
   --browser ${browser} \
   --headless --reporter mochawesome \
   --reporter-options "reportDir=cypress/report/mochawesome-report-${browser},overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss" \
