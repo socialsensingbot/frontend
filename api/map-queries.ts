@@ -773,9 +773,8 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
                                                                                                            AND d.region_type = ?
                                                                                                            AND d.hazard IN (?)
                                                                                                            AND d.source IN (?)
-                                                                                                           AND d.warning IN (?)
-                                                                                                        )
-                                                                                                           ) * 100) as exceedance
+                                                                                                           AND d.warning IN (?))
+                                                                                                           ) * 100, 2) as exceedance
 
                                                                                           FROM (SELECT count(*) as count, region as region
                                                                                                 FROM mat_view_regions r
