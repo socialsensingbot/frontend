@@ -201,7 +201,6 @@ paths:
     post:
       tags:
         - text
-        - twitter
       summary: Returns related Tweets for the specified regions.
       description: "Returns related Tweets for the specified regions."
       parameters:
@@ -227,7 +226,6 @@ paths:
     post:
       tags:
         - statistics
-        - twitter
       summary: Returns related Tweets for the specified regions.
       description: "Returns related Tweets for the specified regions."
       parameters:
@@ -256,8 +254,6 @@ paths:
     post:
       tags:
         - text
-        - statistics
-        - twitter
       summary: "Returns the number of messages, i.e. tweets, since a specific time."
       description: >
         Returns the number of messages, i.e. tweets, since a specific time.
@@ -283,7 +279,6 @@ paths:
     post:
       tags:
         - analytics
-        - twitter
       summary: Returns data for a time series graph.
       description: Returns data for a time series graph.
       parameters:

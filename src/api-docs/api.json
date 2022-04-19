@@ -304,8 +304,7 @@
     "/v1/map/{map}/text": {
       "post": {
         "tags": [
-          "text",
-          "twitter"
+          "text"
         ],
         "summary": "Returns related Tweets for the specified regions.",
         "description": "Returns related Tweets for the specified regions.",
@@ -345,8 +344,7 @@
     "/v1/map/{map}/stats": {
       "post": {
         "tags": [
-          "statistics",
-          "twitter"
+          "statistics"
         ],
         "summary": "Returns related Tweets for the specified regions.",
         "description": "Returns related Tweets for the specified regions.",
@@ -784,9 +782,7 @@
     "/v1/map/{map}/recent-text-count": {
       "post": {
         "tags": [
-          "text",
-          "statistics",
-          "twitter"
+          "text"
         ],
         "summary": "Returns the number of messages, i.e. tweets, since a specific time.",
         "description": "Returns the number of messages, i.e. tweets, since a specific time. This is provided so that recently active regions can be flagged.\n",
@@ -823,8 +819,7 @@
     "/v1/map/{map}/analytics/time": {
       "post": {
         "tags": [
-          "analytics",
-          "twitter"
+          "analytics"
         ],
         "summary": "Returns data for a time series graph.",
         "description": "Returns data for a time series graph.",
