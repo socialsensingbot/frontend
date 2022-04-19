@@ -2,12 +2,12 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Social Sensing API",
-    "description": "Social Sensing API",
+    "description": "Social Sensing API provides the ability to retrieve geographic statistical data relating to weather events. This API is secured with an API key provided by your account manager.\n",
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "https://api-dev.socialsensing.com/"
+      "url": "https://api-dev.socialsensing.com"
     }
   ],
   "security": [
@@ -48,11 +48,9 @@
                     "version": "1.0",
                     "maps": [
                       {
-                        "version": 1,
                         "id": "uk-flood-live",
                         "title": "UK Flood and Related",
                         "location": "uk",
-                        "default_layer_group": "flood-only",
                         "start_lat": 53,
                         "start_lng": -2,
                         "start_zoom": 6,
@@ -60,11 +58,9 @@
                         "last_date": null
                       },
                       {
-                        "version": 1,
                         "id": "uk-flood-historical",
                         "title": "UK Flood (Historical)",
                         "location": "uk",
-                        "default_layer_group": "flood",
                         "start_lat": 53,
                         "start_lng": -2,
                         "start_zoom": 6,
@@ -145,17 +141,20 @@
           }
         ],
         "responses": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "example": [
-                  "dorset",
-                  "powys",
-                  "devon"
-                ],
-                "items": {
-                  "type": "string"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "example": [
+                    "dorset",
+                    "powys",
+                    "devon"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
                 }
               }
             }
@@ -1007,15 +1006,20 @@
           "warnings": "exclude",
           "startDate": 1645394400000,
           "endDate": 1645488000000
-        }
+        },
+        "required": [
+          "hazards",
+          "sources",
+          "regions",
+          "startDate",
+          "regionType",
+          "warnings"
+        ]
       },
       "TimeSeriesRequest": {
         "allOf": [
           {
             "$ref": "#/components/schemas/RegionDataRequest"
-          },
-          {
-            "$ref": "#/components/schemas/PagedRequest"
           },
           {
             "$ref": "#/components/schemas/DateRangeRequest"
@@ -1036,6 +1040,14 @@
               }
             }
           }
+        ],
+        "required": [
+          "hazards",
+          "sources",
+          "regions",
+          "startDate",
+          "regionType",
+          "warnings"
         ]
       },
       "RecentCountRequest": {
@@ -1052,6 +1064,13 @@
               }
             }
           }
+        ],
+        "required": [
+          "hazards",
+          "sources",
+          "regions",
+          "warnings",
+          "regionType"
         ]
       },
       "RecentCountResponseItem": {
@@ -1777,10 +1796,6 @@
             "type": "string",
             "example": "UK Flood"
           },
-          "version": {
-            "type": "string",
-            "example": 1
-          },
           "regionTypes": {
             "type": "array",
             "items": {
@@ -1817,7 +1832,6 @@
         "example": {
           "id": "uk-flood-live",
           "title": "UK Flood",
-          "version": 1,
           "location": "uk",
           "regionTypes": [
             {
