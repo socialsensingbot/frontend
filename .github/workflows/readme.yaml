@@ -5,11 +5,12 @@ on:
   push:
     branches:
       - main
+      - release/2.6
 jobs:
-  build:
+  sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: readmeio/rdme@vXX
+      - uses: readmeio/rdme@7.1.1
         with:
           rdme: openapi src/api-docs/api.json --key=PErUDM6dmfTSloIBG8XUS6IaIepM13xI --id=625ed7e6b26b95052d28aa26
