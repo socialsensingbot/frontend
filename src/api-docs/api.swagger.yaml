@@ -12,6 +12,8 @@ security:
 paths:
   /v1/map/metadata:
     get:
+      tags:
+        - metadata
       summary: Returns metadata regarding all available maps.
       description: >
         Returns metadata regarding all available maps, the primary purpose of this call is to list available maps
@@ -65,6 +67,8 @@ paths:
 
   /v1/map/{map}/metadata:
     get:
+      tags:
+        - metadata
       summary: Returns metadata for a specific map
       description: >
         Returns metadata for a specific map.
@@ -81,6 +85,8 @@ paths:
 
   /v1/map/{map}/now:
     get:
+      tags:
+        - metadata
       summary: Returns the latest date for which there is data for the specified map.
       description: >
         Returns the latest date for which there is data for the specified map.
@@ -99,6 +105,8 @@ paths:
 
   /v1/map/{map}/region-type/{regionType}/regions:
     get:
+      tags:
+        - metadata
       summary: Returns the regions for a given region type and map.
       description: Returns the regions for a given region type and map as an array of identifiers.
       parameters:
@@ -120,6 +128,8 @@ paths:
 
   /v1/map/{map}/regions:
     get:
+      tags:
+        - metadata
       summary: Returns all the region and region type combinations for a given map.
       description: Returns all the region and region type combinations for a given map.
       parameters:
@@ -137,6 +147,8 @@ paths:
 
   /v1/map/{map}/region-type/{regionType}/region/{region}/geography:
     get:
+      tags:
+        - metadata
       summary: Returns the GeoJSON for the region on a map
       description: "Returns the GeoJSON for the region on a map."
       parameters:
@@ -187,6 +199,9 @@ paths:
 
   /v1/map/{map}/text:
     post:
+      tags:
+        - text
+        - twitter
       summary: Returns related Tweets for the specified regions.
       description: "Returns related Tweets for the specified regions."
       parameters:
@@ -210,6 +225,9 @@ paths:
 
   /v1/map/{map}/stats:
     post:
+      tags:
+        - statistics
+        - twitter
       summary: Returns related Tweets for the specified regions.
       description: "Returns related Tweets for the specified regions."
       parameters:
@@ -236,6 +254,10 @@ paths:
 
   /v1/map/{map}/recent-text-count:
     post:
+      tags:
+        - text
+        - statistics
+        - twitter
       summary: "Returns the number of messages, i.e. tweets, since a specific time."
       description: >
         Returns the number of messages, i.e. tweets, since a specific time.
@@ -259,6 +281,9 @@ paths:
 
   /v1/map/{map}/analytics/time:
     post:
+      tags:
+        - analytics
+        - twitter
       summary: Returns data for a time series graph.
       description: Returns data for a time series graph.
       parameters:

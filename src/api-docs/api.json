@@ -18,6 +18,9 @@
   "paths": {
     "/v1/map/metadata": {
       "get": {
+        "tags": [
+          "metadata"
+        ],
         "summary": "Returns metadata regarding all available maps.",
         "description": "Returns metadata regarding all available maps, the primary purpose of this call is to list available maps and their core metadata. This method is primarily an aggregation of ```/v1/map/{map}/metadata``` for each map. The version number returned is the version of the schema for this result and can usually be ignored. The start property contains the default recommended starting position of any rendered map. This is overridden by each map.\n",
         "responses": {
@@ -83,6 +86,9 @@
     },
     "/v1/map/{map}/metadata": {
       "get": {
+        "tags": [
+          "metadata"
+        ],
         "summary": "Returns metadata for a specific map",
         "description": "Returns metadata for a specific map. See the id property of MapMetadata for what should be passed as the path parameter {map}.\n",
         "parameters": [
@@ -106,6 +112,9 @@
     },
     "/v1/map/{map}/now": {
       "get": {
+        "tags": [
+          "metadata"
+        ],
         "summary": "Returns the latest date for which there is data for the specified map.",
         "description": "Returns the latest date for which there is data for the specified map. For archived map data this will be a fixed date (i.e. the last_date field in MapMetadata), otherwise, it's the last time data was processed.\n",
         "parameters": [
@@ -130,6 +139,9 @@
     },
     "/v1/map/{map}/region-type/{regionType}/regions": {
       "get": {
+        "tags": [
+          "metadata"
+        ],
         "summary": "Returns the regions for a given region type and map.",
         "description": "Returns the regions for a given region type and map as an array of identifiers.",
         "parameters": [
@@ -164,6 +176,9 @@
     },
     "/v1/map/{map}/regions": {
       "get": {
+        "tags": [
+          "metadata"
+        ],
         "summary": "Returns all the region and region type combinations for a given map.",
         "description": "Returns all the region and region type combinations for a given map.",
         "parameters": [
@@ -190,6 +205,9 @@
     },
     "/v1/map/{map}/region-type/{regionType}/region/{region}/geography": {
       "get": {
+        "tags": [
+          "metadata"
+        ],
         "summary": "Returns the GeoJSON for the region on a map",
         "description": "Returns the GeoJSON for the region on a map.",
         "parameters": [
@@ -285,6 +303,10 @@
     },
     "/v1/map/{map}/text": {
       "post": {
+        "tags": [
+          "text",
+          "twitter"
+        ],
         "summary": "Returns related Tweets for the specified regions.",
         "description": "Returns related Tweets for the specified regions.",
         "parameters": [
@@ -322,6 +344,10 @@
     },
     "/v1/map/{map}/stats": {
       "post": {
+        "tags": [
+          "statistics",
+          "twitter"
+        ],
         "summary": "Returns related Tweets for the specified regions.",
         "description": "Returns related Tweets for the specified regions.",
         "parameters": [
@@ -757,6 +783,11 @@
     },
     "/v1/map/{map}/recent-text-count": {
       "post": {
+        "tags": [
+          "text",
+          "statistics",
+          "twitter"
+        ],
         "summary": "Returns the number of messages, i.e. tweets, since a specific time.",
         "description": "Returns the number of messages, i.e. tweets, since a specific time. This is provided so that recently active regions can be flagged.\n",
         "parameters": [
@@ -791,6 +822,10 @@
     },
     "/v1/map/{map}/analytics/time": {
       "post": {
+        "tags": [
+          "analytics",
+          "twitter"
+        ],
         "summary": "Returns data for a time series graph.",
         "description": "Returns data for a time series graph.",
         "parameters": [
