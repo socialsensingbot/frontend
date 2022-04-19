@@ -1,10 +1,12 @@
 openapi: 3.0.1
 info:
   title: Social Sensing API
-  description: Social Sensing API
+  description: >
+    Social Sensing API provides the ability to retrieve geographic statistical data relating to weather events. This
+    API is secured with an API key provided by your account manager.
   version: 1.0.0
 servers:
-  - url: https://api-dev.socialsensing.com/
+  - url: https://api-dev.socialsensing.com
 security:
   - ApiKeyAuth: [ ]
 paths:
@@ -103,6 +105,8 @@ paths:
         - $ref: '#/components/parameters/Map'
         - $ref: '#/components/parameters/RegionType'
       responses:
+        200:
+          description: OK
           content:
             'application/json':
               schema:
