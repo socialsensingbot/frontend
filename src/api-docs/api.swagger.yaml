@@ -28,6 +28,12 @@ paths:
       responses:
         200:
           description: OK
+          links:
+            PathParamMapID:
+              operationId: getMapIds
+              parameters: '$response.body#/maps/1/id'
+              description: >
+                The 'id' field of each returned map is used as the path parameter {map} in all map based operations.
           content:
             'application/json':
               schema:
@@ -79,6 +85,7 @@ paths:
     get:
       tags:
         - metadata
+      operationId: getMapIds
       summary: Metadata for a specific map
       description: >
         Returns metadata for a specific map. To obtain the list of available maps see 'Metadata for all available maps'.
@@ -368,7 +375,7 @@ components:
       required: true
       schema:
         type: string
-      description: The map.
+      description: The map id to use for the request, the set of ids can be returned using "Metadata for all available maps".
       example: uk-flood-live
     RegionType:
       in: path

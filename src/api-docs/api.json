@@ -30,6 +30,13 @@
         "responses": {
           "200": {
             "description": "OK",
+            "links": {
+              "PathParamMapID": {
+                "operationId": "getMapIds",
+                "parameters": "$response.body#/maps/1/id",
+                "description": "The 'id' field of each returned map is used as the path parameter {map} in all map based operations.\n"
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -103,6 +110,7 @@
         "tags": [
           "metadata"
         ],
+        "operationId": "getMapIds",
         "summary": "Metadata for a specific map",
         "description": "Returns metadata for a specific map. To obtain the list of available maps see 'Metadata for all available maps'. Included in the response is a list of all region types (including the default to display) for the map a start  location and zoom for the map when displayed, a logical location for the map (e.g. UK, India, World) and  supported hazard types for this map.\n",
         "parameters": [
@@ -960,7 +968,7 @@
         "schema": {
           "type": "string"
         },
-        "description": "The map.",
+        "description": "The map id to use for the request, the set of ids can be returned using \"Metadata for all available maps\".",
         "example": "uk-flood-live"
       },
       "RegionType": {
