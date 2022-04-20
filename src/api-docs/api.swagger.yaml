@@ -16,9 +16,10 @@ security:
 paths:
   /v1/map/metadata:
     get:
+      operationId: GetAllMapsMetadata
       tags:
         - metadata
-      summary: Metadata for all available maps
+      summary: Get Metadata for All Maps
       description: >
         Returns metadata regarding all available maps, the primary purpose of this call is to list available maps
         and their core metadata. This method is primarily an aggregation of ```/v1/map/{map}/metadata``` for each map.
@@ -87,9 +88,9 @@ paths:
       tags:
         - metadata
       operationId: GetMapMetadata
-      summary: Metadata for a specific map
+      summary: Get Metadata for Map by Id
       description: >
-        Returns metadata for a specific map. To obtain the list of available maps see 'Metadata for all available maps'.
+        Returns metadata for a specific map. To get the list of available maps see [Get Metadata for All Maps](../getallmapsmetadata) .
         Included in the response is a list of all region types (including the default to display) for the map a start 
         location and zoom for the map when displayed, a logical location for the map (e.g. UK, India, World) and 
         supported hazard types for this map.
@@ -113,11 +114,13 @@ paths:
     get:
       tags:
         - metadata
-      summary: Returns the latest date for which there is data for the specified map.
+      summary: Get the Latest Date for Map
       description: >
         Returns the latest date for which there is data for the specified map.
         For archived map data this will be a fixed date (i.e. the last_date field in MapMetadata),
-        otherwise, it's the last time data was processed.
+        otherwise, it's the last time data was processed (usually within 10 minutes of ```Date.now()```).
+        
+        To Get a list of all maps and their ids use [Get Metadata for All Maps](../getallmapsmetadata).
       parameters:
         - $ref: '#/components/parameters/Map'
       responses:
