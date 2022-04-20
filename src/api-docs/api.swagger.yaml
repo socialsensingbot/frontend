@@ -112,6 +112,7 @@ paths:
 
   /v1/map/{map}/now:
     get:
+      operationId: GetMapNow
       tags:
         - metadata
       summary: Get the Latest Date for Map
@@ -120,7 +121,8 @@ paths:
         For archived map data this will be a fixed date (i.e. the last_date field in MapMetadata),
         otherwise, it's the last time data was processed (usually within 10 minutes of ```Date.now()```).
         
-        To Get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).
+        
+        To get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).
       parameters:
         - $ref: '#/components/parameters/Map'
       responses:
@@ -137,7 +139,11 @@ paths:
       tags:
         - metadata
       summary: Returns the regions for a given region type and map.
-      description: Returns the regions for a given region type and map as an array of identifiers.
+      description: >
+        Returns a list of region identifiers for the given region type within the given {{map}} as an array of identifiers.
+        
+        
+        To get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).
       parameters:
         - $ref: '#/components/parameters/Map'
         - $ref: '#/components/parameters/RegionType'
@@ -166,7 +172,11 @@ paths:
       tags:
         - metadata
       summary: Returns all the region and region type combinations for a given map.
-      description: Returns all the region and region type combinations for a given map.
+      description: >
+        Returns all the region and region type combinations for a given map.
+        
+        
+        To get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).
       parameters:
         - $ref: '#/components/parameters/Map'
       responses:

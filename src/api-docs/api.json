@@ -147,11 +147,12 @@
     },
     "/v1/map/{map}/now": {
       "get": {
+        "operationId": "GetMapNow",
         "tags": [
           "metadata"
         ],
         "summary": "Get the Latest Date for Map",
-        "description": "Returns the latest date for which there is data for the specified map. For archived map data this will be a fixed date (i.e. the last_date field in MapMetadata), otherwise, it's the last time data was processed (usually within 10 minutes of ```Date.now()```).\nTo Get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).\n",
+        "description": "Returns the latest date for which there is data for the specified map. For archived map data this will be a fixed date (i.e. the last_date field in MapMetadata), otherwise, it's the last time data was processed (usually within 10 minutes of ```Date.now()```).\n\nTo get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/Map"
@@ -178,7 +179,7 @@
           "metadata"
         ],
         "summary": "Returns the regions for a given region type and map.",
-        "description": "Returns the regions for a given region type and map as an array of identifiers.",
+        "description": "Returns a list of region identifiers for the given region type within the given {{map}} as an array of identifiers.\n\nTo get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/Map"
@@ -225,7 +226,7 @@
           "metadata"
         ],
         "summary": "Returns all the region and region type combinations for a given map.",
-        "description": "Returns all the region and region type combinations for a given map.",
+        "description": "Returns all the region and region type combinations for a given map.\n\nTo get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/Map"
