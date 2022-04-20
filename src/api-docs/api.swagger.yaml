@@ -27,7 +27,7 @@ paths:
         by each map.
       responses:
         200:
-          description: A typical 200 response.
+          description: OK
           content:
             'application/json':
               schema:
@@ -68,6 +68,12 @@ paths:
                     lat: 53
                     lng: -2
                     zoom: 6
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
 
   /v1/map/{map}/metadata:
     get:
@@ -137,6 +143,12 @@ paths:
                   - devon
                 items:
                   type: string
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
 
   /v1/map/{map}/regions:
     get:
@@ -155,6 +167,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RegionMetadata'
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
 
 
   /v1/map/{map}/region-type/{regionType}/region/{region}/geography:
@@ -207,6 +225,12 @@ paths:
                   properties:
                     name: dorset
                     title: Dorset
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
 
 
   /v1/map/{map}/text:
@@ -233,6 +257,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TextResponseItem'
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
 
   /v1/map/{map}/stats:
     post:
@@ -260,6 +290,12 @@ paths:
                   $ref: '#/components/schemas/StatsResponseItem'
                 example:
                   $ref: "./examples/stats-response.yaml"
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
 
 
   /v1/map/{map}/recent-text-count:
@@ -286,6 +322,12 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/RecentCountResponseItem'
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
 
   /v1/map/{map}/analytics/time:
     post:
@@ -311,6 +353,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TimeSeriesResponseItem'
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
 
 components:
   parameters:
