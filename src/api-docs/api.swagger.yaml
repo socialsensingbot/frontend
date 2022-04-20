@@ -136,11 +136,12 @@ paths:
 
   /v1/map/{map}/region-type/{regionType}/regions:
     get:
+      operationId: GetMapRegionsForRegionType
       tags:
         - metadata
-      summary: Returns the regions for a given region type and map.
+      summary: Get Map Regions for a Region Type
       description: >
-        Returns a list of region identifiers for the given region type within the given {{map}} as an array of identifiers.
+        Returns a list of region identifiers for the given region type within the given map as an array of identifiers.
         
         
         To get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).
@@ -169,6 +170,7 @@ paths:
 
   /v1/map/{map}/regions:
     get:
+      operationId: GetAllMapRegionsAndTypes
       tags:
         - metadata
       summary: Returns all the region and region type combinations for a given map.
