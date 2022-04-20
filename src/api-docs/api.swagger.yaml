@@ -30,9 +30,9 @@ paths:
           description: OK
           links:
             PathParamMapID:
-              operationId: getMapIds
+              operationId: GetMapMetadata
               parameters:
-                map: '$response.body#/maps/1/id'
+                map: '$response.body#/maps/0/id'
               description: >
                 The 'id' field of each returned map is used as the path parameter {map} in all map based operations.
           content:
@@ -86,7 +86,7 @@ paths:
     get:
       tags:
         - metadata
-      operationId: getMapIds
+      operationId: GetMapMetadata
       summary: Metadata for a specific map
       description: >
         Returns metadata for a specific map. To obtain the list of available maps see 'Metadata for all available maps'.
