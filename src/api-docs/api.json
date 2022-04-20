@@ -3,7 +3,11 @@
   "info": {
     "title": "Social Sensing API",
     "description": "Social Sensing API provides the ability to retrieve geographic statistical data relating to weather events. This API is secured with an API key provided by your account manager.\n",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "contact": {
+      "name": "API Support Team",
+      "email": "support@socialsensing.com"
+    }
   },
   "servers": [
     {
@@ -21,11 +25,11 @@
         "tags": [
           "metadata"
         ],
-        "summary": "Returns metadata regarding all available maps.",
+        "summary": "Metadata for all available maps",
         "description": "Returns metadata regarding all available maps, the primary purpose of this call is to list available maps and their core metadata. This method is primarily an aggregation of ```/v1/map/{map}/metadata``` for each map. The version number returned is the version of the schema for this result and can usually be ignored. The start property contains the default recommended starting position of any rendered map. This is overridden by each map.\n",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "A typical 200 response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -89,8 +93,8 @@
         "tags": [
           "metadata"
         ],
-        "summary": "Returns metadata for a specific map",
-        "description": "Returns metadata for a specific map. See the id property of MapMetadata for what should be passed as the path parameter {map}.\n",
+        "summary": "Metadata for a specific map",
+        "description": "Returns metadata for a specific map. To obtain the list of available maps see 'Metadata for all available maps'. Included in the response is a list of all region types (including the default to display) for the map a start  location and zoom for the map when displayed, a logical location for the map (e.g. UK, India, World) and  supported hazard types for this map.\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/Map"
