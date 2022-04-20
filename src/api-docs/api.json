@@ -115,7 +115,7 @@
         ],
         "operationId": "GetMapMetadata",
         "summary": "Get Metadata for Map by Id",
-        "description": "Returns metadata for a specific map. To get the list of available maps see [Get Metadata for All Maps](../getallmapsmetadata) . Included in the response is a list of all region types (including the default to display) for the map a start  location and zoom for the map when displayed, a logical location for the map (e.g. UK, India, World) and  supported hazard types for this map.\n",
+        "description": "Returns metadata for a specific map. To get the list of available maps see [Get Metadata for All Maps](./getallmapsmetadata) . Included in the response is a list of all region types (including the default to display) for the map a start  location and zoom for the map when displayed, a logical location for the map (e.g. UK, India, World) and  supported hazard types for this map.\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/Map"
@@ -151,7 +151,7 @@
           "metadata"
         ],
         "summary": "Get the Latest Date for Map",
-        "description": "Returns the latest date for which there is data for the specified map. For archived map data this will be a fixed date (i.e. the last_date field in MapMetadata), otherwise, it's the last time data was processed (usually within 10 minutes of ```Date.now()```).\nTo Get a list of all maps and their ids use [Get Metadata for All Maps](../getallmapsmetadata).\n",
+        "description": "Returns the latest date for which there is data for the specified map. For archived map data this will be a fixed date (i.e. the last_date field in MapMetadata), otherwise, it's the last time data was processed (usually within 10 minutes of ```Date.now()```).\nTo Get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/Map"
