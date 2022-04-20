@@ -88,6 +88,12 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/MapMetadata'
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
 
   /v1/map/{map}/now:
     get:
@@ -684,3 +690,19 @@ components:
           lat: 53
           lng: -2
           zoom: 6
+    InvalidParameterError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: "Always 'Invalid Parameter'"
+          pattern: Invalid Parameter
+          example: "Invalid Parameter"
+        errorMessage:
+          type: string
+          description: An error message describing why the parameter has an incorrect value.
+          example: 'The parameter name must be provided and be a string'
+        parameter:
+          type: string
+          description: The parameter from either the path or the JSON body of the request which was invalid.
+          example: 'name'
