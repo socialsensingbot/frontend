@@ -33,7 +33,9 @@
             "links": {
               "PathParamMapID": {
                 "operationId": "getMapIds",
-                "parameters": "$response.body#/maps/1/id",
+                "parameters": {
+                  "map": "$response.body#/maps/1/id"
+                },
                 "description": "The 'id' field of each returned map is used as the path parameter {map} in all map based operations.\n"
               }
             },
