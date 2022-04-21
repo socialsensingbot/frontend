@@ -1040,7 +1040,7 @@
           "warnings": {
             "type": "string",
             "example": "exclude",
-            "description": "The warnings option is used to decide whether to include warnings (automated Tweets publishing weather  warnings) should be included in the results. \n*) 'include' includes warnings. *) 'exclude' does not include warnings. *) 'only' only returns warnings.\n",
+            "description": "The warnings option is used to decide whether to include warnings (automated Tweets publishing weather  warnings) should be included in the results. \n* 'include' includes warnings. * 'exclude' does not include warnings. * 'only' only returns warnings.\n",
             "pattern": "(only|include|exclude)"
           }
         }

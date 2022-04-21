@@ -459,9 +459,9 @@ components:
             The warnings option is used to decide whether to include warnings (automated Tweets publishing weather 
             warnings) should be included in the results. 
             
-            *) 'include' includes warnings.
-            *) 'exclude' does not include warnings.
-            *) 'only' only returns warnings.
+            * 'include' includes warnings.
+            * 'exclude' does not include warnings.
+            * 'only' only returns warnings.
           pattern: "(only|include|exclude)"
     RegionDataRequest:
       allOf:
