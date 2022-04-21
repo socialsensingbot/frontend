@@ -428,7 +428,7 @@
           "statistics"
         ],
         "summary": "Get Statistical Data for Map",
-        "description": "Returns an object mapping regions to their statistics. At present the two statistics are  [exceedance](https://socialsensing.com/materialis/help-and-support/#exceedance) and total count.  The result will look like this:\n\n```json\n{\n  \"west yorkshire\": {\n    \"count\": 109,\n    \"exceedance\": 0.4697\n  },\n   \"shropshire\": {\n     \"count\": 71,\n     \"exceedance\": 0.4697\n   },\n\n...\n}\n```\nTo get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). The list of available regions types and hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).\n",
+        "description": "Returns an object mapping regions to their statistics. At present the two statistics are  [exceedance](https://socialsensing.com/materialis/help-and-support/#exceedance) and total count. If there are no results for the criteria for a given region it will not included in the results. The result will look like this:\n\n```json\n{\n  \"west yorkshire\": {\n    \"count\": 109,\n    \"exceedance\": 0.4697\n  },\n   \"shropshire\": {\n     \"count\": 71,\n     \"exceedance\": 0.4697\n   },\n\n...\n}\n```\nTo get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). The list of available regions types and hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/Map"
@@ -872,11 +872,12 @@
     },
     "/v1/map/{map}/recent-text-count": {
       "post": {
+        "operationId": "GetRegionsWithRecentTexts",
         "tags": [
           "text"
         ],
-        "summary": "Returns the number of messages, i.e. tweets, since a specific time.",
-        "description": "Returns the number of messages, i.e. tweets, since a specific time. This is provided so that recently active regions can be flagged.\n",
+        "summary": "Get Regions with Recent Texts",
+        "description": "Returns the number of messages (i.e. Tweets), since a specific time for all regions on the specified map. This is provided so that recently active regions can be flagged. If a region has no results for the time period it is not returned. I.e. a count of zero is not returned. E.g.:\n```json\n\n{\n  \"powys\": 3,\n  \"devon\": 20,\n  \"dorset\": 23\n}\n```\nTo get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). The list of available regions types and hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/Map"
@@ -1213,6 +1214,7 @@
             "properties": {
               "startDate": {
                 "type": "integer",
+                "description": "The minimum JavaScript time to find results for.",
                 "example": 1645394400000
               }
             }

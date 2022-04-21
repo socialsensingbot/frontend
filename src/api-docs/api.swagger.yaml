@@ -312,8 +312,8 @@ paths:
       summary: Get Statistical Data for Map
       description: >
         Returns an object mapping regions to their statistics. At present the two statistics are 
-        [exceedance](https://socialsensing.com/materialis/help-and-support/#exceedance) and total count. 
-        The result will look like this:
+        [exceedance](https://socialsensing.com/materialis/help-and-support/#exceedance) and total count. If there are
+        no results for the criteria for a given region it will not included in the results. The result will look like this:
         
         
         ```json
@@ -365,12 +365,27 @@ paths:
 
   /v1/map/{map}/recent-text-count:
     post:
+      operationId: GetRegionsWithRecentTexts
       tags:
         - text
-      summary: "Returns the number of messages, i.e. tweets, since a specific time."
+      summary: Get Regions with Recent Texts
       description: >
-        Returns the number of messages, i.e. tweets, since a specific time.
-        This is provided so that recently active regions can be flagged.
+        Returns the number of messages (i.e. Tweets), since a specific time for all regions on the specified map.
+        This is provided so that recently active regions can be flagged. If a region has no results for the time period
+        it is not returned. I.e. a count of zero is not returned. E.g.:
+        
+        ```json
+        
+        
+        {
+          "powys": 3,
+          "devon": 20,
+          "dorset": 23
+        }
+        
+        ```
+        
+        To get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). The list of available regions types and hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).
       parameters:
         - $ref: '#/components/parameters/Map'
       requestBody:
@@ -616,6 +631,7 @@ components:
           properties:
             startDate:
               type: integer
+              description: The minimum JavaScript time to find results for.
               example: 1645394400000
       required:
         - hazards
