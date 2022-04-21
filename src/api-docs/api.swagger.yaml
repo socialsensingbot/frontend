@@ -266,8 +266,12 @@ paths:
     post:
       tags:
         - text
-      summary: Returns related Tweets for the specified regions.
-      description: "Returns related Tweets for the specified regions."
+      operationId: GetTextForMap
+      summary: Get Text for Map.
+      description: >
+        Returns all text messages (Tweets at present) for a given map. The request body should contain the search 
+        criteria of regionType, hazards, sources, warnings and a start and end date. The results are paged with a 
+        default page size of 100.
       parameters:
         - $ref: '#/components/parameters/Map'
       requestBody:
@@ -458,7 +462,7 @@ components:
       properties:
         page:
           type: integer
-          description: "For paged results, the page to return. This means results will be from pageSize * page to pageSize * (page+1) - 1 ."
+          description: "For paged results, the page to return. This means results will be from ```pageSize * page``` to ```pageSize * (page+1) - 1``` ."
           example: 0
         pageSize:
           type: integer
