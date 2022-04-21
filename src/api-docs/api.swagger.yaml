@@ -275,6 +275,13 @@ paths:
         Returns all text messages (Tweets at present) for a given map. The request body should contain the search 
         criteria of regionType, hazards, sources, warnings and a start and end date. The results are paged with a 
         default page size of 100.
+        
+        
+               To get a list of all maps, their ids and available region types, 
+               use [Get Metadata for All Maps](./getallmapsmetadata). 
+        The list of available regions types and hazards can be obtained 
+               using [Get Metadata for Map by Id](./getmapmetadata).
+
       parameters:
         - $ref: '#/components/parameters/Map'
       requestBody:
@@ -305,8 +312,16 @@ paths:
       operationId: GetStatsForMap
       tags:
         - statistics
-      summary: Returns related Tweets for the specified regions.
-      description: "Returns related Tweets for the specified regions."
+      summary: Get Statistical Data for Map
+      description: >
+        Returns an object mapping regions to their statistics. At present the two statistics are exceedance and 
+        total count.
+        
+        
+        To get a list of all maps, their ids and available region types, 
+               use [Get Metadata for All Maps](./getallmapsmetadata). 
+        The list of available regions types and hazards can be obtained 
+               using [Get Metadata for Map by Id](./getmapmetadata).
       parameters:
         - $ref: '#/components/parameters/Map'
       requestBody:

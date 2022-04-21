@@ -377,7 +377,7 @@
         ],
         "operationId": "GetTextForMap",
         "summary": "Get Text for Map.",
-        "description": "Returns all text messages (Tweets at present) for a given map. The request body should contain the search  criteria of regionType, hazards, sources, warnings and a start and end date. The results are paged with a  default page size of 100.\n",
+        "description": "Returns all text messages (Tweets at present) for a given map. The request body should contain the search  criteria of regionType, hazards, sources, warnings and a start and end date. The results are paged with a  default page size of 100.\n\n\n       To get a list of all maps, their ids and available region types, \n       use [Get Metadata for All Maps](./getallmapsmetadata). \nThe list of available regions types and hazards can be obtained \n       using [Get Metadata for Map by Id](./getmapmetadata).\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/Map"
@@ -427,8 +427,8 @@
         "tags": [
           "statistics"
         ],
-        "summary": "Returns related Tweets for the specified regions.",
-        "description": "Returns related Tweets for the specified regions.",
+        "summary": "Get Statistical Data for Map",
+        "description": "Returns an object mapping regions to their statistics. At present the two statistics are exceedance and  total count.\n\nTo get a list of all maps, their ids and available region types, \n       use [Get Metadata for All Maps](./getallmapsmetadata). \nThe list of available regions types and hazards can be obtained \n       using [Get Metadata for Map by Id](./getmapmetadata).\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/Map"
