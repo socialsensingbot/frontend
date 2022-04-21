@@ -428,7 +428,7 @@
           "statistics"
         ],
         "summary": "Get Statistical Data for Map",
-        "description": "Returns an object mapping regions to their statistics. At present the two statistics are exceedance and  total count.\n\nTo get a list of all maps, their ids and available region types, \n       use [Get Metadata for All Maps](./getallmapsmetadata). \nThe list of available regions types and hazards can be obtained \n       using [Get Metadata for Map by Id](./getmapmetadata).\n",
+        "description": "Returns an object mapping regions to their statistics. At present the two statistics are exceedance and  total count.\n\n```json {\n  \"west yorkshire\": {\n    \"count\": 109,\n    \"exceedance\": 0.4697\n  },\n... } ```\nTo get a list of all maps, their ids and available region types, \n       use [Get Metadata for All Maps](./getallmapsmetadata). \nThe list of available regions types and hazards can be obtained \n       using [Get Metadata for Map by Id](./getmapmetadata).\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/Map"

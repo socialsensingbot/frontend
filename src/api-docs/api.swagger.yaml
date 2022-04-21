@@ -318,6 +318,16 @@ paths:
         total count.
         
         
+        ```json
+        {
+          "west yorkshire": {
+            "count": 109,
+            "exceedance": 0.4697
+          },
+        ...
+        }
+        ```
+        
         To get a list of all maps, their ids and available region types, 
                use [Get Metadata for All Maps](./getallmapsmetadata). 
         The list of available regions types and hazards can be obtained 
