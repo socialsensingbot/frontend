@@ -227,7 +227,7 @@
         "tags": [
           "metadata"
         ],
-        "summary": "Returns all the region and region type combinations for a given map.",
+        "summary": "Get All Region and Region Type Combinations for a Map.",
         "description": "Returns all the region and region type combinations for a given map.\n\nTo get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).\n",
         "parameters": [
           {
@@ -266,8 +266,9 @@
         "tags": [
           "metadata"
         ],
-        "summary": "Returns the GeoJSON for the region on a map",
-        "description": "Returns the GeoJSON for the region on a map.",
+        "operationId": "GetRegionAsGeoJSON",
+        "summary": "Get a Region as GeoJSON",
+        "description": "Returns the geography of a specific region in the form of a GeoJSON shape.\n\nTo get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). To get the regions for a specific region type use [Get Map Regions for a Region Type](./getmapregionsforregiontype).\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/Map"
