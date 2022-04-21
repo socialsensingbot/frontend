@@ -176,7 +176,7 @@ paths:
       operationId: GetAllMapRegionsAndTypes
       tags:
         - metadata
-      summary: Get All Region and Region Type Combinations for a Map.
+      summary: Get All Region and Region Type Combinations for a Map
       description: >
         Returns all the region and region type combinations for a given map.
         
@@ -459,7 +459,7 @@ paths:
         
         To get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). 
         The list of available hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).
-        The list of available regions can be obtained using [Get Metadata for Map by Id](./getmapmetadata).
+        The list of available regions can be obtained using [Get All Region and Region Type Combinations for a Map](./getallmapregionsandtypes).
 
       parameters:
         - $ref: '#/components/parameters/Map'
