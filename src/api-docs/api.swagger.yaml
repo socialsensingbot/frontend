@@ -457,7 +457,7 @@ paths:
         ```
         
         
-        To get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). 
+        To get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata). 
         The list of available hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).
         The list of available regions can be obtained using [Get All Region and Region Type Combinations for a Map](./getallmapregionsandtypes).
 
