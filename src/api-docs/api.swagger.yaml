@@ -417,8 +417,10 @@ paths:
       summary: Get Time Series Data for Analytics
       description: >
         
-        Returns data for a time series graph. For example:
-        
+        Returns data for a time series graph.
+        At present the two statistics are 
+                [exceedance](https://socialsensing.com/materialis/help-and-support/#exceedance) and total count. If there are
+                no results for the criteria for a given region it will not included in the results. The result will look like this:        
         
         ```json
 
@@ -453,6 +455,12 @@ paths:
           }
         
         ```
+        
+        
+        To get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). 
+        The list of available hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).
+        The list of available regions can be obtained using [Get Metadata for Map by Id](./getmapmetadata).
+
       parameters:
         - $ref: '#/components/parameters/Map'
       requestBody:
@@ -513,15 +521,9 @@ components:
       in: header
       name: x-api-key
   schemas:
-    AllRegionsDataRequest:
+    AllRegionsNoTypeDataRequest:
       type: object
       properties:
-        regionType:
-          type: string
-          description: >
-            The type of the regions specified by the regions property. The list of available regions types can be 
-            obtained using [Get Metadata for Map by Id](./getmapmetadata).
-          example: county
         hazards:
           type: array
           description: >
@@ -556,6 +558,19 @@ components:
             * 'only' only returns warnings.
 
           pattern: "(only|include|exclude)"
+
+    AllRegionsDataRequest:
+      allOf:
+        - $ref: '#/components/schemas/AllRegionsDataRequest'
+        - type: object
+          properties:
+            regionType:
+              type: string
+              description: >
+                The type of the regions specified by the regions property. The list of available regions types can be 
+                obtained using [Get Metadata for Map by Id](./getmapmetadata).
+              example: county
+
     RegionDataRequest:
       allOf:
         - $ref: '#/components/schemas/AllRegionsDataRequest'
@@ -641,7 +656,7 @@ components:
 
     TimeSeriesRequest:
       allOf:
-        - $ref: '#/components/schemas/RegionDataRequest'
+        - $ref: '#/components/schemas/AllRegionsNoTypeDataRequest'
         - $ref: '#/components/schemas/DateRangeRequest'
         - type: object
           properties:
@@ -654,6 +669,12 @@ components:
               pattern: "(day|hour)"
               description: "Aggregate over either day or hour."
               example: day
+            regions:
+              type: array
+              description: "A set of region ids to retrieve texts for. These can be of any region type except numeric ones, such as 'coarse' and 'fine'."
+              items:
+                type: string
+                example: hertfordshire
       required:
         - hazards
         - sources
