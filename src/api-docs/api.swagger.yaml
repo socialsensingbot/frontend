@@ -277,10 +277,7 @@ paths:
         default page size of 100.
         
         
-               To get a list of all maps, their ids and available region types, 
-               use [Get Metadata for All Maps](./getallmapsmetadata). 
-        The list of available regions types and hazards can be obtained 
-               using [Get Metadata for Map by Id](./getmapmetadata).
+        To get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). The list of available regions types and hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).
 
       parameters:
         - $ref: '#/components/parameters/Map'
@@ -328,10 +325,7 @@ paths:
         }
         ```
         
-        To get a list of all maps, their ids and available region types, 
-               use [Get Metadata for All Maps](./getallmapsmetadata). 
-        The list of available regions types and hazards can be obtained 
-               using [Get Metadata for Map by Id](./getmapmetadata).
+        To get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). The list of available regions types and hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).
       parameters:
         - $ref: '#/components/parameters/Map'
       requestBody:
