@@ -920,11 +920,12 @@
     },
     "/v1/map/{map}/analytics/time": {
       "post": {
+        "operationId": "GetTimeSeriesAnalyticsForMap",
         "tags": [
           "analytics"
         ],
-        "summary": "Returns data for a time series graph.",
-        "description": "Returns data for a time series graph.",
+        "summary": "Get Time Series Data for Analytics",
+        "description": "\nReturns data for a time series graph.\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/Map"

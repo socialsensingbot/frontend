@@ -411,10 +411,13 @@ paths:
 
   /v1/map/{map}/analytics/time:
     post:
+      operationId: GetTimeSeriesAnalyticsForMap
       tags:
         - analytics
-      summary: Returns data for a time series graph.
-      description: Returns data for a time series graph.
+      summary: Get Time Series Data for Analytics
+      description: >
+        
+        Returns data for a time series graph.
       parameters:
         - $ref: '#/components/parameters/Map'
       requestBody:
