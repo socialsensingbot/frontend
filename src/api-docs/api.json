@@ -7,10 +7,6 @@
     "contact": {
       "name": "API Support Team",
       "email": "support@socialsensing.com"
-    },
-    "externalDocs": {
-      "description": "Find out more and how to get access to this api via our website.",
-      "url": "https://soscialsensing.com"
     }
   },
   "servers": [
