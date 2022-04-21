@@ -428,7 +428,7 @@
           "statistics"
         ],
         "summary": "Get Statistical Data for Map",
-        "description": "Returns an object mapping regions to their statistics. At present the two statistics are exceedance and  total count.\n\n```json\n{\n  \"west yorkshire\": {\n    \"count\": 109,\n    \"exceedance\": 0.4697\n  },\n\n...\n}\n```\nTo get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). The list of available regions types and hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).\n",
+        "description": "Returns an object mapping regions to their statistics. At present the two statistics are  [exceedance](https://socialsensing.com/materialis/help-and-support/#exceedance) and total count.  The result will look like this:\n\n```json\n{\n  \"west yorkshire\": {\n    \"count\": 109,\n    \"exceedance\": 0.4697\n  },\n   \"shropshire\": {\n     \"count\": 71,\n     \"exceedance\": 0.4697\n   },\n\n...\n}\n```\nTo get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). The list of available regions types and hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).\n",
         "parameters": [
           {
             "$ref": "#/components/parameters/Map"

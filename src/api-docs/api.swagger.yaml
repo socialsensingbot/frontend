@@ -311,8 +311,9 @@ paths:
         - statistics
       summary: Get Statistical Data for Map
       description: >
-        Returns an object mapping regions to their statistics. At present the two statistics are exceedance and 
-        total count.
+        Returns an object mapping regions to their statistics. At present the two statistics are 
+        [exceedance](https://socialsensing.com/materialis/help-and-support/#exceedance) and total count. 
+        The result will look like this:
         
         
         ```json
@@ -322,6 +323,10 @@ paths:
             "count": 109,
             "exceedance": 0.4697
           },
+           "shropshire": {
+             "count": 71,
+             "exceedance": 0.4697
+           },
         
         ...
         
