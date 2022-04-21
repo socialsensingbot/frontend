@@ -1070,12 +1070,14 @@
         "properties": {
           "page": {
             "type": "integer",
-            "description": "For paged results, the page to return. This means results will be from ```pageSize * page``` to ```(pageSize * ( page + 1)) - 1``` .",
+            "description": "The page of results to return. This means results will be from ```pageSize * page``` to ```(pageSize * ( page + 1)) - 1``` .",
+            "default": 0,
             "example": 0
           },
           "pageSize": {
             "type": "integer",
-            "description": "For paged results, the number of results per page.",
+            "description": "The number of results to return per page.",
+            "default": 100,
             "example": 100
           }
         }
