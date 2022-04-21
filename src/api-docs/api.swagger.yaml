@@ -401,7 +401,8 @@ components:
       required: true
       schema:
         type: string
-      description: The map id to use for the request, the set of ids can be returned using "Metadata for all available maps".
+      description: >
+        The map id to use for the request, the set of ids can be obtained using [Get Metadata for All Maps](./getallmapsmetadata)
       example: uk-flood-live
     RegionType:
       in: path
@@ -409,7 +410,8 @@ components:
       required: true
       schema:
         type: string
-      description: The region type.
+      description: >
+        The region type. The list of available region types can be obtained using [Get Metadata for Map by Id](./getmapmetadata).
       example: county
     Region:
       in: path
@@ -417,7 +419,8 @@ components:
       required: true
       schema:
         type: string
-      description: A region.
+      description: >
+        The region. To get the regions for a specific region type use [Get Map Regions for a Region Type](./getmapregionsforregiontype).
       example: dorset
   securitySchemes:
     ApiKeyAuth:
@@ -430,7 +433,9 @@ components:
       properties:
         regionType:
           type: string
-          description: "The type of the regions specified by the regions property"
+          description: >
+            The type of the regions specified by the regions property. The list of available regions types can be 
+            obtained using [Get Metadata for Map by Id](./getmapmetadata).
           example: county
         hazards:
           type: array
