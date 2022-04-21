@@ -417,7 +417,42 @@ paths:
       summary: Get Time Series Data for Analytics
       description: >
         
-        Returns data for a time series graph.
+        Returns data for a time series graph. For example:
+        
+        
+        ```json
+
+          [
+            {
+              "count": 36,
+              "region": "uk",
+              "exceedance": 1.27,
+              "date": "2022-01-15T00:00:00.000Z"
+            },
+            {
+              "count": 38,
+              "region": "uk",
+              "exceedance": 1.3,
+              "date": "2022-01-16T00:00:00.000Z"
+            },
+            {
+              "count": 22,
+              "region": "uk",
+              "exceedance": 1.14,
+              "date": "2022-01-17T00:00:00.000Z"
+            },
+            {
+              "count": 36,
+              "region": "uk",
+              "exceedance": 1.27,
+              "date": "2022-01-18T00:00:00.000Z"
+            },
+        
+          ...
+        
+          }
+        
+        ```
       parameters:
         - $ref: '#/components/parameters/Map'
       requestBody:
