@@ -8,6 +8,9 @@ info:
   contact:
     name: API Support Team
     email: support@socialsensing.com
+  externalDocs:
+    description: Find out more and how to get access to this api via our website.
+    url: https://soscialsensing.com
 
 servers:
   - url: https://api-dev.socialsensing.com
@@ -299,6 +302,7 @@ paths:
 
   /v1/map/{map}/stats:
     post:
+      operationId: GetStatsForMap
       tags:
         - statistics
       summary: Returns related Tweets for the specified regions.
@@ -500,9 +504,11 @@ components:
       properties:
         startDate:
           type: integer
+          description: The minimum JavaScript time in milliseconds to return a result for.
           example: 1645394400000
         endDate:
           type: integer
+          description: The maximum JavaScript time in milliseconds to return a result for.
           example: 1645488000000
     TextRequest:
       allOf:
