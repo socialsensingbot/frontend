@@ -1018,21 +1018,29 @@
           },
           "hazards": {
             "type": "array",
+            "description": "Hazards represent the weather condition that you are interested in. The list of supported hazards can be  found using [Get Metadata for Map by Id](./getmapmetadata).\n",
             "items": {
               "type": "string",
-              "example": "flood"
+              "example": [
+                "flood",
+                "wind",
+                "snow"
+              ]
             }
           },
           "sources": {
             "type": "array",
+            "description": "The source is name of the service that the data was gathered from. At present only the 'twitter' source is supported.\n",
             "items": {
               "type": "string",
-              "example": "twitter"
+              "example": "twitter",
+              "pattern": "(twitter)"
             }
           },
           "warnings": {
             "type": "string",
             "example": "exclude",
+            "description": "The warnings option is used to decide whether to include warnings (automated Tweets publishing weather  warnings) should be included in the results. \n*) 'include' includes warnings. *) 'exclude' does not include warnings. *) 'only' only returns warnings.\n",
             "pattern": "(only|include|exclude)"
           }
         }
@@ -1062,7 +1070,7 @@
         "properties": {
           "page": {
             "type": "integer",
-            "description": "For paged results, the page to return. This means results will be from ```pageSize * page``` to ```pageSize * (page+1) - 1``` .",
+            "description": "For paged results, the page to return. This means results will be from ```pageSize * page``` to ```(pageSize * ( page + 1)) - 1``` .",
             "example": 0
           },
           "pageSize": {

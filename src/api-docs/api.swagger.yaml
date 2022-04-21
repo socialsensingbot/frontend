@@ -434,17 +434,34 @@ components:
           example: county
         hazards:
           type: array
+          description: >
+            Hazards represent the weather condition that you are interested in. The list of supported hazards can be 
+            found using [Get Metadata for Map by Id](./getmapmetadata).
           items:
             type: string
-            example: flood
+            example:
+              - flood
+              - wind
+              - snow
         sources:
           type: array
+          description: >
+            The source is name of the service that the data was gathered from. At present only the
+            'twitter' source is supported.
           items:
             type: string
             example: twitter
+            pattern: "(twitter)"
         warnings:
           type: string
           example: exclude
+          description: >
+            The warnings option is used to decide whether to include warnings (automated Tweets publishing weather 
+            warnings) should be included in the results. 
+            
+            *) 'include' includes warnings.
+            *) 'exclude' does not include warnings.
+            *) 'only' only returns warnings.
           pattern: "(only|include|exclude)"
     RegionDataRequest:
       allOf:
@@ -462,7 +479,7 @@ components:
       properties:
         page:
           type: integer
-          description: "For paged results, the page to return. This means results will be from ```pageSize * page``` to ```pageSize * (page+1) - 1``` ."
+          description: "For paged results, the page to return. This means results will be from ```pageSize * page``` to ```(pageSize * ( page + 1)) - 1``` ."
           example: 0
         pageSize:
           type: integer
