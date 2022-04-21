@@ -1008,156 +1008,158 @@ export const timesliderFunc: (req, res) => Promise<void> = async (req, res) => {
  *
  */
 export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
-    let map = (await getMaps())[req.params.map];
-    if (!map) {
-        invalidParameter(res, "map", `Unrecognized map ${req.params.map}`);
-        return;
-    }
-    if (typeof req.body.startDate !== "number" || req.body.startDate < 0 || req.body.startDate > Date.now()) {
-        invalidParameter(res, "startDate",
-                         `Invalid start date, startDate=${req.body.startDate}, startDate must be supplied, numeric, positive and less than the current time in milliseconds`);
-        return;
-    }
-    if (typeof req.body.endDate !== "undefined") {
-        if (typeof req.body.endDate !== "number" || req.body.endDate < 0 || req.body.endDate > Date.now()) {
-            invalidParameter(res, "endDate",
-                             `Invalid end date, endDate=${req.body.endDate}, endDate must be numeric, positive and less than the current time in milliseconds`);
+    try {
+        let map = (await getMaps())[req.params.map];
+        if (!map) {
+            invalidParameter(res, "map", `Unrecognized map ${req.params.map}`);
             return;
         }
-    }
-    if (req.body.endDate < req.body.startDate) {
-        invalidParameter(res, "endDate", `Invalid end date, endDate=${req.body.endDate} (${new Date(
-            req.body.endDate)}, endDate is less than startDate=${req.body.startDate} (${new Date(req.body.startDate)}`);
-        return;
-    }
-    if (!Array.isArray(req.body.regions) || req.body.regions.some(i => typeof i !== "string") || req.body.regions.length === 0) {
-        invalidParameter(res, "regions",
-                         `Invalid regions, regions=${req.body.regions}, regions must be supplied as an array of strings`);
-        return;
-    }
-    if (!Array.isArray(req.body.hazards) || req.body.hazards.some(i => typeof i !== "string") || req.body.hazards.length === 0) {
-        invalidParameter(res, "hazards",
-                         `Invalid hazards, hazards=${req.body.hazards}, hazards must be supplied as a non-empty array of strings`);
-        return;
-    }
-    if (!Array.isArray(req.body.sources) || req.body.sources.some(i => typeof i !== "string") || req.body.sources.length === 0) {
-        invalidParameter(res, "sources",
-                         `Invalid sources, sources=${req.body.sources}, sources must be supplied as a non-empty array of strings`);
-        return;
-    }
-    if (typeof req.body.warnings !== "string" || !["include", "exclude", "only"].includes(req.body.warnings)) {
-        invalidParameter(res, "warnings",
-                         `Invalid value for warnings, warnings=${req.body.warnings}, warnings must be a string with the value one of 'include', 'exclude' or 'only'`);
-        return;
-    }
-    if (typeof req.body.timePeriod != "undefined") {
-        if (typeof req.body.timePeriod !== "string" || !["day", "hour"].includes(req.body.timePeriod)) {
-            invalidParameter(res, "timePeriod",
-                             `Invalid value for timePeriod, timePeriod=${req.body.timePeriod}, timePeriod is a string with the value one of 'day' or 'hour'`);
+        if (typeof req.body.startDate !== "number" || req.body.startDate < 0 || req.body.startDate > Date.now()) {
+            invalidParameter(res, "startDate",
+                             `Invalid start date, startDate=${req.body.startDate}, startDate must be supplied, numeric, positive and less than the current time in milliseconds`);
             return;
         }
-    }
-    if (typeof req.body.textSearch !== "undefined") {
-        if (typeof req.body.textSearch !== "string" || req.body.textSearch === "") {
-            invalidParameter(res, "textSearch",
-                             `Invalid value for textSearch, textSearch=${req.body.textSearch}, textSearch must be a string value`);
+        if (typeof req.body.endDate !== "undefined") {
+            if (typeof req.body.endDate !== "number" || req.body.endDate < 0 || req.body.endDate > Date.now()) {
+                invalidParameter(res, "endDate",
+                                 `Invalid end date, endDate=${req.body.endDate}, endDate must be numeric, positive and less than the current time in milliseconds`);
+                return;
+            }
+        }
+        if (req.body.endDate < req.body.startDate) {
+            invalidParameter(res, "endDate", `Invalid end date, endDate=${req.body.endDate} (${new Date(
+                req.body.endDate)}, endDate is less than startDate=${req.body.startDate} (${new Date(req.body.startDate)}`);
             return;
         }
-    }
-    console.log("Analytics time query " + req.params.map, req.body);
-    const lastDateInDB: any = map.last_date;
-    const location: any = map.location;
-    const key = req.params.map + ":" + JSON.stringify(req.body);
-    //They can either be grouped into a notional layer or top level properties
-    const hazards: string[] = req.body.hazards;
-    const sources: string[] = req.body.sources;
-    const regions: string[] = req.body.regions;
-    await db.cache(res, key, async () => {
-        let fullText = "";
-        let textSearch: string = req.body.textSearch;
-        //           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',
-        if (typeof textSearch !== "undefined" && textSearch.length > 0) {
-            fullText = " AND MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
-            let additionalQuery = "(";
-            for (const source of sources) {
-                for (const hazard of hazards) {
-                    for (const region of regions) {
-                        additionalQuery += md5(source + ":" + hazard + ":" + region) + " ";
+        if (!Array.isArray(req.body.regions) || req.body.regions.some(i => typeof i !== "string") || req.body.regions.length === 0) {
+            invalidParameter(res, "regions",
+                             `Invalid regions, regions=${req.body.regions}, regions must be supplied as an array of strings`);
+            return;
+        }
+        if (!Array.isArray(req.body.hazards) || req.body.hazards.some(i => typeof i !== "string") || req.body.hazards.length === 0) {
+            invalidParameter(res, "hazards",
+                             `Invalid hazards, hazards=${req.body.hazards}, hazards must be supplied as a non-empty array of strings`);
+            return;
+        }
+        if (!Array.isArray(req.body.sources) || req.body.sources.some(i => typeof i !== "string") || req.body.sources.length === 0) {
+            invalidParameter(res, "sources",
+                             `Invalid sources, sources=${req.body.sources}, sources must be supplied as a non-empty array of strings`);
+            return;
+        }
+        if (typeof req.body.warnings !== "string" || !["include", "exclude", "only"].includes(req.body.warnings)) {
+            invalidParameter(res, "warnings",
+                             `Invalid value for warnings, warnings=${req.body.warnings}, warnings must be a string with the value one of 'include', 'exclude' or 'only'`);
+            return;
+        }
+        if (typeof req.body.timePeriod != "undefined") {
+            if (typeof req.body.timePeriod !== "string" || !["day", "hour"].includes(req.body.timePeriod)) {
+                invalidParameter(res, "timePeriod",
+                                 `Invalid value for timePeriod, timePeriod=${req.body.timePeriod}, timePeriod is a string with the value one of 'day' or 'hour'`);
+                return;
+            }
+        }
+        if (typeof req.body.textSearch !== "undefined") {
+            if (typeof req.body.textSearch !== "string" || req.body.textSearch === "") {
+                invalidParameter(res, "textSearch",
+                                 `Invalid value for textSearch, textSearch=${req.body.textSearch}, textSearch must be a string value`);
+                return;
+            }
+        }
+        console.log("Analytics time query " + req.params.map, req.body);
+        const lastDateInDB: any = map.last_date;
+        const location: any = map.location;
+        const key = req.params.map + ":" + JSON.stringify(req.body);
+        //They can either be grouped into a notional layer or top level properties
+        const hazards: string[] = req.body.hazards;
+        const sources: string[] = req.body.sources;
+        const regions: string[] = req.body.regions;
+        await db.cache(res, key, async () => {
+            let fullText = "";
+            let textSearch: string = req.body.textSearch;
+            //           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',
+            if (typeof textSearch !== "undefined" && textSearch.length > 0) {
+                fullText = " AND MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
+                let additionalQuery = "(";
+                for (const source of sources) {
+                    for (const hazard of hazards) {
+                        for (const region of regions) {
+                            additionalQuery += md5(source + ":" + hazard + ":" + region) + " ";
+                        }
                     }
                 }
+                additionalQuery += ") ";
+                textSearch = additionalQuery + "+(" + textSearch + ")";
+                console.log("Amended text search is '" + textSearch + "'");
             }
-            additionalQuery += ") ";
-            textSearch = additionalQuery + "+(" + textSearch + ")";
-            console.log("Amended text search is '" + textSearch + "'");
-        }
-        const dayTimePeriod: boolean = req.body.timePeriod === "day";
-        const timeSeriesTable = dayTimePeriod ? "mat_view_timeseries_date" : "mat_view_timeseries_hour";
-        const dateTable = dayTimePeriod ? "mat_view_days" : "mat_view_hours";
-        const from: Date = dateFromMillis(req.body.startDate);
-        const to = new Date(calculateEndDate(map, req));
+            const dayTimePeriod: boolean = req.body.timePeriod === "day";
+            const timeSeriesTable = dayTimePeriod ? "mat_view_timeseries_date" : "mat_view_timeseries_hour";
+            const dateTable = dayTimePeriod ? "mat_view_days" : "mat_view_hours";
+            const from: Date = dateFromMillis(req.body.startDate);
+            const to = new Date(calculateEndDate(map, req));
 
-        if (!regions || regions.length === 0) {
-            const values = fullText ? [hazards, sources, location, textSearch, from, to] : [hazards, sources,
-                                                                                            location, from, to];
-            return await db.sql({
-                                    // language=MySQL
-                                    sql: `select *
-                                          from (select IFNULL(lhs.count, rhs.count)         as count,
-                                                       'all'                                as region,
-                                                       round(1.0 / (cume_dist() OVER w), 2) as exceedance,
-                                                       lhs.date                             as date
-                                                from (SELECT count(*)        as count,
-                                                             tsd.source_date as date
+            if (!regions || regions.length === 0) {
+                const values = fullText ? [hazards, sources, location, textSearch, from, to] : [hazards, sources,
+                                                                                                location, from, to];
+                return await db.sql({
+                                        // language=MySQL
+                                        sql: `select *
+                                              from (select IFNULL(lhs.count, rhs.count)         as count,
+                                                           'all'                                as region,
+                                                           round(1.0 / (cume_dist() OVER w), 2) as exceedance,
+                                                           lhs.date                             as date
+                                                    from (SELECT count(*)        as count,
+                                                                 tsd.source_date as date
 
-                                                      FROM ${timeSeriesTable} tsd
-                                                      WHERE tsd.hazard IN (?)
-                                                        AND tsd.source IN (?)
-                                                        AND tsd.map_location = ? ${fullText}
-                                                      group by date
-                                                      order by date) lhs
-                                                         RIGHT OUTER JOIN (select date, 0 as count
-                                                                           from ${dateTable}) rhs
-                                                                          ON lhs.date = rhs.date
-                                                    WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)
-                                                order by date) x
-                                          where date between ? AND ?
-                                          order by date`,
-                                    values
-                                });
-        } else {
-            console.log("Regions specified", regions);
-            const values = fullText ? [regions, hazards, sources, location, textSearch, from, to] : [regions,
-                                                                                                     hazards,
-                                                                                                     sources,
-                                                                                                     location, from,
-                                                                                                     to];
-            console.log("Values, values");
-            return await db.sql({
-                                    // language=MySQL
-                                    sql: `select *
-                                          from (select IFNULL(lhs.count, rhs.count)         as count,
-                                                       region,
-                                                       round(1.0 / (cume_dist() OVER w), 2) as exceedance,
-                                                       lhs.date                             as date
-                                                from (SELECT count(tsd.source_date) as count,
-                                                             tsd.source_date        as date,
-                                                             tsd.region_group_name  as region
-                                                      FROM ${timeSeriesTable} tsd
-                                                      WHERE tsd.region_group_name IN (?)
-                                                        AND tsd.hazard IN (?)
-                                                        AND tsd.source IN (?)
-                                                        AND tsd.map_location = ? ${fullText}
-                                                      group by date, region
-                                                      order by date
-                                                     ) lhs
-                                                         RIGHT OUTER JOIN (select date, 0 as count from ${dateTable}) rhs
-                                                                          ON lhs.date = rhs.date
-                                                    WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)
-                                               ) x
-                                          where date between ? AND ?
-                                          order by date`, values
+                                                          FROM ${timeSeriesTable} tsd
+                                                          WHERE tsd.hazard IN (?)
+                                                            AND tsd.source IN (?)
+                                                            AND tsd.map_location = ? ${fullText}
+                                                          group by date
+                                                          order by date) lhs
+                                                             RIGHT OUTER JOIN (select date, 0 as count
+                                                                               from ${dateTable}) rhs
+                                                                              ON lhs.date = rhs.date
+                                                        WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)
+                                                    order by date) x
+                                              where date between ? AND ?
+                                              order by date`,
+                                        values
+                                    });
+            } else {
+                console.log("Regions specified", regions);
+                const values = fullText ? [regions, hazards, sources, location, textSearch, from, to] : [regions,
+                                                                                                         hazards,
+                                                                                                         sources,
+                                                                                                         location, from,
+                                                                                                         to];
+                console.log("Values, values");
+                return await db.sql({
+                                        // language=MySQL
+                                        sql: `select *
+                                              from (select IFNULL(lhs.count, rhs.count)         as count,
+                                                           region,
+                                                           round(1.0 / (cume_dist() OVER w), 2) as exceedance,
+                                                           lhs.date                             as date
+                                                    from (SELECT count(tsd.source_date) as count,
+                                                                 tsd.source_date       as date,
+                                                                 tsd.region_group_name as region
+                                                          FROM ${timeSeriesTable} tsd
+                                                          WHERE tsd.region_group_name IN (?)
+                                                            AND tsd.hazard IN (?)
+                                                            AND tsd.source IN (?)
+                                                            AND tsd.map_location = ? ${fullText}
+                                                          group by date, region
+                                                          order by date) lhs
+                                                             RIGHT OUTER JOIN (select date, 0 as count from ${dateTable}) rhs
+                                                                              ON lhs.date = rhs.date
+                                                        WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)) x
+                                              where date between ? AND ?
+                                              order by date`, values
 
-                                });
-        }
-    }, {duration: 60 * 60});
+                                    });
+            }
+        }, {duration: 60 * 60});
+    } catch (e) {
+        handleError(res, e);
+    }
 };
