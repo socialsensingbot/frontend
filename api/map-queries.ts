@@ -1078,13 +1078,13 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
         const to = new Date(calculateEndDate(map, req));
 
 
-        if (req.body.timePeriod === "day" && to.getTime() - from.getTime() / ONE_DAY > 366) {
+        if (req.body.timePeriod === "day" && (to.getTime() - from.getTime()) / ONE_DAY > 366) {
             invalidParameter(res, "startDate/endDate",
                              `The gap between the start date ${from} and the end date ${to} exceeds the maximum of 366 days, for by day analytics. Please break down the request into smaller chunks.`)
             return;
         }
 
-        if (req.body.timePeriod === "hour" && to.getTime() - from.getTime() / ONE_DAY > 32) {
+        if (req.body.timePeriod === "hour" && (to.getTime() - from.getTime()) / ONE_DAY > 32) {
             invalidParameter(res, "startDate/endDate",
                              `The gap between the start date ${from} and the end date ${to} exceeds the maximum of 32 days, for by hour analytics. Please break down the request into smaller chunks.`)
             return;
