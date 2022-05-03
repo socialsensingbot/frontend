@@ -22,5 +22,4 @@ else
   env TZ='UTC' npm test
 fi
 
-
 echo "Completed Build OK"
