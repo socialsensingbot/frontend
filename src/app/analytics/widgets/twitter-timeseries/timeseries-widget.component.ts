@@ -75,7 +75,7 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
         }
     }
 
-    constructor(public metadata: MetadataService,
+    constructor(
                 public notify: NotificationService,
                 public map: MapSelectionService,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,

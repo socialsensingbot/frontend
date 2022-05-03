@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="API Tests" type="mocha-javascript-test-runner">
+    <node-interpreter>project</node-interpreter>
+    <node-options />
+    <mocha-package>$PROJECT_DIR$/amplify/backend/function/api/src/node_modules/mocha</mocha-package>
+    <working-directory>$PROJECT_DIR$/amplify/backend/function/api/src</working-directory>
+    <pass-parent-env>true</pass-parent-env>
+    <envs>
+      <env name="TZ" value="UTC" />
+    </envs>
+    <ui>bdd</ui>
+    <extra-mocha-options />
+    <test-kind>PATTERN</test-kind>
+    <test-pattern>test/**/*.test.js</test-pattern>
+    <method v="2" />
+  </configuration>
+</component>

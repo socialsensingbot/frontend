@@ -37,58 +37,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
-var aws = require("aws-sdk");
-var mysql = require("mysql");
-var stage = process.env.AWS_LAMBDA_FUNCTION_NAME.split("-")[1];
-console.log("STAGE: " + stage);
-var dev = stage === "dev";
 var awsServerlessExpress = require("aws-serverless-express");
-var init = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var Parameters, dbPassword, connection;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, ((new aws.SSM())
-                    .getParameters({
-                    Names: ["DB_PASSWORD", "TWITTER_BEARER_TOKEN"].map(function (secretName) { return process.env[secretName]; }),
-                    WithDecryption: true,
-                })
-                    .promise())];
-            case 1:
-                Parameters = (_a.sent()).Parameters;
-                console.log("Parameters:", Parameters);
-                dbPassword = Parameters.filter(function (i) { return i.Name.endsWith("DB_PASSWORD"); }).pop().Value;
-                console.log("DB Password: " + dbPassword);
-                connection = mysql.createPool({
-                    connectionLimit: 5,
-                    host: "database-" + stage + ".cxsscwdzsrae.eu-west-2.rds.amazonaws.com",
-                    user: "admin",
-                    password: dbPassword,
-                    database: "socialsensing",
-                    charset: "utf8mb4",
-                    // multipleStatements: true,
-                    // connectTimeout: 15000,
-                    // acquireTimeout: 10000,
-                    waitForConnections: true,
-                    queueLimit: 5000,
-                    debug: false
-                });
-                return [2 /*return*/, awsServerlessExpress.createServer(require("./app")(connection))];
-        }
-    });
-}); };
-var server = init();
+var server = awsServerlessExpress.createServer(require("./app"));
 var handler = function (event, context) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, _b;
-    return __generator(this, function (_c) {
-        switch (_c.label) {
-            case 0:
-                console.log("EVENT DATA: " + JSON.stringify(event));
-                context.stage = stage;
-                context.dev = dev;
-                _b = (_a = awsServerlessExpress).proxy;
-                return [4 /*yield*/, server];
-            case 1: return [2 /*return*/, _b.apply(_a, [_c.sent(), event, context, "PROMISE"]).promise];
-        }
+    return __generator(this, function (_a) {
+        console.log("EVENT DATA: " + JSON.stringify(event));
+        return [2 /*return*/, awsServerlessExpress.proxy(server, event, context, "PROMISE").promise];
     });
 }); };
 exports.handler = handler;

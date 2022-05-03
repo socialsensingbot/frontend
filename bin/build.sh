@@ -1,6 +1,11 @@
 # Script to run the for the Amplify Console CI Cypress testing
 cd $(dirname $0)
 cd ..
+cp src/app/map/data/map-data.ts api/
+./amplify/backend/function/query/build.sh
+./amplify/backend/function/api/build.sh
+
+npx browserslist@latest --update-db
 
 if [[ "${AWS_BRANCH}" == staging ]]; then
   npm run-script build-prod

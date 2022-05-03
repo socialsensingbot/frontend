@@ -1,0 +1,445 @@
+components:
+  examples:
+    Example:
+      - json:
+          id: 1495779348669948000
+          geo:
+          lang: en
+          text: "@grandoperayork Can you confirm that Dracula is still going ahead tonight
+                    even with the flooding of River Ouse. Thank you"
+          user:
+            id: 3218380845
+            url:
+            lang:
+            name: Lisa
+            id_str: '3218380845'
+            location: York, England
+            verified: false
+            following:
+            protected: false
+            time_zone:
+            created_at: Tue Apr 28 19:15:18 +0000 2015
+            utc_offset:
+            description: Loved PRINCE since 1984 ❤️'s The Twilight Zone,Escape From New
+              York,John Carpenter,Dark Tower,Stephen King,InsideNo9,Rik&Ade,Spandau Ballet,Squeeze,Psychoville
+            geo_enabled: true
+            screen_name: Lisafurbs
+            listed_count: 32
+            friends_count: 1786
+            is_translator: false
+            notifications:
+            statuses_count: 20560
+            default_profile: true
+            followers_count: 1329
+            translator_type: none
+            favourites_count: 139063
+            profile_image_url: http://pbs.twimg.com/profile_images/682280512061308933/3XRXCw3S_normal.jpg
+            profile_banner_url: https://pbs.twimg.com/profile_banners/3218380845/1462518844
+            profile_link_color: 1DA1F2
+            profile_text_color: '333333'
+            follow_request_sent:
+            contributors_enabled: false
+            default_profile_image: false
+            withheld_in_countries: [ ]
+            profile_background_tile: false
+            profile_image_url_https: https://pbs.twimg.com/profile_images/682280512061308933/3XRXCw3S_normal.jpg
+            profile_background_color: C0DEED
+            profile_sidebar_fill_color: DDEEF6
+            profile_background_image_url: http://abs.twimg.com/images/themes/theme1/bg.png
+            profile_sidebar_border_color: C0DEED
+            profile_use_background_image: true
+            profile_background_image_url_https: https://abs.twimg.com/images/themes/theme1/bg.png
+          place:
+          id_str: '1495779348669947908'
+          source: <a href="http://twitter.com/download/android" rel="nofollow">Twitter for
+            Android</a>
+          entities:
+            urls: [ ]
+            symbols: [ ]
+            hashtags: [ ]
+            user_mentions:
+              - id: 101781590
+                name: Grand Opera House York
+                id_str: '101781590'
+                indices:
+                  - 0
+                  - 15
+                screen_name: grandoperayork
+          trackstr: flood, floods, flooding, flooded
+          favorited: false
+          retweeted: false
+          truncated: false
+          collection: flood_collection
+          created_at: Mon Feb 21 15:16:01 +0000 2022
+          coordinates:
+          quote_count: 0
+          reply_count: 0
+          contributors:
+          filter_level: low
+          timestamp_ms: '1645456561616'
+          trackphrases:
+            - flood
+            - flooded
+            - flooding
+            - floods
+          retweet_count: 0
+          favorite_count: 0
+          is_quote_status: false
+          in_reply_to_user_id: 101781590
+          in_reply_to_status_id:
+          in_reply_to_screen_name: grandoperayork
+          in_reply_to_user_id_str: '101781590'
+          in_reply_to_status_id_str:
+        timestamp: '2022-02-21T15:16:01.000Z'
+        id: '1495779348669947908'
+        location: '{"type": "GeometryCollection", "geometries": [{"type": "Point", "coordinates":
+                  [-1.275, 54.03444444444445]}]}'
+        region: north yorkshire
+        possibly_sensitive: 0
+        source: twitter
+        region_type: county
+        hazard: flood
+        warning: 0
+      - json:
+          id: 1495779091642998800
+          geo:
+          lang: en
+          text: |-
+            Rotherham Station is flooded after the River Don burst its banks.
+
+            Train services in parts of Yorkshire have been c… https://t.co/xtQWVVVKNv
+          user:
+            id: 7587032
+            url: http://news.sky.com/
+            lang:
+            name: Sky News
+            id_str: '7587032'
+            location: London, UK
+            verified: true
+            following:
+            protected: false
+            time_zone:
+            created_at: Thu Jul 19 14:42:53 +0000 2007
+            utc_offset:
+            description: |-
+              For breaking news @SkyNewsBreak. Watch live on Sky 501, Virgin Media HD 602, Freeview 233 and YouTube.
+
+              Download our app: http://onelink.to/skynews
+            geo_enabled: false
+            screen_name: SkyNews
+            listed_count: 28996
+            friends_count: 23
+            is_translator: false
+            notifications:
+            statuses_count: 509760
+            default_profile: false
+            followers_count: 7509836
+            translator_type: none
+            favourites_count: 1
+            profile_image_url: http://pbs.twimg.com/profile_images/1400331605974077442/kelepCgF_normal.jpg
+            profile_banner_url: https://pbs.twimg.com/profile_banners/7587032/1622700167
+            profile_link_color: 385FAC
+            profile_text_color: '333333'
+            follow_request_sent:
+            contributors_enabled: false
+            default_profile_image: false
+            withheld_in_countries: [ ]
+            profile_background_tile: false
+            profile_image_url_https: https://pbs.twimg.com/profile_images/1400331605974077442/kelepCgF_normal.jpg
+            profile_background_color: '000000'
+            profile_sidebar_fill_color: EDEDED
+            profile_background_image_url: http://abs.twimg.com/images/themes/theme1/bg.png
+            profile_sidebar_border_color: '000000'
+            profile_use_background_image: true
+            profile_background_image_url_https: https://abs.twimg.com/images/themes/theme1/bg.png
+          place:
+          id_str: '1495779091642998790'
+          source: <a href="https://studio.twitter.com" rel="nofollow">Twitter Media Studio</a>
+          entities:
+            urls:
+              - url: https://t.co/xtQWVVVKNv
+                indices:
+                  - 117
+                  - 140
+                display_url: twitter.com/i/web/status/1…
+                expanded_url: https://twitter.com/i/web/status/1495779091642998790
+            symbols: [ ]
+            hashtags: [ ]
+            user_mentions: [ ]
+          trackstr: flood, floods, flooding, flooded
+          favorited: false
+          retweeted: false
+          truncated: true
+          collection: flood_collection
+          created_at: Mon Feb 21 15:15:00 +0000 2022
+          coordinates:
+          quote_count: 0
+          reply_count: 0
+          contributors:
+          filter_level: low
+          timestamp_ms: '1645456500336'
+          trackphrases:
+            - flood
+            - flooded
+            - flooding
+            - floods
+          retweet_count: 0
+          extended_tweet:
+            entities:
+              urls:
+                - url: https://t.co/A4Vv4kS26F
+                  indices:
+                    - 210
+                    - 233
+                  display_url: trib.al/fDFCWmC
+                  expanded_url: https://trib.al/fDFCWmC
+              media:
+                - id: 1495724030330036200
+                  url: https://t.co/srWuwPMIlj
+                  type: video
+                  sizes:
+                    large:
+                      h: 1080
+                      w: 1080
+                      resize: fit
+                    small:
+                      h: 680
+                      w: 680
+                      resize: fit
+                    thumb:
+                      h: 150
+                      w: 150
+                      resize: crop
+                    medium:
+                      h: 1080
+                      w: 1080
+                      resize: fit
+                  id_str: '1495724030330036224'
+                  indices:
+                    - 234
+                    - 257
+                  media_url: http://pbs.twimg.com/media/FMHiKlcX0Aw0nIy.jpg
+                  video_info:
+                    variants:
+                      - url: https://video.twimg.com/amplify_video/1495724030330036224/vid/540x540/qlkVLnOTJPycumyV.mp4?tag=14
+                        bitrate: 832000
+                        content_type: video/mp4
+                      - url: https://video.twimg.com/amplify_video/1495724030330036224/vid/320x320/1nXwAiyuKE7DF_9p.mp4?tag=14
+                        bitrate: 432000
+                        content_type: video/mp4
+                      - url: https://video.twimg.com/amplify_video/1495724030330036224/pl/VZaPjdHjd13Ot-uJ.m3u8?tag=14&container=fmp4
+                        content_type: application/x-mpegURL
+                      - url: https://video.twimg.com/amplify_video/1495724030330036224/vid/720x720/hHCt7tGnxOSCZNGQ.mp4?tag=14
+                        bitrate: 1280000
+                        content_type: video/mp4
+                    aspect_ratio:
+                      - 1
+                      - 1
+                    duration_millis: 40064
+                  display_url: pic.twitter.com/srWuwPMIlj
+                  expanded_url: https://twitter.com/SkyNews/status/1495779091642998790/video/1
+                  media_url_https: https://pbs.twimg.com/media/FMHiKlcX0Aw0nIy.jpg
+                  additional_media_info:
+                    title: 'Storm Franklin: Rotherham Station floods as River Don bursts banks'
+                    embeddable: true
+                    description: ''
+                    monetizable: false
+              symbols: [ ]
+              hashtags:
+                - text: StormFranklin
+                  indices:
+                    - 194
+                    - 208
+              user_mentions: [ ]
+            full_text: |-
+              Rotherham Station is flooded after the River Don burst its banks.
+
+              Train services in parts of Yorkshire have been cancelled as Storm Franklin brings even more bad weather to England.
+
+              Latest on #StormFranklin: https://t.co/A4Vv4kS26F https://t.co/srWuwPMIlj
+            extended_entities:
+              media:
+                - id: 1495724030330036200
+                  url: https://t.co/srWuwPMIlj
+                  type: video
+                  sizes:
+                    large:
+                      h: 1080
+                      w: 1080
+                      resize: fit
+                    small:
+                      h: 680
+                      w: 680
+                      resize: fit
+                    thumb:
+                      h: 150
+                      w: 150
+                      resize: crop
+                    medium:
+                      h: 1080
+                      w: 1080
+                      resize: fit
+                  id_str: '1495724030330036224'
+                  indices:
+                    - 234
+                    - 257
+                  media_url: http://pbs.twimg.com/media/FMHiKlcX0Aw0nIy.jpg
+                  video_info:
+                    variants:
+                      - url: https://video.twimg.com/amplify_video/1495724030330036224/vid/540x540/qlkVLnOTJPycumyV.mp4?tag=14
+                        bitrate: 832000
+                        content_type: video/mp4
+                      - url: https://video.twimg.com/amplify_video/1495724030330036224/vid/320x320/1nXwAiyuKE7DF_9p.mp4?tag=14
+                        bitrate: 432000
+                        content_type: video/mp4
+                      - url: https://video.twimg.com/amplify_video/1495724030330036224/pl/VZaPjdHjd13Ot-uJ.m3u8?tag=14&container=fmp4
+                        content_type: application/x-mpegURL
+                      - url: https://video.twimg.com/amplify_video/1495724030330036224/vid/720x720/hHCt7tGnxOSCZNGQ.mp4?tag=14
+                        bitrate: 1280000
+                        content_type: video/mp4
+                    aspect_ratio:
+                      - 1
+                      - 1
+                    duration_millis: 40064
+                  display_url: pic.twitter.com/srWuwPMIlj
+                  expanded_url: https://twitter.com/SkyNews/status/1495779091642998790/video/1
+                  media_url_https: https://pbs.twimg.com/media/FMHiKlcX0Aw0nIy.jpg
+                  additional_media_info:
+                    title: 'Storm Franklin: Rotherham Station floods as River Don bursts banks'
+                    embeddable: true
+                    description: ''
+                    monetizable: false
+            display_text_range:
+              - 0
+              - 233
+          favorite_count: 0
+          is_quote_status: false
+          display_text_range:
+            - 0
+            - 140
+          possibly_sensitive: false
+          in_reply_to_user_id:
+          in_reply_to_status_id:
+          in_reply_to_screen_name:
+          in_reply_to_user_id_str:
+          in_reply_to_status_id_str:
+        timestamp: '2022-02-21T15:15:00.000Z'
+        id: '1495779091642998790'
+        location: '{"type": "GeometryCollection", "geometries": [{"type": "Point", "coordinates":
+                  [-1.5, 54.0]}]}'
+        region: north yorkshire
+        possibly_sensitive: 0
+        source: twitter
+        region_type: county
+        hazard: flood
+        warning: 0
+      - json:
+          id: 1495782878113845200
+          geo:
+          lang: en
+          text: |-
+            Storm Franklin Causing Some Flooding In Northern Powergrid's Region #StormFranklin @Northpowergrid
+            https://t.co/TG5ThUdDyt
+          user:
+            id: 361168224
+            url: http://www.yorkshiretimes.co.uk
+            lang:
+            name: The Yorkshire Times
+            id_str: '361168224'
+            location: Yorkshire
+            verified: false
+            following:
+            protected: false
+            time_zone:
+            created_at: Wed Aug 24 10:53:26 +0000 2011
+            utc_offset:
+            description: "YT features lifestyle, news, business, food, family & more. \nTo
+                      add to our Voice Of The North, send your news to editor@yorkshiretimes.co.uk"
+            geo_enabled: false
+            screen_name: TheYorksTimes
+            listed_count: 303
+            friends_count: 4547
+            is_translator: false
+            notifications:
+            statuses_count: 92766
+            default_profile: false
+            followers_count: 23881
+            translator_type: none
+            favourites_count: 5419
+            profile_image_url: http://pbs.twimg.com/profile_images/959748710417817600/m3l6oro7_normal.jpg
+            profile_banner_url: https://pbs.twimg.com/profile_banners/361168224/1471696527
+            profile_link_color: 5DB004
+            profile_text_color: '333333'
+            follow_request_sent:
+            contributors_enabled: false
+            default_profile_image: false
+            withheld_in_countries: [ ]
+            profile_background_tile: false
+            profile_image_url_https: https://pbs.twimg.com/profile_images/959748710417817600/m3l6oro7_normal.jpg
+            profile_background_color: C0DEED
+            profile_sidebar_fill_color: DDEEF6
+            profile_background_image_url: http://abs.twimg.com/images/themes/theme1/bg.png
+            profile_sidebar_border_color: C0DEED
+            profile_use_background_image: true
+            profile_background_image_url_https: https://abs.twimg.com/images/themes/theme1/bg.png
+          place:
+          id_str: '1495782878113845252'
+          source: <a href="https://www.yorkshiretimes.co.uk/" rel="nofollow">yorkshire-times</a>
+          entities:
+            urls:
+              - url: https://t.co/TG5ThUdDyt
+                indices:
+                  - 99
+                  - 122
+                display_url: yorkshiretimes.co.uk/article/Storm-…
+                expanded_url: https://yorkshiretimes.co.uk/article/Storm-Franklin-Causing-Some-Flooding-In-Northern-Powergrids-Region
+            symbols: [ ]
+            hashtags:
+              - text: StormFranklin
+                indices:
+                  - 68
+                  - 82
+            user_mentions:
+              - id: 440366765
+                name: Northern Powergrid
+                id_str: '440366765'
+                indices:
+                  - 83
+                  - 98
+                screen_name: Northpowergrid
+          trackstr: flood, floods, flooding, flooded
+          favorited: false
+          retweeted: false
+          truncated: false
+          collection: flood_collection
+          created_at: Mon Feb 21 15:30:03 +0000 2022
+          coordinates:
+          quote_count: 0
+          reply_count: 0
+          contributors:
+          filter_level: low
+          timestamp_ms: '1645457403101'
+          trackphrases:
+            - flood
+            - flooded
+            - flooding
+            - floods
+          retweet_count: 0
+          favorite_count: 0
+          is_quote_status: false
+          possibly_sensitive: false
+          in_reply_to_user_id:
+          in_reply_to_status_id:
+          in_reply_to_screen_name:
+          in_reply_to_user_id_str:
+          in_reply_to_status_id_str:
+        timestamp: '2022-02-21T15:30:03.000Z'
+        id: '1495782878113845252'
+        location: '{"type": "GeometryCollection", "geometries": [{"type": "Point", "coordinates":
+                  [-1.5, 54.0]}]}'
+        region: north yorkshire
+        possibly_sensitive: 0
+        source: twitter
+        region_type: county
+        hazard: flood
+        warning: 0

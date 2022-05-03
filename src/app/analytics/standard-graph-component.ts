@@ -27,7 +27,7 @@ export abstract class StandardGraphComponent {
     protected source = "twitter";
     protected hazard = "flood";
 
-    constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
+    constructor(protected _zone: NgZone, protected _router: Router,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService,
                 protected restQueryName: string,
                 protected dateRange = true) {
