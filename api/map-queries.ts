@@ -1074,6 +1074,22 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
         const hazards: string[] = req.body.hazards;
         const sources: string[] = req.body.sources;
         const regions: string[] = req.body.regions;
+        const from: Date = dateFromMillis(req.body.startDate);
+        const to = new Date(calculateEndDate(map, req));
+
+
+        if (req.body.timePeriod === "day" && to.getTime() - from.getTime() / ONE_DAY > 366) {
+            invalidParameter(res, "startDate/endDate",
+                             `The gap between the start date ${from} and the end date ${to} exceeds the maximum of 366 days, for by day analytics. Please break down the request into smaller chunks.`)
+            return;
+        }
+
+        if (req.body.timePeriod === "hour" && to.getTime() - from.getTime() / ONE_DAY > 32) {
+            invalidParameter(res, "startDate/endDate",
+                             `The gap between the start date ${from} and the end date ${to} exceeds the maximum of 32 days, for by hour analytics. Please break down the request into smaller chunks.`)
+            return;
+        }
+
         await db.cache(res, key, async () => {
             let fullText = "";
             let textSearch: string = req.body.textSearch;
@@ -1095,21 +1111,7 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
             const dayTimePeriod: boolean = req.body.timePeriod === "day";
             const timeSeriesTable = dayTimePeriod ? "mat_view_timeseries_date" : "mat_view_timeseries_hour";
             const dateTable = dayTimePeriod ? "mat_view_days" : "mat_view_hours";
-            const from: Date = dateFromMillis(req.body.startDate);
-            const to = new Date(calculateEndDate(map, req));
 
-
-            if (req.body.timePeriod === "day" && to.getTime() - from.getTime() / ONE_DAY > 366) {
-                invalidParameter(res, "startDate/endDate",
-                                 `The gap between the start date ${from} and the end date ${to} exceeds the maximum of 366 days, for by day analytics. Please break down the request into smaller chunks.`)
-                return;
-            }
-
-            if (req.body.timePeriod === "hour" && to.getTime() - from.getTime() / ONE_DAY > 32) {
-                invalidParameter(res, "startDate/endDate",
-                                 `The gap between the start date ${from} and the end date ${to} exceeds the maximum of 32 days, for by hour analytics. Please break down the request into smaller chunks.`)
-                return;
-            }
 
             if (!regions || regions.length === 0) {
                 const values = fullText ? [hazards, sources, location, textSearch, from, to] : [hazards, sources,
