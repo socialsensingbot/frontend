@@ -100,7 +100,7 @@ export class SSDatabase {
 
                 res.setHeader("X-SocialSensing-CachedQuery", "false");
                 return value().then(result => {
-                    if (key !== null) {
+                    if (key !== null && result !== null) {
                         setTimeout(() => {
                             this.queryCache.set(key, result, options.duration);
                         }, 10);
