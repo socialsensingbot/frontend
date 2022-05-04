@@ -137,13 +137,14 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
         try {
             const payload = {
                 layer: this.pref.defaultLayer(),
-                ...query,
+                ...query.layer,
+                location:   query.location,
+                regions:    query.regions,
                 startDate:  this._state.from ? this._state.from : (nowRoundedToHour() - (365.24 * dayInMillis)),
                 endDate:    this._state.to ? this._state.to : nowRoundedToHour(),
                 name:       "time",
                 timePeriod: this.state.timePeriod
             };
-            delete payload.__series_id;
             const serverResults = await this._api.callMapAPIWithCache(this.map.id + "/analytics/time", payload);
             this.error = false;
             return this.queryTransform(serverResults);
