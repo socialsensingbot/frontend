@@ -180,6 +180,11 @@ export const textForRegionsFunc: (req, res) => Promise<void> = async (req, res) 
                              `Invalid value for warnings, warnings=${req.body.warnings}, warnings must be a string with the value one of 'include', 'exclude' or 'only'`);
             return;
         }
+        if (typeof req.body.language !== "undefined" && typeof req.body.lang !== "string") {
+            invalidParameter(res, "language",
+                             `Invalid value for language, language=${req.body.warnings}, warnings must be a string with the value one of 'include', 'exclude' or 'only'`);
+            return;
+        }
         if (typeof req.body.pageSize !== "undefined") {
             if ((typeof req.body.pageSize !== "number") || req.body.pageSize < 0 || req.body.pageSize > 1000) {
                 invalidParameter(res, "pageSize",

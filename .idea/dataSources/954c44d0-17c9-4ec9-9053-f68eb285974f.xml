@@ -1127,7 +1127,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="305" parent="278" name="mv_refresh_event">
       <Definer>admin@%</Definer>
       <Interval>&apos;5&apos; MINUTE</Interval>
-      <LastExecuted>2022-05-03.14:50:00</LastExecuted>
+      <LastExecuted>2022-05-03.16:05:00</LastExecuted>
       <SourceTextLength>25</SourceTextLength>
       <Starts>&apos;2021-01-01 00:00:00&apos;</Starts>
       <Status>enabled</Status>
@@ -1492,9 +1492,9 @@ level</ColNames>
       <NotNull>1</NotNull>
       <Position>16</Position>
     </column>
-    <column id="386" parent="308" name="lang">
+    <column id="386" parent="308" name="language">
       <DataType>varchar(16)|0s</DataType>
-      <DefaultExpression>&apos;en-gb&apos;</DefaultExpression>
+      <DefaultExpression>&apos;en-GB&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>17</Position>
     </column>

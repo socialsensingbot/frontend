@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
-import {MetadataService} from "../../../api/metadata.service";
 import {ActivatedRoute} from "@angular/router";
 import {RESTDataAPIService} from "../../../api/rest-api.service";
 import {Logger} from "@aws-amplify/core";
@@ -139,8 +138,8 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
             const payload = {
                 layer: this.pref.defaultLayer(),
                 ...query,
-                from:       this._state.from ? this._state.from : (nowRoundedToHour() - (365.24 * dayInMillis)),
-                to:         this._state.to ? this._state.to : nowRoundedToHour(),
+                startDate:  this._state.from ? this._state.from : (nowRoundedToHour() - (365.24 * dayInMillis)),
+                endDate:    this._state.to ? this._state.to : nowRoundedToHour(),
                 name:       "time",
                 timePeriod: this.state.timePeriod
             };
