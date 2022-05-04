@@ -146,7 +146,8 @@ BEGIN
                     source,
                     warning,
                     deleted,
-                    map_location
+                    map_location,
+                    language
     FROM mat_view_regions;
     call debug_msg(1, 'refresh_mv_full', 'Refreshed map criteria.');
     COMMIT;
@@ -242,7 +243,8 @@ BEGIN
            tr.region,
            t.warning,
            IFNULL(t.deleted, false) as deleted,
-           'uk'
+           'uk',
+           t.language
     FROM live_text t,
          live_text_regions tr
     WHERE t.source_id = tr.source_id
@@ -263,7 +265,8 @@ BEGIN
            gr.region,
            t.warning,
            IFNULL(t.deleted, false) as deleted,
-           gr.map_location
+           gr.map_location,
+           t.language
     FROM live_text t,
          ref_geo_regions gr
     WHERE ST_Intersects(boundary, location)
@@ -336,7 +339,8 @@ BEGIN
            r.region_type            as region_type,
            IFNULL(t.deleted, false) as deleted,
            t.source_id              as source_id,
-           r.map_location
+           r.map_location,
+           r.language
     FROM mat_view_regions r,
          live_text t
     WHERE t.source_id = r.source_id
@@ -363,7 +367,8 @@ BEGIN
            r.region_type                                                    as region_type,
            IFNULL(t.deleted, false)                                         as deleted,
            t.source_id                                                      as source_id,
-           r.map_location
+           r.map_location,
+           r.language
     FROM mat_view_regions r,
          live_text t
     WHERE t.source_id = r.source_id
@@ -463,7 +468,8 @@ BEGIN
                     t.region,
                     t.warning,
                     t.deleted,
-                    t.map_location
+                    t.map_location,
+                    t.language
     FROM mat_view_map_criteria t,
          (select date from mat_view_days where date BETWEEN start_date and end_date) days;
 
@@ -477,7 +483,8 @@ BEGIN
            t.region,
            t.warning,
            t.deleted,
-           t.map_location
+           t.map_location,
+           t.language
     FROM mat_view_regions t
     WHERE t.source_timestamp BETWEEN start_date and end_date
     GROUP BY region, region_type, hazard, source, t.map_location, warning, deleted, source_date;

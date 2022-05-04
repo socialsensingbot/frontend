@@ -182,7 +182,7 @@ export const textForRegionsFunc: (req, res) => Promise<void> = async (req, res) 
         }
         if (typeof req.body.language !== "undefined" && typeof req.body.lang !== "string") {
             invalidParameter(res, "language",
-                             `Invalid value for language, language=${req.body.warnings}, warnings must be a string with the value one of 'include', 'exclude' or 'only'`);
+                             `Invalid value for language, language=${req.body.warnings}, language is an optional parameter that is an ISO 639-1 language code, see: https://www.andiamo.co.uk/resources/iso-language-codes/. The default value is 'en-GB'`);
             return;
         }
         if (typeof req.body.pageSize !== "undefined") {
@@ -212,6 +212,7 @@ export const textForRegionsFunc: (req, res) => Promise<void> = async (req, res) 
         const pageSize: number = +req.body.pageSize || 100;
         const page: number = +req.body.page || 0;
         const from = page * pageSize;
+        const lang = req.body.language || 'en-GB';
 
         await db.cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
 
