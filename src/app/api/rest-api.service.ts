@@ -140,33 +140,48 @@ export class RESTDataAPIService {
                                                   transform: (any) => any = (i) => i,
                                                   cacheForSeconds: number = -1,
                                                   pageDurationInHours = 30 * 24,
-                                                  retry = true) {
+                                                  retry = true): Promise<any> {
         try {
-            const result: any[] = [];
-            let startDate = payload.startDate;
-            let currEndDate = payload.startDate + pageDurationInHours * 60 * 60 * 1000 - 1;
-            do {
-                const endDate = payload.endDate < currEndDate ? payload.endDate : currEndDate;
-                const rawResult = await this.callMapAPIWithCache(path, {...payload, startDate, endDate}, cacheForSeconds, false, retry);
-                log.debug(rawResult.length + " results back from server");
-                for (const item of rawResult) {
-                    result.push(transform(item));
-                }
-                if (endDate < payload.endDate) {
-                    if (showSpinner) {
-                        this._loading.showIndeterminateSpinner();
+            const key = "rest:query/" + path + ":" + JSON.stringify(payload);
+            const cachedItem = await this.cache.getCached(key);
+            if (cacheForSeconds > 0 && cachedItem && cachedItem.hasData && !cachedItem.expired) {
+                // tslint:disable-next-line:no-console
+                log.verbose("Value for " + key + "in cache");
+                // log.debug("Value for " + key + " was " + JSON.stringify(cachedItem.data));
+                // console.debug("Return cached item", JSON.stringify(cachedItem));
+                return cachedItem.data;
+            } else {
+                log.info("Value for " + key + " not in cache");
+                const result: any[] = [];
+                let startDate = payload.startDate;
+                let currEndDate = payload.startDate + pageDurationInHours * 60 * 60 * 1000 - 1;
+                do {
+                    const endDate = payload.endDate < currEndDate ? payload.endDate : currEndDate;
+                    const rawResult = await this.callMapAPIWithCache(path, {...payload, startDate, endDate}, cacheForSeconds, false, retry);
+                    log.debug(rawResult.length + " results back from server");
+                    for (const item of rawResult) {
+                        result.push(transform(item));
                     }
-                    currEndDate += pageDurationInHours * 60 * 60 * 1000;
-                    startDate += pageDurationInHours * 60 * 60 * 1000;
-                } else {
-                    if (showSpinner) {
-                        this._loading.hideIndeterminateSpinner();
+                    if (endDate < payload.endDate) {
+                        if (showSpinner) {
+                            this._loading.showIndeterminateSpinner();
+                        }
+                        currEndDate += pageDurationInHours * 60 * 60 * 1000;
+                        startDate += pageDurationInHours * 60 * 60 * 1000;
+                    } else {
+                        if (showSpinner) {
+                            this._loading.hideIndeterminateSpinner();
+                        }
+                        log.debug("Aggregated Result", result);
+                        log.debug("Aggregated Result Size", result.length);
+                        if (cacheForSeconds > 0) {
+                            await this.cache.setCached(key, result, cacheForSeconds * 1000);
+                        }
+                        return result;
                     }
-                    log.debug("Aggregated Result", result);
-                    log.debug("Aggregated Result Size", result.length);
-                    return result;
-                }
-            } while (true);
+                } while (true);
+
+            }
         } catch (e) {
             log.error(e);
         }

@@ -173,6 +173,7 @@ export class RESTMapDataService {
             hazards:   layerGroup.hazards,
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,
+            language:  layerGroup.language || "*",
             startDate: roundToHour(startDate),
             endDate:   roundToMinute(endDate),
             regions,
@@ -190,6 +191,7 @@ export class RESTMapDataService {
             hazards:   layerGroup.hazards,
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,
+            language:  layerGroup.language || "*",
             startDate: roundToHour(startDate),
             endDate:   roundToHour(endDate)
 
@@ -207,6 +209,7 @@ export class RESTMapDataService {
             hazards:   layerGroup.hazards,
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,
+            language:  layerGroup.language || "*",
             regions,
             byRegion,
             startDate: roundToHour(startDate),
@@ -226,6 +229,7 @@ export class RESTMapDataService {
             hazards:   layerGroup.hazards,
             sources:   layerGroup.sources,
             warnings:  layerGroup.warnings,
+            language:  layerGroup.language || "*",
             startDate: roundToFiveMinutes(await this.now() - this._pref.combined.recentTweetHighlightOffsetInSeconds * 1000),
             endDate:   roundToFiveMinutes(await this.now())
 
@@ -308,6 +312,7 @@ export class RESTMapDataService {
             hazards:             layerGroup.hazards,
             sources:             layerGroup.sources,
             warnings:            layerGroup.warnings,
+            language:            layerGroup.language || "*",
             startDate:           roundToHour(startDate),
             endDate:             roundToFiveMinutes(endDate),
             exceedanceThreshold: this._pref.combined.exceedanceThreshold,
@@ -325,6 +330,7 @@ export class RESTMapDataService {
             hazards:             layerGroup.hazards,
             sources:             layerGroup.sources,
             warnings:            layerGroup.warnings,
+            language:            layerGroup.language || "*",
             startDate:           roundToHour(startDate),
             endDate:             roundToFiveMinutes(endDate),
             exceedanceThreshold: this._pref.combined.exceedanceThreshold,

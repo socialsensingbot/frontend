@@ -446,7 +446,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                                    const query = JSON.parse(JSON.stringify(q));
                                    log.debug("Graph update from query ", query);
                                    const text: string = query.textSearch;
-                                   if (query.layer && (text.length > 0 || force)) {
+                                   if (query._layer && (text.length > 0 || force)) {
                                        if (text.length > 3) {
                                            // noinspection ES6MissingAwait
                                            this.auto.create(timeSeriesAutocompleteType, text, true,
@@ -484,15 +484,17 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         }
 
         try {
+            let endDate: any = this.range.controls.end.value !== null ? roundToHour(
+                this.range.controls.end.value.getTime()) : nowRoundedToHour();
+            let startDate: any = this.range.controls.start.value !== null ? roundToHour(
+                this.range.controls.start.value.getTime()) : (nowRoundedToHour() - (365.24 * dayInMillis));
             const payload: any = {
                 ...query.layer,
                 location: query.location,
                 regions:  query.regions,
 
-                startDate: this.range.controls.start.value !== null ? roundToHour(
-                    this.range.controls.start.value.getTime()) : (nowRoundedToHour() - (365.24 * dayInMillis)),
-                endDate:   this.range.controls.end.value !== null ? roundToHour(
-                    this.range.controls.end.value.getTime()) : nowRoundedToHour(),
+                startDate: startDate,
+                endDate:   endDate,
                 name:      "time",
                 timePeriod
             };

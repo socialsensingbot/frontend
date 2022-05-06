@@ -187,7 +187,7 @@ BEGIN
     START TRANSACTION;
     call debug_msg(1, 'refresh_mv_full', 'Refreshing data day counts.');
     replace into mat_view_data_days
-    select datediff(max(source_date), min(source_date)) as days, region, region_type, hazard, source, warning
+    select datediff(max(source_date), min(source_date)) as days, region, region_type, hazard, source, warning, language
     from mat_view_text_count tc
     group by region, region_type, hazard, source, warning;
     call debug_msg(1, 'refresh_mv_full', 'Refreshed data day counts.');
