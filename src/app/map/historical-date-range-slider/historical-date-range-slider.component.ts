@@ -91,7 +91,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
      */
     private _options: DateRangeSliderOptions;
     private max: number;
-    private min: any;
+    private min: number;
 
     @Input()
     public set layer(value: string) {
@@ -143,17 +143,17 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
     }
 
     ngOnInit() {
-        this.updateTimerSub = timer(0, 1000).subscribe(async i => {
-                                                           // noinspection ES6MissingAwait
-                                                           this.exec.queue("update-historical-scrollbars", null,
-                                                                           async () => {
-                                                                               log.debug("Checking for update");
-                                                                               if (this.updateLayer) {
-                                                                                   this.updateLayer = false;
-                                                                                   if (this.currentWindowMin && this.currentWindowMax) {
-                                                                                       await this.getData(
-                                                                                           this.currentWindowMin,
-                                                                                           this.currentWindowMax,
+        this.updateTimerSub = timer(0, 300).subscribe(async i => {
+            // noinspection ES6MissingAwait
+            this.exec.queue("update-historical-scrollbars", null,
+                            async () => {
+                                log.debug("Checking for update");
+                                if (this.updateLayer) {
+                                    this.updateLayer = false;
+                                    if (this.currentWindowMin && this.currentWindowMax) {
+                                        await this.getData(
+                                            this.currentWindowMin,
+                                            this.currentWindowMax,
                                                                                            ((this.currentWindowMax - this.currentWindowMin) < MAX_CURRENT_HOUR_WINDOW) ? "hour" : "day").then(
                                                                                            data => this.currentSeries.data = data);
                                                                                        await this.getData(
@@ -171,6 +171,10 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                                                            data => this.currentSeries.data = data);
                                                                                        this.min = this.currentWindowMin;
                                                                                        this.max = this.currentWindowMax;
+                                                                                       this.updateCurrentChartSelection = true;
+                                                                                       log.warn(
+                                                                                           "updateCurrentChartExtent Min & Max =" + new Date(
+                                                                                               this.min) + " -> " + new Date(this.max));
                                                                                        setTimeout(() => {
                                                                                            this.currentDateAxis.zoomToDates(
                                                                                                new Date(this.min), new
@@ -181,7 +185,9 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                                                }
                                                                                if (this.updateCurrentChartSelection && this.min && this.max) {
                                                                                    this.updateCurrentChartSelection = false;
-                                                                                   log.warn("Min & Max the same ", new Date(this.min));
+                                                                                   log.warn(
+                                                                                       "updateCurrentChartSelection Min & Max =" + new Date(
+                                                                                           this.min) + " -> " + new Date(this.max));
                                                                                    this.currentDateAxis.zoomToDates(
                                                                                        new Date(this.min), new Date(this.max),
                                                                                        true,
@@ -279,11 +285,14 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
             this._zone.run(() => {
                 if (this.ready) {
                     // this._options = {...this._options, currentWindowMin: +ev.target.minZoomed, currentWindowMax: +ev.target.maxZoomed};
+                    log.debug("Historical Date Range Changed, event = ", ev);
                     this.currentWindowMin = roundToHour(+ev.target.minZoomed);
                     this.currentWindowMax = roundToMinute(+ev.target.maxZoomed);
+                    log.debug("Historical Date Range Changed, currentWindowMin =", this.currentWindowMin);
+                    log.debug("Historical Date Range Changed, currentWindowMax =", this.currentWindowMax);
                     this.updateCurrentChartExtent = true;
                     this.userHasInteracted = true;
-                    this.exec.uiActivity();
+                    // this.exec.uiActivity();
                     log.debug(ev.target);
                 }
             });
@@ -327,7 +336,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                 // this._options = {...this._options, currentWindowMin: +ev.target.minZoomed, currentWindowMax: +ev.target.maxZoomed};
                 // tslint:disable-next-line:triple-equals
                 if (this.ready && ev.target.minZoomed != ev.target.maxZoomed) {
-                    this.min = roundToHour(ev.target.minZoomed);
+                    this.min = roundToHour(+ev.target.minZoomed);
                     this.max = roundToMinute(+ev.target.maxZoomed);
                     this.updateCurrentChartSelection = true;
                     this.exec.uiActivity();

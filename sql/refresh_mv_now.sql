@@ -574,6 +574,7 @@ DROP EVENT IF EXISTS mv_map_window_refresh_event;
 DROP EVENT IF EXISTS mv_latest_refresh_event;
 
 DROP EVENT IF EXISTS mv_refresh_event;
+
 CREATE EVENT mv_refresh_event
     ON SCHEDULE EVERY 5 MINUTE
         STARTS '2021-01-01 00:00:00'
