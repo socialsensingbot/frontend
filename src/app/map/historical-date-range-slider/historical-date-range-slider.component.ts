@@ -144,63 +144,65 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
 
     ngOnInit() {
         this.updateTimerSub = timer(0, 300).subscribe(async i => {
-            // noinspection ES6MissingAwait
-            this.exec.queue("update-historical-scrollbars", null,
-                            async () => {
-                                log.debug("Checking for update");
-                                if (this.updateLayer) {
-                                    this.updateLayer = false;
-                                    if (this.currentWindowMin && this.currentWindowMax) {
-                                        await this.getData(
-                                            this.currentWindowMin,
-                                            this.currentWindowMax,
-                                                                                           ((this.currentWindowMax - this.currentWindowMin) < MAX_CURRENT_HOUR_WINDOW) ? "hour" : "day").then(
-                                                                                           data => this.currentSeries.data = data);
-                                                                                       await this.getData(
-                                                                                           this._options.now - MAX_HISTORICAL,
-                                                                                           this._options.now, "day").then(
-                                                                                           data => this.historicalSeries.data = data);
-                                                                                   }
-                                                                               }
-                                                                               if (this.updateCurrentChartExtent) {
-                                                                                   if (this.currentWindowMin && this.currentWindowMax) {
-                                                                                       await this.getData(
-                                                                                           this.currentWindowMin,
-                                                                                           this.currentWindowMax,
-                                                                                           ((this.currentWindowMax - this.currentWindowMin) < MAX_CURRENT_HOUR_WINDOW) ? "hour" : "day").then(
-                                                                                           data => this.currentSeries.data = data);
-                                                                                       this.min = this.currentWindowMin;
-                                                                                       this.max = this.currentWindowMax;
-                                                                                       this.updateCurrentChartSelection = true;
-                                                                                       log.warn(
-                                                                                           "updateCurrentChartExtent Min & Max =" + new Date(
-                                                                                               this.min) + " -> " + new Date(this.max));
-                                                                                       setTimeout(() => {
-                                                                                           this.currentDateAxis.zoomToDates(
-                                                                                               new Date(this.min), new
-                                                                                               Date(this.max), true, true);
-                                                                                           this.updateCurrentChartExtent = false;
-                                                                                       }, 300);
-                                                                                   }
-                                                                               }
-                                                                               if (this.updateCurrentChartSelection && this.min && this.max) {
-                                                                                   this.updateCurrentChartSelection = false;
-                                                                                   log.warn(
-                                                                                       "updateCurrentChartSelection Min & Max =" + new Date(
-                                                                                           this.min) + " -> " + new Date(this.max));
-                                                                                   this.currentDateAxis.zoomToDates(
-                                                                                       new Date(this.min), new Date(this.max),
-                                                                                       true,
-                                                                                       true);
-                                                                                   const range: DateRange = new DateRange(this.min,
-                                                                                                                          this.max);
-                                                                                   log.debug("Emitting", range);
-                                                                                   this.dateRange.emit(range);
-                                                                               }
-                                                                           }, "", true, true, true, "inactive");
+                                                          // noinspection ES6MissingAwait
+                                                          this.exec.queue("update-historical-scrollbars", null,
+                                                                          async () => {
+                                                                              log.debug("Checking for update");
+                                                                              if (this.updateLayer) {
+                                                                                  this.updateLayer = false;
+                                                                                  if (this.currentWindowMin && this.currentWindowMax) {
+                                                                                      await this.getData(
+                                                                                          this.currentWindowMin,
+                                                                                          this.currentWindowMax,
+                                                                                          ((this.currentWindowMax - this.currentWindowMin) < MAX_CURRENT_HOUR_WINDOW) ? "hour" : "day").then(
+                                                                                          data => this.currentSeries.data = data);
+                                                                                      await this.getData(
+                                                                                          this._options.now - MAX_HISTORICAL,
+                                                                                          this._options.now, "day").then(
+                                                                                          data => this.historicalSeries.data = data);
+                                                                                  }
+                                                                              }
+                                                                              if (this.updateCurrentChartExtent) {
+                                                                                  if (this.currentWindowMin && this.currentWindowMax) {
+                                                                                      await this.getData(
+                                                                                          this.currentWindowMin,
+                                                                                          this.currentWindowMax,
+                                                                                          ((this.currentWindowMax - this.currentWindowMin) < MAX_CURRENT_HOUR_WINDOW) ? "hour" : "day").then(
+                                                                                          data => this.currentSeries.data = data);
+                                                                                      this.min = this.currentWindowMin;
+                                                                                      this.max = this.currentWindowMax;
+                                                                                      this.updateCurrentChartSelection = true;
+                                                                                      log.warn(
+                                                                                          "updateCurrentChartExtent Min & Max =" + new Date(
+                                                                                              this.min) + " -> " + new Date(this.max));
+                                                                                      setTimeout(() => {
+                                                                                          this.currentDateAxis.zoomToDates(
+                                                                                              new Date(this.min), new
+                                                                                              Date(this.max), true, true);
+                                                                                          this.updateCurrentChartExtent = false;
+                                                                                      }, 300);
+                                                                                  }
+                                                                              }
+                                                                              if (this.updateCurrentChartSelection && this.min && this.max) {
+                                                                                  this.updateCurrentChartSelection = false;
+                                                                                  log.warn(
+                                                                                      "updateCurrentChartSelection Min & Max =" + new Date(
+                                                                                          this.min) + " -> " + new Date(this.max));
+                                                                                  setTimeout(() => {
+                                                                                      this.currentDateAxis.zoomToDates(
+                                                                                          new Date(this.min), new Date(this.max),
+                                                                                          true,
+                                                                                          true);
+                                                                                  }, 300);
+                                                                                  const range: DateRange = new DateRange(this.min,
+                                                                                                                         this.max);
+                                                                                  log.debug("Emitting", range);
+                                                                                  this.dateRange.emit(range);
+                                                                              }
+                                                                          }, "", true, true, true, "inactive");
 
 
-                                                       }
+                                                      }
         );
     }
 
@@ -286,14 +288,17 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                 if (this.ready) {
                     // this._options = {...this._options, currentWindowMin: +ev.target.minZoomed, currentWindowMax: +ev.target.maxZoomed};
                     log.debug("Historical Date Range Changed, event = ", ev);
-                    this.currentWindowMin = roundToHour(+ev.target.minZoomed);
-                    this.currentWindowMax = roundToMinute(+ev.target.maxZoomed);
-                    log.debug("Historical Date Range Changed, currentWindowMin =", this.currentWindowMin);
-                    log.debug("Historical Date Range Changed, currentWindowMax =", this.currentWindowMax);
-                    this.updateCurrentChartExtent = true;
+                    if (+ev.target.minZoomed < +ev.target.maxZoomed) {
+                        this.currentWindowMin = roundToHour(+ev.target.minZoomed);
+                        this.currentWindowMax = roundToMinute(+ev.target.maxZoomed);
+                        log.debug("Historical Date Range Changed, currentWindowMin =", this.currentWindowMin);
+                        log.debug("Historical Date Range Changed, currentWindowMax =", this.currentWindowMax);
+                        this.updateCurrentChartExtent = true;
+                    } else {
+                        log.warn("Zoom min > Zoom max for Historical");
+                    }
                     this.userHasInteracted = true;
-                    // this.exec.uiActivity();
-                    log.debug(ev.target);
+                    this.exec.uiActivity();
                 }
             });
         });
@@ -336,13 +341,17 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                 // this._options = {...this._options, currentWindowMin: +ev.target.minZoomed, currentWindowMax: +ev.target.maxZoomed};
                 // tslint:disable-next-line:triple-equals
                 if (this.ready && ev.target.minZoomed != ev.target.maxZoomed) {
-                    this.min = roundToHour(+ev.target.minZoomed);
-                    this.max = roundToMinute(+ev.target.maxZoomed);
-                    this.updateCurrentChartSelection = true;
-                    this.exec.uiActivity();
-                    this.userHasInteracted = true;
-                    log.debug(this._options);
+                    if (+ev.target.minZoomed < +ev.target.maxZoomed) {
+                        this.min = roundToHour(+ev.target.minZoomed);
+                        this.max = roundToMinute(+ev.target.maxZoomed);
+                        this.updateCurrentChartSelection = true;
+                    } else {
+                        log.warn("Zoom min > Zoom max for Current");
+                    }
                 }
+                this.exec.uiActivity();
+                this.userHasInteracted = true;
+                log.debug(this._options);
             });
         });
         this.updateCurrentChartSelection = true;

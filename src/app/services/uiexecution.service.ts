@@ -52,7 +52,7 @@ export type UIState = "init" | "active" | "inactive";
 
 export const DUPLICATE_REASON = "duplicate";
 
-const inactivityInMilliseconds = 1500;
+const inactivityInMilliseconds = 1000;
 
 /**
  * The UIExecutionService is responsible for making sure

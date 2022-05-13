@@ -1013,17 +1013,17 @@ export const timesliderFunc: (req, res) => Promise<void> = async (req, res) => {
         const sources: string[] = req.body.sources || req.body.layer.sources;
         return await db.sql({
                                 // language=MySQL
-                                sql:    `select IFNULL(lhs.count, rhs.count) as count, lhs.date as date
-                                         from (SELECT count(*)        as count,
-                                                      tsd.source_date as date
-                                               FROM ${timeSeriesTable} tsd
-                                               WHERE tsd.hazard IN (?)
-                                                 AND tsd.source IN (?)
-                                                 AND tsd.language LIKE ?
-                                                 AND tsd.map_location = ?
-                                                 and tsd.source_date between ? and ?
+                                sql: `select IFNULL(lhs.count, rhs.count) as count, IFNULL(lhs.date, rhs.date) as date
+                                      from (SELECT count(*)        as count,
+                                                   tsd.source_date as date
+                                            FROM ${timeSeriesTable} tsd
+                                            WHERE tsd.hazard IN (?)
+                                              AND tsd.source IN (?)
+                                              AND tsd.language LIKE ?
+                                              AND tsd.map_location = ?
+                                              and tsd.source_date between ? and ?
 
-                                               group by date
+                                            group by date
                                                order by date) lhs
                                                   RIGHT OUTER JOIN (select date, 0 as count
                                                                     from ${dateTable}
