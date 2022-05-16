@@ -28,6 +28,7 @@ export interface TimeseriesAnalyticsComponentState {
 
 
 export interface TimeseriesRESTQuery {
+    language?: string;
     dateStep?: number;
     to?: number;
     from?: number;

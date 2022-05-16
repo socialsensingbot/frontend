@@ -38,7 +38,7 @@ const layers: SSLayerConfiguration = {
         },
         {
             "id":          "flood-cy",
-            "title":       "Welsh Floods",
+            "title":       "Floods (Welsh Language)",
             "sources":     ["twitter"],
             "hazards":     ["flood"],
             "warnings":    "exclude",

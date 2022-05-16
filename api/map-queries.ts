@@ -771,7 +771,7 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
 
         const result = {};
 
-        const exceedanceThreshold = req.body.exceedanceThreshold || 90;
+        const exceedanceThreshold = req.body.exceedanceThreshold || 100;
         const countThreshold = req.body.countThreshold || 0;
 
         const endDate = calculateEndDate(map, req);
@@ -784,28 +784,29 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
                                       /* language=MySQL*/ sql: `/* app.ts: stats */ select *
                                                                                     from (select region,
                                                                                                  count,
-                                                                                                 round(((select count(*) + 1
-                                                                                                         from (select sum(tc.text_count) as sum_count, source_date
-                                                                                                               from mat_view_text_count tc
-                                                                                                               where region_counts.region = tc.region
-                                                                                                                 AND tc.region_type = ?
-                                                                                                                 AND tc.hazard IN (?)
-                                                                                                                 AND tc.source IN (?)
-                                                                                                                 AND tc.warning IN (?)
-                                                                                                                 AND tc.language LIKE ?
-                                                                                                                 AND not tc.deleted
-                                                                                                               group by source_date
-                                                                                                               having sum(tc.text_count) >= ROUND(region_counts.count / ?)) re_summed_counts)
+                                                                                                 LEAST(round(((select count(*) + 1
+                                                                                                               from (select sum(tc.text_count) as sum_count, source_date
+                                                                                                                     from mat_view_text_count tc
+                                                                                                                     where region_counts.region = tc.region
+                                                                                                                       AND tc.region_type = ?
+                                                                                                                       AND tc.hazard IN (?)
+                                                                                                                       AND tc.source IN (?)
+                                                                                                                       AND tc.warning IN (?)
+                                                                                                                       AND tc.language LIKE ?
+                                                                                                                       AND not tc.deleted
+                                                                                                                     group by source_date
+                                                                                                                     having sum(tc.text_count) >= ROUND(region_counts.count / ?)) re_summed_counts)
                                                                                                      /
-                                                                                                        (select max(days)
-                                                                                                         from mat_view_data_days d
-                                                                                                         where region_counts.region = d.region
-                                                                                                           AND d.region_type = ?
-                                                                                                           AND d.hazard IN (?)
-                                                                                                           AND d.source IN (?)
-                                                                                                           AND d.warning IN (?)
-                                                                                                           AND d.language LIKE ?)
-                                                                                                           ) * 100, 2) as exceedance
+                                                                                                              (select max(days)
+                                                                                                               from mat_view_data_days d
+                                                                                                               where region_counts.region = d.region
+                                                                                                                 AND d.region_type = ?
+                                                                                                                 AND d.hazard IN (?)
+                                                                                                                 AND d.source IN (?)
+                                                                                                                 AND d.warning IN (?)
+                                                                                                                 AND d.language LIKE ?)
+                                                                                                                 ) * 100, 2),
+                                                                                                       100) as exceedance
 
                                                                                           FROM (SELECT count(*) as count, region as region
                                                                                                 FROM mat_view_regions r
@@ -813,11 +814,11 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
                                                                                                   AND r.hazard IN (?)
                                                                                                   AND r.source IN (?)
                                                                                                   AND r.warning IN (?)
-                                                                                                  AND language LIKE ?
+                                                                                                  AND r.language LIKE ?
                                                                                                   AND not r.deleted
                                                                                                   AND r.source_timestamp between ? AND ?
                                                                                                 group by region) as region_counts) as x
-                                                                                    where exceedance < ?
+                                                                                    where exceedance <= ?
                                                                                       AND count > ?;
                                                                `,
 

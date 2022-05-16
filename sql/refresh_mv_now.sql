@@ -491,6 +491,7 @@ BEGIN
     COMMIT;
     call debug_msg(0, 'update_text_count', CONCAT('Updated mat_view_text_count from ', start_date, ' to ', end_date));
 
+
 END;
 $$
 
@@ -531,6 +532,16 @@ BEGIN
         optimize table mat_view_text_count;
     END IF;
     call debug_msg(0, 'daily_housekeeping', 'Optimized tables');
+
+    START TRANSACTION;
+    call debug_msg(1, 'daily_housekeeping', 'Refreshing data day counts.');
+    replace into mat_view_data_days
+    select datediff(max(source_date), min(source_date)) as days, region, region_type, hazard, source, warning, language
+    from mat_view_text_count tc
+    group by region, region_type, hazard, source, warning, language;
+    call debug_msg(1, 'daily_housekeeping', 'Refreshed data day counts.');
+    COMMIT;
+
     set @rc = 0;
 
 END;
