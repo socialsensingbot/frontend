@@ -11,7 +11,7 @@ describe('02 Date time: ', function () {
 
     describe('select county and date range', () => {
         console.debug("Tests https://github.com/socialsensingbot/frontend/issues/67");
-        const url = MAP_URL + "?zoom=5&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=exceedance&active_polygon=county&selected=scottish%20borders";
+        const url = MAP_URL + "?zoom=5&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=exceedance&active_polygon=county&selected=scottish%20borders&max_range_time=" + MAX_DATE_MILLIS + "&min_range_time=" + MIN_DATE_MILLIS;
         it('with no tweets', () => {
             cy.visitAndWait(url);
             cy.get(".slider-date-time", {timeout: 20000});

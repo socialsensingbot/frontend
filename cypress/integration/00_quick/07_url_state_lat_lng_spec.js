@@ -5,8 +5,8 @@ describe('07 URL State (lat/lng): ', function () {
 
 
   describe('select lat & lng', () => {
-      const url = MAP_URL + "?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&active_number=exceedance&active_polygon=county&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS;
-      const newUrl = MAP_URL + "?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&active_number=exceedance&active_polygon=county&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&selected=cambridgeshire";
+      const url = MAP_URL + "?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&active_number=exceedance&active_polygon=county&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&max_range_time=" + MAX_DATE_MILLIS + "&min_range_time=" + MIN_DATE_MILLIS;
+      const newUrl = MAP_URL + "?zoom=11&lat=52.3336607715546&lng=0.05321502685546875&active_number=exceedance&active_polygon=county&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&selected=cambridgeshire&max_range_time=" + MAX_DATE_MILLIS + "&min_range_time=" + MIN_DATE_MILLIS;
       it('when unauthorized and load state', () => {
           cy.visit(url);
           cy.login();
@@ -23,7 +23,7 @@ describe('07 URL State (lat/lng): ', function () {
 
 
   describe('select county and date range', () => {
-      const url = MAP_URL + "?max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=exceedance&active_polygon=county&selected=powys";
+      const url = MAP_URL + "?max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=exceedance&active_polygon=county&selected=powys&max_range_time=" + MAX_DATE_MILLIS + "&min_range_time=" + MIN_DATE_MILLIS;
     it('when authorized and load state', () => {
         cy.visit("http://localhost:4200/map");
         cy.login();

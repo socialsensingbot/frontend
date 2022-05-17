@@ -8,7 +8,7 @@ describe('#104 Slider and tweet interaction : https://github.com/socialsensingbo
              });
 
              it('Reproduce Issue', () => {
-                 const url = MAP_URL + "?zoom=5&max_time=" + MAX_DATE_MILLIS + "&min_time=" + (MAX_DATE_MILLIS - ONE_DAY_MILLIS) + "&active_number=exceedance&active_polygon=county&selected=greater%20london";
+                 const url = MAP_URL + "?zoom=5&max_time=" + MAX_DATE_MILLIS + "&min_time=" + (MAX_DATE_MILLIS - ONE_DAY_MILLIS) + "&active_number=exceedance&active_polygon=county&selected=greater%20london&max_range_time=" + MAX_DATE_MILLIS + "&min_range_time=" + MIN_DATE_MILLIS;
                  cy.visitAndWait(url);
                  cy.tweetCountTotal172;
                  cy.log("Set slider to whole 4 days (be great if tweets updated as you did this)");
@@ -16,7 +16,7 @@ describe('#104 Slider and tweet interaction : https://github.com/socialsensingbo
                  cy.moveMinDateSliderLeft(14);
                  cy.wait(10000);
                  cy.url({timeout: 20000}).should("equal",
-                                                 MAP_URL + "?zoom=5&max_time=1631664000000&min_time=1631059200000&active_number=exceedance&active_polygon=county&selected=greater%20london");
+                                                 MAP_URL + "?zoom=5&max_time=1631664000000&min_time=1631059200000&active_number=exceedance&active_polygon=county&selected=greater%20london&max_range_time=" + MAX_DATE_MILLIS + "&min_range_time=" + MIN_DATE_MILLIS);
                  cy.log("Click out of London in any other county (1)");
                  cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-cambridgeshire").click();
                  cy.wait(10000);
@@ -43,7 +43,7 @@ describe('#104 Slider and tweet interaction : https://github.com/socialsensingbo
                  cy.twitterPanelHeader("Greater London");
                  cy.tweetCountTotal(177);
                  cy.url({timeout: 20000}).should("equal",
-                                                 MAP_URL + "?zoom=5&max_time=1631664000000&min_time=1631487600000&active_number=exceedance&active_polygon=county&selected=greater%20london");
+                                                 MAP_URL + "?zoom=5&max_time=1631664000000&min_time=1631487600000&active_number=exceedance&active_polygon=county&selected=greater%20london&max_range_time=" + MAX_DATE_MILLIS + "&min_range_time=" + MIN_DATE_MILLIS);
 
              });
 
