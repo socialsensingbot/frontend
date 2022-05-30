@@ -73,8 +73,8 @@ export class NotificationService implements OnDestroy {
         msg = e.message;
       }
       return this.toast.open(`ERROR: ${msg} (this message will not appear in production)`, "got it", {
-        duration:   30000,
-        politeness: "assertive",
+          duration:   90000,
+          politeness: "assertive",
       });
 
     }
