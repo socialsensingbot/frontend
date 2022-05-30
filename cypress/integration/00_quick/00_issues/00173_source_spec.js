@@ -36,6 +36,7 @@ describe('00173 Source: : https://github.com/socialsensingbot/frontend/issues/17
       cy.get(LONDON_TWEET_MENU, {timeout: 60000}).should('be.visible');
       clickSourceMenu();
       cy.get("body .tweet-list-item-menu-source-clear", {timeout: 30000}).click();
+      cy.wait(10000);
       clickSourceMenu();
       cy.get("body .tweet-list-item-menu-source-level-coastal-not-selected", {timeout: 30000}).click();
       cy.wait(10000);
