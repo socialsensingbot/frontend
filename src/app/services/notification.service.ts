@@ -66,8 +66,8 @@ export class NotificationService implements OnDestroy {
     if (environment.production) {
       log.error(e);
     } else {
-      log.error(e);
-      log.error(e);
+      console.error(e);
+        log.error(e);
       let msg = JSON.stringify(e);
       if (e.hasOwnProperty("message")) {
         msg = e.message;
