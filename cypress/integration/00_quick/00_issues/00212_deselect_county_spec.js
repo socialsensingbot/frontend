@@ -8,7 +8,7 @@ describe('#212 Deselect by clicking on non-region: : https://github.com/socialse
              describe('select county', () => {
                  const url = MAP_URL + "?selected=powys&active_number=exceedance&active_polygon=county&max_time=1631664000000&min_time=1631059200000&max_range_time=" + MAX_DATE_MILLIS + "&min_range_time=" + MIN_DATE_MILLIS;
                  it('when unauthorized and load state', () => {
-                     cy.visit(url);
+                     cy.visitAndWait(url);
                      cy.login();
                      cy.url({timeout: 30000}).should("equal", url);
                      cy.noSpinner();
