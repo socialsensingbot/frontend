@@ -1,4 +1,4 @@
-import {MAP_URL, MAX_DATE_MILLIS} from "../../../support";
+import {MAP_URL, MAX_DATE_MILLIS, MIN_DATE_MILLIS} from "../../../support";
 
 const zoomDuration = 1000;
 describe('#212 Deselect by clicking on non-region: : https://github.com/socialsensingbot/frontend/issues/212',
