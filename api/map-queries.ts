@@ -1149,7 +1149,7 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
             //           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',
             if (typeof textSearch !== "undefined" && textSearch.length > 0) {
                 fullText = " AND MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
-                let additionalQuery = "(";
+                let additionalQuery = "+(";
                 for (const source of sources) {
                     for (const hazard of hazards) {
                         for (const region of regions) {
@@ -1203,7 +1203,7 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
                                                                                                                lang,
                                                                                                                location, from,
                                                                                                                to];
-                console.log("Values, values");
+                console.log("Values:",values);
                 return await db.sql({
                                         // language=MySQL
                                         sql: `select *
