@@ -52,6 +52,7 @@ afterEach(() => {
             win.gc();
             win.gc();
         }
+        cy.get('@consoleError').should('not.be.called')
     });
 });
 
@@ -65,3 +66,5 @@ Cypress.on('uncaught:exception', (err, runnable, promise) => {
     }
     return false;
 })
+
+require('cypress-terminal-report/src/installLogsCollector')();

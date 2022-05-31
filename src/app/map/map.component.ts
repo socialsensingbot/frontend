@@ -667,7 +667,7 @@ export class MapComponent implements OnInit, OnDestroy {
             this.activity = true;
             await this.resetStatisticsLayer(layer, clearSelected, approximateFirst);
             this.activity = false;
-        }, layer, false, false, true);
+        }, layer, true, false, true);
     }
 
     /**
