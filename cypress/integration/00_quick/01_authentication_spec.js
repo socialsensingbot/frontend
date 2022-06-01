@@ -5,7 +5,7 @@ describe('01 Authentication:', function () {
       //Login
       cy.visitAndErrorCheck('http://localhost:4200/map');
         cy.login();
-      cy.url().should("include", 'http://localhost:4200/map');
+        cy.url().should("include", 'http://localhost:4200/map');
       //Logout
       cy.logout();
       cy.wait(4000);
