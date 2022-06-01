@@ -74,7 +74,7 @@ Cypress.Commands.add("logout", () => {
 Cypress.Commands.add("visitAndWait", (url) => {
     cy.visit(url, {
         onBeforeLoad(win) {
-            cy.spy(win.console, 'info').as('consoleLog')
+            // cy.spy(win.console, 'info').as('consoleLog')
             cy.spy(win.console, 'error').as('consoleError')
             cy.spy(win.console, 'warn').as('consoleWarn')
         }
