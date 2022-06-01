@@ -24,7 +24,7 @@ describe('11 Analytics: ', function () {
 
 
         it('Export from Analytics', () => {
-            cy.visit(analyticsUrl);
+            cy.visitAndWait(analyticsUrl);
             cy.login();
             cy.url({timeout: 30000}).should("equal", analyticsUrl);
             cy.get("#loading-div", {timeout: 60000}).should("not.exist");

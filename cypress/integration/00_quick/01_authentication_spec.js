@@ -1,7 +1,7 @@
 describe('01 Authentication:', function () {
   // Step 1: setup the application state
   beforeEach(function () {
-    cy.visit('http://localhost:4200/map');
+    cy.visitAndWait('http://localhost:4200/map');
   });
 
   describe('Sign In:', () => {

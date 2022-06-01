@@ -3,7 +3,7 @@ import {MAP_URL, MAX_DATE_MILLIS, MIN_DATE_MILLIS, TS_SELECTED_MIN_DATE, TS_SELE
 describe('02 Date time: ', function () {
     // Step 1: setup the application state
     beforeEach(function () {
-        cy.visit('http://localhost:4200/map/uk-flood-test');
+        cy.visitAndWait('http://localhost:4200/map/uk-flood-test');
         cy.login();
     });
 

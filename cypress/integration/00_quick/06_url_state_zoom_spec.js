@@ -9,7 +9,7 @@ describe('06 URL State (zoom): ', function () {
         const urlZoom7 = url + "&zoom=7";
         const urlZoom8 = url + "&zoom=8";
         it('default zoom', () => {
-            cy.visit(url);
+            cy.visitAndWait(url);
             cy.login();
             cy.url({timeout: 30000}).should("equal", url);
             cy.noSpinner();
@@ -27,7 +27,7 @@ describe('06 URL State (zoom): ', function () {
         });
 
         it('when unauthorized and load state', () => {
-            cy.visit(urlZoom7);
+            cy.visitAndWait(urlZoom7);
             cy.login();
             cy.url().should("equal", urlZoom7);
             cy.noSpinner();
