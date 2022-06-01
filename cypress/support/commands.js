@@ -84,6 +84,17 @@ Cypress.Commands.add("visitAndWait", (url) => {
 });
 
 
+Cypress.Commands.add("visitAndErrorCheck", (url) => {
+    cy.visit(url, {
+        onBeforeLoad(win) {
+            // cy.spy(win.console, 'info').as('consoleLog')
+            cy.spy(win.console, 'error').as('consoleError')
+            cy.spy(win.console, 'warn').as('consoleWarn')
+        }
+    });
+});
+
+
 Cypress.Commands.add("noSpinner", () => {
     cy.get('.map');
     noLoadingDiv();
