@@ -6,7 +6,7 @@ describe('05 URL State (polygon): ', function () {
   describe('select polygon type and count stats', () => {
     const url = MAP_URL + "?active_polygon=coarse&selected=168&active_number=count";
     it('when unauthorized and load state', () => {
-        cy.visitAndWait(url);
+        cy.visitAndErrorCheck(url);
         cy.login();
         cy.url({timeout: 30000}).should("equal", url);
         cy.noSpinner();
@@ -18,7 +18,7 @@ describe('05 URL State (polygon): ', function () {
         cy.logout();
     });
     it('when authorized and load state', () => {
-        cy.visitAndWait(url);
+        cy.visitAndErrorCheck(url);
         cy.login();
       cy.visitAndWait(url);
         cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 60000});

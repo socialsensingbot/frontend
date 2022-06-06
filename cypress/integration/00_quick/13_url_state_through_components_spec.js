@@ -22,7 +22,7 @@ describe('11 Analytics: ', function () {
 
         it('Import from Map Stats', () => {
             let url = MAP_URL + "?active_number=exceedance&active_polygon=county&selected=greater%20london";
-            cy.visit(url);
+            cy.visitAndErrorCheck(url);
             cy.login();
             cy.visitAndWait(url);
             cy.twitterPanelHeader("Greater London");

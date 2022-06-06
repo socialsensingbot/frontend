@@ -6,7 +6,7 @@ describe('08 URL State (county): ', function () {
   describe('select county', () => {
     const url = MAP_URL + "?selected=powys";
     it('when unauthorized and load state', () => {
-      cy.visitAndWait(url);
+      cy.visitAndErrorCheck(url);
         cy.login();
       cy.url({timeout: 30000}).should("equal", url);
       cy.noSpinner();
