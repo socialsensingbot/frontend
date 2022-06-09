@@ -269,9 +269,9 @@ BEGIN
            t.language
     FROM live_text t,
          ref_geo_regions gr
-    WHERE ST_Intersects(boundary, location)
-      AND NOT gr.disabled
-      AND t.source_timestamp BETWEEN start_date and end_date;
+    WHERE t.source_timestamp BETWEEN start_date and end_date
+        AND ST_Intersects(boundary, location)
+      AND NOT gr.disabled;
     COMMIT;
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with boundary matches.');
 
