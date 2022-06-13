@@ -129,12 +129,14 @@ BEGIN
             GET DIAGNOSTICS CONDITION 1
                 @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
             ROLLBACK;
+            ALTER EVENT mv_refresh_event enable;
             set @rc = @p1;
             call debug_msg(-2, 'refresh_mv_full', concat('FAILED: ', @p1, ': ', @p2));
         END;
 
     call debug_msg(0, 'refresh_mv_full', 'Refreshing (Full) Materialized Views');
 
+    ALTER EVENT mv_refresh_event disable;
     START TRANSACTION;
     call debug_msg(1, 'refresh_mv_full', 'Refreshing map criteria.');
     # noinspection SqlWithoutWhere
@@ -193,6 +195,9 @@ BEGIN
     call debug_msg(1, 'refresh_mv_full', 'Refreshed data day counts.');
     COMMIT;
 
+    ALTER EVENT mv_refresh_event enable;
+
+    COMMIT;
     SET rc = 0;
 END;
 $$
@@ -270,12 +275,17 @@ BEGIN
     FROM live_text t,
          ref_geo_regions gr
     WHERE t.source_timestamp BETWEEN start_date and end_date
-        AND ST_Intersects(boundary, location)
+      AND (select count(*)
+           from live_text_regions tr
+           WHERE t.source_id = tr.source_id
+             AND t.source = tr.source
+             AND t.hazard = tr.hazard) = 0
+      AND ST_Intersects(boundary, location)
       AND NOT gr.disabled;
     COMMIT;
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with boundary matches.');
 
-#     START TRANSACTION;
+    #     START TRANSACTION;
 #     REPLACE INTO mat_view_regions
 #     SELECT t.source_id,
 #            t.source,
