@@ -1146,20 +1146,20 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
             let fullText = "";
             let textSearch: string = req.body.textSearch;
             //           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',
-            if (typeof textSearch !== "undefined" && textSearch.length > 0) {
-                fullText = " AND MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
-                let additionalQuery = "+(";
-                for (const source of sources) {
-                    for (const hazard of hazards) {
-                        for (const region of regions) {
-                            additionalQuery += md5(source + ":" + hazard + ":" + region) + " ";
-                        }
-                    }
-                }
-                additionalQuery += ") ";
-                textSearch = additionalQuery + "+(" + textSearch + ")";
-                console.log("Amended text search is '" + textSearch + "'");
-            }
+            // if (typeof textSearch !== "undefined" && textSearch.length > 0) {
+            //     fullText = " AND MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
+            //     let additionalQuery = "+(";
+            //     for (const source of sources) {
+            //         for (const hazard of hazards) {
+            //             for (const region of regions) {
+            //                 additionalQuery += md5(source + ":" + hazard + ":" + region) + " ";
+            //             }
+            //         }
+            //     }
+            //     additionalQuery += ") ";
+            //     textSearch = additionalQuery + "+(" + textSearch + ")";
+            //     console.log("Amended text search is '" + textSearch + "'");
+            // }
             const dayTimePeriod: boolean = req.body.timePeriod === "day";
             const timeSeriesTable = dayTimePeriod ? "mat_view_timeseries_date" : "mat_view_timeseries_hour";
             const dateTable = dayTimePeriod ? "mat_view_days" : "mat_view_hours";
