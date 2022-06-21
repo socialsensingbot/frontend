@@ -155,6 +155,8 @@ BEGIN
     COMMIT;
 
 
+    call debug_msg(1, 'refresh_mv_full',
+                   'Truncating tables mat_view_regions, mat_view_timeseries_date, mat_view_timeseries_hour');
     delete from mat_view_regions;
     delete from mat_view_timeseries_date;
     delete from mat_view_timeseries_hour;
