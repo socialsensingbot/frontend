@@ -31,7 +31,7 @@ describe('#422 CSV Download Tests : https://github.com/socialsensingbot/frontend
                  cy.multiSelectRegions(["cambridgeshire", "hertfordshire"]);
                  cy.twitterPanelHeader("3 regions selected");
                  cy.wait(10000);
-                 cy.tweetCountTotal(396);
+                 cy.tweetCountTotal(387);
 
                  cy.get(".app-tweet-export-btn").click();
                  cy.wait(4000);

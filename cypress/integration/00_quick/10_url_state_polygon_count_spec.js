@@ -13,7 +13,7 @@ describe('05 URL State (polygon): ', function () {
         cy.wait(4000);
         cy.get(".leaflet-overlay-pane svg g path[stroke-width=3]", {timeout: 60000}).should("have.attr", "fill").should(
             "eq",
-            "#2B8CBE");
+            "#045A8D");
         cy.twitterPanelHeader("168");
         cy.logout();
     });

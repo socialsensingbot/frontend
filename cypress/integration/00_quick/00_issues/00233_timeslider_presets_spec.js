@@ -18,7 +18,7 @@ describe('#233 Timeslide presets: : https://github.com/socialsensingbot/frontend
             cy.get(".slider-date-time-min .slider-time").should("contain.text", "00 am");
             cy.get(".app-tweet-drawer", {timeout: 60000}).should("be.visible");
             cy.wait(4000);
-            cy.get('#mat-tab-label-1-0 > .mat-tab-label-content').should("have.text", "353 Tweets");
+            cy.get('#mat-tab-label-1-0 > .mat-tab-label-content').should("have.text", "351 Tweets");
             cy.url().should("equal", url);
             cy.get('.app-map-timer-preset-select').click();
             cy.get('#mat-option-4 > .mat-option-text').click();
@@ -39,7 +39,7 @@ describe('#233 Timeslide presets: : https://github.com/socialsensingbot/frontend
             cy.get(".app-tweet-drawer", {timeout: 60000}).should("be.visible");
             cy.url().should("equal",
                             MAP_URL + "?zoom=5&max_time=1631664000000&min_time=1631577600000&active_number=exceedance&active_polygon=county&selected=greater%20london&max_range_time=" + MAX_DATE_MILLIS + "&min_range_time=" + MIN_DATE_MILLIS);
-            cy.get('#mat-tab-label-1-0').should("have.text", "353 Tweets");
+            cy.get('#mat-tab-label-1-0').should("have.text", "351 Tweets");
             cy.logout();
         });
     });
