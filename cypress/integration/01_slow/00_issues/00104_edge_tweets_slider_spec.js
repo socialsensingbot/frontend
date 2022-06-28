@@ -1,4 +1,4 @@
-import {MAP_URL, MAX_DATE_MILLIS, ONE_DAY_MILLIS} from "../../../support";
+import {MAP_URL, MAX_DATE_MILLIS, MIN_DATE_MILLIS, ONE_DAY_MILLIS} from "../../../support";
 
 describe('#104 Slider and tweet interaction : https://github.com/socialsensingbot/frontend/issues/104',
          function () {
