@@ -3,48 +3,6 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="/cypress/downloads/multiple-regions-flood-tweet-export-2022_06_13@06.02.24.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/multiple-regions-flood-tweet-export-2022_06_13@06.06.29.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/multiple-regions-flood-tweet-export-2022_06_13@06.10.20.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/multiple-regions-flood-tweet-export-2022_06_13@06.12.00.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/multiple-regions-flood-tweet-export-2022_06_13@06.18.50.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/multiple-regions-flood-tweet-export-2022_06_13@06.31.13.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
         <entry key="/ref_data/region-groupings.csv">
           <value>
             <Attribute>

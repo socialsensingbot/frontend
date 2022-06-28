@@ -154,12 +154,17 @@ BEGIN
     call debug_msg(1, 'refresh_mv_full', 'Refreshed map criteria.');
     COMMIT;
 
+    START TRANSACTION;
+
+    call debug_msg(1, 'refresh_mv_full', 'Refreshing first entries.');
+
 
     call debug_msg(1, 'refresh_mv_full',
                    'Truncating tables mat_view_regions, mat_view_timeseries_date, mat_view_timeseries_hour');
-    delete from mat_view_regions;
-    delete from mat_view_timeseries_date;
-    delete from mat_view_timeseries_hour;
+
+    TRUNCATE mat_view_regions;
+    TRUNCATE mat_view_timeseries_date;
+    TRUNCATE mat_view_timeseries_hour;
 
     WHILE dt <= NOW()
         DO
@@ -181,9 +186,6 @@ BEGIN
             SET counter = counter + 1;
         END WHILE;
 
-    START TRANSACTION;
-
-    call debug_msg(1, 'refresh_mv_full', 'Refreshing first entries.');
 
     REPLACE INTO mat_view_first_entries
     SELECT min(source_timestamp) as source_timestamp, hazard, source
@@ -200,6 +202,7 @@ BEGIN
     group by region, region_type, hazard, source, warning;
     call debug_msg(1, 'refresh_mv_full', 'Refreshed data day counts.');
     COMMIT;
+
 
     ALTER EVENT mv_refresh_event enable;
 
@@ -607,6 +610,9 @@ CREATE EVENT daily_housekeeping_event_6
 DROP EVENT IF EXISTS mv_full_refresh_event;
 DROP EVENT IF EXISTS mv_map_window_refresh_event;
 DROP EVENT IF EXISTS mv_latest_refresh_event;
+DROP EVENT IF EXISTS mv_full_refresh;
+DROP EVENT IF EXISTS mv_map_window_refresh;
+DROP EVENT IF EXISTS mv_latest_refresh;
 
 DROP EVENT IF EXISTS mv_refresh_event;
 
