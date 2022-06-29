@@ -163,6 +163,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                                                   }
                                                                               }
                                                                               if (this.updateCurrentChartExtent) {
+                                                                                  this.updateCurrentChartExtent = false;
                                                                                   if (this.currentWindowMin && this.currentWindowMax) {
                                                                                       await this.getData(
                                                                                           this.currentWindowMin,
@@ -392,10 +393,10 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
             endDateRounded.setMilliseconds(0);
             const payload = {
                     ...layer,
-                    regions:   this.regions,
+                    regions: this.regions,
                     timePeriod,
-                    startDate: startDateRounded.getTime(),
-                    endDate:   endDateRounded.getTime()
+                    startDate:   startDateRounded.getTime(),
+                    endDate:     endDateRounded.getTime()
 
                 }
             ;
@@ -404,9 +405,10 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
             }
 
 
-            return await this._api.callMapAPIWithCacheAndDatePaging(this.map + "/timeslider", payload, false, (i) => i,
-                                                                    24 * 60 * 60,
-                                                                    timePeriod === "day" ? 30 * 24 : 30 * 24);
+            const data = await this._api.callMapAPIWithCacheAndDatePaging(this.map + "/timeslider", payload, false, (i) => i,
+                                                                          24 * 60 * 60,
+                                                                          timePeriod === "day" ? 30 * 24 : 30 * 24);
+            return data;
 
         } catch (e) {
             log.error(e);

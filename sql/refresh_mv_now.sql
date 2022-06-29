@@ -99,6 +99,15 @@ BEGIN
             call debug_msg(-2, 'refresh_mv_map_window', concat('FAILED: ', @p1, ': ', @p2));
         END;
     call debug_msg(0, 'refresh_mv_map_window', 'Refreshing (Window Duration) Materialized Views');
+    call debug_msg(1, 'refresh_mv_map_window',
+                   'Deleting data for mat_view_timeseries_date and mat_view_timeseries_hour from more than 2 years ago.');
+    START TRANSACTION;
+    # This is deleted to stop the analytics queries taking too long. With a better algorithm, query or optimizisation
+    # this can be removed. Until then this is to prevent excessively long analytics queries, especially in regards
+    # to text search.
+    DELETE FROM mat_view_timeseries_date WHERE source_date < NOW() - INTERVAL 2 YEAR;
+    DELETE FROM mat_view_timeseries_hour WHERE source_date < NOW() - INTERVAL 2 YEAR;
+    COMMIT;
     call refresh_mv(DATE_SUB(CURDATE(), INTERVAL 7 DAY), DATE_ADD(CURDATE(), INTERVAL 1 DAY), @rc);
     call fill_days(DATE_SUB(CURDATE(), INTERVAL 7 DAY), DATE_ADD(CURDATE(), INTERVAL 1 DAY));
     call fill_hours(DATE_SUB(CURDATE(), INTERVAL 7 DAY), DATE_ADD(CURDATE(), INTERVAL 1 DAY));
@@ -373,8 +382,8 @@ BEGIN
     START TRANSACTION;
     call debug_msg(1, 'refresh_mv', 'Updating mat_view_timeseries_hour');
 
-#     SET @maxTimestampTSH = IFNULL((select max(source_date) from mat_view_timeseries_hour), NOW() - INTERVAL 20 YEAR);
-    DELETE FROM mat_view_timeseries_hour WHERE source_date BETWEEN start_date and end_date;
+    #     SET @maxTimestampTSH = IFNULL((select max(source_date) from mat_view_timeseries_hour), NOW() - INTERVAL 20 YEAR);
+#     DELETE FROM mat_view_timeseries_hour WHERE source_date BETWEEN start_date and end_date;
     REPLACE INTO mat_view_timeseries_hour
     SELECT r.region                                                         as region_group_name,
            t.source                                                         as source,

@@ -184,6 +184,7 @@ export class RESTDataAPIService {
             }
         } catch (e) {
             log.error(e);
+            throw e;
         }
     }
 
@@ -242,8 +243,7 @@ export class RESTDataAPIService {
             log.info(e);
             if (retry) {
                 log.error(e);
-                this._notify.show("No response from the server, maybe a network problem or a slow query.",
-                                  "Retrying ...", retryPeriod);
+                this._loading.showIndeterminateSpinner();
                 return new Promise<any>((resolve, reject) => {
                     setTimeout(async () => {
                         API.post("query", fullPath, {
@@ -260,10 +260,14 @@ export class RESTDataAPIService {
                             if (cacheForSeconds > 0) {
                                 this.cache.setCached(key, data, cacheInMillis);
                             }
+                            this._loading.hideIndeterminateSpinner();
                             resolve(data);
                         }))
                            .catch(e2 => {
-                               this._notify.show("Error running" + " query, please check your network connection");
+                               this._notify.show(
+                                   "Sorry, we're having difficulties could you please refresh the page, if that doesn't work please try again in a few minutes. Apologies for the inconvenience.");
+                               this._loading.hideIndeterminateSpinner();
+
                                reject(e2);
                            });
                     }, retryPeriod);

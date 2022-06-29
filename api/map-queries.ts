@@ -1145,21 +1145,21 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
         await db.cache(res, key, async () => {
             let fullText = "";
             let textSearch: string = req.body.textSearch;
-            //           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',
-            // if (typeof textSearch !== "undefined" && textSearch.length > 0) {
-            //     fullText = " AND MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
-            //     let additionalQuery = "+(";
-            //     for (const source of sources) {
-            //         for (const hazard of hazards) {
-            //             for (const region of regions) {
-            //                 additionalQuery += md5(source + ":" + hazard + ":" + region) + " ";
-            //             }
-            //         }
-            //     }
-            //     additionalQuery += ") ";
-            //     textSearch = additionalQuery + "+(" + textSearch + ")";
-            //     console.log("Amended text search is '" + textSearch + "'");
-            // }
+
+            if (typeof textSearch !== "undefined" && textSearch.length > 0) {
+                fullText = " AND MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE)";
+                // let additionalQuery = "+(";
+                // for (const source of sources) {
+                //     for (const hazard of hazards) {
+                //         for (const region of regions) {
+                //             additionalQuery += md5(source + ":" + hazard + ":" + region) + " ";
+                //         }
+                //     }
+                // }
+                // additionalQuery += ") ";
+                // textSearch = additionalQuery + "+(" + textSearch + ")";
+                console.log("Amended text search is '" + textSearch + "'");
+            }
             const dayTimePeriod: boolean = req.body.timePeriod === "day";
             const timeSeriesTable = dayTimePeriod ? "mat_view_timeseries_date" : "mat_view_timeseries_hour";
             const dateTable = dayTimePeriod ? "mat_view_days" : "mat_view_hours";
@@ -1168,6 +1168,12 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
             if (!regions || regions.length === 0) {
                 const values = fullText ? [hazards, sources, lang, location, textSearch, from, to] : [hazards, sources,
                                                                                                       lang, location, from, to];
+
+                // Important note: The limit of now() - interval 2 year on the join with date table is to coincide with
+                // the limit placed on historical data due to performance issues. If the restriction is removed for
+                // the mat_view_timeseries_date and mat_view_timeseries_hour tables in refresh_mv_now.sql then
+                // it must also be removed here.
+
                 return await db.sql({
                                         // language=MySQL
                                         sql: `select *
@@ -1186,7 +1192,8 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
                                                           group by date
                                                           order by date) lhs
                                                              RIGHT OUTER JOIN (select date, 0 as count
-                                                                               from ${dateTable}) rhs
+                                                                               from ${dateTable}
+                                                                               where date > now() - interval 2 year) rhs
                                                                               ON lhs.date = rhs.date
                                                         WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)
                                                     order by date) x
@@ -1219,9 +1226,10 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
                                                             AND tsd.source IN (?)
                                                             AND tsd.language LIKE ?
                                                             AND tsd.map_location = ? ${fullText}
+
                                                           group by date, region
                                                           order by date) lhs
-                                                             RIGHT OUTER JOIN (select date, 0 as count from ${dateTable}) rhs
+                                                             RIGHT OUTER JOIN (select date, 0 as count from ${dateTable} where date > now() - interval 2 year) rhs
                                                                               ON lhs.date = rhs.date
                                                         WINDOW w AS (ORDER BY IFNULL(lhs.count, rhs.count) desc)) x
                                               where date between ? AND ?

@@ -681,8 +681,9 @@ describe("POST /v1/map/:map/analytics/time", () => {
             .post("/v1/map/uk-flood-test/analytics/time")
             .set("Accept", "application/json")
             .send(textSearch);
+        console.log(response.body);
         expect(response.status).equals(200);
-        expect(response.body.length).equals(19);
+        expect(response.body.length).equals(16);
     });
     it("invalid text search 1", async () => {
         const response = await request(app)

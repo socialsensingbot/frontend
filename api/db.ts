@@ -29,7 +29,7 @@ export class SSDatabase {
                                                            // connectTimeout: 15000,
                                                            // acquireTimeout: 10000,
                                                            waitForConnections: true,
-                                                           queueLimit:         5000,
+                                                           queueLimit:         50,
                                                            debug:              false
                                                        });
                     resolve();
@@ -65,7 +65,7 @@ export class SSDatabase {
                                                            // connectTimeout: 15000,
                                                            // acquireTimeout: 10000,
                                                            waitForConnections: true,
-                                                           queueLimit:         5000,
+                                                           queueLimit:         50,
                                                            debug:              false
                                                        });
                 }));

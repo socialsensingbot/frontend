@@ -1,4 +1,6 @@
 <div class="historical-date-range-slider-surround">
-    <div #historicalScrollbar [style.height]="'92px'" id="hdrs-historical-scrollbar" style="width: 100%"></div>
-    <div #currentScrollbar [style.height]="'92px'" id="hdrs-current-scrollbar" style="width: 100%"></div>
+    <div #historicalScrollbar [style.height]="'92px'" [style.visibility]="ready ? 'visible': 'hidden'"
+         id="hdrs-historical-scrollbar" style="width: 100%"></div>
+    <div #currentScrollbar [style.height]="'92px'" [style.visibility]="ready ? 'visible': 'hidden'"
+         id="hdrs-current-scrollbar" style="width: 100%"></div>
 </div>
