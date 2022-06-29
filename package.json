@@ -81,6 +81,7 @@
     "cypress": "^9.2.0",
     "cypress-intellij-reporter": "0.0.6",
     "cypress-plugin-snapshots": "1.4.4",
+    "cypress-terminal-report": "^3.5.2",
     "glob-promise": "^4.2.2",
     "ini": "^2.0.0",
     "inquirer": "^7.3.3",

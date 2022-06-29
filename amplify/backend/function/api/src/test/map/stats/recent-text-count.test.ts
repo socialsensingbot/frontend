@@ -3,7 +3,20 @@ import {expect} from "chai";
 import {diffStrings, MAX_DATE_MILLIS, MIN_DATE_MILLIS, sortedStringify} from "../../constants";
 import * as app from "../../../app";
 
-const expectedResult = {"greater london": 1, "west yorkshire": 1};
+const expectedResult = {
+        "buckinghamshire": 2,
+        "essex":           2,
+        "greater london":  2,
+        "hertfordshire":   2,
+        "kent":            2,
+        "lancashire":      1,
+        "north yorkshire": 1,
+        "slough":          2,
+        "surrey":          2,
+        "thurrock":        2,
+        "west yorkshire":  1
+    }
+;
 
 
 const reqBody = {

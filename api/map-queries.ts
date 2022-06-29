@@ -1014,17 +1014,16 @@ export const timesliderFunc: (req, res) => Promise<void> = async (req, res) => {
         const sources: string[] = req.body.sources || req.body.layer.sources;
         return await db.sql({
                                 // language=MySQL
-                                sql: `select IFNULL(lhs.count, rhs.count) as count, IFNULL(lhs.date, rhs.date) as date
-                                      from (SELECT count(*)        as count,
-                                                   tsd.source_date as date
-                                            FROM ${timeSeriesTable} tsd
-                                            WHERE tsd.hazard IN (?)
-                                              AND tsd.source IN (?)
-                                              AND tsd.language LIKE ?
-                                              AND tsd.map_location = ?
-                                              and tsd.source_date between ? and ?
-
-                                            group by date
+                                sql:    `select IFNULL(lhs.count, rhs.count) as count, IFNULL(lhs.date, rhs.date) as date
+                                         from (SELECT count(*)        as count,
+                                                      tsd.source_date as date
+                                               FROM ${timeSeriesTable} tsd
+                                               WHERE tsd.source_date between ? and ?
+                                                 AND tsd.hazard IN (?)
+                                                 AND tsd.language LIKE ?
+                                                 AND tsd.map_location = ?
+                                                 AND tsd.source IN (?)
+                                               group by date
                                                order by date) lhs
                                                   RIGHT OUTER JOIN (select date, 0 as count
                                                                     from ${dateTable}
@@ -1147,20 +1146,20 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
             let fullText = "";
             let textSearch: string = req.body.textSearch;
             //           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',
-            if (typeof textSearch !== "undefined" && textSearch.length > 0) {
-                fullText = " AND MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
-                let additionalQuery = "(";
-                for (const source of sources) {
-                    for (const hazard of hazards) {
-                        for (const region of regions) {
-                            additionalQuery += md5(source + ":" + hazard + ":" + region) + " ";
-                        }
-                    }
-                }
-                additionalQuery += ") ";
-                textSearch = additionalQuery + "+(" + textSearch + ")";
-                console.log("Amended text search is '" + textSearch + "'");
-            }
+            // if (typeof textSearch !== "undefined" && textSearch.length > 0) {
+            //     fullText = " AND MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE) ";
+            //     let additionalQuery = "+(";
+            //     for (const source of sources) {
+            //         for (const hazard of hazards) {
+            //             for (const region of regions) {
+            //                 additionalQuery += md5(source + ":" + hazard + ":" + region) + " ";
+            //             }
+            //         }
+            //     }
+            //     additionalQuery += ") ";
+            //     textSearch = additionalQuery + "+(" + textSearch + ")";
+            //     console.log("Amended text search is '" + textSearch + "'");
+            // }
             const dayTimePeriod: boolean = req.body.timePeriod === "day";
             const timeSeriesTable = dayTimePeriod ? "mat_view_timeseries_date" : "mat_view_timeseries_hour";
             const dateTable = dayTimePeriod ? "mat_view_days" : "mat_view_hours";
@@ -1203,7 +1202,7 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
                                                                                                                lang,
                                                                                                                location, from,
                                                                                                                to];
-                console.log("Values, values");
+                console.log("Values:", values);
                 return await db.sql({
                                         // language=MySQL
                                         sql: `select *

@@ -129,12 +129,14 @@ BEGIN
             GET DIAGNOSTICS CONDITION 1
                 @p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
             ROLLBACK;
+            ALTER EVENT mv_refresh_event enable;
             set @rc = @p1;
             call debug_msg(-2, 'refresh_mv_full', concat('FAILED: ', @p1, ': ', @p2));
         END;
 
     call debug_msg(0, 'refresh_mv_full', 'Refreshing (Full) Materialized Views');
 
+    ALTER EVENT mv_refresh_event disable;
     START TRANSACTION;
     call debug_msg(1, 'refresh_mv_full', 'Refreshing map criteria.');
     # noinspection SqlWithoutWhere
@@ -152,6 +154,17 @@ BEGIN
     call debug_msg(1, 'refresh_mv_full', 'Refreshed map criteria.');
     COMMIT;
 
+    START TRANSACTION;
+
+    call debug_msg(1, 'refresh_mv_full', 'Refreshing first entries.');
+
+
+    call debug_msg(1, 'refresh_mv_full',
+                   'Truncating tables mat_view_regions, mat_view_timeseries_date, mat_view_timeseries_hour');
+
+    TRUNCATE mat_view_regions;
+    TRUNCATE mat_view_timeseries_date;
+    TRUNCATE mat_view_timeseries_hour;
 
     WHILE dt <= NOW()
         DO
@@ -173,9 +186,6 @@ BEGIN
             SET counter = counter + 1;
         END WHILE;
 
-    START TRANSACTION;
-
-    call debug_msg(1, 'refresh_mv_full', 'Refreshing first entries.');
 
     REPLACE INTO mat_view_first_entries
     SELECT min(source_timestamp) as source_timestamp, hazard, source
@@ -193,6 +203,10 @@ BEGIN
     call debug_msg(1, 'refresh_mv_full', 'Refreshed data day counts.');
     COMMIT;
 
+
+    ALTER EVENT mv_refresh_event enable;
+
+    COMMIT;
     SET rc = 0;
 END;
 $$
@@ -269,13 +283,18 @@ BEGIN
            t.language
     FROM live_text t,
          ref_geo_regions gr
-    WHERE ST_Intersects(boundary, location)
-      AND NOT gr.disabled
-      AND t.source_timestamp BETWEEN start_date and end_date;
+    WHERE t.source_timestamp BETWEEN start_date and end_date
+      AND (select count(*)
+           from live_text_regions tr
+           WHERE t.source_id = tr.source_id
+             AND t.source = tr.source
+             AND t.hazard = tr.hazard) = 0
+      AND ST_Intersects(boundary, location)
+      AND NOT gr.disabled;
     COMMIT;
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with boundary matches.');
 
-#     START TRANSACTION;
+    #     START TRANSACTION;
 #     REPLACE INTO mat_view_regions
 #     SELECT t.source_id,
 #            t.source,
@@ -334,8 +353,8 @@ BEGIN
            t.hazard                 as hazard,
            t.warning                as warning,
            t.source_date            as source_date,
-           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',
-                  t.source_text)    as source_text,
+
+           t.source_text            as source_text,
            r.region_type            as region_type,
            IFNULL(t.deleted, false) as deleted,
            t.source_id              as source_id,
@@ -362,8 +381,8 @@ BEGIN
            t.hazard                                                         as hazard,
            t.warning                                                        as warning,
            cast(date_format(t.source_timestamp, '%Y-%m-%d %H') as DATETIME) as source_date,
-           concat(md5(concat(r.source, ':', r.hazard, ':', r.region)), ' ',
-                  t.source_text)                                            as source_text,
+
+           t.source_text                                                    as source_text,
            r.region_type                                                    as region_type,
            IFNULL(t.deleted, false)                                         as deleted,
            t.source_id                                                      as source_id,
@@ -515,21 +534,29 @@ BEGIN
     call debug_msg(0, 'daily_housekeeping', 'Optimizing tables');
     IF opt = 1 THEN
         optimize table live_text;
+        call debug_msg(1, 'daily_housekeeping', 'Optimized live_text.');
     ELSEIF opt = 2
     THEN
         optimize table mat_view_regions;
+        call debug_msg(1, 'daily_housekeeping', 'Optimized mat_view_regions.');
     ELSEIF opt = 3
     THEN
         optimize table mat_view_timeseries_date;
+        call debug_msg(1, 'daily_housekeeping', 'Optimized mat_view_timeseries_date.');
     ELSEIF opt = 4
     THEN
         optimize table mat_view_timeseries_hour;
+        call debug_msg(1, 'daily_housekeeping', 'Optimized mat_view_timeseries_hour.');
     ELSEIF opt = 5
     THEN
         optimize table mat_view_first_entries;
+        call debug_msg(1, 'daily_housekeeping', 'Optimized mat_view_first_entries.');
+
     ELSEIF opt = 6
     THEN
         optimize table mat_view_text_count;
+        call debug_msg(1, 'daily_housekeeping', 'Optimized mat_view_text_count.');
+
     END IF;
     call debug_msg(0, 'daily_housekeeping', 'Optimized tables');
 
@@ -583,6 +610,9 @@ CREATE EVENT daily_housekeeping_event_6
 DROP EVENT IF EXISTS mv_full_refresh_event;
 DROP EVENT IF EXISTS mv_map_window_refresh_event;
 DROP EVENT IF EXISTS mv_latest_refresh_event;
+DROP EVENT IF EXISTS mv_full_refresh;
+DROP EVENT IF EXISTS mv_map_window_refresh;
+DROP EVENT IF EXISTS mv_latest_refresh;
 
 DROP EVENT IF EXISTS mv_refresh_event;
 

@@ -72,9 +72,26 @@ Cypress.Commands.add("logout", () => {
 });
 
 Cypress.Commands.add("visitAndWait", (url) => {
-    cy.visit(url);
+    cy.visit(url, {
+        onBeforeLoad(win) {
+            // cy.spy(win.console, 'info').as('consoleLog')
+            cy.spy(win.console, 'error').as('consoleError')
+            cy.spy(win.console, 'warn').as('consoleWarn')
+        }
+    });
     cy.url({timeout: 20000}).should("equal", url);
     cy.noSpinner();
+});
+
+
+Cypress.Commands.add("visitAndErrorCheck", (url) => {
+    cy.visit(url, {
+        onBeforeLoad(win) {
+            // cy.spy(win.console, 'info').as('consoleLog')
+            cy.spy(win.console, 'error').as('consoleError')
+            cy.spy(win.console, 'warn').as('consoleWarn')
+        }
+    });
 });
 
 

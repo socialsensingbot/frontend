@@ -22,7 +22,7 @@ describe('11 Analytics: ', function () {
     describe("Test Timeseries Graph", () => {
         const url = ANALYTICS_URL + "/time"
         it('Graph Options', () => {
-            cy.visit(url);
+            cy.visitAndErrorCheck(url);
             cy.login();
             cy.url({timeout: 30000}).should("equal", url);
             cy.get("#loading-div", {timeout: 60000}).should("not.exist");
@@ -56,7 +56,7 @@ describe('11 Analytics: ', function () {
         });
 
         it('Search Criteria & Save', () => {
-            cy.visit(url);
+            cy.visitAndErrorCheck(url);
             cy.login();
             cy.url({timeout: 30000}).should("equal", url);
             cy.get("#loading-div", {timeout: 60000}).should("not.exist");

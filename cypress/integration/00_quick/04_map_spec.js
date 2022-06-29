@@ -3,8 +3,7 @@ import {MAP_URL} from "../../support";
 describe('04: Map: ', function () {
     // Step 1: setup the application state
     beforeEach(function () {
-        cy.visit(MAP_URL);
-        cy.stubLiveJson("live-old");
+        cy.visitAndErrorCheck(MAP_URL);
         cy.login();
     });
 

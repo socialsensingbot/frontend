@@ -443,10 +443,10 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         return this.exec.queue("update-timeseries-graph", null,
                                async () => {
                                    // Immutable copy
-                                   const query = JSON.parse(JSON.stringify(q));
+                                   const query = JSON.parse(JSON.stringify(q)) as TimeseriesRESTQuery;
                                    log.debug("Graph update from query ", query);
                                    const text: string = query.textSearch;
-                                   if (query._layer && (text.length > 0 || force)) {
+                                   if (query.layer && (text.length > 0 || force)) {
                                        if (text.length > 3) {
                                            // noinspection ES6MissingAwait
                                            this.auto.create(timeSeriesAutocompleteType, text, true,
@@ -460,7 +460,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                                        log.debug("Skipped time series update, force=" + force);
                                    }
 
-                               }, q.__series_id + "-" + force, false, false, true, "inactive"
+                               }, q.__series_id + "-" + force, true, true, true, "inactive"
         );
 
     }
