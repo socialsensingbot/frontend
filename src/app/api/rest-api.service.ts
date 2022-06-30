@@ -122,10 +122,10 @@ export class RESTDataAPIService {
                     result.push(transform(item));
                 }
                 if (page > 0) {
-                    this._loading.showDeterminateSpinner("Loading page " + page, page / maxPages);
+                    this._loading.showDeterminateProgress("Loading page " + page, page / maxPages);
                 }
                 if (rawResult.length < pageSize || page === maxPages - 1) {
-                    this._loading.hideSpinner();
+                    this._loading.hideProgress();
                     return result;
                 } else {
                     page++;
@@ -158,7 +158,7 @@ export class RESTDataAPIService {
                 const iterations = (payload.endDate - payload.startDate) / (pageDurationInHours * 60 * 60 * 1000);
                 let count = 0;
                 if (showSpinner) {
-                    this._loading.showDeterminateSpinner("Loading date range", 0);
+                    this._loading.showDeterminateProgress("Loading date range", 0);
                 }
                 do {
                     const endDate = payload.endDate < currEndDate ? payload.endDate : currEndDate;
@@ -169,13 +169,13 @@ export class RESTDataAPIService {
                     }
                     if (endDate < payload.endDate) {
                         if (showSpinner) {
-                            this._loading.showDeterminateSpinner("Loading date range", count++ / iterations);
+                            this._loading.showDeterminateProgress("Loading date range", count++ / iterations);
                         }
                         currEndDate += pageDurationInHours * 60 * 60 * 1000;
                         startDate += pageDurationInHours * 60 * 60 * 1000;
                     } else {
                         if (showSpinner) {
-                            this._loading.hideSpinner();
+                            this._loading.hideProgress();
                         }
                         log.debug("Aggregated Result", result);
                         log.debug("Aggregated Result Size", result.length);
