@@ -122,10 +122,10 @@ export class RESTDataAPIService {
                     result.push(transform(item));
                 }
                 if (page > 0) {
-                    this._loading.showIndeterminateSpinner();
+                    this._loading.showDeterminateSpinner("Loading page " + page, page / maxPages);
                 }
                 if (rawResult.length < pageSize || page === maxPages - 1) {
-                    this._loading.hideIndeterminateSpinner();
+                    this._loading.hideSpinner();
                     return result;
                 } else {
                     page++;
@@ -155,6 +155,11 @@ export class RESTDataAPIService {
                 const result: any[] = [];
                 let startDate = payload.startDate;
                 let currEndDate = payload.startDate + pageDurationInHours * 60 * 60 * 1000 - 1;
+                const iterations = (payload.endDate - payload.startDate) / (pageDurationInHours * 60 * 60 * 1000);
+                let count = 0;
+                if (showSpinner) {
+                    this._loading.showDeterminateSpinner("Loading date range", 0);
+                }
                 do {
                     const endDate = payload.endDate < currEndDate ? payload.endDate : currEndDate;
                     const rawResult = await this.callMapAPIWithCache(path, {...payload, startDate, endDate}, cacheForSeconds, false, retry);
@@ -164,13 +169,13 @@ export class RESTDataAPIService {
                     }
                     if (endDate < payload.endDate) {
                         if (showSpinner) {
-                            this._loading.showIndeterminateSpinner();
+                            this._loading.showDeterminateSpinner("Loading date range", count++ / iterations);
                         }
                         currEndDate += pageDurationInHours * 60 * 60 * 1000;
                         startDate += pageDurationInHours * 60 * 60 * 1000;
                     } else {
                         if (showSpinner) {
-                            this._loading.hideIndeterminateSpinner();
+                            this._loading.hideSpinner();
                         }
                         log.debug("Aggregated Result", result);
                         log.debug("Aggregated Result Size", result.length);
@@ -190,7 +195,7 @@ export class RESTDataAPIService {
 
 
     private async callAPIInternal(fullPath: string, payload: any, cacheForSeconds: number, key: string,
-                                  useGet = false, retry = true): Promise<Promise<any>> {
+                                  useGet = false, retry = true, showWaitingSpinner = false): Promise<Promise<any>> {
         this.calls++;
         if (this.callsPerMinute > environment.maxCallsPerMinute) {
             console.error("Excessive api calls per minute: " + this.callsPerMinute);
@@ -243,7 +248,9 @@ export class RESTDataAPIService {
             log.info(e);
             if (retry) {
                 log.error(e);
-                this._loading.showIndeterminateSpinner();
+                if (showWaitingSpinner) {
+                    this._loading.showIndeterminateSpinner();
+                }
                 return new Promise<any>((resolve, reject) => {
                     setTimeout(async () => {
                         API.post("query", fullPath, {
@@ -260,13 +267,17 @@ export class RESTDataAPIService {
                             if (cacheForSeconds > 0) {
                                 this.cache.setCached(key, data, cacheInMillis);
                             }
-                            this._loading.hideIndeterminateSpinner();
+                            if (showWaitingSpinner) {
+                                this._loading.hideIndeterminateSpinner();
+                            }
                             resolve(data);
                         }))
                            .catch(e2 => {
                                this._notify.show(
                                    "Sorry, we're having difficulties could you please refresh the page, if that doesn't work please try again in a few minutes. Apologies for the inconvenience.");
-                               this._loading.hideIndeterminateSpinner();
+                               if (showWaitingSpinner) {
+                                   this._loading.hideIndeterminateSpinner();
+                               }
 
                                reject(e2);
                            });

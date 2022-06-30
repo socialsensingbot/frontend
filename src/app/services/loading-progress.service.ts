@@ -29,12 +29,21 @@ export class LoadingProgressService {
     }
 
     public progress(message: string, stage: number = -1) {
+        this.spinnerMode = "determinate";
         if (!this.loadingComplete && stage > 0 && stage > this.currentStage) {
             this.currentStage = stage;
             this.showSpinner = true;
             this._progressPercentage = this.currentStage / this.maxStages;
         }
         log.info(message);
+    }
+
+    public showDeterminateSpinner(message: string, percentage: number) {
+        this.spinnerMode = "determinate";
+        this.showSpinner = true;
+        this._progressPercentage = percentage;
+        log.info(message + " " + percentage * 100 + "%");
+
     }
 
     public loaded(): void {
@@ -55,5 +64,9 @@ export class LoadingProgressService {
     public hideIndeterminateSpinner() {
         this.showSpinner = false;
         this.spinnerMode = "determinate";
+    }
+
+    public hideSpinner() {
+        this.showSpinner = false;
     }
 }

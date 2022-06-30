@@ -504,7 +504,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             if (payload.regions.length === 0) {
                 payload.regions = this.pref.combined.analyticsDefaultRegions;
             }
-            const serverResults = await this._api.callMapAPIWithCacheAndDatePaging(this.map.id + "/analytics/time", payload);
+            const serverResults = await this._api.callMapAPIWithCacheAndDatePaging(this.map.id + "/analytics/time", payload, true);
             log.debug("Server result was ", serverResults);
             this.error = false;
             return this.queryTransform(serverResults);
