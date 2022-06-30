@@ -142,19 +142,6 @@ const invalidRegions2 = {
     endDate:    MAX_DATE_MILLIS,
 
 };
-const invalidRegions3 = {
-    hazards:    [
-        "flood"
-    ],
-    sources:    [
-        "twitter"
-    ],
-    regions:    [],
-    warnings:   "exclude",
-    startDate:  MIN_DATE_MILLIS,
-    endDate:    MAX_DATE_MILLIS,
-
-};
 const invalidWarnings1 = {
     hazards:    [
         "flood"
@@ -544,14 +531,6 @@ describe("POST /v1/map/:map/analytics/time", () => {
             .post("/v1/map/uk-flood-test/analytics/time")
             .set("Accept", "application/json")
             .send(invalidRegions2);
-        expect(response.status).equals(400);
-        expect(response.body.parameter).equals("regions");
-    });
-    it("invalid regions 3", async () => {
-        const response = await request(app)
-            .post("/v1/map/uk-flood-test/analytics/time")
-            .set("Accept", "application/json")
-            .send(invalidRegions3);
         expect(response.status).equals(400);
         expect(response.body.parameter).equals("regions");
     });

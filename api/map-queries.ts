@@ -1078,9 +1078,9 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
                 req.body.endDate)}, endDate is less than startDate=${req.body.startDate} (${new Date(req.body.startDate)}`);
             return;
         }
-        if (!Array.isArray(req.body.regions) || req.body.regions.some(i => typeof i !== "string") || req.body.regions.length === 0) {
+        if (!Array.isArray(req.body.regions) || req.body.regions.some(i => typeof i !== "string")) {
             invalidParameter(res, "regions",
-                             `Invalid regions, regions=${req.body.regions}, regions must be supplied as an array of strings`);
+                             `Invalid regions, regions=${req.body.regions}, regions must be an array of strings.`);
             return;
         }
         if (!Array.isArray(req.body.hazards) || req.body.hazards.some(i => typeof i !== "string") || req.body.hazards.length === 0) {
@@ -1131,9 +1131,9 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
         const to = new Date(calculateEndDate(map, req));
 
 
-        if (req.body.timePeriod === "day" && (to.getTime() - from.getTime()) / ONE_DAY > 366) {
+        if (req.body.timePeriod === "day" && (to.getTime() - from.getTime()) / ONE_DAY > 367) {
             invalidParameter(res, "startDate/endDate",
-                             `The gap between the start date ${from} and the end date ${to} exceeds the maximum of 366 days, for by day analytics. Please break down the request into smaller chunks.`);
+                             `The gap between the start date ${from} and the end date ${to} exceeds the maximum of 367 days, for by day analytics. Please break down the request into smaller chunks.`);
             return;
         }
 
