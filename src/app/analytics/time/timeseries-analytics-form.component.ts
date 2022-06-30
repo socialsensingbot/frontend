@@ -79,11 +79,16 @@ export class TimeseriesAnalyticsFormComponent implements OnInit, OnDestroy {
             this.mapData.regionsDropDown(this.map.id).then(
                 regions => {
                     this.allRegions = regions;
-                    log.debug(regions);
+                    log.verbose(regions);
                     this.filteredRegions = this.regionControl.valueChanges.pipe(
                         startWith(null),
                         map((region: string | null) => region ? this._filter(region) : this.allRegions.slice()));
                     this.regions = regions.filter(i => this._data.regions.includes(i.value));
+                    this.filteredRegions.subscribe(i => {
+                        log.verbose("Filtered regions: " + JSON.stringify(i));
+
+                    });
+                    log.verbose("All regions: " + JSON.stringify(this.regions));
                 });
         }
 

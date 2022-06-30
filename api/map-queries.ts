@@ -583,6 +583,7 @@ export const mapRegionsFunc: (req, res) => Promise<void> = async (req, res) => {
                                   AND mm.id = ?
                                   AND gr.title = uniq_title.title
                                   AND gr.level = uniq_title.level
+                                  AND gr.region_type <> 'bi_country'
                                 order by gr.level desc, text asc`,
                                 values:                         [req.params.map]
                             });
