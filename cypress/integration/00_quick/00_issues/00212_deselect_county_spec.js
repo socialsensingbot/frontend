@@ -15,8 +15,7 @@ describe('#212 Deselect by clicking on non-region: : https://github.com/socialse
                      cy.wait(2000);
                      cy.get(".map").click(128, 128);
                      cy.wait(2000);
-                     cy.url({timeout: 30000}).should("equal",
-                                                     MAP_URL + "?&active_number=exceedance&active_polygon=county&max_time=1631664000000&min_time=1631577600000&max_range_time=" + MAX_DATE_MILLIS + "&min_range_time=" + MIN_DATE_MILLIS);
+                     cy.url({timeout: 30000}).should("not.contain", "powys");
                      cy.logout();
                  });
 
