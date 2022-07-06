@@ -122,10 +122,10 @@ export class RESTDataAPIService {
                     result.push(transform(item));
                 }
                 if (page > 0) {
-                    this._loading.showIndeterminateSpinner();
+                    this._loading.showDeterminateProgress("Loading page " + page, page / maxPages);
                 }
                 if (rawResult.length < pageSize || page === maxPages - 1) {
-                    this._loading.hideIndeterminateSpinner();
+                    this._loading.hideProgress();
                     return result;
                 } else {
                     page++;
@@ -140,41 +140,62 @@ export class RESTDataAPIService {
                                                   transform: (any) => any = (i) => i,
                                                   cacheForSeconds: number = -1,
                                                   pageDurationInHours = 30 * 24,
-                                                  retry = true) {
+                                                  retry = true): Promise<any> {
         try {
-            const result: any[] = [];
-            let startDate = payload.startDate;
-            let currEndDate = payload.startDate + pageDurationInHours * 60 * 60 * 1000 - 1;
-            do {
-                const endDate = payload.endDate < currEndDate ? payload.endDate : currEndDate;
-                const rawResult = await this.callMapAPIWithCache(path, {...payload, startDate, endDate}, cacheForSeconds, false, retry);
-                log.debug(rawResult.length + " results back from server");
-                for (const item of rawResult) {
-                    result.push(transform(item));
+            const key = "rest:query/" + path + ":" + JSON.stringify(payload);
+            const cachedItem = await this.cache.getCached(key);
+            if (cacheForSeconds > 0 && cachedItem && cachedItem.hasData && !cachedItem.expired) {
+                // tslint:disable-next-line:no-console
+                log.verbose("Value for " + key + "in cache");
+                // log.debug("Value for " + key + " was " + JSON.stringify(cachedItem.data));
+                // console.debug("Return cached item", JSON.stringify(cachedItem));
+                return cachedItem.data;
+            } else {
+                log.info("Value for " + key + " not in cache");
+                const result: any[] = [];
+                let startDate = payload.startDate;
+                let currEndDate = payload.startDate + pageDurationInHours * 60 * 60 * 1000 - 1;
+                const iterations = (payload.endDate - payload.startDate) / (pageDurationInHours * 60 * 60 * 1000);
+                let count = 0;
+                if (showSpinner) {
+                    this._loading.showDeterminateProgress("Loading date range", 0);
                 }
-                if (endDate < payload.endDate) {
-                    if (showSpinner) {
-                        this._loading.showIndeterminateSpinner();
+                do {
+                    const endDate = payload.endDate < currEndDate ? payload.endDate : currEndDate;
+                    const rawResult = await this.callMapAPIWithCache(path, {...payload, startDate, endDate}, cacheForSeconds, false, retry);
+                    log.debug(rawResult.length + " results back from server");
+                    for (const item of rawResult) {
+                        result.push(transform(item));
                     }
-                    currEndDate += pageDurationInHours * 60 * 60 * 1000;
-                    startDate += pageDurationInHours * 60 * 60 * 1000;
-                } else {
-                    if (showSpinner) {
-                        this._loading.hideIndeterminateSpinner();
+                    if (endDate < payload.endDate) {
+                        if (showSpinner) {
+                            this._loading.showDeterminateProgress("Loading date range", count++ / iterations);
+                        }
+                        currEndDate += pageDurationInHours * 60 * 60 * 1000;
+                        startDate += pageDurationInHours * 60 * 60 * 1000;
+                    } else {
+                        if (showSpinner) {
+                            this._loading.hideProgress();
+                        }
+                        log.debug("Aggregated Result", result);
+                        log.debug("Aggregated Result Size", result.length);
+                        if (cacheForSeconds > 0) {
+                            await this.cache.setCached(key, result, cacheForSeconds * 1000);
+                        }
+                        return result;
                     }
-                    log.debug("Aggregated Result", result);
-                    log.debug("Aggregated Result Size", result.length);
-                    return result;
-                }
-            } while (true);
+                } while (true);
+
+            }
         } catch (e) {
             log.error(e);
+            throw e;
         }
     }
 
 
     private async callAPIInternal(fullPath: string, payload: any, cacheForSeconds: number, key: string,
-                                  useGet = false, retry = true): Promise<Promise<any>> {
+                                  useGet = false, retry = true, showWaitingSpinner = false): Promise<Promise<any>> {
         this.calls++;
         if (this.callsPerMinute > environment.maxCallsPerMinute) {
             console.error("Excessive api calls per minute: " + this.callsPerMinute);
@@ -227,8 +248,9 @@ export class RESTDataAPIService {
             log.info(e);
             if (retry) {
                 log.error(e);
-                this._notify.show("No response from the server, maybe a network problem or a slow query.",
-                                  "Retrying ...", retryPeriod);
+                if (showWaitingSpinner) {
+                    this._loading.showIndeterminateSpinner();
+                }
                 return new Promise<any>((resolve, reject) => {
                     setTimeout(async () => {
                         API.post("query", fullPath, {
@@ -245,10 +267,18 @@ export class RESTDataAPIService {
                             if (cacheForSeconds > 0) {
                                 this.cache.setCached(key, data, cacheInMillis);
                             }
+                            if (showWaitingSpinner) {
+                                this._loading.hideIndeterminateSpinner();
+                            }
                             resolve(data);
                         }))
                            .catch(e2 => {
-                               this._notify.show("Error running" + " query, please check your network connection");
+                               this._notify.show(
+                                   "Sorry, we're having difficulties could you please refresh the page, if that doesn't work please try again in a few minutes. Apologies for the inconvenience.");
+                               if (showWaitingSpinner) {
+                                   this._loading.hideIndeterminateSpinner();
+                               }
+
                                reject(e2);
                            });
                     }, retryPeriod);

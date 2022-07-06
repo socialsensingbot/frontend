@@ -13,6 +13,8 @@ export class LoadingProgressService {
     private currentStage = 0;
     private loadingComplete = false;
     public showSpinner = false;
+    public showProgress = false;
+    public opacity = 1.0;
     public spinnerMode: ProgressSpinnerMode = "determinate";
     private _progressPercentage = 0;
 
@@ -29,12 +31,26 @@ export class LoadingProgressService {
     }
 
     public progress(message: string, stage: number = -1) {
+        this.spinnerMode = "determinate";
         if (!this.loadingComplete && stage > 0 && stage > this.currentStage) {
             this.currentStage = stage;
             this.showSpinner = true;
             this._progressPercentage = this.currentStage / this.maxStages;
+            this.opacity = 1.0;
         }
         log.info(message);
+    }
+
+    public showDeterminateProgress(message: string, percentage: number) {
+        this.spinnerMode = "indeterminate";
+        this.opacity = 0.2;
+        this.showProgress = true;
+        this.showSpinner = true;
+        if (percentage > this._progressPercentage) {
+            this._progressPercentage = percentage;
+        }
+        log.info(message + " " + percentage * 100 + "%");
+
     }
 
     public loaded(): void {
@@ -55,5 +71,15 @@ export class LoadingProgressService {
     public hideIndeterminateSpinner() {
         this.showSpinner = false;
         this.spinnerMode = "determinate";
+    }
+
+    public hideSpinner() {
+        this.showSpinner = false;
+    }
+
+    public hideProgress() {
+        this._progressPercentage = 0;
+        this.showProgress = false;
+        this.showSpinner = false;
     }
 }

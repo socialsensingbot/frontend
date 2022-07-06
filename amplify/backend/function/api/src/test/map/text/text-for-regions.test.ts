@@ -565,7 +565,7 @@ describe("POST /v1/map/:map/text", () => {
             .set("Accept", "application/json")
             .send(reqBody);
         console.log(JSON.stringify(response.body));
-        expect(JSON.stringify(response.body)).to.equal(JSON.stringify(singleRegion));
+        expect(JSON.stringify(response.body[0])).to.equal(JSON.stringify(singleRegion));
     });
     it("invalid map", async () => {
         const response = await request(app)

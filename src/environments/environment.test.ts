@@ -18,20 +18,24 @@ import {SSLayerConfiguration} from "../app/types"; // Included with Angular CLI.
 const layers: SSLayerConfiguration = {
     "available":    [
         {
-            "id":          "flood",
-            "title":       "Floods",
-            "sources":     ["twitter"],
-            "hazards":     ["flood"],
-            "warnings":    "exclude",
+            "id":       "flood",
+            "title":    "Floods",
+            "sources":  ["twitter"],
+            "hazards":  ["flood"],
+            "warnings": "exclude",
+            "language": "*",
+
             "annotations": ["source", "impact"],
             "icons":       ["flood"]
         },
         {
-            "id":          "wind",
-            "title":       "Wind",
-            "sources":     ["twitter"],
-            "hazards":     ["wind"],
-            "warnings":    "exclude",
+            "id":       "wind",
+            "title":    "Wind",
+            "sources":  ["twitter"],
+            "hazards":  ["wind"],
+            "warnings": "exclude",
+            "language": "*",
+
             "annotations": ["impact"],
             "icons":       ["strong-wind"]
         }

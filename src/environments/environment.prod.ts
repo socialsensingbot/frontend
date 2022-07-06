@@ -5,58 +5,70 @@ import {SSLayerConfiguration} from "../app/types";
 const layers: SSLayerConfiguration = {
     "available": [
         {
-            "id":          "flood",
-            "title":       "Floods",
-            "sources":     ["twitter"],
-            "hazards":     ["flood"],
-            "warnings":    "exclude",
+            "id":       "flood",
+            "title":    "Floods",
+            "sources":  ["twitter"],
+            "hazards":  ["flood"],
+            "warnings": "exclude",
+            "language": "*",
+
             "annotations": ["source", "impact"],
             "icons":       ["flood"]
         },
         {
-            "id":          "flood-with-warnings",
-            "title":       "Floods (includes warnings)",
-            "sources":     ["twitter"],
-            "hazards":     ["flood"],
-            "warnings":    "include",
+            "id":       "flood-with-warnings",
+            "title":    "Floods (includes warnings)",
+            "sources":  ["twitter"],
+            "hazards":  ["flood"],
+            "warnings": "include",
+            "language": "*",
+
             "annotations": ["source", "impact"],
             "icons":       ["flood", "storm-warning"]
 
         },
         {
-            "id":          "flood-warnings-only",
-            "title":       "Floods (only warnings)",
-            "sources":     ["twitter"],
-            "hazards":     ["flood"],
-            "warnings":    "only",
+            "id":       "flood-warnings-only",
+            "title":    "Floods (only warnings)",
+            "sources":  ["twitter"],
+            "hazards":  ["flood"],
+            "warnings": "only",
+            "language": "*",
+
             "annotations": ["source", "impact"],
             "icons":       ["storm-warning"]
         },
         {
-            "id":          "wind",
-            "title":       "Wind",
-            "sources":     ["twitter"],
-            "hazards":     ["wind"],
-            "warnings":    "exclude",
+            "id":       "wind",
+            "title":    "Wind",
+            "sources":  ["twitter"],
+            "hazards":  ["wind"],
+            "warnings": "exclude",
+            "language": "*",
+
             "annotations": ["impact"],
             "icons":       ["strong-wind"]
 
         },
         {
-            "id":          "wind-and-flood",
-            "title":       "Wind & Flood",
-            "sources":     ["twitter"],
-            "hazards":     ["wind", "flood"],
-            "warnings":    "exclude",
+            "id":       "wind-and-flood",
+            "title":    "Wind & Flood",
+            "sources":  ["twitter"],
+            "hazards":  ["wind", "flood"],
+            "warnings": "exclude",
+            "language": "*",
+
             "annotations": ["source", "impact"],
             "icons":       ["flood", "strong-wind"]
         },
         {
-            "id":          "snow",
-            "title":       "Snow",
-            "sources":     ["twitter"],
-            "hazards":     ["snow"],
-            "warnings":    "exclude",
+            "id":       "snow",
+            "title":    "Snow",
+            "sources":  ["twitter"],
+            "hazards":  ["snow"],
+            "warnings": "exclude",
+            "language": "*",
+
             "annotations": ["impact"],
             "icons":       ["snow"]
         },
@@ -80,7 +92,7 @@ export const environment = {
     name:             "production",
     lamdaEnvironment: "prod",
     demo:             false,
-    version: "2.6",
+    version:          "2.7",
     // timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
     timezone:             "UTC",
     locale:               "en-GB",
