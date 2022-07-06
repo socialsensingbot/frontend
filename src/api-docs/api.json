@@ -1,0 +1,2072 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Social Sensing API",
+    "description": "Social Sensing API provides the ability to retrieve geographic statistical data relating to weather events. This API is secured with an API key provided by your account manager.\n",
+    "version": "1.0.0",
+    "contact": {
+      "name": "API Support Team",
+      "email": "support@socialsensing.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api-dev.socialsensing.com"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/v1/map/metadata": {
+      "get": {
+        "operationId": "GetAllMapsMetadata",
+        "tags": [
+          "metadata"
+        ],
+        "summary": "Get Metadata for All Maps",
+        "description": "Returns metadata regarding all available maps, the primary purpose of this call is to list available maps and their core metadata. This method is primarily an aggregation of ```/v1/map/{map}/metadata``` for each map. The version number returned is the version of the schema for this result and can usually be ignored. The start property contains the default recommended starting position of any rendered map. This is overridden by each map.\n",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "links": {
+              "PathParamMapID": {
+                "operationId": "GetMapMetadata",
+                "parameters": {
+                  "map": "$response.body#/maps/0/id"
+                },
+                "description": "The 'id' field of each returned map is used as the path parameter {map} in all map based operations.\n"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "version": {
+                      "type": "string",
+                      "description": "The version of this metadata.",
+                      "example": "1.0.0"
+                    },
+                    "maps": {
+                      "type": "array",
+                      "description": "A collection of Map Metadata objects which are an aggregation of ```/v1/map/{map}/metadata``` being called for each map.\n",
+                      "items": {
+                        "$ref": "#/components/schemas/MapMetadata"
+                      }
+                    },
+                    "start": {
+                      "$ref": "#/components/schemas/StartMetadata"
+                    }
+                  },
+                  "example": {
+                    "version": "1.0",
+                    "maps": [
+                      {
+                        "id": "uk-flood-live",
+                        "title": "UK Flood and Related",
+                        "location": "uk",
+                        "start_lat": 53,
+                        "start_lng": -2,
+                        "start_zoom": 6,
+                        "default_region_type": "county",
+                        "last_date": null
+                      },
+                      {
+                        "id": "uk-flood-historical",
+                        "title": "UK Flood (Historical)",
+                        "location": "uk",
+                        "start_lat": 53,
+                        "start_lng": -2,
+                        "start_zoom": 6,
+                        "default_region_type": "coarse",
+                        "last_date": "2021-09-15T00:00:00.000Z"
+                      }
+                    ],
+                    "start": {
+                      "lat": 53,
+                      "lng": -2,
+                      "zoom": 6
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidParameterError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/map/{map}/metadata": {
+      "get": {
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "GetMapMetadata",
+        "summary": "Get Metadata for Map by Id",
+        "description": "Returns metadata for a specific map. To get the list of available maps see [Get Metadata for All Maps](./getallmapsmetadata) . Included in the response is a list of all region types (including the default to display) for the map a start  location and zoom for the map when displayed, a logical location for the map (e.g. UK, India, World) and  supported hazard types for this map.\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Map"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MapMetadata"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidParameterError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/map/{map}/now": {
+      "get": {
+        "operationId": "GetMapNow",
+        "tags": [
+          "metadata"
+        ],
+        "summary": "Get the Latest Date for Map",
+        "description": "Returns the latest date for which there is data for the specified map. For archived map data this will be a fixed date (i.e. the last_date field in MapMetadata), otherwise, it's the last time data was processed (usually within 10 minutes of ```Date.now()```).\n\nTo get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Map"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "example": 1425744000000
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/map/{map}/region-type/{regionType}/regions": {
+      "get": {
+        "operationId": "GetMapRegionsForRegionType",
+        "tags": [
+          "metadata"
+        ],
+        "summary": "Get Map Regions for a Region Type",
+        "description": "Returns a list of region identifiers for the given region type within the given map as an array of identifiers.\n\nTo get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Map"
+          },
+          {
+            "$ref": "#/components/parameters/RegionType"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "example": [
+                    "dorset",
+                    "powys",
+                    "devon"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidParameterError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/map/{map}/regions": {
+      "get": {
+        "operationId": "GetAllMapRegionsAndTypes",
+        "tags": [
+          "metadata"
+        ],
+        "summary": "Get All Region and Region Type Combinations for a Map",
+        "description": "Returns all the region and region type combinations for a given map.\n\nTo get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Map"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RegionMetadata"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidParameterError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/map/{map}/region-type/{regionType}/region/{region}/geography": {
+      "get": {
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "GetRegionAsGeoJSON",
+        "summary": "Get a Region as GeoJSON",
+        "description": "Returns the geography of a specific region in the form of a GeoJSON shape.\n\nTo get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). To get the regions for a specific region type use [Get Map Regions for a Region Type](./getmapregionsforregiontype).\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Map"
+          },
+          {
+            "$ref": "#/components/parameters/RegionType"
+          },
+          {
+            "$ref": "#/components/parameters/Region"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "example": {
+                    "type": "MultiPolygon",
+                    "coordinates": [
+                      [
+                        [
+                          [
+                            -1.9558910160193534,
+                            50.69082376519951
+                          ],
+                          [
+                            -1.9558893443374288,
+                            50.690823003820576
+                          ],
+                          [
+                            -1.9558878401255066,
+                            50.690821949512824
+                          ],
+                          [
+                            -1.9558865541389825,
+                            50.690820637850905
+                          ],
+                          [
+                            -1.9558855297698494,
+                            50.69081911309314
+                          ],
+                          [
+                            -1.9558848015825583,
+                            50.690817426688206
+                          ],
+                          [
+                            -1.9558843941477386,
+                            50.69081563553908
+                          ],
+                          [
+                            -1.9558843212131305,
+                            50.690813800083035
+                          ],
+                          [
+                            -1.955884585239707,
+                            50.69081198225238
+                          ],
+                          [
+                            -1.955885177318635,
+                            50.690810243384675
+                          ],
+                          [
+                            -1.9558860774718787,
+                            50.69080864215312
+                          ],
+                          [
+                            -1.955887255326302,
+                            50.69080723258677
+                          ],
+                          [
+                            -2.009636095853156,
+                            50.68342104040844
+                          ]
+                        ]
+                      ]
+                    ],
+                    "properties": {
+                      "name": "dorset",
+                      "title": "Dorset"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidParameterError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/map/{map}/text": {
+      "post": {
+        "tags": [
+          "text"
+        ],
+        "operationId": "GetTextForMap",
+        "summary": "Get Text for Map.",
+        "description": "Returns all text messages (Tweets at present) for a given map. The request body should contain the search  criteria of regionType, hazards, sources, warnings and a start and end date. The results are paged with a  default page size of 100.\n\nTo get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). The list of available regions types and hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Map"
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TextRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TextResponseItem"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidParameterError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/map/{map}/stats": {
+      "post": {
+        "operationId": "GetStatsForMap",
+        "tags": [
+          "statistics"
+        ],
+        "summary": "Get Statistical Data for Map",
+        "description": "Returns an object mapping regions to their statistics. At present the two statistics are  [exceedance](https://socialsensing.com/materialis/help-and-support/#exceedance) and total count. If there are no results for the criteria for a given region it will not included in the results. The result will look like this:\n\n```json\n{\n  \"west yorkshire\": {\n    \"count\": 109,\n    \"exceedance\": 0.4697\n  },\n   \"shropshire\": {\n     \"count\": 71,\n     \"exceedance\": 0.4697\n   },\n\n...\n}\n```\nTo get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). The list of available regions types and hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Map"
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StatsResponseItem"
+                  },
+                  "example": {
+                    "west yorkshire": {
+                      "count": 109,
+                      "exceedance": 0.4697
+                    },
+                    "shropshire": {
+                      "count": 71,
+                      "exceedance": 0.4697
+                    },
+                    "lancashire": {
+                      "count": 20,
+                      "exceedance": 2.0355
+                    },
+                    "greater manchester": {
+                      "count": 114,
+                      "exceedance": 0.4175
+                    },
+                    "hertfordshire": {
+                      "count": 6,
+                      "exceedance": 3.1837
+                    },
+                    "north yorkshire": {
+                      "count": 118,
+                      "exceedance": 0.3653
+                    },
+                    "kent": {
+                      "count": 22,
+                      "exceedance": 1.7223
+                    },
+                    "south yorkshire": {
+                      "count": 153,
+                      "exceedance": 0.3132
+                    },
+                    "stirling": {
+                      "count": 4,
+                      "exceedance": 1.6701
+                    },
+                    "nottingham": {
+                      "count": 10,
+                      "exceedance": 1.2004
+                    },
+                    "nottinghamshire": {
+                      "count": 12,
+                      "exceedance": 1.9311
+                    },
+                    "derbyshire": {
+                      "count": 142,
+                      "exceedance": 0.3653
+                    },
+                    "dublin": {
+                      "count": 5,
+                      "exceedance": 4.6451
+                    },
+                    "norfolk": {
+                      "count": 5,
+                      "exceedance": 5.167
+                    },
+                    "staffordshire": {
+                      "count": 21,
+                      "exceedance": 1.7223
+                    },
+                    "ceredigion": {
+                      "count": 3,
+                      "exceedance": 2.0355
+                    },
+                    "cork": {
+                      "count": 1,
+                      "exceedance": 31.8894
+                    },
+                    "derby": {
+                      "count": 35,
+                      "exceedance": 0.3132
+                    },
+                    "merseyside": {
+                      "count": 7,
+                      "exceedance": 3.5491
+                    },
+                    "medway": {
+                      "count": 5,
+                      "exceedance": 0.4697
+                    },
+                    "cheshire": {
+                      "count": 17,
+                      "exceedance": 1.2004
+                    },
+                    "powys": {
+                      "count": 22,
+                      "exceedance": 0.5741
+                    },
+                    "aberdeen city": {
+                      "count": 5,
+                      "exceedance": 1.2526
+                    },
+                    "kingston upon hull, city of": {
+                      "count": 4,
+                      "exceedance": 0.7307
+                    },
+                    "donegal": {
+                      "count": 6,
+                      "exceedance": 1.357
+                    },
+                    "tyne and wear": {
+                      "count": 6,
+                      "exceedance": 1.9833
+                    },
+                    "denbighshire": {
+                      "count": 2,
+                      "exceedance": 1.357
+                    },
+                    "down": {
+                      "count": 6,
+                      "exceedance": 1.0438
+                    },
+                    "greater london": {
+                      "count": 50,
+                      "exceedance": 4.3319
+                    },
+                    "cumbria": {
+                      "count": 8,
+                      "exceedance": 3.3925
+                    },
+                    "armagh": {
+                      "count": 6,
+                      "exceedance": 1.4092
+                    },
+                    "dorset": {
+                      "count": 3,
+                      "exceedance": 7.9854
+                    },
+                    "monmouthshire": {
+                      "count": 4,
+                      "exceedance": 1.5658
+                    },
+                    "city of edinburgh": {
+                      "count": 5,
+                      "exceedance": 4.3841
+                    },
+                    "herefordshire": {
+                      "count": 16,
+                      "exceedance": 0.9395
+                    },
+                    "stockton-on-tees": {
+                      "count": 3,
+                      "exceedance": 0.9916
+                    },
+                    "leicestershire": {
+                      "count": 14,
+                      "exceedance": 2.5052
+                    },
+                    "leicester": {
+                      "count": 6,
+                      "exceedance": 2.2965
+                    },
+                    "buckinghamshire": {
+                      "count": 6,
+                      "exceedance": 1.4092
+                    },
+                    "warrington": {
+                      "count": 2,
+                      "exceedance": 3.9144
+                    },
+                    "angus": {
+                      "count": 1,
+                      "exceedance": 6.5762
+                    },
+                    "lincolnshire": {
+                      "count": 4,
+                      "exceedance": 5.428
+                    },
+                    "leitrim": {
+                      "count": 2,
+                      "exceedance": 1.3048
+                    },
+                    "northamptonshire": {
+                      "count": 5,
+                      "exceedance": 3.4447
+                    },
+                    "darlington": {
+                      "count": 3,
+                      "exceedance": 0.6785
+                    },
+                    "aberdeenshire": {
+                      "count": 2,
+                      "exceedance": 4.4885
+                    },
+                    "oxfordshire": {
+                      "count": 4,
+                      "exceedance": 6.6806
+                    },
+                    "shetland islands": {
+                      "count": 1,
+                      "exceedance": 3.5491
+                    },
+                    "worcestershire": {
+                      "count": 19,
+                      "exceedance": 2.0355
+                    },
+                    "york": {
+                      "count": 11,
+                      "exceedance": 1.2004
+                    },
+                    "dumfries and galloway": {
+                      "count": 3,
+                      "exceedance": 2.4008
+                    },
+                    "east riding of yorkshire": {
+                      "count": 4,
+                      "exceedance": 1.5658
+                    },
+                    "rhondda, cynon, taff": {
+                      "count": 1,
+                      "exceedance": 15.7098
+                    },
+                    "durham": {
+                      "count": 2,
+                      "exceedance": 5.5324
+                    },
+                    "longford": {
+                      "count": 1,
+                      "exceedance": 2.9228
+                    },
+                    "essex": {
+                      "count": 5,
+                      "exceedance": 6.0021
+                    },
+                    "northumberland": {
+                      "count": 4,
+                      "exceedance": 3.6013
+                    },
+                    "west sussex": {
+                      "count": 4,
+                      "exceedance": 4.2797
+                    },
+                    "brighton and hove": {
+                      "count": 1,
+                      "exceedance": 13.8309
+                    },
+                    "glasgow city": {
+                      "count": 3,
+                      "exceedance": 12.3173
+                    },
+                    "pembrokeshire": {
+                      "count": 1,
+                      "exceedance": 7.5678
+                    },
+                    "telford and wrekin": {
+                      "count": 8,
+                      "exceedance": 0.7829
+                    },
+                    "west midlands": {
+                      "count": 8,
+                      "exceedance": 5.0104
+                    },
+                    "west berkshire": {
+                      "count": 1,
+                      "exceedance": 14.9791
+                    },
+                    "north lanarkshire": {
+                      "count": 1,
+                      "exceedance": 8.4551
+                    },
+                    "north lincolnshire": {
+                      "count": 1,
+                      "exceedance": 6.4718
+                    },
+                    "milton keynes": {
+                      "count": 3,
+                      "exceedance": 3.0793
+                    },
+                    "cardiff": {
+                      "count": 2,
+                      "exceedance": 9.9165
+                    },
+                    "bristol, city of": {
+                      "count": 2,
+                      "exceedance": 13.2568
+                    },
+                    "londonderry": {
+                      "count": 4,
+                      "exceedance": 1.2004
+                    },
+                    "wiltshire": {
+                      "count": 4,
+                      "exceedance": 2.6618
+                    },
+                    "warwickshire": {
+                      "count": 5,
+                      "exceedance": 4.3841
+                    },
+                    "blackburn with darwen": {
+                      "count": 2,
+                      "exceedance": 1.7223
+                    },
+                    "blaenau gwent": {
+                      "count": 3,
+                      "exceedance": 0.4697
+                    },
+                    "isle of wight": {
+                      "count": 1,
+                      "exceedance": 14.9791
+                    },
+                    "swansea": {
+                      "count": 1,
+                      "exceedance": 12.5783
+                    },
+                    "slough": {
+                      "count": 1,
+                      "exceedance": 5.2192
+                    },
+                    "southampton": {
+                      "count": 1,
+                      "exceedance": 11.1169
+                    },
+                    "wrexham": {
+                      "count": 5,
+                      "exceedance": 1.0438
+                    },
+                    "galway": {
+                      "count": 1,
+                      "exceedance": 13.4656
+                    },
+                    "suffolk": {
+                      "count": 7,
+                      "exceedance": 3.6013
+                    },
+                    "gloucestershire": {
+                      "count": 2,
+                      "exceedance": 12.4217
+                    },
+                    "swindon": {
+                      "count": 2,
+                      "exceedance": 1.7223
+                    },
+                    "hampshire": {
+                      "count": 2,
+                      "exceedance": 16.023
+                    },
+                    "newport": {
+                      "count": 1,
+                      "exceedance": 13.1524
+                    },
+                    "conwy": {
+                      "count": 4,
+                      "exceedance": 2.3486
+                    },
+                    "surrey": {
+                      "count": 4,
+                      "exceedance": 11.0125
+                    },
+                    "peterborough": {
+                      "count": 1,
+                      "exceedance": 9.4468
+                    },
+                    "somerset": {
+                      "count": 2,
+                      "exceedance": 14.3006
+                    },
+                    "scottish borders": {
+                      "count": 1,
+                      "exceedance": 7.5678
+                    },
+                    "carmarthenshire": {
+                      "count": 1,
+                      "exceedance": 8.5073
+                    },
+                    "stoke-on-trent": {
+                      "count": 2,
+                      "exceedance": 3.2881
+                    },
+                    "east sussex": {
+                      "count": 1,
+                      "exceedance": 19.6242
+                    },
+                    "caerphilly": {
+                      "count": 2,
+                      "exceedance": 2.5052
+                    },
+                    "fife": {
+                      "count": 1,
+                      "exceedance": 16.3361
+                    },
+                    "roscommon": {
+                      "count": 1,
+                      "exceedance": 3.2359
+                    },
+                    "antrim": {
+                      "count": 1,
+                      "exceedance": 18.0063
+                    },
+                    "perth and kinross": {
+                      "count": 1,
+                      "exceedance": 8.8205
+                    },
+                    "east ayrshire": {
+                      "count": 1,
+                      "exceedance": 5.5846
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidParameterError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/map/{map}/recent-text-count": {
+      "post": {
+        "operationId": "GetRegionsWithRecentTexts",
+        "tags": [
+          "text"
+        ],
+        "summary": "Get Regions with Recent Texts",
+        "description": "Returns the number of messages (i.e. Tweets), since a specific time for all regions on the specified map. This is provided so that recently active regions can be flagged. If a region has no results for the time period it is not returned. I.e. a count of zero is not returned. E.g.:\n```json\n\n{\n  \"powys\": 3,\n  \"devon\": 20,\n  \"dorset\": 23\n}\n```\nTo get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). The list of available regions types and hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Map"
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecentCountRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecentCountResponseItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidParameterError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/map/{map}/analytics/time": {
+      "post": {
+        "operationId": "GetTimeSeriesAnalyticsForMap",
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get Time Series Data for Analytics",
+        "description": "\nReturns data for a time series graph. At present the two statistics are \n        [exceedance](https://socialsensing.com/materialis/help-and-support/#exceedance) and total count. If there are\n        no results for the criteria for a given region it will not included in the results. The result will look like this:        \n\n```json\n\n  [\n    {\n      \"count\": 36,\n      \"region\": \"uk\",\n      \"exceedance\": 1.27,\n      \"date\": \"2022-01-15T00:00:00.000Z\"\n    },\n    {\n      \"count\": 38,\n      \"region\": \"uk\",\n      \"exceedance\": 1.3,\n      \"date\": \"2022-01-16T00:00:00.000Z\"\n    },\n    {\n      \"count\": 22,\n      \"region\": \"uk\",\n      \"exceedance\": 1.14,\n      \"date\": \"2022-01-17T00:00:00.000Z\"\n    },\n    {\n      \"count\": 36,\n      \"region\": \"uk\",\n      \"exceedance\": 1.27,\n      \"date\": \"2022-01-18T00:00:00.000Z\"\n    },\n\n  ...\n\n  }\n\n```\n\nTo get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).  The list of available hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata). The list of available regions can be obtained using [Get All Region and Region Type Combinations for a Map](./getallmapregionsandtypes).\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Map"
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimeSeriesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimeSeriesResponseItem"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidParameterError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "Map": {
+        "in": "path",
+        "name": "map",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "The map id to use for the request, the set of ids can be obtained using [Get Metadata for All Maps](./getallmapsmetadata)\n",
+        "example": "uk-flood-live"
+      },
+      "RegionType": {
+        "in": "path",
+        "name": "regionType",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "The region type. The list of available region types can be obtained using [Get Metadata for Map by Id](./getmapmetadata).\n",
+        "example": "county"
+      },
+      "Region": {
+        "in": "path",
+        "name": "region",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "The region. To get the regions for a specific region type use [Get Map Regions for a Region Type](./getmapregionsforregiontype).\n",
+        "example": "dorset"
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
+    "schemas": {
+      "AllRegionsNoTypeDataRequest": {
+        "type": "object",
+        "properties": {
+          "hazards": {
+            "type": "array",
+            "description": "Hazards represent the weather condition that you are interested in. The list of supported hazards can be  found using [Get Metadata for Map by Id](./getmapmetadata).\n",
+            "items": {
+              "type": "string",
+              "example": [
+                "flood",
+                "wind",
+                "snow"
+              ]
+            }
+          },
+          "sources": {
+            "type": "array",
+            "description": "The source is name of the service that the data was gathered from. At present only the 'twitter' source is supported.\n",
+            "items": {
+              "type": "string",
+              "example": "twitter",
+              "pattern": "(twitter)"
+            }
+          },
+          "warnings": {
+            "type": "string",
+            "example": "exclude",
+            "description": "The warnings option is used to decide whether to include warnings (automated Tweets publishing weather  warnings) should be included in the results. \n* 'include' includes warnings.\n* 'exclude' does not include warnings.\n* 'only' only returns warnings.\n",
+            "pattern": "(only|include|exclude)"
+          }
+        }
+      },
+      "AllRegionsDataRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AllRegionsNoTypeDataRequest"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "regionType": {
+                "type": "string",
+                "description": "The type of the regions specified by the regions property. The list of available regions types can be  obtained using [Get Metadata for Map by Id](./getmapmetadata).\n",
+                "example": "county"
+              }
+            }
+          }
+        ]
+      },
+      "RegionDataRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AllRegionsDataRequest"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "regions": {
+                "type": "array",
+                "description": "A set of regions to retrieve texts for. These regions must be of the type specified by the property regionType.",
+                "items": {
+                  "type": "string",
+                  "example": "hertfordshire"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PagedRequest": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "The page of results to return. This means results will be from ```pageSize * page``` to ```(pageSize * ( page + 1)) - 1``` .",
+            "default": 0,
+            "example": 0
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "The number of results to return per page.",
+            "default": 100,
+            "example": 100
+          }
+        }
+      },
+      "DateRangeRequest": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "integer",
+            "description": "The minimum JavaScript time in milliseconds to return a result for.",
+            "example": 1645394400000
+          },
+          "endDate": {
+            "type": "integer",
+            "description": "The maximum JavaScript time in milliseconds to return a result for.",
+            "example": 1645488000000
+          }
+        }
+      },
+      "TextRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RegionDataRequest"
+          },
+          {
+            "$ref": "#/components/schemas/PagedRequest"
+          },
+          {
+            "$ref": "#/components/schemas/DateRangeRequest"
+          }
+        ],
+        "example": {
+          "hazards": [
+            "flood"
+          ],
+          "sources": [
+            "twitter"
+          ],
+          "regions": [
+            "hertfordshire"
+          ],
+          "warnings": "exclude",
+          "pageSize": 300,
+          "page": 0,
+          "startDate": 1645394400000,
+          "endDate": 1645488000000,
+          "regionType": "county"
+        },
+        "required": [
+          "hazards",
+          "sources",
+          "regions",
+          "startDate",
+          "regionType",
+          "warnings"
+        ]
+      },
+      "StatsRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AllRegionsDataRequest"
+          },
+          {
+            "$ref": "#/components/schemas/DateRangeRequest"
+          }
+        ],
+        "example": {
+          "regionType": "county",
+          "regions": [
+            "greater london"
+          ],
+          "hazards": [
+            "flood"
+          ],
+          "sources": [
+            "twitter"
+          ],
+          "warnings": "exclude",
+          "startDate": 1645394400000,
+          "endDate": 1645488000000
+        },
+        "required": [
+          "hazards",
+          "sources",
+          "regions",
+          "startDate",
+          "regionType",
+          "warnings"
+        ]
+      },
+      "TimeSeriesRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AllRegionsNoTypeDataRequest"
+          },
+          {
+            "$ref": "#/components/schemas/DateRangeRequest"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "textSearch": {
+                "type": "string",
+                "description": "Additional BOOLEAN (MySQL) query string matched against the text of each message.",
+                "example": "windy AND cold"
+              },
+              "timePeriod": {
+                "type": "string",
+                "pattern": "(day|hour)",
+                "description": "Aggregate over either day or hour.",
+                "example": "day"
+              },
+              "regions": {
+                "type": "array",
+                "description": "A set of region ids to retrieve texts for. These can be of any region type except numeric ones, such as 'coarse' and 'fine'.",
+                "items": {
+                  "type": "string",
+                  "example": "hertfordshire"
+                }
+              }
+            }
+          }
+        ],
+        "required": [
+          "hazards",
+          "sources",
+          "regions",
+          "startDate",
+          "regionType",
+          "warnings"
+        ]
+      },
+      "RecentCountRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AllRegionsDataRequest"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "startDate": {
+                "type": "integer",
+                "description": "The minimum JavaScript time to find results for.",
+                "example": 1645394400000
+              }
+            }
+          }
+        ],
+        "required": [
+          "hazards",
+          "sources",
+          "regions",
+          "warnings",
+          "regionType"
+        ]
+      },
+      "RecentCountResponseItem": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "integer"
+        },
+        "example": {
+          "powys": 3,
+          "devon": 20,
+          "dorset": 23
+        }
+      },
+      "StatsResponseItem": {
+        "type": "object",
+        "description": "The statistics for a given region.",
+        "properties": {
+          "region": {
+            "type": "string",
+            "example": "hertfordshire",
+            "description": "The region the statistics are for."
+          },
+          "count": {
+            "type": "integer",
+            "example": 195,
+            "description": "The number of messages counted for this region."
+          },
+          "exceedance": {
+            "type": "number",
+            "example": 35.2,
+            "minimum": 0,
+            "maximum": 100,
+            "description": "The exceedance value for the region as a percentage. Lower is more unusual, higher is more usual."
+          }
+        }
+      },
+      "TextResponseItem": {
+        "type": "object",
+        "properties": {
+          "json": {
+            "type": "object",
+            "description": "The full JSON object supplied by the source service, i.e. Twitter",
+            "additionalProperties": true
+          },
+          "timestamp": {
+            "type": "integer",
+            "example": 1425822000000
+          },
+          "source": {
+            "type": "string",
+            "example": "twitter",
+            "description": "The originating service, e.g. Twitter, for the message"
+          },
+          "id": {
+            "type": "string",
+            "example": "200434034030",
+            "description": "The identifier given by the source service, i.e. Twitter, for the message"
+          },
+          "location": {
+            "type": "object",
+            "description": "A GeoJSON object representing the location of the message.",
+            "additionalProperties": true
+          },
+          "region_type": {
+            "type": "string",
+            "example": "county",
+            "description": "The region type of the region this message belongs to"
+          },
+          "region": {
+            "type": "string",
+            "example": "hertfordshire",
+            "description": "The region this message relates to."
+          },
+          "hazard": {
+            "type": "string",
+            "example": "flood",
+            "description": "The hazard this message relates to."
+          },
+          "possibly_sensitive": {
+            "type": "boolean",
+            "description": "TRUE if the message may contain inappropriate text or images.",
+            "example": false
+          },
+          "warning": {
+            "type": "boolean",
+            "description": "TRUE if the message comes from an automated warning.",
+            "example": false
+          }
+        },
+        "example": {
+          "components": {
+            "examples": {
+              "Example": [
+                {
+                  "json": {
+                    "id": 1495779348669948000,
+                    "geo": null,
+                    "lang": "en",
+                    "text": "@grandoperayork Can you confirm that Dracula is still going ahead tonight even with the flooding of River Ouse. Thank you",
+                    "user": {
+                      "id": 3218380845,
+                      "url": null,
+                      "lang": null,
+                      "name": "Lisa",
+                      "id_str": "3218380845",
+                      "location": "York, England",
+                      "verified": false,
+                      "following": null,
+                      "protected": false,
+                      "time_zone": null,
+                      "created_at": "Tue Apr 28 19:15:18 +0000 2015",
+                      "utc_offset": null,
+                      "description": "Loved PRINCE since 1984 ❤️'s The Twilight Zone,Escape From New York,John Carpenter,Dark Tower,Stephen King,InsideNo9,Rik&Ade,Spandau Ballet,Squeeze,Psychoville",
+                      "geo_enabled": true,
+                      "screen_name": "Lisafurbs",
+                      "listed_count": 32,
+                      "friends_count": 1786,
+                      "is_translator": false,
+                      "notifications": null,
+                      "statuses_count": 20560,
+                      "default_profile": true,
+                      "followers_count": 1329,
+                      "translator_type": "none",
+                      "favourites_count": 139063,
+                      "profile_image_url": "http://pbs.twimg.com/profile_images/682280512061308933/3XRXCw3S_normal.jpg",
+                      "profile_banner_url": "https://pbs.twimg.com/profile_banners/3218380845/1462518844",
+                      "profile_link_color": "1DA1F2",
+                      "profile_text_color": "333333",
+                      "follow_request_sent": null,
+                      "contributors_enabled": false,
+                      "default_profile_image": false,
+                      "withheld_in_countries": [],
+                      "profile_background_tile": false,
+                      "profile_image_url_https": "https://pbs.twimg.com/profile_images/682280512061308933/3XRXCw3S_normal.jpg",
+                      "profile_background_color": "C0DEED",
+                      "profile_sidebar_fill_color": "DDEEF6",
+                      "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+                      "profile_sidebar_border_color": "C0DEED",
+                      "profile_use_background_image": true,
+                      "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png"
+                    },
+                    "place": null,
+                    "id_str": "1495779348669947908",
+                    "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
+                    "entities": {
+                      "urls": [],
+                      "symbols": [],
+                      "hashtags": [],
+                      "user_mentions": [
+                        {
+                          "id": 101781590,
+                          "name": "Grand Opera House York",
+                          "id_str": "101781590",
+                          "indices": [
+                            0,
+                            15
+                          ],
+                          "screen_name": "grandoperayork"
+                        }
+                      ]
+                    },
+                    "trackstr": "flood, floods, flooding, flooded",
+                    "favorited": false,
+                    "retweeted": false,
+                    "truncated": false,
+                    "collection": "flood_collection",
+                    "created_at": "Mon Feb 21 15:16:01 +0000 2022",
+                    "coordinates": null,
+                    "quote_count": 0,
+                    "reply_count": 0,
+                    "contributors": null,
+                    "filter_level": "low",
+                    "timestamp_ms": "1645456561616",
+                    "trackphrases": [
+                      "flood",
+                      "flooded",
+                      "flooding",
+                      "floods"
+                    ],
+                    "retweet_count": 0,
+                    "favorite_count": 0,
+                    "is_quote_status": false,
+                    "in_reply_to_user_id": 101781590,
+                    "in_reply_to_status_id": null,
+                    "in_reply_to_screen_name": "grandoperayork",
+                    "in_reply_to_user_id_str": "101781590",
+                    "in_reply_to_status_id_str": null
+                  },
+                  "timestamp": "2022-02-21T15:16:01.000Z",
+                  "id": "1495779348669947908",
+                  "location": "{\"type\": \"GeometryCollection\", \"geometries\": [{\"type\": \"Point\", \"coordinates\": [-1.275, 54.03444444444445]}]}",
+                  "region": "north yorkshire",
+                  "possibly_sensitive": 0,
+                  "source": "twitter",
+                  "region_type": "county",
+                  "hazard": "flood",
+                  "warning": 0
+                },
+                {
+                  "json": {
+                    "id": 1495779091642998800,
+                    "geo": null,
+                    "lang": "en",
+                    "text": "Rotherham Station is flooded after the River Don burst its banks.\n\nTrain services in parts of Yorkshire have been c… https://t.co/xtQWVVVKNv",
+                    "user": {
+                      "id": 7587032,
+                      "url": "http://news.sky.com/",
+                      "lang": null,
+                      "name": "Sky News",
+                      "id_str": "7587032",
+                      "location": "London, UK",
+                      "verified": true,
+                      "following": null,
+                      "protected": false,
+                      "time_zone": null,
+                      "created_at": "Thu Jul 19 14:42:53 +0000 2007",
+                      "utc_offset": null,
+                      "description": "For breaking news @SkyNewsBreak. Watch live on Sky 501, Virgin Media HD 602, Freeview 233 and YouTube.\n\nDownload our app: http://onelink.to/skynews",
+                      "geo_enabled": false,
+                      "screen_name": "SkyNews",
+                      "listed_count": 28996,
+                      "friends_count": 23,
+                      "is_translator": false,
+                      "notifications": null,
+                      "statuses_count": 509760,
+                      "default_profile": false,
+                      "followers_count": 7509836,
+                      "translator_type": "none",
+                      "favourites_count": 1,
+                      "profile_image_url": "http://pbs.twimg.com/profile_images/1400331605974077442/kelepCgF_normal.jpg",
+                      "profile_banner_url": "https://pbs.twimg.com/profile_banners/7587032/1622700167",
+                      "profile_link_color": "385FAC",
+                      "profile_text_color": "333333",
+                      "follow_request_sent": null,
+                      "contributors_enabled": false,
+                      "default_profile_image": false,
+                      "withheld_in_countries": [],
+                      "profile_background_tile": false,
+                      "profile_image_url_https": "https://pbs.twimg.com/profile_images/1400331605974077442/kelepCgF_normal.jpg",
+                      "profile_background_color": "000000",
+                      "profile_sidebar_fill_color": "EDEDED",
+                      "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+                      "profile_sidebar_border_color": "000000",
+                      "profile_use_background_image": true,
+                      "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png"
+                    },
+                    "place": null,
+                    "id_str": "1495779091642998790",
+                    "source": "<a href=\"https://studio.twitter.com\" rel=\"nofollow\">Twitter Media Studio</a>",
+                    "entities": {
+                      "urls": [
+                        {
+                          "url": "https://t.co/xtQWVVVKNv",
+                          "indices": [
+                            117,
+                            140
+                          ],
+                          "display_url": "twitter.com/i/web/status/1…",
+                          "expanded_url": "https://twitter.com/i/web/status/1495779091642998790"
+                        }
+                      ],
+                      "symbols": [],
+                      "hashtags": [],
+                      "user_mentions": []
+                    },
+                    "trackstr": "flood, floods, flooding, flooded",
+                    "favorited": false,
+                    "retweeted": false,
+                    "truncated": true,
+                    "collection": "flood_collection",
+                    "created_at": "Mon Feb 21 15:15:00 +0000 2022",
+                    "coordinates": null,
+                    "quote_count": 0,
+                    "reply_count": 0,
+                    "contributors": null,
+                    "filter_level": "low",
+                    "timestamp_ms": "1645456500336",
+                    "trackphrases": [
+                      "flood",
+                      "flooded",
+                      "flooding",
+                      "floods"
+                    ],
+                    "retweet_count": 0,
+                    "extended_tweet": {
+                      "entities": {
+                        "urls": [
+                          {
+                            "url": "https://t.co/A4Vv4kS26F",
+                            "indices": [
+                              210,
+                              233
+                            ],
+                            "display_url": "trib.al/fDFCWmC",
+                            "expanded_url": "https://trib.al/fDFCWmC"
+                          }
+                        ],
+                        "media": [
+                          {
+                            "id": 1495724030330036200,
+                            "url": "https://t.co/srWuwPMIlj",
+                            "type": "video",
+                            "sizes": {
+                              "large": {
+                                "h": 1080,
+                                "w": 1080,
+                                "resize": "fit"
+                              },
+                              "small": {
+                                "h": 680,
+                                "w": 680,
+                                "resize": "fit"
+                              },
+                              "thumb": {
+                                "h": 150,
+                                "w": 150,
+                                "resize": "crop"
+                              },
+                              "medium": {
+                                "h": 1080,
+                                "w": 1080,
+                                "resize": "fit"
+                              }
+                            },
+                            "id_str": "1495724030330036224",
+                            "indices": [
+                              234,
+                              257
+                            ],
+                            "media_url": "http://pbs.twimg.com/media/FMHiKlcX0Aw0nIy.jpg",
+                            "video_info": {
+                              "variants": [
+                                {
+                                  "url": "https://video.twimg.com/amplify_video/1495724030330036224/vid/540x540/qlkVLnOTJPycumyV.mp4?tag=14",
+                                  "bitrate": 832000,
+                                  "content_type": "video/mp4"
+                                },
+                                {
+                                  "url": "https://video.twimg.com/amplify_video/1495724030330036224/vid/320x320/1nXwAiyuKE7DF_9p.mp4?tag=14",
+                                  "bitrate": 432000,
+                                  "content_type": "video/mp4"
+                                },
+                                {
+                                  "url": "https://video.twimg.com/amplify_video/1495724030330036224/pl/VZaPjdHjd13Ot-uJ.m3u8?tag=14&container=fmp4",
+                                  "content_type": "application/x-mpegURL"
+                                },
+                                {
+                                  "url": "https://video.twimg.com/amplify_video/1495724030330036224/vid/720x720/hHCt7tGnxOSCZNGQ.mp4?tag=14",
+                                  "bitrate": 1280000,
+                                  "content_type": "video/mp4"
+                                }
+                              ],
+                              "aspect_ratio": [
+                                1,
+                                1
+                              ],
+                              "duration_millis": 40064
+                            },
+                            "display_url": "pic.twitter.com/srWuwPMIlj",
+                            "expanded_url": "https://twitter.com/SkyNews/status/1495779091642998790/video/1",
+                            "media_url_https": "https://pbs.twimg.com/media/FMHiKlcX0Aw0nIy.jpg",
+                            "additional_media_info": {
+                              "title": "Storm Franklin: Rotherham Station floods as River Don bursts banks",
+                              "embeddable": true,
+                              "description": "",
+                              "monetizable": false
+                            }
+                          }
+                        ],
+                        "symbols": [],
+                        "hashtags": [
+                          {
+                            "text": "StormFranklin",
+                            "indices": [
+                              194,
+                              208
+                            ]
+                          }
+                        ],
+                        "user_mentions": []
+                      },
+                      "full_text": "Rotherham Station is flooded after the River Don burst its banks.\n\nTrain services in parts of Yorkshire have been cancelled as Storm Franklin brings even more bad weather to England.\n\nLatest on #StormFranklin: https://t.co/A4Vv4kS26F https://t.co/srWuwPMIlj",
+                      "extended_entities": {
+                        "media": [
+                          {
+                            "id": 1495724030330036200,
+                            "url": "https://t.co/srWuwPMIlj",
+                            "type": "video",
+                            "sizes": {
+                              "large": {
+                                "h": 1080,
+                                "w": 1080,
+                                "resize": "fit"
+                              },
+                              "small": {
+                                "h": 680,
+                                "w": 680,
+                                "resize": "fit"
+                              },
+                              "thumb": {
+                                "h": 150,
+                                "w": 150,
+                                "resize": "crop"
+                              },
+                              "medium": {
+                                "h": 1080,
+                                "w": 1080,
+                                "resize": "fit"
+                              }
+                            },
+                            "id_str": "1495724030330036224",
+                            "indices": [
+                              234,
+                              257
+                            ],
+                            "media_url": "http://pbs.twimg.com/media/FMHiKlcX0Aw0nIy.jpg",
+                            "video_info": {
+                              "variants": [
+                                {
+                                  "url": "https://video.twimg.com/amplify_video/1495724030330036224/vid/540x540/qlkVLnOTJPycumyV.mp4?tag=14",
+                                  "bitrate": 832000,
+                                  "content_type": "video/mp4"
+                                },
+                                {
+                                  "url": "https://video.twimg.com/amplify_video/1495724030330036224/vid/320x320/1nXwAiyuKE7DF_9p.mp4?tag=14",
+                                  "bitrate": 432000,
+                                  "content_type": "video/mp4"
+                                },
+                                {
+                                  "url": "https://video.twimg.com/amplify_video/1495724030330036224/pl/VZaPjdHjd13Ot-uJ.m3u8?tag=14&container=fmp4",
+                                  "content_type": "application/x-mpegURL"
+                                },
+                                {
+                                  "url": "https://video.twimg.com/amplify_video/1495724030330036224/vid/720x720/hHCt7tGnxOSCZNGQ.mp4?tag=14",
+                                  "bitrate": 1280000,
+                                  "content_type": "video/mp4"
+                                }
+                              ],
+                              "aspect_ratio": [
+                                1,
+                                1
+                              ],
+                              "duration_millis": 40064
+                            },
+                            "display_url": "pic.twitter.com/srWuwPMIlj",
+                            "expanded_url": "https://twitter.com/SkyNews/status/1495779091642998790/video/1",
+                            "media_url_https": "https://pbs.twimg.com/media/FMHiKlcX0Aw0nIy.jpg",
+                            "additional_media_info": {
+                              "title": "Storm Franklin: Rotherham Station floods as River Don bursts banks",
+                              "embeddable": true,
+                              "description": "",
+                              "monetizable": false
+                            }
+                          }
+                        ]
+                      },
+                      "display_text_range": [
+                        0,
+                        233
+                      ]
+                    },
+                    "favorite_count": 0,
+                    "is_quote_status": false,
+                    "display_text_range": [
+                      0,
+                      140
+                    ],
+                    "possibly_sensitive": false,
+                    "in_reply_to_user_id": null,
+                    "in_reply_to_status_id": null,
+                    "in_reply_to_screen_name": null,
+                    "in_reply_to_user_id_str": null,
+                    "in_reply_to_status_id_str": null
+                  },
+                  "timestamp": "2022-02-21T15:15:00.000Z",
+                  "id": "1495779091642998790",
+                  "location": "{\"type\": \"GeometryCollection\", \"geometries\": [{\"type\": \"Point\", \"coordinates\": [-1.5, 54.0]}]}",
+                  "region": "north yorkshire",
+                  "possibly_sensitive": 0,
+                  "source": "twitter",
+                  "region_type": "county",
+                  "hazard": "flood",
+                  "warning": 0
+                },
+                {
+                  "json": {
+                    "id": 1495782878113845200,
+                    "geo": null,
+                    "lang": "en",
+                    "text": "Storm Franklin Causing Some Flooding In Northern Powergrid's Region #StormFranklin @Northpowergrid\nhttps://t.co/TG5ThUdDyt",
+                    "user": {
+                      "id": 361168224,
+                      "url": "http://www.yorkshiretimes.co.uk",
+                      "lang": null,
+                      "name": "The Yorkshire Times",
+                      "id_str": "361168224",
+                      "location": "Yorkshire",
+                      "verified": false,
+                      "following": null,
+                      "protected": false,
+                      "time_zone": null,
+                      "created_at": "Wed Aug 24 10:53:26 +0000 2011",
+                      "utc_offset": null,
+                      "description": "YT features lifestyle, news, business, food, family & more. \nTo add to our Voice Of The North, send your news to editor@yorkshiretimes.co.uk",
+                      "geo_enabled": false,
+                      "screen_name": "TheYorksTimes",
+                      "listed_count": 303,
+                      "friends_count": 4547,
+                      "is_translator": false,
+                      "notifications": null,
+                      "statuses_count": 92766,
+                      "default_profile": false,
+                      "followers_count": 23881,
+                      "translator_type": "none",
+                      "favourites_count": 5419,
+                      "profile_image_url": "http://pbs.twimg.com/profile_images/959748710417817600/m3l6oro7_normal.jpg",
+                      "profile_banner_url": "https://pbs.twimg.com/profile_banners/361168224/1471696527",
+                      "profile_link_color": "5DB004",
+                      "profile_text_color": "333333",
+                      "follow_request_sent": null,
+                      "contributors_enabled": false,
+                      "default_profile_image": false,
+                      "withheld_in_countries": [],
+                      "profile_background_tile": false,
+                      "profile_image_url_https": "https://pbs.twimg.com/profile_images/959748710417817600/m3l6oro7_normal.jpg",
+                      "profile_background_color": "C0DEED",
+                      "profile_sidebar_fill_color": "DDEEF6",
+                      "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+                      "profile_sidebar_border_color": "C0DEED",
+                      "profile_use_background_image": true,
+                      "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png"
+                    },
+                    "place": null,
+                    "id_str": "1495782878113845252",
+                    "source": "<a href=\"https://www.yorkshiretimes.co.uk/\" rel=\"nofollow\">yorkshire-times</a>",
+                    "entities": {
+                      "urls": [
+                        {
+                          "url": "https://t.co/TG5ThUdDyt",
+                          "indices": [
+                            99,
+                            122
+                          ],
+                          "display_url": "yorkshiretimes.co.uk/article/Storm-…",
+                          "expanded_url": "https://yorkshiretimes.co.uk/article/Storm-Franklin-Causing-Some-Flooding-In-Northern-Powergrids-Region"
+                        }
+                      ],
+                      "symbols": [],
+                      "hashtags": [
+                        {
+                          "text": "StormFranklin",
+                          "indices": [
+                            68,
+                            82
+                          ]
+                        }
+                      ],
+                      "user_mentions": [
+                        {
+                          "id": 440366765,
+                          "name": "Northern Powergrid",
+                          "id_str": "440366765",
+                          "indices": [
+                            83,
+                            98
+                          ],
+                          "screen_name": "Northpowergrid"
+                        }
+                      ]
+                    },
+                    "trackstr": "flood, floods, flooding, flooded",
+                    "favorited": false,
+                    "retweeted": false,
+                    "truncated": false,
+                    "collection": "flood_collection",
+                    "created_at": "Mon Feb 21 15:30:03 +0000 2022",
+                    "coordinates": null,
+                    "quote_count": 0,
+                    "reply_count": 0,
+                    "contributors": null,
+                    "filter_level": "low",
+                    "timestamp_ms": "1645457403101",
+                    "trackphrases": [
+                      "flood",
+                      "flooded",
+                      "flooding",
+                      "floods"
+                    ],
+                    "retweet_count": 0,
+                    "favorite_count": 0,
+                    "is_quote_status": false,
+                    "possibly_sensitive": false,
+                    "in_reply_to_user_id": null,
+                    "in_reply_to_status_id": null,
+                    "in_reply_to_screen_name": null,
+                    "in_reply_to_user_id_str": null,
+                    "in_reply_to_status_id_str": null
+                  },
+                  "timestamp": "2022-02-21T15:30:03.000Z",
+                  "id": "1495782878113845252",
+                  "location": "{\"type\": \"GeometryCollection\", \"geometries\": [{\"type\": \"Point\", \"coordinates\": [-1.5, 54.0]}]}",
+                  "region": "north yorkshire",
+                  "possibly_sensitive": 0,
+                  "source": "twitter",
+                  "region_type": "county",
+                  "hazard": "flood",
+                  "warning": 0
+                }
+              ]
+            }
+          }
+        }
+      },
+      "TimeSeriesResponseItem": {
+        "type": "object",
+        "description": "Stats for a given day/hour window per region",
+        "properties": {
+          "region": {
+            "type": "string",
+            "example": "hertfordshire",
+            "description": "The region the statistics are for."
+          },
+          "date": {
+            "type": "string",
+            "example": "2021-02-22T00:00:00.000Z",
+            "description": "UTC date string for the data."
+          },
+          "count": {
+            "type": "integer",
+            "example": 195,
+            "description": "The number of messages counted for this region."
+          },
+          "exceedance": {
+            "type": "number",
+            "example": 35.2,
+            "minimum": 0,
+            "maximum": 100,
+            "description": "The exceedance value for the region as a percentage. Lower is more unusual, higher is more usual."
+          }
+        }
+      },
+      "StartMetadata": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number",
+            "example": 53
+          },
+          "lng": {
+            "type": "number",
+            "example": -0.1
+          },
+          "zoom": {
+            "type": "integer",
+            "example": 12
+          }
+        }
+      },
+      "CoreRegionMetadata": {
+        "type": "object",
+        "required": [
+          "id",
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "A human-readable string describing the region",
+            "example": "Dorset"
+          },
+          "id": {
+            "description": "An identifier for the region.",
+            "type": "string",
+            "example": "dorset"
+          }
+        }
+      },
+      "RegionMetadata": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CoreRegionMetadata"
+          },
+          {
+            "type": "object",
+            "description": "Region metadata",
+            "required": [
+              "id",
+              "title",
+              "type",
+              "level"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "The region type.",
+                "example": "county"
+              },
+              "level": {
+                "type": "integer",
+                "description": "The aggregation level of the region.",
+                "example": 1
+              }
+            }
+          }
+        ]
+      },
+      "MapMetadata": {
+        "required": [
+          "defaultRegionType",
+          "hazards",
+          "id",
+          "location",
+          "regionAggregations",
+          "start"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "uk-flood-live"
+          },
+          "title": {
+            "type": "string",
+            "example": "UK Flood"
+          },
+          "regionTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CoreRegionMetadata"
+            }
+          },
+          "regionAggregations": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "countries"
+            }
+          },
+          "start": {
+            "$ref": "#/components/schemas/StartMetadata"
+          },
+          "location": {
+            "type": "string",
+            "example": "uk"
+          },
+          "hazards": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "flood"
+            }
+          },
+          "defaultRegionType": {
+            "type": "string",
+            "example": "county"
+          }
+        },
+        "description": "Map metadata",
+        "example": {
+          "id": "uk-flood-live",
+          "title": "UK Flood",
+          "location": "uk",
+          "regionTypes": [
+            {
+              "id": "county",
+              "title": "Local Authority"
+            },
+            {
+              "id": "fine",
+              "title": "Fine Grid"
+            },
+            {
+              "id": "coarse",
+              "title": "Coarse Grid"
+            },
+            {
+              "id": "uk_country",
+              "title": "UK Countries"
+            },
+            {
+              "id": "iso_country",
+              "title": "ISO Countries"
+            },
+            {
+              "id": "nuts1",
+              "title": "UK Regions"
+            }
+          ],
+          "regionAggregations": [
+            "uk-countries"
+          ],
+          "defaultRegionType": "county",
+          "start": {
+            "lat": 53,
+            "lng": -2,
+            "zoom": 6
+          }
+        }
+      },
+      "InvalidParameterError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Always 'Invalid Parameter'",
+            "pattern": "Invalid Parameter",
+            "example": "Invalid Parameter"
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "An error message describing why the parameter has an incorrect value.",
+            "example": "The parameter name must be provided and be a string"
+          },
+          "parameter": {
+            "type": "string",
+            "description": "The parameter from either the path or the JSON body of the request which was invalid.",
+            "example": "name"
+          }
+        }
+      }
+    }
+  }
+}

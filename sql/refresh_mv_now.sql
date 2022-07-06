@@ -25,12 +25,7 @@ BEGIN
     call debug_msg(1, 'refresh_mv_auto', concat('This is iteration ', @max_id));
     IF GET_LOCK('internal_mv_refresh', 60) THEN
         call debug_msg(1, 'refresh_mv_auto', 'LOCK ACQUIRED');
-        IF mod(@max_id, 12 * 12) = 1
-        THEN
-            call debug_msg(0, 'refresh_mv_auto', 'Selected FULL');
-            call refresh_mv_full(@rc);
-            call debug_msg(0, 'refresh_mv_auto', 'Completed FULL');
-        ELSEIF mod(@max_id, 12) = 1
+        IF mod(@max_id, 12) = 1
         THEN
             call debug_msg(0, 'refresh_mv_auto', 'Selected WINDOW');
             call refresh_mv_map_window(@rc);
@@ -104,10 +99,10 @@ BEGIN
             call debug_msg(-2, 'refresh_mv_map_window', concat('FAILED: ', @p1, ': ', @p2));
         END;
     call debug_msg(0, 'refresh_mv_map_window', 'Refreshing (Window Duration) Materialized Views');
-    call refresh_mv(DATE_SUB(CURDATE(), INTERVAL 4 DAY), DATE_ADD(CURDATE(), INTERVAL 1 DAY), @rc);
-    call fill_days(DATE_SUB(CURDATE(), INTERVAL 4 DAY), DATE_ADD(CURDATE(), INTERVAL 1 DAY));
-    call fill_hours(DATE_SUB(CURDATE(), INTERVAL 4 DAY), DATE_ADD(CURDATE(), INTERVAL 1 DAY));
-    call update_text_count(DATE_SUB(CURDATE(), INTERVAL 4 DAY), DATE_ADD(CURDATE(), INTERVAL 1 DAY));
+    call refresh_mv(DATE_SUB(CURDATE(), INTERVAL 7 DAY), DATE_ADD(CURDATE(), INTERVAL 1 DAY), @rc);
+    call fill_days(DATE_SUB(CURDATE(), INTERVAL 7 DAY), DATE_ADD(CURDATE(), INTERVAL 1 DAY));
+    call fill_hours(DATE_SUB(CURDATE(), INTERVAL 7 DAY), DATE_ADD(CURDATE(), INTERVAL 1 DAY));
+    call update_text_count(DATE_SUB(CURDATE(), INTERVAL 7 DAY), DATE_ADD(CURDATE(), INTERVAL 1 DAY));
     call debug_msg(0, 'refresh_mv', 'Updated mat_view_days');
     SET rc = 0;
 END;
@@ -156,6 +151,7 @@ BEGIN
     call debug_msg(1, 'refresh_mv_full', 'Refreshed map criteria.');
     COMMIT;
 
+
     WHILE dt <= NOW()
         DO
             CALL debug_msg(1, 'refresh_mv_full', CONCAT('Refreshing week starting ', dt));
@@ -166,12 +162,12 @@ BEGIN
             CALL fill_days(dt, DATE_ADD(dt, INTERVAL 1 MONTH));
             CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling hours for week starting ', dt));
             CALL fill_hours(dt, DATE_ADD(dt, INTERVAL 1 MONTH));
-            IF MOD(counter, 12) = 1
-            THEN
-                CALL refresh_mv_map_window(@rc);
-            ELSE
-                CALL refresh_mv_now(@rc);
-            END IF;
+            #             IF MOD(counter, 12) = 1
+#             THEN
+#                 CALL refresh_mv_map_window(@rc);
+#             ELSE
+#                 CALL refresh_mv_now(@rc);
+#             END IF;
             SET dt = DATE_ADD(dt, INTERVAL 1 MONTH);
             SET counter = counter + 1;
         END WHILE;
@@ -496,8 +492,7 @@ $$
 DROP PROCEDURE IF EXISTS daily_housekeeping;
 
 DELIMITER $$
-CREATE PROCEDURE daily_housekeeping(OUT rc INT)
-
+CREATE PROCEDURE daily_housekeeping(IN opt INT, OUT rc INT)
 BEGIN
     -- rollback transaction and bubble up errors if something bad happens
     DECLARE exit handler FOR SQLEXCEPTION, SQLWARNING
@@ -510,24 +505,62 @@ BEGIN
         END;
 
     call debug_msg(0, 'daily_housekeeping', 'Optimizing tables');
-    #     optimize table live_text;
-#     optimize table mat_view_regions;
-#     optimize table mat_view_timeseries_date;
-#     optimize table mat_view_timeseries_hour;
-#     optimize table mat_view_first_entries;
-#     optimize table mat_view_text_count;
+    IF opt = 1 THEN
+        optimize table live_text;
+    ELSEIF opt = 2
+    THEN
+        optimize table mat_view_regions;
+    ELSEIF opt = 3
+    THEN
+        optimize table mat_view_timeseries_date;
+    ELSEIF opt = 4
+    THEN
+        optimize table mat_view_timeseries_hour;
+    ELSEIF opt = 5
+    THEN
+        optimize table mat_view_first_entries;
+    ELSEIF opt = 6
+    THEN
+        optimize table mat_view_text_count;
+    END IF;
     call debug_msg(0, 'daily_housekeeping', 'Optimized tables');
     set @rc = 0;
 
 END;
 $$
 
-
 DROP EVENT IF EXISTS daily_housekeeping_event;
-CREATE EVENT daily_housekeeping_event
-    ON SCHEDULE EVERY 1 DAY
-        STARTS '2021-01-01 04:17:17'
-    DO CALL daily_housekeeping(@rc);
+
+DROP EVENT IF EXISTS daily_housekeeping_event_1;
+CREATE EVENT daily_housekeeping_event_1
+    ON SCHEDULE EVERY 1 WEEK
+        STARTS '2021-01-01 02:17:17'
+    DO CALL daily_housekeeping(1, @rc);
+DROP EVENT IF EXISTS daily_housekeeping_event_2;
+CREATE EVENT daily_housekeeping_event_2
+    ON SCHEDULE EVERY 1 WEEK
+        STARTS '2021-01-02 02:17:17'
+    DO CALL daily_housekeeping(2, @rc);
+DROP EVENT IF EXISTS daily_housekeeping_event_3;
+CREATE EVENT daily_housekeeping_event_3
+    ON SCHEDULE EVERY 1 WEEK
+        STARTS '2021-01-03 02:17:17'
+    DO CALL daily_housekeeping(3, @rc);
+DROP EVENT IF EXISTS daily_housekeeping_event_4;
+CREATE EVENT daily_housekeeping_event_4
+    ON SCHEDULE EVERY 1 WEEK
+        STARTS '2021-01-04 02:17:17'
+    DO CALL daily_housekeeping(4, @rc);
+DROP EVENT IF EXISTS daily_housekeeping_event_5;
+CREATE EVENT daily_housekeeping_event_5
+    ON SCHEDULE EVERY 1 WEEK
+        STARTS '2021-01-05 02:17:17'
+    DO CALL daily_housekeeping(5, @rc);
+DROP EVENT IF EXISTS daily_housekeeping_event_6;
+CREATE EVENT daily_housekeeping_event_6
+    ON SCHEDULE EVERY 1 WEEK
+        STARTS '2021-01-06 02:17:17'
+    DO CALL daily_housekeeping(6, @rc);
 
 DROP EVENT IF EXISTS mv_full_refresh_event;
 DROP EVENT IF EXISTS mv_map_window_refresh_event;

@@ -16,7 +16,7 @@ describe('#104 Slider and tweet interaction : https://github.com/socialsensingbo
                  cy.moveMinDateSliderLeft(14);
                  cy.wait(10000);
                  cy.url({timeout: 20000}).should("equal",
-                                                 MAP_URL + "?zoom=5&max_time=1631664000000&min_time=1631314800000&active_number=exceedance&active_polygon=county&selected=greater%20london");
+                                                 MAP_URL + "?zoom=5&max_time=1631664000000&min_time=1631059200000&active_number=exceedance&active_polygon=county&selected=greater%20london");
                  cy.log("Click out of London in any other county (1)");
                  cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-cambridgeshire").click();
                  cy.wait(10000);
@@ -26,11 +26,11 @@ describe('#104 Slider and tweet interaction : https://github.com/socialsensingbo
                  cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-greater-london").click({force: true});
                  cy.wait(10000);
                  cy.twitterPanelHeader("Greater London");
-                 cy.tweetCountTotal(196);
+                 cy.tweetCountTotal(224);
                  cy.log("Move time slider back to 1 day back from latest time");
                  cy.moveMinDateSliderRight(7);
                  cy.wait(3000);
-                 cy.tweetCountTotal(174);
+                 cy.tweetCountTotal(177);
                  cy.wait(10000);
                  cy.log("Click out of London in any other county (2)");
                  cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-wiltshire").click({force: true});
@@ -41,9 +41,9 @@ describe('#104 Slider and tweet interaction : https://github.com/socialsensingbo
                  cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-greater-london").click({force: true});
                  cy.wait(10000);
                  cy.twitterPanelHeader("Greater London");
-                 cy.tweetCountTotal(174);
+                 cy.tweetCountTotal(177);
                  cy.url({timeout: 20000}).should("equal",
-                                                 MAP_URL + "?zoom=5&max_time=1631664000000&min_time=1631566800000&active_number=exceedance&active_polygon=county&selected=greater%20london");
+                                                 MAP_URL + "?zoom=5&max_time=1631664000000&min_time=1631487600000&active_number=exceedance&active_polygon=county&selected=greater%20london");
 
              });
 

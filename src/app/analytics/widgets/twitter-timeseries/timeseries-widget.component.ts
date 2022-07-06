@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
-import {MetadataService} from "../../../api/metadata.service";
 import {ActivatedRoute} from "@angular/router";
 import {RESTDataAPIService} from "../../../api/rest-api.service";
 import {Logger} from "@aws-amplify/core";
@@ -75,7 +74,7 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
         }
     }
 
-    constructor(public metadata: MetadataService,
+    constructor(
                 public notify: NotificationService,
                 public map: MapSelectionService,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
@@ -138,13 +137,14 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
         try {
             const payload = {
                 layer: this.pref.defaultLayer(),
-                ...query,
-                from:       this._state.from ? this._state.from : (nowRoundedToHour() - (365.24 * dayInMillis)),
-                to:         this._state.to ? this._state.to : nowRoundedToHour(),
+                ...query.layer,
+                location:   query.location,
+                regions:    query.regions,
+                startDate:  this._state.from ? this._state.from : (nowRoundedToHour() - (365.24 * dayInMillis)),
+                endDate:    this._state.to ? this._state.to : nowRoundedToHour(),
                 name:       "time",
                 timePeriod: this.state.timePeriod
             };
-            delete payload.__series_id;
             const serverResults = await this._api.callMapAPIWithCache(this.map.id + "/analytics/time", payload);
             this.error = false;
             return this.queryTransform(serverResults);

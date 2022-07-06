@@ -37,7 +37,7 @@ describe('11 Analytics: ', function () {
             snapshot('app-timeseries-multi-query-chart', "13-analytics-timeseries-imported-from-map-1");
 
             cy.url({timeout: 30000}).should("equal",
-                                            ANALYTICS_URL + "/time?active_number=count&active_polygon=county&selected=greater%20london&active_layer=flood");
+                                            ANALYTICS_URL + "/time?active_number=count&active_polygon=county&selected=greater%20london&max_time=1631664000000&min_time=1631577600000&active_layer=flood");
             cy.get("#loading-div", {timeout: 60000}).should("not.exist");
             cy.wait(4000);
             snapshot('app-timeseries-multi-query-chart', "13-analytics-timeseries-graph");

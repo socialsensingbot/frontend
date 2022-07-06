@@ -1,26 +1,26 @@
 [
-    {
-        "groupName": "metoffice",
-        "precedence": 1
-    },
-    {
-        "groupName": "demo",
-        "precedence": 2
-    },
-    {
-        "groupName": "socialsensing",
-        "precedence": 3
-    },
-    {
-        "groupName": "testuser",
-        "precedence": 4
-    },
-    {
-        "groupName": "cypressA",
-        "precedence": 5
-    },
-    {
-        "groupName": "cypressB",
-        "precedence": 6
-    }
+  {
+    "groupName": "metoffice",
+    "precedence": 1
+  },
+  {
+    "groupName": "demo",
+    "precedence": 2
+  },
+  {
+    "groupName": "socialsensing",
+    "precedence": 3
+  },
+  {
+    "groupName": "testuser",
+    "precedence": 4
+  },
+  {
+    "groupName": "cypressA",
+    "precedence": 5
+  },
+  {
+    "groupName": "cypressB",
+    "precedence": 6
+  }
 ]

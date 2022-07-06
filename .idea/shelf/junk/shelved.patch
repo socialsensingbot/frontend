@@ -1,0 +1,84 @@
+Index: amplify/team-provider-info.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{\n  \"dev\": {\n    \"awscloudformation\": {\n      \"AuthRoleName\": \"amplify-socialsensing-dev-183906-authRole\",\n      \"UnauthRoleArn\": \"arn:aws:iam::686957444051:role/amplify-socialsensing-dev-183906-unauthRole\",\n      \"AuthRoleArn\": \"arn:aws:iam::686957444051:role/amplify-socialsensing-dev-183906-authRole\",\n      \"Region\": \"eu-west-2\",\n      \"DeploymentBucketName\": \"amplify-socialsensing-dev-183906-deployment\",\n      \"UnauthRoleName\": \"amplify-socialsensing-dev-183906-unauthRole\",\n      \"StackName\": \"amplify-socialsensing-dev-183906\",\n      \"StackId\": \"arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-dev-183906/6da31140-62fe-11ea-a0c9-060e4e394d84\",\n      \"AmplifyAppId\": \"dtmxl3q3i7oix\",\n      \"APIGatewayAuthURL\": \"https://s3.amazonaws.com/amplify-socialsensing-dev-183906-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json\"\n    },\n    \"categories\": {\n      \"auth\": {\n        \"socialsensingf07a871c\": {},\n        \"userPoolGroups\": {}\n      },\n      \"function\": {\n        \"S3Triggerb3a090e2\": {\n          \"deploymentBucketName\": \"amplify-socialsensing-dev-183906-deployment\",\n          \"s3Key\": \"amplify-builds/S3Triggerb3a090e2-754e48743050344b787a-build.zip\"\n        },\n        \"query\": {\n          \"deploymentBucketName\": \"amplify-socialsensing-dev-183906-deployment\",\n          \"s3Key\": \"amplify-builds/query-41736f76444c6e6a6e64-build.zip\"\n        }\n      },\n      \"hosting\": {\n        \"amplifyhosting\": {\n          \"appId\": \"dtmxl3q3i7oix\",\n          \"type\": \"cicd\"\n        }\n      }\n    }\n  },\n  \"prod\": {\n    \"awscloudformation\": {\n      \"AuthRoleName\": \"amplify-socialsensing-prod-224245-authRole\",\n      \"UnauthRoleArn\": \"arn:aws:iam::686957444051:role/amplify-socialsensing-prod-224245-unauthRole\",\n      \"AuthRoleArn\": \"arn:aws:iam::686957444051:role/amplify-socialsensing-prod-224245-authRole\",\n      \"Region\": \"eu-west-2\",\n      \"DeploymentBucketName\": \"amplify-socialsensing-prod-224245-deployment\",\n      \"UnauthRoleName\": \"amplify-socialsensing-prod-224245-unauthRole\",\n      \"StackName\": \"amplify-socialsensing-prod-224245\",\n      \"StackId\": \"arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-prod-224245/76208f10-6320-11ea-9f6c-06bdd06f2a66\",\n      \"AmplifyAppId\": \"dtmxl3q3i7oix\"\n    },\n    \"categories\": {\n      \"auth\": {\n        \"socialsensingf07a871c\": {},\n        \"userPoolGroups\": {}\n      },\n      \"function\": {\n        \"S3Triggerb3a090e2\": {}\n      },\n      \"hosting\": {\n        \"amplifyhosting\": {\n          \"type\": \"cicd\"\n        }\n      }\n    }\n  },\n  \"demo\": {\n    \"awscloudformation\": {\n      \"AuthRoleName\": \"amplify-socialsensing-demo-144920-authRole\",\n      \"UnauthRoleArn\": \"arn:aws:iam::686957444051:role/amplify-socialsensing-demo-144920-unauthRole\",\n      \"AuthRoleArn\": \"arn:aws:iam::686957444051:role/amplify-socialsensing-demo-144920-authRole\",\n      \"Region\": \"eu-west-2\",\n      \"DeploymentBucketName\": \"amplify-socialsensing-demo-144920-deployment\",\n      \"UnauthRoleName\": \"amplify-socialsensing-demo-144920-unauthRole\",\n      \"StackName\": \"amplify-socialsensing-demo-144920\",\n      \"StackId\": \"arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-demo-144920/7eed7060-bf8f-11ea-9f1b-021ebf3a767c\",\n      \"AmplifyAppId\": \"dtmxl3q3i7oix\"\n    },\n    \"categories\": {\n      \"auth\": {\n        \"socialsensingf07a871c\": {},\n        \"userPoolGroups\": {}\n      },\n      \"function\": {\n        \"S3Triggerb3a090e2\": {}\n      },\n      \"hosting\": {\n        \"amplifyhosting\": {\n          \"appId\": \"dtmxl3q3i7oix\",\n          \"type\": \"cicd\"\n        }\n      }\n    }\n  },\n  \"pwsdemo\": {\n    \"awscloudformation\": {\n      \"AuthRoleName\": \"amplify-socialsensing-pwsdemo-155623-authRole\",\n      \"UnauthRoleArn\": \"arn:aws:iam::686957444051:role/amplify-socialsensing-pwsdemo-155623-unauthRole\",\n      \"AuthRoleArn\": \"arn:aws:iam::686957444051:role/amplify-socialsensing-pwsdemo-155623-authRole\",\n      \"Region\": \"eu-west-2\",\n      \"DeploymentBucketName\": \"amplify-socialsensing-pwsdemo-155623-deployment\",\n      \"UnauthRoleName\": \"amplify-socialsensing-pwsdemo-155623-unauthRole\",\n      \"StackName\": \"amplify-socialsensing-pwsdemo-155623\",\n      \"StackId\": \"arn:aws:cloudformation:eu-west-2:686957444051:stack/amplify-socialsensing-pwsdemo-155623/54ff9df0-de6a-11eb-8cee-0618b2a83ab4\",\n      \"AmplifyAppId\": \"dtmxl3q3i7oix\"\n    },\n    \"categories\": {\n      \"auth\": {\n        \"socialsensingf07a871c\": {},\n        \"userPoolGroups\": {}\n      },\n      \"function\": {\n        \"S3Triggerb3a090e2\": {\n          \"deploymentBucketName\": \"amplify-socialsensing-pwsdemo-155623-deployment\",\n          \"s3Key\": \"amplify-builds/S3Triggerb3a090e2-754e48743050344b787a-build.zip\"\n        },\n        \"query\": {\n          \"deploymentBucketName\": \"amplify-socialsensing-pwsdemo-155623-deployment\",\n          \"s3Key\": \"amplify-builds/query-6d786a326e4e74635a70-build.zip\"\n        }\n      },\n      \"hosting\": {\n        \"amplifyhosting\": {\n          \"appId\": \"dtmxl3q3i7oix\",\n          \"type\": \"cicd\"\n        }\n      }\n    }\n  }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/amplify/team-provider-info.json b/amplify/team-provider-info.json
+--- a/amplify/team-provider-info.json	(revision e286a2c2fca577642d18e7cdfd4eec08dab72fca)
++++ b/amplify/team-provider-info.json	(date 1627392280694)
+@@ -53,7 +53,10 @@
+         "userPoolGroups": {}
+       },
+       "function": {
+-        "S3Triggerb3a090e2": {}
++        "S3Triggerb3a090e2": {
++          "deploymentBucketName": "amplify-socialsensing-prod-224245-deployment",
++          "s3Key": "amplify-builds/S3Triggerb3a090e2-34614f6e574c74506878-build.zip"
++        }
+       },
+       "hosting": {
+         "amplifyhosting": {
+Index: amplify/backend/function/query/query-cloudformation-template.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{\n  \"AWSTemplateFormatVersion\": \"2010-09-09\",\n  \"Description\": \"Lambda Function resource stack creation using Amplify CLI\",\n  \"Parameters\": {\n    \"CloudWatchRule\": {\n      \"Type\": \"String\",\n      \"Default\": \"NONE\",\n      \"Description\": \" Schedule Expression\"\n    },\n    \"deploymentBucketName\": {\n      \"Type\": \"String\"\n    },\n    \"env\": {\n      \"Type\": \"String\"\n    },\n    \"s3Key\": {\n      \"Type\": \"String\"\n    }\n  },\n  \"Conditions\": {\n    \"ShouldNotCreateEnvResources\": {\n      \"Fn::Equals\": [\n        {\n          \"Ref\": \"env\"\n        },\n        \"NONE\"\n      ]\n    }\n  },\n  \"Resources\": {\n    \"LambdaFunction\": {\n      \"Type\": \"AWS::Lambda::Function\",\n      \"Metadata\": {\n        \"aws:asset:path\": \"./src\",\n        \"aws:asset:property\": \"Code\"\n      },\n      \"Properties\": {\n        \"Code\": {\n          \"S3Bucket\": {\n            \"Ref\": \"deploymentBucketName\"\n          },\n          \"S3Key\": {\n            \"Ref\": \"s3Key\"\n          }\n        },\n        \"Handler\": \"index.handler\",\n        \"FunctionName\": {\n          \"Fn::If\": [\n            \"ShouldNotCreateEnvResources\",\n            \"query\",\n            {\n              \"Fn::Join\": [\n                \"\",\n                [\n                  \"query\",\n                  \"-\",\n                  {\n                    \"Ref\": \"env\"\n                  }\n                ]\n              ]\n            }\n          ]\n        },\n        \"Environment\": {\n          \"Variables\": {\n            \"ENV\": {\n              \"Ref\": \"env\"\n            },\n            \"REGION\": {\n              \"Ref\": \"AWS::Region\"\n            }\n          }\n        },\n        \"Role\": {\n          \"Fn::GetAtt\": [\n            \"LambdaExecutionRole\",\n            \"Arn\"\n          ]\n        },\n        \"Runtime\": \"nodejs14.x\",\n        \"Layers\": [],\n        \"Timeout\": \"25\",\n        \"VpcConfig\": {\n          \"SecurityGroupIds\": [\n            \"sg-c0f105a1\"\n          ],\n          \"SubnetIds\": [\n            \"subnet-6a99e303\",\n            \"subnet-2c6abf60\",\n            \"subnet-bbb234c1\"\n          ]\n        }\n      }\n    },\n    \"LambdaExecutionRole\": {\n      \"Type\": \"AWS::IAM::Role\",\n      \"Properties\": {\n        \"RoleName\": {\n          \"Fn::If\": [\n            \"ShouldNotCreateEnvResources\",\n            \"socialsensingLambdaRole8e725c47\",\n            {\n              \"Fn::Join\": [\n                \"\",\n                [\n                  \"socialsensingLambdaRole8e725c47\",\n                  \"-\",\n                  {\n                    \"Ref\": \"env\"\n                  }\n                ]\n              ]\n            }\n          ]\n        },\n        \"AssumeRolePolicyDocument\": {\n          \"Version\": \"2012-10-17\",\n          \"Statement\": [\n            {\n              \"Effect\": \"Allow\",\n              \"Principal\": {\n                \"Service\": [\n                  \"lambda.amazonaws.com\"\n                ]\n              },\n              \"Action\": [\n                \"sts:AssumeRole\"\n              ]\n            }\n          ]\n        }\n      }\n    },\n    \"lambdaexecutionpolicy\": {\n      \"DependsOn\": [\n        \"LambdaExecutionRole\"\n      ],\n      \"Type\": \"AWS::IAM::Policy\",\n      \"Properties\": {\n        \"PolicyName\": \"lambda-execution-policy\",\n        \"Roles\": [\n          {\n            \"Ref\": \"LambdaExecutionRole\"\n          }\n        ],\n        \"PolicyDocument\": {\n          \"Version\": \"2012-10-17\",\n          \"Statement\": [\n            {\n              \"Effect\": \"Allow\",\n              \"Action\": [\n                \"ec2:CreateNetworkInterface\",\n                \"ec2:DescribeNetworkInterfaces\",\n                \"ec2:DeleteNetworkInterface\"\n              ],\n              \"Resource\": \"*\"\n            },\n            {\n              \"Effect\": \"Allow\",\n              \"Action\": [\n                \"logs:CreateLogGroup\",\n                \"logs:CreateLogStream\",\n                \"logs:PutLogEvents\"\n              ],\n              \"Resource\": {\n                \"Fn::Sub\": [\n                  \"arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${lambda}:log-stream:*\",\n                  {\n                    \"region\": {\n                      \"Ref\": \"AWS::Region\"\n                    },\n                    \"account\": {\n                      \"Ref\": \"AWS::AccountId\"\n                    },\n                    \"lambda\": {\n                      \"Ref\": \"LambdaFunction\"\n                    }\n                  }\n                ]\n              }\n            }\n          ]\n        }\n      }\n    }\n  },\n  \"Outputs\": {\n    \"Name\": {\n      \"Value\": {\n        \"Ref\": \"LambdaFunction\"\n      }\n    },\n    \"Arn\": {\n      \"Value\": {\n        \"Fn::GetAtt\": [\n          \"LambdaFunction\",\n          \"Arn\"\n        ]\n      }\n    },\n    \"Region\": {\n      \"Value\": {\n        \"Ref\": \"AWS::Region\"\n      }\n    },\n    \"LambdaExecutionRole\": {\n      \"Value\": {\n        \"Ref\": \"LambdaExecutionRole\"\n      }\n    }\n  }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/amplify/backend/function/query/query-cloudformation-template.json b/amplify/backend/function/query/query-cloudformation-template.json
+--- a/amplify/backend/function/query/query-cloudformation-template.json	(revision e286a2c2fca577642d18e7cdfd4eec08dab72fca)
++++ b/amplify/backend/function/query/query-cloudformation-template.json	(date 1627392204218)
+@@ -80,18 +80,7 @@
+         },
+         "Runtime": "nodejs14.x",
+         "Layers": [],
+-        "Timeout": "25",
+-        "VpcConfig": {
+-          "SecurityGroupIds": [
+-            "sg-c0f105a1"
+-          ],
+-          "SubnetIds": [
+-            "subnet-6a99e303",
+-            "subnet-2c6abf60",
+-            "subnet-bbb234c1"
+-          ]
+-        }
+-      }
++        "Timeout": "25"
+     },
+     "LambdaExecutionRole": {
+       "Type": "AWS::IAM::Role",
+@@ -210,4 +199,4 @@
+       }
+     }
+   }
+-}
+\ No newline at end of file
++}
+Index: amplify/backend/function/S3Triggerb3a090e2/src/package-lock.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{\n  \"name\": \"S3Triggerb3a090e2\",\n  \"version\": \"2.0.0\",\n  \"lockfileVersion\": 1\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/amplify/backend/function/S3Triggerb3a090e2/src/package-lock.json b/amplify/backend/function/S3Triggerb3a090e2/src/package-lock.json
+--- a/amplify/backend/function/S3Triggerb3a090e2/src/package-lock.json	(revision e286a2c2fca577642d18e7cdfd4eec08dab72fca)
++++ b/amplify/backend/function/S3Triggerb3a090e2/src/package-lock.json	(date 1627392280538)
+@@ -1,5 +1,13 @@
+ {
+   "name": "S3Triggerb3a090e2",
+   "version": "2.0.0",
+-  "lockfileVersion": 1
++  "lockfileVersion": 2,
++  "requires": true,
++  "packages": {
++    "": {
++      "name": "S3Triggerb3a090e2",
++      "version": "2.0.0",
++      "license": "Apache-2.0"
++    }
++  }
+ }

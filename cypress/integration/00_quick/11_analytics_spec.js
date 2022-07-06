@@ -4,7 +4,7 @@ import {v4 as uuidv4} from "uuid";
 const zoomDuration = 1000;
 
 function snapshot(query = 'app-timeseries-multi-query-chart', name = "analytics-timeseries-graph-exceedance-bar") {
-    cy.wait(10000);
+    cy.wait(20000);
     cy.get(query).scrollIntoView()
         .toMatchImageSnapshot({
                                   "imageConfig": {

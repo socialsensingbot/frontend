@@ -4,6 +4,8 @@ cd "$(dirname $0)"
 export PATH=$PATH:$(pwd)
 cd ..
 #cd amplify && git clean -fdx && cd ..
+./amplify/backend/function/query/build.sh
+./amplify/backend/function/api/build.sh
 
 if [[ "${AWS_BRANCH}" == staging ]]; then
   backup.sh
@@ -15,7 +17,7 @@ elif [[ "${AWS_BRANCH}" == demo ]]; then
 elif [[ "${AWS_BRANCH}" == master ]]; then
   amplifyPush --simple
 elif [[ "${AWS_BRANCH}" == release* ]]; then
-#  backup.sh
+  #  backup.sh
   amplifyPush --simple
 else
   amplifyPush --simple

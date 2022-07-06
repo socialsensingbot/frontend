@@ -1,5 +1,4 @@
 import {Component, Input, NgZone, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
-import {MetadataService} from "../../api/metadata.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {RESTDataAPIService} from "../../api/rest-api.service";
 import {Logger} from "@aws-amplify/core";
@@ -144,7 +143,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this._state = value;
     }
 
-    constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
+    constructor(protected _zone: NgZone, protected _router: Router,
                 public notify: NotificationService, public map: MapSelectionService,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
                 public exec: UIExecutionService, public saves: SavedGraphService, public dialog: MatDialog,
@@ -390,87 +389,37 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
-    private initGraphFromRouteParams(): void {
-        this._route.params.subscribe(async params => {
-            this.noData = true;
-            this.updating = true;
-            try {
-                const queryParams = this._route.snapshot.queryParams;
-                if (queryParams.active_layer) {
-                    this.mapLayer = this.pref.enabledLayers.filter(i => i.id === queryParams.active_layer)[0];
-                } else {
-                    this.mapLayer = this.pref.defaultLayer();
-                }
+    public async timePeriodChanged(timePeriod: TimePeriod) {
+        const switchedToHours = timePeriod === "hour";
 
-                log.info("State is now " + JSON.stringify(this.state));
-                if (params.id) {
-                    // We need to load a saved graph
-                    this.state = this.defaultState();
-                    this.seriesCollection.clear();
-                    this.setEOCFromQuery(queryParams);
-                    this.graphId = params.id;
-                    const savedGraph = await this.saves.get(params.id);
-                    if (savedGraph !== null) {
-                        this.title = savedGraph.title;
-                        this.state = JSON.parse(savedGraph.state);
-                        await this.timePeriodChanged(this.state.timePeriod || "day");
-                        log.debug("Loaded saved graph with state ", this.state);
-                        await this.refreshAllSeries();
-                        // this.exec.uiActivity();
-                    } else {
-                        this.navigateToRoot();
-                    }
-                } else {
-                    // This is a new (unsaved) graph.
-                    this.graphId = null;
-                    this.title = "";
-                    if (typeof queryParams.text_search !== "undefined") {
-                        this.state.queries[0].textSearch = queryParams.text_search;
-                    }
-                    // We don't support coarse or fine region types as they are numeric (grid) based.
-                    // The selected region can be passed in from other parts of the app such as the map.
-                    if (typeof queryParams.selected !== "undefined" && queryParams.active_polygon !== "coarse" && queryParams.active_polygon !== "fine") {
-                        log.debug("Taking the selected region from the query ", queryParams.selected);
-                        this.state = this.defaultState();
-                        log.debug("State is now ", JSON.stringify(this.state));
-                        if (Array.isArray(queryParams.selected)) {
-                            log.debug("Regions selected: ", JSON.stringify(queryParams.selected));
-                            for (const region of queryParams.selected) {
-                                try {
-                                    log.debug("Adding query for region " + region);
-                                    const newQuery = this.newQuery();
-                                    newQuery.regions.push(region);
-                                    this.state.queries.push(newQuery);
-                                    await this.updateGraph(newQuery, this.state.timePeriod, true);
-                                } catch (e) {
-                                    console.error(e);
-                                }
+        log.debug("Time period was " + timePeriod);
+        log.debug("Time period is now " + timePeriod);
+        this.state.timePeriod = timePeriod;
+        const today = this.now;
+        const day = today.getDate();
+        const month = today.getMonth();
+        const year = today.getFullYear();
+        let minDate: Date;
+        let maxDate: Date;
+        if (switchedToHours) {
+            minDate = this.seriesCollection.minScrollbarDate ? this.seriesCollection.minScrollbarDate : new Date(
+                this.now.getTime() - ONE_DAY);
+            maxDate = this.seriesCollection.maxScrollbarDate ? this.seriesCollection.maxScrollbarDate : this.now;
+            log.debug("Min date is now " + minDate);
+            log.debug("Max date is now " + maxDate);
+        } else {
+            minDate = new Date(year - 1, month, day);
+            maxDate = this.now;
+        }
+        this.range.controls.start.setValue(minDate);
+        this.range.controls.end.setValue(maxDate);
+        this.seriesCollection.dateSpacing = timePeriod === "day" ? dayInMillis : hourInMillis;
+        this.seriesCollection.minDate = minDate;
+        this.seriesCollection.maxDate = maxDate;
+        this.seriesCollection.rangeChanged.emit();
 
-                            }
-                            log.debug("State is now ", JSON.stringify(this.state));
-                        } else {
-                            let newQuery: TimeseriesRESTQuery = this.newQuery();
-                            this.state.queries = [newQuery];
-                            newQuery.regions = [queryParams.selected];
-                            log.debug("State is now ", JSON.stringify(this.state));
-                            await this.updateGraph(newQuery, this.state.timePeriod, true);
-                        }
-                        log.debug("State is now ", JSON.stringify(this.state));
-                        this.setEOCFromQuery(queryParams);
-                    } else {
-                        // No region is selected or a numeric region is selected.
-                        await this.clear();
-                        this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
-                        this.setEOCFromQuery(queryParams);
-                        await this.updateGraph(this.state.queries[0], this.state.timePeriod, true);
+        await this.refreshAllSeries();
 
-                    }
-                }
-            } finally {
-                this.updating = false;
-            }
-
-        });
     }
 
     /**
@@ -535,20 +484,25 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         }
 
         try {
-            const payload = {
-                layer: this.mapLayer,
-                ...query,
-                from: this.range.controls.start.value !== null ? roundToHour(
+            const payload: any = {
+                ...query.layer,
+                location: query.location,
+                regions:  query.regions,
+
+                startDate: this.range.controls.start.value !== null ? roundToHour(
                     this.range.controls.start.value.getTime()) : (nowRoundedToHour() - (365.24 * dayInMillis)),
-                to:   this.range.controls.end.value !== null ? roundToHour(this.range.controls.end.value.getTime()) : nowRoundedToHour(),
-                name: "time",
+                endDate:   this.range.controls.end.value !== null ? roundToHour(
+                    this.range.controls.end.value.getTime()) : nowRoundedToHour(),
+                name:      "time",
                 timePeriod
             };
+            if (query.textSearch) {
+                payload.textSearch = query.textSearch;
+            }
             if (payload.regions.length === 0) {
                 payload.regions = this.pref.combined.analyticsDefaultRegions;
             }
-            delete payload.__series_id;
-            const serverResults = await this._api.callMapAPIWithCache(this.map.id + "/analytics/time", payload, 60 * 60);
+            const serverResults = await this._api.callMapAPIWithCacheAndDatePaging(this.map.id + "/analytics/time", payload);
             log.debug("Server result was ", serverResults);
             this.error = false;
             return this.queryTransform(serverResults);
@@ -560,37 +514,87 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
-    public async timePeriodChanged(timePeriod: TimePeriod) {
-        const switchedToHours = timePeriod === "hour";
+    private initGraphFromRouteParams(): void {
+        this._route.params.subscribe(async params => {
+            this.noData = true;
+            this.updating = true;
+            try {
+                const queryParams = this._route.snapshot.queryParams;
+                if (queryParams.active_layer) {
+                    this.mapLayer = this.pref.enabledLayers.filter(i => i.id === queryParams.active_layer)[0];
+                } else {
+                    this.mapLayer = this.pref.defaultLayer();
+                }
 
-        log.debug("Time period was " + timePeriod);
-        log.debug("Time period is now " + timePeriod);
-        this.state.timePeriod = timePeriod;
-        const today = this.now;
-        const day = today.getDate();
-        const month = today.getMonth();
-        const year = today.getFullYear();
-        let minDate: Date;
-        let maxDate: Date;
-        if (switchedToHours) {
-            minDate = this.seriesCollection.minScrollbarDate ? this.seriesCollection.minScrollbarDate : new Date(
-                this.now.getTime() - ONE_DAY);
-            maxDate = this.seriesCollection.maxScrollbarDate ? this.seriesCollection.maxScrollbarDate : this.now;
-            log.debug("Min date is now " + minDate)
-            log.debug("Max date is now " + maxDate)
-        } else {
-            minDate = new Date(year - 1, month, day);
-            maxDate = this.now;
-        }
-        this.range.controls.start.setValue(minDate);
-        this.range.controls.end.setValue(maxDate);
-        this.seriesCollection.dateSpacing = timePeriod === "day" ? dayInMillis : hourInMillis;
-        this.seriesCollection.minDate = minDate;
-        this.seriesCollection.maxDate = maxDate;
-        this.seriesCollection.rangeChanged.emit();
+                log.info("State is now " + JSON.stringify(this.state));
+                if (params.id) {
+                    // We need to load a saved graph
+                    this.state = this.defaultState();
+                    this.seriesCollection.clear();
+                    this.setEOCFromQuery(queryParams);
+                    this.graphId = params.id;
+                    const savedGraph = await this.saves.get(params.id);
+                    if (savedGraph !== null) {
+                        this.title = savedGraph.title;
+                        this.state = JSON.parse(savedGraph.state);
+                        await this.timePeriodChanged(this.state.timePeriod || "day");
+                        log.debug("Loaded saved graph with state ", this.state);
+                        await this.refreshAllSeries();
+                        // this.exec.uiActivity();
+                    } else {
+                        this.navigateToRoot();
+                    }
+                } else {
+                    // This is a new (unsaved) graph.
+                    this.graphId = null;
+                    this.title = "";
+                    if (typeof queryParams.text_search !== "undefined") {
+                        this.state.queries[0].textSearch = queryParams.text_search;
+                    }
+                    // We don't support coarse or fine region types as they are numeric (grid) based.
+                    // The selected region can be passed in from other parts of the app such as the map.
+                    if (typeof queryParams.selected !== "undefined" && queryParams.active_polygon !== "coarse" && queryParams.active_polygon !== "fine") {
+                        log.debug("Taking the selected region from the query ", queryParams.selected);
+                        this.state = this.defaultState();
+                        log.debug("State is now ", JSON.stringify(this.state));
+                        if (Array.isArray(queryParams.selected)) {
+                            log.debug("Regions selected: ", JSON.stringify(queryParams.selected));
+                            for (const region of queryParams.selected) {
+                                try {
+                                    log.debug("Adding query for region " + region);
+                                    const newQuery = this.newQuery();
+                                    newQuery.regions.push(region);
+                                    this.state.queries.push(newQuery);
+                                    await this.updateGraph(newQuery, this.state.timePeriod, true);
+                                } catch (e) {
+                                    console.error(e);
+                                }
 
-        await this.refreshAllSeries();
+                            }
+                            log.debug("State is now ", JSON.stringify(this.state));
+                        } else {
+                            const newQuery: TimeseriesRESTQuery = this.newQuery();
+                            this.state.queries = [newQuery];
+                            newQuery.regions = [queryParams.selected];
+                            log.debug("State is now ", JSON.stringify(this.state));
+                            await this.updateGraph(newQuery, this.state.timePeriod, true);
+                        }
+                        log.debug("State is now ", JSON.stringify(this.state));
+                        this.setEOCFromQuery(queryParams);
+                    } else {
+                        // No region is selected or a numeric region is selected.
+                        await this.clear();
+                        this.state.queries[0].regions = this.pref.combined.analyticsDefaultRegions;
+                        this.setEOCFromQuery(queryParams);
+                        await this.updateGraph(this.state.queries[0], this.state.timePeriod, true);
 
+                    }
+                }
+            } finally {
+                this.updating = false;
+            }
+
+        });
     }
 
     public async addToDashboard() {
