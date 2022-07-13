@@ -5,6 +5,7 @@ import {Logger} from "@aws-amplify/core";
 import {environment} from "../../../environments/environment";
 import {PreferenceService} from "../../pref/preference.service";
 import {roundToHour, roundToMinute} from "../../common";
+import {DateRangeSliderOptions} from "../types";
 
 const log = new Logger("date-range");
 
@@ -39,7 +40,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
      */
     public sliderOptions: Options = {
         floor:      Date.now(),
-        ceil:       Date.now(),
+        ceil:       Date.now() - 1000,
         showTicks:  false,
         ticksArray: [],
         stepsArray: [],
@@ -54,7 +55,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
         translate:            (value: number, label: LabelType): string => {
             log.verbose("translate value " + value + " for " + label);
 
-            if (value === this.sliderOptions.ceil && this._pref.combined.mostRecentDateIsNow) {
+            if (value >= this._options.now && this._pref.combined.mostRecentDateIsNow) {
                 return `<span class="slider-date-time slider-date-time-max"><span class='slider-time'></span> <span class='slider-date'>now</span></span>`;
 
             }
@@ -132,19 +133,26 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
      */
     @Input()
     public set options(value: DateRangeSliderOptions) {
+        if (value === null) {
+            return;
+        }
         log.debug("Options: " + JSON.stringify(value));
         this._options = value;
         if (value.min <= 0) {
-            throw new Error("Min value must be positive");
+            log.warn("Min value must be positive");
+            return;
         }
         if (value.max <= 0) {
-            throw new Error("Max value must be positive");
+            log.warn("Max value must be positive");
+            return;
         }
-        if (value.startMin < 0) {
-            throw new Error("Lower value must be positive");
+        if (value.startMin <= 0) {
+            log.warn("Lower value must be > 0");
+            return;
         }
-        if (value.startMax < 0) {
-            throw new Error("Upper value must be positive");
+        if (value.startMax <= 0) {
+            log.warn("Upper value must be > 0");
+            return;
         }
         this._pref.waitUntilReady().then(() => {
             this.sliderOptions = {...this.sliderOptions, ceil: roundToMinute(value.max), floor: roundToHour(value.min)};
@@ -163,8 +171,10 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.updateTimerSub = timer(0, 60 * 1000).subscribe(i => {
                                                                 log.debug("Received new time-keyed data");
-                                                                this.updateTicks();
-                                                                this.refresh.emit();
+                                                                if (this.ready) {
+                                                                    this.updateTicks();
+                                                                    this.refresh.emit();
+                                                                }
                                                             }
         );
     }
@@ -225,12 +235,6 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     }
 }
 
-export class DateRangeSliderOptions {
-    min: number;
-    max: number;
-    startMin: number;
-    startMax: number;
-}
 
 export class DateRange {
     constructor(public lower: number, public upper: number) {

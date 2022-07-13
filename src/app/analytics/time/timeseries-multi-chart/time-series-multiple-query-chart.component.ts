@@ -7,6 +7,7 @@ import {ColumnSeries, DateAxis, LineSeries, ValueAxis, XYChart} from "@amcharts/
 import jt_theme from "../../../theme/jt.theme";
 import {Logger} from "@aws-amplify/core";
 import {GraphType, TimeseriesCollectionModel} from "../../timeseries";
+import {LoadingProgressService} from "../../../services/loading-progress.service";
 
 const log = new Logger("app-timeseries-multi-query-chart");
 
@@ -42,7 +43,7 @@ export class TimeSeriesMultipleQueryChartComponent implements OnInit, AfterViewI
     private dateAxis: DateAxis;
     private disableRangeEvents: boolean = false;
 
-    constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute) {
+    constructor(private _zone: NgZone, private _router: Router, private _route: ActivatedRoute, public loading: LoadingProgressService) {
 
 
     }

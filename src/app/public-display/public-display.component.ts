@@ -3,11 +3,10 @@ import {GeoJSON, latLng, Layer, layerGroup, LayerGroup, Map, tileLayer} from "le
 import * as rxjs from "rxjs";
 import {Subscription} from "rxjs";
 import {Tweet} from "../map/twitter/tweet";
-import {DateRangeSliderOptions} from "../map/date-range-slider/date-range-slider.component";
 import {ONE_DAY, RegionStatsMap, RegionTweeCount} from "../map/data/map-data";
 import {RegionSelection} from "../map/region-selection";
 import {environment} from "../../environments/environment";
-import {PolygonData} from "../map/types";
+import {DateRangeSliderOptions, PolygonData} from "../map/types";
 import {ActivatedRoute, Params, Router} from "@angular/router";
 import {MapSelectionService} from "../map-selection.service";
 import {LayerStyleService} from "../map/services/layer-style.service";
@@ -50,7 +49,8 @@ export class PublicDisplayComponent implements OnInit {
         max:      Date.now(),
         min:      Date.now() - 7 * ONE_DAY,
         startMin: Date.now() - ONE_DAY,
-        startMax: Date.now()
+        startMax: Date.now(),
+        now:      Date.now()
     };
     public selection = new RegionSelection();
     public showTwitterTimeline: boolean;
@@ -458,7 +458,8 @@ export class PublicDisplayComponent implements OnInit {
                 this.sliderOptions = {
                     ...this.sliderOptions,
                     startMin: this.minDate,
-                    startMax: this.maxDate
+                    startMax: this.maxDate,
+                    now:      await this.data.now()
                 };
                 this.ready = true;
                 if (completedAnimations >= this.currentDisplayScreen.animationLoops) {
@@ -532,7 +533,8 @@ export class PublicDisplayComponent implements OnInit {
                 min:      now - startTimeOffsetMilliseconds,
                 max:      now,
                 startMin: this.minDate,
-                startMax: this.maxDate
+                startMax: this.maxDate,
+                now:      now
             };
             if (this.currentDisplayScreen.data?.layerId) {
                 this.activeLayerGroup = this.currentDisplayScreen.data.layerId;

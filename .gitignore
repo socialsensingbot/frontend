@@ -50,13 +50,12 @@ Thumbs.db
 /cypress/report/
 /cypress/screenshots/
 
-#amplify
+#amplify-do-not-edit-begin
 amplify/\#current-cloud-backend
 amplify/.config/local-*
 amplify/logs
 amplify/mock-data
 amplify/backend/amplify-meta.json
-amplify/backend/awscloudformation
 amplify/backend/.temp
 build/
 dist/
@@ -69,14 +68,6 @@ amplify-build-config.json
 amplify-gradle-config.json
 amplifytools.xcconfig
 .secret-*
-/ref_data/countries.geojson
-/ref_data/countries_geojson_to_sql.sh
-/ref_data/iso_countriess.sql
-/ref_data/nuts1.geojson
-/ref_data/nuts1.sql
-/ref_data/nuts1_to_sql.sh
-/ref_data/uk_countries.geo.json
-/ref_data/uk_countries.geojson
-/ref_data/uk_countries.sql
-/ref_data/uk_countries_to_sql.sh
-/ref_data_tmp/
+**.sample
+#amplify-do-not-edit-end
+socialsensing-api-1.0.0.tgz

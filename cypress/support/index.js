@@ -27,11 +27,11 @@ export const ANALYTICS_URL = "http://localhost:4200/map/uk-flood-test/analytics"
 export const DASHBOARD_URL = "http://localhost:4200/map/uk-flood-test/dashboard"
 export const MAX_DATE = "16-Sept-21";
 export const TS_SELECTED_MIN_DATE = "14-Sept-21";
-export const TS_SELECTED_MIN_TIME = "01 am";
+export const TS_SELECTED_MIN_TIME = "00 am";
 export const MIN_DATE = "11-Sept-21";
-export const MIN_DATE_MILLIS = 1631577600000;
 export const MAX_DATE_MILLIS = 1631664000000;
 export const ONE_DAY_MILLIS = 24 * 60 * 60 * 1000;
+export const MIN_DATE_MILLIS = MAX_DATE_MILLIS - ONE_DAY_MILLIS;
 export const LONDON_URL = MAP_URL + "?selected=greater%20london&zoom=5&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=exceedance&active_polygon=county";
 export const LONDON_TWEET = ".app-twitter-id-1437925044643155976";
 export const LONDON_TWEET_MENU = LONDON_TWEET + " > .app-tweet-item-card-surround > .app-tweet-item-menu > .mat-focus-indicator > .mat-button-wrapper > .mat-icon";
@@ -52,6 +52,7 @@ afterEach(() => {
             win.gc();
             win.gc();
         }
+        // cy.get('@consoleError').should('not.be.called')
     });
 });
 
@@ -65,3 +66,7 @@ Cypress.on('uncaught:exception', (err, runnable, promise) => {
     }
     return false;
 })
+
+require('cypress-terminal-report/src/installLogsCollector')({
+                                                                collectTypes: ['cons:info', 'cons:warn', 'cons:error', 'cy:log', 'cy:xhr', 'cy:request', 'cy:route', 'cy:intercept', 'cy:command']
+                                                            });

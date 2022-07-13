@@ -1,5 +1,4 @@
 import {Component, Input, NgZone, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
-import {MetadataService} from "../../api/metadata.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {RESTDataAPIService} from "../../api/rest-api.service";
 import {Logger} from "@aws-amplify/core";
@@ -144,7 +143,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         this._state = value;
     }
 
-    constructor(public metadata: MetadataService, protected _zone: NgZone, protected _router: Router,
+    constructor(protected _zone: NgZone, protected _router: Router,
                 public notify: NotificationService, public map: MapSelectionService,
                 protected _route: ActivatedRoute, protected _api: RESTDataAPIService, public pref: PreferenceService,
                 public exec: UIExecutionService, public saves: SavedGraphService, public dialog: MatDialog,
@@ -390,6 +389,133 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
 
     }
 
+    public async timePeriodChanged(timePeriod: TimePeriod) {
+        const switchedToHours = timePeriod === "hour";
+
+        log.debug("Time period was " + timePeriod);
+        log.debug("Time period is now " + timePeriod);
+        this.state.timePeriod = timePeriod;
+        const today = this.now;
+        const day = today.getDate();
+        const month = today.getMonth();
+        const year = today.getFullYear();
+        let minDate: Date;
+        let maxDate: Date;
+        if (switchedToHours) {
+            minDate = this.seriesCollection.minScrollbarDate ? this.seriesCollection.minScrollbarDate : new Date(
+                this.now.getTime() - ONE_DAY);
+            maxDate = this.seriesCollection.maxScrollbarDate ? this.seriesCollection.maxScrollbarDate : this.now;
+            log.debug("Min date is now " + minDate);
+            log.debug("Max date is now " + maxDate);
+        } else {
+            minDate = new Date(year - 1, month, day);
+            maxDate = this.now;
+        }
+        this.range.controls.start.setValue(minDate);
+        this.range.controls.end.setValue(maxDate);
+        this.seriesCollection.dateSpacing = timePeriod === "day" ? dayInMillis : hourInMillis;
+        this.seriesCollection.minDate = minDate;
+        this.seriesCollection.maxDate = maxDate;
+        this.seriesCollection.rangeChanged.emit();
+
+        await this.refreshAllSeries();
+
+    }
+
+    /**
+     * Removes a query, it's series and all it's state from the graph.
+     * @param query
+     */
+    public removeQuery(query: TimeseriesRESTQuery) {
+        // Remove the query
+        this.state.queries = this.state.queries.filter(i => i.__series_id !== query.__series_id);
+        // Remove it's associated series
+        this.seriesCollection.removeTimeseries(query.__series_id);
+
+        // This counts as UI activity i.e. prevents new queries from being run for a few secs.
+        this.exec.uiActivity();
+    }
+
+    public async updateGraph(q: TimeseriesRESTQuery, timePeriod, force): Promise<any> {
+        log.debug("updateGraph");
+        // console.trace("timeseries updateGraph");
+        // noinspection ES6MissingAwait
+        return this.exec.queue("update-timeseries-graph", null,
+                               async () => {
+                                   // Immutable copy
+                                   const query = JSON.parse(JSON.stringify(q)) as TimeseriesRESTQuery;
+                                   log.debug("Graph update from query ", query);
+                                   const text: string = query.textSearch;
+                                   if (query.layer && (text.length > 0 || force)) {
+                                       if (text.length > 3) {
+                                           // noinspection ES6MissingAwait
+                                           this.auto.create(timeSeriesAutocompleteType, text, true,
+                                                            this.pref.combined.shareTextAutocompleteInGroup);
+                                       }
+                                       // No need to do an await here as we want async execution
+                                       // the await needs to be called on the result of this function updateGraph()
+                                       // noinspection ES6MissingAwait
+                                       await this._updateGraphInternal(query, timePeriod);
+                                   } else {
+                                       log.debug("Skipped time series update, force=" + force);
+                                   }
+
+                               }, q.__series_id + "-" + force, true, true, true, "inactive"
+        );
+
+    }
+
+    public graphTypeChanged(type: GraphType) {
+        this.exec.uiActivity();
+        this.seriesCollection.graphType = type;
+    }
+
+    public async deleteSavedGraph(id: string) {
+        await this.saves.delete(id);
+        if (id === this.graphId) {
+            this.navigateToRoot();
+        }
+    }
+
+    protected async executeQuery(query: TimeseriesRESTQuery, timePeriod: TimePeriod): Promise<any[]> {
+
+        if (!this.map.id) {
+            return;
+        }
+
+        try {
+            let endDate: any = this.range.controls.end.value !== null ? roundToHour(
+                this.range.controls.end.value.getTime()) : nowRoundedToHour();
+            let startDate: any = this.range.controls.start.value !== null ? roundToHour(
+                this.range.controls.start.value.getTime()) : (nowRoundedToHour() - (365.24 * dayInMillis));
+            const payload: any = {
+                ...query.layer,
+                location: query.location,
+                regions:  query.regions,
+
+                startDate: startDate,
+                endDate:   endDate,
+                name:      "time",
+                timePeriod
+            };
+            if (query.textSearch) {
+                payload.textSearch = query.textSearch;
+            }
+            if (payload.regions.length === 0) {
+                payload.regions = this.pref.combined.analyticsDefaultRegions;
+            }
+            const serverResults = await this._api.callMapAPIWithCacheAndDatePaging(this.map.id + "/analytics/time", payload, true);
+            log.debug("Server result was ", serverResults);
+            this.error = false;
+            return this.queryTransform(serverResults);
+        } catch (e) {
+            log.error(e);
+            this.error = true;
+            return null;
+        }
+
+    }
+
     private initGraphFromRouteParams(): void {
         this._route.params.subscribe(async params => {
             this.noData = true;
@@ -449,7 +575,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                             }
                             log.debug("State is now ", JSON.stringify(this.state));
                         } else {
-                            let newQuery: TimeseriesRESTQuery = this.newQuery();
+                            const newQuery: TimeseriesRESTQuery = this.newQuery();
                             this.state.queries = [newQuery];
                             newQuery.regions = [queryParams.selected];
                             log.debug("State is now ", JSON.stringify(this.state));
@@ -471,126 +597,6 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             }
 
         });
-    }
-
-    /**
-     * Removes a query, it's series and all it's state from the graph.
-     * @param query
-     */
-    public removeQuery(query: TimeseriesRESTQuery) {
-        // Remove the query
-        this.state.queries = this.state.queries.filter(i => i.__series_id !== query.__series_id);
-        // Remove it's associated series
-        this.seriesCollection.removeTimeseries(query.__series_id);
-
-        // This counts as UI activity i.e. prevents new queries from being run for a few secs.
-        this.exec.uiActivity();
-    }
-
-    public async updateGraph(q: TimeseriesRESTQuery, timePeriod, force): Promise<any> {
-        log.debug("updateGraph");
-        // console.trace("timeseries updateGraph");
-        // noinspection ES6MissingAwait
-        return this.exec.queue("update-timeseries-graph", null,
-                               async () => {
-                                   // Immutable copy
-                                   const query = JSON.parse(JSON.stringify(q));
-                                   log.debug("Graph update from query ", query);
-                                   const text: string = query.textSearch;
-                                   if (query.layer && (text.length > 0 || force)) {
-                                       if (text.length > 3) {
-                                           // noinspection ES6MissingAwait
-                                           this.auto.create(timeSeriesAutocompleteType, text, true,
-                                                            this.pref.combined.shareTextAutocompleteInGroup);
-                                       }
-                                       // No need to do an await here as we want async execution
-                                       // the await needs to be called on the result of this function updateGraph()
-                                       // noinspection ES6MissingAwait
-                                       await this._updateGraphInternal(query, timePeriod);
-                                   } else {
-                                       log.debug("Skipped time series update, force=" + force);
-                                   }
-
-                               }, q.__series_id + "-" + force, false, false, true, "inactive"
-        );
-
-    }
-
-    public graphTypeChanged(type: GraphType) {
-        this.exec.uiActivity();
-        this.seriesCollection.graphType = type;
-    }
-
-    public async deleteSavedGraph(id: string) {
-        await this.saves.delete(id);
-        if (id === this.graphId) {
-            this.navigateToRoot();
-        }
-    }
-
-    protected async executeQuery(query: TimeseriesRESTQuery, timePeriod: TimePeriod): Promise<any[]> {
-
-        if (!this.map.id) {
-            return;
-        }
-
-        try {
-            const payload = {
-                layer: this.mapLayer,
-                ...query,
-                from: this.range.controls.start.value !== null ? roundToHour(
-                    this.range.controls.start.value.getTime()) : (nowRoundedToHour() - (365.24 * dayInMillis)),
-                to:   this.range.controls.end.value !== null ? roundToHour(this.range.controls.end.value.getTime()) : nowRoundedToHour(),
-                name: "time",
-                timePeriod
-            };
-            if (payload.regions.length === 0) {
-                payload.regions = this.pref.combined.analyticsDefaultRegions;
-            }
-            delete payload.__series_id;
-            const serverResults = await this._api.callMapAPIWithCache(this.map.id + "/analytics/time", payload, 60 * 60);
-            log.debug("Server result was ", serverResults);
-            this.error = false;
-            return this.queryTransform(serverResults);
-        } catch (e) {
-            log.error(e);
-            this.error = true;
-            return null;
-        }
-
-    }
-
-    public async timePeriodChanged(timePeriod: TimePeriod) {
-        const switchedToHours = timePeriod === "hour";
-
-        log.debug("Time period was " + timePeriod);
-        log.debug("Time period is now " + timePeriod);
-        this.state.timePeriod = timePeriod;
-        const today = this.now;
-        const day = today.getDate();
-        const month = today.getMonth();
-        const year = today.getFullYear();
-        let minDate: Date;
-        let maxDate: Date;
-        if (switchedToHours) {
-            minDate = this.seriesCollection.minScrollbarDate ? this.seriesCollection.minScrollbarDate : new Date(
-                this.now.getTime() - ONE_DAY);
-            maxDate = this.seriesCollection.maxScrollbarDate ? this.seriesCollection.maxScrollbarDate : this.now;
-            log.debug("Min date is now " + minDate)
-            log.debug("Max date is now " + maxDate)
-        } else {
-            minDate = new Date(year - 1, month, day);
-            maxDate = this.now;
-        }
-        this.range.controls.start.setValue(minDate);
-        this.range.controls.end.setValue(maxDate);
-        this.seriesCollection.dateSpacing = timePeriod === "day" ? dayInMillis : hourInMillis;
-        this.seriesCollection.minDate = minDate;
-        this.seriesCollection.maxDate = maxDate;
-        this.seriesCollection.rangeChanged.emit();
-
-        await this.refreshAllSeries();
-
     }
 
     public async addToDashboard() {

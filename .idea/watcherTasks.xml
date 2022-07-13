@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ProjectTasksOptions" suppressed-tasks="SCSS" />
+  <component name="ProjectTasksOptions" suppressed-tasks="SCSS">
+    <TaskOptions isEnabled="true">
+      <option name="arguments" value="bundle $FileName$ --outfile $FileDir$/$FileNameWithoutAllExtensions$.json" />
+      <option name="checkSyntaxErrors" value="true" />
+      <option name="description" />
+      <option name="exitCodeBehavior" value="ERROR" />
+      <option name="fileExtension" value="yml" />
+      <option name="immediateSync" value="true" />
+      <option name="name" value="Build Swagger" />
+      <option name="output" value="$FileDir$" />
+      <option name="outputFilters">
+        <array />
+      </option>
+      <option name="outputFromStdout" value="false" />
+      <option name="program" value="swagger-cli" />
+      <option name="runOnExternalChanges" value="true" />
+      <option name="scopeName" value="API Doc (Swagger)" />
+      <option name="trackOnlyRoot" value="false" />
+      <option name="workingDir" value="$FileDir$" />
+      <envs />
+    </TaskOptions>
+  </component>
 </project>

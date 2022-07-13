@@ -7,7 +7,8 @@ export type AmplifyDependentResourcesAttributes = {
             "UserPoolArn": "string",
             "UserPoolName": "string",
             "AppClientIDWeb": "string",
-            "AppClientID": "string"
+            "AppClientID": "string",
+            "CreatedSNSRole": "string"
         },
         "userPoolGroups": {
             "metofficeGroupRole": "string",
@@ -37,6 +38,12 @@ export type AmplifyDependentResourcesAttributes = {
             "Region": "string",
             "LambdaExecutionRole": "string",
             "CloudWatchEventRule": "string"
+        },
+        "api": {
+            "Name": "string",
+            "Arn": "string",
+            "Region": "string",
+            "LambdaExecutionRole": "string"
         }
     },
     "storage": {
@@ -51,6 +58,11 @@ export type AmplifyDependentResourcesAttributes = {
             "GraphQLAPIEndpointOutput": "string"
         },
         "query": {
+            "RootUrl": "string",
+            "ApiName": "string",
+            "ApiId": "string"
+        },
+        "api": {
             "RootUrl": "string",
             "ApiName": "string",
             "ApiId": "string"

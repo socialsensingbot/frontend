@@ -19,6 +19,7 @@ const {initPlugin} = require('cypress-plugin-snapshots/plugin');
  * @type {Cypress.PluginConfig}
  */
 module.exports = (on, config) => {
+    require('cypress-terminal-report/src/installLogsPrinter')(on);
     on('task', {  // a task to find one file matching the given mask
         // returns just the first matching file
         async findFiles(mask) {

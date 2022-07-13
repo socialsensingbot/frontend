@@ -32,6 +32,17 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["flood"],
             "warnings":    "exclude",
+            "language":    "*",
+            "annotations": ["source", "impact"],
+            "icons":       ["flood"]
+        },
+        {
+            "id":          "flood-cy",
+            "title":       "Floods (Welsh Language)",
+            "sources":     ["twitter"],
+            "hazards":     ["flood"],
+            "warnings":    "exclude",
+            "language":    "cy",
             "annotations": ["source", "impact"],
             "icons":       ["flood"]
         },
@@ -41,6 +52,7 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["flood"],
             "warnings":    "include",
+            "language":    "*",
             "annotations": ["source", "impact"],
             "icons":       ["flood", "storm-warning"]
 
@@ -51,6 +63,7 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["flood"],
             "warnings":    "only",
+            "language":    "*",
             "annotations": ["source", "impact"],
             "icons":       ["storm-warning"]
         },
@@ -60,6 +73,7 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["wind"],
             "warnings":    "exclude",
+            "language":    "*",
             "annotations": ["impact"],
             "icons":       ["strong-wind"]
 
@@ -70,6 +84,7 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["wind", "flood"],
             "warnings":    "exclude",
+            "language":    "*",
             "annotations": ["source", "impact"],
             "icons":       ["flood", "strong-wind"]
         },
@@ -79,6 +94,7 @@ const layers: SSLayerConfiguration = {
             "sources":     ["twitter"],
             "hazards":     ["snow"],
             "warnings":    "exclude",
+            "language":    "*",
             "annotations": ["impact"],
             "icons":       ["snow"]
         },
@@ -146,13 +162,14 @@ export const environment = {
     mapTileUrlTemplate:                  "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg",
     defaultDashboard,
     layers:                              layers,
-    layersEnabled:                       ["flood", "flood-with-warnings", "flood-warnings-only", "wind", "wind-and-flood", "snow"],
+    layersEnabled:                       ["flood", "flood-cy", "flood-with-warnings", "flood-warnings-only", "wind", "wind-and-flood",
+                                          "snow"],
     blinkRateInMilliseconds:             1000,
     // mapTileUrlTemplate:
     // "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnVkeWFydGh1ciIsImEiOiJjamZrem1ic3owY3k4MnhuYWt2dGxmZmk5In0.ddp6_hNhs_n9MJMrlBwTVg"
     shareTextAutocompleteInGroup:    true,
     useRestMapData:                  true,
-    maxCallsPerMinute:               10000,
+    maxCallsPerMinute:               300,
     analyticsDefaultRegions:         ["uk"],
     tweetCSVExportFormat:            "default",
     showAnalyticsSideMenu:           false,

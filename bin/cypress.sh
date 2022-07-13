@@ -4,4 +4,4 @@
 cd $(dirname $0)
 cd ..
 #DEBUG=cypress:* node ./node_modules/cypress/bin/cypress open -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS}
-node ./node_modules/cypress/bin/cypress open -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS}
+TZ=UTC node ./node_modules/cypress/bin/cypress open -e TEST_AC_USER=${TEST_AC_USER},TEST_AC_PASS=${TEST_AC_PASS}

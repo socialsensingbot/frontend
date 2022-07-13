@@ -13,7 +13,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "amplify-modelgen": "node amplify/scripts/amplify-modelgen.js",
-    "amplify:query": "cp src/app/map/data/map-data.ts amplify/backend/function/query/src && cd amplify/backend/function/query/src && npm install && tsc --project tsconfig.json",
+    "amplify:query": "cd amplify/backend/function/query && ./build.sh",
+    "amplify:api": "cd amplify/backend/function/api && ./build.sh",
     "amplify-push": "node amplify/scripts/amplify-push.js"
   },
   "private": true,
@@ -80,6 +81,7 @@
     "cypress": "^9.2.0",
     "cypress-intellij-reporter": "0.0.6",
     "cypress-plugin-snapshots": "1.4.4",
+    "cypress-terminal-report": "^3.5.2",
     "glob-promise": "^4.2.2",
     "ini": "^2.0.0",
     "inquirer": "^7.3.3",
@@ -99,6 +101,7 @@
     "protractor": "^7.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "supertest": "^6.2.2",
     "ts-node": "~9.1.1",
     "tslint": "~6.1.0",
     "typescript": "4.1.5"

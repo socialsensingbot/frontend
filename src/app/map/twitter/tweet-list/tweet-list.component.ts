@@ -10,6 +10,7 @@ import {AnnotationService} from "../../../pref/annotation.service";
 import {MatDialog} from "@angular/material/dialog";
 import {MatMenuTrigger} from "@angular/material/menu";
 import {TweetCopyDialogComponent} from "./tweet-copy-dialog/tweet-copy-dialog.component";
+import {NotificationService} from "../../../services/notification.service";
 
 const twitterLink = require("twitter-text")
 
@@ -82,6 +83,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
     public annotationTypes: any[] = [];
 
     constructor(private _zone: NgZone, private _dialog: MatDialog, public pref: PreferenceService,
+                private _notify: NotificationService,
                 public annotate: AnnotationService) {
     }
 
@@ -145,15 +147,17 @@ export class TweetListComponent implements OnInit, OnDestroy {
     public async annotateTweet(tweet, annotations, $event: MouseEvent) {
         // This is a simple optimization, that changes our local version of the annotations first
         // we then get the authoritative version from the server
-        this.annotations[tweet.id] = {...this.annotationsFor(tweet), ...annotations};
-        const groupTweetAnnotations = await this.annotate.addAnnotations(tweet, annotations);
+        const currAnnotations = this.annotations[tweet.id];
         try {
+            this.annotations[tweet.id] = {...this.annotationsFor(tweet), ...annotations};
+            const groupTweetAnnotations = await this.annotate.addAnnotations(tweet, annotations);
             this.annotations[tweet.id] = groupTweetAnnotations.annotations;
+            log.info("Emitting ", tweet);
+            this.update.emit(tweet);
         } catch (e) {
-            log.error(e);
+            this.annotations[tweet.id] = currAnnotations;
+            this._notify.error(e);
         }
-        log.info("Emitting ", tweet);
-        this.update.emit(tweet);
     }
 
     public async annotateTweetKeyValue(tweet, annotationKey, annotationValue, $event: MouseEvent) {

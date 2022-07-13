@@ -1,0 +1,926 @@
+openapi: 3.0.1
+info:
+  title: Social Sensing API
+  description: >
+    Social Sensing API provides the ability to retrieve geographic statistical data relating to weather events. This
+    API is secured with an API key provided by your account manager.
+  version: 1.0.0
+  contact:
+    name: API Support Team
+    email: support@socialsensing.com
+#  externalDocs:
+#    description: Find out more and how to get access to this api via our website.
+#    url: https://soscialsensing.com
+
+servers:
+  - url: https://api-dev.socialsensing.com
+security:
+  - ApiKeyAuth: [ ]
+paths:
+  /v1/map/metadata:
+    get:
+      operationId: GetAllMapsMetadata
+      tags:
+        - metadata
+      summary: Get Metadata for All Maps
+      description: >
+        Returns metadata regarding all available maps, the primary purpose of this call is to list available maps
+        and their core metadata. This method is primarily an aggregation of ```/v1/map/{map}/metadata``` for each map.
+        The version number returned is the version of the schema for this result and can usually be ignored.
+        The start property contains the default recommended starting position of any rendered map. This is overridden
+        by each map.
+      responses:
+        200:
+          description: OK
+          links:
+            PathParamMapID:
+              operationId: GetMapMetadata
+              parameters:
+                map: '$response.body#/maps/0/id'
+              description: >
+                The 'id' field of each returned map is used as the path parameter {map} in all map based operations.
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                    description: The version of this metadata.
+                    example: "1.0.0"
+                  maps:
+                    type: array
+                    description: >
+                      A collection of Map Metadata objects which are an aggregation of ```/v1/map/{map}/metadata``` being called for each map.
+                    items:
+                      $ref: '#/components/schemas/MapMetadata'
+                  start:
+                    $ref: '#/components/schemas/StartMetadata'
+                example:
+                  version: '1.0'
+                  maps:
+                    - id: uk-flood-live
+                      title: UK Flood and Related
+                      location: uk
+                      start_lat: 53
+                      start_lng: -2
+                      start_zoom: 6
+                      default_region_type: county
+                      last_date:
+                    - id: uk-flood-historical
+                      title: UK Flood (Historical)
+                      location: uk
+                      start_lat: 53
+                      start_lng: -2
+                      start_zoom: 6
+                      default_region_type: coarse
+                      last_date: '2021-09-15T00:00:00.000Z'
+                  start:
+                    lat: 53
+                    lng: -2
+                    zoom: 6
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
+
+  /v1/map/{map}/metadata:
+    get:
+      tags:
+        - metadata
+      operationId: GetMapMetadata
+      summary: Get Metadata for Map by Id
+      description: >
+        Returns metadata for a specific map. To get the list of available maps see [Get Metadata for All Maps](./getallmapsmetadata) .
+        Included in the response is a list of all region types (including the default to display) for the map a start 
+        location and zoom for the map when displayed, a logical location for the map (e.g. UK, India, World) and 
+        supported hazard types for this map.
+      parameters:
+        - $ref: '#/components/parameters/Map'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/MapMetadata'
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
+
+  /v1/map/{map}/now:
+    get:
+      operationId: GetMapNow
+      tags:
+        - metadata
+      summary: Get the Latest Date for Map
+      description: >
+        Returns the latest date for which there is data for the specified map.
+        For archived map data this will be a fixed date (i.e. the last_date field in MapMetadata),
+        otherwise, it's the last time data was processed (usually within 10 minutes of ```Date.now()```).
+        
+        
+        To get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).
+      parameters:
+        - $ref: '#/components/parameters/Map'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: integer
+                example: 1425744000000
+
+  /v1/map/{map}/region-type/{regionType}/regions:
+    get:
+      operationId: GetMapRegionsForRegionType
+      tags:
+        - metadata
+      summary: Get Map Regions for a Region Type
+      description: >
+        Returns a list of region identifiers for the given region type within the given map as an array of identifiers.
+        
+        
+        To get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).
+      parameters:
+        - $ref: '#/components/parameters/Map'
+        - $ref: '#/components/parameters/RegionType'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: array
+                example:
+                  - dorset
+                  - powys
+                  - devon
+                items:
+                  type: string
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
+
+  /v1/map/{map}/regions:
+    get:
+      operationId: GetAllMapRegionsAndTypes
+      tags:
+        - metadata
+      summary: Get All Region and Region Type Combinations for a Map
+      description: >
+        Returns all the region and region type combinations for a given map.
+        
+        
+        To get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata).
+      parameters:
+        - $ref: '#/components/parameters/Map'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RegionMetadata'
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
+
+
+  /v1/map/{map}/region-type/{regionType}/region/{region}/geography:
+    get:
+      tags:
+        - metadata
+      operationId: GetRegionAsGeoJSON
+      summary: Get a Region as GeoJSON
+      description: >
+        Returns the geography of a specific region in the form of a GeoJSON shape.
+        
+        
+        To get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). To get the
+        regions for a specific region type use [Get Map Regions for a Region Type](./getmapregionsforregiontype).
+      parameters:
+        - $ref: '#/components/parameters/Map'
+        - $ref: '#/components/parameters/RegionType'
+        - $ref: '#/components/parameters/Region'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: object
+                additionalProperties: true
+                example:
+                  type: MultiPolygon
+                  coordinates:
+                    - - - - -1.9558910160193534
+                          - 50.69082376519951
+                        - - -1.9558893443374288
+                          - 50.690823003820576
+                        - - -1.9558878401255066
+                          - 50.690821949512824
+                        - - -1.9558865541389825
+                          - 50.690820637850905
+                        - - -1.9558855297698494
+                          - 50.69081911309314
+                        - - -1.9558848015825583
+                          - 50.690817426688206
+                        - - -1.9558843941477386
+                          - 50.69081563553908
+                        - - -1.9558843212131305
+                          - 50.690813800083035
+                        - - -1.955884585239707
+                          - 50.69081198225238
+                        - - -1.955885177318635
+                          - 50.690810243384675
+                        - - -1.9558860774718787
+                          - 50.69080864215312
+                        - - -1.955887255326302
+                          - 50.69080723258677
+                        - - -2.009636095853156
+                          - 50.68342104040844
+                  properties:
+                    name: dorset
+                    title: Dorset
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
+
+
+  /v1/map/{map}/text:
+    post:
+      tags:
+        - text
+      operationId: GetTextForMap
+      summary: Get Text for Map
+      description: >
+        Returns all text messages (Tweets at present) for a given map. The request body should contain the search 
+        criteria of regionType, hazards, sources, warnings and a start and end date. The results are paged with a 
+        default page size of 100.
+        
+        
+        To get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). The list of available regions types and hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).
+
+      parameters:
+        - $ref: '#/components/parameters/Map'
+      requestBody:
+        description: ""
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TextRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TextResponseItem'
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
+
+  /v1/map/{map}/stats:
+    post:
+      operationId: GetStatsForMap
+      tags:
+        - statistics
+      summary: Get Statistical Data for Map
+      description: >
+        Returns an object mapping regions to their statistics. At present the two statistics are 
+        [exceedance](https://socialsensing.com/materialis/help-and-support/#exceedance) and total count. If there are
+        no results for the criteria for a given region it will not included in the results. The result will look like this:
+        
+        
+        ```json
+        
+        {
+          "west yorkshire": {
+            "count": 109,
+            "exceedance": 0.4697
+          },
+           "shropshire": {
+             "count": 71,
+             "exceedance": 0.4697
+           },
+        
+        ...
+        
+        }
+        
+        ```
+
+        To get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata).
+        The list of available regions types and hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).
+      parameters:
+        - $ref: '#/components/parameters/Map'
+      requestBody:
+        description: ""
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatsRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StatsResponseItem'
+                example:
+                  $ref: "./examples/stats-response.yaml"
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
+
+
+  /v1/map/{map}/recent-text-count:
+    post:
+      operationId: GetRegionsWithRecentTexts
+      tags:
+        - text
+      summary: Get Regions with Recent Texts
+      description: >
+        Returns the number of messages (i.e. Tweets), since a specific time for all regions on the specified map.
+        This is provided so that recently active regions can be flagged. If a region has no results for the time period
+        it is not returned. I.e. a count of zero is not returned. E.g.:
+        
+        ```json
+        
+        
+        {
+          "powys": 3,
+          "devon": 20,
+          "dorset": 23
+        }
+        
+        ```
+        
+        To get a list of all maps, their ids and available region types, use [Get Metadata for All Maps](./getallmapsmetadata). The list of available regions types and hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).
+      parameters:
+        - $ref: '#/components/parameters/Map'
+      requestBody:
+        description: ""
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecentCountRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/RecentCountResponseItem'
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
+
+  /v1/map/{map}/analytics/time:
+    post:
+      operationId: GetTimeSeriesAnalyticsForMap
+      tags:
+        - analytics
+      summary: Get Time Series Data for Analytics
+      description: >
+        
+        Returns data for a time series graph.
+        At present the two statistics are 
+                [exceedance](https://socialsensing.com/materialis/help-and-support/#exceedance) and total count. If there are
+                no results for the criteria for a given region it will not included in the results. The result will look like this:        
+        
+        ```json
+
+          [
+            {
+              "count": 36,
+              "region": "uk",
+              "exceedance": 1.27,
+              "date": "2022-01-15T00:00:00.000Z"
+            },
+            {
+              "count": 38,
+              "region": "uk",
+              "exceedance": 1.3,
+              "date": "2022-01-16T00:00:00.000Z"
+            },
+            {
+              "count": 22,
+              "region": "uk",
+              "exceedance": 1.14,
+              "date": "2022-01-17T00:00:00.000Z"
+            },
+            {
+              "count": 36,
+              "region": "uk",
+              "exceedance": 1.27,
+              "date": "2022-01-18T00:00:00.000Z"
+            },
+        
+          ...
+        
+          }
+        
+        ```
+        
+        
+        To get a list of all maps and their ids use [Get Metadata for All Maps](./getallmapsmetadata). 
+        The list of available hazards can be obtained using [Get Metadata for Map by Id](./getmapmetadata).
+        The list of available regions can be obtained using [Get All Region and Region Type Combinations for a Map](./getallmapregionsandtypes).
+
+      parameters:
+        - $ref: '#/components/parameters/Map'
+      requestBody:
+        description: ""
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeSeriesRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TimeSeriesResponseItem'
+        400:
+          description: Invalid Parameter
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/InvalidParameterError'
+
+components:
+  parameters:
+    Map:
+      in: path
+      name: map
+      required: true
+      schema:
+        type: string
+      description: >
+        The map id to use for the request, the set of ids can be obtained using [Get Metadata for All Maps](./getallmapsmetadata)
+      example: uk-flood-live
+    RegionType:
+      in: path
+      name: regionType
+      required: true
+      schema:
+        type: string
+      description: >
+        The region type. The list of available region types can be obtained using [Get Metadata for Map by Id](./getmapmetadata).
+      example: county
+    Region:
+      in: path
+      name: region
+      required: true
+      schema:
+        type: string
+      description: >
+        The region. To get the regions for a specific region type use [Get Map Regions for a Region Type](./getmapregionsforregiontype).
+      example: dorset
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+  schemas:
+    AllRegionsNoTypeDataRequest:
+      type: object
+      properties:
+        hazards:
+          type: array
+          description: >
+            Hazards represent the weather condition that you are interested in. The list of supported hazards can be 
+            found using [Get Metadata for Map by Id](./getmapmetadata).
+          items:
+            type: string
+            example:
+              - flood
+              - wind
+              - snow
+        sources:
+          type: array
+          description: >
+            The source is name of the service that the data was gathered from. At present only the
+            'twitter' source is supported.
+          items:
+            type: string
+            example: twitter
+            pattern: "(twitter)"
+        warnings:
+          type: string
+          example: exclude
+          description: >
+            The warnings option is used to decide whether to include warnings (automated Tweets publishing weather 
+            warnings) should be included in the results. 
+            
+            * 'include' includes warnings.
+            
+            * 'exclude' does not include warnings.
+            
+            * 'only' only returns warnings.
+
+          pattern: "(only|include|exclude)"
+
+    AllRegionsDataRequest:
+      allOf:
+        - $ref: '#/components/schemas/AllRegionsNoTypeDataRequest'
+        - type: object
+          properties:
+            regionType:
+              type: string
+              description: >
+                The type of the regions specified by the regions property. The list of available regions types can be 
+                obtained using [Get Metadata for Map by Id](./getmapmetadata).
+              example: county
+
+    RegionDataRequest:
+      allOf:
+        - $ref: '#/components/schemas/AllRegionsDataRequest'
+        - type: object
+          properties:
+            regions:
+              type: array
+              description: "A set of regions to retrieve texts for. These regions must be of the type specified by the property regionType."
+              items:
+                type: string
+                example: hertfordshire
+    PagedRequest:
+      type: object
+      properties:
+        page:
+          type: integer
+          description: "The page of results to return. This means results will be from ```pageSize * page``` to ```(pageSize * ( page + 1)) - 1``` ."
+          default: 0
+          example: 0
+        pageSize:
+          type: integer
+          description: "The number of results to return per page."
+          default: 100
+          example: 100
+    DateRangeRequest:
+      type: object
+      properties:
+        startDate:
+          type: integer
+          description: The minimum JavaScript time in milliseconds to return a result for.
+          example: 1645394400000
+        endDate:
+          type: integer
+          description: The maximum JavaScript time in milliseconds to return a result for.
+          example: 1645488000000
+    TextRequest:
+      allOf:
+        - $ref: '#/components/schemas/RegionDataRequest'
+        - $ref: '#/components/schemas/PagedRequest'
+        - $ref: '#/components/schemas/DateRangeRequest'
+      example:
+        hazards:
+          - flood
+        sources:
+          - twitter
+        regions:
+          - hertfordshire
+        warnings: exclude
+        pageSize: 300
+        page: 0
+        startDate: 1645394400000
+        endDate: 1645488000000
+        regionType: county
+      required:
+        - hazards
+        - sources
+        - regions
+        - startDate
+        - regionType
+        - warnings
+    StatsRequest:
+      allOf:
+        - $ref: '#/components/schemas/AllRegionsDataRequest'
+        - $ref: '#/components/schemas/DateRangeRequest'
+      example:
+        regionType: county
+        regions:
+          - greater london
+        hazards:
+          - flood
+        sources:
+          - twitter
+        warnings: exclude
+        startDate: 1645394400000
+        endDate: 1645488000000
+      required:
+        - hazards
+        - sources
+        - regions
+        - startDate
+        - regionType
+        - warnings
+
+    TimeSeriesRequest:
+      allOf:
+        - $ref: '#/components/schemas/AllRegionsNoTypeDataRequest'
+        - $ref: '#/components/schemas/DateRangeRequest'
+        - type: object
+          properties:
+            textSearch:
+              type: string
+              description: "Additional BOOLEAN (MySQL) query string matched against the text of each message."
+              example: "windy AND cold"
+            timePeriod:
+              type: string
+              pattern: "(day|hour)"
+              description: "Aggregate over either day or hour."
+              example: day
+            regions:
+              type: array
+              description: "A set of region ids to retrieve texts for. These can be of any region type except numeric ones, such as 'coarse' and 'fine'."
+              items:
+                type: string
+                example: hertfordshire
+      required:
+        - hazards
+        - sources
+        - regions
+        - startDate
+        - regionType
+        - warnings
+
+    RecentCountRequest:
+      allOf:
+        - $ref: '#/components/schemas/AllRegionsDataRequest'
+        - type: object
+          properties:
+            startDate:
+              type: integer
+              description: The minimum JavaScript time to find results for.
+              example: 1645394400000
+      required:
+        - hazards
+        - sources
+        - regions
+        - warnings
+        - regionType
+
+    RecentCountResponseItem:
+      type: object
+      additionalProperties:
+        type: integer
+      example:
+        powys: 3
+        devon: 20
+        dorset: 23
+    StatsResponseItem:
+      type: object
+      description: "The statistics for a given region."
+      properties:
+        region:
+          type: string
+          example: hertfordshire
+          description: "The region the statistics are for."
+        count:
+          type: integer
+          example: 195
+          description: "The number of messages counted for this region."
+        exceedance:
+          type: number
+          example: 35.2
+          minimum: 0.0
+          maximum: 100.0
+          description: "The exceedance value for the region as a percentage. Lower is more unusual, higher is more usual."
+
+    TextResponseItem:
+      type: object
+      properties:
+        json:
+          type: object
+          description: "The full JSON object supplied by the source service, i.e. Twitter"
+          additionalProperties: true
+        timestamp:
+          type: integer
+          example: 1425822000000
+        source:
+          type: string
+          example: twitter
+          description: "The originating service, e.g. Twitter, for the message"
+        id:
+          type: string
+          example: "200434034030"
+          description: "The identifier given by the source service, i.e. Twitter, for the message"
+        location:
+          type: object
+          description: "A GeoJSON object representing the location of the message."
+          additionalProperties: true
+        region_type:
+          type: string
+          example: county
+          description: "The region type of the region this message belongs to"
+        region:
+          type: string
+          example: hertfordshire
+          description: "The region this message relates to."
+        hazard:
+          type: string
+          example: flood
+          description: "The hazard this message relates to."
+        possibly_sensitive:
+          type: boolean
+          description: "TRUE if the message may contain inappropriate text or images."
+          example: false
+        warning:
+          type: boolean
+          description: "TRUE if the message comes from an automated warning."
+          example:
+            false
+      example:
+        $ref: "examples/text-response.yaml"
+
+
+    TimeSeriesResponseItem:
+      type: object
+      description: "Stats for a given day/hour window per region"
+      properties:
+        region:
+          type: string
+          example: hertfordshire
+          description: "The region the statistics are for."
+        date:
+          type: string
+          example: "2021-02-22T00:00:00.000Z"
+          description: "UTC date string for the data."
+        count:
+          type: integer
+          example: 195
+          description: "The number of messages counted for this region."
+        exceedance:
+          type: number
+          example: 35.2
+          minimum: 0.0
+          maximum: 100.0
+          description: "The exceedance value for the region as a percentage. Lower is more unusual, higher is more usual."
+
+    StartMetadata:
+      type: object
+      properties:
+        lat:
+          type: number
+          example: 53.0
+        lng:
+          type: number
+          example: -0.1
+        zoom:
+          type: integer
+          example: 12
+
+    CoreRegionMetadata:
+      type: object
+      required:
+        - id
+        - title
+      properties:
+        title:
+          type: string
+          description: A human-readable string describing the region
+          example: Dorset
+        id:
+          description: An identifier for the region.
+          type: string
+          example: dorset
+
+    RegionMetadata:
+      allOf:
+        - $ref: '#/components/schemas/CoreRegionMetadata'
+        - type: object
+          description: Region metadata
+          required:
+            - id
+            - title
+            - type
+            - level
+          properties:
+            type:
+              type: string
+              description: The region type.
+              example: county
+            level:
+              type: integer
+              description: The aggregation level of the region.
+              example: 1
+
+    MapMetadata:
+      required:
+        - defaultRegionType
+        - hazards
+        - id
+        - location
+        - regionAggregations
+        - start
+      type: object
+      properties:
+        id:
+          type: string
+          example: "uk-flood-live"
+        title:
+          type: string
+          example: "UK Flood"
+        regionTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoreRegionMetadata'
+        regionAggregations:
+          type: array
+          items:
+            type: string
+            example: "countries"
+        start:
+          $ref: '#/components/schemas/StartMetadata'
+        location:
+          type: string
+          example: "uk"
+        hazards:
+          type: array
+          items:
+            type: string
+            example: "flood"
+        defaultRegionType:
+          type: string
+          example: "county"
+      description: Map metadata
+      example:
+        id: uk-flood-live
+        title: UK Flood
+        location: uk
+        regionTypes:
+          - id: county
+            title: Local Authority
+          - id: fine
+            title: Fine Grid
+          - id: coarse
+            title: Coarse Grid
+          - id: uk_country
+            title: UK Countries
+          - id: iso_country
+            title: ISO Countries
+          - id: nuts1
+            title: UK Regions
+        regionAggregations:
+          - uk-countries
+        defaultRegionType: county
+        start:
+          lat: 53
+          lng: -2
+          zoom: 6
+    InvalidParameterError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: "Always 'Invalid Parameter'"
+          pattern: Invalid Parameter
+          example: "Invalid Parameter"
+        errorMessage:
+          type: string
+          description: An error message describing why the parameter has an incorrect value.
+          example: 'The parameter name must be provided and be a string'
+        parameter:
+          type: string
+          description: The parameter from either the path or the JSON body of the request which was invalid.
+          example: 'name'

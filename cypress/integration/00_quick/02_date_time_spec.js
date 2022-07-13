@@ -3,7 +3,7 @@ import {MAP_URL, MAX_DATE_MILLIS, MIN_DATE_MILLIS, TS_SELECTED_MIN_DATE, TS_SELE
 describe('02 Date time: ', function () {
     // Step 1: setup the application state
     beforeEach(function () {
-        cy.visit('http://localhost:4200/map/uk-flood-test');
+        cy.visitAndErrorCheck('http://localhost:4200/map/uk-flood-test');
         cy.login();
     });
 
@@ -11,7 +11,7 @@ describe('02 Date time: ', function () {
 
     describe('select county and date range', () => {
         console.debug("Tests https://github.com/socialsensingbot/frontend/issues/67");
-        const url = MAP_URL + "?zoom=5&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=exceedance&active_polygon=county&selected=scottish%20borders";
+        const url = MAP_URL + "?zoom=5&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=exceedance&active_polygon=county&selected=tipperary&max_range_time=" + MAX_DATE_MILLIS + "&min_range_time=" + MIN_DATE_MILLIS;
         it('with no tweets', () => {
             cy.visitAndWait(url);
             cy.get(".slider-date-time", {timeout: 20000});
@@ -22,7 +22,7 @@ describe('02 Date time: ', function () {
             cy.get(".slider-date-time-max .slider-time").should("contain.text", "");
             cy.get(".app-tweet-drawer", {timeout: 60000}).should("be.visible");
             cy.url().should("equal", url);
-            cy.twitterPanelHeader("Scottish Borders", "No Tweets");
+            cy.twitterPanelHeader("Tipperary", "No Tweets");
             cy.logout();
         });
     });

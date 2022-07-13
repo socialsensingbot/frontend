@@ -28,6 +28,7 @@ export interface TimeseriesAnalyticsComponentState {
 
 
 export interface TimeseriesRESTQuery {
+    language?: string;
     dateStep?: number;
     to?: number;
     from?: number;
@@ -36,6 +37,9 @@ export interface TimeseriesRESTQuery {
     textSearch?: string;
     __series_id?: string;
     layer?: SSMapLayer
+    page?: number;
+    pageSize?: number;
+    timePeriod?: "day" | "hour";
 }
 
 

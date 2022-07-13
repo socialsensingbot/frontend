@@ -44,7 +44,9 @@
               "src/mstile-150x150.png",
               "src/safari-pinned-tab.svg",
               "src/site.webmanifest",
-              "src/assets"
+              "src/assets",
+              "src/apidoc.html",
+              "src/api-docs"
             ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",

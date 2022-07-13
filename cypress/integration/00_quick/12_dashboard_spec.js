@@ -24,7 +24,7 @@ describe('11 Analytics: ', function () {
 
 
         it('Export from Analytics', () => {
-            cy.visit(analyticsUrl);
+            cy.visitAndErrorCheck(analyticsUrl);
             cy.login();
             cy.url({timeout: 30000}).should("equal", analyticsUrl);
             cy.get("#loading-div", {timeout: 60000}).should("not.exist");
@@ -68,7 +68,7 @@ describe('11 Analytics: ', function () {
 
         it('Export from Map Stats', () => {
             let url = MAP_URL + "?active_number=exceedance&active_polygon=county&selected=greater%20london";
-            cy.visit(url);
+            cy.visitAndErrorCheck(url);
             cy.login();
             cy.visitAndWait(url);
             cy.twitterPanelHeader("Greater London");
