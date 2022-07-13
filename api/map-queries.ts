@@ -816,7 +816,7 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
                                                                                                   AND r.source IN (?)
                                                                                                   AND r.warning IN (?)
                                                                                                   AND r.language LIKE ?
-                                                                                                  AND not r.deleted
+                                                                                                  AND NOT r.deleted
                                                                                                   AND r.source_timestamp between ? AND ?
                                                                                                 group by region) as region_counts) as x
                                                                                     where exceedance <= ?
@@ -1024,6 +1024,7 @@ export const timesliderFunc: (req, res) => Promise<void> = async (req, res) => {
                                                  AND tsd.language LIKE ?
                                                  AND tsd.map_location = ?
                                                  AND tsd.source IN (?)
+                                                 AND NOT tsd.deleted
                                                group by date
                                                order by date) lhs
                                                   RIGHT OUTER JOIN (select date, 0 as count
@@ -1190,6 +1191,7 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
                                                             AND tsd.source IN (?)
                                                             AND tsd.language LIKE ?
                                                             AND tsd.map_location = ? ${fullText}
+                                                          AND NOT tsd.deleted
                                                           group by date
                                                           order by date) lhs
                                                              RIGHT OUTER JOIN (select date, 0 as count
@@ -1227,7 +1229,7 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
                                                             AND tsd.source IN (?)
                                                             AND tsd.language LIKE ?
                                                             AND tsd.map_location = ? ${fullText}
-
+                                                        AND NOT tsd.deleted
                                                           group by date, region
                                                           order by date) lhs
                                                              RIGHT OUTER JOIN (select date, 0 as count from ${dateTable} where date > now() - interval 2 year) rhs
