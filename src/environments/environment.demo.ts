@@ -27,70 +27,74 @@ const defaultDashboard: Dashboard = {
 const layers: SSLayerConfiguration = {
     "available": [
         {
-            "id":       "flood",
-            "title":    "Floods",
-            "sources":  ["twitter"],
-            "hazards":  ["flood"],
-            "warnings": "exclude",
-            "language": "*",
-
+            "id":          "flood",
+            "title":       "Floods",
+            "sources":     ["twitter"],
+            "hazards":     ["flood"],
+            "warnings":    "exclude",
+            "language":    "*",
             "annotations": ["source", "impact"],
             "icons":       ["flood"]
         },
         {
-            "id":       "flood-with-warnings",
-            "title":    "Floods (includes warnings)",
-            "sources":  ["twitter"],
-            "hazards":  ["flood"],
-            "warnings": "include",
-            "language": "*",
-
+            "id":          "flood-cy",
+            "title":       "Floods (Welsh Language)",
+            "sources":     ["twitter"],
+            "hazards":     ["flood"],
+            "warnings":    "exclude",
+            "language":    "cy",
+            "annotations": ["source", "impact"],
+            "icons":       ["flood"]
+        },
+        {
+            "id":          "flood-with-warnings",
+            "title":       "Floods (includes warnings)",
+            "sources":     ["twitter"],
+            "hazards":     ["flood"],
+            "warnings":    "include",
+            "language":    "*",
             "annotations": ["source", "impact"],
             "icons":       ["flood", "storm-warning"]
 
         },
         {
-            "id":       "flood-warnings-only",
-            "title":    "Floods (only warnings)",
-            "sources":  ["twitter"],
-            "hazards":  ["flood"],
-            "warnings": "only",
-            "language": "*",
-
+            "id":          "flood-warnings-only",
+            "title":       "Floods (only warnings)",
+            "sources":     ["twitter"],
+            "hazards":     ["flood"],
+            "warnings":    "only",
+            "language":    "*",
             "annotations": ["source", "impact"],
             "icons":       ["storm-warning"]
         },
         {
-            "id":       "wind",
-            "title":    "Wind",
-            "sources":  ["twitter"],
-            "hazards":  ["wind"],
-            "warnings": "exclude",
-            "language": "*",
-
+            "id":          "wind",
+            "title":       "Wind",
+            "sources":     ["twitter"],
+            "hazards":     ["wind"],
+            "warnings":    "exclude",
+            "language":    "*",
             "annotations": ["impact"],
             "icons":       ["strong-wind"]
 
         },
         {
-            "id":       "wind-and-flood",
-            "title":    "Wind & Flood",
-            "sources":  ["twitter"],
-            "hazards":  ["wind", "flood"],
-            "warnings": "exclude",
-            "language": "*",
-
+            "id":          "wind-and-flood",
+            "title":       "Wind & Flood",
+            "sources":     ["twitter"],
+            "hazards":     ["wind", "flood"],
+            "warnings":    "exclude",
+            "language":    "*",
             "annotations": ["source", "impact"],
             "icons":       ["flood", "strong-wind"]
         },
         {
-            "id":       "snow",
-            "title":    "Snow",
-            "sources":  ["twitter"],
-            "hazards":  ["snow"],
-            "warnings": "exclude",
-            "language": "*",
-
+            "id":          "snow",
+            "title":       "Snow",
+            "sources":     ["twitter"],
+            "hazards":     ["snow"],
+            "warnings":    "exclude",
+            "language":    "*",
             "annotations": ["impact"],
             "icons":       ["snow"]
         },
@@ -143,7 +147,7 @@ export const environment = {
     ],
 
     // features: ["impact", "source", "map"],
-    features: ["impact", "source", "map", "dashboard", "analytics", "display"],
+    features: ["impact", "source", "map", "dashboard", "analytics", "display", "historical"],
 
     showErrors:                          false,
     showLoadingMessages:                 true,
