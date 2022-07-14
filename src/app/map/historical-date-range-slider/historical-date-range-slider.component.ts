@@ -204,7 +204,8 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                                                   log.debug("Emitting", range);
                                                                                   this.dateRange.emit(range);
                                                                               }
-                                                                          }, "", true, true, true, "inactive", 100, 10000, true);
+                                                                          }, "update-historical-scrollbars", true, true, true, "inactive",
+                                                                          100, 10000, true);
 
 
                                                       }
