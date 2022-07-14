@@ -132,6 +132,7 @@ export class RESTDataAPIService {
                 }
             } while (!interrupted());
             if (interrupted()) {
+                log.debug("Interrupted while paging " + path);
                 return null;
             }
         } catch (e) {
@@ -189,6 +190,7 @@ export class RESTDataAPIService {
                     }
                 } while (!interrupted());
                 if (interrupted()) {
+                    log.debug("Interrupted while paging " + path);
                     return null;
                 }
 
