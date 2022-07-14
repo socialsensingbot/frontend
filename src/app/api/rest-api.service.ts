@@ -111,7 +111,7 @@ export class RESTDataAPIService {
 
     public async callMapAPIWithCacheAndPaging(path: string, payload: any, transform: (any) => any, cacheForSeconds: number = -1,
                                               pageSize = 300,
-                                              maxPages = 100) {
+                                              maxPages = 100, interrupted: () => boolean = () => false) {
         try {
             const result: any[] = [];
             let page = 0;
@@ -130,7 +130,7 @@ export class RESTDataAPIService {
                 } else {
                     page++;
                 }
-            } while (true);
+            } while (!interrupted());
         } catch (e) {
             log.error(e);
         }
@@ -140,7 +140,7 @@ export class RESTDataAPIService {
                                                   transform: (any) => any = (i) => i,
                                                   cacheForSeconds: number = -1,
                                                   pageDurationInHours = 30 * 24,
-                                                  retry = true): Promise<any> {
+                                                  retry = true, interrupted: () => boolean = () => false): Promise<any> {
         try {
             const key = "rest:query/" + path + ":" + JSON.stringify(payload);
             const cachedItem = await this.cache.getCached(key);
@@ -184,7 +184,7 @@ export class RESTDataAPIService {
                         }
                         return result;
                     }
-                } while (true);
+                } while (!interrupted());
 
             }
         } catch (e) {

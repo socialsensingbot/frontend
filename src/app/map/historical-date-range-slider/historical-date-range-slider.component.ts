@@ -146,7 +146,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
         this.updateTimerSub = timer(0, 300).subscribe(async i => {
                                                           // noinspection ES6MissingAwait
                                                           this.exec.queue("update-historical-scrollbars", null,
-                                                                          async () => {
+                                                                          async (interrupted: () => boolean) => {
                                                                               log.debug("Checking for update");
                                                                               if (this.updateLayer) {
                                                                                   this.updateLayer = false;
@@ -158,7 +158,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                                                           data => this.currentSeries.data = data);
                                                                                       await this.getData(
                                                                                           this._options.now - MAX_HISTORICAL,
-                                                                                          this._options.now, "day").then(
+                                                                                          this._options.now, "day", 100, interrupted).then(
                                                                                           data => this.historicalSeries.data = data);
                                                                                   }
                                                                               }
@@ -200,7 +200,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                                                   log.debug("Emitting", range);
                                                                                   this.dateRange.emit(range);
                                                                               }
-                                                                          }, "", true, true, true, "inactive");
+                                                                          }, "", true, true, true, "inactive", 100, 10000, true);
 
 
                                                       }
@@ -358,7 +358,8 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
         this.updateCurrentChartSelection = true;
     }
 
-    private async getData(startDate: number, endDate: number, timePeriod: TimePeriod, pageSize: number = 1000): Promise<any[]> {
+    private async getData(startDate: number, endDate: number, timePeriod: TimePeriod, pageSize: number = 1000,
+                          interrupted: () => boolean = () => false): Promise<any[]> {
 
         // console.trace("getData: from: " + from + ", to: " + to + ", timePeriod: " + timePeriod);
         try {
@@ -393,10 +394,10 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
             endDateRounded.setMilliseconds(0);
             const payload = {
                     ...layer,
-                    regions: this.regions,
+                    regions:   this.regions,
                     timePeriod,
-                    startDate:   startDateRounded.getTime(),
-                    endDate:     endDateRounded.getTime()
+                    startDate: startDateRounded.getTime(),
+                    endDate:   endDateRounded.getTime()
 
                 }
             ;
@@ -407,7 +408,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
 
             const data = await this._api.callMapAPIWithCacheAndDatePaging(this.map + "/timeslider", payload, false, (i) => i,
                                                                           24 * 60 * 60,
-                                                                          timePeriod === "day" ? 30 * 24 : 30 * 24);
+                                                                          timePeriod === "day" ? 30 * 24 : 30 * 24, true, interrupted);
             return data;
 
         } catch (e) {

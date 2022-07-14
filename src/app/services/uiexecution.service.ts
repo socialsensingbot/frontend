@@ -14,10 +14,10 @@ class ExecutionTask {
     public rescheduleAttempts: number = 0;
 
     constructor(public resolve: (value?: any) => void, public reject: (reason?: any) => void,
-                private _task: () => any, public name: string, public waitForStates: AppState[] | null,
+                private _task: (interrupted: () => boolean) => any, public name: string, public waitForStates: AppState[] | null,
                 private _dedup: string, private _notify: NotificationService, public reschedule: boolean,
                 public silentFailure: boolean, public waitForUIState: UIState, public rescheduleDelay: number,
-                public maxRescheduleAttempts: number) {
+                public maxRescheduleAttempts: number, public interrupted: boolean = false) {
 
     }
 
@@ -30,7 +30,7 @@ class ExecutionTask {
         try {
             const start = Date.now();
             log.info("ExecutionTask: executing " + this.name + "(" + this.dedup + ")");
-            this.resolve(this._task());
+            this.resolve(this._task(() => this.interrupted));
             if (Date.now() - start > maxTaskDuration) {
                 log.warn(
                     `Task exceeded maximum recommended duration: ${this.name}(${this.dedup}) max is ${maxTaskDuration} this took ${Date.now() - start}`);
@@ -76,6 +76,7 @@ export class UIExecutionService {
     private dedupMap: Map<any, ExecutionTask> = new Map<any, ExecutionTask>();
     private lastUIActivity: number = 0;
     private _uiInactiveTimer: Subscription;
+    private currentTask: ExecutionTask;
 
     constructor(private _notify: NotificationService, @Inject(RollbarService) private _rollbar: Rollbar) {
     }
@@ -99,6 +100,7 @@ export class UIExecutionService {
             this._queue = [];
             while (snapshot.length > 0 && !this._pause) {
                 const task = snapshot.shift();
+                this.currentTask = task;
                 try {
                     log.debug("Execution Queue", this._queue);
                     log.debug(`Task ${task.name} taken from queue`);
@@ -175,9 +177,14 @@ export class UIExecutionService {
         this.uiStateChange.emit(this.uistate);
     }
 
-    public queue(name: string, waitForStates: AppState[] | null, task: () => any, dedup: any = null,
+    public queueWithInterrupt(name: string, waitForStates: AppState[] | null, task: () => any) {
+        this.queue(name, waitForStates, task, true, false, true, false, null, 100, 100000, true)
+    }
+
+    public queue(name: string, waitForStates: AppState[] | null, task: (interrupted: () => boolean) => any, dedup: any = null,
                  silentFailure: boolean = false, replaceExisting: boolean = false, reschedule: boolean = false,
-                 waitForUIState: UIState = null, rescheduleDelayInMillis = 100, maxRescheduleAttempts = 100000) {
+                 waitForUIState: UIState = null, rescheduleDelayInMillis = 100, maxRescheduleAttempts = 100000,
+                 interruptable: boolean = false) {
 
         return new Promise<any>((resolve, reject) => {
             let dedupKey = null;
@@ -189,6 +196,9 @@ export class UIExecutionService {
                                                     reschedule, silentFailure, waitForUIState, rescheduleDelayInMillis,
                                                     maxRescheduleAttempts);
             if (dedupKey !== null) {
+                if (interruptable && this.currentTask.dedup == dedupKey) {
+                    this.currentTask.interrupted = true;
+                }
                 if (this.dedupMap.has(dedupKey)) {
                     if (replaceExisting) {
                         log.info(
