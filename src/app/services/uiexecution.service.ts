@@ -30,7 +30,9 @@ class ExecutionTask {
         try {
             const start = Date.now();
             log.info("ExecutionTask: executing " + this.name + "(" + this.dedup + ")");
-            this.resolve(this._task(() => this.interrupted));
+            let result: any = this._task(() => this.interrupted);
+            log.info("ExecutionTask: finished " + this.name + "(" + this.dedup + ") with result ", result);
+            this.resolve(result);
             if (Date.now() - start > maxTaskDuration) {
                 log.warn(
                     `Task exceeded maximum recommended duration: ${this.name}(${this.dedup}) max is ${maxTaskDuration} this took ${Date.now() - start}`);
@@ -100,7 +102,6 @@ export class UIExecutionService {
             this._queue = [];
             while (snapshot.length > 0 && !this._pause) {
                 const task = snapshot.shift();
-                this.currentTask = task;
                 try {
                     log.debug("Execution Queue", this._queue);
                     log.debug(`Task ${task.name} taken from queue`);
@@ -108,9 +109,12 @@ export class UIExecutionService {
                         this._state) >= 0) && (task.waitForUIState === null || this.uistate === task.waitForUIState)) {
                         log.info(`Executing ${task.name}(${task.dedup})`);
                         try {
+                            this.currentTask = task;
                             await task.execute();
                         } catch (e) {
                             log.error(`ERROR: executing ${task.name}(${task.dedup})`, e);
+                        } finally {
+                            this.currentTask = null;
                         }
                         log.info(`Executed ${task.name}(${task.dedup})`);
                         if (task.dedup !== null) {
