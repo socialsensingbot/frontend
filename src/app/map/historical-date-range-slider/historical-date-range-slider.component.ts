@@ -159,7 +159,9 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                                                       await this.getData(
                                                                                           this._options.now - MAX_HISTORICAL,
                                                                                           this._options.now, "day", 100, interrupted).then(
-                                                                                          data => this.historicalSeries.data = data);
+                                                                                          data => {
+                                                                                              if (data !== null) {this.historicalSeries.data = data;}
+                                                                                          });
                                                                                   }
                                                                               }
                                                                               if (this.updateCurrentChartExtent) {
@@ -169,7 +171,9 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                                                           this.currentWindowMin,
                                                                                           this.currentWindowMax,
                                                                                           ((this.currentWindowMax - this.currentWindowMin) < MAX_CURRENT_HOUR_WINDOW) ? "hour" : "day").then(
-                                                                                          data => this.currentSeries.data = data);
+                                                                                          data => {
+                                                                                              if (data !== null) {this.currentSeries.data = data;}
+                                                                                          });
                                                                                       this.min = this.currentWindowMin;
                                                                                       this.max = this.currentWindowMax;
                                                                                       this.updateCurrentChartSelection = true;

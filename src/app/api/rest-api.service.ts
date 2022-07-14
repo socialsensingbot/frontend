@@ -185,6 +185,9 @@ export class RESTDataAPIService {
                         return result;
                     }
                 } while (!interrupted());
+                if (interrupted()) {
+                    return null;
+                }
 
             }
         } catch (e) {
