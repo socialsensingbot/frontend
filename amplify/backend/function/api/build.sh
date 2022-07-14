@@ -10,7 +10,7 @@ cp ../../../../../api/socialsensing-api*.tgz .
 npm install socialsensing-api*.tgz
 npm install
 tsc --project tsconfig.json
-if [[ -z "$SKIP_TESTS" ]] ; then
+if [[ -z "$SKIP_TESTS" ]]; then
   if [[ "${AWS_BRANCH:-}" == staging ]]; then
     echo "Tests are run on dev branches only."
   elif [[ "${AWS_BRANCH:-}" == demo ]]; then
