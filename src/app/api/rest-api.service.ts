@@ -131,6 +131,9 @@ export class RESTDataAPIService {
                     page++;
                 }
             } while (!interrupted());
+            if (interrupted()) {
+                return null;
+            }
         } catch (e) {
             log.error(e);
         }
