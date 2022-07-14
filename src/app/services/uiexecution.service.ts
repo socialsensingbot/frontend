@@ -30,7 +30,7 @@ class ExecutionTask {
         try {
             const start = Date.now();
             log.info("ExecutionTask: executing " + this.name + "(" + this.dedup + ")");
-            let result: any = this._task(() => this.interrupted);
+            let result: any = await this._task(() => this.interrupted);
             log.info("ExecutionTask: finished " + this.name + "(" + this.dedup + ") with result ", result);
             this.resolve(result);
             if (Date.now() - start > maxTaskDuration) {
