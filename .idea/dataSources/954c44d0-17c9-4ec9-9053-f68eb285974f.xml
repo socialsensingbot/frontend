@@ -1103,6 +1103,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="303" parent="278" name="daily_housekeeping_event_6">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-07-13.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-06 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -1117,6 +1118,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="305" parent="278" name="mv_refresh_event">
       <Definer>admin@%</Definer>
       <Interval>&apos;5&apos; MINUTE</Interval>
+      <LastExecuted>2022-07-13.17:20:00</LastExecuted>
       <SourceTextLength>25</SourceTextLength>
       <Starts>&apos;2021-01-01 00:00:00&apos;</Starts>
       <Status>enabled</Status>
@@ -1327,7 +1329,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <Position>2</Position>
     </argument>
     <column id="355" parent="306" name="id">
-      <AutoIncrement>959332</AutoIncrement>
+      <AutoIncrement>961483</AutoIncrement>
       <DataType>int|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -1384,7 +1386,7 @@ level</ColNames>
       <UnderlyingIndexName>internal_debug_id_uindex</UnderlyingIndexName>
     </key>
     <column id="366" parent="307" name="id">
-      <AutoIncrement>55787</AutoIncrement>
+      <AutoIncrement>56108</AutoIncrement>
       <DataType>bigint|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -2068,7 +2070,10 @@ language</ColNames>
     <index id="482" parent="317" name="mat_view_timeseries_date_secondary_idx">
       <ColNames>source_date
 hazard
-language</ColNames>
+language
+source
+deleted
+map_location</ColNames>
       <Type>btree</Type>
     </index>
     <index id="483" parent="317" name="mat_view_timeseries_date_source_date_index">
@@ -2149,7 +2154,7 @@ source</ColNames>
       <NotNull>1</NotNull>
       <Position>11</Position>
     </column>
-    <index id="497" parent="318" name="mat_view_timeseries_date_tertiary_hour">
+    <index id="497" parent="318" name="mat_view_timeseries_hour_tertiary_index">
       <ColNames>region_group_name
 hazard
 source
@@ -2169,7 +2174,10 @@ language</ColNames>
     <index id="499" parent="318" name="mat_view_timeseries_hour_secondary_idx">
       <ColNames>source_date
 hazard
-language</ColNames>
+language
+source
+deleted
+map_location</ColNames>
       <Type>btree</Type>
     </index>
     <index id="500" parent="318" name="mat_view_timeseries_hour_source_date_asc_index">

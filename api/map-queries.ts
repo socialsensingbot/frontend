@@ -1022,9 +1022,9 @@ export const timesliderFunc: (req, res) => Promise<void> = async (req, res) => {
                                                WHERE tsd.source_date between ? and ?
                                                  AND tsd.hazard IN (?)
                                                  AND tsd.language LIKE ?
-                                                 AND tsd.map_location = ?
                                                  AND tsd.source IN (?)
                                                  AND NOT tsd.deleted
+                                                 AND tsd.map_location = ?
                                                group by date
                                                order by date) lhs
                                                   RIGHT OUTER JOIN (select date, 0 as count
@@ -1032,7 +1032,7 @@ export const timesliderFunc: (req, res) => Promise<void> = async (req, res) => {
                                                                     where date between ? and ?) rhs
                                                                    ON lhs.date = rhs.date
                                         `,
-                                values: [hazards, sources, lang, location, from, to, from, to]
+                                values: [from, to, hazards, lang, sources, location, from, to]
                             });
 
     }, {duration: 60 * 60});
