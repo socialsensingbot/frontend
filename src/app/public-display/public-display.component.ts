@@ -177,7 +177,7 @@ export class PublicDisplayComponent implements OnInit {
             const oldLocation = this.data.mapMetadata.location;
             this.data.switchDataSet(value).then(async () => {
                 if (this._activeRegionType) {
-                    await this.data.loadGeography(this._activeRegionType);
+                    await this.data.loadGeography(this._activeRegionType, () => false);
                 }
                 log.debug(`Old location ${oldLocation} new location ${this.data.mapMetadata.location}`);
                 if (this.data.mapMetadata.location !== oldLocation) {
@@ -436,8 +436,7 @@ export class PublicDisplayComponent implements OnInit {
                             completedAnimations++;
                         }
                         this._statsMap = await this.data.getRegionStatsMap(this._activeLayerGroup, this._activeRegionType, this.minDate,
-
-                                                                           this.maxDate);
+                                                                           this.maxDate, () => false);
                         if (this.pref.combined.publicDisplayTweetScroll === "window") {
                             this.tweets = await this.data.publicDisplayTweets(this.activeLayerGroup, this.activeRegionType,
                                                                               this.minDate,
@@ -559,7 +558,7 @@ export class PublicDisplayComponent implements OnInit {
             this._twitterIsStale = true;
             this.updateAnnotationTypes();
             this.title = this.currentDisplayScreen.title;
-            await this.data.loadGeography(this.activeRegionType);
+            await this.data.loadGeography(this.activeRegionType, () => false);
             await this.resetStatisticsLayer(this.activeStatistic);
             if (this.pref.combined.publicDisplayTweetScroll === "all") {
                 log.info("Before tweet load");
@@ -647,8 +646,8 @@ export class PublicDisplayComponent implements OnInit {
             // this.hideTweets();
             log.debug(layer);
             const curLayerGroup = layerGroup();
-            this.geographyData = await this.data.geoJsonGeographyFor(this._activeRegionType) as PolygonData;
-            this.regionTweetMap = await this.data.recentTweets(this._activeLayerGroup, this._activeRegionType);
+            this.geographyData = await this.data.geoJsonGeographyFor(this._activeRegionType, () => false) as PolygonData;
+            this.regionTweetMap = await this.data.recentTweets(this._activeLayerGroup, this._activeRegionType, () => false);
             this._geojson[layer] = new GeoJSON(this.geographyData as geojson.GeoJsonObject, {
                 style: {
                     className:   "app-map-region-geography",
@@ -742,7 +741,8 @@ export class PublicDisplayComponent implements OnInit {
             log.debug("Loading stats");
             const features = geography.features;
             log.debug("Before stats");
-            const statsMap = await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this.minDate, this.maxDate);
+            const statsMap = await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this.minDate, this.maxDate,
+                                                               () => false);
             log.debug("After stats");
             for (const feature of features) {
                 const featureProperties = feature.properties;

@@ -173,7 +173,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
     public mapLayer: SSMapLayer = null;
 
     public async serverNow(): Promise<number> {
-        return await this._api.callMapAPIWithCache(this.map.id + "/now", {}, 60) as Promise<number>;
+        return await this._api.callMapAPIWithCache(this.map.id + "/now", {}, 60, false, true, () => false) as Promise<number>;
     }
 
     public updateSavedGraphs() {
@@ -254,7 +254,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             // Now display the graph for that first query.
             this.noData = true;
             this.updating = true;
-            await this._updateGraphInternal(query, this.state.timePeriod);
+            await this._updateGraphInternal(query, this.state.timePeriod, () => false);
             this.updating = false;
             log.debug("Clear finished");
         }
@@ -440,28 +440,26 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         log.debug("updateGraph");
         // console.trace("timeseries updateGraph");
         // noinspection ES6MissingAwait
-        return this.exec.queue("update-timeseries-graph", null,
-                               async () => {
-                                   // Immutable copy
-                                   const query = JSON.parse(JSON.stringify(q)) as TimeseriesRESTQuery;
-                                   log.debug("Graph update from query ", query);
-                                   const text: string = query.textSearch;
-                                   if (query.layer && (text.length > 0 || force)) {
-                                       if (text.length > 3) {
-                                           // noinspection ES6MissingAwait
-                                           this.auto.create(timeSeriesAutocompleteType, text, true,
-                                                            this.pref.combined.shareTextAutocompleteInGroup);
-                                       }
-                                       // No need to do an await here as we want async execution
-                                       // the await needs to be called on the result of this function updateGraph()
-                                       // noinspection ES6MissingAwait
-                                       await this._updateGraphInternal(query, timePeriod);
-                                   } else {
-                                       log.debug("Skipped time series update, force=" + force);
-                                   }
+        return this.exec.queue("update-timeseries-graph", null, async (interrupted: () => boolean) => {
+            // Immutable copy
+            const query = JSON.parse(JSON.stringify(q)) as TimeseriesRESTQuery;
+            log.debug("Graph update from query ", query);
+            const text: string = query.textSearch;
+            if (query.layer && (text.length > 0 || force)) {
+                if (text.length > 3) {
+                    // noinspection ES6MissingAwait
+                    this.auto.create(timeSeriesAutocompleteType, text, true,
+                                     this.pref.combined.shareTextAutocompleteInGroup);
+                }
+                // No need to do an await here as we want async execution
+                // the await needs to be called on the result of this function updateGraph()
+                // noinspection ES6MissingAwait
+                await this._updateGraphInternal(query, timePeriod, interrupted);
+            } else {
+                log.debug("Skipped time series update, force=" + force);
+            }
 
-                               }, q.__series_id + "-" + force, true, true, true, "inactive"
-        );
+        }, q.__series_id + "-" + force, true, true, true, true, "inactive", 100, 100000);
 
     }
 
@@ -477,7 +475,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         }
     }
 
-    protected async executeQuery(query: TimeseriesRESTQuery, timePeriod: TimePeriod): Promise<any[]> {
+    protected async executeQuery(query: TimeseriesRESTQuery, timePeriod: TimePeriod, interrupted: () => boolean): Promise<any[]> {
 
         if (!this.map.id) {
             return;
@@ -504,7 +502,10 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             if (payload.regions.length === 0) {
                 payload.regions = this.pref.combined.analyticsDefaultRegions;
             }
-            const serverResults = await this._api.callMapAPIWithCacheAndDatePaging(this.map.id + "/analytics/time", payload, true);
+            const serverResults = await this._api.callMapAPIWithCacheAndDatePaging(this.map.id + "/analytics/time",
+                                                                                   payload, true, (i) => i, 60 * 60 * 24,
+                                                                                   30 * 24, true,
+                                                                                   interrupted);
             log.debug("Server result was ", serverResults);
             this.error = false;
             return this.queryTransform(serverResults);
@@ -664,9 +665,9 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         return {eoc: this.statType, lob: "line", queries: [], timePeriod: "day"};
     }
 
-    private async _updateGraphInternal(query, timePeriod: TimePeriod) {
+    private async _updateGraphInternal(query, timePeriod: TimePeriod, interrupted: () => boolean) {
         log.debug("_updateGraphInternal() called");
-        return this.executeQuery(query, timePeriod).then(queryResult => {
+        return this.executeQuery(query, timePeriod, interrupted).then(queryResult => {
             if (queryResult && queryResult.length === 0) {
                 log.info("No data returned from query");
             } else {

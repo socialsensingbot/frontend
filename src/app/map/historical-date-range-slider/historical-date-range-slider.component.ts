@@ -147,7 +147,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                           // noinspection ES6MissingAwait
                                                           this.exec.queue("update-historical-scrollbars", null,
                                                                           async (interrupted: () => boolean) => {
-                                                                              log.debug("Checking for update");
+                                                                              log.verbose("Checking for update");
                                                                               if (this.updateLayer) {
                                                                                   this.updateLayer = false;
                                                                                   if (this.currentWindowMin && this.currentWindowMax) {
@@ -204,7 +204,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                                                   log.debug("Emitting", range);
                                                                                   this.dateRange.emit(range);
                                                                               }
-                                                                          }, "", true, true, true, "inactive", 100, 10000, true);
+                                                                          }, "", true, true, true, true, "inactive", 100, 10000);
 
 
                                                       }

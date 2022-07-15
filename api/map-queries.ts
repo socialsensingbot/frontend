@@ -1240,7 +1240,7 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
 
                                     });
             }
-        }, {duration: 60 * 60});
+        }, {duration: 7 * 24 * 60 * 60});
     } catch (e) {
         handleError(res, e);
     }

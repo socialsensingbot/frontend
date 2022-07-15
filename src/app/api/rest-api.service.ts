@@ -39,7 +39,7 @@ export class RESTDataAPIService {
         });
     }
 
-    public async callQueryAPI(functionName: string, payload: any, cacheForSeconds: number = 60): Promise<any> {
+    public async callQueryAPI(functionName: string, payload: any, cacheForSeconds: number = 60, interrupted: () => boolean): Promise<any> {
 
         if (useLambda) {
             log.debug("Calling " + functionName, payload);
@@ -80,7 +80,7 @@ export class RESTDataAPIService {
                     return cachedItem.data;
                 } else {
                     log.debug("Value for " + key + " not in cache");
-                    return await this.callAPIInternal(path, payload, cacheForSeconds, key);
+                    return await this.callAPIInternal(path, payload, cacheForSeconds, key, false, true, false, interrupted);
                 }
             } else {
                 return await API.get("query", path, {
@@ -93,10 +93,15 @@ export class RESTDataAPIService {
     }
 
 
-    public async callMapAPIWithCache(path: string, payload: any, cacheForSeconds: number = -1, useGet = false, retry = true): Promise<any> {
+    public async callMapAPIWithCache(path: string, payload: any, cacheForSeconds: number = -1, useGet = false, retry = true,
+                                     interrupted: () => boolean): Promise<any> {
         log.verbose("callMapAPIWithCache()");
         const key = "rest:map/" + path + ":" + JSON.stringify(payload);
         const cachedItem = await this.cache.getCached(key);
+        if (interrupted()) {
+            log.debug("callMapAPIWithCache() interrupted");
+            return null;
+        }
         if (cacheForSeconds > 0 && cachedItem && cachedItem.hasData && !cachedItem.expired) {
             // tslint:disable-next-line:no-console
             log.verbose("Value for " + key + "in cache");
@@ -105,7 +110,7 @@ export class RESTDataAPIService {
             return cachedItem.data;
         } else {
             log.info("Value for " + key + " not in cache");
-            return await this.callAPIInternal("/map/" + path, payload, cacheForSeconds, key, useGet, retry);
+            return await this.callAPIInternal("/map/" + path, payload, cacheForSeconds, key, useGet, retry, false, interrupted);
         }
     }
 
@@ -115,8 +120,9 @@ export class RESTDataAPIService {
         try {
             const result: any[] = [];
             let page = 0;
-            do {
-                const rawResult = await this.callMapAPIWithCache(path, {...payload, pageSize, page,}, cacheForSeconds, false, false);
+            while (!interrupted()) {
+                const rawResult = await this.callMapAPIWithCache(path, {...payload, pageSize, page,}, cacheForSeconds, false, false,
+                                                                 interrupted);
                 log.debug(rawResult.length + " tweets back from server");
                 for (const item of rawResult) {
                     result.push(transform(item));
@@ -130,7 +136,7 @@ export class RESTDataAPIService {
                 } else {
                     page++;
                 }
-            } while (!interrupted());
+            }
             if (interrupted()) {
                 log.debug("Interrupted while paging " + path);
                 return null;
@@ -148,6 +154,10 @@ export class RESTDataAPIService {
         try {
             const key = "rest:query/" + path + ":" + JSON.stringify(payload);
             const cachedItem = await this.cache.getCached(key);
+            if (interrupted()) {
+                log.debug("Interrupted");
+                return null;
+            }
             if (cacheForSeconds > 0 && cachedItem && cachedItem.hasData && !cachedItem.expired) {
                 // tslint:disable-next-line:no-console
                 log.verbose("Value for " + key + "in cache");
@@ -164,9 +174,10 @@ export class RESTDataAPIService {
                 if (showSpinner) {
                     this._loading.showDeterminateProgress("Loading date range", 0);
                 }
-                do {
+                while (!interrupted()) {
                     const endDate = payload.endDate < currEndDate ? payload.endDate : currEndDate;
-                    const rawResult = await this.callMapAPIWithCache(path, {...payload, startDate, endDate}, cacheForSeconds, false, retry);
+                    const rawResult = await this.callMapAPIWithCache(path, {...payload, startDate, endDate}, cacheForSeconds, false, retry,
+                                                                     interrupted);
                     log.debug(rawResult.length + " results back from server");
                     for (const item of rawResult) {
                         result.push(transform(item));
@@ -188,7 +199,7 @@ export class RESTDataAPIService {
                         }
                         return result;
                     }
-                } while (!interrupted());
+                }
                 if (interrupted()) {
                     log.debug("Interrupted while paging " + path);
                     return null;
@@ -203,7 +214,8 @@ export class RESTDataAPIService {
 
 
     private async callAPIInternal(fullPath: string, payload: any, cacheForSeconds: number, key: string,
-                                  useGet = false, retry = true, showWaitingSpinner = false): Promise<Promise<any>> {
+                                  useGet = false, retry = true, showWaitingSpinner = false,
+                                  interrupted: () => boolean): Promise<Promise<any>> {
         this.calls++;
         if (this.callsPerMinute > environment.maxCallsPerMinute) {
             console.error("Excessive api calls per minute: " + this.callsPerMinute);
@@ -261,6 +273,11 @@ export class RESTDataAPIService {
                 }
                 return new Promise<any>((resolve, reject) => {
                     setTimeout(async () => {
+                        if (interrupted()) {
+                            log.debug("callAPIInternal() interrupted");
+                            return null;
+                        }
+
                         API.post("query", fullPath, {
                             body:    payload,
                             headers: {

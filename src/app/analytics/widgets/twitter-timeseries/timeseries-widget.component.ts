@@ -98,32 +98,29 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
         // Immutable copy
         const query: TimeseriesRESTQuery = JSON.parse(JSON.stringify(q));
 
-        await this.exec.queue("update-timeseries-graph", null,
-                              async () => {
-                                  try {
-                                      log.debug("Graph update from query ", query);
+        await this.exec.queue("update-timeseries-graph", null, async (interrupted: () => boolean) => {
+            try {
+                log.debug("Graph update from query ", query);
 
-                                      this.emitChange();
-                                      if (query.textSearch.length > 0 || query.regions.length > 0 || force) {
-                                          const queryResult = await this.executeQuery(query);
-                                          if (queryResult && queryResult.length > 0) {
-                                              this.seriesCollection.updateTimeseries(
-                                                  new TimeseriesModel(toLabel(query, this.pref.combined.layers),
-                                                                      queryResult,
-                                                                      query.__series_id));
-                                          } else {
-                                              log.warn(queryResult);
-                                          }
-                                      } else {
-                                          log.debug("Skipped time series update, force=" + force);
-                                      }
-                                  } finally {
-                                      this.updating = false;
-                                  }
+                this.emitChange();
+                if (query.textSearch.length > 0 || query.regions.length > 0 || force) {
+                    const queryResult = await this.executeQuery(query, interrupted);
+                    if (queryResult && queryResult.length > 0) {
+                        this.seriesCollection.updateTimeseries(
+                            new TimeseriesModel(toLabel(query, this.pref.combined.layers),
+                                                queryResult,
+                                                query.__series_id));
+                    } else {
+                        log.warn(queryResult);
+                    }
+                } else {
+                    log.debug("Skipped time series update, force=" + force);
+                }
+            } finally {
+                this.updating = false;
+            }
 
-                              }, this.id + "-" + (query.__series_id || uuidv4()) + "-" + force, false, true, true,
-                              "inactive"
-        );
+        }, this.id + "-" + (query.__series_id || uuidv4()) + "-" + force, true, false, true, true, "inactive");
 
     }
 
@@ -132,7 +129,7 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
 
     }
 
-    protected async executeQuery(query: TimeseriesRESTQuery): Promise<any[]> {
+    protected async executeQuery(query: TimeseriesRESTQuery, interrupted: () => boolean): Promise<any[]> {
         this.updating = true;
         try {
             log.debug(query);
@@ -146,7 +143,8 @@ export class TimeseriesWidgetComponent implements OnInit, OnDestroy, OnChanges {
                 timePeriod: this.state.timePeriod
             };
             log.debug(payload);
-            const serverResults = await this._api.callMapAPIWithCache(this.map.id + "/analytics/time", payload);
+            const serverResults = await this._api.callMapAPIWithCache(this.map.id + "/analytics/time", payload, -1, false, true,
+                                                                      interrupted);
             this.error = false;
             return this.queryTransform(serverResults);
         } catch (e) {

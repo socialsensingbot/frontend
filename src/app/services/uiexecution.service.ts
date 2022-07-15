@@ -29,7 +29,7 @@ class ExecutionTask {
     public async execute() {
         try {
             const start = Date.now();
-            log.debug("ExecutionTask: executing " + this.name + "(" + this.dedup + ")");
+            log.verbose("ExecutionTask: executing " + this.name + "(" + this.dedup + ")");
             let result: any = await this._task(() => this.interrupted);
             log.verbose("ExecutionTask: finished " + this.name + "(" + this.dedup + ") with result ", result);
             this.resolve(result);
@@ -96,7 +96,7 @@ export class UIExecutionService {
         });
         this._executionTimer = timer(0, 100).subscribe(async () => {
             if (this._queue.length > 0) {
-                log.debug(this._queue.length + " items in the execution queue ", this._queue);
+                log.verbose(this._queue.length + " items in the execution queue ", this._queue);
             }
             const snapshot = [...this._queue];
             this._queue = [];
@@ -107,7 +107,7 @@ export class UIExecutionService {
                     log.verbose(`Task ${task.name} taken from queue`);
                     if ((task.waitForStates === null || task.waitForStates.indexOf(
                         this._state) >= 0) && (task.waitForUIState === null || this.uistate === task.waitForUIState)) {
-                        log.debug(`Executing ${task.name}(${task.dedup})`);
+                        log.verbose(`Executing ${task.name}(${task.dedup})`);
                         try {
                             this.currentTask = task;
                             await task.execute();
@@ -116,7 +116,7 @@ export class UIExecutionService {
                         } finally {
                             this.currentTask = null;
                         }
-                        log.debug(`Executed ${task.name}(${task.dedup})`);
+                        log.verbose(`Executed ${task.name}(${task.dedup})`);
                         if (task.dedup !== null) {
                             this.dedupMap.delete(task.dedup);
                         }
@@ -182,13 +182,13 @@ export class UIExecutionService {
     }
 
     public queueWithInterrupt(name: string, waitForStates: AppState[] | null, task: () => any) {
-        this.queue(name, waitForStates, task, true, false, true, false, null, 100, 100000, true)
+        this.queue(name, waitForStates, task, true, true, false, true, false, null, 100, 100000)
     }
 
     public queue(name: string, waitForStates: AppState[] | null, task: (interrupted: () => boolean) => any, dedup: any = null,
-                 silentFailure: boolean = false, replaceExisting: boolean = false, reschedule: boolean = false,
-                 waitForUIState: UIState = null, rescheduleDelayInMillis = 100, maxRescheduleAttempts = 100000,
-                 interruptable: boolean = false) {
+                 interruptable: boolean = false, silentFailure: boolean = false, replaceExisting: boolean = false,
+                 reschedule: boolean = false, waitForUIState: UIState = null, rescheduleDelayInMillis = 100,
+                 maxRescheduleAttempts = 100000) {
 
         return new Promise<any>((resolve, reject) => {
             let dedupKey = null;
@@ -200,7 +200,7 @@ export class UIExecutionService {
                                                     reschedule, silentFailure, waitForUIState, rescheduleDelayInMillis,
                                                     maxRescheduleAttempts);
             if (dedupKey !== null) {
-                if (interruptable && this.currentTask && this.currentTask.dedup === dedupKey) {
+                if (interruptable && this.currentTask !== null && this.currentTask.dedup === dedupKey) {
                     log.debug("Interrupting " + this.currentTask.name + " with dedup" + dedupKey)
                     this.currentTask.interrupted = true;
                 }
