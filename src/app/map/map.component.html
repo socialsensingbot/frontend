@@ -208,7 +208,7 @@
                                                   [layer]="activeLayerGroup"
                                                   [map]="this.mapSelectionService.id"
                                                   [options]="sliderOptions"
-                                                  [regions]="'uk'"></app-historical-date-range-slider>
+                                                  [regions]="['uk']"></app-historical-date-range-slider>
             </div>
             <mat-progress-bar *ngIf="activity && ready" class="map-progress" mode="indeterminate"
                               [color]="pref.combined.toolbarColor"></mat-progress-bar>

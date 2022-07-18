@@ -1015,17 +1015,18 @@ export const timesliderFunc: (req, res) => Promise<void> = async (req, res) => {
         const sources: string[] = req.body.sources || req.body.layer.sources;
         return await db.sql({
                                 // language=MySQL
-                                sql:    `select IFNULL(lhs.count, rhs.count) as count, IFNULL(lhs.date, rhs.date) as date
-                                         from (SELECT count(*)        as count,
-                                                      tsd.source_date as date
-                                               FROM ${timeSeriesTable} tsd
-                                               WHERE tsd.source_date between ? and ?
-                                                 AND tsd.hazard IN (?)
-                                                 AND tsd.language LIKE ?
-                                                 AND tsd.source IN (?)
-                                                 AND NOT tsd.deleted
-                                                 AND tsd.map_location = ?
-                                               group by date
+                                sql: `/* app.js timeslider */ select IFNULL(lhs.count, rhs.count) as count,
+                                                                     IFNULL(lhs.date, rhs.date)   as date
+                                                              from (SELECT count(*)        as count,
+                                                                           tsd.source_date as date
+                                                                    FROM ${timeSeriesTable} tsd
+                                                                    WHERE tsd.source_date between ? and ?
+                                                                      AND tsd.hazard IN (?)
+                                                                      AND tsd.language LIKE ?
+                                                                      AND tsd.source IN (?)
+                                                                      AND NOT tsd.deleted
+                                                                      AND tsd.map_location = ?
+                                                                    group by date
                                                order by date) lhs
                                                   RIGHT OUTER JOIN (select date, 0 as count
                                                                     from ${dateTable}

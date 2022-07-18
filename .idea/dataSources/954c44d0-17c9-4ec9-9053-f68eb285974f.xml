@@ -1068,6 +1068,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="298" parent="278" name="daily_housekeeping_event_1">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-07-15.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-01 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -1075,6 +1076,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="299" parent="278" name="daily_housekeeping_event_2">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-07-16.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-02 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -1082,6 +1084,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="300" parent="278" name="daily_housekeeping_event_3">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-07-17.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-03 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -1089,6 +1092,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="301" parent="278" name="daily_housekeeping_event_4">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-07-18.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-04 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -1111,6 +1115,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="304" parent="278" name="daily_housekeeping_event_7">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-07-14.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-07 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -1118,10 +1123,10 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="305" parent="278" name="mv_refresh_event">
       <Definer>admin@%</Definer>
       <Interval>&apos;5&apos; MINUTE</Interval>
-      <LastExecuted>2022-07-13.17:20:00</LastExecuted>
+      <LastExecuted>2022-07-18.17:25:00</LastExecuted>
       <SourceTextLength>25</SourceTextLength>
       <Starts>&apos;2021-01-01 00:00:00&apos;</Starts>
-      <Status>enabled</Status>
+      <Status>disabled</Status>
     </scheduled-event>
     <table id="306" parent="278" name="internal_debug">
       <Comment>Non operational table containing debug log statements.</Comment>
@@ -1329,7 +1334,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <Position>2</Position>
     </argument>
     <column id="355" parent="306" name="id">
-      <AutoIncrement>961483</AutoIncrement>
+      <AutoIncrement>981274</AutoIncrement>
       <DataType>int|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -1386,7 +1391,7 @@ level</ColNames>
       <UnderlyingIndexName>internal_debug_id_uindex</UnderlyingIndexName>
     </key>
     <column id="366" parent="307" name="id">
-      <AutoIncrement>56108</AutoIncrement>
+      <AutoIncrement>57537</AutoIncrement>
       <DataType>bigint|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
