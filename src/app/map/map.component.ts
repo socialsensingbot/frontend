@@ -665,10 +665,16 @@ export class MapComponent implements OnInit, OnDestroy {
             return;
         }
         log.debug("scheduleResetLayers()");
-        await this._exec.queue("Reset Layers", ["ready"], async (interrupted: () => boolean) => {
+        return await this._exec.queue("Reset Layers", ["ready"], async (interrupted: () => boolean) => {
             this.activity = true;
-            await this.resetStatisticsLayer(layer, clearSelected, approximateFirst, interrupted);
-            this.activity = false;
+            this._updating = true;
+
+            try {
+                await this.resetStatisticsLayer(layer, clearSelected, approximateFirst, interrupted);
+            } finally {
+                this._updating = false;
+                this.activity = false;
+            }
         }, layer, true, true, false, true);
     }
 
@@ -1220,25 +1226,19 @@ export class MapComponent implements OnInit, OnDestroy {
                                           if (this.destroyed) {
                                               return;
                                           }
-                                          if (!this._updating) {
                                               this.activity = true;
-                                              this._updating = true;
                                               try {
 
                                                   await this.scheduleResetLayers(this.activeStatistic, clearSelected, approximateFirst);
                                                   await this.updateTwitterPanel(interrupted);
                                               } finally {
                                                   this.activity = false;
-                                                  this._updating = false;
                                                   if (this._params) {
                                                       this._exec.changeState("ready");
                                                   } else {
                                                       this._exec.changeState("no-params");
                                                   }
                                               }
-                                          } else {
-                                              log.debug("Update in progress so skipping this update");
-                                          }
                                       }
             , reason, false, true);
     }
