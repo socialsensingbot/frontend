@@ -150,7 +150,8 @@ CREATE PROCEDURE refresh_mv_full(
 )
 BEGIN
 
-    DECLARE dt DATE DEFAULT '2017-01-01';
+    DECLARE dt DATE DEFAULT NOW();
+    DECLARE enddate DATE DEFAULT '2017-01-01';
     declare counter int default 0;
     -- rollback transaction and bubble up errors if something bad happens
     DECLARE exit handler FOR SQLEXCEPTION, SQLWARNING
@@ -172,23 +173,23 @@ BEGIN
         SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
 
 
-        WHILE dt <= NOW()
+        WHILE dt >= enddate
             DO
-                CALL debug_msg(1, 'refresh_mv_full', CONCAT('Refreshing month starting ', dt));
-                CALL refresh_mv(dt, DATE_ADD(dt, INTERVAL 1 MONTH), @rc);
-                CALL debug_msg(1, 'refresh_mv_full', CONCAT('Updating text count for month starting ', dt));
-                CALL update_text_count(dt, DATE_ADD(dt, INTERVAL 1 MONTH));
-                CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling days for month starting ', dt));
-                CALL fill_days(dt, DATE_ADD(dt, INTERVAL 1 MONTH));
-                CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling hours for month starting ', dt));
-                CALL fill_hours(dt, DATE_ADD(dt, INTERVAL 1 MONTH));
+                CALL debug_msg(1, 'refresh_mv_full', CONCAT('Refreshing month ending ', dt));
+                CALL refresh_mv(DATE_SUB(dt, INTERVAL 1 MONTH), dt, @rc);
+                CALL debug_msg(1, 'refresh_mv_full', CONCAT('Updating text count for month ending ', dt));
+                CALL update_text_count(DATE_SUB(dt, INTERVAL 1 MONTH), dt);
+                CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling days for month ending ', dt));
+                CALL fill_days(DATE_SUB(dt, INTERVAL 1 MONTH), dt);
+                CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling hours for month ending ', dt));
+                CALL fill_hours(DATE_SUB(dt, INTERVAL 1 MONTH), dt);
                 #             IF MOD(counter, 12) = 1
 #             THEN
 #                 CALL refresh_mv_map_window(@rc);
 #             ELSE
 #                 CALL refresh_mv_now(@rc);
 #             END IF;
-                SET dt = DATE_ADD(dt, INTERVAL 1 MONTH);
+                SET dt = DATE_SUB(dt, INTERVAL 1 MONTH);
                 SET counter = counter + 1;
             END WHILE;
 

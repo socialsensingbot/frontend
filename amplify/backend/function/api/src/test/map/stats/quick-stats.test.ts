@@ -18,6 +18,22 @@ const reqBody = {
     endDate:    MAX_DATE_MILLIS,
     regionType: "county"
 };
+const geoJsonRequest = {
+    hazards: [
+        "flood"
+    ],
+    sources: [
+        "twitter"
+    ],
+
+    warnings: "exclude",
+
+    startDate:  MIN_DATE_MILLIS,
+    endDate:    MAX_DATE_MILLIS,
+    regionType: "county",
+    format:     "geojson"
+};
+
 const invalidHazard1 = {
     hazards: [1],
     sources: [
@@ -326,6 +342,18 @@ describe("POST /v1/map/:map/stats", () => {
         expect(response.body["west yorkshire"].count).to.equal(13);
         expect(response.body["west yorkshire"].exceedance).to.be.above(1);
         expect(response.body["west yorkshire"].exceedance).to.be.below(50);
+    });
+    it("stats as geojson", async () => {
+        const response = await request(app)
+            .post("/v1/map/uk-flood-test/stats")
+            .set("Accept", "application/json")
+            .send(geoJsonRequest);
+        // console.log(sortedStringify(response.body));
+        expect(Object.keys(response.body).length).to.equal(2);
+        expect(response.body.features.length).to.equal(174);
+        expect(response.body.features[10].properties.name).to.equal('blaenau gwent');
+        expect(response.body.features[10].properties.count).to.be.above(0);
+        expect(response.body.features[10].properties.exceedance).to.be.below(20);
     });
     it("invalid map", async () => {
         const response = await request(app)

@@ -770,7 +770,6 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
     const lang = getLangAsSQLLike(req);
     await db.cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
 
-        const result = {};
 
         const exceedanceThreshold = req.body.exceedanceThreshold || 100;
         const countThreshold = req.body.countThreshold || 0;
@@ -839,16 +838,31 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
                                       ]
                                   }, true);
 
-
-        for (const row of rows) {
-            if (req.body.debug) {
-                console.info("Fetching row ", row);
+        if (req.body.format === "geojson") {
+            const featureMap = {};
+            const regions = await db.sql(
+                {sql: "select region, ST_AsGeoJSON(boundary) geojson from ref_geo_regions where region_type = ?", values: [regionType]});
+            for (const region of regions) {
+                featureMap[region.region] = JSON.parse(region.geojson);
+                featureMap[region.region].properties = {name: region.region, count: 0, exceedance: 100.0};
+            }
+            for (const row of rows) {
+                featureMap[row.region].properties = {name: row.region, count: row.count, exceedance: row.exceedance};
             }
 
-            result[row.region] = {count: row.count, exceedance: row.exceedance};
+            return {type: "FeatureCollection", features: Object.values(featureMap)};
+        } else {
+            const result = {};
+            for (const row of rows) {
+                if (req.body.debug) {
+                    console.info("Fetching row ", row);
+                }
+
+                result[row.region] = {count: row.count, exceedance: row.exceedance};
+            }
+            return result;
         }
 
-        return result;
 
     }, {duration: 5 * 60});
 
@@ -1015,23 +1029,23 @@ export const timesliderFunc: (req, res) => Promise<void> = async (req, res) => {
         const sources: string[] = req.body.sources || req.body.layer.sources;
         return await db.sql({
                                 // language=MySQL
-                                sql: `/* app.js timeslider */ select IFNULL(lhs.count, rhs.count) as count,
-                                                                     IFNULL(lhs.date, rhs.date)   as date
-                                                              from (SELECT count(*)        as count,
-                                                                           tsd.source_date as date
-                                                                    FROM ${timeSeriesTable} tsd
-                                                                    WHERE tsd.source_date between ? and ?
-                                                                      AND tsd.hazard IN (?)
-                                                                      AND tsd.language LIKE ?
-                                                                      AND tsd.source IN (?)
-                                                                      AND NOT tsd.deleted
-                                                                      AND tsd.map_location = ?
-                                                                    group by date
-                                               order by date) lhs
-                                                  RIGHT OUTER JOIN (select date, 0 as count
-                                                                    from ${dateTable}
-                                                                    where date between ? and ?) rhs
-                                                                   ON lhs.date = rhs.date
+                                sql:    `/* app.js timeslider */ select IFNULL(lhs.count, rhs.count) as count,
+                                                                        IFNULL(lhs.date, rhs.date)   as date
+                                                                 from (SELECT count(*)        as count,
+                                                                              tsd.source_date as date
+                                                                       FROM ${timeSeriesTable} tsd
+                                                                       WHERE tsd.source_date between ? and ?
+                                                                         AND tsd.hazard IN (?)
+                                                                         AND tsd.language LIKE ?
+                                                                         AND tsd.source IN (?)
+                                                                         AND NOT tsd.deleted
+                                                                         AND tsd.map_location = ?
+                                                                       group by date
+                                                                       order by date) lhs
+                                                                          RIGHT OUTER JOIN (select date, 0 as count
+                                                                                            from ${dateTable}
+                                                                                            where date between ? and ?) rhs
+                                                                                           ON lhs.date = rhs.date
                                         `,
                                 values: [from, to, hazards, lang, sources, location, from, to]
                             });
@@ -1147,7 +1161,7 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
 
         await db.cache(res, key, async () => {
             let fullText = "";
-            let textSearch: string = req.body.textSearch;
+            const textSearch: string = req.body.textSearch;
 
             if (typeof textSearch !== "undefined" && textSearch.length > 0) {
                 fullText = " AND MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE)";
