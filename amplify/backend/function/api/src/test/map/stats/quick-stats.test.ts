@@ -348,7 +348,7 @@ describe("POST /v1/map/:map/stats", () => {
             .post("/v1/map/uk-flood-test/stats")
             .set("Accept", "application/json")
             .send(geoJsonRequest);
-        // console.log(sortedStringify(response.body));
+        console.log(JSON.stringify(response.body));
         expect(Object.keys(response.body).length).to.equal(2);
         expect(response.body.features.length).to.equal(174);
         expect(response.body.features[10].properties.name).to.equal('blaenau gwent');

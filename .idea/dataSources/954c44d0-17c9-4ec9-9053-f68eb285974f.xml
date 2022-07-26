@@ -1021,7 +1021,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <routine id="289" parent="278" name="refresh_mv">
       <Definer>admin@%</Definer>
       <RoutineKind>procedure</RoutineKind>
-      <SourceTextLength>8001</SourceTextLength>
+      <SourceTextLength>8895</SourceTextLength>
     </routine>
     <routine id="290" parent="278" name="refresh_mv_auto">
       <Definer>admin@%</Definer>
@@ -1327,7 +1327,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <Position>2</Position>
     </argument>
     <column id="355" parent="306" name="id">
-      <AutoIncrement>981873</AutoIncrement>
+      <AutoIncrement>988408</AutoIncrement>
       <DataType>int|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -1384,7 +1384,7 @@ level</ColNames>
       <UnderlyingIndexName>internal_debug_id_uindex</UnderlyingIndexName>
     </key>
     <column id="366" parent="307" name="id">
-      <AutoIncrement>57537</AutoIncrement>
+      <AutoIncrement>58910</AutoIncrement>
       <DataType>bigint|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>

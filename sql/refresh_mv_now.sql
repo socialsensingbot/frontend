@@ -256,6 +256,27 @@ BEGIN
     call debug_msg(1, 'refresh_mv', CONCAT('End Date: ', end_date));
     START TRANSACTION;
 
+    call debug_msg(1, 'refresh_mv', 'Removing weather stations.');
+    START TRANSACTION;
+
+    update live_text
+    set deleted=1
+    where source_timestamp BETWEEN start_date and end_date
+      AND (
+                LOWER(source_json -> "$.user.screen_name") like '%weather%'
+            OR LOWER(source_json -> "$.user.name") like '% weather%'
+            OR LOWER(source_json -> "$.user.screen_name") like '%wx%'
+            OR LOWER(source_json -> "$.user.name") like '%wx%'
+            OR (LOWER(source_json -> "$.text") like '%humidity%pressure%')
+            OR (LOWER(source_json -> "$.text") like '%mph%°c%')
+            OR (LOWER(source_json -> "$.text") like '%°c%')
+            OR (LOWER(source_json -> "$.text") like '%°f%')
+            OR LOWER(source_json -> "$.text") like '%mph%hpa%'
+        );
+    COMMIT;
+    call debug_msg(1, 'refresh_mv', 'Removed weather stations.');
+
+
     #     delete from mat_view_regions where source_timestamp < NOW() - INTERVAL 1 YEAR;
 
 #     SET @maxTimestamp = IFNULL((select max(source_timestamp) from mat_view_regions), NOW() - INTERVAL 20 YEAR);
@@ -264,6 +285,8 @@ BEGIN
 #     call debug_msg(1, 'refresh_mv', 'Deleted old from mat_view_regions');
 
     # Put in the fine, coarse and county stats that Rudy generates data for (the old way of doing this)
+
+
     START TRANSACTION;
     REPLACE INTO mat_view_regions
     SELECT t.source_id,

@@ -335,9 +335,12 @@ export class MapComponent implements OnInit, OnDestroy {
                 if (this._sliderIsStale) {
                     log.debug("Slider is stale");
                     sliderUpdateInProgress = true;
-                    this._sliderIsStale = false;
-                    await this.updateFromSlider();
-                    sliderUpdateInProgress = false;
+                    try {
+                        this._sliderIsStale = false;
+                        await this.updateFromSlider();
+                    } finally {
+                        sliderUpdateInProgress = false;
+                    }
                 }
             }
         });
