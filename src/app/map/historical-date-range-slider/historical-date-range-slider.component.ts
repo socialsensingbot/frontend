@@ -166,7 +166,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                                                           });
                                                                                   }
                                                                               }
-                                                                              if (this.updateCurrentChartExtent) {
+                                                                              if (this.ready && this.updateCurrentChartExtent) {
                                                                                   this.updateCurrentChartExtent = false;
                                                                                   if (this.currentWindowMin && this.currentWindowMax) {
                                                                                       await this.getData(
@@ -190,7 +190,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                                                       }, 300);
                                                                                   }
                                                                               }
-                                                                              if (this.updateCurrentChartSelection && this.min && this.max) {
+                                                                              if (this.ready && this.updateCurrentChartSelection && this.min && this.max) {
                                                                                   this.updateCurrentChartSelection = false;
                                                                                   log.warn(
                                                                                       "updateCurrentChartSelection Min & Max =" + new Date(
@@ -364,47 +364,68 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
         this.currentChart.rightAxesContainer.visible = false;
         this.currentChart.bottomAxesContainer.visible = false;
 
+        let startChangedTriggered = false;
+        let endChangedTriggered = false;
         // dateAxis.adjustMinMax(this._options.min, this._options.max);
+        this.currentChart.scrollbarX.startGrip.events.on("drag", (ev) => {
+            log.debug("Current Date Axis Event - startchanged.")
+            startChangedTriggered = true;
+        });
+        this.currentChart.scrollbarX.endGrip.events.on("drag", (ev) => {
+            log.debug("Current Date Axis Event - endchanged.")
+            endChangedTriggered = true;
+        });
+        this.currentDateAxis.events.on("startendchanged", (ev) => {
+            log.debug("Current Date Axis Event - startendchanged.")
 
+
+        });
         this.currentDateAxis.events.on("datarangechanged", (ev) => {
+            log.debug("Current Date Axis Event - datarangechanged.");
             if (ev.target.maxZoomed - ev.target.minZoomed > MAX_CURRENT_WINDOW) {
-                if (ev.target.maxZoomed !== this.currentWindowMax) {
-                    this.currentDateAxis.zoomToDates(new Date(ev.target.maxZoomed - MAX_CURRENT_WINDOW),
-                                                     new Date(ev.target.maxZoomed), true, true);
-                } else {
-                    this.currentDateAxis.zoomToDates(new Date(ev.target.minZoomed),
-                                                     new Date(ev.target.minZoomed + MAX_CURRENT_WINDOW), true, true);
-                }
+                log.debug("Current Date Axis Event - skipping until the range is fixed.");
+                setTimeout(() => {
+                    if (endChangedTriggered) {
+                        log.debug("Current Date Axis Event - adjusting to max.");
+                        startChangedTriggered = false;
+                        endChangedTriggered = false;
+                        this.currentDateAxis.zoomToDates(new Date(ev.target.maxZoomed - MAX_CURRENT_WINDOW),
+                                                         new Date(ev.target.maxZoomed), false, true);
+                    }
+                    if (startChangedTriggered) {
+                        startChangedTriggered = false;
+                        endChangedTriggered = false;
+                        log.debug("Current Date Axis Event - adjusting to min")
+                        this.currentDateAxis.zoomToDates(new Date(ev.target.minZoomed),
+                                                         new Date(ev.target.minZoomed + MAX_CURRENT_WINDOW), false, true);
+                    }
+                }, 400);
+                return;
+            } else {
+                log.debug("Current Date Axis Event - date range is valid.");
+
             }
             this._zone.run(() => {
-                if (ev.target.maxZoomed - ev.target.minZoomed > MAX_CURRENT_WINDOW) {
-                    if (ev.target.maxZoomed !== this.max) {
-                        this.min = ev.target.maxZoomed - MAX_CURRENT_WINDOW;
-                        this.max = ev.target.maxZoomed;
-                    } else {
-                        this.min = ev.target.minZoomed;
-                        this.max = ev.target.minZoomed + MAX_CURRENT_WINDOW;
 
-                    }
-                    // this._options = {...this._options, currentWindowMin: +ev.target.minZoomed, currentWindowMax: +ev.target.maxZoomed};
-                    // tslint:disable-next-line:triple-equals
-                    if (this.ready && ev.target.minZoomed != ev.target.maxZoomed) {
-                        if (+ev.target.minZoomed < +ev.target.maxZoomed) {
-
-                        } else {
-                            this.min = +ev.target.minZoomed;
-                            this.max = +ev.target.maxZoomed;
-
-                        }
-                        this.updateCurrentChartSelection = true;
-                    } else {
-                        log.warn("Zoom min > Zoom max for Current");
-                    }
+                // this._options = {...this._options, currentWindowMin: +ev.target.minZoomed, currentWindowMax:
+                // +ev.target.maxZoomed}; tslint:disable-next-line:triple-equals
+                if (+ev.target.minZoomed < +ev.target.maxZoomed) {
+                    this.min = +ev.target.minZoomed;
+                    this.max = +ev.target.maxZoomed;
+                } else {
+                    log.warn("Zoom min > Zoom max for Current");
                 }
+
+                if (ev.target.minZoomed !== ev.target.maxZoomed) {
+                    this.updateCurrentChartSelection = true;
+                }
+
                 this.exec.uiActivity();
                 this.userHasInteracted = true;
                 log.debug(this._options);
             });
+
+
         });
         this.updateCurrentChartSelection = true;
     }
