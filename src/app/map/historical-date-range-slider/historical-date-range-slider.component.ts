@@ -19,6 +19,8 @@ import {roundToHour, roundToMinute} from "../../common";
 const log = new Logger("historical-date-range");
 
 const MAX_HISTORICAL: number = 365 * 24 * 60 * 60 * 1000;
+const MAX_CURRENT_EXTENT: number = 30 * 24 * 60 * 60 * 1000;
+const MAX_CURRENT_WINDOW: number = 7 * 24 * 60 * 60 * 1000;
 const MAX_CURRENT_HOUR_WINDOW: number = 30 * 24 * 60 * 60 * 1000;
 
 @Component({
@@ -288,14 +290,37 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
         this.historicalChart.rightAxesContainer.visible = false;
         this.historicalChart.bottomAxesContainer.visible = false;
 
+
         this.historicalDateAxis.events.on("datarangechanged", (ev) => {
+            if (ev.target.maxZoomed - ev.target.minZoomed > MAX_CURRENT_EXTENT) {
+                if (ev.target.maxZoomed !== this.currentWindowMax) {
+                    this.historicalDateAxis.zoomToDates(new Date(ev.target.maxZoomed - MAX_CURRENT_EXTENT),
+                                                        new Date(ev.target.maxZoomed), true, true);
+                } else {
+                    this.historicalDateAxis.zoomToDates(new Date(ev.target.minZoomed),
+                                                        new Date(ev.target.minZoomed + MAX_CURRENT_EXTENT), true, true);
+                }
+            }
             this._zone.run(() => {
+                if (ev.target.maxZoomed - ev.target.minZoomed > MAX_CURRENT_EXTENT) {
+                    if (ev.target.maxZoomed !== this.currentWindowMax) {
+                        this.currentWindowMin = ev.target.maxZoomed - MAX_CURRENT_EXTENT;
+                        this.currentWindowMax = ev.target.maxZoomed;
+                    } else {
+                        this.currentWindowMin = ev.target.minZoomed;
+                        this.currentWindowMax = ev.target.minZoomed + MAX_CURRENT_EXTENT;
+
+                    }
+                } else {
+                    this.currentWindowMin = ev.target.minZoomed;
+                    this.currentWindowMax = ev.target.maxZoomed;
+
+                }
                 if (this.ready) {
                     // this._options = {...this._options, currentWindowMin: +ev.target.minZoomed, currentWindowMax: +ev.target.maxZoomed};
                     log.debug("Historical Date Range Changed, event = ", ev);
                     if (+ev.target.minZoomed < +ev.target.maxZoomed) {
-                        this.currentWindowMin = roundToHour(+ev.target.minZoomed);
-                        this.currentWindowMax = roundToMinute(+ev.target.maxZoomed);
+
                         log.debug("Historical Date Range Changed, currentWindowMin =", this.currentWindowMin);
                         log.debug("Historical Date Range Changed, currentWindowMax =", this.currentWindowMax);
                         this.updateCurrentChartExtent = true;
@@ -342,13 +367,35 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
         // dateAxis.adjustMinMax(this._options.min, this._options.max);
 
         this.currentDateAxis.events.on("datarangechanged", (ev) => {
+            if (ev.target.maxZoomed - ev.target.minZoomed > MAX_CURRENT_WINDOW) {
+                if (ev.target.maxZoomed !== this.currentWindowMax) {
+                    this.currentDateAxis.zoomToDates(new Date(ev.target.maxZoomed - MAX_CURRENT_WINDOW),
+                                                     new Date(ev.target.maxZoomed), true, true);
+                } else {
+                    this.currentDateAxis.zoomToDates(new Date(ev.target.minZoomed),
+                                                     new Date(ev.target.minZoomed + MAX_CURRENT_WINDOW), true, true);
+                }
+            }
             this._zone.run(() => {
-                // this._options = {...this._options, currentWindowMin: +ev.target.minZoomed, currentWindowMax: +ev.target.maxZoomed};
-                // tslint:disable-next-line:triple-equals
-                if (this.ready && ev.target.minZoomed != ev.target.maxZoomed) {
-                    if (+ev.target.minZoomed < +ev.target.maxZoomed) {
-                        this.min = roundToHour(+ev.target.minZoomed);
-                        this.max = roundToMinute(+ev.target.maxZoomed);
+                if (ev.target.maxZoomed - ev.target.minZoomed > MAX_CURRENT_WINDOW) {
+                    if (ev.target.maxZoomed !== this.max) {
+                        this.min = ev.target.maxZoomed - MAX_CURRENT_WINDOW;
+                        this.max = ev.target.maxZoomed;
+                    } else {
+                        this.min = ev.target.minZoomed;
+                        this.max = ev.target.minZoomed + MAX_CURRENT_WINDOW;
+
+                    }
+                    // this._options = {...this._options, currentWindowMin: +ev.target.minZoomed, currentWindowMax: +ev.target.maxZoomed};
+                    // tslint:disable-next-line:triple-equals
+                    if (this.ready && ev.target.minZoomed != ev.target.maxZoomed) {
+                        if (+ev.target.minZoomed < +ev.target.maxZoomed) {
+
+                        } else {
+                            this.min = +ev.target.minZoomed;
+                            this.max = +ev.target.maxZoomed;
+
+                        }
                         this.updateCurrentChartSelection = true;
                     } else {
                         log.warn("Zoom min > Zoom max for Current");
