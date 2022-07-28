@@ -885,8 +885,11 @@ export class MapComponent implements OnInit, OnDestroy {
                     this._loadTimer = timer(0, ONE_MINUTE_IN_MILLIS)
                         .subscribe(async () => {
                             this.activity = true;
-                            await this.load();
-                            this.activity = false;
+                            try {
+                                await this.load();
+                            } finally {
+                                this.activity = false;
+                            }
 
                         });
                     this._notify.dismiss();
@@ -1229,19 +1232,19 @@ export class MapComponent implements OnInit, OnDestroy {
                                           if (this.destroyed) {
                                               return;
                                           }
-                                              this.activity = true;
-                                              try {
+                                          this.activity = true;
+                                          try {
 
-                                                  await this.scheduleResetLayers(this.activeStatistic, clearSelected, approximateFirst);
-                                                  await this.updateTwitterPanel(interrupted);
-                                              } finally {
-                                                  this.activity = false;
-                                                  if (this._params) {
-                                                      this._exec.changeState("ready");
-                                                  } else {
-                                                      this._exec.changeState("no-params");
-                                                  }
+                                              await this.scheduleResetLayers(this.activeStatistic, clearSelected, approximateFirst);
+                                              await this.updateTwitterPanel(interrupted);
+                                          } finally {
+                                              this.activity = false;
+                                              if (this._params) {
+                                                  this._exec.changeState("ready");
+                                              } else {
+                                                  this._exec.changeState("no-params");
                                               }
+                                          }
                                       }
             , reason, false, true);
     }
