@@ -1180,7 +1180,7 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
 
             if (typeof textSearch !== "undefined" && textSearch.length > 0) {
                 // fullText = " AND MATCH (tsd.source_text) AGAINST(? IN BOOLEAN MODE)";
-                fullText = " tsd.source_text LIKE ? ";
+                fullText = " AND tsd.source_text LIKE ? ";
                 textSearch = `%${textSearch}%`;
                 // let additionalQuery = "+(";
                 // for (const source of sources) {
