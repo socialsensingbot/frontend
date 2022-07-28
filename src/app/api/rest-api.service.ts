@@ -12,6 +12,7 @@ import {Logger} from "@aws-amplify/core";
 import {NgForageCache} from "ngforage";
 import {timer} from "rxjs";
 import {LoadingProgressService} from "../services/loading-progress.service";
+import {sleep} from "../common";
 
 const useLambda = false;
 
@@ -229,89 +230,63 @@ export class RESTDataAPIService {
             return;
 
         }
-        let response: Promise<any>;
-        if (useGet) {
-            response = API.get("query", fullPath, {
-                'queryStringParameters': payload,
-                headers:                 {
-                    Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
-                },
+        let retryCount = retry ? 4 : 1;
+        while (retryCount-- > 0) {
+            let response: Promise<any>;
 
-            });
-        } else {
-            response = API.post("query", fullPath, {
-                body:    payload,
-                headers: {
-                    Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
-                },
-
-            });
-        }
-        let cacheInMillis: number = cacheForSeconds * 1000 * (1 + Math.random() / 10);
-        return response.then(data => {
-            if (typeof data !== "undefined") {
-                // tslint:disable-next-line:no-console
-                if (!environment.production) {
-                    console.debug("Returning uncached item", data);
-                }
-                if (cacheForSeconds > 0) {
-                    this.cache.setCached(key, data, cacheInMillis);
-                }
-            } else {
-                if (!environment.production) {
-                    console.debug("Returning undefined item", data);
-                }
+            if (interrupted()) {
+                log.debug("callAPIInternal() interrupted");
+                return null;
             }
-            return data;
-        }).catch(e => {
-            this.calls++;
-            log.info(e);
-            if (retry) {
-                log.error(e);
+            if (useGet) {
+                response = API.get("query", fullPath, {
+                    'queryStringParameters': payload,
+                    headers:                 {
+                        Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+                    },
+
+                });
+            } else {
+                response = API.post("query", fullPath, {
+                    body:    payload,
+                    headers: {
+                        Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+                    },
+
+                });
+            }
+            let cacheInMillis: number = cacheForSeconds * 1000 * (1 + Math.random() / 10);
+            try {
+                const data = await response;
+                if (typeof data !== "undefined") {
+                    // tslint:disable-next-line:no-console
+                    if (!environment.production) {
+                        console.debug("Returning uncached item", data);
+                    }
+                    if (cacheForSeconds > 0) {
+                        await this.cache.setCached(key, data, cacheInMillis);
+                    }
+                } else {
+                    if (!environment.production) {
+                        console.debug("Returning undefined item", data);
+                    }
+                }
+                this._loading.hideIndeterminateSpinner();
+                return data;
+            } catch (e) {
+                this.calls++;
+                log.warn(e);
                 if (showWaitingSpinner) {
                     this._loading.showIndeterminateSpinner();
                 }
-                return new Promise<any>((resolve, reject) => {
-                    setTimeout(async () => {
-                        if (interrupted()) {
-                            log.debug("callAPIInternal() interrupted");
-                            return null;
-                        }
-
-                        API.post("query", fullPath, {
-                            body:    payload,
-                            headers: {
-                                Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
-                            },
-                        }).then(data => this._ngZone.run(() => {
-                            this._notify.show("Problem resolved", "Good", 2000);
-                            if (!environment.production) {
-                                // tslint:disable-next-line:no-console
-                                console.debug("Returning uncached item", data);
-                            }
-                            if (cacheForSeconds > 0) {
-                                this.cache.setCached(key, data, cacheInMillis);
-                            }
-                            if (showWaitingSpinner) {
-                                this._loading.hideIndeterminateSpinner();
-                            }
-                            resolve(data);
-                        }))
-                           .catch(e2 => {
-                               this._notify.show(
-                                   "Sorry, we're having difficulties could you please refresh the page, if that doesn't work please try again in a few minutes. Apologies for the inconvenience.");
-                               if (showWaitingSpinner) {
-                                   this._loading.hideIndeterminateSpinner();
-                               }
-
-                               reject(e2);
-                           });
-                    }, retryPeriod);
-                });
-            } else {
-                log.warn(e);
-                return null;
             }
-        });
+            await sleep(60000 / (retryCount + 1));
+        }
+        this._notify.show(
+            "Sorry, we're having difficulties could you please refresh the page, if that doesn't work please try again in a few minutes. Apologies for the inconvenience.");
+        if (showWaitingSpinner) {
+            this._loading.hideIndeterminateSpinner();
+        }
+        throw (new Error("Failed after retrying " + fullPath));
     }
 }
