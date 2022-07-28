@@ -1959,12 +1959,15 @@ source</ColNames>
       <Position>10</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <index id="468" parent="317" name="mat_view_regions_flood_no_region_idx">
+    <index id="468" parent="317" name="mat_view_regions_flood_stats_idx">
       <ColNames>source_timestamp
 region_type
 hazard
 source
-deleted</ColNames>
+warning
+language
+deleted
+region</ColNames>
       <Type>btree</Type>
     </index>
     <index id="469" parent="317" name="mat_view_regions_flood_ts_idx">

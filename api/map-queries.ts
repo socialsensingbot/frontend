@@ -845,9 +845,10 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
                                           regionType, req.body.hazards, req.body.sources,
                                           warningsValues(req.body.warnings), lang,
 
+                                          new Date(req.body.startDate), new Date(endDate),
                                           regionType, req.body.hazards, req.body.sources,
                                           warningsValues(req.body.warnings), lang,
-                                          new Date(req.body.startDate), new Date(endDate),
+
                                           exceedanceThreshold, countThreshold
 
                                       ]
