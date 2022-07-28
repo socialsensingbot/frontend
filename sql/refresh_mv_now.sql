@@ -149,9 +149,28 @@ CREATE PROCEDURE refresh_mv_full(
     OUT rc INT
 )
 BEGIN
+    call debug_msg(1, 'refresh_mv_full_and_reset',
+                   'Truncating tables mat_view_regions, mat_view_timeseries_date, mat_view_timeseries_hour');
 
-    DECLARE dt DATE DEFAULT NOW();
-    DECLARE enddate DATE DEFAULT '2017-01-01';
+
+    TRUNCATE mat_view_regions;
+    TRUNCATE mat_view_timeseries_date;
+    TRUNCATE mat_view_timeseries_hour;
+    CALL refresh_mv_full_until(NOW(), @rc);
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS refresh_mv_full_until;
+
+DELIMITER $$
+CREATE PROCEDURE refresh_mv_full_until(
+    IN end_date DATE,
+    OUT rc INT
+)
+BEGIN
+
+    DECLARE start_date DATE DEFAULT '2017-01-01';
     declare counter int default 0;
     -- rollback transaction and bubble up errors if something bad happens
     DECLARE exit handler FOR SQLEXCEPTION, SQLWARNING
@@ -173,23 +192,23 @@ BEGIN
         SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
 
 
-        WHILE dt >= enddate
+        WHILE end_date >= start_date
             DO
-                CALL debug_msg(1, 'refresh_mv_full', CONCAT('Refreshing month ending ', dt));
-                CALL refresh_mv(DATE_SUB(dt, INTERVAL 1 MONTH), dt, @rc);
-                CALL debug_msg(1, 'refresh_mv_full', CONCAT('Updating text count for month ending ', dt));
-                CALL update_text_count(DATE_SUB(dt, INTERVAL 1 MONTH), dt);
-                CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling days for month ending ', dt));
-                CALL fill_days(DATE_SUB(dt, INTERVAL 1 MONTH), dt);
-                CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling hours for month ending ', dt));
-                CALL fill_hours(DATE_SUB(dt, INTERVAL 1 MONTH), dt);
+                CALL debug_msg(1, 'refresh_mv_full', CONCAT('Refreshing month ending ', end_date));
+                CALL refresh_mv(DATE_SUB(end_date, INTERVAL 1 MONTH), end_date, @rc);
+                CALL debug_msg(1, 'refresh_mv_full', CONCAT('Updating text count for month ending ', end_date));
+                CALL update_text_count(DATE_SUB(end_date, INTERVAL 1 MONTH), end_date);
+                CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling days for month ending ', end_date));
+                CALL fill_days(DATE_SUB(end_date, INTERVAL 1 MONTH), end_date);
+                CALL debug_msg(1, 'refresh_mv_full', CONCAT('Filling hours for month ending ', end_date));
+                CALL fill_hours(DATE_SUB(end_date, INTERVAL 1 MONTH), end_date);
                 #             IF MOD(counter, 12) = 1
 #             THEN
 #                 CALL refresh_mv_map_window(@rc);
 #             ELSE
 #                 CALL refresh_mv_now(@rc);
 #             END IF;
-                SET dt = DATE_SUB(dt, INTERVAL 1 MONTH);
+                SET end_date = DATE_SUB(end_date, INTERVAL 1 MONTH);
                 SET counter = counter + 1;
             END WHILE;
 
@@ -281,14 +300,16 @@ BEGIN
 
 #     SET @maxTimestamp = IFNULL((select max(source_timestamp) from mat_view_regions), NOW() - INTERVAL 20 YEAR);
     call debug_msg(1, 'refresh_mv', 'Updating mat_view_regions');
-    #     DELETE FROM mat_view_regions WHERE source_timestamp BETWEEN start_date and end_date;
-#     call debug_msg(1, 'refresh_mv', 'Deleted old from mat_view_regions');
+    #     call debug_msg(1, 'refresh_mv', 'Deleted old from mat_view_regions');
 
     # Put in the fine, coarse and county stats that Rudy generates data for (the old way of doing this)
 
 
     START TRANSACTION;
-    REPLACE INTO mat_view_regions
+    call debug_msg(2, 'refresh_mv', 'Deleting from mat_view_regions');
+    DELETE FROM mat_view_regions WHERE source_timestamp BETWEEN start_date and end_date;
+    call debug_msg(2, 'refresh_mv', 'Inserting into mat_view_regions from live_text_regions data.');
+    INSERT INTO mat_view_regions
     SELECT t.source_id,
            t.source,
            t.hazard,
@@ -305,11 +326,11 @@ BEGIN
       AND t.source = tr.source
       AND t.hazard = tr.hazard
       AND t.source_timestamp BETWEEN start_date and end_date;
-    COMMIT;
+
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with live_text_regions data.');
 
     # Add in all other regions (the new way of doing this)
-    START TRANSACTION;
+
     REPLACE INTO mat_view_regions
     SELECT t.source_id,
            t.source,
@@ -387,8 +408,8 @@ BEGIN
     call debug_msg(1, 'refresh_mv', 'Updating mat_view_timeseries_date');
 
     #     SET @maxTimestampTSD = IFNULL((select max(source_date) from mat_view_timeseries_date), NOW() - INTERVAL 20 YEAR);
-#     DELETE FROM mat_view_timeseries_date WHERE source_date BETWEEN start_date and end_date;
-    REPLACE INTO mat_view_timeseries_date
+    DELETE FROM mat_view_timeseries_date WHERE source_date BETWEEN start_date and end_date;
+    INSERT INTO mat_view_timeseries_date
     SELECT r.region                 as region_group_name,
            t.source                 as source,
            t.hazard                 as hazard,
@@ -415,8 +436,8 @@ BEGIN
     call debug_msg(1, 'refresh_mv', 'Updating mat_view_timeseries_hour');
 
     #     SET @maxTimestampTSH = IFNULL((select max(source_date) from mat_view_timeseries_hour), NOW() - INTERVAL 20 YEAR);
-#     DELETE FROM mat_view_timeseries_hour WHERE source_date BETWEEN start_date and end_date;
-    REPLACE INTO mat_view_timeseries_hour
+    DELETE FROM mat_view_timeseries_hour WHERE source_date BETWEEN start_date and end_date;
+    INSERT INTO mat_view_timeseries_hour
     SELECT r.region                                                         as region_group_name,
            t.source                                                         as source,
            t.hazard                                                         as hazard,

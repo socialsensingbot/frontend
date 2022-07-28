@@ -234,9 +234,10 @@ export const textForRegionsFunc: (req, res) => Promise<void> = async (req, res) 
                                                                                 r.hazard                 as hazard,
                                                                                 r.warning                as warning
                                                                          FROM live_text t
-                                                                                  LEFT JOIN mat_view_regions r
-                                                                                            ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
-                                                                         WHERE r.source_timestamp between ? AND ?
+                                                                                  LEFT JOIN mat_view_regions_{{req.body.hazards[0]}} r
+                                                                         ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
+                                                                         WHERE r.source_timestamp between ?
+                                                                           AND ?
                                                                            AND r.region IN (?)
                                                                            AND r.region_type = ?
                                                                            AND r.hazard IN (?)
@@ -244,7 +245,8 @@ export const textForRegionsFunc: (req, res) => Promise<void> = async (req, res) 
                                                                            AND r.warning IN (?)
                                                                            AND r.language LIKE ?
                                                                            AND not t.deleted
-                                                                         order by r.source_timestamp desc
+                                                                         order by r.source_timestamp
+                                         desc
                                                                          LIMIT ?,?`,
                                      values: [new Date(req.body.startDate), new Date(endDate),
                                               req.body.regions, regionType, req.body.hazards,
@@ -285,17 +287,19 @@ export const textForPublicDisplayFunc: (req, res) => Promise<void> = async (req,
                                                                                            r.region             as region,
                                                                                            t.possibly_sensitive as possibly_sensitive
                                                                                     FROM live_text t
-                                                                                             LEFT JOIN mat_view_regions r
-                                                                                                       ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
-                                                                                    WHERE r.source_timestamp between ? AND ?
+                                                                                             LEFT JOIN mat_view_regions_{{req.body.hazards[0]}} r
+                                                                                    ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
+                                                                                    WHERE r.source_timestamp between ?
+                                                                                      AND ?
                                                                                       AND r.region_type = ?
                                                                                       AND r.hazard IN (?)
                                                                                       AND r.source IN (?)
                                                                                       AND r.warning IN (?)
                                                                                       AND r.language LIKE ?
                                                                                       AND NOT t.deleted
-                                                                                    ORDER BY r.source_timestamp desc
-                                                                                    LIMIT ?,?
+                                                                                    ORDER BY r.source_timestamp
+                                             desc
+                                                 LIMIT ?,?
                                              `,
                                      values: [new Date(req.body.startDate), new Date(endDate),
                                               req.params.regionType, req.body.hazards,
@@ -528,9 +532,10 @@ export const recentTextCountFunc: (req, res) => Promise<void> = async (req, res)
         const rows = await db.sql({
                                       // language=MySQL
                                       sql:    `/* app.ts: recent-text-count */ SELECT r.region AS region, count(*) AS count
-                                                                               FROM mat_view_regions r
+                                                                               FROM mat_view_regions_{{req.body.hazards[0]}} r
                                                                                WHERE r.region_type = ?
-                                                                                 AND r.source_timestamp between ? and ?
+                                                                                 AND r.source_timestamp between ?
+                                                                                 and ?
                                                                                  AND r.hazard IN (?)
                                                                                  AND r.source IN (?)
                                                                                  AND r.warning IN (?)
@@ -809,14 +814,15 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
                                                                                                        100) as exceedance
 
                                                                                           FROM (SELECT count(*) as count, region as region
-                                                                                                FROM mat_view_regions r
+                                                                                                FROM mat_view_regions_{{req.body.hazards[0]}} r
                                                                                                 WHERE r.region_type = ?
                                                                                                   AND r.hazard IN (?)
                                                                                                   AND r.source IN (?)
                                                                                                   AND r.warning IN (?)
                                                                                                   AND r.language LIKE ?
                                                                                                   AND NOT r.deleted
-                                                                                                  AND r.source_timestamp between ? AND ?
+                                                                                                  AND r.source_timestamp between ?
+                                                                                                  AND ?
                                                                                                 group by region) as region_counts) as x
                                                                                     where exceedance <= ?
                                                                                       AND count > ?;
@@ -930,7 +936,7 @@ export const accurateStatsFunc: (req, res) => Promise<void> = async (req, res) =
                                                                         FROM
                                                                             (SELECT count(source_id) as count,
                                                                                     floor((? - unix_timestamp(r.source_timestamp)) / ?) as period
-                                                                             FROM mat_view_regions r
+                                                                             FROM mat_view_regions_{{req.body.hazards[0]}} r
                                                                              WHERE r.region = regions.region
                                                                                AND r.region_type = ?
                                                                                AND r.hazard IN (?)
@@ -950,7 +956,7 @@ export const accurateStatsFunc: (req, res) => Promise<void> = async (req, res) =
                                                                         ) x
                                                                   WHERE period = 0 AND count > 0)  as exceedance,
                                                (SELECT count(*) as count
-                                                FROM mat_view_regions r
+                                                FROM mat_view_regions_{{req.body.hazards[0]}} r
                                                 WHERE r.region = regions.region
                                                   AND r.region_type = ?
                                                   AND r.hazard IN (?)
