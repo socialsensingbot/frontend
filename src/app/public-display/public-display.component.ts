@@ -435,8 +435,12 @@ export class PublicDisplayComponent implements OnInit {
                             now = await this.data.now();
                             completedAnimations++;
                         }
-                        this._statsMap = await this.data.getRegionStatsMap(this._activeLayerGroup, this._activeRegionType, this.minDate,
-                                                                           this.maxDate, () => false);
+                        try {
+                            this._statsMap = await this.data.getRegionStatsMap(this._activeLayerGroup, this._activeRegionType, this.minDate,
+                                                                               this.maxDate, () => false);
+                        } catch (e) {
+                            log.error(e);
+                        }
                         if (this.pref.combined.publicDisplayTweetScroll === "window") {
                             this.tweets = await this.data.publicDisplayTweets(this.activeLayerGroup, this.activeRegionType,
                                                                               this.minDate,
