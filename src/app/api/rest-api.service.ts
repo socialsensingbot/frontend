@@ -279,8 +279,8 @@ export class RESTDataAPIService {
                 if (showWaitingSpinner) {
                     this._loading.showIndeterminateSpinner();
                 }
+                await sleep(60000 / (retryCount + 1));
             }
-            await sleep(60000 / (retryCount + 1));
         }
         this._notify.show(
             "Sorry, we're having difficulties could you please refresh the page, if that doesn't work please try again in a few minutes. Apologies for the inconvenience.");
