@@ -402,8 +402,25 @@ BEGIN
 #       AND (select count(*) from ref_geo_regions where st_intersects(boundary, t.location) and map_location = 'uk') = 0
 #       AND t.source_timestamp BETWEEN start_date and end_date;
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions');
-
-
+    START TRANSACTION;
+    call debug_msg(1, 'refresh_mv', 'Updating hazard partitioned tables');
+    replace into mat_view_regions_wind
+    select *
+    from mat_view_regions
+    where source_timestamp BETWEEN start_date and end_date
+      and hazard = 'wind';
+    replace into mat_view_regions_flood
+    select *
+    from mat_view_regions
+    where source_timestamp BETWEEN start_date and end_date
+      and hazard = 'flood';
+    replace into mat_view_regions_snow
+    select *
+    from mat_view_regions
+    where source_timestamp BETWEEN start_date and end_date
+      and hazard = 'snow';
+    call debug_msg(1, 'refresh_mv', 'Updated hazard partitioned tables');
+    COMMIT;
     START TRANSACTION;
     call debug_msg(1, 'refresh_mv', 'Updating mat_view_timeseries_date');
 
