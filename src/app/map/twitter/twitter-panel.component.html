@@ -35,26 +35,29 @@
         <mat-icon matTooltip="Download these Tweets as a CSV file.">vertical_align_bottom</mat-icon>
       </button>
       <button mat-icon-button class="app-toolbar-btn app-tweet-btn app-tweet-refresh-btn" (click)="refresh()">
-        <mat-icon matTooltip="Manually refresh the tweet list.">refresh</mat-icon>
+          <mat-icon matTooltip="Manually refresh the tweet list.">refresh</mat-icon>
       </button>
-      <div class="app-toolbar-separator"></div>
+        <div class="app-toolbar-separator"></div>
     </ng-container>
 
-    <div *ngIf="!ready">
-      <mat-spinner diameter="48" class="app-tweet-area-loading-spinner"></mat-spinner>
-    </div>
+      <div *ngIf="!ready || !showTimeline">
+          <mat-spinner diameter="48" class="app-tweet-area-loading-spinner"></mat-spinner>
+      </div>
   </mat-toolbar>
 
+    <div *ngIf="!showTimeline">
+        <mat-spinner class="app-tweet-area-loading-spinner" diameter="48"></mat-spinner>
+    </div>
 
-  <div class="app-tweet-table" *ngIf="showTimeline">
+    <div class="app-tweet-table" *ngIf="showTimeline">
 
 
-    <mat-tab-group (selectedTabChange)="update(null)">
-        <mat-tab>
-            <ng-template mat-tab-label>
-                <span class="app-tweet-visible-tweets-tab-label">{{ready ? visibleTweets.length : ''}} Tweets</span>
-            </ng-template>
-            <ng-template matTabContent>
+        <mat-tab-group (selectedTabChange)="update(null)">
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <span class="app-tweet-visible-tweets-tab-label">{{ready ? visibleTweets.length : ''}} Tweets</span>
+                </ng-template>
+                <ng-template matTabContent>
                 <app-tweet-list (update)="update($event)" [annotationTypes]="annotationTypes" [tweets]="visibleTweets"
                                 group="visible"
                                 [style.visibility]="tweetsReady ? 'visible' : 'hidden'"></app-tweet-list>

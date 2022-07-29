@@ -1028,6 +1028,7 @@ export class MapComponent implements OnInit, OnDestroy {
             if (feature.properties.count > 0) {
                 log.debug("Count > 0");
                 log.debug(`this.activePolyLayerShortName=${this.activeRegionType}`);
+                this.showTwitterTimeline = false;
                 this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType, this.selection.regionNames(),
                                                      this._dateMin,
                                                      this._dateMax, 300, 100, interrupted);

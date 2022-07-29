@@ -18,9 +18,11 @@ export class SSDatabase {
             console.log("DB Running in test mode.")
             this.readyPromise = new Promise((resolve, reject) => {
                 try {
+                    let dbEnvironment: string | undefined = process.env.DB_ENV || "dev";
+                    console.log("Using db environment: " + dbEnvironment);
                     this.connection = mysql.createPool({
                                                            connectionLimit: 5,
-                                                           host:            "database-dev.cxsscwdzsrae.eu-west-2.rds.amazonaws.com",
+                                                           host:            `database-${dbEnvironment}.cxsscwdzsrae.eu-west-2.rds.amazonaws.com`,
                                                            user:            "admin",
                                                            password:        process.env.SS_TEST_DB_PASSWORD,
                                                            database:        "socialsensing",
