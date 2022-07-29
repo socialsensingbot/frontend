@@ -1029,12 +1029,15 @@ export class MapComponent implements OnInit, OnDestroy {
                 log.debug("Count > 0");
                 log.debug(`this.activePolyLayerShortName=${this.activeRegionType}`);
                 this.showTwitterTimeline = false;
-                this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType, this.selection.regionNames(),
-                                                     this._dateMin,
-                                                     this._dateMax, 300, 100, interrupted);
-                log.debug(this.tweets);
-                this.twitterPanelHeader = true;
-                this.showTwitterTimeline = true;
+                try {
+                    this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType, this.selection.regionNames(),
+                                                         this._dateMin,
+                                                         this._dateMax, 300, 100, interrupted);
+                    log.debug(this.tweets);
+                } finally {
+                    this.twitterPanelHeader = true;
+                    this.showTwitterTimeline = true;
+                }
                 this.showTweets();
             } else {
                 log.debug(`Count == ${feature.properties.count}`);

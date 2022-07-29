@@ -7,23 +7,23 @@
           <ng-container *ngIf="tweets.length > 0">
             <div class="app-tweet-heading" style="color: black">{{selection.firstRegion().title}}</div>
 
-            <div class="app-tweet-sub-heading">
-              <help page="help-and-support#exceedance"
-                    tooltip="Exceedance probability is calculated by comparing the current level of tweet activity with historical tweet activity.">
-                Exceedance probability&nbsp;
-              </help>
-              {{selection.firstRegion().exceedanceProbability}}%
+            <div *ngIf="showTimeline" class="app-tweet-sub-heading">
+                <help page="help-and-support#exceedance"
+                      tooltip="Exceedance probability is calculated by comparing the current level of tweet activity with historical tweet activity.">
+                    Exceedance probability&nbsp;
+                </help>
+                {{selection.firstRegion().exceedanceProbability}}%
             </div>
 
           </ng-container>
 
-          <ng-container *ngIf="tweets.length === 0">
+            <ng-container *ngIf="tweets.length === 0 && showTimeline">
 
-            <div *ngIf="selection" class="app-tweet-heading"
-                 style="color: black">{{selection.firstRegion().title}}<br/></div>
-            <div class="app-tweet-sub-heading">No Tweets</div>
-            <span *ngIf="!selection" class="app-tweet-heading" style="color: black">Loading ...<br/></span>
-          </ng-container>
+                <div *ngIf="selection " class="app-tweet-heading"
+                     style="color: black">{{selection.firstRegion().title}}<br/></div>
+                <div class="app-tweet-sub-heading">No Tweets</div>
+                <span *ngIf="!selection" class="app-tweet-heading" style="color: black">Loading ...<br/></span>
+            </ng-container>
         </ng-container>
         <ng-container *ngIf="selection.count > 1">
           <span class="app-tweet-heading">{{selection.count}} regions selected</span>
@@ -40,35 +40,34 @@
         <div class="app-toolbar-separator"></div>
     </ng-container>
 
-      <div *ngIf="!ready || !showTimeline">
+      <div *ngIf="!ready">
           <mat-spinner diameter="48" class="app-tweet-area-loading-spinner"></mat-spinner>
       </div>
   </mat-toolbar>
 
-    <div *ngIf="!showTimeline">
-        <mat-spinner class="app-tweet-area-loading-spinner" diameter="48"></mat-spinner>
-    </div>
-
-    <div class="app-tweet-table" *ngIf="showTimeline">
+    <div class="app-tweet-table">
 
 
         <mat-tab-group (selectedTabChange)="update(null)">
             <mat-tab>
                 <ng-template mat-tab-label>
-                    <span class="app-tweet-visible-tweets-tab-label">{{ready ? visibleTweets.length : ''}} Tweets</span>
+                    <span *ngIf="showTimeline"
+                          class="app-tweet-visible-tweets-tab-label">{{ready ? visibleTweets.length : ''}} Tweets</span>
                 </ng-template>
                 <ng-template matTabContent>
-                <app-tweet-list (update)="update($event)" [annotationTypes]="annotationTypes" [tweets]="visibleTweets"
-                                group="visible"
-                                [style.visibility]="tweetsReady ? 'visible' : 'hidden'"></app-tweet-list>
+                    <app-tweet-list (update)="update($event)" *ngIf="showTimeline" [annotationTypes]="annotationTypes"
+                                    [tweets]="visibleTweets"
+                                    group="visible"
+                                    [style.visibility]="tweetsReady ? 'visible' : 'hidden'"></app-tweet-list>
             </ng-template>
         </mat-tab>
         <mat-tab>
             <ng-template mat-tab-label>
-                <span class="app-tweet-hidden-tweets-tab-label">{{ready ? hiddenTweets.length : ''}} Ignored</span>
+                <span *ngIf="showTimeline"
+                      class="app-tweet-hidden-tweets-tab-label">{{ready ? hiddenTweets.length : ''}} Ignored</span>
             </ng-template>
             <ng-template matTabContent>
-                <app-tweet-list group="hidden" [tweets]="hiddenTweets" (update)="update($event)"
+                <app-tweet-list (update)="update($event)" *ngIf="showTimeline" [tweets]="hiddenTweets" group="hidden"
                                 [style.visibility]="tweetsReady ? 'visible' : 'hidden'"></app-tweet-list>
             </ng-template>
         </mat-tab>
