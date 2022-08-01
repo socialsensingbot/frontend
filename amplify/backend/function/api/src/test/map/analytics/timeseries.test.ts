@@ -403,7 +403,7 @@ const textSearch = {
     startDate:  MIN_DATE_MILLIS,
     endDate:    MAX_DATE_MILLIS,
 
-    textSearch: "wet AND windy"
+    textSearch: "wet"
 };
 const invalidTextSearch1 = {
     hazards:    [
@@ -662,7 +662,7 @@ describe("POST /v1/map/:map/analytics/time", () => {
             .send(textSearch);
         console.log(response.body);
         expect(response.status).equals(200);
-        expect(response.body.length).equals(16);
+        expect(response.body.length).equals(4);
     });
     it("invalid text search 1", async () => {
         const response = await request(app)

@@ -36,7 +36,7 @@
         "api": {
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
-          "s3Key": "amplify-builds/api-786e707468744f6e5644-build.zip"
+          "s3Key": "amplify-builds/api-546d6b2b534f74514252-build.zip"
         }
       },
       "hosting": {
