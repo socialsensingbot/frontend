@@ -149,13 +149,7 @@ CREATE PROCEDURE refresh_mv_full(
     OUT rc INT
 )
 BEGIN
-    call debug_msg(1, 'refresh_mv_full_and_reset',
-                   'Truncating tables mat_view_regions, mat_view_timeseries_date, mat_view_timeseries_hour');
-
-
-    TRUNCATE mat_view_regions;
-    TRUNCATE mat_view_timeseries_date;
-    TRUNCATE mat_view_timeseries_hour;
+    call debug_msg(1, 'refresh_mv', 'Refreshing up untiil now()');
     CALL refresh_mv_full_until(NOW(), @rc);
 END;
 $$
@@ -617,6 +611,9 @@ BEGIN
     ELSEIF opt = 2
     THEN
         optimize table mat_view_regions;
+        optimize table mat_view_regions_flood;
+        optimize table mat_view_regions_wind;
+        optimize table mat_view_regions_snow;
         call debug_msg(1, 'daily_housekeeping', 'Optimized mat_view_regions.');
     ELSEIF opt = 3
     THEN

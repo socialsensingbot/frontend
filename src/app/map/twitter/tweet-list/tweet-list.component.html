@@ -185,7 +185,7 @@
                 <!--        <mat-spinner diameter="24" class="app-tweet-load-spinner"></mat-spinner>-->
             </div>
             <ng-container *ngFor="let tweet of page.tweets; let i = index">
-                <div [attr.data-index]="i+ page.start"
+                <div [attr.data-index]="i+ page.start" [id]="'app-twitter-id-'+tweet.id"
                      [attr.data-i]="i"
                      [attr.data-page]="p"
                      [attr.data-tweet-id]="tweet.id"

@@ -11,6 +11,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {MatMenuTrigger} from "@angular/material/menu";
 import {TweetCopyDialogComponent} from "./tweet-copy-dialog/tweet-copy-dialog.component";
 import {NotificationService} from "../../../services/notification.service";
+import {getUniqueListBy} from "../../../common";
 
 const twitterLink = require("twitter-text")
 
@@ -354,18 +355,19 @@ export class TweetListComponent implements OnInit, OnDestroy {
      * Update the tweets stored in this list.
      * @param val an array of {@link Tweet}s
      */
-    private updateTweets(val: Tweet[]) {
-        this.tweetCount = val.length;
+    private updateTweets(v: Tweet[]) {
+        let newTweets = v;
+        this.tweetCount = newTweets.length;
         log.debug("updateTweets()");
         if (this._destroyed) {
             return;
         }
         let changed = false;
-        if (val.length !== this._tweets.length) {
+        if (newTweets.length !== this._tweets.length) {
             changed = true;
         } else {
-            for (let i = 0; i < val.length; i++) {
-                if (this._tweets[i].id !== val[i].id) {
+            for (let i = 0; i < newTweets.length; i++) {
+                if (this._tweets[i].id !== newTweets[i].id) {
                     changed = true;
                 }
 
@@ -377,34 +379,35 @@ export class TweetListComponent implements OnInit, OnDestroy {
             return;
         }
 
-        if (this.pages.length !== Math.ceil(val.length / this.PAGE_SIZE)) {
-            this.pages.length = Math.ceil(val.length / this.PAGE_SIZE);
+        if (this.pages.length !== Math.ceil(newTweets.length / this.PAGE_SIZE)) {
+            this.pages.length = Math.ceil(newTweets.length / this.PAGE_SIZE);
         }
-        if (val.length !== this._tweets.length) {
-            this._tweets.length = val.length;
+        if (newTweets.length !== this._tweets.length) {
+            this._tweets.length = newTweets.length;
         }
-        if (this.loaded.length !== val.length) {
-            this.loaded.length = val.length;
+        if (this.loaded.length !== newTweets.length) {
+            this.loaded.length = newTweets.length;
         }
         let currPage = new TweetPage(0, 0, []);
-        this.pages.length = Math.ceil(val.length / this.PAGE_SIZE);
-        for (let i = 0; i < val.length; i++) {
+        this.pages.length = Math.ceil(newTweets.length / this.PAGE_SIZE);
+        newTweets = getUniqueListBy(newTweets, "id") as Tweet[];
+        for (let i = 0; i < newTweets.length; i++) {
             const page = Math.floor(i / this.PAGE_SIZE);
             const tweetOnPage = i % this.PAGE_SIZE;
-            if (this.isCached(val[i].id)) {
-                this.cache[val[i].id] = this.cached(val[i].id);
+            if (this.isCached(newTweets[i].id)) {
+                this.cache[newTweets[i].id] = this.cached(newTweets[i].id);
             }
             if (tweetOnPage === 0) {
                 currPage = new TweetPage(page, i, []);
             }
-            const tweet = val[i];
+            const tweet = newTweets[i];
             if (tweetOnPage >= currPage.tweets.length) {
                 currPage.tweets.push(tweet);
             } else {
                 currPage.tweets[tweetOnPage] = tweet;
             }
 
-            const lastEntryOnPage = i === (val.length - 1) || ((i + 1) % this.PAGE_SIZE) === 0;
+            const lastEntryOnPage = i === (newTweets.length - 1) || ((i + 1) % this.PAGE_SIZE) === 0;
             if (lastEntryOnPage) {
                 // Do not change/reload unchanged pages.
                 if (typeof this.pages[page] === "undefined" || !this.pages[page].is(currPage)) {

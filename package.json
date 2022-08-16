@@ -78,7 +78,7 @@
     "codelyzer": "^6.0.2",
     "csv": "^6.0.4",
     "csv-parse": "^5.0.3",
-    "cypress": "^9.2.0",
+    "cypress": "^10.4.0",
     "cypress-intellij-reporter": "0.0.6",
     "cypress-plugin-snapshots": "1.4.4",
     "cypress-terminal-report": "^3.5.2",

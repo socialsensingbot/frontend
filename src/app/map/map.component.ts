@@ -323,7 +323,7 @@ export class MapComponent implements OnInit, OnDestroy {
                     log.debug("Twitter is stale");
                     twitterUpdateInProgress = true;
                     this._twitterIsStale = false;
-                    await this.updateTwitter();
+                    await this.updateTwitter(false);
                     twitterUpdateInProgress = false;
                 }
             }
@@ -1015,7 +1015,7 @@ export class MapComponent implements OnInit, OnDestroy {
     /**
      * Update the Twitter panel by updating the properties it reacts to.
      */
-    private async updateTwitterPanel(interrupted: () => boolean) {
+    private async updateTwitterPanel(clear: boolean = false, interrupted: () => boolean) {
         log.debug("updateTwitterPanel()");
         if (this.destroyed) {
             return;
@@ -1028,7 +1028,7 @@ export class MapComponent implements OnInit, OnDestroy {
             if (feature.properties.count > 0) {
                 log.debug("Count > 0");
                 log.debug(`this.activePolyLayerShortName=${this.activeRegionType}`);
-                this.showTwitterTimeline = false;
+                this.showTwitterTimeline = clear ? false : true;
                 try {
                     this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType, this.selection.regionNames(),
                                                          this._dateMin,
@@ -1100,7 +1100,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
         await this.updateSearch({selected: this.selection.regionNames()});
         this.selectedFeatureNames = this.selection.regionNames();
-        await this.updateTwitter();
+        await this.updateTwitter(true);
         if (this.selection.isSelected(e.target.feature)) {
             this.highlight(e.target, 3);
         } else {
@@ -1240,7 +1240,7 @@ export class MapComponent implements OnInit, OnDestroy {
                                           try {
 
                                               await this.scheduleResetLayers(this.activeStatistic, clearSelected, approximateFirst);
-                                              await this.updateTwitterPanel(interrupted);
+                                              await this.updateTwitterPanel(true, interrupted);
                                           } finally {
                                               this.activity = false;
                                               if (this._params) {
@@ -1341,14 +1341,14 @@ export class MapComponent implements OnInit, OnDestroy {
      * Update the twitter panel using the currently selected feature.
      *
      */
-    private async updateTwitter() {
+    private async updateTwitter(clear: boolean) {
         log.debug("updateTwitter()");
         if (this.destroyed) {
             return;
         }
         await this._exec.queue("Update Twitter", ["ready"], async (interrupted: () => boolean) => {
             // noinspection ES6MissingAwait
-            await this.updateTwitterPanel(interrupted);
+            await this.updateTwitterPanel(clear, interrupted);
         }, "", true, true, true, true, null, 1000, 5);
     }
 

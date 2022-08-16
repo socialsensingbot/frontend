@@ -110,11 +110,13 @@ Cypress.Commands.add("noSpinner", () => {
 });
 
 Cypress.Commands.add("twitterPanelHeader", (text, subheadingText) => {
+    noLoadingDiv();
     cy.get("twitter-panel");
     noTweetLoadingSpinner();
     cy.wait(1000);
     noTweetLoadingSpinner();
     cy.get(".app-tweet-heading", {timeout: LONG_TIMEOUT});
+    cy.wait(1000);
     cy.get(".app-tweet-heading", {timeout: LONG_TIMEOUT}).should("contain.text", text);
     if (subheadingText) {
         cy.get(".app-tweet-sub-heading", {timeout: LONG_TIMEOUT});
