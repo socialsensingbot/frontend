@@ -285,16 +285,16 @@ export const textForPublicDisplayFunc: (req, res) => Promise<void> = async (req,
                                                                                        r.region             as region,
                                                                                        t.possibly_sensitive as possibly_sensitive
                                                                                 FROM live_text t
-                                                                                             LEFT JOIN mat_view_regions r
-                                                                                                       ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
-                                                                                    WHERE r.source_timestamp between ? AND ?
-                                                                                      AND r.region_type = ?
-                                                                                      AND r.hazard IN (?)
-                                                                                      AND r.source IN (?)
-                                                                                      AND r.warning IN (?)
-                                                                                      AND r.language LIKE ?
-                                                                                      AND NOT t.deleted
-                                                                                    ORDER BY r.source_timestamp desc
+                                                                                         LEFT JOIN mat_view_regions r
+                                                                                                   ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
+                                                                                WHERE r.source_timestamp between ? AND ?
+                                                                                  AND r.region_type = ?
+                                                                                  AND r.hazard IN (?)
+                                                                                  AND r.source IN (?)
+                                                                                  AND r.warning IN (?)
+                                                                                  AND r.language LIKE ?
+                                                                                  AND NOT t.deleted
+                                                                                ORDER BY r.source_timestamp desc
                                                                                     LIMIT ?,?
                                              `,
                                      values: [new Date(req.body.startDate), new Date(endDate),
@@ -332,7 +332,8 @@ export const csvExportFunc: (req, res) => Promise<void> = async (req, res) => {
                                                                             t.source_html               as html,
                                                                             r.source_timestamp          as timestamp,
                                                                             r.source_id                 as id,
-                                                                            ST_AsGeoJSON(t.location)    as location,
+#                                                                             ST_AsGeoJSON(t.location)    as location,
+                                                                            ''                          as location,
                                                                             rmram.region_aggregation_id as agg_region,
                                                                             t.possibly_sensitive        as possibly_sensitive,
                                                                             r.region                    as region
