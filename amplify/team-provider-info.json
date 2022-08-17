@@ -25,7 +25,7 @@
         },
         "query": {
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
-          "s3Key": "amplify-builds/query-794b6c4c4874506e3256-build.zip",
+          "s3Key": "amplify-builds/query-65793436545750346876-build.zip",
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
         },
         "twitterCompliance": {
@@ -36,7 +36,7 @@
         "api": {
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
-          "s3Key": "amplify-builds/api-546d6b2b534f74514252-build.zip"
+          "s3Key": "amplify-builds/api-6132586f445667366776-build.zip"
         }
       },
       "hosting": {
