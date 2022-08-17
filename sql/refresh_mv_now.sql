@@ -246,8 +246,6 @@ BEGIN
     call debug_msg(1, 'refresh_mv', CONCAT('Start Date: ', start_date));
     call debug_msg(1, 'refresh_mv', CONCAT('End Date: ', end_date));
     SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
-    START TRANSACTION;
-
     #     delete from mat_view_regions where source_timestamp < NOW() - INTERVAL 1 YEAR;
 
 #     SET @maxTimestamp = IFNULL((select max(source_timestamp) from mat_view_regions), NOW() - INTERVAL 20 YEAR);
@@ -293,11 +291,11 @@ BEGIN
     FROM live_text t,
          ref_geo_regions gr
     WHERE t.source_timestamp BETWEEN start_date and end_date
-      AND (select count(*)
-           from live_text_regions tr
-           WHERE t.source_id = tr.source_id
-             AND t.source = tr.source
-             AND t.hazard = tr.hazard) = 0
+#       AND (select count(*)
+#            from live_text_regions tr
+#            WHERE t.source_id = tr.source_id
+#              AND t.source = tr.source
+#              AND t.hazard = tr.hazard) = 0
       AND ST_Intersects(boundary, location)
       AND NOT gr.disabled;
     COMMIT;

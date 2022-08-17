@@ -218,7 +218,7 @@ export const textForRegionsFunc: (req, res) => Promise<void> = async (req, res) 
         const from = page * pageSize;
         const lang = getLangAsSQLLike(req);
 
-        await db.cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
+        await db.cache(res, null, async () => {
 
             return (await db.sql({
                                      sql:
@@ -274,17 +274,17 @@ export const textForPublicDisplayFunc: (req, res) => Promise<void> = async (req,
         console.debug("StartDate: " + new Date(req.body.startDate));
         console.debug("EndDate: " + new Date(endDate));
         const lang = getLangAsSQLLike(req);
-        await db.cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
+        await db.cache(res, null, async () => {
 
             return (await db.sql({
                                      sql:
                                      // language=MySQL
-                                             `/* app.ts: text-for-public-display */ select t.source_json        as json,
-                                                                                           r.source_timestamp   as timestamp,
-                                                                                           r.source_id          as id,
-                                                                                           r.region             as region,
-                                                                                           t.possibly_sensitive as possibly_sensitive
-                                                                                    FROM live_text t
+                                         `/* app.ts: text-for-public-display */ select t.source_json        as json,
+                                                                                       r.source_timestamp   as timestamp,
+                                                                                       r.source_id          as id,
+                                                                                       r.region             as region,
+                                                                                       t.possibly_sensitive as possibly_sensitive
+                                                                                FROM live_text t
                                                                                              LEFT JOIN mat_view_regions r
                                                                                                        ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
                                                                                     WHERE r.source_timestamp between ? AND ?
@@ -323,43 +323,42 @@ export const csvExportFunc: (req, res) => Promise<void> = async (req, res) => {
     console.debug("StartDate: " + new Date(req.body.startDate));
     console.debug("EndDate: " + new Date(endDate));
 
-    await db.cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
+    await db.cache(res, null, async () => {
 
         return (await db.sql({
                                  sql:
                                  // language=MySQL
-                                     `/* app.ts: text_for_regions */ select t.source_json            as json,
-                                                                            t.source_html            as html,
-                                                                            r.source_timestamp       as timestamp,
-                                                                            r.source_id              as id,
-                                                                            ST_AsGeoJSON(t.location) as location,
-                                                                            r.region                 as agg_region,
-                                                                            t.possibly_sensitive     as possibly_sensitive,
-                                                                            r2.region                as region
+                                     `/* app.ts: text_for_regions */ select t.source_json               as json,
+                                                                            t.source_html               as html,
+                                                                            r.source_timestamp          as timestamp,
+                                                                            r.source_id                 as id,
+                                                                            ST_AsGeoJSON(t.location)    as location,
+                                                                            rmram.region_aggregation_id as agg_region,
+                                                                            t.possibly_sensitive        as possibly_sensitive,
+                                                                            r.region                    as region
                                                                      FROM live_text t
                                                                               LEFT JOIN mat_view_regions r
                                                                                         ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
-                                                                              LEFT JOIN mat_view_regions r2
-                                                                                        ON r2.source_id = r.source_id and
-                                                                                           r2.hazard = r.hazard and
-                                                                                           r2.source = r.source and
-                                                                                           r2.region_type = ?
-
+                                                                              LEFT JOIN ref_map_region_aggregation_mappings rmram
+                                                                                        on r.region = rmram.region AND rmram.region_type = r.region_type
                                                                      WHERE r.source_timestamp between ? AND ?
-                                                                       AND r.region in (?)
                                                                        AND r.region_type = ?
                                                                        AND r.hazard IN (?)
                                                                        AND r.source IN (?)
-                                                                       AND r.warning IN (?)
-                                                                       AND r.language LIKE ?
+                                                                       AND rmram.region_aggregation_id IN (?)
+                                                                       AND t.warning IN (?)
+                                                                       AND t.language LIKE ?
                                                                        AND not t.deleted
-                                                                       AND r2.region is not null
                                                                      order by r.source_timestamp desc
                                                                      LIMIT ?,?`,
-                                 values: [req.body.byRegion, new Date(req.body.startDate), new Date(endDate),
-                                          req.body.regions, req.params.regionType, req.body.hazards,
+                                 values: [new Date(req.body.startDate), new Date(endDate),
+                                          req.body.byRegion,
+                                          req.body.hazards,
                                           req.body.sources,
-                                          warningsValues(req.body.warnings), lang, from, pageSize
+                                          req.body.regions,
+                                          warningsValues(req.body.warnings),
+                                          lang,
+                                          from, pageSize
                                  ]
                              }));
 
@@ -726,9 +725,9 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
         return;
     }
     if (typeof req.body.endDate !== "undefined") {
-        if (typeof req.body.endDate !== "number" || req.body.endDate < 0 || req.body.endDate > Date.now()) {
+        if (typeof req.body.endDate !== "number" || req.body.endDate < 0) {
             invalidParameter(res, "endDate",
-                             `Invalid end date, endDate=${req.body.endDate}, endDate must be numeric, positive and less than the current time in milliseconds`);
+                             `Invalid end date, endDate=${req.body.endDate}, endDate must be numeric and positive`);
             return;
         }
     }
