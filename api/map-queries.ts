@@ -293,16 +293,16 @@ export const textForPublicDisplayFunc: (req, res) => Promise<void> = async (req,
                                                                                        r.region             as region,
                                                                                        t.possibly_sensitive as possibly_sensitive
                                                                                 FROM live_text t
-                                                                                             LEFT JOIN mat_view_regions_${req.body.hazards[0]} r
-                                                                                                       ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
-                                                                                    WHERE r.source_timestamp between ?
-                                                                                        AND ?
-                                                                                      AND r.region_type = ?
-                                                                                      AND r.hazard IN (?)
-                                                                                      AND r.source IN (?)
-                                                                                      AND r.warning IN (?)
-                                                                                      AND r.language LIKE ?
-                                                                                      AND NOT t.deleted
+                                                                                         LEFT JOIN mat_view_regions_${req.body.hazards[0]} r
+                                                                                                   ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
+                                                                                WHERE r.source_timestamp between ?
+                                                                                    AND ?
+                                                                                  AND r.region_type = ?
+                                                                                  AND r.hazard IN (?)
+                                                                                  AND r.source IN (?)
+                                                                                  AND r.warning IN (?)
+                                                                                  AND r.language LIKE ?
+                                                                                  AND NOT t.deleted
                                                                                     ORDER BY r.source_timestamp
                                                                                         desc
                                                                                     LIMIT ?,?
@@ -338,29 +338,42 @@ export const csvExportFunc: (req, res) => Promise<void> = async (req, res) => {
         return (await db.sql({
                                  sql:
                                  // language=MySQL
-                                     `/* app.ts: text_for_regions */ select t.source_json               as json,
-                                                                            t.source_html               as html,
-                                                                            r.source_timestamp          as timestamp,
-                                                                            r.source_id                 as id,
-                                                                            ST_AsGeoJSON(t.location)    as location,
-                                                                            rmram.region_aggregation_id as agg_region,
-                                                                            t.possibly_sensitive        as possibly_sensitive,
-                                                                            r.region                    as region
-                                                                     FROM live_text t
-                                                                              LEFT JOIN mat_view_regions r
-                                                                                        ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
-                                                                              LEFT JOIN ref_map_region_aggregation_mappings rmram
-                                                                                        on r.region = rmram.region AND rmram.region_type = r.region_type
-                                                                     WHERE r.source_timestamp between ? AND ?
-                                                                       AND r.region_type = ?
-                                                                       AND r.hazard IN (?)
-                                                                       AND r.source IN (?)
-                                                                       AND rmram.region_aggregation_id IN (?)
-                                                                       AND t.warning IN (?)
-                                                                       AND t.language LIKE ?
-                                                                       AND not t.deleted
-                                                                     order by r.source_timestamp desc
-                                                                     LIMIT ?,?`,
+                                     `/* app.ts: csv_export */ select t.source_json               as json,
+                                                                      t.source_html               as html,
+                                                                      r.source_timestamp          as timestamp,
+                                                                      r.source_id                 as id,
+#                                                                             ST_AsGeoJSON(t.location)    as location,
+                                                                      CASE
+                                                                          WHEN r.region_relation = 0 THEN 'Default'
+                                                                          WHEN r.region_relation = 1 THEN 'Set by location inference'
+                                                                          WHEN r.region_relation = 2
+                                                                              THEN 'Tweet location intersects the region'
+                                                                          WHEN r.region_relation = 3
+                                                                              THEN 'Region contains the tweet location'
+                                                                          WHEN r.region_relation = 4
+                                                                              THEN 'Tweet location contains the region'
+                                                                          ELSE 'ERROR'
+                                                                          END
+                                                                                                  as location,
+                                                                      rmram.region_aggregation_id as agg_region,
+                                                                      t.possibly_sensitive        as possibly_sensitive,
+                                                                      r.region                    as region,
+                                                                      r.region_relation           as region_relation_code
+                                                               FROM live_text t
+                                                                        LEFT JOIN mat_view_regions r
+                                                                                  ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
+                                                                        LEFT JOIN ref_map_region_aggregation_mappings rmram
+                                                                                  on r.region = rmram.region AND rmram.region_type = r.region_type
+                                                               WHERE r.source_timestamp between ? AND ?
+                                                                 AND r.region_type = ?
+                                                                 AND r.hazard IN (?)
+                                                                 AND r.source IN (?)
+                                                                 AND rmram.region_aggregation_id IN (?)
+                                                                 AND t.warning IN (?)
+                                                                 AND t.language LIKE ?
+                                                                 AND not t.deleted
+                                                               order by r.source_timestamp desc
+                                                               LIMIT ?,?`,
                                  values: [new Date(req.body.startDate), new Date(endDate),
                                           req.body.byRegion,
                                           req.body.hazards,
