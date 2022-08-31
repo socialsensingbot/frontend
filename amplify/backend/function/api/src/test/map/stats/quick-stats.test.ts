@@ -339,7 +339,7 @@ describe("POST /v1/map/:map/stats", () => {
             .send(reqBody);
         console.log(sortedStringify(response.body));
         expect(Object.keys(response.body).length).to.equal(118);
-        expect(response.body["west yorkshire"].count).to.equal(13);
+        expect(response.body["west yorkshire"].count).to.equal(52);
         expect(response.body["west yorkshire"].exceedance).to.be.above(1);
         expect(response.body["west yorkshire"].exceedance).to.be.below(50);
     });
@@ -481,14 +481,6 @@ describe("POST /v1/map/:map/stats", () => {
             .post("/v1/map/uk-flood-test/stats")
             .set("Accept", "application/json")
             .send(invalidEndDate2);
-        expect(response.status).equals(400);
-        expect(response.body.parameter).equals("endDate");
-    });
-    it("invalid end date 3", async () => {
-        const response = await request(app)
-            .post("/v1/map/uk-flood-test/stats")
-            .set("Accept", "application/json")
-            .send(invalidEndDate3);
         expect(response.status).equals(400);
         expect(response.body.parameter).equals("endDate");
     });

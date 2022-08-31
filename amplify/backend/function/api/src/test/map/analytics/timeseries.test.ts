@@ -460,14 +460,14 @@ describe("POST /v1/map/:map/analytics/time", () => {
             .set("Accept", "application/json")
             .send(reqBody);
         console.log(JSON.stringify(response.body));
-        expect(response.body.length).equal(17);
-        expect(response.body[0].count).equal(10);
+        expect(response.body.length).equal(19);
+        expect(response.body[0].count).equal(1);
         expect(response.body[0].region).equal("hertfordshire");
-        expect(response.body[0].date).equal("2021-09-14T07:00:00.000Z");
+        expect(response.body[0].date).equal("2021-09-14T04:00:00.000Z");
 
-        expect(response.body[1].count).equal(22);
+        expect(response.body[1].count).equal(6);
         expect(response.body[1].region).equal("hertfordshire");
-        expect(response.body[1].date).equal("2021-09-14T08:00:00.000Z");
+        expect(response.body[1].date).equal("2021-09-14T05:00:00.000Z");
 
     });
     it("invalid map", async () => {
@@ -644,7 +644,7 @@ describe("POST /v1/map/:map/analytics/time", () => {
             .set("Accept", "application/json")
             .send(regionCountry);
         expect(response.status).equals(200);
-        expect(response.body.length).equals(17);
+        expect(response.body.length).equals(20);
     });
     it("for a region which is an area", async () => {
         const response = await request(app)
@@ -652,7 +652,7 @@ describe("POST /v1/map/:map/analytics/time", () => {
             .set("Accept", "application/json")
             .send(regionArea);
         expect(response.status).equals(200);
-        expect(response.body.length).equals(17);
+        expect(response.body.length).equals(19);
     });
 
     it("supply a text search criteria", async () => {

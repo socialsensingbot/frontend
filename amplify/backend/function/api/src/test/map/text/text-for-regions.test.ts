@@ -2,7 +2,6 @@ import * as request from "supertest";
 import {expect} from "chai";
 import {MAX_DATE_MILLIS, MIN_DATE_MILLIS} from "../../constants";
 import * as app from "../../../app";
-import {singleRegion} from "./data/single-region";
 
 const reqBody = {
     hazards:    [
@@ -565,16 +564,15 @@ describe("POST /v1/map/:map/text", () => {
             .set("Accept", "application/json")
             .send(reqBody);
         console.log(JSON.stringify(response.body));
-        expect(JSON.stringify(response.body[0])).to.equal(JSON.stringify(singleRegion));
-    });
-    it("invalid map", async () => {
-        const response = await request(app)
-            .post("/v1/map/uk-flood-test2/text")
-            .set("Accept", "application/json")
-            .send(reqBody);
-        expect(response.status).equals(400);
-        expect(response.body.parameter).equals("map");
-    });
+        expect(response.body.length).equal(2);
+        it("invalid map", async () => {
+            const response = await request(app)
+                .post("/v1/map/uk-flood-test2/text")
+                .set("Accept", "application/json")
+                .send(reqBody);
+            expect(response.status).equals(400);
+            expect(response.body.parameter).equals("map");
+        });
     it("invalid hazards 1", async () => {
         const response = await request(app)
             .post("/v1/map/uk-flood-test/text")

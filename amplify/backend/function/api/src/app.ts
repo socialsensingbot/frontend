@@ -14,7 +14,7 @@ import {
     timeseriesFunc
 } from "socialsensing-api/map-queries";
 
-//bump 12
+//bump 13
 
 
 // declare a new express app
