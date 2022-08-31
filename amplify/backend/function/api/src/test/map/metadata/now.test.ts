@@ -23,6 +23,6 @@ describe("GET /v1/map/:map/metadata", () => {
             .get("/v1/map/uk-flood-test/now")
             .set("Accept", "application/json");
         console.log(response.body);
-        expect(response.body).to.equal(1631660400000);
+        expect(response.body).to.equal(1631664000000);
     });
 });

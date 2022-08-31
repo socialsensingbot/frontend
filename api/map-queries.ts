@@ -582,7 +582,7 @@ export const recentTextCountFunc: (req, res) => Promise<void> = async (req, res)
 
 export const nowFunc: (req, res) => Promise<void> = async (req, res) => {
     const lastDate: Date = (await getMaps())[req.params.map].last_date;
-    const endDate: number = lastDate == null ? Date.now() : lastDate.getTime();
+    const endDate: number = lastDate == null ? Date.now() : new Date(lastDate.toUTCString()).getTime();
     res.json(endDate);
 };
 

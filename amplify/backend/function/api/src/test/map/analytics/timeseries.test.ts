@@ -463,11 +463,9 @@ describe("POST /v1/map/:map/analytics/time", () => {
         expect(response.body.length).equal(19);
         expect(response.body[0].count).equal(1);
         expect(response.body[0].region).equal("hertfordshire");
-        expect(response.body[0].date).equal("2021-09-14T04:00:00.000Z");
 
         expect(response.body[1].count).equal(6);
         expect(response.body[1].region).equal("hertfordshire");
-        expect(response.body[1].date).equal("2021-09-14T05:00:00.000Z");
 
     });
     it("invalid map", async () => {
