@@ -200,7 +200,7 @@ export class UIExecutionService {
                                                     reschedule, silentFailure, waitForUIState, rescheduleDelayInMillis,
                                                     maxRescheduleAttempts);
             if (dedupKey !== null) {
-                if (interruptable && this.currentTask !== null && this.currentTask.dedup === dedupKey) {
+                if (interruptable && this.currentTask && this.currentTask.dedup === dedupKey) {
                     log.debug("Interrupting " + this.currentTask.name + " with dedup" + dedupKey)
                     this.currentTask.interrupted = true;
                 }

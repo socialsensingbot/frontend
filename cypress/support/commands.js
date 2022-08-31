@@ -254,7 +254,7 @@ Cypress.Commands.add("moveMinDateSliderRight", (times, expectURLChange = false) 
             if (expectURLChange) {
                 cy.url({timeout: 20000}).should("not.equal", url);
             } else {
-                cy.wait(3000);
+                cy.wait(5000);
             }
         })
     }

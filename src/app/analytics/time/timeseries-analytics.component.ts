@@ -675,19 +675,23 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                 this.noData = false;
 
             }
-            for (const element of queryResult) {
-                element.date = new Date(element.date);
-            }
-            if (queryResult && queryResult.length > 0) {
-                log.debug("Updating time series.");
-                this.seriesCollection.updateTimeseries(
-                    new TimeseriesModel(toLabel(query, this.pref.combined.layers), queryResult,
-                                        query.__series_id));
+            if (queryResult === null) {
+                log.error("Null result from updateGraphInternal query.");
             } else {
-                log.warn(queryResult);
-                this.seriesCollection.updateTimeseries(
-                    new TimeseriesModel(toLabel(query, this.pref.combined.layers), [],
-                                        query.__series_id));
+                for (const element of queryResult) {
+                    element.date = new Date(element.date);
+                }
+                if (queryResult && queryResult.length > 0) {
+                    log.debug("Updating time series.");
+                    this.seriesCollection.updateTimeseries(
+                        new TimeseriesModel(toLabel(query, this.pref.combined.layers), queryResult,
+                                            query.__series_id));
+                } else {
+                    log.warn(queryResult);
+                    this.seriesCollection.updateTimeseries(
+                        new TimeseriesModel(toLabel(query, this.pref.combined.layers), [],
+                                            query.__series_id));
+                }
             }
             log.debug("_updateGraphInternal() finished");
         }).catch(e => log.error(e));

@@ -31,6 +31,7 @@ describe('00173 Source: : https://github.com/socialsensingbot/frontend/issues/17
         cy.get(".app-tweet-table", {timeout: 30000});
         cy.get(twitterIdClass, {timeout: 60000});
         cy.get(twitterIdClass, {timeout: 60000}).should('be.visible');
+        cy.wait(10000);
         cy.get(POWYS_TWEET_MENU, {timeout: 60000});
         cy.get(POWYS_TWEET_MENU, {timeout: 60000}).should('be.visible');
         clickSourceMenu()
@@ -48,7 +49,9 @@ describe('00173 Source: : https://github.com/socialsensingbot/frontend/issues/17
             .get("body .tweet-list-item-menu-source-level-river-selected", {timeout: 30000});
         cy.wait(5000);
         cy.visitAndWait(url);
+        cy.get(".app-tweet-drawer", {timeout: 30000}).should("be.visible");
         cy.get(".app-tweet-table", {timeout: 30000});
+        cy.wait(10000);
         clickSourceMenu()
             .get("body .tweet-list-item-menu-source-level-coastal-not-selected", {timeout: 30000})
             .get("body .tweet-list-item-menu-source-level-river-selected", {timeout: 30000});

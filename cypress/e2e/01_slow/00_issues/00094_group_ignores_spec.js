@@ -1,6 +1,6 @@
-import {LONDON_URL} from "../../../support/e2e";
+import {POWYS_URL} from "../../../support/e2e";
 
-const url = LONDON_URL;
+const url = POWYS_URL;
 
 const testUnhide = (refresh, count, fail) => {
     cy.log("Un-ignoring " + count);
@@ -36,7 +36,7 @@ const testHide = (refresh, count) => {
 };
 
 //TODO: fix the test and remove skip
-describe.skip('#94 Group Ignore Prefs : https://github.com/socialsensingbot/frontend/issues/94 :', {
+describe('#94 Group Ignore Prefs : https://github.com/socialsensingbot/frontend/issues/94 :', {
     retries: {
         runMode:  8,
         openMode: 1,

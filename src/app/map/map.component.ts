@@ -1042,7 +1042,7 @@ export class MapComponent implements OnInit, OnDestroy {
             } else {
                 log.debug(`Count == ${feature.properties.count}`);
                 this.twitterPanelHeader = true;
-                this.showTwitterTimeline = false;
+                this.showTwitterTimeline = true;
                 this.tweets = [];
             }
         } else if (features.length === 0) {

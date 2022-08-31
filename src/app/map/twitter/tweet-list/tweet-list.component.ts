@@ -357,6 +357,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
      */
     private updateTweets(v: Tweet[]) {
         let newTweets = v;
+        newTweets = getUniqueListBy(newTweets, "id") as Tweet[];
         this.tweetCount = newTweets.length;
         log.debug("updateTweets()");
         if (this._destroyed) {
@@ -367,7 +368,12 @@ export class TweetListComponent implements OnInit, OnDestroy {
             changed = true;
         } else {
             for (let i = 0; i < newTweets.length; i++) {
-                if (this._tweets[i].id !== newTweets[i].id) {
+                if (!this._tweets[i]) {
+                } else if (!newTweets[i]) {
+                    log.warn("New tweets have a missing value at index " + i);
+                    log.warn(newTweets);
+                    changed = true;
+                } else if (this._tweets[i].id !== newTweets[i].id) {
                     changed = true;
                 }
 
@@ -390,7 +396,6 @@ export class TweetListComponent implements OnInit, OnDestroy {
         }
         let currPage = new TweetPage(0, 0, []);
         this.pages.length = Math.ceil(newTweets.length / this.PAGE_SIZE);
-        newTweets = getUniqueListBy(newTweets, "id") as Tweet[];
         for (let i = 0; i < newTweets.length; i++) {
             const page = Math.floor(i / this.PAGE_SIZE);
             const tweetOnPage = i % this.PAGE_SIZE;

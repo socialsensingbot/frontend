@@ -19,7 +19,7 @@ describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issu
         it.only('row changes', () => {
             cy.visitAndWait(url);
             cy.twitterPanelHeader("West Yorkshire");
-            cy.tweetCountTotal(225);
+            cy.tweetCountTotal(303);
             cy.unhideTweets(10);
             cy.get(".atr-0.atr-visible", {timeout: 90000})
             cy.get(".atr-0.atr-visible .app-twitter-tweet", {timeout: 90000}).should("be.visible");

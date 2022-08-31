@@ -18,12 +18,12 @@ describe('#124 Region multi select : https://github.com/socialsensingbot/fronten
                  cy.multiSelectRegions(["cambridgeshire", "inverclyde"]);
                  cy.twitterPanelHeader("3 regions selected");
                  cy.wait(60000);
-                 cy.tweetCountTotal(626);
+                 cy.tweetCountTotal(220);
                  cy.url().should("contain", "selected=powys&selected=cambridgeshire&selected=inverclyde&max_range_time")
                  cy.multiSelectRegions(["cambridgeshire"]);
                  cy.twitterPanelHeader("2 regions selected");
                  cy.wait(10000);
-                 cy.tweetCountTotal(185);
+                 cy.tweetCountTotal(28);
                  cy.url().should("contain",
                                  "selected=inverclyde&max_range_time");
                  cy.multiSelectRegions(["inverclyde"]);
@@ -38,7 +38,7 @@ describe('#124 Region multi select : https://github.com/socialsensingbot/fronten
                  cy.visitAndWait(url);
                  cy.twitterPanelHeader("3 regions selected");
                  cy.wait(60000);
-                 cy.tweetCountTotal(626);
+                 cy.tweetCountTotal(220);
                  for (let county of ["cambridgeshire", "powys", "inverclyde"]) {
                      cy.get(`div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-${county}[stroke-width=3]`);
                  }

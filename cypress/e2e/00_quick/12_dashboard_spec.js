@@ -16,7 +16,7 @@ function snapshot(query = 'app-timeseries-multi-query-chart', name = "analytics-
                               });
 }
 
-describe('11 Analytics: ', function () {
+describe('12 Dashboard Spec: ', function () {
 
     describe("Test Timeseries Graph", () => {
         const url = DASHBOARD_URL;
