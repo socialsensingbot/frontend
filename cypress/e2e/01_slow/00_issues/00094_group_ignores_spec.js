@@ -1,7 +1,39 @@
-import {POWYS_URL, testHide, testUnhide} from "../../../support/e2e";
+import {POWYS_URL} from "../../../support/e2e";
 
 const url = POWYS_URL;
 
+const testUnhide = (refresh, count, fail) => {
+    cy.log("Un-ignoring " + count);
+
+    const tweetHidden = ".atr-0.atr-hidden";
+    cy.get(".app-tweet-drawer", {timeout: 30000}).should("be.visible");
+    cy.get(".app-tweet-drawer", {timeout: 30000}).then(drawer => {
+        if (!fail && drawer.find(tweetHidden).length === 0) {
+            cy.log("Skipping non existent tweet");
+        } else {
+            cy.get(tweetHidden).scrollIntoView().should('be.visible');
+            cy.unignoreTweet(tweetHidden);
+            cy.wait(1000);
+        }
+    })
+};
+
+const testHide = (refresh, count) => {
+
+    cy.log("Ignoring");
+    const tweetVisible = `.atr-visible .app-tweet-item`;
+    cy.get(".app-tweet-drawer", {timeout: 30000}).should("be.visible");
+    cy.clickTweetTab(1);
+    cy.get(tweetVisible, {timeout: 60000})
+        .then(t => {
+            const index = t.first().parents(".atr-visible").attr("data-index");
+            cy.get(`.atr-visible.atr-${index}`, {timeout: 60000}).scrollIntoView().should('be.visible');
+            cy.ignoreTweet(`.atr-visible.atr-${index}`);
+            cy.wait(1000);
+        });
+
+
+};
 
 //TODO: fix the test and remove skip
 describe('#94 Group Ignore Prefs : https://github.com/socialsensingbot/frontend/issues/94 :', {
