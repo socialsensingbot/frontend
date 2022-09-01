@@ -18,9 +18,9 @@ describe('03 Ignore tweets: ', function () {
         cy.login();
         cy.visitAndWait(url);
         cy.get(".app-tweet-drawer", {timeout: 30000}).should("be.visible");
+        cy.wait(20000);
         cy.get(".app-tweet-table", {timeout: 30000}).then(panel => {
-            cy.wait(30000);
-            // Make sure other tests have not hidden the tweet we're testing against
+            cy.log(panel);
             if (panel.find(POWYS_TWEET).length > 0) {
                 cy.get(POWYS_TWEET_VISIBLE, {timeout: 60000});
                 cy.get(POWYS_TWEET_VISIBLE, {timeout: 60000}).should('be.visible');
