@@ -35,6 +35,7 @@ describe('00156 Impact: : https://github.com/socialsensingbot/frontend/issues/15
      */
 
 
+
     it('Try impacts', () => {
         cy.visit(url);
         cy.login();
@@ -42,6 +43,8 @@ describe('00156 Impact: : https://github.com/socialsensingbot/frontend/issues/15
         cy.wait(10000);
         cy.get(".app-tweet-drawer", {timeout: 30000}).should("be.visible");
         cy.get(".app-tweet-table", {timeout: 30000});
+        // Make sure other tests have not hidden the tweet we're testing against
+        cy.unhideTweets(1);
         cy.get(twitterIdClass, {timeout: 60000});
         cy.get(twitterIdClass, {timeout: 60000}).should('be.visible');
         clickImpactMenu("Clear");
