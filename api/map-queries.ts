@@ -261,10 +261,10 @@ export const textForRegionsFunc: MapFunction = async (req, res) => {
                 return (await db.sql({
                                          sql:
                                          // language=MySQL
-                                             `/* app.ts: text_for_regions */ select distinct t.source      as source,
-                                                                                             t.source_id   as id,
-                                                                                             r.region      as region,
-                                                                                             r.region_type as region_type
+                                             `/* app.ts: text_for_regions */ select t.source      as source,
+                                                                                    t.source_id   as id,
+                                                                                    r.region      as region,
+                                                                                    r.region_type as region_type
                                                                              FROM live_text t
                                                                                       LEFT JOIN mat_view_regions r
                                                                                                 ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
@@ -305,10 +305,10 @@ export const textForRegionsFunc: MapFunction = async (req, res) => {
                 return (await db.sql({
                                          sql:
                                          // language=MySQL
-                                             `/* app.ts: text_for_regions */ select distinct t.source      as source,
-                                                                                             t.source_id   as id,
-                                                                                             r.region      as region,
-                                                                                             r.region_type as region_type
+                                             `/* app.ts: text_for_regions */ select t.source      as source,
+                                                                                    t.source_id   as id,
+                                                                                    r.region      as region,
+                                                                                    r.region_type as region_type
                                                                              FROM live_text t
                                                                                       LEFT JOIN mat_view_regions r
                                                                                                 ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
@@ -997,7 +997,7 @@ export const statsFunc: MapFunction = async (req, res) => {
                                                                                                        100) as exceedance
 
                                                                                           FROM (SELECT count(*) as count, region as region
-                                                                                                FROM mat_view_regions_${req.body.hazards[0]} r
+                                                                                                FROM mat_view_regions r
                                                                                                 WHERE r.source_timestamp between ?
                                                                                                     AND ?
                                                                                                   AND r.region_type = ?

@@ -543,10 +543,13 @@ export class TweetListComponent implements OnInit, OnDestroy {
         this.minPage = 0;
         this.maxPage = 0;
         for (let page = 0; page < this.INITIAL_PAGES; page++) {
-            await this.loadTweetPage(page).then((tweets) => this.pages.push(new TweetPage(page, tweets)));
+            await this.loadTweetPage(page).then((tweets) => {
+                if (tweets.length > 0) {this.pages.push(new TweetPage(page, tweets))}
+                return tweets;
+            });
         }
         for (let page = 0; page < this.INITIAL_PAGES; page++) {
-            if (!this.pages[page].isEmpty()) {
+            if (this.pages[page] && !this.pages[page].isEmpty()) {
                 this.maxPage = page;
             }
         }
