@@ -141,12 +141,6 @@
           ]
         }
       ]
-    },
-    "apiresultsandcache": {
-      "service": "DynamoDB",
-      "serviceType": "imported",
-      "providerPlugin": "awscloudformation",
-      "dependsOn": []
     }
   },
   "hosting": {

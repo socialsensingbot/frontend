@@ -49,16 +49,6 @@
           "appId": "dtmxl3q3i7oix",
           "type": "cicd"
         }
-      },
-      "storage": {
-        "apiresultsandcache": {
-          "tableName": "api-results-and-cache",
-          "region": "eu-west-2",
-          "arn": "arn:aws:dynamodb:eu-west-2:686957444051:table/api-results-and-cache",
-          "streamArn": "arn:aws:dynamodb:eu-west-2:686957444051:table/api-results-and-cache/stream/2022-09-02T13:55:37.153",
-          "partitionKeyName": "key",
-          "partitionKeyType": "S"
-        }
       }
     }
   },
