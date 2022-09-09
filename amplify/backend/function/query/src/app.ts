@@ -1,15 +1,11 @@
 /* tslint:disable:no-console */
 import * as express from "express";
 import * as bodyParser from "body-parser";
-import {functionLookup, MapFunctionName, MapFunctionRequest} from "socialsensing-api/map-queries";
-import {handleError} from "socialsensing-api/util";
-import {Request, Response} from "express-serve-static-core";
-import {readFromPersistentCache} from "socialsensing-api/db";
+import {functionLookup, MapFunctionName, MapFunctionRequest, callFunction} from "socialsensing-api/map-queries";
 
 // bump 87
 const awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
 
-const md5 = require("md5");
 // declare a new express app
 const app = express();
 app.use(bodyParser.json() as any);
@@ -28,95 +24,6 @@ app.use((req, res, next) => {
  app.post("/map/regions", regionsFunc);
  app.get("/map/regions", regionsFunc);
  */
-
-const AWS = require("aws-sdk");
-// Set the region
-AWS.config.update({region: "eu-west-2"});
-
-// Create an SQS service object
-const sqs = new AWS.SQS({apiVersion: "2012-11-05"});
-
-
-const callFunction = async (name: MapFunctionName, req: Request, res: Response, proxy = false, persistenCache = true) => {
-
-    const key = md5(req.path + JSON.stringify(req.body));
-
-    const newRequest: MapFunctionRequest = {
-        name,
-        path:    req.path,
-        params:  req.params,
-        body:    req.body,
-        key,
-        proxied: req.body.async_response && proxy
-
-    };
-    const cacheValue = persistenCache ? await readFromPersistentCache(key) : null;
-    if (newRequest.proxied) {
-        try {
-            if (!cacheValue) {
-                console.log("PROXYING: SENDING REQUEST VIA SQS");
-                newRequest.body.async_key = key;
-                console.log("PROXYING: With message", newRequest);
-                const params = {
-                    // Remove DelaySeconds parameter and value for FIFO queues
-                    DelaySeconds:      10,
-                    MessageAttributes: {
-                        Path:     {
-                            DataType:    "String",
-                            StringValue: req.path
-                        },
-                        Function: {
-                            DataType:    "String",
-                            StringValue: name
-                        },
-                        Key:      {
-                            DataType:    "String",
-                            StringValue: key
-                        }
-                    },
-                    MessageBody:       JSON.stringify(newRequest),
-                    // MessageDeduplicationId: key,  // Required for FIFO queues
-                    // MessageGroupId: name,  // Required for FIFO queues
-                    QueueUrl: process.env.QUERY_QUEUE
-                };
-                console.log("PROXYING: With params", params);
-                const promise = new Promise((resolve, reject) => {
-                    sqs.sendMessage(params, (err, data) => {
-                        if (err) {
-                            console.error("PROXYING: SEND ERROR", err);
-                            reject(err);
-                        } else {
-                            console.log("PROXYING: SEND SUCCESS", data.MessageId);
-                            resolve(data.MessageId);
-                        }
-                    });
-                });
-                await promise;
-
-            } else {
-                // We have a value in the persistent cache so let's short circuit proxying
-                // and go straight to returning the key.
-                console.log("PROXYING NOT REQUIRED: Value already in persistent cache.");
-            }
-            await res.json({
-                               __async_response__: true,
-                               key
-                           });
-        } catch (e) {
-            handleError(res, e);
-        }
-    } else {
-        if (!cacheValue) {
-            console.log("PROXYING NOT REQUIRED: Running locally");
-            return await functionLookup(name)(newRequest, res);
-        } else {
-            // We have a value in the persistent cache so let's short circuit
-            // execution and go straight to returning the value directly.
-            console.log("PROXYING NOT REQUIRED: Returning cache value directly");
-            await res.json(cacheValue);
-        }
-    }
-};
 
 
 app.get("/map/response/:key", (req, res) => callFunction("from-cache", req, res));

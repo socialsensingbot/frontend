@@ -2,16 +2,7 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import {
-    allMapRegionsAPIVersionFunc,
-    mapMetadataFunc,
-    metadataForMapByIDFunc,
-    nowFunc,
-    recentTextCountFunc,
-    regionGeographyFunc,
-    regionsForRegionTypeFunc,
-    statsFunc,
-    textForRegionsFunc,
-    timeseriesFunc
+   callFunction
 } from "socialsensing-api/map-queries";
 
 //bump 13
@@ -38,28 +29,32 @@ app.use((req, res, next) => {
 /**
  * Returns the global metadata. Including all the metadata for individual maps.
  */
-app.post("/v1/map/metadata", mapMetadataFunc);
-app.get("/v1/map/metadata", mapMetadataFunc);
+app.post("/v1/map/metadata", (req, res) => callFunction("map-metadata", req, res));
+app.get("/v1/map/metadata", (req, res) => callFunction("map-metadata", req, res));
 
 /**
  * Returns the time according to the API. I.e. the date of the last processed data. Kept for completeness/testing, probably not going to be
  * used by customers.
  */
-app.get("/v1/map/:map/now", nowFunc);
-app.post("/v1/map/:map/now", nowFunc);
+app.get("/v1/map/:map/now", (req, res) => callFunction("now", req, res));
+app.post("/v1/map/:map/now", (req, res) => callFunction("now", req, res));
 
 
 /**
  * Returns the metadata for a given map.
  */
-app.get("/v1/map/:map/metadata", metadataForMapByIDFunc);
-app.post("/v1/map/:map/metadata", metadataForMapByIDFunc);
+app.get("/v1/map/:map/metadata", (req, res) => callFunction("map-metadata-by-id", req, res));
+app.post("/v1/map/:map/metadata", (req, res) => callFunction("map-metadata", req, res));
 
 /**
  * Returns the Tweets (or any other form of text based message) for a given region and regionType.
  */
-app.post("/v1/map/:map/text", textForRegionsFunc);
+app.post("/v1/map/:map/text", (req, res) => callFunction("text-for-regions", req, res));
 
+/**
+ * Returns the text for a given source and source id.
+ */
+app.post("/v1/map/:map/text/:source/:id", (req, res) => callFunction("text", req, res));
 
 /**
  * Returns the data to show the exceedance AND counts on the main map. This is a highly optimized version
@@ -67,22 +62,29 @@ app.post("/v1/map/:map/text", textForRegionsFunc);
  * criteria of hazards, sources AND warning.
  *
  */
-app.post("/v1/map/:map/stats", statsFunc);
+app.post("/v1/map/:map/stats", (req, res) => callFunction("stats", req, res));
 
 /**
  * Returns the geography in GeoJSON for a given region of a regionType.
  */
-app.get("/v1/map/:map/region-type/:regionType/region/:region/geography", regionGeographyFunc);
+app.get("/v1/map/:map/region-type/:regionType/region/:region/geography", (req, res) => callFunction("region-geography", req, res));
 
-app.post("/v1/map/:map/recent-text-count", recentTextCountFunc);
+
+/**
+ * Returns the geography in GeoJSON for all regions of a regionType.
+ */
+app.get("/v1/map/:map/region-type/:regionType/geography", (req, res) => callFunction("geography", req, res));
+
+
+app.post("/v1/map/:map/recent-text-count", (req, res) => callFunction("recent-text-count", req, res));
 
 /**
  * Returns all the regions for a given map, regardless of region type.
  * IMPORTANT: this screens out numerically named regions.
  */
-app.get("/v1/map/:map/regions", allMapRegionsAPIVersionFunc);
+app.get("/v1/map/:map/regions", (req, res) => callFunction("all-map-regions-api", req, res));
 
-app.get("/v1/map/:map/region-type/:regionType/regions", regionsForRegionTypeFunc);
+app.get("/v1/map/:map/region-type/:regionType/regions", (req, res) => callFunction("regions-by-type", req, res));
 
 
 /**
@@ -99,7 +101,7 @@ app.get("/v1/map/:map/region-type/:regionType/regions", regionsForRegionTypeFunc
  *
  *
  */
-app.post("/v1/map/:map/analytics/time", timeseriesFunc);
+app.post("/v1/map/:map/analytics/time", (req, res) => callFunction("timeseries", req, res));
 
 
 function sleep(ms) {

@@ -33,7 +33,7 @@
     "typescript": "^3.9.10"
   },
   "scripts": {
-    "test": "npx mocha -b --timeout 26s --exit --trace-warnings test/**/*.test.js",
+    "test": "STORAGE_JSONSTORAGE_BUCKETNAME=json183906-dev npx mocha -b --timeout 30s --exit --trace-warnings test/**/*.test.js",
     "build": "tsc"
   },
   "author": "",

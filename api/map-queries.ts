@@ -1,6 +1,6 @@
 /* tslint:disable:no-console */
 import {AggregationMap, MapMetadata, ONE_DAY, RegionGeography, ServiceMetadata} from "./map-data.js";
-import {SSDatabase} from "./db.js";
+import {readFromPersistentCache, SSDatabase} from "./db.js";
 import {dateFromMillis, handleError, invalidParameter, stage} from "./util.js";
 
 const db = new SSDatabase(stage);
@@ -590,12 +590,12 @@ export const regionGeographyFunc: MapFunction = async (req, res) => {
 
             const geography = await db.sql({
                                                // language=MySQL
-                                               sql:                                                             `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
-                                                                                                                                         from ref_geo_regions gr,
-                                                                                                                                              ref_map_metadata mm
-                                                                                                                                         where mm.id = ?
-                                                                                                                                           AND region_type = ?
-                                                                                                                                           AND region = ?
+                                               sql: `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
+                                                                             from ref_geo_regions gr,
+                                                                                  ref_map_metadata mm
+                                                                             where mm.id = ?
+                                                                               AND region_type = ?
+                                                                               AND region = ?
                                                                                AND gr.map_location = mm.location`,
                                                values: [req.params.map,
                                                         req.params.regionType,
@@ -1454,6 +1454,7 @@ export type MapFunctionName =
     "stats"
     | "accurate-stats"
     | "all-map-regions"
+    | "all-map-regions-api"
     | "csv-export"
     | "geography"
     | "map-aggregations"
@@ -1466,14 +1467,15 @@ export type MapFunctionName =
     | "text-for-public-display"
     | "text-for-regions"
     | "timeseries"
-    | "timeslider" |
-    "from-cache" | "now" | "text"
+    | "timeslider"
+    | "from-cache" | "now" | "text"
     ;
 
 export const functionLookupTable: { [key: string]: MapFunction } = {
     stats:                     statsFunc,
     "accurate-stats":          accurateStatsFunc,
     "all-map-regions":         allMapRegionsFunc,
+    "all-map-regions-api":     allMapRegionsAPIVersionFunc,
     "csv-export":              csvExportFunc,
     geography:                 geographyFunc,
     "map-aggregations":        mapAggregationsFunc,
@@ -1492,6 +1494,99 @@ export const functionLookupTable: { [key: string]: MapFunction } = {
     "from-cache":              fromCache
 };
 
+const md5 = require("md5");
+
+const AWS = require("aws-sdk");
+// Set the region
+AWS.config.update({region: "eu-west-2"});
+
+// Create an SQS service object
+const sqs = new AWS.SQS({apiVersion: "2012-11-05"});
+
+import {Request, Response} from "express-serve-static-core";
+
 export const functionLookup: (name: MapFunctionName) => MapFunction = (name) => {
     return functionLookupTable[name];
+};
+
+
+export const callFunction = async (name: MapFunctionName, req: Request, res: Response, proxy = false, persistenCache = true) => {
+
+    const key = md5(req.path + JSON.stringify(req.body));
+
+    const newRequest: MapFunctionRequest = {
+        name,
+        path:    req.path,
+        params:  req.params,
+        body:    req.body,
+        key,
+        proxied: req.body.async_response && proxy
+
+    };
+    const cacheValue = persistenCache ? await readFromPersistentCache(key) : null;
+    if (newRequest.proxied) {
+        try {
+            if (!cacheValue) {
+                console.log("PROXYING: SENDING REQUEST VIA SQS");
+                newRequest.body.async_key = key;
+                console.log("PROXYING: With message", newRequest);
+                const params = {
+                    // Remove DelaySeconds parameter and value for FIFO queues
+                    DelaySeconds:      10,
+                    MessageAttributes: {
+                        Path:     {
+                            DataType:    "String",
+                            StringValue: req.path
+                        },
+                        Function: {
+                            DataType:    "String",
+                            StringValue: name
+                        },
+                        Key:      {
+                            DataType:    "String",
+                            StringValue: key
+                        }
+                    },
+                    MessageBody:       JSON.stringify(newRequest),
+                    // MessageDeduplicationId: key,  // Required for FIFO queues
+                    // MessageGroupId: name,  // Required for FIFO queues
+                    QueueUrl: process.env.QUERY_QUEUE
+                };
+                console.log("PROXYING: With params", params);
+                const promise = new Promise((resolve, reject) => {
+                    sqs.sendMessage(params, (err, data) => {
+                        if (err) {
+                            console.error("PROXYING: SEND ERROR", err);
+                            reject(err);
+                        } else {
+                            console.log("PROXYING: SEND SUCCESS", data.MessageId);
+                            resolve(data.MessageId);
+                        }
+                    });
+                });
+                await promise;
+
+            } else {
+                // We have a value in the persistent cache so let's short circuit proxying
+                // and go straight to returning the key.
+                console.log("PROXYING NOT REQUIRED: Value already in persistent cache.");
+            }
+            await res.json({
+                               __async_response__: true,
+                               key
+                           });
+        } catch (e) {
+            handleError(res, e);
+        }
+    } else {
+        if (!cacheValue) {
+            console.log("PROXYING NOT REQUIRED: Running locally");
+            return await functionLookup(name)(newRequest, res);
+        } else {
+            // We have a value in the persistent cache so let's short circuit
+            // execution and go straight to returning the value directly.
+            console.log("PROXYING NOT REQUIRED: Returning cache value directly");
+            await res.json(cacheValue);
+        }
+    }
 };

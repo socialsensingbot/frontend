@@ -26,6 +26,14 @@
     "storagejsonstorageBucketName": {
       "Type": "String",
       "Default": "storagejsonstorageBucketName"
+    },
+    "customquerySQSName": {
+      "Type": "String",
+      "Default": "customquerySQSName"
+    },
+    "customquerySQSArn": {
+      "Type": "String",
+      "Default": "customquerySQSArn"
     }
   },
   "Conditions": {
@@ -127,6 +135,9 @@
             },
             "STORAGE_JSONSTORAGE_BUCKETNAME": {
               "Ref": "storagejsonstorageBucketName"
+            },
+            "QUERY_QUEUE": {
+              "Ref": "customquerySQSName"
             }
           }
         },
@@ -137,6 +148,7 @@
           ]
         },
         "Runtime": "nodejs14.x",
+        "MemorySize": 1024,
         "Layers": [],
         "Timeout": 25
       }
@@ -198,6 +210,15 @@
             {
               "Effect": "Allow",
               "Action": [
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
                 "logs:CreateLogGroup",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
@@ -218,6 +239,14 @@
                   }
                 ]
               }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "sqs:SendMessage",
+                "sqs:GetQueueAttributes"
+              ],
+              "Resource": "*"
             }
           ]
         }

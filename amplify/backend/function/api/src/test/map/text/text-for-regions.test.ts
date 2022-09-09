@@ -236,23 +236,6 @@ const invalidPageSize2 = {
     endDate:    MAX_DATE_MILLIS,
     regionType: "county"
 };
-const invalidPageSize3 = {
-    hazards:    [
-        "flood"
-    ],
-    sources:    [
-        "twitter"
-    ],
-    regions:    [
-        "hertfordshire"
-    ],
-    warnings:   "exclude",
-    pageSize:   1001,
-    page:       0,
-    startDate:  MIN_DATE_MILLIS,
-    endDate:    MAX_DATE_MILLIS,
-    regionType: "county"
-};
 const noPageSize = {
     hazards:    [
         "flood"
@@ -683,14 +666,6 @@ describe("POST /v1/map/:map/text", () => {
             .post("/v1/map/uk-flood-test/text")
             .set("Accept", "application/json")
             .send(invalidPageSize2);
-        expect(response.status).equals(400);
-        expect(response.body.parameter).equals("pageSize");
-    });
-    it("invalid page size 3", async () => {
-        const response = await request(app)
-            .post("/v1/map/uk-flood-test/text")
-            .set("Accept", "application/json")
-            .send(invalidPageSize3);
         expect(response.status).equals(400);
         expect(response.body.parameter).equals("pageSize");
     });
