@@ -186,6 +186,12 @@ export class TweetListComponent implements OnInit, OnDestroy {
             if (Date.now() - this.lastDateShow > 1 * 1000) {
                 this.showDateHeader = false;
             }
+            if (this.minPage > 0) {
+                //If the scroll position is at the top, you can't generate any more scroll up events. So we nudge it down a bit.
+                if ($(".app-tweet-list").scrollTop() === 0) {
+                    $(".app-tweet-list").scrollTop(100);
+                }
+            }
         });
         this._annotationRemovalSubscription = this.annotate.tweetAnnotationsRemoved.subscribe(
             groupTweetAnnotations => delete this.annotations[groupTweetAnnotations.tweetId]);
@@ -276,7 +282,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
         // }
     }
 
-    public calcFirstVisibleDate() {
+    public calcFirstVisibleDate($event: IInfiniteScrollEvent) {
         const checkInView = (elem, partial) => {
             const container = $(".app-tweet-list");
             const contHeight = container.height();
@@ -306,6 +312,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
             this.showDateHeader = true;
             this.lastDateShow = Date.now();
         }
+
     }
 
     public styleFor(type: string, tweet: Tweet) {

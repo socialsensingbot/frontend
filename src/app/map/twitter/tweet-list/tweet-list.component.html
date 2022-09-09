@@ -9,7 +9,7 @@
      [infiniteScrollThrottle]="throttle"
      alwaysCallback="true"
      [scrollWindow]="false"
-     (scroll)="calcFirstVisibleDate()"
+     (scroll)="calcFirstVisibleDate($event)"
      (scrolled)="onScrollDown($event)"
      (scrolledUp)="onUp($event)">
     <ng-template #toggleAnnotation let-tweet="tweet" let-key="key" let-positiveTitle="positiveTitle"
