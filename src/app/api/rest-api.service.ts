@@ -221,17 +221,14 @@ export class RESTDataAPIService {
                                   interrupted: () => boolean): Promise<Promise<any>> {
         this.calls++;
         payload.async_response = true;
-        if (this.callsPerMinute > environment.maxCallsPerMinute) {
-            console.error("Excessive api calls per minute: " + this.callsPerMinute);
-            console.error("API call was path: " + fullPath + " payload: " + JSON.stringify(payload));
-            console.trace("Excessive calls trace");
-            if (!environment.production) {
-                this._notify.show(
-                    "Too many calls to the server (" + this.callsPerMinute + " > " + environment.maxCallsPerMinute + "). This is most likely a bug and this message will not be shown in production.",
-                    "Ignoring this call", 60);
-            }
-
-        }
+        // if (this.callsPerMinute > environment.maxCallsPerMinute) {
+        //     console.error("Excessive api calls per minute: " + this.callsPerMinute);
+        //     console.error("API call was path: " + fullPath + " payload: " + JSON.stringify(payload));
+        //     console.trace("Excessive calls trace");
+        //     if (!environment.production) {
+        //         this._notify.show(
+        //             "Too many calls to the server (" + this.callsPerMinute + " > " + environment.maxCallsPerMinute + "). This is most
+        // likely a bug and this message will not be shown in production.", "Ignoring this call", 60); }  }
         let retryCount = retry ? 4 : 1;
         while (retryCount-- > 0) {
             let response: Promise<any>;
