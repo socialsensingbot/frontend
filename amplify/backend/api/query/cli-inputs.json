@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "paths": {
+    "/refdata/{dataset}": {
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ]
+      },
+      "lambdaFunction": "query"
+    },
+    "/query/{queryName}": {
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ]
+      },
+      "lambdaFunction": "query"
+    },
+    "/map/{map}": {
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "read"
+        ]
+      },
+      "lambdaFunction": "query"
+    },
+    "/map/metadata": {
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "read"
+        ]
+      },
+      "lambdaFunction": "query"
+    }
+  }
+}
