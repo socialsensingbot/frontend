@@ -40,7 +40,7 @@
         },
         "sqsquery": {
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
-          "s3Key": "amplify-builds/sqsquery-47516d4e52764f577279-build.zip",
+          "s3Key": "amplify-builds/sqsquery-756c537836596d326b35-build.zip",
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
         }
       },

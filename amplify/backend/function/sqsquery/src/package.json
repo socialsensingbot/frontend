@@ -1,5 +1,5 @@
 {
-  "name": "socialsensing-lambda-query",
+  "name": "socialsensing-lambda-sqsquery",
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
