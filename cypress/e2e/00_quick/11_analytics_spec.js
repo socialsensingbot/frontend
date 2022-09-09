@@ -51,7 +51,7 @@ describe('11 Analytics: ', function () {
             cy.get('.epp-timeseries-eoc-count').click();
             cy.get('.epp-timeseries-lob-bar').click();
             cy.get('.epp-timeseries-period-hour').click();
-            cy.wait(20000);
+            cy.wait(90000);
             snapshot('app-timeseries-multi-query-chart', "analytics-timeseries-graph-hour-bar-count");
         });
 

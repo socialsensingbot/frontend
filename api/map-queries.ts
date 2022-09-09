@@ -3,7 +3,6 @@ import {AggregationMap, MapMetadata, ONE_DAY, RegionGeography, ServiceMetadata} 
 import {SSDatabase} from "./db.js";
 import {dateFromMillis, handleError, invalidParameter, stage} from "./util.js";
 
-const md5 = require("md5");
 const db = new SSDatabase(stage);
 
 process.on("exit", () => {
@@ -61,11 +60,44 @@ export const warningsValues = (warning: string) => {
 //         });
 // }
 
+// From Cache
+
+export interface MapFunctionRequest {
+    name: string;
+    params: any;
+    path: string;
+    body: any;
+    key: string;
+    proxied: boolean;
+}
+
+export interface MapFunctionResponse {
+    json: (any) => void;
+    status: (integer) => void;
+}
+
+export type MapFunction = (req: MapFunctionRequest, res: MapFunctionResponse) => Promise<void>;
+
+export const fromCache: MapFunction = async (req, res) => {
+
+    try {
+        const cachedResult: any = await db.fromCache(req.params.key);
+        if (cachedResult) {
+            res.json(cachedResult);
+        } else {
+            res.status(404);
+        }
+
+    } catch (e) {
+        handleError(res, e);
+    }
+};
+
 // Map Related Queries
-export const mapMetadataFunc: (req, res) => Promise<void> = async (req, res) => {
+export const mapMetadataFunc: MapFunction = async (req, res) => {
 
 
-    await db.cache(res, req.path, async () => {
+    await db.cache(res, false, "map-metadata", req.params, req.key, async () => {
         const data = await db.sql({
                                       sql: `select *
                                             from ref_map_metadata`,
@@ -87,9 +119,9 @@ export const mapMetadataFunc: (req, res) => Promise<void> = async (req, res) => 
 
 };
 
-export const metadataForMapByIDFunc: (req, res) => Promise<void> = async (req, res) => {
+export const metadataForMapByIDFunc: MapFunction = async (req, res) => {
     console.log("metadataForMapByIDFunc");
-    await db.cache(res, req.path, async () => {
+    await db.cache(res, req.proxied, "map-metadata-by-id", req.params, req.key, async () => {
 
         console.log("Get Map");
         const map = await getMap(req.params.map);
@@ -140,7 +172,7 @@ function getLangAsSQLLike(req): string {
     return (req.body.language || "*").replace(/\*/, "%").replace(/\?/, "_");
 }
 
-export const textForRegionsFunc: (req, res) => Promise<void> = async (req, res) => {
+export const textForRegionsFunc: MapFunction = async (req, res) => {
     try {
         const map = (await getMaps())[req.params.map];
         if (!map) {
@@ -190,9 +222,9 @@ export const textForRegionsFunc: (req, res) => Promise<void> = async (req, res) 
             return;
         }
         if (typeof req.body.pageSize !== "undefined") {
-            if ((typeof req.body.pageSize !== "number") || req.body.pageSize < 0 || req.body.pageSize > 1000) {
+            if ((typeof req.body.pageSize !== "number") || req.body.pageSize < 0) {
                 invalidParameter(res, "pageSize",
-                                 `Invalid value for optional parameter pageSize, pageSize=${req.body.pageSize}, pageSize must be a number between (inclusively) 0 and 1000`);
+                                 `Invalid value for optional parameter pageSize, pageSize=${req.body.pageSize}, pageSize must be a positive number`);
                 return;
             }
         }
@@ -217,62 +249,157 @@ export const textForRegionsFunc: (req, res) => Promise<void> = async (req, res) 
         const page: number = +req.body.page || 0;
         const from = page * pageSize;
         const lang = getLangAsSQLLike(req);
-
-        await db.cache(res, null, async () => {
-
-            return (await db.sql({
-                                     sql:
-                                     // language=MySQL
-                                         `/* app.ts: text_for_regions */ select t.source_json            as json,
-                                                                                r.source_timestamp       as timestamp,
-                                                                                r.source_id              as id,
-                                                                                ST_AsGeoJSON(t.location) as location,
-                                                                                r.region                 as region,
-                                                                                t.possibly_sensitive     as possibly_sensitive,
-                                                                                r.source                 as source,
-                                                                                r.region_type            as region_type,
-                                                                                r.hazard                 as hazard,
-                                                                                r.warning                as warning
-                                                                         FROM live_text t
-                                                                                  LEFT JOIN mat_view_regions_${req.body.hazards[0]} r
-                                                                                            ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
-                                                                         WHERE r.source_timestamp between ?
-                                                                             AND ?
-                                                                           AND r.region IN (?)
-                                                                           AND r.region_type = ?
-                                                                           AND r.hazard IN (?)
-                                                                           AND r.source IN (?)
-                                                                           AND r.warning IN (?)
-                                                                           AND r.language LIKE ?
-                                                                           AND not t.deleted
-                                                                         order by r.source_timestamp
-                                                                             desc
-                                                                         LIMIT ?,?`,
-                                     values: [new Date(
-                                         req.body.startDate), new Date(endDate),
-                                              req.body.regions,
-                                              regionType,
-                                              req.body.hazards,
-                                              req.body.sources,
-                                              warningsValues(
-                                                  req.body.warnings),
-                                              lang,
-                                              from,
-                                              pageSize
-                                     ]
-                                 })).map(i => {
-                i.json = JSON.parse(i.json);
-                return i;
-            });
+        const restrictToIds: string[] = req.body.restrictToIds || [];
+        const restrictToNames: string[] = req.body.restrictToNames || [];
+        const excludeIds: string[] = req.body.excludeIds || [];
+        const excludeNames: string[] = req.body.excludeNames || [];
 
 
-        }, {duration: 60});
+        if (req.body?.restrictOrExclude === "restrict") {
+            await db.cache(res, req.proxied, "text-for-regions-restricted", req.body, req.key, async () => {
+
+                return (await db.sql({
+                                         sql:
+                                         // language=MySQL
+                                             `/* app.ts: text_for_regions */ select distinct t.source      as source,
+                                                                                             t.source_id   as id,
+                                                                                             r.region      as region,
+                                                                                             r.region_type as region_type
+                                                                             FROM live_text t
+                                                                                      LEFT JOIN mat_view_regions r
+                                                                                                ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
+                                                                             WHERE r.source_timestamp between ? AND ?
+                                                                               AND r.region IN (?)
+                                                                               AND r.region_type = ?
+                                                                               AND r.hazard IN (?)
+                                                                               AND r.source IN (?)
+                                                                               AND r.warning IN (?)
+                                                                               AND r.language LIKE ?
+                                                                               AND not t.deleted
+                                                                               AND (t.source_id IN (?)
+                                                                                 OR t.source_json -> "$.user.screen_name" IN (?))
+                                                                             order by r.source_timestamp
+                                                                                 desc
+                                                                             LIMIT ?,?`,
+                                         values: [new Date(
+                                             req.body.startDate), new Date(endDate),
+                                                  req.body.regions,
+                                                  regionType,
+                                                  req.body.hazards,
+                                                  req.body.sources,
+                                                  warningsValues(
+                                                      req.body.warnings),
+                                                  lang,
+                                                  restrictToIds.length > 0 ? restrictToIds : ["_hack_to_stop_SQL_error"],
+                                                  restrictToNames.length > 0 ? restrictToNames : ["_hack_to_stop_SQL_error"],
+                                                  from,
+                                                  pageSize
+                                         ]
+                                     }));
+
+
+            }, {duration: 60 * 5, memoryCache: true, persistentCache: true});
+        } else {
+            await db.cache(res, req.proxied, "text-for-regions-excluded", req.body, req.key, async () => {
+
+                return (await db.sql({
+                                         sql:
+                                         // language=MySQL
+                                             `/* app.ts: text_for_regions */ select distinct t.source      as source,
+                                                                                             t.source_id   as id,
+                                                                                             r.region      as region,
+                                                                                             r.region_type as region_type
+                                                                             FROM live_text t
+                                                                                      LEFT JOIN mat_view_regions r
+                                                                                                ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
+                                                                             WHERE r.source_timestamp between ?
+                                                                                 AND ?
+                                                                               AND r.region IN (?)
+                                                                               AND r.region_type = ?
+                                                                               AND r.hazard IN (?)
+                                                                               AND r.source IN (?)
+                                                                               AND r.warning IN (?)
+                                                                               AND r.language LIKE ?
+                                                                               AND not t.deleted
+                                                                               AND (t.source_id NOT IN (?)
+                                                                                 AND t.source_json -> "$.user.screen_name" NOT IN (?))
+                                                                             order by r.source_timestamp
+                                                                                 desc
+                                                                             LIMIT ?,?`,
+                                         values: [new Date(
+                                             req.body.startDate), new Date(endDate),
+                                                  req.body.regions,
+                                                  regionType,
+                                                  req.body.hazards,
+                                                  req.body.sources,
+                                                  warningsValues(
+                                                      req.body.warnings),
+                                                  lang,
+                                                  excludeIds.length > 0 ? excludeIds : ["_hack_to_stop_SQL_error"],
+                                                  excludeNames.length > 0 ? excludeNames : ["_hack_to_stop_SQL_error"],
+                                                  from,
+                                                  pageSize
+                                         ]
+                                     }));
+
+
+            }, {duration: 60 * 5, memoryCache: true, persistentCache: true});
+        }
+
     } catch (e) {
         handleError(res, e);
     }
 };
 
-export const textForPublicDisplayFunc: (req, res) => Promise<void> = async (req, res) => {
+
+export const textFunc: MapFunction = async (req, res) => {
+    try {
+        await db.cache(res, req.proxied, "text", req.params, req.key, async () => {
+
+            return (await db.sql({
+                                     sql:
+                                     // language=MySQL
+                                             `/* app.ts: text */ select t.source_json -> "$.user.followers_count"                 as followers_count,
+                                                                        t.source_json -> "$.user.friends_count"                   as friends_count,
+                                                                        t.source_json -> "$.user.retweet_count"                   as retweet_count,
+                                                                        t.source_json -> "$.user.verified"                        as verified,
+                                                                        JSON_UNQUOTE(t.source_json -> "$.user.screen_name")       as screen_name,
+                                                                        JSON_UNQUOTE(t.source_json -> "$.user.name")              as username,
+                                                                        JSON_UNQUOTE(t.source_json -> "$.user.profile_image_url") as profile_image_url,
+                                                                        JSON_UNQUOTE(IF(
+                                                                            JSON_CONTAINS_PATH(t.source_json, 'one', '$.extended_tweet'),
+                                                                            t.source_json ->
+                                                                            "$.extended_tweet.full_text",
+                                                                            t.source_json ->
+                                                                            "$.text"))                                            as text,
+                                                                        IF(
+                                                                            JSON_CONTAINS_PATH(t.source_json, 'one', '$.extended_tweet'),
+                                                                            t.source_json -> "$.extended_tweet.entities",
+                                                                            t.source_json ->
+                                                                            "$.entities")                                         as entities,
+
+                                                                        r.source_timestamp                                        as timestamp,
+                                                                        r.source_id                                               as id,
+                                                                        t.possibly_sensitive                                      as possibly_sensitive
+                                                                 FROM live_text t
+                                                                          LEFT JOIN mat_view_regions r
+                                                                                    ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
+                                                                 WHERE t.source = ?
+                                                                   AND t.source_id = ?
+                                             `,
+                                     values: [
+                                         req.params.source, req.params.id
+                                     ]
+                                 }))[0];
+
+
+        }, {duration: 24 * 60 * 60, memoryCache: true, persistentCache: true});
+    } catch (e) {
+        handleError(res, e);
+    }
+};
+
+export const textForPublicDisplayFunc: MapFunction = async (req, res) => {
     try {
         const lastDate: Date = (await getMaps())[req.params.map].last_date;
         const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
@@ -282,27 +409,45 @@ export const textForPublicDisplayFunc: (req, res) => Promise<void> = async (req,
         console.debug("StartDate: " + new Date(req.body.startDate));
         console.debug("EndDate: " + new Date(endDate));
         const lang = getLangAsSQLLike(req);
-        await db.cache(res, null, async () => {
+        await db.cache(res, req.proxied, "text-for-pd", req.params, req.key, async () => {
 
             return (await db.sql({
                                      sql:
                                      // language=MySQL
-                                         `/* app.ts: text-for-public-display */ select t.source_json        as json,
-                                                                                       r.source_timestamp   as timestamp,
-                                                                                       r.source_id          as id,
-                                                                                       r.region             as region,
-                                                                                       t.possibly_sensitive as possibly_sensitive
-                                                                                FROM live_text t
-                                                                                         LEFT JOIN mat_view_regions_${req.body.hazards[0]} r
-                                                                                                   ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
-                                                                                WHERE r.source_timestamp between ?
-                                                                                    AND ?
-                                                                                  AND r.region_type = ?
-                                                                                  AND r.hazard IN (?)
-                                                                                  AND r.source IN (?)
-                                                                                  AND r.warning IN (?)
-                                                                                  AND r.language LIKE ?
-                                                                                  AND NOT t.deleted
+                                             `/* app.ts: text-for-public-display */ select t.source_json -> "$.user.followers_count"                 as followers_count,
+                                                                                           t.source_json -> "$.user.friends_count"                   as friends_count,
+                                                                                           t.source_json -> "$.user.retweet_count"                   as retweet_count,
+                                                                                           t.source_json -> "$.user.verified"                        as verified,
+                                                                                           JSON_UNQUOTE(t.source_json -> "$.user.screen_name")       as screen_name,
+                                                                                           JSON_UNQUOTE(t.source_json -> "$.user.name")              as username,
+                                                                                           JSON_UNQUOTE(t.source_json -> "$.user.profile_image_url") as profile_image_url,
+                                                                                           JSON_UNQUOTE(IF(
+                                                                                               JSON_CONTAINS_PATH(t.source_json, 'one', '$.extended_tweet'),
+                                                                                               t.source_json ->
+                                                                                               "$.extended_tweet.full_text",
+                                                                                               t.source_json ->
+                                                                                               "$.text"))                                            as text,
+                                                                                           IF(
+                                                                                               JSON_CONTAINS_PATH(t.source_json, 'one', '$.extended_tweet'),
+                                                                                               t.source_json -> "$.extended_tweet.entities",
+                                                                                               t.source_json ->
+                                                                                               "$.entities")                                         as entities,
+
+                                                                                           r.source_timestamp                                        as timestamp,
+                                                                                           r.source_id                                               as id,
+                                                                                           r.region                                                  as region,
+                                                                                           t.possibly_sensitive                                      as possibly_sensitive
+                                                                                    FROM live_text t
+                                                                                             LEFT JOIN mat_view_regions_${req.body.hazards[0]} r
+                                                                                                       ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
+                                                                                    WHERE r.source_timestamp between ?
+                                                                                        AND ?
+                                                                                      AND r.region_type = ?
+                                                                                      AND r.hazard IN (?)
+                                                                                      AND r.source IN (?)
+                                                                                      AND r.warning IN (?)
+                                                                                      AND r.language LIKE ?
+                                                                                      AND NOT t.deleted
                                                                                     ORDER BY r.source_timestamp
                                                                                         desc
                                                                                     LIMIT ?,?
@@ -316,14 +461,14 @@ export const textForPublicDisplayFunc: (req, res) => Promise<void> = async (req,
                                  }));
 
 
-        }, {duration: 60 * 60});
+        }, {duration: 60 * 60, memoryCache: false});
     } catch (e) {
         handleError(res, e);
     }
 };
 
 
-export const csvExportFunc: (req, res) => Promise<void> = async (req, res) => {
+export const csvExportFunc: MapFunction = async (req, res) => {
     const lastDate: Date = (await getMaps())[req.params.map].last_date;
     const endDate: number = lastDate == null ? req.body.endDate : Math.min(req.body.endDate, lastDate.getTime());
     const pageSize: number = +req.body.pageSize || 1000;
@@ -333,15 +478,32 @@ export const csvExportFunc: (req, res) => Promise<void> = async (req, res) => {
     console.debug("StartDate: " + new Date(req.body.startDate));
     console.debug("EndDate: " + new Date(endDate));
 
-    await db.cache(res, null, async () => {
+    await db.cache(res, req.proxied, "csv-export", req.params, req.key, async () => {
 
         return (await db.sql({
                                  sql:
                                  // language=MySQL
-                                     `/* app.ts: csv_export */ select t.source_json               as json,
-                                                                      t.source_html               as html,
-                                                                      r.source_timestamp          as timestamp,
-                                                                      r.source_id                 as id,
+                                     `/* app.ts: csv_export */ select t.source_json -> "$.user.followers_count"                 as followers_count,
+                                                                      t.source_json -> "$.user.friends_count"                   as friends_count,
+                                                                      t.source_json -> "$.user.retweet_count"                   as retweet_count,
+                                                                      t.source_json -> "$.user.verified"                        as verified,
+                                                                      JSON_UNQUOTE(t.source_json -> "$.user.screen_name")       as screen_name,
+                                                                      JSON_UNQUOTE(t.source_json -> "$.user.name")              as username,
+                                                                      JSON_UNQUOTE(t.source_json -> "$.user.profile_image_url") as profile_image_url,
+                                                                      JSON_UNQUOTE(IF(
+                                                                          JSON_CONTAINS_PATH(t.source_json, 'one', '$.extended_tweet'),
+                                                                          t.source_json -> "$.extended_tweet.full_text",
+                                                                          t.source_json ->
+                                                                          "$.text"))                                            as text,
+                                                                      IF(
+                                                                          JSON_CONTAINS_PATH(t.source_json, 'one', '$.extended_tweet'),
+                                                                          t.source_json -> "$.extended_tweet.entities",
+                                                                          t.source_json ->
+                                                                          "$.entities")                                         as entities,
+
+                                                                      t.source_html                                             as html,
+                                                                      r.source_timestamp                                        as timestamp,
+                                                                      r.source_id                                               as id,
 #                                                                             ST_AsGeoJSON(t.location)    as location,
                                                                       CASE
                                                                           WHEN r.region_relation = 0 THEN 'Default'
@@ -354,11 +516,11 @@ export const csvExportFunc: (req, res) => Promise<void> = async (req, res) => {
                                                                               THEN 'Tweet location contains the region'
                                                                           ELSE 'ERROR'
                                                                           END
-                                                                                                  as location,
-                                                                      rmram.region_aggregation_id as agg_region,
-                                                                      t.possibly_sensitive        as possibly_sensitive,
-                                                                      r.region                    as region,
-                                                                      r.region_relation           as region_relation_code
+                                                                                                                                as location,
+                                                                      rmram.region_aggregation_id                               as agg_region,
+                                                                      t.possibly_sensitive                                      as possibly_sensitive,
+                                                                      r.region                                                  as region,
+                                                                      r.region_relation                                         as region_relation_code
                                                                FROM live_text t
                                                                         LEFT JOIN mat_view_regions r
                                                                                   ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
@@ -386,12 +548,12 @@ export const csvExportFunc: (req, res) => Promise<void> = async (req, res) => {
                              }));
 
 
-    }, {duration: 60 * 60});
+    }, {duration: 60 * 60, memoryCache: false, persistentCache: true});
 };
 
 
-export const geographyFunc: (req, res) => Promise<void> = async (req, res) => {
-    await db.cache(res, null, async () => {
+export const geographyFunc: MapFunction = async (req, res) => {
+    await db.cache(res, req.proxied, "geography", req.params, req.key, async () => {
         try {
 
             const geography = await db.sql({
@@ -418,22 +580,22 @@ export const geographyFunc: (req, res) => Promise<void> = async (req, res) => {
         } catch (e) {
             console.error("FAILED: Could not get geography, hit this error ", e);
         }
-    }, {duration: 24 * 60 * 60});
+    }, {duration: 24 * 60 * 60, memoryCache: false, persistentCache: true});
 };
 
 
-export const regionGeographyFunc: (req, res) => Promise<void> = async (req, res) => {
-    await db.cache(res, null, async () => {
+export const regionGeographyFunc: MapFunction = async (req, res) => {
+    await db.cache(res, req.proxied, "region-geography", req.params, req.key, async () => {
         try {
 
             const geography = await db.sql({
                                                // language=MySQL
-                                               sql: `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
-                                                                             from ref_geo_regions gr,
-                                                                                  ref_map_metadata mm
-                                                                             where mm.id = ?
-                                                                               AND region_type = ?
-                                                                               AND region = ?
+                                               sql:                                                             `/* app.ts: geography */ select ST_AsGeoJSON(boundary) as geo, region, gr.title
+                                                                                                                                         from ref_geo_regions gr,
+                                                                                                                                              ref_map_metadata mm
+                                                                                                                                         where mm.id = ?
+                                                                                                                                           AND region_type = ?
+                                                                                                                                           AND region = ?
                                                                                AND gr.map_location = mm.location`,
                                                values: [req.params.map,
                                                         req.params.regionType,
@@ -448,12 +610,12 @@ export const regionGeographyFunc: (req, res) => Promise<void> = async (req, res)
         } catch (e) {
             console.error("FAILED: Could not get geography, hit this error ", e);
         }
-    }, {duration: 24 * 60 * 60});
+    }, {duration: 24 * 60 * 60, memoryCache: false});
 };
 
-export const mapAggregationsFunc: (req, res) => Promise<void> = async (req, res) => {
+export const mapAggregationsFunc: MapFunction = async (req, res) => {
 
-    await db.cache(res, req.path, async () => {
+    await db.cache(res, req.proxied, "map-aggregations", req.params, req.key, async () => {
 
         const aggregationTypes = await db.sql({
                                                   // language=MySQL
@@ -504,9 +666,9 @@ export const mapAggregationsFunc: (req, res) => Promise<void> = async (req, res)
 
 
         return aggroMap;
-    }, {duration: 24 * 60 * 60});
+    }, {duration: 24 * 60 * 60, memoryCache: true});
 };
-export const recentTextCountFunc: (req, res) => Promise<void> = async (req, res) => {
+export const recentTextCountFunc: MapFunction = async (req: MapFunctionRequest, res: MapFunctionResponse) => {
     const lastDate: Date = (await getMaps())[req.params.map].last_date;
     const regionType: any = req.params.regionType || req.body.regionType;
     const map = (await getMaps())[req.params.map];
@@ -547,7 +709,7 @@ export const recentTextCountFunc: (req, res) => Promise<void> = async (req, res)
         return;
     }
     const lang = getLangAsSQLLike(req);
-    await db.cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
+    await db.cache(res, req.proxied, " recent-text-count", req.params, req.key, async () => {
         const endDate = calculateEndDate(map, req);
 
         const rows = await db.sql({
@@ -574,25 +736,25 @@ export const recentTextCountFunc: (req, res) => Promise<void> = async (req, res)
         }
         return result;
 
-    }, {duration: 60});
+    }, {duration: 60, memoryCache: true});
 
 
 };
 
 
-export const nowFunc: (req, res) => Promise<void> = async (req, res) => {
+export const nowFunc: MapFunction = async (req, res) => {
     const lastDate: Date = (await getMaps())[req.params.map].last_date;
     const endDate: number = lastDate == null ? Date.now() : new Date(lastDate.toUTCString()).getTime();
     res.json(endDate);
 };
 
-export const mapRegionsFunc: (req, res) => Promise<void> = async (req, res) => {
+export const mapRegionsFunc: MapFunction = async (req, res) => {
     const map = (await getMaps())[req.params.map];
     if (!map) {
         invalidParameter(res, "map", `Unrecognized map ${req.params.map}`);
         return;
     }
-    await db.cache(res, req.path, async () => {
+    await db.cache(res, req.proxied, "map-regions", req.params, req.key, async () => {
         return await db.sql({
                                 // language=MySQL
                                 sql:                            `/* app.ts: map regions for dropdown */
@@ -613,16 +775,16 @@ export const mapRegionsFunc: (req, res) => Promise<void> = async (req, res) => {
                                 order by gr.level desc, text asc`,
                                 values:                         [req.params.map]
                             });
-    }, {duration: 60 * 60});
+    }, {duration: 60 * 60, memoryCache: true});
 };
 
-export const allMapRegionsFunc: (req, res) => Promise<void> = async (req, res) => {
+export const allMapRegionsFunc: MapFunction = async (req, res) => {
     const map = (await getMaps())[req.params.map];
     if (!map) {
         invalidParameter(res, "map", `Unrecognized map ${req.params.map}`);
         return;
     }
-    await db.cache(res, req.path, async () => {
+    await db.cache(res, req.proxied, "all-map-regions", req.params, req.key, async () => {
         return await db.sql({
                                 // language=MySQL
                                 sql: `/* app.ts: map regions */ select distinct gr.region      as value,
@@ -637,7 +799,7 @@ export const allMapRegionsFunc: (req, res) => Promise<void> = async (req, res) =
                                                                 order by level desc, text asc`,
                                 values: [req.params.map]
                             });
-    }, {duration: 12 * 60 * 60});
+    }, {duration: 12 * 60 * 60, memoryCache: true});
 
 };
 
@@ -647,13 +809,13 @@ export const allMapRegionsFunc: (req, res) => Promise<void> = async (req, res) =
  * @param req
  * @param res
  */
-export const allMapRegionsAPIVersionFunc: (req, res) => Promise<void> = async (req, res) => {
+export const allMapRegionsAPIVersionFunc: MapFunction = async (req, res) => {
     const map = (await getMaps())[req.params.map];
     if (!map) {
         invalidParameter(res, "map", `Unrecognized map ${req.params.map}`);
         return;
     }
-    await db.cache(res, req.path, async () => {
+    await db.cache(res, req.proxied, "all-map-regions-api", req.params, req.key, async () => {
         return await db.sql({
                                 // language=MySQL
                                 sql: `/* app.ts: map regions */ select distinct gr.region      as id,
@@ -668,12 +830,12 @@ export const allMapRegionsAPIVersionFunc: (req, res) => Promise<void> = async (r
                                                                 order by level desc, title asc`,
                                 values: [req.params.map]
                             });
-    }, {duration: 12 * 60 * 60});
+    }, {duration: 12 * 60 * 60, memoryCache: true});
 
 };
 
 
-export const regionsForRegionTypeFunc: (req, res) => Promise<void> = async (req, res) => {
+export const regionsForRegionTypeFunc: MapFunction = async (req, res) => {
     const map = (await getMaps())[req.params.map];
     if (!map) {
         invalidParameter(res, "map", `Unrecognized map ${req.params.map}`);
@@ -684,7 +846,7 @@ export const regionsForRegionTypeFunc: (req, res) => Promise<void> = async (req,
                          `Invalid value for path parameter regionType, regionType=${req.params.regionType}, regionType must supplied as a string value`);
         return;
     }
-    await db.cache(res, req.path, async () => {
+    await db.cache(res, req.proxied, "regions-for-region-type", req.params, req.key, async () => {
         const rows = await db.sql({
                                       // language=MySQL
                                       sql: `/* app.ts: regionType regions */ select region
@@ -702,10 +864,10 @@ export const regionsForRegionTypeFunc: (req, res) => Promise<void> = async (req,
         }
         return result;
 
-    }, {duration: 24 * 60 * 60});
+    }, {duration: 24 * 60 * 60, memoryCache: true});
 };
 
-function calculateEndDate(map, req): number {
+function calculateEndDate(map, req: MapFunctionRequest): number {
     let endDate: number;
     const lastDate: Date = map.last_date;
     if (lastDate) {
@@ -740,7 +902,7 @@ function calculateEndDate(map, req): number {
  *
  *
  */
-export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
+export const statsFunc: MapFunction = async (req, res) => {
     const map = (await getMaps())[req.params.map];
     if (!map) {
         invalidParameter(res, "map", `Unrecognized map ${req.params.map}`);
@@ -794,7 +956,7 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
     }
 
     const lang = getLangAsSQLLike(req);
-    await db.cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
+    await db.cache(res, req.proxied, "stats", req.body, req.key, async () => {
 
 
         const exceedanceThreshold = req.body.exceedanceThreshold || 100;
@@ -892,7 +1054,7 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
         }
 
 
-    }, {duration: 5 * 60});
+    }, {duration: 5 * 60, memoryCache: req.body.format !== "geojson"});
 
 };
 
@@ -914,9 +1076,8 @@ export const statsFunc: (req, res) => Promise<void> = async (req, res) => {
  *
  */
 
-export const accurateStatsFunc: (req, res) => Promise<void> = async (req, res) => {
-
-    await db.cache(res, req.path + ":" + JSON.stringify(req.body), async () => {
+export const accurateStatsFunc: MapFunction = async (req, res) => {
+    await db.cache(res, req.proxied, "acc-stats", req.params, req.key, async () => {
 
         const firstDateInSeconds = (await db.sql({
                                                      // language=MySQL
@@ -1020,7 +1181,7 @@ export const accurateStatsFunc: (req, res) => Promise<void> = async (req, res) =
 
         return result;
 
-    }, {duration: 5 * 60});
+    }, {duration: 5 * 60, memoryCache: true});
 
 };
 /**
@@ -1039,14 +1200,13 @@ export const accurateStatsFunc: (req, res) => Promise<void> = async (req, res) =
  *
  *
  */
-export const timesliderFunc: (req, res) => Promise<void> = async (req, res) => {
+export const timesliderFunc: MapFunction = async (req, res) => {
     console.log("Timeslider query " + req.params.map, req.body);
     const lastDateInDB: any = (await getMaps())[req.params.map].last_date;
     const location: any = (await getMaps())[req.params.map].location;
-    const key = req.params.map + ":" + JSON.stringify(req.body);
     const lang = getLangAsSQLLike(req);
 
-    await db.cache(res, key, async () => {
+    await db.cache(res, req.proxied, "timeslider", req.params, req.key, async () => {
         const dayTimePeriod: boolean = req.body.timePeriod === "day";
         const timeSeriesTable = dayTimePeriod ? "mat_view_timeseries_date" : "mat_view_timeseries_hour";
         const dateTable = dayTimePeriod ? "mat_view_days" : "mat_view_hours";
@@ -1078,7 +1238,7 @@ export const timesliderFunc: (req, res) => Promise<void> = async (req, res) => {
                                 values: [from, to, hazards, lang, sources, location, from, to]
                             });
 
-    }, {duration: 60 * 60});
+    }, {duration: 60 * 60, memoryCache: true});
 };
 
 
@@ -1098,7 +1258,7 @@ export const timesliderFunc: (req, res) => Promise<void> = async (req, res) => {
  *
  *
  */
-export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
+export const timeseriesFunc: MapFunction = async (req, res) => {
     try {
         const map = (await getMaps())[req.params.map];
         if (!map) {
@@ -1165,7 +1325,6 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
         console.log("Analytics time query " + req.params.map, req.body);
         const lastDateInDB: any = map.last_date;
         const location: any = map.location;
-        const key = req.params.map + ":" + JSON.stringify(req.body);
         // They can either be grouped into a notional layer or top level properties
         const hazards: string[] = req.body.hazards;
         const sources: string[] = req.body.sources;
@@ -1187,7 +1346,7 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
             return;
         }
 
-        await db.cache(res, key, async () => {
+        await db.cache(res, req.proxied, "timeseries", req.params, req.key, async () => {
             let fullText = "";
             let textSearch: string = req.body.textSearch;
 
@@ -1285,8 +1444,54 @@ export const timeseriesFunc: (req, res) => Promise<void> = async (req, res) => {
 
                                     });
             }
-        }, {duration: 7 * 24 * 60 * 60});
+        }, {duration: 7 * 24 * 60 * 60, memoryCache: true});
     } catch (e) {
         handleError(res, e);
     }
+};
+
+export type MapFunctionName =
+    "stats"
+    | "accurate-stats"
+    | "all-map-regions"
+    | "csv-export"
+    | "geography"
+    | "map-aggregations"
+    | "map-metadata"
+    | "map-regions"
+    | "map-metadata-by-id"
+    | "recent-text-count"
+    | "region-geography"
+    | "regions-by-type"
+    | "text-for-public-display"
+    | "text-for-regions"
+    | "timeseries"
+    | "timeslider" |
+    "from-cache" | "now" | "text"
+    ;
+
+export const functionLookupTable: { [key: string]: MapFunction } = {
+    stats:                     statsFunc,
+    "accurate-stats":          accurateStatsFunc,
+    "all-map-regions":         allMapRegionsFunc,
+    "csv-export":              csvExportFunc,
+    geography:                 geographyFunc,
+    "map-aggregations":        mapAggregationsFunc,
+    "map-metadata":            mapMetadataFunc,
+    "map-regions":             mapRegionsFunc,
+    "map-metadata-by-id":      metadataForMapByIDFunc,
+    now:                       nowFunc,
+    "recent-text-count":       recentTextCountFunc,
+    "region-geography":        regionGeographyFunc,
+    "regions-by-type":         regionsForRegionTypeFunc,
+    "text-for-public-display": textForPublicDisplayFunc,
+    "text-for-regions":        textForRegionsFunc,
+    timeseries:                timeseriesFunc,
+    timeslider:                timesliderFunc,
+    text:                      textFunc,
+    "from-cache":              fromCache
+};
+
+export const functionLookup: (name: MapFunctionName) => MapFunction = (name) => {
+    return functionLookupTable[name];
 };

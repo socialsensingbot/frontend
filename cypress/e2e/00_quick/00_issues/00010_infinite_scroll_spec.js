@@ -3,7 +3,7 @@ import {MAP_URL} from "../../../support/e2e";
 
 describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issues/10): ', function () {
 
-    const pageSize = 5;
+    const pageSize = 10;
     const minPages = 3;
 
     // Step 1: setup the application state
@@ -14,42 +14,52 @@ describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issu
 
 
     describe('scroll', () => {
-        const url = MAP_URL + "?selected=west%20yorkshire&zoom=5&max_time=1629131100000&min_time=1628784000000&active_number=exceedance&active_polygon=county";
+        const url = MAP_URL + "?selected=greater%20london&zoom=5&max_time=1629131100000&min_time=1628784000000&active_number=exceedance&active_polygon=county";
 
         it.only('row changes', () => {
             cy.visitAndWait(url);
-            cy.twitterPanelHeader("West Yorkshire");
-            cy.tweetCountTotal(303);
-            cy.unhideTweets(10);
-            cy.get(".atr-0.atr-visible", {timeout: 90000})
-            cy.get(".atr-0.atr-visible .app-twitter-tweet", {timeout: 90000}).should("be.visible");
+            cy.twitterPanelHeader("Greater London");
+            cy.wait(1000);
+            cy.tweetCountTotal(1807);
+            cy.wait(1000);
+            cy.unhideTweets(40);
+            cy.get(".app-tweet-list-visible .atr-0.atr-visible", {timeout: 90000})
+            cy.get(".app-tweet-list-visible .atr-0.atr-visible .app-twitter-tweet", {timeout: 90000}).should(
+                "be.visible");
 
             cy.log(
                 `There should be ${minPages} pages of ${pageSize} tweets loaded at any time. The first page should contain ${pageSize} tweets and the ${minPages + 1} page should contain no tweets.`);
 
+            cy.wait(5000);
             cy.get("twitter-panel").find('.app-tweet-paged .app-tweet-row-active').its('length').should('eq',
                                                                                                         minPages * pageSize);
-            cy.get(".app-tweet-page-0").find('.app-tweet-row-active').its('length').should('eq', pageSize);
-            cy.get(`.app-tweet-page-${minPages} .app-tweet-row-active`).should("not.exist");
+            cy.get(".app-tweet-list-visible .app-tweet-page-0").its('length').should('eq', 1);
+            cy.get(".app-tweet-list-visible .app-tweet-page-0").find('.app-tweet-row-active').its('length').should('eq',
+                                                                                                                   pageSize);
+            cy.get(`.app-tweet-list-visible .app-tweet-page-${minPages} .app-tweet-row-active`).should("not.exist");
 
             cy.log("Now we scroll to the bottom.");
 
             cy.get('.app-tweet-list').scrollTo('bottom');
-            cy.wait(10000);
+            cy.wait(5000);
             cy.get('.app-tweet-list').scrollTo('bottom');
-            cy.wait(10000);
+            cy.wait(5000);
 
             cy.log(
                 `There should be ${minPages} pages of ${pageSize} tweets loaded at any time. The first page should not have any visible tweets and the ${minPages + 1} page should contain ${pageSize} tweets.`);
 
-            cy.get("twitter-panel").find('.app-tweet-paged .app-tweet-row-active').its('length').should('be.gt',
-                                                                                                        minPages * pageSize);
-            cy.get(".app-tweet-page-0 .app-tweet-row-active").should("not.be.visible");
-            cy.get(`.app-tweet-page-${minPages}`).find('.app-tweet-row-active').its('length').should('eq', pageSize);
-            cy.get(".atr-0", {timeout: 20000}).should("not.be.visible");
+            cy.get("twitter-panel").find('.app-tweet-list-visible  .app-tweet-paged .app-tweet-row-active').its('length').should(
+                'be.gte',
+                minPages * pageSize);
+            cy.get(".app-tweet-list-visible  .app-tweet-page-0").should("not.exist");
+            cy.get(".app-tweet-list-visible  .atr-0", {timeout: 20000}).should("not.exist");
+            cy.get(`.app-tweet-list-visible  .app-tweet-page-${minPages}`, {timeout: 30000}).find(
+                '.app-tweet-row-active').its('length').should('eq', pageSize);
 
             cy.log("Now we scroll back to the top.");
 
+            cy.get('.app-tweet-list').scrollTo('top');
+            cy.wait(5000);
             cy.get('.app-tweet-list').scrollTo('top');
             cy.wait(5000);
             cy.get('.app-tweet-list').scrollTo('top');
@@ -60,7 +70,7 @@ describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issu
             cy.get("twitter-panel").find('.app-tweet-paged .app-tweet-row-active').its('length').should('eq',
                                                                                                         minPages * pageSize);
             cy.get(".app-tweet-page-0").find('.app-tweet-row-active').its('length').should('eq', pageSize);
-            cy.get(`.app-tweet-page-${minPages} .app-tweet-row-active`).should("not.exist");
+            cy.get(`.app-tweet-page-${minPages}`).should("not.exist");
 
             cy.log("And the first tweet should be visible and loaded.")
 

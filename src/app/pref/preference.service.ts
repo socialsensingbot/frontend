@@ -14,6 +14,16 @@ const log = new Logger("pref-service");
                 providedIn: "root"
             })
 export class PreferenceService {
+    public get twitterUserBlackList(): string[] {
+        this.waitUntilReady();
+        return this._twitterUserBlackList;
+    }
+
+    public get tweetBlackList(): string[] {
+        this.waitUntilReady();
+        return this._tweetBlackList;
+    }
+
     public tweetIgnored = new EventEmitter<GroupTweetIgnore>();
     public twitterUserIgnored = new EventEmitter<GroupTwitterUserIgnore>();
     public tweetUnignored = new EventEmitter<GroupTweetIgnore>();
@@ -463,5 +473,15 @@ export class PreferenceService {
                     this.combined.layers));
         }
         return defaultLayer;
+    }
+
+    public async getTweetBlackList(): Promise<string[]> {
+        await this.waitUntilReady();
+        return this._tweetBlackList;
+    }
+
+    public async getTwitterUserBlackList(): Promise<string[]> {
+        await this.waitUntilReady();
+        return this._twitterUserBlackList;
     }
 }

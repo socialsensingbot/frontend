@@ -95,27 +95,26 @@
             <!--      <button (click)="pref.markIrrelevant(tweet) && removeTweet(tweet,$event)" mat-menu-item>Mark Irrelevant</button>-->
 
         </mat-menu>
-        <div [ngClass]="tweet.json.possibly_sensitive  ? 'sensitive': 'non-sensitive'"
+        <div [ngClass]="tweet.possibly_sensitive  ? 'sensitive': 'non-sensitive'"
              [style]="styleFor('impact',tweet)"
              class="app-tweet-item app-tweet-row-active">
             <div class="app-tweet-item-text">
                 <div class="app-twitter-tweet">
-                    <img [src]="tweet.json.user.profile_image_url" class="app-twitter-profile-image"
+                    <img [src]="tweet.profile_image_url" class="app-twitter-profile-image"
                          onerror="this.style.opacity = 0">
-                    <div class="app-twitter-user-name">{{tweet.json.user.name}}
-                        <span *ngIf="tweet.json.user.verified"
+                    <div class="app-twitter-user-name">{{tweet.username}}
+                        <span *ngIf="tweet.verified"
                               class="app-twitter-verified"><svg aria-label="Verified account" viewBox="0 0 24 24"><g
                                 style=""><path
                                 d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"></path></g></svg></span>
                     </div>
-                    <div class="app-twitter-screen-name">@{{tweet.json.user.screen_name}}</div>
+                    <div class="app-twitter-screen-name">@{{tweet.screen_name}}</div>
                     <div [innerHTML]="tweetHtml(tweet)|safeHtml" class="app-twitter-text">
                     </div>
                     <!--                    <div [innerHTML]="tweet.text | safeHtml" class="app-twitter-text"></div>-->
                     <div class="app-pd-twitter-date">{{tweet.date | date:"shortTime"}}
                         - {{tweet.date | date:"mediumDate"}}</div>
-                    <!--                    {{tweet.json.extended_tweet.entities.media|json}}-->
-                    <div *ngIf="!tweet.json.possibly_sensitive">
+                    <div *ngIf="!tweet.possibly_sensitive">
                         <div *ngFor="let media of mediaEntities(tweet)">
                             <!--                            {{media|json}}-->
                             <ng-container *ngIf="media?.additional_media_info?.embeddable === false">
@@ -146,13 +145,14 @@
                                 </div>
                             </ng-container>
                         </div>
+                        <!--                        {{tweet|json}}-->
                     </div>
                     <div class="app-twitter-line"></div>
                     <div class="app-twitter-stats">
                         <span *ngIf="pref.combined.showTwitterLikes" class="app-twitter-likes"><mat-icon>favorite_border</mat-icon>
-                            {{tweet.json.favorite_count > 0 ? tweet.json.favorite_count : " "}}</span>
+                            {{tweet.favorite_count > 0 ? tweet.favorite_count : " "}}</span>
                         <span *ngIf="pref.combined.showTwitterRTs" class="app-twitter-rt"><mat-icon>cached</mat-icon>
-                            {{tweet.json.retweet_count > 0 ? tweet.json.retweet_count : " "}}</span>
+                            {{tweet.retweet_count > 0 ? tweet.retweet_count : " "}}</span>
                         <span class="app-twitter-open"><a [href]="tweet.url" aria-label="View on Twitter"
                                                           rel="noopener noreferrer" role="link" target="_blank"><mat-icon>open_in_new</mat-icon>
                             Open in Twitter</a></span>
@@ -178,18 +178,18 @@
     </ng-template>
 
 
-    <div class="app-tweet-paged app-tweet-page-{{p}}" *ngFor="let page of pages; let p= index">
+    <div *ngFor="let page of pages; let p= index" class="app-tweet-paged app-tweet-page-{{page.page}}">
         <ng-container *ngIf="page">
             <div class="app-tweet-scroll-
       -outer" *ngIf="p == 0 && p < minPage">
                 <!--        <mat-spinner diameter="24" class="app-tweet-load-spinner"></mat-spinner>-->
             </div>
             <ng-container *ngFor="let tweet of page.tweets; let i = index">
-                <div [attr.data-index]="i+ page.start" [id]="'app-twitter-id-'+tweet.id"
+                <div [attr.data-index]="i+page.page*PAGE_SIZE" [attr.data-page]="page.page"
                      [attr.data-i]="i"
-                     [attr.data-page]="p"
+                     [id]="'app-twitter-id-'+tweet.id"
                      [attr.data-tweet-id]="tweet.id"
-                     class="app-tweet-row atr-{{group}} atr-{{i+ page.start}} app-twitter-id-{{tweet.id}}"
+                     class="app-tweet-row atr-{{group}} atr-{{i+ page.page*PAGE_SIZE}} app-twitter-id-{{tweet.id}}"
                 >
                     <!--          <div class="app-tweet-date-separator"-->
                     <!--               *ngIf="isNewDate(i + page.start)">{{tweet.date | date:"mediumDate"}}</div>-->

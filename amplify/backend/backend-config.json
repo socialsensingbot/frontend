@@ -33,7 +33,23 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda",
-      "dependsOn": []
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "jsonstorage",
+          "attributes": [
+            "BucketName"
+          ]
+        },
+        {
+          "category": "custom",
+          "resourceName": "querySQS",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        }
+      ]
     },
     "twitterCompliance": {
       "build": true,
@@ -45,7 +61,29 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda",
-      "dependsOn": []
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "jsonstorage",
+          "attributes": [
+            "BucketName"
+          ]
+        }
+      ]
+    },
+    "sqsquery": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "jsonstorage",
+          "attributes": [
+            "BucketName"
+          ]
+        }
+      ]
     }
   },
   "storage": {
@@ -103,6 +141,12 @@
           ]
         }
       ]
+    },
+    "apiresultsandcache": {
+      "service": "DynamoDB",
+      "serviceType": "imported",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": []
     }
   },
   "hosting": {
@@ -158,6 +202,13 @@
           ]
         }
       ]
+    }
+  },
+  "custom": {
+    "querySQS": {
+      "service": "customCloudformation",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": []
     }
   }
 }

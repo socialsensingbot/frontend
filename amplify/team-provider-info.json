@@ -25,7 +25,7 @@
         },
         "query": {
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
-          "s3Key": "amplify-builds/query-72674971693649756173-build.zip",
+          "s3Key": "amplify-builds/query-4d445330314d4d543237-build.zip",
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
         },
         "twitterCompliance": {
@@ -36,13 +36,28 @@
         "api": {
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix",
           "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
-          "s3Key": "amplify-builds/api-4c6d546e3167306e7756-build.zip"
+          "s3Key": "amplify-builds/api-55737154575676724231-build.zip"
+        },
+        "sqsquery": {
+          "deploymentBucketName": "amplify-socialsensing-dev-183906-deployment",
+          "s3Key": "amplify-builds/sqsquery-424d57794a3061646567-build.zip",
+          "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
         }
       },
       "hosting": {
         "amplifyhosting": {
           "appId": "dtmxl3q3i7oix",
           "type": "cicd"
+        }
+      },
+      "storage": {
+        "apiresultsandcache": {
+          "tableName": "api-results-and-cache",
+          "region": "eu-west-2",
+          "arn": "arn:aws:dynamodb:eu-west-2:686957444051:table/api-results-and-cache",
+          "streamArn": "arn:aws:dynamodb:eu-west-2:686957444051:table/api-results-and-cache/stream/2022-09-02T13:55:37.153",
+          "partitionKeyName": "key",
+          "partitionKeyType": "S"
         }
       }
     }

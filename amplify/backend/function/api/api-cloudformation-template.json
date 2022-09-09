@@ -22,6 +22,10 @@
     "functionsocialsensingapilayerArn": {
       "Type": "String",
       "Default": "functionsocialsensingapilayerArn"
+    },
+    "storagejsonstorageBucketName": {
+      "Type": "String",
+      "Default": "storagejsonstorageBucketName"
     }
   },
   "Conditions": {
@@ -120,6 +124,9 @@
                   "DB_PASSWORD"
                 ]
               ]
+            },
+            "STORAGE_JSONSTORAGE_BUCKETNAME": {
+              "Ref": "storagejsonstorageBucketName"
             }
           }
         },
@@ -272,6 +279,64 @@
       "DependsOn": [
         "LambdaExecutionRole"
       ]
+    },
+    "AmplifyResourcesPolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "s3:ListBucket",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "storagejsonstorageBucketName"
+                      }
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "storagejsonstorageBucketName"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
     }
   },
   "Outputs": {

@@ -14,6 +14,7 @@
     "lint": "ng lint",
     "amplify-modelgen": "node amplify/scripts/amplify-modelgen.js",
     "amplify:query": "cd amplify/backend/function/query && ./build.sh",
+    "amplify:sqsquery": "cd amplify/backend/function/sqsquery && ./build.sh",
     "amplify:api": "cd amplify/backend/function/api && ./build.sh",
     "amplify-push": "node amplify/scripts/amplify-push.js"
   },

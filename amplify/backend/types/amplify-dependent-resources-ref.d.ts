@@ -44,6 +44,13 @@ export type AmplifyDependentResourcesAttributes = {
             "Arn": "string",
             "Region": "string",
             "LambdaExecutionRole": "string"
+        },
+        "sqsquery": {
+            "Name": "string",
+            "Arn": "string",
+            "Region": "string",
+            "LambdaExecutionRole": "string",
+            "lambdaexecutionpolicy": "string"
         }
     },
     "storage": {
@@ -66,6 +73,13 @@ export type AmplifyDependentResourcesAttributes = {
             "RootUrl": "string",
             "ApiName": "string",
             "ApiId": "string"
+        }
+    },
+    "custom": {
+        "querySQS": {
+            "Name": "string",
+            "Arn": "string",
+            "Region": "string"
         }
     }
 }

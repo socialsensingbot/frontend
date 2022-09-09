@@ -140,30 +140,12 @@ Cypress.Commands.add("tweetCountTotal", (sum) => {
     cy.get(".app-tweet-visible-tweets-tab-label", {timeout: 30000}).then(header => {
         const headerParts = header.text().trim().split(" ");
         const visibleCount = +headerParts[0];
-        cy.get(".app-tweet-hidden-tweets-tab-label", {timeout: 30000})
-            .then(title => {
-                      const hiddenCount = +title.text().trimLeft().split(" ")[0];
-                      expect(hiddenCount + visibleCount).equals(sum);
-                  }
-            );
+        expect(visibleCount).equals(sum);
 
-    })
+
+    });
 });
 
-Cypress.Commands.add("withTweetCounts", (callback) => {
-    cy.wait(4000);
-    cy.get(".app-tweet-visible-tweets-tab-label").then(header => {
-        const headerParts = header.text().trim().split(" ");
-        const visibleCount = +headerParts[0];
-        cy.get(".app-tweet-hidden-tweets-tab-label", {timeout: 30000})
-            .then(title => {
-                      const hiddenCount = +title.text().trimLeft().split(" ")[0];
-                      callback(visibleCount, hiddenCount);
-                  }
-            );
-
-    })
-});
 
 
 Cypress.Commands.add("tweetCount", (vis, hid) => {
@@ -203,9 +185,9 @@ Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
 Cypress.Commands.add("unignoreTweet", (tweetSelector) => {
     cy.wait(1000);
     cy.get(tweetSelector + " .app-tweet-item-menu", {timeout: 10000});
-    cy.get(tweetSelector + " .app-tweet-item-menu").click();
+    cy.get(tweetSelector + " .app-tweet-item-menu mat-icon").should("be.visible").click();
     cy.wait(3000);
-    cy.get(markAsMenu, {timeout: LONG_TIMEOUT}).click();
+    cy.get(markAsMenu, {timeout: LONG_TIMEOUT}).should("be.visible").click();
     cy.wait(1000);
     cy.get(markAsUnignoredMenu).click();
 
@@ -221,7 +203,8 @@ Cypress.Commands.add("unhideTweets", (num) => {
             if (drawer.find(tweetHidden).length === 0) {
                 cy.log("Skipping non existent tweet");
             } else {
-                cy.get(tweetHidden).scrollIntoView().should('be.visible');
+                cy.get(tweetHidden).should('be.visible');
+                cy.wait(500);
                 cy.unignoreTweet(tweetHidden);
                 cy.wait(500);
             }

@@ -496,17 +496,17 @@ export class PublicDisplayComponent implements OnInit {
         const sensitivePenalty: number = i.potentiallySensitive ? 1024 : 1;
         const greyListPenalty = i.greylisted ? 1024 : 1;
         // Filter out more spammy users
-        const ratio: number = i.json.user.followers_count / (i.json.user.friends_count || 1);
+        const ratio: number = i.followers_count / (i.friends_count || 1);
         // This penalises spammy users
         const followerRatioPenalty = ratio <= 1 ? 32 : 1;
         // This penalises broadcast (news like) accounts.
-        const followerPenalty = i.json.user.followers_count > 256 ? 4 : 1;
+        const followerPenalty = i.followers_count > 256 ? 4 : 1;
         // This heavily penalises non-interactive accounts (following too many people)
-        const friendsPenalty = i.json.user.friends_count > 1000 ? 128 : 1;
-        const mentionsPenalty = (i.json.entities?.user_mentions?.length > 2) ? 2 : 1;
-        const hashtagsPenalty = (i.json.entities?.hashtags?.length > 2) ? 16 : 1;
-        const urlPenalty = (i.json.entities?.urls?.length > 0 && i.mediaCount === 0) ? 64 : 1;
-        const verifiedPenalty = i.json.user.verified ? 4 : 1;
+        const friendsPenalty = i.friends_count > 1000 ? 128 : 1;
+        const mentionsPenalty = (i.mention_count > 2) ? 2 : 1;
+        const hashtagsPenalty = (i.hashtag_count > 2) ? 16 : 1;
+        const urlPenalty = (i.url_count > 0 && i.mediaCount === 0) ? 64 : 1;
+        const verifiedPenalty = i.verified ? 4 : 1;
         const lengthPenalty = i.tokens.length < 20 ? 2 : 1;
         return this._statsMap && this._statsMap[i.region] ? (this._statsMap[i.region].exceedance / mediaBonus)
             * sensitivePenalty * greyListPenalty * followerRatioPenalty * mentionsPenalty
@@ -601,7 +601,7 @@ export class PublicDisplayComponent implements OnInit {
         }
         // filter out more spammy users
         if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
-            tweets = tweets.filter(i => i.json.user.followers_count / (i.json.user.friends_count || 1) > 1);
+            tweets = tweets.filter(i => i.followers_count / (i.friends_count || 1) > 1);
         }
         // filter out all tweets without a photo
         if (tweets.length > this.pref.combined.publicDisplayMaxTweets && tweets.filter(
@@ -610,20 +610,20 @@ export class PublicDisplayComponent implements OnInit {
         }
         // filter out tweets with urls but don't contain images (usually promotional tweets)
         if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
-            tweets = tweets.filter(i => !(i.mediaCount === 0 && i.json.entities?.urls?.length > 0));
+            tweets = tweets.filter(i => !(i.mediaCount === 0 && i.url_count > 0));
         }
         // filter out tweets with oo many mentions (3+) usually promotional/activism tweets
         if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
-            tweets = tweets.filter(i => !(i.json.entities?.user_mentions?.length > 2));
+            tweets = tweets.filter(i => !(i.mention_count > 2));
         }
         // filter out tweets with too many hashtags (3+) usually promotional/activism tweets
         if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
-            tweets = tweets.filter(i => !(i.json.entities?.hashtags?.length > 2));
+            tweets = tweets.filter(i => !(i.hashtag_count > 2));
         }
         // filter out tweets from verified users, usually news/broadcast tweets
         // they rarely contain direct eyewitness reporting
         if (tweets.length > this.pref.combined.publicDisplayMaxTweets) {
-            tweets = tweets.filter(i => !i.json.user.verified);
+            tweets = tweets.filter(i => !i.verified);
         }
         // sort tweets so that when we slice them we slice off the least relevant
         tweets.sort((i, j) => {

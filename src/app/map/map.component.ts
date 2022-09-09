@@ -14,7 +14,7 @@ import {AuthService} from "../auth/auth.service";
 import {HttpClient} from "@angular/common/http";
 import {AppState, UIExecutionService} from "../services/uiexecution.service";
 import {ColorCodeService} from "./services/color-code.service";
-import {Tweet} from "./twitter/tweet";
+import {TweetCriteria} from "./twitter/tweet";
 import {getOS, roundToHour, roundToMinute} from "../common";
 import {RegionSelection} from "./region-selection";
 import {PreferenceService} from "../pref/preference.service";
@@ -59,7 +59,7 @@ export class MapComponent implements OnInit, OnDestroy {
     @ViewChild("chart") newTimeslider: ElementRef;
 
     // The UI state fields
-    public tweets: Tweet[] = null;
+    public tweetCriteria: TweetCriteria = null;
     public tweetsVisible = false;
     public twitterPanelHeader: boolean;
     public activity = false;
@@ -527,6 +527,7 @@ export class MapComponent implements OnInit, OnDestroy {
     //     // this.data.downloadAggregate(aggregrationSetId, id,
     public countries: any[];
     public isDev: boolean = !environment.production;
+    public tweetCount: number = 666;
 
     public set activeLayerGroup(value: string) {
         log.debug("set activeLayerGroup");
@@ -1030,10 +1031,12 @@ export class MapComponent implements OnInit, OnDestroy {
                 log.debug(`this.activePolyLayerShortName=${this.activeRegionType}`);
                 this.showTwitterTimeline = clear ? false : true;
                 try {
-                    this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType, this.selection.regionNames(),
-                                                         this._dateMin,
-                                                         this._dateMax, 300, 100, interrupted);
-                    log.debug(this.tweets);
+                    this.tweetCriteria = {
+                        layerGroup: this.activeLayerGroup, regionType: this.activeRegionType, regionNames: this.selection.regionNames(),
+                        min:        this._dateMin,
+                        max:        this._dateMax
+                    };
+                    log.debug(this.tweetCriteria);
                 } finally {
                     this.twitterPanelHeader = true;
                     this.showTwitterTimeline = true;
@@ -1043,18 +1046,21 @@ export class MapComponent implements OnInit, OnDestroy {
                 log.debug(`Count == ${feature.properties.count}`);
                 this.twitterPanelHeader = true;
                 this.showTwitterTimeline = true;
-                this.tweets = [];
+                this.tweetCriteria = null;
             }
         } else if (features.length === 0) {
             log.debug("0 features");
             this.showTwitterTimeline = false;
-            this.tweets = [];
+            this.tweetCriteria = null;
             this.hideTweets();
         } else {
             log.debug(features.length + " features");
-            this.tweets = await this.data.tweets(this.activeLayerGroup, this.activeRegionType, this.selection.regionNames(), this._dateMin,
-                                                 this._dateMax, 300, 100, interrupted);
-            log.debug(this.tweets);
+            this.tweetCriteria = {
+                layerGroup: this.activeLayerGroup, regionType: this.activeRegionType, regionNames: this.selection.regionNames(),
+                min:        this._dateMin,
+                max:        this._dateMax
+            };
+            log.debug(this.tweetCriteria);
             this.twitterPanelHeader = true;
             this.showTwitterTimeline = true;
         }

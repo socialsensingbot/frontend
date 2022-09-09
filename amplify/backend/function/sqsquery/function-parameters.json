@@ -1,0 +1,16 @@
+{
+  "lambdaLayers": [],
+  "permissions": {
+    "storage": {
+      "jsonstorage": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    }
+  },
+  "secretNames": [
+    "DB_PASSWORD"
+  ]
+}

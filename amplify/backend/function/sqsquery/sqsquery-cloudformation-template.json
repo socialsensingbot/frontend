@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"7.6.22\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"9.2.1\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",
@@ -16,17 +16,6 @@
     "s3Key": {
       "Type": "String"
     },
-    "secretsPathAmplifyAppId": {
-      "Type": "String"
-    },
-    "functionsocialsensingapilayerArn": {
-      "Type": "String",
-      "Default": "functionsocialsensingapilayerArn"
-    },
-    "storagejsonstorageBucketName": {
-      "Type": "String",
-      "Default": "storagejsonstorageBucketName"
-    },
     "customquerySQSName": {
       "Type": "String",
       "Default": "customquerySQSName"
@@ -34,6 +23,13 @@
     "customquerySQSArn": {
       "Type": "String",
       "Default": "customquerySQSArn"
+    },
+    "storagejsonstorageBucketName": {
+      "Type": "String",
+      "Default": "storagejsonstorageBucketName"
+    },
+    "secretsPathAmplifyAppId": {
+      "Type": "String"
     }
   },
   "Conditions": {
@@ -66,12 +62,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "query",
+            "sqsquery",
             {
               "Fn::Join": [
                 "",
                 [
-                  "query",
+                  "sqsquery",
                   "-",
                   {
                     "Ref": "env"
@@ -89,27 +85,11 @@
             "REGION": {
               "Ref": "AWS::Region"
             },
-            "TWITTER_BEARER_TOKEN": {
-              "Fn::Join": [
-                "",
-                [
-                  {
-                    "Fn::Sub": [
-                      "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
-                      {
-                        "appId": {
-                          "Ref": "secretsPathAmplifyAppId"
-                        },
-                        "env": {
-                          "Ref": "env"
-                        },
-                        "functionName": "query"
-                      }
-                    ]
-                  },
-                  "TWITTER_BEARER_TOKEN"
-                ]
-              ]
+            "QUERY_QUEUE": {
+              "Ref": "customquerySQSName"
+            },
+            "STORAGE_JSONSTORAGE_BUCKETNAME": {
+              "Ref": "storagejsonstorageBucketName"
             },
             "DB_PASSWORD": {
               "Fn::Join": [
@@ -125,19 +105,13 @@
                         "env": {
                           "Ref": "env"
                         },
-                        "functionName": "query"
+                        "functionName": "sqsquery"
                       }
                     ]
                   },
                   "DB_PASSWORD"
                 ]
               ]
-            },
-            "STORAGE_JSONSTORAGE_BUCKETNAME": {
-              "Ref": "storagejsonstorageBucketName"
-            },
-            "QUERY_QUEUE": {
-              "Ref": "customquerySQSName"
             }
           }
         },
@@ -150,7 +124,7 @@
         "Runtime": "nodejs14.x",
         "MemorySize": 1024,
         "Layers": [],
-        "Timeout": "25"
+        "Timeout": 900
       }
     },
     "LambdaExecutionRole": {
@@ -159,12 +133,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "socialsensingLambdaRole8e725c47",
+            "socialsensingLambdaRole48cb3e49",
             {
               "Fn::Join": [
                 "",
                 [
-                  "socialsensingLambdaRole8e725c47",
+                  "socialsensingLambdaRole48cb3e49",
                   "-",
                   {
                     "Ref": "env"
@@ -192,6 +166,42 @@
         }
       }
     },
+    "LambdaFunctionEventSourceMapping": {
+      "DependsOn": [
+        "lambdaexecutionpolicy"
+      ],
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "EventSourceArn": {
+          "Fn::Join": [
+            ":",
+            [
+              "arn:aws:sqs",
+              {
+                "Ref": "AWS::Region"
+              },
+              {
+                "Ref": "AWS::AccountId"
+              },
+              {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "querySQS",
+                    {
+                      "Ref": "env"
+                    }
+                  ]
+                ]
+              }
+            ]
+          ]
+        },
+        "FunctionName": {
+          "Ref": "LambdaFunction"
+        }
+      }
+    },
     "lambdaexecutionpolicy": {
       "DependsOn": [
         "LambdaExecutionRole"
@@ -207,15 +217,6 @@
         "PolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "ec2:CreateNetworkInterface",
-                "ec2:DescribeNetworkInterfaces",
-                "ec2:DeleteNetworkInterface"
-              ],
-              "Resource": "*"
-            },
             {
               "Effect": "Allow",
               "Action": [
@@ -243,7 +244,8 @@
             {
               "Effect": "Allow",
               "Action": [
-                "sqs:SendMessage",
+                "sqs:ReceiveMessage",
+                "sqs:DeleteMessage",
                 "sqs:GetQueueAttributes"
               ],
               "Resource": "*"
@@ -251,63 +253,6 @@
           ]
         }
       }
-    },
-    "AmplifyFunctionSecretsPolicy": {
-      "Type": "AWS::IAM::Policy",
-      "Properties": {
-        "PolicyName": "amplify-function-secrets-policy",
-        "Roles": [
-          {
-            "Ref": "LambdaExecutionRole"
-          }
-        ],
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "ssm:GetParameter",
-                "ssm:GetParameters"
-              ],
-              "Resource": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "arn:aws:ssm:",
-                    {
-                      "Ref": "AWS::Region"
-                    },
-                    ":",
-                    {
-                      "Ref": "AWS::AccountId"
-                    },
-                    ":parameter",
-                    {
-                      "Fn::Sub": [
-                        "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
-                        {
-                          "appId": {
-                            "Ref": "secretsPathAmplifyAppId"
-                          },
-                          "env": {
-                            "Ref": "env"
-                          },
-                          "functionName": "query"
-                        }
-                      ]
-                    },
-                    "*"
-                  ]
-                ]
-              }
-            }
-          ]
-        }
-      },
-      "DependsOn": [
-        "LambdaExecutionRole"
-      ]
     },
     "AmplifyResourcesPolicy": {
       "DependsOn": [
@@ -366,6 +311,63 @@
           ]
         }
       }
+    },
+    "AmplifyFunctionSecretsPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-function-secrets-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "ssm:GetParameter",
+                "ssm:GetParameters"
+              ],
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:ssm:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":parameter",
+                    {
+                      "Fn::Sub": [
+                        "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
+                        {
+                          "appId": {
+                            "Ref": "secretsPathAmplifyAppId"
+                          },
+                          "env": {
+                            "Ref": "env"
+                          },
+                          "functionName": "sqsquery"
+                        }
+                      ]
+                    },
+                    "*"
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ]
     }
   },
   "Outputs": {
@@ -390,6 +392,11 @@
     "LambdaExecutionRole": {
       "Value": {
         "Ref": "LambdaExecutionRole"
+      }
+    },
+    "lambdaexecutionpolicy": {
+      "Value": {
+        "Ref": "lambdaexecutionpolicy"
       }
     }
   }
