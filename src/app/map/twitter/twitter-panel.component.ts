@@ -7,6 +7,7 @@ import {ExportToCsv} from "export-to-csv";
 import {RegionSelection} from "../region-selection";
 import {AnnotationService} from "../../pref/annotation.service";
 import {TwitterExporterService} from "./twitter-exporter.service";
+import {RESTMapDataService} from "../data/rest-map-data.service";
 
 const log = new Logger("twitter-panel");
 
@@ -60,7 +61,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     constructor(private _zone: NgZone, public pref: PreferenceService, private _annotation: AnnotationService,
-                private _exporter: TwitterExporterService) {
+                private _exporter: TwitterExporterService, private data: RESTMapDataService) {
 
 
     }
@@ -102,7 +103,8 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
         }
     }
 
-    public ngOnInit(): void {
+    public async ngOnInit(): Promise<void> {
+        // await this.pref.waitUntilReady();
         this.tweetIgnoreSub = this.pref.tweetIgnored.subscribe((sub) => {
             this.update(null);
         });
@@ -120,8 +122,16 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     public async download() {
-        // await this._exporter.exportToCSV(this.visibleTweets.filter(i => i.valid), this.selection.all(), this.annotationTypes,
-        // this.layer);
+        let tweetRequest: Promise<Tweet[]>;
+        // @ts-ignore
+        tweetRequest = this.data.tweets(this._tweetCriteria.layerGroup, this._tweetCriteria.regionType, this._tweetCriteria.regionNames,
+                                        this._tweetCriteria.min,
+                                        this._tweetCriteria.max, 0, 100000, "exclude",
+                                        await this.pref.getTweetBlackList(),
+                                        await this.pref.getTwitterUserBlackList());
+        const tweets = (await tweetRequest).filter(async value => !this.pref.isTweetIgnored(value) && value.valid);
+        await this._exporter.exportToCSV(tweets, this.selection.all(), this.annotationTypes,
+                                         this.layer);
     }
 
     private updateTweets(val: Tweet[]) {

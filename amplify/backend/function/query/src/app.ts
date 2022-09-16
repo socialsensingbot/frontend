@@ -1,9 +1,9 @@
 /* tslint:disable:no-console */
 import * as express from "express";
 import * as bodyParser from "body-parser";
-import {functionLookup, MapFunctionName, MapFunctionRequest, callFunction} from "socialsensing-api/map-queries";
+import {callFunction} from "socialsensing-api/map-queries";
 
-// bump 88
+// bump 90
 const awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
 
 // declare a new express app

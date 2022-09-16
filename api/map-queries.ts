@@ -2,6 +2,7 @@
 import {AggregationMap, MapMetadata, ONE_DAY, RegionGeography, ServiceMetadata} from "./map-data.js";
 import {readFromPersistentCache, SSDatabase} from "./db.js";
 import {dateFromMillis, handleError, invalidParameter, stage} from "./util.js";
+import {Request, Response} from "express-serve-static-core";
 
 const db = new SSDatabase(stage);
 
@@ -377,7 +378,18 @@ export const textFunc: MapFunction = async (req, res) => {
                                                                             t.source_json -> "$.extended_tweet.entities",
                                                                             t.source_json ->
                                                                             "$.entities")                                         as entities,
-
+                                                                        CASE
+                                                                            WHEN r.region_relation = 0 THEN 'Default'
+                                                                            WHEN r.region_relation = 1 THEN 'Set by location inference'
+                                                                            WHEN r.region_relation = 2
+                                                                                THEN 'Tweet location intersects the region'
+                                                                            WHEN r.region_relation = 3
+                                                                                THEN 'Region contains the tweet location'
+                                                                            WHEN r.region_relation = 4
+                                                                                THEN 'Tweet location contains the region'
+                                                                            ELSE 'ERROR'
+                                                                            END
+                                                                                                                                  as region_allocation,
                                                                         r.source_timestamp                                        as timestamp,
                                                                         r.source_id                                               as id,
                                                                         t.possibly_sensitive                                      as possibly_sensitive
@@ -516,7 +528,7 @@ export const csvExportFunc: MapFunction = async (req, res) => {
                                                                               THEN 'Tweet location contains the region'
                                                                           ELSE 'ERROR'
                                                                           END
-                                                                                                                                as location,
+                                                                                                                                as region_allocation,
                                                                       rmram.region_aggregation_id                               as agg_region,
                                                                       t.possibly_sensitive                                      as possibly_sensitive,
                                                                       r.region                                                  as region,
@@ -537,7 +549,7 @@ export const csvExportFunc: MapFunction = async (req, res) => {
                                                                order by r.source_timestamp desc
                                                                LIMIT ?,?`,
                                  values: [new Date(req.body.startDate), new Date(endDate),
-                                          req.body.byRegion,
+                                          req.params.regionType || req.body.byRegion,
                                           req.body.hazards,
                                           req.body.sources,
                                           req.body.regions,
@@ -1340,11 +1352,16 @@ export const timeseriesFunc: MapFunction = async (req, res) => {
             return;
         }
 
-        if (req.body.timePeriod === "hour" && (to.getTime() - from.getTime()) / ONE_DAY > 32) {
+        if (req.body.timePeriod === "hour" && (to.getTime() - from.getTime()) / ONE_DAY > 367) {
             invalidParameter(res, "startDate/endDate",
-                             `The gap between the start date ${from} and the end date ${to} exceeds the maximum of 32 days, for by hour analytics. Please break down the request into smaller chunks.`);
+                             `The gap between the start date ${from} and the end date ${to} exceeds the maximum of 367 days, for by day analytics. Please break down the request into smaller chunks.`);
             return;
         }
+
+        // if (req.body.timePeriod === "hour" && (to.getTime() - from.getTime()) / ONE_DAY > 32) {
+        //     invalidParameter(res, "startDate/endDate",
+        //                      `The gap between the start date ${from} and the end date ${to} exceeds the maximum of 32 days, for by hour
+        // analytics. Please break down the request into smaller chunks.`); return; }
 
         await db.cache(res, req.proxied, "timeseries", req.params, req.key, async () => {
             let fullText = "";
@@ -1502,8 +1519,6 @@ AWS.config.update({region: "eu-west-2"});
 
 // Create an SQS service object
 const sqs = new AWS.SQS({apiVersion: "2012-11-05"});
-
-import {Request, Response} from "express-serve-static-core";
 
 export const functionLookup: (name: MapFunctionName) => MapFunction = (name) => {
     return functionLookupTable[name];

@@ -221,6 +221,7 @@ export class RESTDataAPIService {
                                   interrupted: () => boolean): Promise<Promise<any>> {
         this.calls++;
         payload.async_response = true;
+        payload.client_version = environment.name + "-" + environment.version;
         // if (this.callsPerMinute > environment.maxCallsPerMinute) {
         //     console.error("Excessive api calls per minute: " + this.callsPerMinute);
         //     console.error("API call was path: " + fullPath + " payload: " + JSON.stringify(payload));

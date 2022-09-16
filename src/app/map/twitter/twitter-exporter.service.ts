@@ -6,7 +6,6 @@ import {AnnotationService} from "../../pref/annotation.service";
 import {PreferenceService} from "../../pref/preference.service";
 import {Region} from "../region-selection";
 import {Logger} from "@aws-amplify/core";
-import {PolygonData} from "../types";
 import {RESTMapDataService} from "../data/rest-map-data.service";
 import * as geojson from "geojson";
 import {NotificationService} from "../../services/notification.service";
@@ -23,7 +22,7 @@ export class TwitterExporterService {
     }
 
 
-    public async download(layerGroupId: string, polygonDatum: PolygonData, regionType: string, startDate: number,
+    public async download(layerGroupId: string, regionType: string, startDate: number,
                           endDate: number, annotationTypes: any[], layer: string): Promise<void> {
         const options = {
             fieldSeparator:   ",",
@@ -63,13 +62,9 @@ export class TwitterExporterService {
     }
 
     public async downloadAggregate(layerGroupId: string, aggregrationSetId: string, selectedAggregates: string[],
-                                   polygonDatum: PolygonData, startDate: number, endDate: number, byRegion: string,
+                                   startDate: number, endDate: number, byRegion: string,
                                    annotationTypes: any[], layer: string) {
-        log.debug(
-            "downloadAggregate(aggregrationSetId=" + aggregrationSetId +
-            ", selectedAggregates=" + selectedAggregates +
-            ", polygonDatum=" + polygonDatum +
-            ", startDate=" + startDate + ", endDate=" + endDate + ")");
+
         const options = {
             fieldSeparator:   ",",
             quoteStrings:     "\"",
@@ -150,12 +145,12 @@ export class TwitterExporterService {
                 if (this._pref.combined.sanitizeForGDPR) {
                     return this.createCSVExportTweet(includeSource, region, impact, source, i.id, i.date.toUTCString(),
                                                      "https://twitter.com/username_removed/status/" + i.id,
-                                                     this.sanitizeForGDPR($("<div>").html(i.text).text()), JSON.stringify(i.location));
+                                                     this.sanitizeForGDPR($("<div>").html(i.text).text()), i.location);
 
                 } else {
                     return this.createCSVExportTweet(includeSource, region, impact, source, i.id, i.date.toUTCString(),
                                                      "https://twitter.com/username_removed/status/" + i.id, $("<div>").html(i.text).text(),
-                                                     JSON.stringify(i.location));
+                                                     i.location);
                 }
             });
 
@@ -229,11 +224,11 @@ export class TwitterExporterService {
         if (sanitize) {
             return this.createCSVExportTweet(includeSource, regionMap[tweet.region], impact, source, tweet.id, tweet.date.toUTCString(),
                                              "https://twitter.com/username_removed/status/" + tweet.id,
-                                             this.sanitizeForGDPR($("<div>").html(tweet.text).text()), JSON.stringify(tweet.location));
+                                             this.sanitizeForGDPR($("<div>").html(tweet.text).text()), tweet.location);
 
         } else {
             return this.createCSVExportTweet(includeSource, regionMap[tweet.region], impact, source, tweet.id, tweet.date.toUTCString(),
-                                             tweet.url, $("<div>").html(tweet.text).text(), JSON.stringify(tweet.location));
+                                             tweet.url, $("<div>").html(tweet.text).text(), tweet.location);
         }
     }
 
@@ -242,10 +237,10 @@ export class TwitterExporterService {
                          text: string, location: string) {
         // if (this._pref.combined.tweetCSVExportFormat === "pws") {
         if (includeSource) {
-            return {region, impact, source, id, date, url, text, location};
+            return {region, impact, source, id, date, url, text};
 
         } else {
-            return {region, impact, id, date, url, text, location};
+            return {region, impact, id, date, url, text};
         }
 
     }

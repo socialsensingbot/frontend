@@ -20,7 +20,7 @@ describe('#10 Infinite Scroll (https://github.com/socialsensingbot/frontend/issu
             cy.visitAndWait(url);
             cy.twitterPanelHeader("Greater London");
             cy.wait(1000);
-            cy.tweetCountTotal(1807);
+            cy.tweetCountTotal(452);
             cy.wait(1000);
             cy.unhideTweets(40);
             cy.get(".app-tweet-list-visible .atr-0.atr-visible", {timeout: 90000})

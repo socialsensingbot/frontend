@@ -4,7 +4,7 @@
     <ng-container *ngIf="ready">
       <div class="app-tweet-heading-text">
         <ng-container *ngIf="selection.count === 1">
-          <ng-container *ngIf="tweetCount > 0">
+          <ng-container *ngIf="selection.tweetCount() > 0">
               <div class="app-tweet-heading" style="color: black">{{selection.firstRegion().title}}</div>
 
               <div *ngIf="showTimeline" class="app-tweet-sub-heading">
@@ -17,7 +17,7 @@
 
           </ng-container>
 
-            <ng-container *ngIf="tweetCount === 0 && showTimeline">
+            <ng-container *ngIf="selection.tweetCount() === 0 && showTimeline">
 
                 <div *ngIf="selection " class="app-tweet-heading"
                      style="color: black">{{selection.firstRegion().title}}<br/></div>
@@ -52,7 +52,8 @@
             <mat-tab>
                 <ng-template mat-tab-label>
                     <span *ngIf="showTimeline"
-                          class="app-tweet-visible-tweets-tab-label">{{selection.tweetCount()}} Tweets</span>
+                          class="app-tweet-visible-tweets-tab-label">{{selection.tweetCount()}}
+                        Tweet{{selection.tweetCount() === 1 ? '' : 's'}}</span>
                 </ng-template>
                 <ng-template matTabContent>
                     <app-tweet-list (update)="update($event)" *ngIf="showTimeline" [annotationTypes]="annotationTypes"

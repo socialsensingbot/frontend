@@ -565,12 +565,11 @@ export class MapComponent implements OnInit, OnDestroy {
         log.debug(this.activeRegionType);
         if (this.data.hasCountryAggregates()) {
             await this._exporter.downloadAggregate(this.activeLayerGroup, "uk-countries", this.selectedCountries,
-                                                   await this.data.geoJsonGeographyFor(this.activeRegionType, () => false) as PolygonData,
+
                                                    this._dateMin,
                                                    this._dateMax, this.activeRegionType, this.annotationTypes, this.activeLayerGroup);
         } else {
             await this._exporter.download(this.activeLayerGroup,
-                                          await this.data.geoJsonGeographyFor(this.activeRegionType, () => false) as PolygonData,
                                           this.activeRegionType,
                                           this._dateMin, this._dateMax, this.annotationTypes, this.activeLayerGroup);
         }

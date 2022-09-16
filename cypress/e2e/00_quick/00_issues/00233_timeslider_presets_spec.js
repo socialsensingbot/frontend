@@ -18,7 +18,7 @@ describe('#233 Timeslide presets: : https://github.com/socialsensingbot/frontend
             cy.get(".slider-date-time-min .slider-time").should("contain.text", "00 am");
             cy.get(".app-tweet-drawer", {timeout: 60000}).should("be.visible");
             cy.wait(2000);
-            cy.get('#mat-tab-label-1-0 > .mat-tab-label-content').should("have.text", "49 Tweets");
+            cy.get('#mat-tab-label-1-0 > .mat-tab-label-content').should("have.text", "13 Tweets");
             cy.get('.app-map-timer-preset-select').click();
             cy.get('#mat-option-4 > .mat-option-text').click();
             cy.wait(2000);
@@ -29,7 +29,7 @@ describe('#233 Timeslide presets: : https://github.com/socialsensingbot/frontend
             cy.url().should("contain",
                             "max_time=" + MAX_DATE_MILLIS + "&min_time=" + (MAX_DATE_MILLIS - 3 * 60 * 60 * 1000));
             cy.wait(20000);
-            cy.get('#mat-tab-label-1-0').should("have.text", "4 Tweets");
+            cy.get('#mat-tab-label-1-0').should("have.text", "1 Tweet");
             cy.get('.app-map-timer-preset-select').click();
             cy.get('#mat-option-1 > .mat-option-text').click();
             cy.wait(10000);
@@ -39,7 +39,7 @@ describe('#233 Timeslide presets: : https://github.com/socialsensingbot/frontend
             cy.get(".app-tweet-drawer", {timeout: 60000}).should("be.visible");
             cy.url().should("contain", "max_time=1631664000000&min_time=1631577600000");
             cy.wait(2000);
-            cy.get('#mat-tab-label-1-0').should("have.text", "49 Tweets");
+            cy.get('#mat-tab-label-1-0').should("have.text", "13 Tweets");
             cy.logout();
         });
     });

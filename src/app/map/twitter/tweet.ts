@@ -1,5 +1,4 @@
 import {environment} from "../../../environments/environment";
-import * as geojson from "geojson";
 import {blacklist, greylist} from "../../public-display/keywords";
 
 const twitterLink = require("twitter-text");
@@ -19,7 +18,6 @@ export interface CSVExportTweet {
     date: string;
     url: string;
     text: string;
-    location: string;
     source?: string;
 
 }
@@ -140,8 +138,8 @@ export class Tweet {
     }
 
 
-    public get location(): geojson.GeometryCollection {
-        return this._location as geojson.GeometryCollection;
+    public get location(): string {
+        return this._location;
     }
 
     public get region(): string {
@@ -211,7 +209,7 @@ export class Tweet {
      * @param _date the timestamp associated with the tweet.
      * @param _region the region associated with this tweet
      */
-    constructor(private _id: string = null, private _html: string = null, private _location: geojson.GeoJsonObject, private _date: Date,
+    constructor(private _id: string = null, private _html: string = null, private _location: string, private _date: Date,
                 private _region: string, private _possibly_sensitive = false, private _text: string, private _verified: boolean,
                 private _friends_count: number,
                 private _followers_count: number,
