@@ -339,7 +339,7 @@ describe("POST /v1/map/:map/stats", () => {
             .send(reqBody);
         console.log(sortedStringify(response.body));
         expect(Object.keys(response.body).length).to.equal(118);
-        expect(response.body["west yorkshire"].count).to.equal(52);
+        expect(response.body["west yorkshire"].count).to.equal(13);
         expect(response.body["west yorkshire"].exceedance).to.be.above(1);
         expect(response.body["west yorkshire"].exceedance).to.be.below(50);
     });
