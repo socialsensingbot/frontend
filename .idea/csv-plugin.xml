@@ -3,55 +3,6 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="/cypress/downloads/west_yorkshire-flood-tweet-export-2022_09_12@05.39.24.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/west_yorkshire-flood-tweet-export-2022_09_12@05.39.54.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/west_yorkshire-flood-tweet-export-2022_09_12@05.41.11.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/west_yorkshire-flood-tweet-export-2022_09_12@05.42.21.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/west_yorkshire-flood-tweet-export-2022_09_12@05.46.09.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/west_yorkshire-flood-tweet-export-2022_09_12@05.47.11.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/cypress/downloads/west_yorkshire-flood-tweet-export-2022_09_12@05.51.59.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
         <entry key="/ref_data/region-groupings.csv">
           <value>
             <Attribute>
