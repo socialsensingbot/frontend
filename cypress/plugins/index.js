@@ -41,6 +41,15 @@ module.exports = (on, config) => {
             return list[0]
         }
     });
+
+    on('before:browser:launch', (browser) => {
+        if (browser.name === 'electron') {
+            return {
+                width:  1920,
+                height: 1080,
+            }
+        }
+    })
     initPlugin(on, config);
     return config;
 };

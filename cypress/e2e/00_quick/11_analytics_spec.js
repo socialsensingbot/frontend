@@ -7,13 +7,16 @@ function snapshot(query = 'app-timeseries-multi-query-chart', name = "analytics-
     cy.wait(20000);
     cy.get(query).scrollIntoView()
         .toMatchImageSnapshot({
-                                  "imageConfig": {
+                                  "imageConfig":      {
                                       "createDiffImage": true,                // Should a "diff image" be created, can be disabled for performance
                                       "threshold":       0.1,                      // Amount in pixels or percentage before snapshot image is invalid
                                       "thresholdType":   "percent",             // Can be either "pixel" or "percent"
                                   },
-                                  "name":        name,            // Naming resulting image file with a custom name rather than concatenating test titles
-                                  "separator":   "_",  // Naming resulting image file with a custom separator rather than using the default ` #`
+                                  "name":             name,            // Naming resulting image file with a custom name rather than concatenating test titles
+                                  "separator":        "_",
+                                  "screenshotConfig": {   // Naming resulting image file with a custom separator rather than using the default ` #`
+                                      clip: {x: 0, y: 0, width: 1024, height: 600},
+                                  }
                               });
 }
 
