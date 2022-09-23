@@ -18,10 +18,9 @@ function snapshot(query = 'app-timeseries-multi-query-chart', name = "analytics-
                               });
 }
 
-describe('11 Analytics: ', function () {
+describe('14 Analytics and Back: ', function () {
 
-    describe("Test Timeseries Graph", () => {
-        const url = ANALYTICS_URL + "/time"
+    describe("Switch to analytics and then return to the map.", () => {
 
         it('Import from Map Stats', () => {
             let url = MAP_URL + "?active_number=exceedance&active_polygon=county&selected=greater%20london";
@@ -36,14 +35,9 @@ describe('11 Analytics: ', function () {
             cy.url().should("contain", ANALYTICS_URL + "/time");
             cy.wait(5000);
             cy.get('.mat-chip').should("contain.text", "Greater London");
-            cy.wait(30000);
-            snapshot('app-timeseries-multi-query-chart', "13-analytics-timeseries-imported-from-map-1");
-
-            cy.url({timeout: 30000}).should("contain",
-                                            ANALYTICS_URL + "/time?active_number=count&active_polygon=county&selected=greater%20london");
-            cy.get("#loading-div", {timeout: 60000}).should("not.exist");
-            cy.wait(30000);
-            snapshot('app-timeseries-multi-query-chart', "13-analytics-timeseries-graph");
+            cy.get('.app-top-links-map').click();
+            cy.wait(5000);
+            cy.get(".app-tweet-area-loading-spinner").should("not.be.visible");
 
             // cy.get('#mat-button-toggle-2-button > .mat-button-toggle-label-content').click();
             // cy.wait(4000);
