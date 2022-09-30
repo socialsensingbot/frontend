@@ -52,7 +52,7 @@ const elNotVisible = (selector) => {
 
 
 const noTweetLoadingSpinner = function () {
-    elNotVisible(".app-tweet-area-loading-spinner");
+    cy.get(".app-tweet-area-loading-spinner").should("not.exist");
 };
 
 Cypress.Commands.add("login", (username = "cypress1@example.com") => {

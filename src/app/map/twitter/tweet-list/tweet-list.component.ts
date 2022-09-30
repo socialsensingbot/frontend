@@ -214,7 +214,10 @@ export class TweetListComponent implements OnInit, OnDestroy {
         });
 
         if (this._criteria) {
-            this.reset().then(() => this.ready = true);
+            this.reset().then(() => {
+                this.ready = true;
+                this.update.emit(null);
+            });
         } else {
             this.ready = true;
         }

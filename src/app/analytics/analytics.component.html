@@ -12,7 +12,8 @@
             <!--       <mat-icon>power_settings_new</mat-icon>-->
             Dashboard
         </button>
-        <button *ngIf="pref.ready &&pref.featureSupported('map')" [queryParamsHandling]="''" class="app-top-links-map"
+        <button *ngIf="pref.ready &&pref.featureSupported('map')" [queryParamsHandling]="'merge'"
+                class="app-top-links-map"
                 [routerLink]="'/map/'+map.id"
                 mat-button>
             <!--       <mat-icon>power_settings_new</mat-icon>-->

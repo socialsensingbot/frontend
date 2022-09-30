@@ -1,17 +1,17 @@
 <div class="app-tweet-outer">
 
   <mat-toolbar class="expanded-toolbar app-toolbar">
-    <ng-container *ngIf="ready">
-      <div class="app-tweet-heading-text">
-        <ng-container *ngIf="selection.count === 1">
-          <ng-container *ngIf="selection.tweetCount() > 0">
-              <div class="app-tweet-heading" style="color: black">{{selection.firstRegion().title}}</div>
+    <ng-container *ngIf="ready && selection.all().length > 0">
+        <div class="app-tweet-heading-text">
+            <ng-container *ngIf="selection.count === 1">
+                <ng-container *ngIf="selection.tweetCount() > 0">
+                    <div class="app-tweet-heading" style="color: black">{{selection.firstRegion().title}}</div>
 
-              <div *ngIf="showTimeline" class="app-tweet-sub-heading">
-                  <help page="help-and-support#exceedance"
-                        tooltip="Exceedance probability is calculated by comparing the current level of tweet activity with historical tweet activity.">
-                      Exceedance probability&nbsp;
-                  </help>
+                    <div *ngIf="showTimeline" class="app-tweet-sub-heading">
+                        <help page="help-and-support#exceedance"
+                              tooltip="Exceedance probability is calculated by comparing the current level of tweet activity with historical tweet activity.">
+                            Exceedance probability&nbsp;
+                        </help>
                   {{selection.firstRegion().exceedanceProbability}}%
               </div>
 
