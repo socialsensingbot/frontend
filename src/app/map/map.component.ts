@@ -295,6 +295,7 @@ export class MapComponent implements OnInit, OnDestroy {
         // schedulers execution.
 
         if (this.destroyed) {
+            console.warn("Destroyed!");
             return;
         }
 
@@ -313,6 +314,7 @@ export class MapComponent implements OnInit, OnDestroy {
             if (state === "ready") {
                 log.debug("Setting this to be ready");
                 this.ready = true;
+                this._twitterIsStale = true;
             }
         });
 

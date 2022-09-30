@@ -104,7 +104,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     public async ngOnInit(): Promise<void> {
-        // await this.pref.waitUntilReady();
+        await this.pref.waitUntilReady();
         this.tweetIgnoreSub = this.pref.tweetIgnored.subscribe((sub) => {
             this.update(null);
         });

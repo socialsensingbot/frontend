@@ -91,6 +91,7 @@ export class TweetListComponent implements OnInit, OnDestroy {
     public ignored: any;
 
     private _criteria: TweetCriteria;
+    private _stale: boolean;
 
     public get criteria(): TweetCriteria {
         return this._criteria;
@@ -98,12 +99,22 @@ export class TweetListComponent implements OnInit, OnDestroy {
 
     @Input()
     public set criteria(value: TweetCriteria) {
-        if (JSON.stringify(value) !== JSON.stringify(this._criteria)) {
-            this._criteria = value;
+        if (JSON.stringify(value) !== JSON.stringify(this._criteria) || this._stale) {
             // noinspection JSIgnoredPromiseFromCall
             if (this.ready) {
-                this.reset();
+                log.info("New Twitter criteria");
+                this._criteria = value;
+                this.reset().then(i => {
+                    this._stale = false;
+                    log.info("Criteria marked as NOT stale");
+                    this.update.emit(null);
+                });
+            } else {
+                log.info("Criteria marked as stale");
+                this._stale = true;
             }
+        } else {
+            log.info("No change to Twitter criteria");
         }
     }
 
@@ -202,7 +213,11 @@ export class TweetListComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.reset().then(() => this.ready = true);
+        if (this._criteria) {
+            this.reset().then(() => this.ready = true);
+        } else {
+            this.ready = true;
+        }
     }
 
     public ngOnDestroy(): void {

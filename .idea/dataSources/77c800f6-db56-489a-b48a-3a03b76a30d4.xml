@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="Demo">
-  <database-model serializer="dbm" dbms="MYSQL" family-id="MYSQL" format-version="4.39">
+  <database-model serializer="dbm" dbms="MYSQL" family-id="MYSQL" format-version="4.40">
     <root id="1">
       <DefaultCasing>exact</DefaultCasing>
       <DefaultEngine>InnoDB</DefaultEngine>
@@ -1401,12 +1401,11 @@ level</ColNames>
       <Type>btree</Type>
     </index>
     <key id="370" parent="307" name="PRIMARY">
-      <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>id</UnderlyingIndexColNames>
     </key>
     <key id="371" parent="307" name="internal_debug_id_uindex">
-      <ColNames>id</ColNames>
       <UnderlyingIndexName>internal_debug_id_uindex</UnderlyingIndexName>
     </key>
     <column id="372" parent="308" name="id">
@@ -1426,12 +1425,11 @@ level</ColNames>
       <Unique>1</Unique>
     </index>
     <key id="375" parent="308" name="PRIMARY">
-      <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>id</UnderlyingIndexColNames>
     </key>
     <key id="376" parent="308" name="internal_mv_refresh_id_uindex">
-      <ColNames>id</ColNames>
       <UnderlyingIndexName>internal_mv_refresh_id_uindex</UnderlyingIndexName>
     </key>
     <column id="377" parent="309" name="source_id">
@@ -1578,11 +1576,11 @@ hazard</ColNames>
       <Type>btree</Type>
     </index>
     <key id="405" parent="309" name="PRIMARY">
-      <ColNames>source_id
-source
-hazard</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>source_id
+source
+hazard</UnderlyingIndexColNames>
     </key>
     <column id="406" parent="310" name="region_type">
       <DataType>varchar(64)|0s</DataType>
@@ -1629,13 +1627,13 @@ source_id</ColNames>
       <Type>btree</Type>
     </index>
     <key id="414" parent="310" name="PRIMARY">
-      <ColNames>region_type
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexColNames>region_type
 region
 source
 source_id
-hazard</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
+hazard</UnderlyingIndexColNames>
     </key>
     <column id="415" parent="311" name="days">
       <DataType>bigint|0s</DataType>
@@ -1682,14 +1680,14 @@ hazard</ColNames>
       <Position>7</Position>
     </column>
     <key id="422" parent="311" name="PRIMARY">
-      <ColNames>region
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexColNames>region
 source
 hazard
 region_type
 warning
-language</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
+language</UnderlyingIndexColNames>
     </key>
     <column id="423" parent="312" name="date">
       <DataType>date|0s</DataType>
@@ -1702,12 +1700,11 @@ language</ColNames>
       <Unique>1</Unique>
     </index>
     <key id="425" parent="312" name="PRIMARY">
-      <ColNames>date</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>date</UnderlyingIndexColNames>
     </key>
     <key id="426" parent="312" name="mat_view_days_date_uindex">
-      <ColNames>date</ColNames>
       <UnderlyingIndexName>mat_view_days_date_uindex</UnderlyingIndexName>
     </key>
     <column id="427" parent="313" name="source_timestamp">
@@ -1727,10 +1724,10 @@ language</ColNames>
       <Position>3</Position>
     </column>
     <key id="430" parent="313" name="PRIMARY">
-      <ColNames>hazard
-source</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>hazard
+source</UnderlyingIndexColNames>
     </key>
     <column id="431" parent="314" name="date">
       <DataType>datetime|0s</DataType>
@@ -1738,9 +1735,9 @@ source</ColNames>
       <Position>1</Position>
     </column>
     <key id="432" parent="314" name="PRIMARY">
-      <ColNames>date</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>date</UnderlyingIndexColNames>
     </key>
     <column id="433" parent="315" name="region">
       <DataType>varchar(64)|0s</DataType>
@@ -1888,14 +1885,14 @@ deleted</ColNames>
       <Type>btree</Type>
     </index>
     <key id="457" parent="316" name="PRIMARY">
-      <ColNames>source_id
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexColNames>source_id
 region
 region_type
 map_location
 hazard
-source</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
+source</UnderlyingIndexColNames>
     </key>
     <column id="458" parent="317" name="source_id">
       <DataType>varchar(64)|0s</DataType>
@@ -2272,7 +2269,9 @@ source</ColNames>
       <Type>btree</Type>
     </index>
     <key id="513" parent="320" name="PRIMARY">
-      <ColNames>region
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexColNames>region
 region_type
 hazard
 source
@@ -2280,9 +2279,7 @@ source_date
 map_location
 warning
 deleted
-language</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
+language</UnderlyingIndexColNames>
     </key>
     <column id="514" parent="321" name="region_group_name">
       <DataType>varchar(64)|0s</DataType>
@@ -2380,14 +2377,14 @@ map_location</ColNames>
       <Type>fulltext</Type>
     </index>
     <key id="530" parent="321" name="PRIMARY">
-      <ColNames>source_id
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexColNames>source_id
 region_group_name
 region_type
 map_location
 hazard
-source</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
+source</UnderlyingIndexColNames>
     </key>
     <column id="531" parent="322" name="region_group_name">
       <DataType>varchar(64)|0s</DataType>
@@ -2488,14 +2485,14 @@ map_location</ColNames>
       <Type>fulltext</Type>
     </index>
     <key id="548" parent="322" name="PRIMARY">
-      <ColNames>source_id
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexColNames>source_id
 region_group_name
 region_type
 map_location
 hazard
-source</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
+source</UnderlyingIndexColNames>
     </key>
     <column id="549" parent="323" name="boundary">
       <DataType>geometry|0s</DataType>
@@ -2589,16 +2586,13 @@ map_location</ColNames>
       <Type>spatial</Type>
     </index>
     <key id="568" parent="323" name="PRIMARY">
-      <ColNames>region
-region_type
-map_location</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>region
+region_type
+map_location</UnderlyingIndexColNames>
     </key>
     <key id="569" parent="323" name="ref_geo_regions_map_location_region_region_type_uindex">
-      <ColNames>map_location
-region
-region_type</ColNames>
       <UnderlyingIndexName>ref_geo_regions_map_location_region_region_type_uindex</UnderlyingIndexName>
     </key>
     <column id="570" parent="324" name="boundary">
@@ -2684,12 +2678,11 @@ geo_region_type</ColNames>
       <Unique>1</Unique>
     </index>
     <key id="585" parent="326" name="PRIMARY">
-      <ColNames>value</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>value</UnderlyingIndexColNames>
     </key>
     <key id="586" parent="326" name="ref_integers_value_uindex">
-      <ColNames>value</ColNames>
       <UnderlyingIndexName>ref_integers_value_uindex</UnderlyingIndexName>
     </key>
     <column id="587" parent="327" name="k">
@@ -2711,12 +2704,11 @@ geo_region_type</ColNames>
       <Unique>1</Unique>
     </index>
     <key id="591" parent="327" name="PRIMARY">
-      <ColNames>k</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>k</UnderlyingIndexColNames>
     </key>
     <key id="592" parent="327" name="ref_key_value_key_uindex">
-      <ColNames>k</ColNames>
       <UnderlyingIndexName>ref_key_value_key_uindex</UnderlyingIndexName>
     </key>
     <column id="593" parent="328" name="id">
@@ -2763,12 +2755,11 @@ geo_region_type</ColNames>
       <Unique>1</Unique>
     </index>
     <key id="602" parent="328" name="PRIMARY">
-      <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>id</UnderlyingIndexColNames>
     </key>
     <key id="603" parent="328" name="ref_map_metadata_id_uindex">
-      <ColNames>id</ColNames>
       <UnderlyingIndexName>ref_map_metadata_id_uindex</UnderlyingIndexName>
     </key>
     <column id="604" parent="329" name="map_id">
@@ -2811,11 +2802,11 @@ geo_region_type</ColNames>
       <Position>3</Position>
     </column>
     <key id="612" parent="331" name="PRIMARY">
-      <ColNames>region_aggregation_id
-region_type
-region</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>region_aggregation_id
+region_type
+region</UnderlyingIndexColNames>
     </key>
     <column id="613" parent="332" name="id">
       <DataType>varchar(64)|0s</DataType>
@@ -2833,12 +2824,11 @@ region</ColNames>
       <Unique>1</Unique>
     </index>
     <key id="616" parent="332" name="PRIMARY">
-      <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>id</UnderlyingIndexColNames>
     </key>
     <key id="617" parent="332" name="ref_map_region_aggregations_id_uindex">
-      <ColNames>id</ColNames>
       <UnderlyingIndexName>ref_map_region_aggregations_id_uindex</UnderlyingIndexName>
     </key>
     <column id="618" parent="333" name="id">
@@ -2862,12 +2852,11 @@ region</ColNames>
       <Unique>1</Unique>
     </index>
     <key id="622" parent="333" name="PRIMARY">
-      <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>id</UnderlyingIndexColNames>
     </key>
     <key id="623" parent="333" name="ref_map_region_aggregations_id_uindex">
-      <ColNames>id</ColNames>
       <UnderlyingIndexName>ref_map_region_aggregations_id_uindex</UnderlyingIndexName>
     </key>
     <column id="624" parent="334" name="boundary">

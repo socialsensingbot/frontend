@@ -450,7 +450,7 @@ export const textForPublicDisplayFunc: MapFunction = async (req, res) => {
                                                                                            r.region                                                  as region,
                                                                                            t.possibly_sensitive                                      as possibly_sensitive
                                                                                     FROM live_text t
-                                                                                             LEFT JOIN mat_view_regions_${req.body.hazards[0]} r
+                                                                                             LEFT JOIN mat_view_regions r
                                                                                                        ON t.source = r.source AND t.source_id = r.source_id AND t.hazard = r.hazard
                                                                                     WHERE r.source_timestamp between ?
                                                                                         AND ?
@@ -727,7 +727,7 @@ export const recentTextCountFunc: MapFunction = async (req: MapFunctionRequest, 
         const rows = await db.sql({
                                       // language=MySQL
                                       sql:    `/* app.ts: recent-text-count */ SELECT r.region AS region, count(*) AS count
-                                                                               FROM mat_view_regions_${req.body.hazards[0]} r
+                                                                               FROM mat_view_regions r
                                                                                WHERE r.region_type = ?
                                                                                  AND r.source_timestamp between ?
                                                                                    and ?
@@ -1131,7 +1131,7 @@ export const accurateStatsFunc: MapFunction = async (req, res) => {
                                                                         FROM
                                                                             (SELECT count(source_id) as count,
                                                                                     floor((? - unix_timestamp(r.source_timestamp)) / ?) as period
-                                                                             FROM mat_view_regions_${req.body.hazards[0]} r
+                                                                             FROM mat_view_regions r
                                                                              WHERE r.region = regions.region
                                                                                AND r.region_type = ?
                                                                                AND r.hazard IN (?)
@@ -1151,7 +1151,7 @@ export const accurateStatsFunc: MapFunction = async (req, res) => {
                                                                         ) x
                                                                   WHERE period = 0 AND count > 0)  as exceedance,
                                                (SELECT count(*) as count
-                                                FROM mat_view_regions_${req.body.hazards[0]} r
+                                                FROM mat_view_regions r
                                                 WHERE r.region = regions.region
                                                   AND r.region_type = ?
                                                   AND r.hazard IN (?)

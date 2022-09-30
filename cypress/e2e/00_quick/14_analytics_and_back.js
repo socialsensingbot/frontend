@@ -22,7 +22,7 @@ describe('14 Analytics and Back: ', function () {
 
     describe("Switch to analytics and then return to the map.", () => {
 
-        it('Import from Map Stats', () => {
+        it('Using Map Menu Item', () => {
             let url = MAP_URL + "?active_number=exceedance&active_polygon=county&selected=greater%20london";
             cy.visitAndErrorCheck(url);
             cy.login();
@@ -37,7 +37,7 @@ describe('14 Analytics and Back: ', function () {
             cy.get('.mat-chip').should("contain.text", "Greater London");
             cy.get('.app-top-links-map').click();
             cy.wait(5000);
-            cy.get(".app-tweet-area-loading-spinner").should("not.be.visible");
+            cy.get(".app-tweet-area-loading-spinner").should("not.exist");
 
             // cy.get('#mat-button-toggle-2-button > .mat-button-toggle-label-content').click();
             // cy.wait(4000);
@@ -49,4 +49,31 @@ describe('14 Analytics and Back: ', function () {
 
 
     });
+
+    it('Using back button', () => {
+        let url = MAP_URL + "?active_number=exceedance&active_polygon=county&selected=greater%20london";
+        cy.visitAndErrorCheck(url);
+        cy.login();
+        cy.visitAndWait(url);
+        cy.twitterPanelHeader("Greater London");
+        cy.get("#loading-div", {timeout: 60000}).should("not.exist");
+        cy.get("#mat-tab-label-0-1 > div").click();
+        cy.get('.app-stats-panel-count-open-in-analytics').click();
+        cy.wait(1000);
+        cy.url().should("contain", ANALYTICS_URL + "/time");
+        cy.wait(5000);
+        cy.get('.mat-chip').should("contain.text", "Greater London");
+        cy.go('back');
+        cy.wait(5000);
+        cy.get(".app-tweet-area-loading-spinner").should("not.exist");
+
+        // cy.get('#mat-button-toggle-2-button > .mat-button-toggle-label-content').click();
+        // cy.wait(4000);
+        // snapshot('app-timeseries-multi-query-chart', "13-analytics-timeseries-graph-exceedance");
+        // cy.get('#mat-button-toggle-5-button > .mat-button-toggle-label-content').click();
+        // cy.wait(4000);
+        // snapshot('app-timeseries-multi-query-chart', "13-analytics-timeseries-graph-exceedance-bar");
+    });
+
+
 });

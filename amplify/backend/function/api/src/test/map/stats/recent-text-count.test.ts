@@ -4,17 +4,17 @@ import {diffStrings, MAX_DATE_MILLIS, MIN_DATE_MILLIS, sortedStringify} from "..
 import * as app from "../../../app";
 
 const expectedResult = {
-        "buckinghamshire": 12,
-        "essex":           12,
-        "greater london":  12,
-        "hertfordshire":   12,
-        "kent":            12,
-        "lancashire":      6,
-        "north yorkshire": 6,
-        "slough":          12,
-        "surrey":          12,
-        "thurrock":        12,
-        "west yorkshire":  6
+        "buckinghamshire": 2,
+        "essex":           2,
+        "greater london":  2,
+        "hertfordshire":   2,
+        "kent":            2,
+        "lancashire":      1,
+        "north yorkshire": 1,
+        "slough":          2,
+        "surrey":          2,
+        "thurrock":        2,
+        "west yorkshire":  1
     }
 
 ;
