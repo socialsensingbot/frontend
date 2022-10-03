@@ -1,7 +1,7 @@
 import {MAP_URL} from "../../support/e2e";
 
 const zoomDuration = 1000;
-describe('05 URL State (polygon): ', function () {
+describe('10 URL State (polygon): ', function () {
 
     describe('select polygon type and count stats', () => {
         const url = MAP_URL + "?active_polygon=coarse&selected=168&active_number=count";

@@ -40,7 +40,7 @@
         <div class="app-toolbar-separator"></div>
     </ng-container>
 
-      <div *ngIf="!ready">
+      <div *ngIf="!ready && selection.all().length > 0">
           <mat-spinner diameter="48" class="app-tweet-area-loading-spinner"></mat-spinner>
       </div>
   </mat-toolbar>

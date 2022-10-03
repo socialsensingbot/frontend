@@ -105,6 +105,11 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
     public async ngOnInit(): Promise<void> {
         await this.pref.waitUntilReady();
+        //We won't get an update event from the child panels if there are no tweets
+        //so here we set the status to ready.
+        if (this.selection.tweetCount() == 0) {
+            this.ready = true;
+        }
         this.tweetIgnoreSub = this.pref.tweetIgnored.subscribe((sub) => {
             this.update(null);
         });
