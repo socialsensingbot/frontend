@@ -130,17 +130,17 @@
         },
         "query": {
           "deploymentBucketName": "amplify-socialsensing-demo-144920-deployment",
-          "s3Key": "amplify-builds/query-6b4653764b447a696971-build.zip",
+          "s3Key": "amplify-builds/query-7834544b32413261584c-build.zip",
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
         },
         "sqsquery": {
           "deploymentBucketName": "amplify-socialsensing-demo-144920-deployment",
-          "s3Key": "amplify-builds/sqsquery-4e373767747177462f73-build.zip",
+          "s3Key": "amplify-builds/sqsquery-7276676f362f587a6d38-build.zip",
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
         },
         "api": {
           "deploymentBucketName": "amplify-socialsensing-demo-144920-deployment",
-          "s3Key": "amplify-builds/api-615169333949714d4846-build.zip",
+          "s3Key": "amplify-builds/api-4d6b3054484148323968-build.zip",
           "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
         }
       },
@@ -149,6 +149,17 @@
           "appId": "dtmxl3q3i7oix",
           "type": "cicd"
         }
+      },
+      "storage": {
+        "jsonstorage": {}
+      },
+      "api": {
+        "socialsensing": {},
+        "query": {},
+        "api": {}
+      },
+      "custom": {
+        "querySQS": {}
       }
     }
   }
