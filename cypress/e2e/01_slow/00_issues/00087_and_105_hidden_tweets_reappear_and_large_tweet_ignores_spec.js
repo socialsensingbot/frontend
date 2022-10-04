@@ -27,7 +27,7 @@ const testUnhide = (refresh, count, fail) => {
         if (!fail && drawer.find(tweetHidden).length === 0) {
             cy.log("Skipping non existent tweet");
         } else {
-            cy.get(tweetHidden).scrollIntoView().should('be.visible');
+            cy.get(tweetHidden).should('be.visible');
             cy.unignoreTweet(tweetHidden);
             cy.wait(2000);
         }
@@ -43,7 +43,7 @@ const testHide = (refresh, count) => {
     cy.get(tweetVisible, {timeout: 60000})
         .then(t => {
             const index = t.first().parents(".atr-visible").attr("data-index");
-            cy.get(`.atr-visible.atr-${index}`, {timeout: 60000}).scrollIntoView().should('be.visible');
+            cy.get(`.atr-visible.atr-${index}`, {timeout: 60000}).should('be.visible');
             cy.ignoreTweet(`.atr-visible.atr-${index}`);
             cy.wait(2000);
         });
