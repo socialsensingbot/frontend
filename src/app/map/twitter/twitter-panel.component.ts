@@ -8,6 +8,7 @@ import {RegionSelection} from "../region-selection";
 import {AnnotationService} from "../../pref/annotation.service";
 import {TwitterExporterService} from "./twitter-exporter.service";
 import {RESTMapDataService} from "../data/rest-map-data.service";
+import {MatTabChangeEvent} from "@angular/material/tabs";
 
 const log = new Logger("twitter-panel");
 
@@ -83,6 +84,7 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
         this.pref.waitUntilReady().then(i => this.ready = true);
         this.tweetsReady = true;
+        log.debug("tweets ready")
     }
 
     public refresh() {
@@ -141,5 +143,9 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
 
     private updateTweets(val: Tweet[]) {
 
+    }
+
+    public tabChanged($event: MatTabChangeEvent): void {
+        this.update(null);
     }
 }

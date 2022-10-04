@@ -48,7 +48,7 @@
     <div class="app-tweet-table">
 
 
-        <mat-tab-group (selectedTabChange)="update(null)">
+        <mat-tab-group (selectedTabChange)="tabChanged($event)">
             <mat-tab>
                 <ng-template mat-tab-label>
                     <span *ngIf="showTimeline"
