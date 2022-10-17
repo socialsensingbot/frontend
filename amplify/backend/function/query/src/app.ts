@@ -3,7 +3,7 @@ import * as express from "express";
 import * as bodyParser from "body-parser";
 import {callFunction} from "socialsensing-api/map-queries";
 
-// bump 90
+// bump 91
 const awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
 
 // declare a new express app

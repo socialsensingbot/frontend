@@ -1,7 +1,114 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="Demo">
   <database-model serializer="dbm" dbms="MYSQL" family-id="MYSQL" format-version="4.40">
-    <root id="1"/>
+    <root id="1">
+      <DefaultCasing>exact</DefaultCasing>
+      <DefaultEngine>InnoDB</DefaultEngine>
+      <DefaultTmpEngine>InnoDB</DefaultTmpEngine>
+      <Grants>|root||admin||ALTER|G
+|root||rdsadmin|localhost|ALTER|G
+|root||admin||ALTER ROUTINE|G
+|root||rdsadmin|localhost|ALTER ROUTINE|G
+|root||rdsadmin|localhost|APPLICATION_PASSWORD_ADMIN|G
+|root||mysql.infoschema|localhost|AUDIT_ABORT_EXEMPT|G
+|root||mysql.sys|localhost|AUDIT_ABORT_EXEMPT|G
+|root||rdsadmin|localhost|AUDIT_ABORT_EXEMPT|G
+|root||rdsadmin|localhost|AUDIT_ADMIN|G
+|root||rdsadmin|localhost|AUTHENTICATION_POLICY_ADMIN|G
+|root||rdsadmin|localhost|BACKUP_ADMIN|G
+|root||rdsadmin|localhost|BINLOG_ADMIN|G
+|root||rdsadmin|localhost|BINLOG_ENCRYPTION_ADMIN|G
+|root||rdsadmin|localhost|CLONE_ADMIN|G
+|root||rdsadmin|localhost|CONNECTION_ADMIN|G
+|root||admin||CREATE|G
+|root||rdsadmin|localhost|CREATE|G
+|root||admin||CREATE ROLE|G
+|root||rdsadmin|localhost|CREATE ROLE|G
+|root||admin||CREATE ROUTINE|G
+|root||rdsadmin|localhost|CREATE ROUTINE|G
+|root||rdsadmin|localhost|CREATE TABLESPACE|G
+|root||admin||CREATE TEMPORARY TABLES|G
+|root||rdsadmin|localhost|CREATE TEMPORARY TABLES|G
+|root||admin||CREATE USER|G
+|root||rdsadmin|localhost|CREATE USER|G
+|root||admin||CREATE VIEW|G
+|root||rdsadmin|localhost|CREATE VIEW|G
+|root||admin||DELETE|G
+|root||rdsadmin|localhost|DELETE|G
+|root||admin||DROP|G
+|root||rdsadmin|localhost|DROP|G
+|root||admin||DROP ROLE|G
+|root||rdsadmin|localhost|DROP ROLE|G
+|root||rdsadmin|localhost|ENCRYPTION_KEY_ADMIN|G
+|root||admin||EVENT|G
+|root||rdsadmin|localhost|EVENT|G
+|root||admin||EXECUTE|G
+|root||rdsadmin|localhost|EXECUTE|G
+|root||rdsadmin|localhost|FILE|G
+|root||admin||FLUSH_OPTIMIZER_COSTS|G
+|root||rdsadmin|localhost|FLUSH_OPTIMIZER_COSTS|G
+|root||admin||FLUSH_STATUS|G
+|root||rdsadmin|localhost|FLUSH_STATUS|G
+|root||admin||FLUSH_TABLES|G
+|root||rdsadmin|localhost|FLUSH_TABLES|G
+|root||admin||FLUSH_USER_RESOURCES|G
+|root||rdsadmin|localhost|FLUSH_USER_RESOURCES|G
+|root||rdsadmin|localhost|GROUP_REPLICATION_ADMIN|G
+|root||admin||INDEX|G
+|root||rdsadmin|localhost|INDEX|G
+|root||rdsadmin|localhost|INNODB_REDO_LOG_ARCHIVE|G
+|root||rdsadmin|localhost|INNODB_REDO_LOG_ENABLE|G
+|root||admin||INSERT|G
+|root||rdsadmin|localhost|INSERT|G
+|root||admin||LOCK TABLES|G
+|root||rdsadmin|localhost|LOCK TABLES|G
+|root||admin||PASSWORDLESS_USER_ADMIN|G
+|root||rdsadmin|localhost|PASSWORDLESS_USER_ADMIN|G
+|root||rdsadmin|localhost|PERSIST_RO_VARIABLES_ADMIN|G
+|root||admin||PROCESS|G
+|root||rdsadmin|localhost|PROCESS|G
+|root||admin||REFERENCES|G
+|root||rdsadmin|localhost|REFERENCES|G
+|root||admin||RELOAD|G
+|root||rdsadmin|localhost|RELOAD|G
+|root||admin||REPLICATION CLIENT|G
+|root||rdsadmin|localhost|REPLICATION CLIENT|G
+|root||admin||REPLICATION SLAVE|G
+|root||rdsadmin|localhost|REPLICATION SLAVE|G
+|root||rdsrepladmin||REPLICATION SLAVE|G
+|root||rdsadmin|localhost|REPLICATION_APPLIER|G
+|root||rdsadmin|localhost|REPLICATION_SLAVE_ADMIN|G
+|root||rdsadmin|localhost|RESOURCE_GROUP_ADMIN|G
+|root||rdsadmin|localhost|RESOURCE_GROUP_USER|G
+|root||rdsadmin|localhost|ROLE_ADMIN|G
+|root||admin||SELECT|G
+|root||mysql.infoschema|localhost|SELECT|G
+|root||rdsadmin|localhost|SELECT|G
+|root||rdsadmin|localhost|SERVICE_CONNECTION_ADMIN|G
+|root||rdsadmin|localhost|SESSION_VARIABLES_ADMIN|G
+|root||rdsadmin|localhost|SET_USER_ID|G
+|root||admin||SHOW DATABASES|G
+|root||rdsadmin|localhost|SHOW DATABASES|G
+|root||admin||SHOW VIEW|G
+|root||rdsadmin|localhost|SHOW VIEW|G
+|root||rdsadmin|localhost|SHOW_ROUTINE|G
+|root||rdsadmin|localhost|SHUTDOWN|G
+|root||rdsadmin|localhost|SUPER|G
+|root||mysql.infoschema|localhost|SYSTEM_USER|G
+|root||mysql.sys|localhost|SYSTEM_USER|G
+|root||rdsadmin|localhost|SYSTEM_USER|G
+|root||rdsadmin|localhost|SYSTEM_VARIABLES_ADMIN|G
+|root||rdsadmin|localhost|TABLE_ENCRYPTION_ADMIN|G
+|root||admin||TRIGGER|G
+|root||rdsadmin|localhost|TRIGGER|G
+|root||admin||UPDATE|G
+|root||rdsadmin|localhost|UPDATE|G
+|root||rdsadmin|localhost|XA_RECOVER_ADMIN|G
+|root||admin||grant option|G
+|root||rdsadmin|localhost|grant option|G
+sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
+      <ServerVersion>8.0.28</ServerVersion>
+    </root>
     <collation id="2" parent="1" name="armscii8_general_ci">
       <Charset>armscii8</Charset>
       <DefaultForCharset>1</DefaultForCharset>
@@ -896,7 +1003,7 @@
     <routine id="285" parent="274" name="daily_housekeeping">
       <Definer>admin@%</Definer>
       <RoutineKind>procedure</RoutineKind>
-      <SourceTextLength>2584</SourceTextLength>
+      <SourceTextLength>2729</SourceTextLength>
     </routine>
     <routine id="286" parent="274" name="debug_msg">
       <Definer>admin@%</Definer>
@@ -916,7 +1023,7 @@
     <routine id="289" parent="274" name="refresh_mv">
       <Definer>admin@%</Definer>
       <RoutineKind>procedure</RoutineKind>
-      <SourceTextLength>9701</SourceTextLength>
+      <SourceTextLength>10058</SourceTextLength>
     </routine>
     <routine id="290" parent="274" name="refresh_mv_auto">
       <Definer>admin@%</Definer>
@@ -968,6 +1075,7 @@
     <scheduled-event id="299" parent="274" name="daily_housekeeping_event_1">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-09-30.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-01 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -975,6 +1083,7 @@
     <scheduled-event id="300" parent="274" name="daily_housekeeping_event_2">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-10-01.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-02 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -982,6 +1091,7 @@
     <scheduled-event id="301" parent="274" name="daily_housekeeping_event_3">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-10-02.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-03 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -989,6 +1099,7 @@
     <scheduled-event id="302" parent="274" name="daily_housekeeping_event_4">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-10-03.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-04 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -996,6 +1107,7 @@
     <scheduled-event id="303" parent="274" name="daily_housekeeping_event_5">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-10-04.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-05 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -1248,7 +1360,7 @@
       <Position>2</Position>
     </argument>
     <column id="361" parent="307" name="id">
-      <AutoIncrement>992288</AutoIncrement>
+      <AutoIncrement>1096670</AutoIncrement>
       <DataType>int|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -1274,236 +1386,266 @@
       <NotNull>1</NotNull>
       <Position>5</Position>
     </column>
-    <index id="366" parent="307" name="internal_debug_id_uindex">
+    <index id="366" parent="307" name="PRIMARY">
       <ColNames>id</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="367" parent="307" name="internal_debug_time_level_index">
+    <index id="367" parent="307" name="internal_debug_id_uindex">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="368" parent="307" name="internal_debug_time_level_index">
       <ColNames>time
 level</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="368" parent="307" name="internal_debug_time_source_level_index">
+    <index id="369" parent="307" name="internal_debug_time_source_level_index">
       <ColNames>time
 source
 level</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="369" parent="307" name="internal_debug_source_level_index">
+    <index id="370" parent="307" name="internal_debug_source_level_index">
       <ColNames>source
 level</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="370" parent="307" name="PRIMARY">
+    <key id="371" parent="307" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>id</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <key id="371" parent="307" name="internal_debug_id_uindex">
+    <key id="372" parent="307" name="internal_debug_id_uindex">
       <UnderlyingIndexName>internal_debug_id_uindex</UnderlyingIndexName>
     </key>
-    <column id="372" parent="308" name="id">
-      <AutoIncrement>59004</AutoIncrement>
+    <column id="373" parent="308" name="id">
+      <AutoIncrement>64050</AutoIncrement>
       <DataType>bigint|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="373" parent="308" name="time">
+    <column id="374" parent="308" name="time">
       <DataType>timestamp|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <index id="374" parent="308" name="internal_mv_refresh_id_uindex">
+    <index id="375" parent="308" name="PRIMARY">
       <ColNames>id</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="375" parent="308" name="PRIMARY">
+    <index id="376" parent="308" name="internal_mv_refresh_id_uindex">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="377" parent="308" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>id</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <key id="376" parent="308" name="internal_mv_refresh_id_uindex">
+    <key id="378" parent="308" name="internal_mv_refresh_id_uindex">
       <UnderlyingIndexName>internal_mv_refresh_id_uindex</UnderlyingIndexName>
     </key>
-    <column id="377" parent="309" name="source_id">
+    <column id="379" parent="309" name="source_id">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="378" parent="309" name="source_date">
+    <column id="380" parent="309" name="source_date">
       <DataType>date|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="379" parent="309" name="source_text">
+    <column id="381" parent="309" name="source_text">
       <DataType>text|0s</DataType>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="380" parent="309" name="source">
+    <column id="382" parent="309" name="source">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;twitter&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="381" parent="309" name="hazard">
+    <column id="383" parent="309" name="hazard">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;flood&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>5</Position>
     </column>
-    <column id="382" parent="309" name="region_1">
+    <column id="384" parent="309" name="region_1">
       <DataType>varchar(64)|0s</DataType>
       <Position>6</Position>
     </column>
-    <column id="383" parent="309" name="region_2">
+    <column id="385" parent="309" name="region_2">
       <DataType>varchar(64)|0s</DataType>
       <Position>7</Position>
     </column>
-    <column id="384" parent="309" name="region_3">
+    <column id="386" parent="309" name="region_3">
       <DataType>varchar(64)|0s</DataType>
       <Position>8</Position>
     </column>
-    <column id="385" parent="309" name="source_json">
+    <column id="387" parent="309" name="source_json">
       <DataType>json|0s</DataType>
       <NotNull>1</NotNull>
       <Position>9</Position>
     </column>
-    <column id="386" parent="309" name="location">
+    <column id="388" parent="309" name="location">
       <DataType>geometry|0s</DataType>
       <NotNull>1</NotNull>
       <Position>10</Position>
     </column>
-    <column id="387" parent="309" name="source_html">
+    <column id="389" parent="309" name="source_html">
       <DataType>mediumtext|0s</DataType>
       <Position>11</Position>
     </column>
-    <column id="388" parent="309" name="source_timestamp">
+    <column id="390" parent="309" name="source_timestamp">
       <DataType>timestamp|0s</DataType>
       <Position>12</Position>
     </column>
-    <column id="389" parent="309" name="deleted">
+    <column id="391" parent="309" name="deleted">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <Position>13</Position>
     </column>
-    <column id="390" parent="309" name="compliance_reason">
+    <column id="392" parent="309" name="compliance_reason">
       <DataType>varchar(64)|0s</DataType>
       <Position>14</Position>
     </column>
-    <column id="391" parent="309" name="warning">
+    <column id="393" parent="309" name="warning">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>15</Position>
     </column>
-    <column id="392" parent="309" name="possibly_sensitive">
+    <column id="394" parent="309" name="possibly_sensitive">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>16</Position>
     </column>
-    <column id="393" parent="309" name="language">
+    <column id="395" parent="309" name="language">
       <DataType>varchar(16)|0s</DataType>
       <DefaultExpression>&apos;en&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>17</Position>
     </column>
-    <index id="394" parent="309" name="live_text_source_id_source_hazard_index">
+    <column id="396" parent="309" name="source_version">
+      <DataType>varchar(16)|0s</DataType>
+      <DefaultExpression>&apos;1.1&apos;</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>18</Position>
+    </column>
+    <index id="397" parent="309" name="PRIMARY">
+      <ColNames>source_id
+source
+hazard</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="398" parent="309" name="live_text_source_id_source_hazard_index">
       <ColNames>source_id
 source
 hazard</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="395" parent="309" name="live_text_source_id_source_source_timestamp_hazard_index">
+    <index id="399" parent="309" name="live_text_source_id_source_source_timestamp_hazard_index">
       <ColNames>source_id
 source
 source_timestamp
 hazard</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="396" parent="309" name="live_text_source_id_index">
+    <index id="400" parent="309" name="live_text_source_id_index">
       <ColNames>source_id</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="397" parent="309" name="text_by_region_source_date_index">
+    <index id="401" parent="309" name="text_by_region_source_date_index">
       <ColNames>source_date</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="398" parent="309" name="full_text_idx">
+    <index id="402" parent="309" name="full_text_idx">
       <ColNames>source_text</ColNames>
       <Type>fulltext</Type>
     </index>
-    <index id="399" parent="309" name="text_by_region_source_hazard_source_date_region_index">
+    <index id="403" parent="309" name="text_by_region_source_hazard_source_date_region_index">
       <ColNames>source
 hazard
 source_date
 region_1</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="400" parent="309" name="text_by_region_source_hazard_source_date_index">
+    <index id="404" parent="309" name="text_by_region_source_hazard_source_date_index">
       <ColNames>source
 hazard
 source_date</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="401" parent="309" name="live_text_source_hazard_region_1_source_timestamp_index">
+    <index id="405" parent="309" name="live_text_source_hazard_region_1_source_timestamp_index">
       <ColNames>source
 hazard
 region_1
 source_timestamp</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="402" parent="309" name="location">
+    <index id="406" parent="309" name="location">
       <ColNames>location</ColNames>
       <Type>spatial</Type>
     </index>
-    <index id="403" parent="309" name="live_text_source_timestamp_source_hazard_index">
+    <index id="407" parent="309" name="live_text_source_timestamp_source_hazard_index">
       <ColNames>source_timestamp
 source
 hazard</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="404" parent="309" name="live_text_source_timestamp_index">
+    <index id="408" parent="309" name="live_text_source_timestamp_index">
       <ColNames>source_timestamp</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="405" parent="309" name="PRIMARY">
+    <key id="409" parent="309" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>source_id
-source
-hazard</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="406" parent="310" name="region_type">
+    <column id="410" parent="310" name="region_type">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="407" parent="310" name="region">
+    <column id="411" parent="310" name="region">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="408" parent="310" name="source">
+    <column id="412" parent="310" name="source">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="409" parent="310" name="source_id">
+    <column id="413" parent="310" name="source_id">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="410" parent="310" name="hazard">
+    <column id="414" parent="310" name="hazard">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;flood&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>5</Position>
     </column>
-    <index id="411" parent="310" name="ltr_main_index">
+    <index id="415" parent="310" name="PRIMARY">
+      <ColNames>region_type
+region
+source
+source_id
+hazard</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="416" parent="310" name="ltr_main_index">
       <ColNames>region_type
 region
 source_id
@@ -1511,240 +1653,271 @@ source
 hazard</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="412" parent="310" name="live_text_regions_source_hazard_source_id_index">
+    <index id="417" parent="310" name="live_text_regions_source_hazard_source_id_index">
       <ColNames>source
 hazard
 source_id</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="413" parent="310" name="live_text_regions_source_id_index">
+    <index id="418" parent="310" name="live_text_regions_source_id_index">
       <ColNames>source_id</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="414" parent="310" name="PRIMARY">
+    <key id="419" parent="310" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>region_type
-region
-source
-source_id
-hazard</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="415" parent="311" name="days">
+    <column id="420" parent="311" name="days">
       <DataType>bigint|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="416" parent="311" name="region">
+    <column id="421" parent="311" name="region">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="417" parent="311" name="region_type">
+    <column id="422" parent="311" name="region_type">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="418" parent="311" name="hazard">
+    <column id="423" parent="311" name="hazard">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;flood&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="419" parent="311" name="source">
+    <column id="424" parent="311" name="source">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;twitter&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="420" parent="311" name="warning">
+    <column id="425" parent="311" name="warning">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>6</Position>
     </column>
-    <column id="421" parent="311" name="language">
+    <column id="426" parent="311" name="language">
       <DataType>varchar(16)|0s</DataType>
       <DefaultExpression>&apos;en&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>7</Position>
     </column>
-    <key id="422" parent="311" name="PRIMARY">
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-      <UnderlyingIndexColNames>region
+    <index id="427" parent="311" name="PRIMARY">
+      <ColNames>region
 source
 hazard
 region_type
 warning
-language</UnderlyingIndexColNames>
+language</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="428" parent="311" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="423" parent="312" name="date">
+    <column id="429" parent="312" name="date">
       <DataType>date|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <index id="424" parent="312" name="mat_view_days_date_uindex">
+    <index id="430" parent="312" name="PRIMARY">
       <ColNames>date</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="425" parent="312" name="PRIMARY">
+    <index id="431" parent="312" name="mat_view_days_date_uindex">
+      <ColNames>date</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="432" parent="312" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>date</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <key id="426" parent="312" name="mat_view_days_date_uindex">
+    <key id="433" parent="312" name="mat_view_days_date_uindex">
       <UnderlyingIndexName>mat_view_days_date_uindex</UnderlyingIndexName>
     </key>
-    <column id="427" parent="313" name="source_timestamp">
+    <column id="434" parent="313" name="source_timestamp">
       <DataType>timestamp|0s</DataType>
       <Position>1</Position>
     </column>
-    <column id="428" parent="313" name="hazard">
+    <column id="435" parent="313" name="hazard">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;flood&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="429" parent="313" name="source">
+    <column id="436" parent="313" name="source">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;twitter&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <key id="430" parent="313" name="PRIMARY">
+    <index id="437" parent="313" name="PRIMARY">
+      <ColNames>hazard
+source</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="438" parent="313" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>hazard
-source</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="431" parent="314" name="date">
+    <column id="439" parent="314" name="date">
       <DataType>datetime|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <key id="432" parent="314" name="PRIMARY">
+    <index id="440" parent="314" name="PRIMARY">
+      <ColNames>date</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="441" parent="314" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>date</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="433" parent="315" name="region">
+    <column id="442" parent="315" name="region">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="434" parent="315" name="region_type">
+    <column id="443" parent="315" name="region_type">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="435" parent="315" name="hazard">
+    <column id="444" parent="315" name="hazard">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;flood&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="436" parent="315" name="source">
+    <column id="445" parent="315" name="source">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;twitter&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="437" parent="315" name="warning">
+    <column id="446" parent="315" name="warning">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>5</Position>
     </column>
-    <column id="438" parent="315" name="deleted">
+    <column id="447" parent="315" name="deleted">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>6</Position>
     </column>
-    <column id="439" parent="315" name="map_location">
+    <column id="448" parent="315" name="map_location">
       <DataType>varchar(16)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>7</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="440" parent="315" name="language">
+    <column id="449" parent="315" name="language">
       <DataType>varchar(16)|0s</DataType>
       <DefaultExpression>&apos;en&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>8</Position>
     </column>
-    <column id="441" parent="316" name="source_id">
+    <column id="450" parent="316" name="source_id">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="442" parent="316" name="source">
+    <column id="451" parent="316" name="source">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;twitter&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="443" parent="316" name="hazard">
+    <column id="452" parent="316" name="hazard">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;flood&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="444" parent="316" name="source_timestamp">
+    <column id="453" parent="316" name="source_timestamp">
       <DataType>timestamp|0s</DataType>
       <Position>4</Position>
     </column>
-    <column id="445" parent="316" name="region_type">
+    <column id="454" parent="316" name="region_type">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>5</Position>
     </column>
-    <column id="446" parent="316" name="region">
+    <column id="455" parent="316" name="region">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>6</Position>
     </column>
-    <column id="447" parent="316" name="warning">
+    <column id="456" parent="316" name="warning">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>7</Position>
     </column>
-    <column id="448" parent="316" name="deleted">
+    <column id="457" parent="316" name="deleted">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>8</Position>
     </column>
-    <column id="449" parent="316" name="map_location">
+    <column id="458" parent="316" name="map_location">
       <DataType>varchar(16)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>9</Position>
     </column>
-    <column id="450" parent="316" name="language">
+    <column id="459" parent="316" name="language">
       <DataType>varchar(16)|0s</DataType>
       <DefaultExpression>&apos;en&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>10</Position>
     </column>
-    <index id="451" parent="316" name="mat_view_regions_source_id_source_hazard_index">
+    <column id="460" parent="316" name="region_relation">
+      <DataType>tinyint|0s</DataType>
+      <DefaultExpression>0</DefaultExpression>
+      <Position>11</Position>
+    </column>
+    <index id="461" parent="316" name="PRIMARY">
+      <ColNames>source_id
+region
+region_type
+map_location
+hazard
+source</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="462" parent="316" name="mat_view_regions_source_id_source_hazard_index">
       <ColNames>source_id
 source
 hazard</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="452" parent="316" name="mat_view_regions_timestamp_index">
+    <index id="463" parent="316" name="mat_view_regions_timestamp_index">
       <ColNames>source_timestamp
 region
 region_type
@@ -1753,24 +1926,24 @@ source</ColNames>
       <ReverseColNames>source_timestamp</ReverseColNames>
       <Type>btree</Type>
     </index>
-    <index id="453" parent="316" name="mat_view_regions_non_region_indexes">
+    <index id="464" parent="316" name="mat_view_regions_non_region_indexes">
       <ColNames>region_type
 source_timestamp
 hazard
 source</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="454" parent="316" name="mat_view_regions_region_type_source_timestamp_region_index">
+    <index id="465" parent="316" name="mat_view_regions_region_type_source_timestamp_region_index">
       <ColNames>region_type
 source_timestamp
 region</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="455" parent="316" name="mat_view_regions_region_type_index">
+    <index id="466" parent="316" name="mat_view_regions_region_type_index">
       <ColNames>region_type</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="456" parent="316" name="mat_view_regions_main_index">
+    <index id="467" parent="316" name="mat_view_regions_main_index">
       <ColNames>region
 region_type
 hazard
@@ -1779,78 +1952,78 @@ source
 deleted</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="457" parent="316" name="PRIMARY">
+    <key id="468" parent="316" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>source_id
-region
-region_type
-map_location
-hazard
-source</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="458" parent="317" name="source_id">
+    <column id="469" parent="317" name="source_id">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="459" parent="317" name="source">
+    <column id="470" parent="317" name="source">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;twitter&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="460" parent="317" name="hazard">
+    <column id="471" parent="317" name="hazard">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;flood&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="461" parent="317" name="source_timestamp">
+    <column id="472" parent="317" name="source_timestamp">
       <DataType>timestamp|0s</DataType>
       <Position>4</Position>
     </column>
-    <column id="462" parent="317" name="region_type">
+    <column id="473" parent="317" name="region_type">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="463" parent="317" name="region">
+    <column id="474" parent="317" name="region">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="464" parent="317" name="warning">
+    <column id="475" parent="317" name="warning">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>7</Position>
     </column>
-    <column id="465" parent="317" name="deleted">
+    <column id="476" parent="317" name="deleted">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>8</Position>
     </column>
-    <column id="466" parent="317" name="map_location">
+    <column id="477" parent="317" name="map_location">
       <DataType>varchar(16)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>9</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="467" parent="317" name="language">
+    <column id="478" parent="317" name="language">
       <DataType>varchar(16)|0s</DataType>
       <DefaultExpression>&apos;en&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>10</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <index id="468" parent="317" name="mat_view_regions_flood_stats_idx">
+    <column id="479" parent="317" name="region_relation">
+      <DataType>int|0s</DataType>
+      <DefaultExpression>0</DefaultExpression>
+      <Position>11</Position>
+    </column>
+    <index id="480" parent="317" name="mat_view_regions_flood_stats_idx">
       <ColNames>source_timestamp
 region_type
 hazard
@@ -1861,7 +2034,7 @@ deleted
 region</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="469" parent="317" name="mat_view_regions_flood_ts_idx">
+    <index id="481" parent="317" name="mat_view_regions_flood_ts_idx">
       <ColNames>source_timestamp
 region
 region_type
@@ -1870,7 +2043,7 @@ source</ColNames>
       <ReverseColNames>source_timestamp</ReverseColNames>
       <Type>btree</Type>
     </index>
-    <index id="470" parent="317" name="mat_view_regions_flood_main_idx">
+    <index id="482" parent="317" name="mat_view_regions_flood_main_idx">
       <ColNames>region
 region_type
 hazard
@@ -1879,68 +2052,73 @@ source
 deleted</ColNames>
       <Type>btree</Type>
     </index>
-    <column id="471" parent="318" name="source_id">
+    <column id="483" parent="318" name="source_id">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="472" parent="318" name="source">
+    <column id="484" parent="318" name="source">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;twitter&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="473" parent="318" name="hazard">
+    <column id="485" parent="318" name="hazard">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;flood&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="474" parent="318" name="source_timestamp">
+    <column id="486" parent="318" name="source_timestamp">
       <DataType>timestamp|0s</DataType>
       <Position>4</Position>
     </column>
-    <column id="475" parent="318" name="region_type">
+    <column id="487" parent="318" name="region_type">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="476" parent="318" name="region">
+    <column id="488" parent="318" name="region">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="477" parent="318" name="warning">
+    <column id="489" parent="318" name="warning">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>7</Position>
     </column>
-    <column id="478" parent="318" name="deleted">
+    <column id="490" parent="318" name="deleted">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>8</Position>
     </column>
-    <column id="479" parent="318" name="map_location">
+    <column id="491" parent="318" name="map_location">
       <DataType>varchar(16)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>9</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="480" parent="318" name="language">
+    <column id="492" parent="318" name="language">
       <DataType>varchar(16)|0s</DataType>
       <DefaultExpression>&apos;en&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>10</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <index id="481" parent="318" name="mat_view_regions_snow_stats_idx">
+    <column id="493" parent="318" name="region_relation">
+      <DataType>int|0s</DataType>
+      <DefaultExpression>0</DefaultExpression>
+      <Position>11</Position>
+    </column>
+    <index id="494" parent="318" name="mat_view_regions_snow_stats_idx">
       <ColNames>source_timestamp
 region_type
 hazard
@@ -1951,7 +2129,7 @@ deleted
 region</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="482" parent="318" name="mat_view_regions_snow_ts_idx">
+    <index id="495" parent="318" name="mat_view_regions_snow_ts_idx">
       <ColNames>source_timestamp
 region
 region_type
@@ -1960,7 +2138,7 @@ source</ColNames>
       <ReverseColNames>source_timestamp</ReverseColNames>
       <Type>btree</Type>
     </index>
-    <index id="483" parent="318" name="mat_view_regions_snow_main_idx">
+    <index id="496" parent="318" name="mat_view_regions_snow_main_idx">
       <ColNames>region
 region_type
 hazard
@@ -1969,68 +2147,73 @@ source
 deleted</ColNames>
       <Type>btree</Type>
     </index>
-    <column id="484" parent="319" name="source_id">
+    <column id="497" parent="319" name="source_id">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="485" parent="319" name="source">
+    <column id="498" parent="319" name="source">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;twitter&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="486" parent="319" name="hazard">
+    <column id="499" parent="319" name="hazard">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;flood&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="487" parent="319" name="source_timestamp">
+    <column id="500" parent="319" name="source_timestamp">
       <DataType>timestamp|0s</DataType>
       <Position>4</Position>
     </column>
-    <column id="488" parent="319" name="region_type">
+    <column id="501" parent="319" name="region_type">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="489" parent="319" name="region">
+    <column id="502" parent="319" name="region">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="490" parent="319" name="warning">
+    <column id="503" parent="319" name="warning">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>7</Position>
     </column>
-    <column id="491" parent="319" name="deleted">
+    <column id="504" parent="319" name="deleted">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>8</Position>
     </column>
-    <column id="492" parent="319" name="map_location">
+    <column id="505" parent="319" name="map_location">
       <DataType>varchar(16)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>9</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="493" parent="319" name="language">
+    <column id="506" parent="319" name="language">
       <DataType>varchar(16)|0s</DataType>
       <DefaultExpression>&apos;en&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>10</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <index id="494" parent="319" name="mat_view_regions_wind_stats_idx">
+    <column id="507" parent="319" name="region_relation">
+      <DataType>int|0s</DataType>
+      <DefaultExpression>0</DefaultExpression>
+      <Position>11</Position>
+    </column>
+    <index id="508" parent="319" name="mat_view_regions_wind_stats_idx">
       <ColNames>source_timestamp
 region_type
 hazard
@@ -2041,7 +2224,7 @@ deleted
 region</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="495" parent="319" name="mat_view_regions_wind_ts_idx">
+    <index id="509" parent="319" name="mat_view_regions_wind_ts_idx">
       <ColNames>source_timestamp
 region
 region_type
@@ -2050,7 +2233,7 @@ source</ColNames>
       <ReverseColNames>source_timestamp</ReverseColNames>
       <Type>btree</Type>
     </index>
-    <index id="496" parent="319" name="mat_view_regions_wind_main_idx">
+    <index id="510" parent="319" name="mat_view_regions_wind_main_idx">
       <ColNames>region
 region_type
 hazard
@@ -2059,114 +2242,69 @@ source
 deleted</ColNames>
       <Type>btree</Type>
     </index>
-    <column id="497" parent="320" name="text_count">
+    <column id="511" parent="320" name="text_count">
       <DataType>bigint|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="498" parent="320" name="source">
+    <column id="512" parent="320" name="source">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;twitter&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="499" parent="320" name="hazard">
+    <column id="513" parent="320" name="hazard">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;flood&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="500" parent="320" name="source_date">
+    <column id="514" parent="320" name="source_date">
       <DataType>datetime|0s</DataType>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="501" parent="320" name="region_type">
+    <column id="515" parent="320" name="region_type">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="502" parent="320" name="region">
+    <column id="516" parent="320" name="region">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="503" parent="320" name="warning">
+    <column id="517" parent="320" name="warning">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>7</Position>
     </column>
-    <column id="504" parent="320" name="deleted">
+    <column id="518" parent="320" name="deleted">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>8</Position>
     </column>
-    <column id="505" parent="320" name="map_location">
+    <column id="519" parent="320" name="map_location">
       <DataType>varchar(16)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>9</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="506" parent="320" name="language">
+    <column id="520" parent="320" name="language">
       <DataType>varchar(16)|0s</DataType>
       <DefaultExpression>&apos;en&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>10</Position>
     </column>
-    <index id="507" parent="320" name="mat_view_text_count_count_index">
-      <ColNames>text_count</ColNames>
-      <Type>btree</Type>
-    </index>
-    <index id="508" parent="320" name="mat_view_text_count_region_type_hazard_source_count_index">
-      <ColNames>region_type
-hazard
-source
-text_count</ColNames>
-      <Type>btree</Type>
-    </index>
-    <index id="509" parent="320" name="mat_view_text_count_all_but_region_index">
-      <ColNames>region_type
-hazard
-source
-warning
-deleted
-text_count</ColNames>
-      <Type>btree</Type>
-    </index>
-    <index id="510" parent="320" name="mat_view_text_count_region_type_hazard_source_index">
-      <ColNames>region_type
-hazard
-source</ColNames>
-      <Type>btree</Type>
-    </index>
-    <index id="511" parent="320" name="mat_view_text_count_all_index">
+    <index id="521" parent="320" name="PRIMARY">
       <ColNames>region
-region_type
-hazard
-source
-warning
-deleted
-text_count</ColNames>
-      <Type>btree</Type>
-    </index>
-    <index id="512" parent="320" name="mat_view_text_count_region_region_type_hazard_source_index">
-      <ColNames>region
-region_type
-hazard
-source</ColNames>
-      <Type>btree</Type>
-    </index>
-    <key id="513" parent="320" name="PRIMARY">
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-      <UnderlyingIndexColNames>region
 region_type
 hazard
 source
@@ -2174,69 +2312,129 @@ source_date
 map_location
 warning
 deleted
-language</UnderlyingIndexColNames>
+language</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="522" parent="320" name="mat_view_text_count_count_index">
+      <ColNames>text_count</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="523" parent="320" name="mat_view_text_count_region_type_hazard_source_count_index">
+      <ColNames>region_type
+hazard
+source
+text_count</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="524" parent="320" name="mat_view_text_count_all_but_region_index">
+      <ColNames>region_type
+hazard
+source
+warning
+deleted
+text_count</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="525" parent="320" name="mat_view_text_count_region_type_hazard_source_index">
+      <ColNames>region_type
+hazard
+source</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="526" parent="320" name="mat_view_text_count_all_index">
+      <ColNames>region
+region_type
+hazard
+source
+warning
+deleted
+text_count</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="527" parent="320" name="mat_view_text_count_region_region_type_hazard_source_index">
+      <ColNames>region
+region_type
+hazard
+source</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="528" parent="320" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="514" parent="321" name="region_group_name">
+    <column id="529" parent="321" name="region_group_name">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="515" parent="321" name="source">
+    <column id="530" parent="321" name="source">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;twitter&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="516" parent="321" name="hazard">
+    <column id="531" parent="321" name="hazard">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;flood&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="517" parent="321" name="warning">
+    <column id="532" parent="321" name="warning">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="518" parent="321" name="source_date">
+    <column id="533" parent="321" name="source_date">
       <DataType>date|0s</DataType>
       <NotNull>1</NotNull>
       <Position>5</Position>
     </column>
-    <column id="519" parent="321" name="source_text">
+    <column id="534" parent="321" name="source_text">
       <DataType>text|0s</DataType>
       <NotNull>1</NotNull>
       <Position>6</Position>
     </column>
-    <column id="520" parent="321" name="region_type">
+    <column id="535" parent="321" name="region_type">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>7</Position>
     </column>
-    <column id="521" parent="321" name="deleted">
+    <column id="536" parent="321" name="deleted">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>8</Position>
     </column>
-    <column id="522" parent="321" name="source_id">
+    <column id="537" parent="321" name="source_id">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>9</Position>
     </column>
-    <column id="523" parent="321" name="map_location">
+    <column id="538" parent="321" name="map_location">
       <DataType>varchar(16)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>10</Position>
     </column>
-    <column id="524" parent="321" name="language">
+    <column id="539" parent="321" name="language">
       <DataType>varchar(16)|0s</DataType>
       <DefaultExpression>&apos;en&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>11</Position>
     </column>
-    <index id="525" parent="321" name="mat_view_timeseries_date_tertiary_index">
+    <index id="540" parent="321" name="PRIMARY">
+      <ColNames>source_id
+region_group_name
+region_type
+map_location
+hazard
+source</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="541" parent="321" name="mat_view_timeseries_date_tertiary_index">
       <ColNames>region_group_name
 hazard
 source
@@ -2246,14 +2444,14 @@ map_location
 source_date</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="526" parent="321" name="mat_view_timeseries_date_primary_idx">
+    <index id="542" parent="321" name="mat_view_timeseries_date_primary_idx">
       <ColNames>source_date
 region_group_name
 hazard
 language</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="527" parent="321" name="mat_view_timeseries_date_secondary_idx">
+    <index id="543" parent="321" name="mat_view_timeseries_date_secondary_idx">
       <ColNames>source_date
 hazard
 language
@@ -2262,85 +2460,90 @@ deleted
 map_location</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="528" parent="321" name="mat_view_timeseries_date_source_date_index">
+    <index id="544" parent="321" name="mat_view_timeseries_date_source_date_index">
       <ColNames>source_date</ColNames>
       <ReverseColNames>source_date</ReverseColNames>
       <Type>btree</Type>
     </index>
-    <index id="529" parent="321" name="full_text_idx">
+    <index id="545" parent="321" name="full_text_idx">
       <ColNames>source_text</ColNames>
       <Type>fulltext</Type>
     </index>
-    <key id="530" parent="321" name="PRIMARY">
+    <key id="546" parent="321" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>source_id
-region_group_name
-region_type
-map_location
-hazard
-source</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="531" parent="322" name="region_group_name">
+    <column id="547" parent="322" name="region_group_name">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="532" parent="322" name="source">
+    <column id="548" parent="322" name="source">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;twitter&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="533" parent="322" name="hazard">
+    <column id="549" parent="322" name="hazard">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;flood&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="534" parent="322" name="warning">
+    <column id="550" parent="322" name="warning">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="535" parent="322" name="source_date">
+    <column id="551" parent="322" name="source_date">
       <DataType>datetime|0s</DataType>
       <Position>5</Position>
     </column>
-    <column id="536" parent="322" name="source_text">
+    <column id="552" parent="322" name="source_text">
       <DataType>text|0s</DataType>
       <NotNull>1</NotNull>
       <Position>6</Position>
     </column>
-    <column id="537" parent="322" name="region_type">
+    <column id="553" parent="322" name="region_type">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>7</Position>
     </column>
-    <column id="538" parent="322" name="deleted">
+    <column id="554" parent="322" name="deleted">
       <DataType>bigint|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>8</Position>
     </column>
-    <column id="539" parent="322" name="source_id">
+    <column id="555" parent="322" name="source_id">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>9</Position>
     </column>
-    <column id="540" parent="322" name="map_location">
+    <column id="556" parent="322" name="map_location">
       <DataType>varchar(16)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>10</Position>
     </column>
-    <column id="541" parent="322" name="language">
+    <column id="557" parent="322" name="language">
       <DataType>varchar(16)|0s</DataType>
       <DefaultExpression>&apos;en-GB&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>11</Position>
     </column>
-    <index id="542" parent="322" name="mat_view_timeseries_hour_tertiary_index">
+    <index id="558" parent="322" name="PRIMARY">
+      <ColNames>source_id
+region_group_name
+region_type
+map_location
+hazard
+source</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="559" parent="322" name="mat_view_timeseries_hour_tertiary_index">
       <ColNames>region_group_name
 hazard
 source
@@ -2350,14 +2553,14 @@ map_location
 source_date</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="543" parent="322" name="mat_view_timeseries_hour_primary_idx">
+    <index id="560" parent="322" name="mat_view_timeseries_hour_primary_idx">
       <ColNames>source_date
 region_group_name
 hazard
 language</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="544" parent="322" name="mat_view_timeseries_hour_secondary_idx">
+    <index id="561" parent="322" name="mat_view_timeseries_hour_secondary_idx">
       <ColNames>source_date
 hazard
 language
@@ -2366,439 +2569,475 @@ deleted
 map_location</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="545" parent="322" name="mat_view_timeseries_hour_source_date_asc_index">
+    <index id="562" parent="322" name="mat_view_timeseries_hour_source_date_asc_index">
       <ColNames>source_date</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="546" parent="322" name="mat_view_timeseries_hour_source_date_index">
+    <index id="563" parent="322" name="mat_view_timeseries_hour_source_date_index">
       <ColNames>source_date</ColNames>
       <ReverseColNames>source_date</ReverseColNames>
       <Type>btree</Type>
     </index>
-    <index id="547" parent="322" name="full_text_idx">
+    <index id="564" parent="322" name="full_text_idx">
       <ColNames>source_text</ColNames>
       <Type>fulltext</Type>
     </index>
-    <key id="548" parent="322" name="PRIMARY">
+    <key id="565" parent="322" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>source_id
-region_group_name
-region_type
-map_location
-hazard
-source</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="549" parent="323" name="boundary">
+    <column id="566" parent="323" name="boundary">
       <DataType>geometry|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="550" parent="323" name="region">
+    <column id="567" parent="323" name="region">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="551" parent="323" name="map_location">
+    <column id="568" parent="323" name="map_location">
       <DataType>varchar(16)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="552" parent="323" name="region_type">
+    <column id="569" parent="323" name="region_type">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="553" parent="323" name="title">
+    <column id="570" parent="323" name="title">
       <DataType>varchar(256)|0s</DataType>
       <Position>5</Position>
     </column>
-    <column id="554" parent="323" name="level">
+    <column id="571" parent="323" name="level">
       <DataType>int|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>6</Position>
     </column>
-    <column id="555" parent="323" name="centroid">
+    <column id="572" parent="323" name="centroid">
       <DataType>geometry|0s</DataType>
       <NotNull>1</NotNull>
       <Position>7</Position>
     </column>
-    <column id="556" parent="323" name="envelope">
+    <column id="573" parent="323" name="envelope">
       <DataType>geometry|0s</DataType>
       <NotNull>1</NotNull>
       <Position>8</Position>
     </column>
-    <column id="557" parent="323" name="buffered">
+    <column id="574" parent="323" name="buffered">
       <DataType>geometry|0s</DataType>
       <NotNull>1</NotNull>
       <Position>9</Position>
     </column>
-    <column id="558" parent="323" name="disabled">
+    <column id="575" parent="323" name="disabled">
       <DataType>tinyint(1)|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>10</Position>
     </column>
-    <index id="559" parent="323" name="ref_geo_regions_map_location_region_region_type_uindex">
+    <index id="576" parent="323" name="PRIMARY">
+      <ColNames>region
+region_type
+map_location</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="577" parent="323" name="ref_geo_regions_map_location_region_region_type_uindex">
       <ColNames>map_location
 region
 region_type</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="560" parent="323" name="boundary_index">
+    <index id="578" parent="323" name="boundary_index">
       <ColNames>boundary</ColNames>
       <Type>spatial</Type>
     </index>
-    <index id="561" parent="323" name="ref_geo_regions_boundary_index">
+    <index id="579" parent="323" name="ref_geo_regions_boundary_index">
       <ColNames>boundary</ColNames>
       <Type>spatial</Type>
     </index>
-    <index id="562" parent="323" name="ref_geo_regions_region_index">
+    <index id="580" parent="323" name="ref_geo_regions_region_index">
       <ColNames>region</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="563" parent="323" name="ref_geo_regions_region_type_map_location_index">
+    <index id="581" parent="323" name="ref_geo_regions_region_type_map_location_index">
       <ColNames>region_type
 map_location</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="564" parent="323" name="ref_geo_regions_title_index">
+    <index id="582" parent="323" name="ref_geo_regions_title_index">
       <ColNames>title</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="565" parent="323" name="centroid">
+    <index id="583" parent="323" name="centroid">
       <ColNames>centroid</ColNames>
       <Type>spatial</Type>
     </index>
-    <index id="566" parent="323" name="envelope">
+    <index id="584" parent="323" name="envelope">
       <ColNames>envelope</ColNames>
       <Type>spatial</Type>
     </index>
-    <index id="567" parent="323" name="buffered">
+    <index id="585" parent="323" name="buffered">
       <ColNames>buffered</ColNames>
       <Type>spatial</Type>
     </index>
-    <key id="568" parent="323" name="PRIMARY">
+    <key id="586" parent="323" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>region
-region_type
-map_location</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <key id="569" parent="323" name="ref_geo_regions_map_location_region_region_type_uindex">
+    <key id="587" parent="323" name="ref_geo_regions_map_location_region_region_type_uindex">
       <UnderlyingIndexName>ref_geo_regions_map_location_region_region_type_uindex</UnderlyingIndexName>
     </key>
-    <column id="570" parent="324" name="boundary">
+    <column id="588" parent="324" name="boundary">
       <DataType>geometry|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="571" parent="324" name="region">
+    <column id="589" parent="324" name="region">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="572" parent="324" name="map_location">
+    <column id="590" parent="324" name="map_location">
       <DataType>varchar(16)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="573" parent="324" name="region_type">
+    <column id="591" parent="324" name="region_type">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="574" parent="324" name="title">
+    <column id="592" parent="324" name="title">
       <DataType>varchar(256)|0s</DataType>
       <Position>5</Position>
       <CollationName>utf8mb4_general_ci</CollationName>
     </column>
-    <column id="575" parent="324" name="level">
+    <column id="593" parent="324" name="level">
       <DataType>int|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>6</Position>
     </column>
-    <column id="576" parent="325" name="virtual_region_type">
+    <column id="594" parent="325" name="virtual_region_type">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="577" parent="325" name="virtual_region">
+    <column id="595" parent="325" name="virtual_region">
       <DataType>varchar(64)|0s</DataType>
       <Position>2</Position>
     </column>
-    <column id="578" parent="325" name="geo_region">
+    <column id="596" parent="325" name="geo_region">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="579" parent="325" name="geo_region_type">
+    <column id="597" parent="325" name="geo_region_type">
       <DataType>varchar(64)|0s</DataType>
       <Position>4</Position>
     </column>
-    <foreign-key id="580" parent="325" name="ref_geo_virtual_regions_ref_geo_regions_region_fk">
+    <foreign-key id="598" parent="325" name="ref_geo_virtual_regions_ref_geo_regions_region_fk">
       <ColNames>geo_region
 geo_region_type</ColNames>
       <RefColNames>region
 region_type</RefColNames>
       <RefTableName>ref_geo_regions</RefTableName>
     </foreign-key>
-    <index id="581" parent="325" name="ref_geo_virtual_regions_all_columns_idx">
+    <index id="599" parent="325" name="ref_geo_virtual_regions_all_columns_idx">
       <ColNames>virtual_region_type
 virtual_region
 geo_region
 geo_region_type</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="582" parent="325" name="ref_geo_virtual_regions_ref_geo_regions_region_fk">
+    <index id="600" parent="325" name="ref_geo_virtual_regions_ref_geo_regions_region_fk">
       <ColNames>geo_region
 geo_region_type</ColNames>
       <Type>btree</Type>
     </index>
-    <column id="583" parent="326" name="value">
+    <column id="601" parent="326" name="value">
       <DataType>bigint|0s</DataType>
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <index id="584" parent="326" name="ref_integers_value_uindex">
+    <index id="602" parent="326" name="PRIMARY">
       <ColNames>value</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="585" parent="326" name="PRIMARY">
+    <index id="603" parent="326" name="ref_integers_value_uindex">
+      <ColNames>value</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="604" parent="326" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>value</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <key id="586" parent="326" name="ref_integers_value_uindex">
+    <key id="605" parent="326" name="ref_integers_value_uindex">
       <UnderlyingIndexName>ref_integers_value_uindex</UnderlyingIndexName>
     </key>
-    <column id="587" parent="327" name="k">
+    <column id="606" parent="327" name="k">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="588" parent="327" name="boolean_value">
+    <column id="607" parent="327" name="boolean_value">
       <DataType>tinyint(1)|0s</DataType>
       <Position>2</Position>
     </column>
-    <column id="589" parent="327" name="string_value">
+    <column id="608" parent="327" name="string_value">
       <DataType>varchar(1024)|0s</DataType>
       <Position>3</Position>
     </column>
-    <index id="590" parent="327" name="ref_key_value_key_uindex">
+    <index id="609" parent="327" name="PRIMARY">
       <ColNames>k</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="591" parent="327" name="PRIMARY">
+    <index id="610" parent="327" name="ref_key_value_key_uindex">
+      <ColNames>k</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="611" parent="327" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>k</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <key id="592" parent="327" name="ref_key_value_key_uindex">
+    <key id="612" parent="327" name="ref_key_value_key_uindex">
       <UnderlyingIndexName>ref_key_value_key_uindex</UnderlyingIndexName>
     </key>
-    <column id="593" parent="328" name="id">
+    <column id="613" parent="328" name="id">
       <DataType>varchar(32)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="594" parent="328" name="title">
+    <column id="614" parent="328" name="title">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="595" parent="328" name="location">
+    <column id="615" parent="328" name="location">
       <DataType>varchar(6)|0s</DataType>
       <Position>3</Position>
     </column>
-    <column id="596" parent="328" name="start_lat">
+    <column id="616" parent="328" name="start_lat">
       <DataType>float|0s</DataType>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="597" parent="328" name="start_lng">
+    <column id="617" parent="328" name="start_lng">
       <DataType>float|0s</DataType>
       <NotNull>1</NotNull>
       <Position>5</Position>
     </column>
-    <column id="598" parent="328" name="start_zoom">
+    <column id="618" parent="328" name="start_zoom">
       <DataType>int|0s</DataType>
       <Position>6</Position>
     </column>
-    <column id="599" parent="328" name="default_region_type">
+    <column id="619" parent="328" name="default_region_type">
       <DataType>varchar(64)|0s</DataType>
       <DefaultExpression>&apos;county&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>7</Position>
     </column>
-    <column id="600" parent="328" name="last_date">
+    <column id="620" parent="328" name="last_date">
       <DataType>date|0s</DataType>
       <Position>8</Position>
     </column>
-    <index id="601" parent="328" name="ref_map_metadata_id_uindex">
+    <index id="621" parent="328" name="PRIMARY">
       <ColNames>id</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="602" parent="328" name="PRIMARY">
+    <index id="622" parent="328" name="ref_map_metadata_id_uindex">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="623" parent="328" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>id</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <key id="603" parent="328" name="ref_map_metadata_id_uindex">
+    <key id="624" parent="328" name="ref_map_metadata_id_uindex">
       <UnderlyingIndexName>ref_map_metadata_id_uindex</UnderlyingIndexName>
     </key>
-    <column id="604" parent="329" name="map_id">
+    <column id="625" parent="329" name="map_id">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="605" parent="329" name="region_aggregation_type_id">
+    <column id="626" parent="329" name="region_aggregation_type_id">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="606" parent="330" name="map_id">
+    <column id="627" parent="330" name="map_id">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="607" parent="330" name="region_id">
+    <column id="628" parent="330" name="region_id">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="608" parent="330" name="title">
+    <column id="629" parent="330" name="title">
       <DataType>varchar(256)|0s</DataType>
       <Position>3</Position>
     </column>
-    <column id="609" parent="331" name="region_aggregation_id">
+    <column id="630" parent="331" name="region_aggregation_id">
       <DataType>varchar(32)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="610" parent="331" name="region_type">
+    <column id="631" parent="331" name="region_type">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="611" parent="331" name="region">
+    <column id="632" parent="331" name="region">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <key id="612" parent="331" name="PRIMARY">
+    <index id="633" parent="331" name="PRIMARY">
+      <ColNames>region_aggregation_id
+region_type
+region</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="634" parent="331" name="ref_map_region_aggregation_mappings_index1">
+      <ColNames>region
+region_type
+region_aggregation_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="635" parent="331" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>region_aggregation_id
-region_type
-region</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="613" parent="332" name="id">
+    <column id="636" parent="332" name="id">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="614" parent="332" name="title">
+    <column id="637" parent="332" name="title">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <index id="615" parent="332" name="ref_map_region_aggregations_id_uindex">
+    <index id="638" parent="332" name="PRIMARY">
       <ColNames>id</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="616" parent="332" name="PRIMARY">
+    <index id="639" parent="332" name="ref_map_region_aggregations_id_uindex">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="640" parent="332" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>id</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <key id="617" parent="332" name="ref_map_region_aggregations_id_uindex">
+    <key id="641" parent="332" name="ref_map_region_aggregations_id_uindex">
       <UnderlyingIndexName>ref_map_region_aggregations_id_uindex</UnderlyingIndexName>
     </key>
-    <column id="618" parent="333" name="id">
+    <column id="642" parent="333" name="id">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="619" parent="333" name="title">
+    <column id="643" parent="333" name="title">
       <DataType>varchar(256)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="620" parent="333" name="region_aggregation_type_id">
+    <column id="644" parent="333" name="region_aggregation_type_id">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <index id="621" parent="333" name="ref_map_region_aggregations_id_uindex">
+    <index id="645" parent="333" name="PRIMARY">
       <ColNames>id</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="622" parent="333" name="PRIMARY">
+    <index id="646" parent="333" name="ref_map_region_aggregations_id_uindex">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="647" parent="333" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
-      <UnderlyingIndexColNames>id</UnderlyingIndexColNames>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <key id="623" parent="333" name="ref_map_region_aggregations_id_uindex">
+    <key id="648" parent="333" name="ref_map_region_aggregations_id_uindex">
       <UnderlyingIndexName>ref_map_region_aggregations_id_uindex</UnderlyingIndexName>
     </key>
-    <column id="624" parent="334" name="boundary">
+    <column id="649" parent="334" name="boundary">
       <DataType>geometry|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="625" parent="334" name="region">
+    <column id="650" parent="334" name="region">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="626" parent="334" name="map_location">
+    <column id="651" parent="334" name="map_location">
       <DataType>varchar(16)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="627" parent="334" name="region_type">
+    <column id="652" parent="334" name="region_type">
       <DataType>varchar(64)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="628" parent="334" name="title">
+    <column id="653" parent="334" name="title">
       <DataType>varchar(256)|0s</DataType>
       <Position>5</Position>
     </column>
-    <column id="629" parent="334" name="level">
+    <column id="654" parent="334" name="level">
       <DataType>int|0s</DataType>
       <NotNull>1</NotNull>
       <Position>6</Position>
     </column>
-    <column id="630" parent="334" name="centroid">
+    <column id="655" parent="334" name="centroid">
       <DataType>geometry|0s</DataType>
       <NotNull>1</NotNull>
       <Position>7</Position>
     </column>
-    <column id="631" parent="334" name="envelope">
+    <column id="656" parent="334" name="envelope">
       <DataType>geometry|0s</DataType>
       <NotNull>1</NotNull>
       <Position>8</Position>
     </column>
-    <column id="632" parent="334" name="buffered">
+    <column id="657" parent="334" name="buffered">
       <DataType>geometry|0s</DataType>
       <NotNull>1</NotNull>
       <Position>9</Position>
     </column>
-    <column id="633" parent="334" name="disabled">
+    <column id="658" parent="334" name="disabled">
       <DataType>tinyint|0s</DataType>
       <NotNull>1</NotNull>
       <Position>10</Position>
