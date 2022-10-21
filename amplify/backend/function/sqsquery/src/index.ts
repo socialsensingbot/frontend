@@ -1,6 +1,6 @@
 import {functionLookup, MapFunctionName, MapFunctionRequest, MapFunctionResponse} from "socialsensing-api/map-queries";
 
-//bump 35
+//bump 36
 /**
  * @type {import('@types/aws-lambda').APIGatewayProxyHandler}
  */

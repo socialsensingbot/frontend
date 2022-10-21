@@ -15,7 +15,7 @@
       "resourceName": "socialsensingapilayer",
       "version": "Always choose latest version",
       "isLatestVersionSelected": true,
-      "env": "demo"
+      "env": "dev"
     }
   ],
   "secretNames": [
