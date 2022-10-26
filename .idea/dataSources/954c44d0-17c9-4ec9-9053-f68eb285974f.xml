@@ -1131,6 +1131,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="306" parent="278" name="mv_refresh_event">
       <Definer>admin@%</Definer>
       <Interval>&apos;5&apos; MINUTE</Interval>
+      <LastExecuted>2022-10-26.17:20:00</LastExecuted>
       <SourceTextLength>25</SourceTextLength>
       <Starts>&apos;2021-01-01 00:00:00&apos;</Starts>
       <Status>enabled</Status>

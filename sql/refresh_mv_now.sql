@@ -330,14 +330,15 @@ BEGIN
     SELECT t.source_id,
            t.source,
            t.hazard,
-           t.source_timestamp                                                                as source_timestamp,
+           t.source_timestamp       as source_timestamp,
            gr.region_type,
            gr.region,
            t.warning,
-           IFNULL(t.deleted, false)                                                          as deleted,
+           IFNULL(t.deleted, false) as deleted,
            gr.map_location,
            t.language,
-           IF(ST_Contains(boundary, location), 3, IF(ST_Contains(location, boundary), 4, 2)) as region_relation
+           3                        as region_relation
+#            IF(ST_Contains(boundary, location), 3, IF(ST_Contains(location, boundary), 4, 2)) as region_relation
     FROM live_text t,
          ref_geo_regions gr
     WHERE t.source_timestamp BETWEEN start_date and end_date
@@ -347,7 +348,7 @@ BEGIN
 #                  AND t.source = tr.source
 #                  AND t.hazard = tr.hazard
 #                  AND tr.region_type NOT IN ('county', 'fine', 'coarse')) = 0
-      AND ST_Intersects(boundary, location)
+#       AND ST_Intersects(boundary, location)
       AND NOT gr.disabled
       #Added as we're only supporting tweets within a region not intersecting etc.
       AND ST_Contains(boundary, location);
