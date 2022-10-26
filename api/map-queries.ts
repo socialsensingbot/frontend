@@ -549,7 +549,7 @@ export const csvExportFunc: MapFunction = async (req, res) => {
                                                                order by r.source_timestamp desc
                                                                LIMIT ?,?`,
                                  values: [new Date(req.body.startDate), new Date(endDate),
-                                          req.body.byRegion,
+                                          req.params.regionType || req.body.byRegion,
                                           req.body.hazards,
                                           req.body.sources,
                                           req.body.regions,

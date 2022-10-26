@@ -303,30 +303,30 @@ BEGIN
     call debug_msg(2, 'refresh_mv', 'Deleting from mat_view_regions');
     DELETE FROM mat_view_regions WHERE source_timestamp BETWEEN start_date and end_date;
     call debug_msg(2, 'refresh_mv', 'Inserting into mat_view_regions from live_text_regions data.');
-    INSERT INTO mat_view_regions
-    SELECT t.source_id,
-           t.source,
-           t.hazard,
-           t.source_timestamp          source_timestamp,
-           tr.region_type,
-           tr.region,
-           t.warning,
-           IFNULL(t.deleted, false) as deleted,
-           'uk',
-           t.language,
-           1                        as region_relation
-    FROM live_text t,
-         live_text_regions tr
-    WHERE t.source_id = tr.source_id
-      AND t.source = tr.source
-      AND t.hazard = tr.hazard
-      AND t.source_timestamp BETWEEN start_date and end_date;
+    #     INSERT INTO mat_view_regions
+#     SELECT t.source_id,
+#            t.source,
+#            t.hazard,
+#            t.source_timestamp          source_timestamp,
+#            tr.region_type,
+#            tr.region,
+#            t.warning,
+#            IFNULL(t.deleted, false) as deleted,
+#            'uk',
+#            t.language,
+#            1                        as region_relation
+#     FROM live_text t,
+#          live_text_regions tr
+#     WHERE t.source_id = tr.source_id
+#       AND t.source = tr.source
+#       AND t.hazard = tr.hazard
+#       AND t.source_timestamp BETWEEN start_date and end_date;
 
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with live_text_regions data.');
 
     # Add in all other regions (the new way of doing this)
 
-    REPLACE INTO mat_view_regions
+    INSERT INTO mat_view_regions
     SELECT t.source_id,
            t.source,
            t.hazard,
@@ -348,7 +348,9 @@ BEGIN
 #                  AND t.hazard = tr.hazard
 #                  AND tr.region_type NOT IN ('county', 'fine', 'coarse')) = 0
       AND ST_Intersects(boundary, location)
-      AND NOT gr.disabled;
+      AND NOT gr.disabled
+      #Added as we're only supporting tweets within a region not intersecting etc.
+      AND ST_Contains(boundary, location);
     COMMIT;
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with boundary matches.');
 

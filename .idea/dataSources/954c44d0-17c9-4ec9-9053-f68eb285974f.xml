@@ -1075,6 +1075,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="299" parent="278" name="daily_housekeeping_event_1">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-10-21.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-01 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -1082,6 +1083,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="300" parent="278" name="daily_housekeeping_event_2">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-10-22.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-02 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -1089,6 +1091,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="301" parent="278" name="daily_housekeeping_event_3">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-10-23.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-03 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -1096,6 +1099,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="302" parent="278" name="daily_housekeeping_event_4">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-10-24.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-04 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -1103,6 +1107,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="303" parent="278" name="daily_housekeeping_event_5">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-10-25.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-05 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -1110,6 +1115,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="304" parent="278" name="daily_housekeeping_event_6">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-10-26.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-06 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -1117,6 +1123,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <scheduled-event id="305" parent="278" name="daily_housekeeping_event_7">
       <Definer>admin@%</Definer>
       <Interval>&apos;1&apos; WEEK</Interval>
+      <LastExecuted>2022-10-20.03:17:17</LastExecuted>
       <SourceTextLength>31</SourceTextLength>
       <Starts>&apos;2021-01-07 02:17:17&apos;</Starts>
       <Status>enabled</Status>
@@ -1355,7 +1362,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <Position>2</Position>
     </argument>
     <column id="361" parent="307" name="id">
-      <AutoIncrement>1096268</AutoIncrement>
+      <AutoIncrement>1098213</AutoIncrement>
       <DataType>int|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
