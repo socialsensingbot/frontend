@@ -24,7 +24,7 @@ describe('#104 Slider and tweet interaction : https://github.com/socialsensingbo
                  cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-cambridgeshire").click();
                  cy.get(".app-tweet-table", {timeout: 30000});
                  cy.wait(10000);
-                 cy.tweetCountTotal(48);
+                 cy.tweetCountTotal(46);
                  cy.log("Click back into London (1)");
                  // cy.get(".app-draw-close-button > .mat-button-wrapper > .mat-icon", {timeout: 30000}).click();
                  cy.get("div.leaflet-pane.leaflet-overlay-pane > svg > g > path.x-feature-name-greater-london").click({force: true});

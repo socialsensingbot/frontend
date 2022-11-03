@@ -22,7 +22,7 @@ describe('#126 Pop state : https://github.com/socialsensingbot/frontend/issues/1
                  cy.wait(10000);
                  cy.twitterPanelHeader("Cambridgeshire");
                  cy.wait(2000);
-                 cy.tweetCountTotal(56);
+                 cy.tweetCountTotal(54);
                  cy.url({timeout: 20000}).should("equal",
                                                  MAP_URL + "?max_time=1631664000000&min_time=1631354400000&active_number=exceedance&active_polygon=county&selected=cambridgeshire");
                  cy.log("Go back into London.");
