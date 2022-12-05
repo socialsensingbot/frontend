@@ -14,7 +14,7 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm ci
+        - npm ci --legacy-peer-deps
         - mkdir -p dist/frontend
     build:
       commands:
