@@ -289,143 +289,74 @@ BEGIN
     COMMIT;
     call debug_msg(1, 'refresh_mv', 'Removed weather stations.');
 
-
-    #     delete from mat_view_regions where source_timestamp < NOW() - INTERVAL 1 YEAR;
-
-#     SET @maxTimestamp = IFNULL((select max(source_timestamp) from mat_view_regions), NOW() - INTERVAL 20 YEAR);
-    call debug_msg(1, 'refresh_mv', 'Updating mat_view_regions');
-    #     call debug_msg(1, 'refresh_mv', 'Deleted old from mat_view_regions');
-
-    # Put in the fine, coarse and county stats that Rudy generates data for (the old way of doing this)
-
-
     START TRANSACTION;
+
     call debug_msg(2, 'refresh_mv', 'Deleting from mat_view_regions');
     DELETE FROM mat_view_regions WHERE source_timestamp BETWEEN start_date and end_date;
-    call debug_msg(2, 'refresh_mv', 'Inserting into mat_view_regions from live_text_regions data.');
-    #     INSERT INTO mat_view_regions
-#     SELECT t.source_id,
-#            t.source,
-#            t.hazard,
-#            t.source_timestamp          source_timestamp,
-#            tr.region_type,
-#            tr.region,
-#            t.warning,
-#            IFNULL(t.deleted, false) as deleted,
-#            'uk',
-#            t.language,
-#            1                        as region_relation
-#     FROM live_text t,
-#          live_text_regions tr
-#     WHERE t.source_id = tr.source_id
-#       AND t.source = tr.source
-#       AND t.hazard = tr.hazard
-#       AND t.source_timestamp BETWEEN start_date and end_date;
+    call debug_msg(1, 'refresh_mv', 'Deleted old from mat_view_regions');
 
-    call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with live_text_regions data.');
+    call debug_msg(1, 'refresh_mv', 'Updating mat_view_regions');
 
-    # Add in all other regions (the new way of doing this)
+    # Put in the fine, coarse and county stats that Rudy generates data for
 
     INSERT INTO mat_view_regions
     SELECT t.source_id,
            t.source,
            t.hazard,
-           t.source_timestamp                                                                as source_timestamp,
+           t.source_timestamp          source_timestamp,
+           tr.region_type,
+           tr.region,
+           t.warning,
+           IFNULL(t.deleted, false) as deleted,
+           'uk',
+           t.language,
+           1
+    FROM live_text t,
+         live_text_regions tr
+    WHERE t.source_id = tr.source_id
+      AND t.source = tr.source
+      AND t.hazard = tr.hazard
+      AND t.source_timestamp BETWEEN start_date and end_date
+      AND region_type IN ('county', 'fine', 'coarse')
+      AND (select count(*) as c
+           from live_text_regions ltr
+           where t.source_id = ltr.source_id
+             and t.hazard = ltr.hazard
+             and region_type = 'county') < 10;
+
+    call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with live_text_regions data.');
+
+    # Add in any other regions
+    INSERT INTO mat_view_regions
+    SELECT t.source_id,
+           t.source,
+           t.hazard,
+           t.source_timestamp       as source_timestamp,
            gr.region_type,
            gr.region,
            t.warning,
-           IFNULL(t.deleted, false)                                                          as deleted,
+           IFNULL(t.deleted, false) as deleted,
            gr.map_location,
            t.language,
-           IF(ST_Contains(boundary, location), 3, IF(ST_Contains(location, boundary), 4, 2)) as region_relation
+           2
     FROM live_text t,
-         ref_geo_regions gr
+         ref_geo_regions gr USE INDEX (envelope)
     WHERE t.source_timestamp BETWEEN start_date and end_date
-#           AND (select count(*)
-#                from live_text_regions tr
-#                WHERE t.source_id = tr.source_id
-#                  AND t.source = tr.source
-#                  AND t.hazard = tr.hazard
-#                  AND tr.region_type NOT IN ('county', 'fine', 'coarse')) = 0
-#       AND ST_Intersects(boundary, location)
+      AND gr.region_type NOT IN ('county', 'fine', 'coarse')
+      AND gr.map_location = 'uk'
+      AND ST_Contains(envelope, location)
       AND ST_Intersects(boundary, location)
-      AND NOT ST_Contains(location, boundary)
       AND NOT gr.disabled;
-    #Added as we're only supporting tweets within a region not intersecting etc.
     COMMIT;
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with boundary matches.');
 
-    #     START TRANSACTION;
-#     REPLACE INTO mat_view_regions
-#     SELECT t.source_id,
-#            t.source,
-#            t.hazard,
-#            t.source_timestamp       as source_timestamp,
-#            vr.virtual_region_type   as region_type,
-#            vr.virtual_region        as region,
-#            t.warning,
-#            IFNULL(t.deleted, false) as deleted,
-#            gr.map_location
-#     FROM live_text t,
-#          ref_geo_regions gr,
-#          ref_geo_virtual_regions vr
-#     WHERE ST_Intersects(boundary, location)
-#       AND vr.geo_region = gr.region
-#       AND vr.geo_region_type = gr.region_type
-#       AND NOT gr.disabled
-#       AND t.source_timestamp BETWEEN start_date and end_date;
-#     COMMIT;
-#     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions with virtual region boundary matches.');
-
-
-    #     call debug_msg(1, 'refresh_mv', 'Fixing mat_view_regions for UK only');
-
-    #     # UK Locations are buffered with a 0.01 degree buffer. At present this is not done on the world map
-
-#     # If the world map is supported then this may be required to capture location just outside of the strict
-#     # boundary supplied. We only use the buffered values when the non buffered regions do not match.
-#     INSERT INTO mat_view_regions
-#     SELECT t.source_id,
-#            t.source,
-#            t.hazard,
-#            t.source_timestamp,
-#            gr.region_type,
-#            gr.region,
-#            t.warning,
-#            IFNULL(t.deleted, false) as deleted,
-#            gr.map_location
-#     FROM live_text t,
-#          ref_geo_regions gr
-#     WHERE ST_Intersects(buffered, location)
-#       AND map_location = 'uk'
-#       AND (select count(*) from ref_geo_regions where st_intersects(boundary, t.location) and map_location = 'uk') = 0
-#       AND t.source_timestamp BETWEEN start_date and end_date;
     call debug_msg(1, 'refresh_mv', 'Updated mat_view_regions');
-    #     START TRANSACTION;
-#     call debug_msg(1, 'refresh_mv', 'Updating hazard partitioned tables');
-#     replace into mat_view_regions_wind
-#     select *
-#     from mat_view_regions
-#     where source_timestamp BETWEEN start_date and end_date
-#       and hazard = 'wind';
-#     replace into mat_view_regions_flood
-#     select *
-#     from mat_view_regions
-#     where source_timestamp BETWEEN start_date and end_date
-#       and hazard = 'flood';
-#     replace into mat_view_regions_snow
-#     select *
-#     from mat_view_regions
-#     where source_timestamp BETWEEN start_date and end_date
-#       and hazard = 'snow';
-#     call debug_msg(1, 'refresh_mv', 'Updated hazard partitioned tables');
-#     COMMIT;
+
     START TRANSACTION;
     call debug_msg(1, 'refresh_mv', 'Updating mat_view_timeseries_date');
 
-    #     SET @maxTimestampTSD = IFNULL((select max(source_date) from mat_view_timeseries_date), NOW() - INTERVAL 20 YEAR);
     DELETE FROM mat_view_timeseries_date WHERE source_date BETWEEN start_date and end_date;
-    INSERT INTO mat_view_timeseries_date
+    REPLACE INTO mat_view_timeseries_date
     SELECT r.region                 as region_group_name,
            t.source                 as source,
            t.hazard                 as hazard,
@@ -453,7 +384,7 @@ BEGIN
 
     #     SET @maxTimestampTSH = IFNULL((select max(source_date) from mat_view_timeseries_hour), NOW() - INTERVAL 20 YEAR);
     DELETE FROM mat_view_timeseries_hour WHERE source_date BETWEEN start_date and end_date;
-    INSERT INTO mat_view_timeseries_hour
+    REPLACE INTO mat_view_timeseries_hour
     SELECT r.region                                                         as region_group_name,
            t.source                                                         as source,
            t.hazard                                                         as hazard,
