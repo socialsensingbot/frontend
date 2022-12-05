@@ -30,7 +30,7 @@ test:
   phases:
     preTest:
       commands:
-        - npm ci
+        - npm ci --legacy-peer-deps
         - npm install -g cypress
         - npm install -g pm2
         - npm install -g wait-on
