@@ -1,17 +1,24 @@
 {
   "features": {
     "graphqltransformer": {
-      "addmissingownerfields": false,
-      "improvepluralization": false,
-      "validatetypenamereservedwords": true,
-      "useexperimentalpipelinedtransformer": false,
-      "enableiterativegsiupdates": false,
-      "secondarykeyasgsi": false,
-      "skipoverridemutationinputtypes": false,
-      "transformerversion": 1,
-      "suppressschemamigrationprompt": true,
-      "securityEnhancementNotification": false,
-      "showfieldauthnotification": false
+      "addmissingownerfields" : false,
+      "improvepluralization" : false,
+      "validatetypenamereservedwords" : true,
+      "useexperimentalpipelinedtransformer" : false,
+      "enableiterativegsiupdates" : false,
+      "secondarykeyasgsi" : false,
+      "skipoverridemutationinputtypes" : false,
+      "transformerversion" : 1,
+      "suppressschemamigrationprompt" : true,
+      "securityenhancementnotification" : true,
+      "showfieldauthnotification" : false,
+      "usesubusernamefordefaultidentityclaim" : true,
+      "usefieldnameforprimarykeyconnectionfield" : false,
+      "enableautoindexquerynames" : false,
+      "respectprimarykeyattributesonconnectionfield" : false,
+      "shoulddeepmergedirectiveconfigdefaults" : false,
+      "populateownerfieldforstaticgroupauth" : false,
+      "securityEnhancementNotification" : false
     },
     "frontend-ios": {
       "enablexcodeintegration": false
@@ -49,8 +56,5 @@
     "project": {
       "overrides": true
     }
-  },
-  "debug": {
-    "shareProjectConfig": true
   }
 }
