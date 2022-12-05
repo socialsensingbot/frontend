@@ -103,7 +103,9 @@
           "secretsPathAmplifyAppId" : "dtmxl3q3i7oix"
         },
         "sqsquery" : {
-          "secretsPathAmplifyAppId" : "dtmxl3q3i7oix"
+          "secretsPathAmplifyAppId" : "dtmxl3q3i7oix",
+          "deploymentBucketName" : "amplify-socialsensing-prod-224245-deployment",
+          "s3Key" : "amplify-builds/sqsquery-516f59477645584f6677-build.zip"
         }
       },
       "hosting" : {
