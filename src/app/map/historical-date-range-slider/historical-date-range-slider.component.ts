@@ -19,6 +19,8 @@ import {roundToHour, roundToMinute} from "../../common";
 const log = new Logger("historical-date-range");
 
 const MAX_HISTORICAL: number = 365 * 24 * 60 * 60 * 1000;
+const MAX_CURRENT_EXTENT: number = 30 * 24 * 60 * 60 * 1000;
+const MAX_CURRENT_WINDOW: number = 7 * 24 * 60 * 60 * 1000;
 const MAX_CURRENT_HOUR_WINDOW: number = 30 * 24 * 60 * 60 * 1000;
 
 @Component({
@@ -146,8 +148,8 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
         this.updateTimerSub = timer(0, 300).subscribe(async i => {
                                                           // noinspection ES6MissingAwait
                                                           this.exec.queue("update-historical-scrollbars", null,
-                                                                          async () => {
-                                                                              log.debug("Checking for update");
+                                                                          async (interrupted: () => boolean) => {
+                                                                              log.verbose("Checking for update");
                                                                               if (this.updateLayer) {
                                                                                   this.updateLayer = false;
                                                                                   if (this.currentWindowMin && this.currentWindowMax) {
@@ -158,18 +160,22 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                                                           data => this.currentSeries.data = data);
                                                                                       await this.getData(
                                                                                           this._options.now - MAX_HISTORICAL,
-                                                                                          this._options.now, "day").then(
-                                                                                          data => this.historicalSeries.data = data);
+                                                                                          this._options.now, "day", 100, interrupted).then(
+                                                                                          data => {
+                                                                                              if (data !== null) {this.historicalSeries.data = data;}
+                                                                                          });
                                                                                   }
                                                                               }
-                                                                              if (this.updateCurrentChartExtent) {
+                                                                              if (this.ready && this.updateCurrentChartExtent) {
                                                                                   this.updateCurrentChartExtent = false;
                                                                                   if (this.currentWindowMin && this.currentWindowMax) {
                                                                                       await this.getData(
                                                                                           this.currentWindowMin,
                                                                                           this.currentWindowMax,
                                                                                           ((this.currentWindowMax - this.currentWindowMin) < MAX_CURRENT_HOUR_WINDOW) ? "hour" : "day").then(
-                                                                                          data => this.currentSeries.data = data);
+                                                                                          data => {
+                                                                                              if (data !== null) {this.currentSeries.data = data;}
+                                                                                          });
                                                                                       this.min = this.currentWindowMin;
                                                                                       this.max = this.currentWindowMax;
                                                                                       this.updateCurrentChartSelection = true;
@@ -184,7 +190,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                                                       }, 300);
                                                                                   }
                                                                               }
-                                                                              if (this.updateCurrentChartSelection && this.min && this.max) {
+                                                                              if (this.ready && this.updateCurrentChartSelection && this.min && this.max) {
                                                                                   this.updateCurrentChartSelection = false;
                                                                                   log.warn(
                                                                                       "updateCurrentChartSelection Min & Max =" + new Date(
@@ -200,7 +206,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
                                                                                   log.debug("Emitting", range);
                                                                                   this.dateRange.emit(range);
                                                                               }
-                                                                          }, "", true, true, true, "inactive");
+                                                                          }, "", true, true, true, true, "inactive", 100, 10000);
 
 
                                                       }
@@ -284,14 +290,37 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
         this.historicalChart.rightAxesContainer.visible = false;
         this.historicalChart.bottomAxesContainer.visible = false;
 
+
         this.historicalDateAxis.events.on("datarangechanged", (ev) => {
+            if (ev.target.maxZoomed - ev.target.minZoomed > MAX_CURRENT_EXTENT) {
+                if (ev.target.maxZoomed !== this.currentWindowMax) {
+                    this.historicalDateAxis.zoomToDates(new Date(ev.target.maxZoomed - MAX_CURRENT_EXTENT),
+                                                        new Date(ev.target.maxZoomed), true, true);
+                } else {
+                    this.historicalDateAxis.zoomToDates(new Date(ev.target.minZoomed),
+                                                        new Date(ev.target.minZoomed + MAX_CURRENT_EXTENT), true, true);
+                }
+            }
             this._zone.run(() => {
+                if (ev.target.maxZoomed - ev.target.minZoomed > MAX_CURRENT_EXTENT) {
+                    if (ev.target.maxZoomed !== this.currentWindowMax) {
+                        this.currentWindowMin = ev.target.maxZoomed - MAX_CURRENT_EXTENT;
+                        this.currentWindowMax = ev.target.maxZoomed;
+                    } else {
+                        this.currentWindowMin = ev.target.minZoomed;
+                        this.currentWindowMax = ev.target.minZoomed + MAX_CURRENT_EXTENT;
+
+                    }
+                } else {
+                    this.currentWindowMin = ev.target.minZoomed;
+                    this.currentWindowMax = ev.target.maxZoomed;
+
+                }
                 if (this.ready) {
                     // this._options = {...this._options, currentWindowMin: +ev.target.minZoomed, currentWindowMax: +ev.target.maxZoomed};
                     log.debug("Historical Date Range Changed, event = ", ev);
                     if (+ev.target.minZoomed < +ev.target.maxZoomed) {
-                        this.currentWindowMin = roundToHour(+ev.target.minZoomed);
-                        this.currentWindowMax = roundToMinute(+ev.target.maxZoomed);
+
                         log.debug("Historical Date Range Changed, currentWindowMin =", this.currentWindowMin);
                         log.debug("Historical Date Range Changed, currentWindowMax =", this.currentWindowMax);
                         this.updateCurrentChartExtent = true;
@@ -335,30 +364,74 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
         this.currentChart.rightAxesContainer.visible = false;
         this.currentChart.bottomAxesContainer.visible = false;
 
+        let startChangedTriggered = false;
+        let endChangedTriggered = false;
         // dateAxis.adjustMinMax(this._options.min, this._options.max);
+        this.currentChart.scrollbarX.startGrip.events.on("drag", (ev) => {
+            log.debug("Current Date Axis Event - startchanged.")
+            startChangedTriggered = true;
+        });
+        this.currentChart.scrollbarX.endGrip.events.on("drag", (ev) => {
+            log.debug("Current Date Axis Event - endchanged.")
+            endChangedTriggered = true;
+        });
+        this.currentDateAxis.events.on("startendchanged", (ev) => {
+            log.debug("Current Date Axis Event - startendchanged.")
 
+
+        });
         this.currentDateAxis.events.on("datarangechanged", (ev) => {
-            this._zone.run(() => {
-                // this._options = {...this._options, currentWindowMin: +ev.target.minZoomed, currentWindowMax: +ev.target.maxZoomed};
-                // tslint:disable-next-line:triple-equals
-                if (this.ready && ev.target.minZoomed != ev.target.maxZoomed) {
-                    if (+ev.target.minZoomed < +ev.target.maxZoomed) {
-                        this.min = roundToHour(+ev.target.minZoomed);
-                        this.max = roundToMinute(+ev.target.maxZoomed);
-                        this.updateCurrentChartSelection = true;
-                    } else {
-                        log.warn("Zoom min > Zoom max for Current");
+            log.debug("Current Date Axis Event - datarangechanged.");
+            if (ev.target.maxZoomed - ev.target.minZoomed > MAX_CURRENT_WINDOW) {
+                log.debug("Current Date Axis Event - skipping until the range is fixed.");
+                setTimeout(() => {
+                    if (endChangedTriggered) {
+                        log.debug("Current Date Axis Event - adjusting to max.");
+                        startChangedTriggered = false;
+                        endChangedTriggered = false;
+                        this.currentDateAxis.zoomToDates(new Date(ev.target.maxZoomed - MAX_CURRENT_WINDOW),
+                                                         new Date(ev.target.maxZoomed), false, true);
                     }
+                    if (startChangedTriggered) {
+                        startChangedTriggered = false;
+                        endChangedTriggered = false;
+                        log.debug("Current Date Axis Event - adjusting to min")
+                        this.currentDateAxis.zoomToDates(new Date(ev.target.minZoomed),
+                                                         new Date(ev.target.minZoomed + MAX_CURRENT_WINDOW), false, true);
+                    }
+                }, 400);
+                return;
+            } else {
+                log.debug("Current Date Axis Event - date range is valid.");
+
+            }
+            this._zone.run(() => {
+
+                // this._options = {...this._options, currentWindowMin: +ev.target.minZoomed, currentWindowMax:
+                // +ev.target.maxZoomed}; tslint:disable-next-line:triple-equals
+                if (+ev.target.minZoomed < +ev.target.maxZoomed) {
+                    this.min = +ev.target.minZoomed;
+                    this.max = +ev.target.maxZoomed;
+                } else {
+                    log.warn("Zoom min > Zoom max for Current");
                 }
+
+                if (ev.target.minZoomed !== ev.target.maxZoomed) {
+                    this.updateCurrentChartSelection = true;
+                }
+
                 this.exec.uiActivity();
                 this.userHasInteracted = true;
                 log.debug(this._options);
             });
+
+
         });
         this.updateCurrentChartSelection = true;
     }
 
-    private async getData(startDate: number, endDate: number, timePeriod: TimePeriod, pageSize: number = 1000): Promise<any[]> {
+    private async getData(startDate: number, endDate: number, timePeriod: TimePeriod, pageSize: number = 1000,
+                          interrupted: () => boolean = () => false): Promise<any[]> {
 
         // console.trace("getData: from: " + from + ", to: " + to + ", timePeriod: " + timePeriod);
         try {
@@ -393,10 +466,10 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
             endDateRounded.setMilliseconds(0);
             const payload = {
                     ...layer,
-                    regions: this.regions,
+                    regions:   this.regions,
                     timePeriod,
-                    startDate:   startDateRounded.getTime(),
-                    endDate:     endDateRounded.getTime()
+                    startDate: startDateRounded.getTime(),
+                    endDate:   endDateRounded.getTime()
 
                 }
             ;
@@ -407,7 +480,7 @@ export class HistoricalDateRangeSliderComponent implements OnInit, OnDestroy, Af
 
             const data = await this._api.callMapAPIWithCacheAndDatePaging(this.map + "/timeslider", payload, false, (i) => i,
                                                                           24 * 60 * 60,
-                                                                          timePeriod === "day" ? 30 * 24 : 30 * 24);
+                                                                          timePeriod === "day" ? 30 * 24 : 30 * 24, true, interrupted);
             return data;
 
         } catch (e) {

@@ -6,6 +6,7 @@ cd ..
 #cd amplify && git clean -fdx && cd ..
 ./amplify/backend/function/query/build.sh
 ./amplify/backend/function/api/build.sh
+./amplify/backend/function/sqsquery/build.sh
 
 if [[ "${AWS_BRANCH}" == staging ]]; then
   backup.sh

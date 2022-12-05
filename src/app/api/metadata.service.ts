@@ -5,6 +5,7 @@
 import {Injectable} from "@angular/core";
 import {Logger} from "@aws-amplify/core";
 import {RESTDataAPIService} from "./rest-api.service";
+
 const log = new Logger("metadata-api");
 
 export interface MetadataKeyValue {
@@ -23,7 +24,7 @@ export class MetadataService {
 
 
     constructor(_api: RESTDataAPIService) {
-        this.regions = _api.callQueryAPI("refdata", {name: "regions"});
+        this.regions = _api.callQueryAPI("refdata", {name: "regions"}, 60, () => false);
     }
 
 }

@@ -12,6 +12,8 @@ import {Logger} from "@aws-amplify/core";
 import {NgForageCache} from "ngforage";
 import {timer} from "rxjs";
 import {LoadingProgressService} from "../services/loading-progress.service";
+import {sleep} from "../common";
+import {Storage} from "@aws-amplify/storage";
 
 const useLambda = false;
 
@@ -39,7 +41,7 @@ export class RESTDataAPIService {
         });
     }
 
-    public async callQueryAPI(functionName: string, payload: any, cacheForSeconds: number = 60): Promise<any> {
+    public async callQueryAPI(functionName: string, payload: any, cacheForSeconds: number = 60, interrupted: () => boolean): Promise<any> {
 
         if (useLambda) {
             log.debug("Calling " + functionName, payload);
@@ -80,7 +82,7 @@ export class RESTDataAPIService {
                     return cachedItem.data;
                 } else {
                     log.debug("Value for " + key + " not in cache");
-                    return await this.callAPIInternal(path, payload, cacheForSeconds, key);
+                    return await this.callAPIInternal(path, payload, cacheForSeconds, key, false, true, false, interrupted);
                 }
             } else {
                 return await API.get("query", path, {
@@ -93,10 +95,16 @@ export class RESTDataAPIService {
     }
 
 
-    public async callMapAPIWithCache(path: string, payload: any, cacheForSeconds: number = -1, useGet = false, retry = true): Promise<any> {
+    public async callMapAPIWithCache(path: string, payload: any, cacheForSeconds: number = -1, useGet: boolean = false,
+                                     retry: boolean = true,
+                                     interrupted: () => boolean): Promise<any> {
         log.verbose("callMapAPIWithCache()");
         const key = "rest:map/" + path + ":" + JSON.stringify(payload);
         const cachedItem = await this.cache.getCached(key);
+        if (interrupted()) {
+            log.debug("callMapAPIWithCache() interrupted");
+            return null;
+        }
         if (cacheForSeconds > 0 && cachedItem && cachedItem.hasData && !cachedItem.expired) {
             // tslint:disable-next-line:no-console
             log.verbose("Value for " + key + "in cache");
@@ -105,18 +113,19 @@ export class RESTDataAPIService {
             return cachedItem.data;
         } else {
             log.info("Value for " + key + " not in cache");
-            return await this.callAPIInternal("/map/" + path, payload, cacheForSeconds, key, useGet, retry);
+            return await this.callAPIInternal("/map/" + path, payload, cacheForSeconds, key, useGet, retry, false, interrupted);
         }
     }
 
     public async callMapAPIWithCacheAndPaging(path: string, payload: any, transform: (any) => any, cacheForSeconds: number = -1,
                                               pageSize = 300,
-                                              maxPages = 100) {
+                                              maxPages = 100, interrupted: () => boolean = () => false) {
         try {
             const result: any[] = [];
             let page = 0;
-            do {
-                const rawResult = await this.callMapAPIWithCache(path, {...payload, pageSize, page,}, cacheForSeconds, false, false);
+            while (!interrupted()) {
+                const rawResult = await this.callMapAPIWithCache(path, {...payload, pageSize, page,}, cacheForSeconds, false, false,
+                                                                 interrupted);
                 log.debug(rawResult.length + " tweets back from server");
                 for (const item of rawResult) {
                     result.push(transform(item));
@@ -130,7 +139,11 @@ export class RESTDataAPIService {
                 } else {
                     page++;
                 }
-            } while (true);
+            }
+            if (interrupted()) {
+                log.debug("Interrupted while paging " + path);
+                return null;
+            }
         } catch (e) {
             log.error(e);
         }
@@ -140,10 +153,14 @@ export class RESTDataAPIService {
                                                   transform: (any) => any = (i) => i,
                                                   cacheForSeconds: number = -1,
                                                   pageDurationInHours = 30 * 24,
-                                                  retry = true): Promise<any> {
+                                                  retry = true, interrupted: () => boolean = () => false): Promise<any> {
         try {
             const key = "rest:query/" + path + ":" + JSON.stringify(payload);
             const cachedItem = await this.cache.getCached(key);
+            if (interrupted()) {
+                log.debug("Interrupted");
+                return null;
+            }
             if (cacheForSeconds > 0 && cachedItem && cachedItem.hasData && !cachedItem.expired) {
                 // tslint:disable-next-line:no-console
                 log.verbose("Value for " + key + "in cache");
@@ -160,9 +177,10 @@ export class RESTDataAPIService {
                 if (showSpinner) {
                     this._loading.showDeterminateProgress("Loading date range", 0);
                 }
-                do {
+                while (!interrupted()) {
                     const endDate = payload.endDate < currEndDate ? payload.endDate : currEndDate;
-                    const rawResult = await this.callMapAPIWithCache(path, {...payload, startDate, endDate}, cacheForSeconds, false, retry);
+                    const rawResult = await this.callMapAPIWithCache(path, {...payload, startDate, endDate}, cacheForSeconds, false, retry,
+                                                                     interrupted);
                     log.debug(rawResult.length + " results back from server");
                     for (const item of rawResult) {
                         result.push(transform(item));
@@ -184,7 +202,11 @@ export class RESTDataAPIService {
                         }
                         return result;
                     }
-                } while (true);
+                }
+                if (interrupted()) {
+                    log.debug("Interrupted while paging " + path);
+                    return null;
+                }
 
             }
         } catch (e) {
@@ -195,7 +217,111 @@ export class RESTDataAPIService {
 
 
     private async callAPIInternal(fullPath: string, payload: any, cacheForSeconds: number, key: string,
-                                  useGet = false, retry = true, showWaitingSpinner = false): Promise<Promise<any>> {
+                                  useGet = false, retry = true, showWaitingSpinner = false,
+                                  interrupted: () => boolean): Promise<Promise<any>> {
+        this.calls++;
+        payload.async_response = true;
+        payload.client_version = environment.name + "-" + environment.version;
+        // if (this.callsPerMinute > environment.maxCallsPerMinute) {
+        //     console.error("Excessive api calls per minute: " + this.callsPerMinute);
+        //     console.error("API call was path: " + fullPath + " payload: " + JSON.stringify(payload));
+        //     console.trace("Excessive calls trace");
+        //     if (!environment.production) {
+        //         this._notify.show(
+        //             "Too many calls to the server (" + this.callsPerMinute + " > " + environment.maxCallsPerMinute + "). This is most
+        // likely a bug and this message will not be shown in production.", "Ignoring this call", 60); }  }
+        let retryCount = retry ? 4 : 1;
+        while (retryCount-- > 0) {
+            let response: Promise<any>;
+
+            if (interrupted()) {
+                log.debug("callAPIInternal() interrupted");
+                return null;
+            }
+            if (useGet) {
+                response = API.get("query", fullPath, {
+                    queryStringParameters: payload,
+                    headers:               {
+                        Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+                    },
+
+                });
+            } else {
+                response = API.post("query", fullPath, {
+                    body:    payload,
+                    headers: {
+                        Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+                    },
+
+                });
+            }
+            const cacheInMillis: number = cacheForSeconds * 1000 * (1 + Math.random() / 10);
+            try {
+                let s3Data;
+                if ((await response).__async_response__) {
+                    log.debug("Asynchronous response back from API, polling ...");
+                    let pollCount = 0;
+                    const responseKey: string = (await response).key;
+                    while (pollCount++ < 50) {
+                        await sleep(200);
+                        try {
+                            s3Data = await Storage.get("api/" + responseKey + ".gz.json", {download: true,});
+                            const body: any = JSON.parse(await s3Data.Body.text());
+                            log.debug("Result acquired ", body);
+                            this._loading.hideIndeterminateSpinner();
+                            if (cacheForSeconds > 0) {
+                                await this.cache.setCached(key, body.data, cacheInMillis);
+                            }
+                            return body.data;
+                        } catch (e) {
+                            log.verbose(e);
+                            this._loading.showIndeterminateSpinner();
+                            log.debug("Result not acquired ");
+                            await sleep(1000 + pollCount * 200);
+                        }
+                    }
+                    this._loading.hideIndeterminateSpinner();
+                    return null;
+                } else {
+                    log.debug("Synchronous response back from API");
+                    s3Data = await response;
+                }
+                if (typeof s3Data !== "undefined") {
+                    // tslint:disable-next-line:no-console
+                    if (!environment.production) {
+                        console.debug("Returning uncached item", s3Data);
+                    }
+                    if (cacheForSeconds > 0) {
+                        await this.cache.setCached(key, s3Data, cacheInMillis);
+                    }
+                } else {
+                    if (!environment.production) {
+                        console.debug("Returning undefined item", s3Data);
+                    }
+                }
+                this._loading.hideIndeterminateSpinner();
+                return s3Data;
+            } catch (e) {
+                this.calls++;
+                log.warn(e);
+                if (showWaitingSpinner) {
+                    this._loading.showIndeterminateSpinner();
+                }
+                await sleep(60000 / (retryCount + 1));
+            }
+        }
+        this._notify.show(
+            "Sorry, we're having difficulties could you please refresh the page, if that doesn't work please try again in a few minutes. Apologies for the inconvenience.");
+        if (showWaitingSpinner) {
+            this._loading.hideIndeterminateSpinner();
+        }
+        throw (new Error("Failed after retrying " + fullPath));
+    }
+
+
+    private async callAPIInternalOld(fullPath: string, payload: any, cacheForSeconds: number, key: string,
+                                     useGet = false, retry = true, showWaitingSpinner = false,
+                                     interrupted: () => boolean): Promise<Promise<any>> {
         this.calls++;
         if (this.callsPerMinute > environment.maxCallsPerMinute) {
             console.error("Excessive api calls per minute: " + this.callsPerMinute);
@@ -209,84 +335,63 @@ export class RESTDataAPIService {
             return;
 
         }
-        let response: Promise<any>;
-        if (useGet) {
-            response = API.get("query", fullPath, {
-                'queryStringParameters': payload,
-                headers:                 {
-                    Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
-                },
+        let retryCount = retry ? 4 : 1;
+        while (retryCount-- > 0) {
+            let response: Promise<any>;
 
-            });
-        } else {
-            response = API.post("query", fullPath, {
-                body:    payload,
-                headers: {
-                    Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
-                },
-
-            });
-        }
-        let cacheInMillis: number = cacheForSeconds * 1000 * (1 + Math.random() / 10);
-        return response.then(data => {
-            if (typeof data !== "undefined") {
-                // tslint:disable-next-line:no-console
-                if (!environment.production) {
-                    console.debug("Returning uncached item", data);
-                }
-                if (cacheForSeconds > 0) {
-                    this.cache.setCached(key, data, cacheInMillis);
-                }
-            } else {
-                if (!environment.production) {
-                    console.debug("Returning undefined item", data);
-                }
+            if (interrupted()) {
+                log.debug("callAPIInternal() interrupted");
+                return null;
             }
-            return data;
-        }).catch(e => {
-            this.calls++;
-            log.info(e);
-            if (retry) {
-                log.error(e);
+            if (useGet) {
+                response = API.get("query", fullPath, {
+                    queryStringParameters: payload,
+                    headers:               {
+                        Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+                    },
+
+                });
+            } else {
+                response = API.post("query", fullPath, {
+                    body:    payload,
+                    headers: {
+                        Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+                    },
+
+                });
+            }
+            const cacheInMillis: number = cacheForSeconds * 1000 * (1 + Math.random() / 10);
+            try {
+                const data = await response;
+                if (typeof data !== "undefined") {
+                    // tslint:disable-next-line:no-console
+                    if (!environment.production) {
+                        console.debug("Returning uncached item", data);
+                    }
+                    if (cacheForSeconds > 0) {
+                        await this.cache.setCached(key, data, cacheInMillis);
+                    }
+                } else {
+                    if (!environment.production) {
+                        console.debug("Returning undefined item", data);
+                    }
+                }
+                this._loading.hideIndeterminateSpinner();
+                return data;
+            } catch (e) {
+                this.calls++;
+                log.warn(e);
                 if (showWaitingSpinner) {
                     this._loading.showIndeterminateSpinner();
                 }
-                return new Promise<any>((resolve, reject) => {
-                    setTimeout(async () => {
-                        API.post("query", fullPath, {
-                            body:    payload,
-                            headers: {
-                                Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
-                            },
-                        }).then(data => this._ngZone.run(() => {
-                            this._notify.show("Problem resolved", "Good", 2000);
-                            if (!environment.production) {
-                                // tslint:disable-next-line:no-console
-                                console.debug("Returning uncached item", data);
-                            }
-                            if (cacheForSeconds > 0) {
-                                this.cache.setCached(key, data, cacheInMillis);
-                            }
-                            if (showWaitingSpinner) {
-                                this._loading.hideIndeterminateSpinner();
-                            }
-                            resolve(data);
-                        }))
-                           .catch(e2 => {
-                               this._notify.show(
-                                   "Sorry, we're having difficulties could you please refresh the page, if that doesn't work please try again in a few minutes. Apologies for the inconvenience.");
-                               if (showWaitingSpinner) {
-                                   this._loading.hideIndeterminateSpinner();
-                               }
-
-                               reject(e2);
-                           });
-                    }, retryPeriod);
-                });
-            } else {
-                log.warn(e);
-                return null;
+                await sleep(60000 / (retryCount + 1));
             }
-        });
+        }
+        this._notify.show(
+            "Sorry, we're having difficulties could you please refresh the page, if that doesn't work please try again in a few minutes. Apologies for the inconvenience.");
+        if (showWaitingSpinner) {
+            this._loading.hideIndeterminateSpinner();
+        }
+        throw (new Error("Failed after retrying " + fullPath));
     }
 }

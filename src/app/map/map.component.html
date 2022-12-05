@@ -61,7 +61,8 @@
                     <mat-tab label="Twitter">
                         <twitter-panel [annotationTypes]="annotationTypes" [selection]="selection"
                                        [layer]="activeLayerGroup" [showHeaderInfo]="twitterPanelHeader"
-                                       [showTimeline]="showTwitterTimeline" [tweets]="tweets"
+                                       [showTimeline]="showTwitterTimeline" [tweetCount]="tweetCount"
+                                       [tweetCriteria]="tweetCriteria"
                                        class="twitter-panel"></twitter-panel>
                     </mat-tab>
                     <mat-tab label="Stats">
@@ -208,7 +209,7 @@
                                                   [layer]="activeLayerGroup"
                                                   [map]="this.mapSelectionService.id"
                                                   [options]="sliderOptions"
-                                                  [regions]="'uk'"></app-historical-date-range-slider>
+                                                  [regions]="['uk']"></app-historical-date-range-slider>
             </div>
             <mat-progress-bar *ngIf="activity && ready" class="map-progress" mode="indeterminate"
                               [color]="pref.combined.toolbarColor"></mat-progress-bar>

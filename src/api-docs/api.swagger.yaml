@@ -270,7 +270,7 @@ paths:
       tags:
         - text
       operationId: GetTextForMap
-      summary: Get Text for Map.
+      summary: Get Text for Map
       description: >
         Returns all text messages (Tweets at present) for a given map. The request body should contain the search 
         criteria of regionType, hazards, sources, warnings and a start and end date. The results are paged with a 

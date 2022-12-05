@@ -2,20 +2,20 @@
 cd $(dirname $0)
 cd ..
 
-tests="cypress/integration/00_quick"
+tests="cypress/e2e/00_quick"
 browsers="electron"
 record="--record false" #Or "--record"
 timeoutDuration=600
 if [[ "${AWS_BRANCH}" == feature* ]]; then
-  tests="cypress/integration/00_quick"
+  tests="cypress/e2e/00_quick"
   browsers="electron"
 fi
 if [[ "${AWS_BRANCH}" == release* ]]; then
-  tests="cypress/integration"
+  tests="cypress/e2e"
   browsers="electron"
 fi
 if [[ "${AWS_BRANCH}" == "" ]]; then
-  tests="cypress/integration"
+  tests="cypress/e2e"
   browsers="electron"
 fi
 if [[ "${AWS_BRANCH}" == staging ]]; then

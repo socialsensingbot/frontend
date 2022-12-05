@@ -1,8 +1,15 @@
 import {environment} from "../../../environments/environment";
-import * as geojson from "geojson";
 import {blacklist, greylist} from "../../public-display/keywords";
 
 const twitterLink = require("twitter-text");
+
+export interface TweetCriteria {
+    layerGroup: string;
+    regionType: string;
+    regionNames: string[];
+    min: number;
+    max: number;
+}
 
 export interface CSVExportTweet {
     region: string;
@@ -11,7 +18,6 @@ export interface CSVExportTweet {
     date: string;
     url: string;
     text: string;
-    location: string;
     source?: string;
 
 }
@@ -22,6 +28,47 @@ export interface CSVExportTweet {
  * The class is lazily initialized on various data accesses as the full construction of this object includes some CPU intensive tasks.
  */
 export class Tweet {
+    private _url_count: number;
+
+    public get url_count(): number {
+        return this._url_count;
+    }
+
+    private _hashtag_count: number;
+
+    public get hashtag_count(): number {
+        return this._hashtag_count;
+    }
+
+    private _mention_count: any;
+
+    public get mention_count(): any {
+        return this._mention_count;
+    }
+
+    public get verified(): boolean {
+        return this._verified;
+    }
+
+
+    public get friends_count(): number {
+        return this._friends_count;
+    }
+
+
+    public get followers_count(): any {
+        return this._followers_count;
+    }
+
+    public get mediaCount(): number {
+        this.lazyInit();
+        const mediaEntities = this._entities.media;
+        if (mediaEntities) {
+            return mediaEntities.length;
+        } else {
+            return 0;
+        }
+    }
 
     private _media: any[];
 
@@ -41,14 +88,8 @@ export class Tweet {
         return this._tokens;
     }
 
-    public get mediaCount(): number {
-        this.lazyInit();
-        const mediaEntities = this.json.extended_tweet ? this.json.extended_tweet.entities.media : this.json.entities.media;
-        if (mediaEntities) {
-            return mediaEntities.length;
-        } else {
-            return 0;
-        }
+    get possibly_sensitive(): boolean {
+        return this._possibly_sensitive;
     }
 
     public get greylisted(): boolean {
@@ -72,28 +113,33 @@ export class Tweet {
         return this._html;
     }
 
-    /**
-     * All constructor values bust be optional for the {@link Tweet#populate} method.
-     * @param _id the tweet id as defined by Twitter
-     * @param _html the html text used tio stub the tweet before the Twitter scripts are called.
-     * @param _json the original JSON of the tweet.
-     * @param _location the location associated with the tweet as determined by the backend process.
-     * @param _date the timestamp associated with the tweet.
-     * @param _region the region associated with this tweet
-     */
-    constructor(private _id: string = null, private _html: string = null, private _json: any = {}, private _location: geojson.GeoJsonObject,
-                private _date: Date, private _region: string, private _possibly_sensitive = false) {
+    get retweet_count(): number {
+        return this._retweet_count;
     }
 
-    public get json(): any {
-        if (typeof this._json === "string") {
-            this._json = JSON.parse(this._json);
-        }
-        return this._json;
+    get profile_image_url(): string {
+        return this._profile_image_url;
     }
 
-    public get location(): geojson.GeometryCollection {
-        return this._location as geojson.GeometryCollection;
+    get screen_name(): string {
+        return this._screen_name;
+    }
+
+    get username(): string {
+        return this._username;
+    }
+
+    public get sender(): string {
+        return this.screen_name;
+    }
+
+    public get text(): string {
+        return this._text;
+    }
+
+
+    public get location(): string {
+        return this._location;
     }
 
     public get region(): string {
@@ -133,11 +179,8 @@ export class Tweet {
         return this._hour;
     }
 
-    private _sender: string;
-
-    public get sender(): string {
-        this.lazyInit();
-        return this._sender;
+    private get entities(): any {
+        return this._entities;
     }
 
     private _url: string;
@@ -158,8 +201,24 @@ export class Tweet {
         return this._id;
     }
 
-    public get text(): string {
-        return this.json.extended_tweet ? this.json.extended_tweet.full_text : this.json.text;
+    /**
+     * All constructor values bust be optional for the {@link Tweet#populate} method.
+     * @param _id the tweet id as defined by Twitter
+     * @param _html the html text used tio stub the tweet before the Twitter scripts are called.
+     * @param _location the location associated with the tweet as determined by the backend process.
+     * @param _date the timestamp associated with the tweet.
+     * @param _region the region associated with this tweet
+     */
+    constructor(private _id: string = null, private _html: string = null, private _location: string, private _date: Date,
+                private _region: string, private _possibly_sensitive = false, private _text: string, private _verified: boolean,
+                private _friends_count: number,
+                private _followers_count: number,
+                private _retweet_count: number,
+                private _entities: any,
+                private _profile_image_url: string,
+                private _screen_name: string,
+                private _username: string
+    ) {
     }
 
 
@@ -171,30 +230,6 @@ export class Tweet {
         } else {
             return "<h3>This tweet's text is no longer available.</h3>";
         }
-    }
-
-
-    /**
-     * Populate this tweet from data from a Tweet like structure.
-     * Primarily used to copy a deserialized Tweet which is not a
-     * class but a Tweet like class.
-     *
-     * @param tweet the {@link Tweet} to copy data from.
-     */
-    public populate(tweet: Tweet): Tweet {
-        this._id = tweet._id;
-        this._html = tweet._html;
-        this._date = tweet._date;
-        this._year = tweet._year;
-        this._month = tweet._month;
-        this._day = tweet._day;
-        this._hour = tweet._hour;
-        this._sender = tweet._sender;
-        this._url = tweet._url;
-        this._valid = tweet._valid;
-        this._init = tweet._init;
-        this._possibly_sensitive = tweet._possibly_sensitive;
-        return this;
     }
 
 
@@ -212,9 +247,7 @@ export class Tweet {
      */
     public lazyInit() {
         if (!this._init) {
-            this._tokens = this.text.replace(/https?:\/\/[^\s]+/g, "").toLowerCase().split(/[^#@a-zA-Z_’'\u00C0-\u024F\u1E00-\u1EFF]+/);
-            this._sender = this.json.user.screen_name;
-            this._url = "https://twitter.com/" + this._sender + "/status/" + this._id;
+            this._url = "https://twitter.com/" + this.screen_name + "/status/" + this._id;
 
             this._year = new Intl.DateTimeFormat(environment.locale,
                                                  {year: "2-digit", timeZone: environment.timezone}).format(this._date);
@@ -225,15 +258,23 @@ export class Tweet {
             this._hour = new Intl.DateTimeFormat(environment.locale,
                                                  {hour: "2-digit", hour12: true, timeZone: environment.timezone}).format(
                 this._date);
-            const entities = this.json.extended_tweet ? this.json.extended_tweet.entities : this.json.entities;
             const text = this.text;
-            let urlEntities: string[] = entities.urls;
-            if (entities.media) {
-                urlEntities = [...urlEntities, ...entities.media]
+            if (this._entities) {
+                let urlEntities: string[] = this._entities.urls;
+                if (this._entities.media) {
+                    urlEntities = [...urlEntities, ...this._entities.media]
+                }
+                this._html = "<p>" + twitterLink.default.autoLink(text, {urlEntities, targetBlank: true, title: false}) + "</p>";
+                const mediaEntities = this._entities.media;
+                this._media = typeof mediaEntities !== "undefined" ? mediaEntities : [];
+                this._mention_count = this._entities?.user_mentions?.length || 0;
+                this._hashtag_count = this._entities?.hashtags?.length || 0;
+                this._url_count = this._entities?.urls?.length || 0;
+            } else {
+                this._html = "<p>" + twitterLink.default.autoLink(text, {urlEntities: [], targetBlank: true, title: false}) + "</p>";
+
             }
-            this._html = "<p>" + twitterLink.default.autoLink(text, {urlEntities, targetBlank: true, title: false}) + "</p>";
-            const mediaEntities = this.json.extended_tweet ? this.json.extended_tweet.entities.media : this.json.entities.media;
-            this._media = typeof mediaEntities !== "undefined" ? mediaEntities : [];
+            this._tokens = this.text.replace(/https?:\/\/[^\s]+/g, "").toLowerCase().split(/[^#@a-zA-Z_’'\u00C0-\u024F\u1E00-\u1EFF]+/);
         }
         this._init = true;
     }

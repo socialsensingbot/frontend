@@ -115,4 +115,12 @@ export class RegionSelection {
     public clearWithoutEmitting(): void {
         this.regions = {};
     }
+
+    public tweetCount(): any {
+        let result = 0;
+        for (const region of this.all()) {
+            result += region.tweetCount;
+        }
+        return result;
+    }
 }

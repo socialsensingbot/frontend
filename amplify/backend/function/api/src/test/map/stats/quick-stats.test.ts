@@ -18,6 +18,22 @@ const reqBody = {
     endDate:    MAX_DATE_MILLIS,
     regionType: "county"
 };
+const geoJsonRequest = {
+    hazards: [
+        "flood"
+    ],
+    sources: [
+        "twitter"
+    ],
+
+    warnings: "exclude",
+
+    startDate:  1644969600000,
+    endDate:    MAX_DATE_MILLIS,
+    regionType: "county",
+    format:     "geojson"
+};
+
 const invalidHazard1 = {
     hazards: [1],
     sources: [
@@ -322,11 +338,23 @@ describe("POST /v1/map/:map/stats", () => {
             .set("Accept", "application/json")
             .send(reqBody);
         console.log(sortedStringify(response.body));
-        expect(Object.keys(response.body).length).to.equal(118);
+        expect(Object.keys(response.body).length).to.equal(117);
         expect(response.body["west yorkshire"].count).to.equal(13);
         expect(response.body["west yorkshire"].exceedance).to.be.above(1);
         expect(response.body["west yorkshire"].exceedance).to.be.below(50);
     });
+    // it("stats as geojson", async () => {
+    //     const response = await request(app)
+    //         .post("/v1/map/uk-flood-test/stats")
+    //         .set("Accept", "application/json")
+    //         .send(geoJsonRequest);
+    //     console.log(JSON.stringify(response.body));
+    //     // expect(Object.keys(response.body).length).to.equal(2);
+    //     // expect(response.body.features.length).to.equal(174);
+    //     // expect(response.body.features[10].properties.name).to.equal('blaenau gwent');
+    //     // expect(response.body.features[10].properties.count).to.be.above(0);
+    //     // expect(response.body.features[10].properties.exceedance).to.be.below(20);
+    // });
     it("invalid map", async () => {
         const response = await request(app)
             .post("/v1/map/uk-flood-test2/text")
@@ -453,14 +481,6 @@ describe("POST /v1/map/:map/stats", () => {
             .post("/v1/map/uk-flood-test/stats")
             .set("Accept", "application/json")
             .send(invalidEndDate2);
-        expect(response.status).equals(400);
-        expect(response.body.parameter).equals("endDate");
-    });
-    it("invalid end date 3", async () => {
-        const response = await request(app)
-            .post("/v1/map/uk-flood-test/stats")
-            .set("Accept", "application/json")
-            .send(invalidEndDate3);
         expect(response.status).equals(400);
         expect(response.body.parameter).equals("endDate");
     });

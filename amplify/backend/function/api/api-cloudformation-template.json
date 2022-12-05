@@ -22,6 +22,18 @@
     "functionsocialsensingapilayerArn": {
       "Type": "String",
       "Default": "functionsocialsensingapilayerArn"
+    },
+    "storagejsonstorageBucketName": {
+      "Type": "String",
+      "Default": "storagejsonstorageBucketName"
+    },
+    "customquerySQSName": {
+      "Type": "String",
+      "Default": "customquerySQSName"
+    },
+    "customquerySQSArn": {
+      "Type": "String",
+      "Default": "customquerySQSArn"
     }
   },
   "Conditions": {
@@ -120,6 +132,12 @@
                   "DB_PASSWORD"
                 ]
               ]
+            },
+            "STORAGE_JSONSTORAGE_BUCKETNAME": {
+              "Ref": "storagejsonstorageBucketName"
+            },
+            "QUERY_QUEUE": {
+              "Ref": "customquerySQSName"
             }
           }
         },
@@ -130,6 +148,7 @@
           ]
         },
         "Runtime": "nodejs14.x",
+        "MemorySize": 1024,
         "Layers": [],
         "Timeout": 25
       }
@@ -191,6 +210,15 @@
             {
               "Effect": "Allow",
               "Action": [
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
                 "logs:CreateLogGroup",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
@@ -211,6 +239,14 @@
                   }
                 ]
               }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "sqs:SendMessage",
+                "sqs:GetQueueAttributes"
+              ],
+              "Resource": "*"
             }
           ]
         }
@@ -272,6 +308,64 @@
       "DependsOn": [
         "LambdaExecutionRole"
       ]
+    },
+    "AmplifyResourcesPolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "s3:ListBucket",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "storagejsonstorageBucketName"
+                      }
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "storagejsonstorageBucketName"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
     }
   },
   "Outputs": {

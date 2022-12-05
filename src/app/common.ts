@@ -119,3 +119,5 @@ function getCoordinatesDump(gj) {
     }
     return coords;
 }
+
+export const getUniqueListBy = (arr, key) => [...new Map(arr.map(item => [item[key], item])).values()];

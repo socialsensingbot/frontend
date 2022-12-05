@@ -1,29 +1,10 @@
 /* tslint:disable:no-console */
 import * as express from "express";
 import * as bodyParser from "body-parser";
-import {
-    accurateStatsFunc,
-    allMapRegionsFunc,
-    csvExportFunc,
-    geographyFunc,
-    mapAggregationsFunc,
-    mapMetadataFunc,
-    mapRegionsFunc,
-    metadataForMapByIDFunc,
-    nowFunc,
-    recentTextCountFunc,
-    regionGeographyFunc,
-    regionsForRegionTypeFunc,
-    statsFunc,
-    textForPublicDisplayFunc,
-    textForRegionsFunc,
-    timeseriesFunc,
-    timesliderFunc
-} from "socialsensing-api/map-queries";
+import {callFunction} from "socialsensing-api/map-queries";
 
-//bump 35
+// bump 92
 const awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
-
 
 // declare a new express app
 const app = express();
@@ -40,54 +21,59 @@ app.use((req, res, next) => {
 });
 
 /*
-app.post("/map/regions", regionsFunc);
-app.get("/map/regions", regionsFunc);
-*/
-
-app.post("/map/metadata", mapMetadataFunc);
-app.get("/map/metadata", mapMetadataFunc);
-
-app.get("/map/:map/metadata", metadataForMapByIDFunc);
-app.post("/map/:map/metadata", metadataForMapByIDFunc);
-
-app.post("/map/:map/region-type/:regionType/text-for-regions", textForRegionsFunc);
-
-app.post("/map/:map/region-type/:regionType/text-for-public-display", textForPublicDisplayFunc);
-
-app.post("/map/:map/region-type/:regionType/csv-export", csvExportFunc);
-
-app.get("/map/:map/region-type/:regionType/geography", geographyFunc);
-app.post("/map/:map/region-type/:regionType/geography", geographyFunc);
-
-app.post("/map/:map/region-type/:regionType/region/:region/geography", regionGeographyFunc);
-app.get("/map/:map/region-type/:regionType/region/:region/geography", regionGeographyFunc);
-
-app.post("/map/:map/aggregations", mapAggregationsFunc);
-app.get("/map/:map/aggregations", mapAggregationsFunc);
-
-app.post("/map/:map/region-type/:regionType/recent-text-count", recentTextCountFunc);
+ app.post("/map/regions", regionsFunc);
+ app.get("/map/regions", regionsFunc);
+ */
 
 
-app.post("/map/:map/now", nowFunc);
-app.get("/map/:map/now", nowFunc);
+app.get("/map/response/:key", (req, res) => callFunction("from-cache", req, res));
+app.post("/map/metadata", (req, res) => callFunction("map-metadata", req, res));
+app.get("/map/metadata", (req, res) => callFunction("map-metadata", req, res));
+
+app.get("/map/:map/metadata", (req, res) => callFunction("map-metadata-by-id", req, res));
+app.post("/map/:map/metadata", (req, res) => callFunction("map-metadata-by-id", req, res));
+
+app.post("/map/text/:source/:id", (req, res) => callFunction("text", req, res, false));
+app.get("/map/text/:source/:id", (req, res) => callFunction("text", req, res, false));
+app.post("/map/:map/region-type/:regionType/text-for-regions", (req, res) => callFunction("text-for-regions", req, res, false, true));
+
+app.post("/map/:map/region-type/:regionType/text-for-public-display",
+         (req, res) => callFunction("text-for-public-display", req, res, true));
+
+app.post("/map/:map/region-type/:regionType/csv-export", (req, res) => callFunction("csv-export", req, res, true));
+
+app.get("/map/:map/region-type/:regionType/geography", (req, res) => callFunction("geography", req, res));
+app.post("/map/:map/region-type/:regionType/geography", (req, res) => callFunction("geography", req, res, true));
+
+app.post("/map/:map/region-type/:regionType/region/:region/geography", (req, res) => callFunction("region-geography", req, res, true));
+app.get("/map/:map/region-type/:regionType/region/:region/geography", (req, res) => callFunction("region-geography", req, res));
+
+app.post("/map/:map/aggregations", (req, res) => callFunction("map-aggregations", req, res));
+app.get("/map/:map/aggregations", (req, res) => callFunction("map-aggregations", req, res));
+
+app.post("/map/:map/region-type/:regionType/recent-text-count", (req, res) => callFunction("recent-text-count", req, res, false));
+
+
+app.post("/map/:map/now", (req, res) => callFunction("now", req, res, false, false));
+app.get("/map/:map/now", (req, res) => callFunction("now", req, res, false, false));
 
 /**
  * Returns all the regions for a given map, regardless of region type.
  * IMPORTANT: this screens out numerically named regions.
  */
-app.post("/map/:map/regions", mapRegionsFunc);
-app.get("/map/:map/regions", mapRegionsFunc);
+app.post("/map/:map/regions", (req, res) => callFunction("map-regions", req, res));
+app.get("/map/:map/regions", (req, res) => callFunction("map-regions", req, res));
 
 
 /**
  * Returns all the regions for a given map, regardless of region type.
  * IMPORTANT: this screens out numerically named regions.
  */
-app.get("/map/:map/all-regions", allMapRegionsFunc);
-app.post("/map/:map/all-regions", allMapRegionsFunc);
+app.get("/map/:map/all-regions", (req, res) => callFunction("all-map-regions", req, res));
+app.post("/map/:map/all-regions", (req, res) => callFunction("all-map-regions", req, res));
 
-app.post("/map/:map/region-type/:regionType/regions", regionsForRegionTypeFunc);
-app.get("/map/:map/region-type/:regionType/regions", regionsForRegionTypeFunc);
+app.post("/map/:map/region-type/:regionType/regions", (req, res) => callFunction("regions-by-type", req, res));
+app.get("/map/:map/region-type/:regionType/regions", (req, res) => callFunction("regions-by-type", req, res));
 
 /**
  * Returns the data to show the exceedance AND counts on the main map. This is a highly optimized version
@@ -108,7 +94,7 @@ app.get("/map/:map/region-type/:regionType/regions", regionsForRegionTypeFunc);
  *
  *
  */
-app.post("/map/:map/region-type/:regionType/stats", statsFunc);
+app.post("/map/:map/region-type/:regionType/stats", (req, res) => callFunction("stats", req, res, true));
 
 
 /**
@@ -127,7 +113,7 @@ app.post("/map/:map/region-type/:regionType/stats", statsFunc);
  *
  *
  */
-app.post("/map/:map/region-type/:regionType/accurate-stats", accurateStatsFunc);
+app.post("/map/:map/region-type/:regionType/accurate-stats", (req, res) => callFunction("accurate-stats", req, res, true));
 
 
 /**
@@ -146,7 +132,7 @@ app.post("/map/:map/region-type/:regionType/accurate-stats", accurateStatsFunc);
  *
  *
  */
-app.post("/map/:map/timeslider", timesliderFunc);
+app.post("/map/:map/timeslider", (req, res) => callFunction("timeslider", req, res, true));
 
 
 /**
@@ -165,7 +151,7 @@ app.post("/map/:map/timeslider", timesliderFunc);
  *
  *
  */
-app.post("/map/:map/analytics/time", timeseriesFunc);
+app.post("/map/:map/analytics/time", (req, res) => callFunction("timeseries", req, res, true));
 
 
 function sleep(ms) {

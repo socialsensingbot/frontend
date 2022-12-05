@@ -4,6 +4,7 @@ cd ..
 cp src/app/map/data/map-data.ts api/
 ./amplify/backend/function/query/build.sh
 ./amplify/backend/function/api/build.sh
+./amplify/backend/function/sqsquery/build.sh
 
 npx browserslist@latest --update-db
 

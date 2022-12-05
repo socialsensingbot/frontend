@@ -5,7 +5,7 @@
     </span>
     <span *ngIf="isDev">(development)</span>
     <span class="menu-spacer">&nbsp;</span>
-    <div fxLayout="row" fxShow="false" fxShow.gt-sm id="login">
+    <div class="app-top-links-dashboard" fxLayout="row" fxShow="false" fxShow.gt-sm id="login">
         <button *ngIf="pref.ready && pref.featureSupported('dashboard')"
                 [routerLink]="'/map/' + map.id + '/dashboard'"
                 mat-button>
@@ -13,13 +13,14 @@
             Dashboard
         </button>
         <button *ngIf="pref.ready &&pref.featureSupported('map')" [queryParamsHandling]="'merge'"
+                class="app-top-links-map"
                 [routerLink]="'/map/'+map.id"
                 mat-button>
             <!--       <mat-icon>power_settings_new</mat-icon>-->
             Map
         </button>
-        <help-button></help-button>
-        <button (click)="logout()" id="logout" mat-button>
+        <help-button class="app-top-links-help"></help-button>
+        <button (click)="logout()" class="app-top-links-logout" id="logout" mat-button>
             <mat-icon>exit_to_app</mat-icon>
             Logout
         </button>

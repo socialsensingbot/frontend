@@ -52,7 +52,7 @@ const elNotVisible = (selector) => {
 
 
 const noTweetLoadingSpinner = function () {
-    elNotVisible(".app-tweet-area-loading-spinner");
+    cy.get(".app-tweet-area-loading-spinner").should("not.exist");
 };
 
 Cypress.Commands.add("login", (username = "cypress1@example.com") => {
@@ -110,11 +110,13 @@ Cypress.Commands.add("noSpinner", () => {
 });
 
 Cypress.Commands.add("twitterPanelHeader", (text, subheadingText) => {
+    noLoadingDiv();
     cy.get("twitter-panel");
     noTweetLoadingSpinner();
     cy.wait(1000);
     noTweetLoadingSpinner();
     cy.get(".app-tweet-heading", {timeout: LONG_TIMEOUT});
+    cy.wait(1000);
     cy.get(".app-tweet-heading", {timeout: LONG_TIMEOUT}).should("contain.text", text);
     if (subheadingText) {
         cy.get(".app-tweet-sub-heading", {timeout: LONG_TIMEOUT});
@@ -138,17 +140,14 @@ Cypress.Commands.add("tweetCountTotal", (sum) => {
     cy.get(".app-tweet-visible-tweets-tab-label", {timeout: 30000}).then(header => {
         const headerParts = header.text().trim().split(" ");
         const visibleCount = +headerParts[0];
-        cy.get(".app-tweet-hidden-tweets-tab-label", {timeout: 30000})
-            .then(title => {
-                      const hiddenCount = +title.text().trimLeft().split(" ")[0];
-                      expect(hiddenCount + visibleCount).equals(sum);
-                  }
-            );
+        expect(visibleCount).equals(sum);
 
-    })
+
+    });
 });
 
 Cypress.Commands.add("withTweetCounts", (callback) => {
+    cy.log("Tweet counts are currently unavilable");
     cy.wait(4000);
     cy.get(".app-tweet-visible-tweets-tab-label").then(header => {
         const headerParts = header.text().trim().split(" ");
@@ -162,7 +161,6 @@ Cypress.Commands.add("withTweetCounts", (callback) => {
 
     })
 });
-
 
 Cypress.Commands.add("tweetCount", (vis, hid) => {
     cy.get("#mat-tab-label-1-0 > .mat-tab-label-content").then(header => {
@@ -201,9 +199,9 @@ Cypress.Commands.add("ignoreTweet", (tweetSelector) => {
 Cypress.Commands.add("unignoreTweet", (tweetSelector) => {
     cy.wait(1000);
     cy.get(tweetSelector + " .app-tweet-item-menu", {timeout: 10000});
-    cy.get(tweetSelector + " .app-tweet-item-menu").click();
+    cy.get(tweetSelector + " .app-tweet-item-menu mat-icon").should("be.visible").click();
     cy.wait(3000);
-    cy.get(markAsMenu, {timeout: LONG_TIMEOUT}).click();
+    cy.get(markAsMenu, {timeout: LONG_TIMEOUT}).should("be.visible").click();
     cy.wait(1000);
     cy.get(markAsUnignoredMenu).click();
 
@@ -219,7 +217,8 @@ Cypress.Commands.add("unhideTweets", (num) => {
             if (drawer.find(tweetHidden).length === 0) {
                 cy.log("Skipping non existent tweet");
             } else {
-                cy.get(tweetHidden).scrollIntoView().should('be.visible');
+                cy.get(tweetHidden).should('be.visible');
+                cy.wait(500);
                 cy.unignoreTweet(tweetHidden);
                 cy.wait(500);
             }
@@ -252,7 +251,7 @@ Cypress.Commands.add("moveMinDateSliderRight", (times, expectURLChange = false) 
             if (expectURLChange) {
                 cy.url({timeout: 20000}).should("not.equal", url);
             } else {
-                cy.wait(3000);
+                cy.wait(5000);
             }
         })
     }

@@ -14,10 +14,10 @@ class ExecutionTask {
     public rescheduleAttempts: number = 0;
 
     constructor(public resolve: (value?: any) => void, public reject: (reason?: any) => void,
-                private _task: () => any, public name: string, public waitForStates: AppState[] | null,
+                private _task: (interrupted: () => boolean) => any, public name: string, public waitForStates: AppState[] | null,
                 private _dedup: string, private _notify: NotificationService, public reschedule: boolean,
                 public silentFailure: boolean, public waitForUIState: UIState, public rescheduleDelay: number,
-                public maxRescheduleAttempts: number) {
+                public maxRescheduleAttempts: number, public interrupted: boolean = false) {
 
     }
 
@@ -29,8 +29,10 @@ class ExecutionTask {
     public async execute() {
         try {
             const start = Date.now();
-            log.info("ExecutionTask: executing " + this.name + "(" + this.dedup + ")");
-            this.resolve(this._task());
+            log.verbose("ExecutionTask: executing " + this.name + "(" + this.dedup + ")");
+            let result: any = await this._task(() => this.interrupted);
+            log.verbose("ExecutionTask: finished " + this.name + "(" + this.dedup + ") with result ", result);
+            this.resolve(result);
             if (Date.now() - start > maxTaskDuration) {
                 log.warn(
                     `Task exceeded maximum recommended duration: ${this.name}(${this.dedup}) max is ${maxTaskDuration} this took ${Date.now() - start}`);
@@ -76,6 +78,7 @@ export class UIExecutionService {
     private dedupMap: Map<any, ExecutionTask> = new Map<any, ExecutionTask>();
     private lastUIActivity: number = 0;
     private _uiInactiveTimer: Subscription;
+    private currentTask: ExecutionTask;
 
     constructor(private _notify: NotificationService, @Inject(RollbarService) private _rollbar: Rollbar) {
     }
@@ -93,24 +96,27 @@ export class UIExecutionService {
         });
         this._executionTimer = timer(0, 100).subscribe(async () => {
             if (this._queue.length > 0) {
-                log.info(this._queue.length + " items in the execution queue ", this._queue);
+                log.verbose(this._queue.length + " items in the execution queue ", this._queue);
             }
             const snapshot = [...this._queue];
             this._queue = [];
             while (snapshot.length > 0 && !this._pause) {
                 const task = snapshot.shift();
                 try {
-                    log.debug("Execution Queue", this._queue);
-                    log.debug(`Task ${task.name} taken from queue`);
+                    log.verbose("Execution Queue", this._queue);
+                    log.verbose(`Task ${task.name} taken from queue`);
                     if ((task.waitForStates === null || task.waitForStates.indexOf(
                         this._state) >= 0) && (task.waitForUIState === null || this.uistate === task.waitForUIState)) {
-                        log.info(`Executing ${task.name}(${task.dedup})`);
+                        log.verbose(`Executing ${task.name}(${task.dedup})`);
                         try {
+                            this.currentTask = task;
                             await task.execute();
                         } catch (e) {
                             log.error(`ERROR: executing ${task.name}(${task.dedup})`, e);
+                        } finally {
+                            this.currentTask = null;
                         }
-                        log.info(`Executed ${task.name}(${task.dedup})`);
+                        log.verbose(`Executed ${task.name}(${task.dedup})`);
                         if (task.dedup !== null) {
                             this.dedupMap.delete(task.dedup);
                         }
@@ -122,13 +128,13 @@ export class UIExecutionService {
                                     () => {
 
                                         this._queue.push(task);
-                                        log.debug(
+                                        log.verbose(
                                             `RE-ADDED out of sequence task ${task.name} for ${task.rescheduleDelay}ms on execution queue,
               state ${this._state} needs to be one of ${task.waitForStates} and ${this.uistate} must be ${task.waitForUIState}.`,
                                             this._queue);
                                     }, task.rescheduleDelay
                                 );
-                                log.debug(
+                                log.verbose(
                                     `RESCHEDULED out of sequence task ${task.name} for ${task.rescheduleDelay}ms on execution queue,
               state ${this._state} needs to be one of ${task.waitForStates} and ${this.uistate} must be ${task.waitForUIState}.`);
                             } else {
@@ -175,9 +181,14 @@ export class UIExecutionService {
         this.uiStateChange.emit(this.uistate);
     }
 
-    public queue(name: string, waitForStates: AppState[] | null, task: () => any, dedup: any = null,
-                 silentFailure: boolean = false, replaceExisting: boolean = false, reschedule: boolean = false,
-                 waitForUIState: UIState = null, rescheduleDelayInMillis = 100, maxRescheduleAttempts = 100000) {
+    public queueWithInterrupt(name: string, waitForStates: AppState[] | null, task: () => any) {
+        this.queue(name, waitForStates, task, true, true, false, true, false, null, 100, 100000)
+    }
+
+    public queue(name: string, waitForStates: AppState[] | null, task: (interrupted: () => boolean) => any, dedup: any = null,
+                 interruptable: boolean = false, silentFailure: boolean = false, replaceExisting: boolean = false,
+                 reschedule: boolean = false, waitForUIState: UIState = null, rescheduleDelayInMillis = 100,
+                 maxRescheduleAttempts = 100000) {
 
         return new Promise<any>((resolve, reject) => {
             let dedupKey = null;
@@ -189,16 +200,20 @@ export class UIExecutionService {
                                                     reschedule, silentFailure, waitForUIState, rescheduleDelayInMillis,
                                                     maxRescheduleAttempts);
             if (dedupKey !== null) {
+                if (interruptable && this.currentTask && this.currentTask.dedup === dedupKey) {
+                    log.debug("Interrupting " + this.currentTask.name + " with dedup" + dedupKey)
+                    this.currentTask.interrupted = true;
+                }
                 if (this.dedupMap.has(dedupKey)) {
                     if (replaceExisting) {
-                        log.info(
+                        log.debug(
                             `Replacing existing ${name} (${dedupKey}) on execution queue as this task is already queued and deduplication is turned on.`);
                         if (!silentFailure) {
                             log.warn(`Replacing duplicate ${name} (${dedupKey}) on execution queue`);
                         }
                         const oldTask = this.dedupMap.get(dedupKey);
                         executionTask.resolve = (value) => {
-                            log.info("Resolving original task " + oldTask.dedup);
+                            log.debug("Resolving original task " + oldTask.dedup);
                             oldTask.resolve(value);
                             resolve(value);
                         };
@@ -220,13 +235,13 @@ export class UIExecutionService {
                 }
             }
             this._queue.push(executionTask);
-            log.debug(`Added ${name} to queue`);
+            log.verbose(`Added ${name} to queue`);
         });
     }
 
     public changeState(newState: AppState) {
         this._state = newState;
         this.state.emit(newState);
-        log.info("*** STATE " + newState.toUpperCase().replace("-", " ") + " ***");
+        log.debug("*** STATE " + newState.toUpperCase().replace("-", " ") + " ***");
     }
 }

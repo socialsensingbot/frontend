@@ -1,12 +1,14 @@
 import {Component, Input, NgZone, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
 import {PreferenceService} from "../../pref/preference.service";
-import {Hub, Logger} from "@aws-amplify/core";
-import {Tweet} from "./tweet";
+import {Logger} from "@aws-amplify/core";
+import {Tweet, TweetCriteria} from "./tweet";
 import {Subscription} from "rxjs";
 import {ExportToCsv} from "export-to-csv";
 import {RegionSelection} from "../region-selection";
 import {AnnotationService} from "../../pref/annotation.service";
 import {TwitterExporterService} from "./twitter-exporter.service";
+import {RESTMapDataService} from "../data/rest-map-data.service";
+import {MatTabChangeEvent} from "@angular/material/tabs";
 
 const log = new Logger("twitter-panel");
 
@@ -16,11 +18,22 @@ const log = new Logger("twitter-panel");
                styleUrls:   ["./twitter-panel.component.scss"]
            })
 export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
+    private _tweetCriteria: TweetCriteria;
+
+    public get tweetCriteria(): TweetCriteria {
+        return this._tweetCriteria;
+    }
 
 
     @Input() selection: RegionSelection;
-    public hiddenTweets: Tweet[] = [];
-    public visibleTweets: Tweet[] = [];
+
+    @Input()
+    public set tweetCriteria(criteria: TweetCriteria | null) {
+        this._tweetCriteria = criteria;
+
+    }
+
+    private _tweetCount: number;
     public ready: boolean;
     public tweetsReady: boolean;
     @Input() showHeaderInfo = true;
@@ -39,36 +52,24 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
     @Input()
     private layer: string;
 
-    public get tweets(): Tweet[] | null {
-        return this._tweets != null ? this._tweets : [];
+    public get tweetCount(): number {
+        return this._tweetCount;
     }
 
     @Input()
-    public set tweets(val: Tweet[] | null) {
-        if (val === null) {
-            // this.ready = false;
-            this._tweets = [];
-            this.hiddenTweets = [];
-            this.visibleTweets = [];
-            this.pref.waitUntilReady().then(i => this.ready = true);
-            log.debug("Tweets reset");
-            return;
-        }
-
-        this.updateTweets(val);
-
+    public set tweetCount(value: number) {
+        this._tweetCount = value;
     }
 
     constructor(private _zone: NgZone, public pref: PreferenceService, private _annotation: AnnotationService,
-                private _exporter: TwitterExporterService) {
-        Hub.listen("twitter-panel", (e) => {
-            if (e.payload && e.payload.message === "refresh") {
-                this._zone.run(() => this.updateTweets(this._tweets));
-            }
-        });
+                private _exporter: TwitterExporterService, private data: RESTMapDataService) {
 
 
     }
+
+    public hiddenTweets: (t: Tweet[]) => Tweet[] = (tweets) => tweets.filter(i => this.pref.isBlacklisted(i));
+
+    public visibleTweets: (t: Tweet[]) => Tweet[] = (tweets) => tweets.filter(i => !this.pref.isBlacklisted(i));
 
     public show($event: any) {
         log.debug($event);
@@ -82,20 +83,11 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
     public update(tweet: Tweet) {
 
         this.pref.waitUntilReady().then(i => this.ready = true);
-        this.visibleTweets = this._tweets.filter(i => !this.pref.isBlacklisted(i));
-        this.hiddenTweets = this._tweets.filter(i => this.pref.isBlacklisted(i));
         this.tweetsReady = true;
+        log.debug("tweets ready")
     }
 
     public refresh() {
-        const tweets = this.tweets;
-        this.tweets = [];
-        this.pref.waitUntilReady().then(i => this.ready = true);
-        this.tweetsReady = false;
-        setTimeout(() => this._zone.run(() => {
-            this.tweets = tweets;
-            this.tweetsReady = true;
-        }), 50);
     }
 
     public ngOnDestroy(): void {
@@ -113,7 +105,13 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
         }
     }
 
-    public ngOnInit(): void {
+    public async ngOnInit(): Promise<void> {
+        await this.pref.waitUntilReady();
+        //We won't get an update event from the child panels if there are no tweets
+        //so here we set the status to ready.
+        if (this.selection.tweetCount() == 0) {
+            this.ready = true;
+        }
         this.tweetIgnoreSub = this.pref.tweetIgnored.subscribe((sub) => {
             this.update(null);
         });
@@ -131,16 +129,23 @@ export class TwitterPanelComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     public async download() {
-        await this._exporter.exportToCSV(this.visibleTweets.filter(i => i.valid), this.selection.all(), this.annotationTypes, this.layer);
+        let tweetRequest: Promise<Tweet[]>;
+        // @ts-ignore
+        tweetRequest = this.data.tweets(this._tweetCriteria.layerGroup, this._tweetCriteria.regionType, this._tweetCriteria.regionNames,
+                                        this._tweetCriteria.min,
+                                        this._tweetCriteria.max, 0, 100000, "exclude",
+                                        await this.pref.getTweetBlackList(),
+                                        await this.pref.getTwitterUserBlackList());
+        const tweets = (await tweetRequest).filter(async value => !this.pref.isTweetIgnored(value) && value.valid);
+        await this._exporter.exportToCSV(tweets, this.selection.all(), this.annotationTypes,
+                                         this.layer);
     }
 
     private updateTweets(val: Tweet[]) {
-        this._tweets = val;
-        log.debug("updateTweets()");
-        if (this._destroyed) {
-            return;
-        }
+
+    }
+
+    public tabChanged($event: MatTabChangeEvent): void {
         this.update(null);
-        this.tweetsReady = true;
     }
 }

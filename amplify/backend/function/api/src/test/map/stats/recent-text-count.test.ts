@@ -16,6 +16,7 @@ const expectedResult = {
         "thurrock":        2,
         "west yorkshire":  1
     }
+
 ;
 
 

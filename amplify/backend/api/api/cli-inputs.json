@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "paths": {
+    "/map/{mapId}": {
+      "name": "/map/{mapId}",
+      "lambdaFunction": "api",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

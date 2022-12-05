@@ -1,29 +1,29 @@
 <div class="app-tweet-outer">
 
   <mat-toolbar class="expanded-toolbar app-toolbar">
-    <ng-container *ngIf="ready">
-      <div class="app-tweet-heading-text">
-        <ng-container *ngIf="selection.count === 1">
-          <ng-container *ngIf="tweets.length > 0">
-            <div class="app-tweet-heading" style="color: black">{{selection.firstRegion().title}}</div>
+    <ng-container *ngIf="ready && selection.all().length > 0">
+        <div class="app-tweet-heading-text">
+            <ng-container *ngIf="selection.count === 1">
+                <ng-container *ngIf="selection.tweetCount() > 0">
+                    <div class="app-tweet-heading" style="color: black">{{selection.firstRegion().title}}</div>
 
-            <div class="app-tweet-sub-heading">
-              <help page="help-and-support#exceedance"
-                    tooltip="Exceedance probability is calculated by comparing the current level of tweet activity with historical tweet activity.">
-                Exceedance probability&nbsp;
-              </help>
-              {{selection.firstRegion().exceedanceProbability}}%
-            </div>
+                    <div *ngIf="showTimeline" class="app-tweet-sub-heading">
+                        <help page="help-and-support#exceedance"
+                              tooltip="Exceedance probability is calculated by comparing the current level of tweet activity with historical tweet activity.">
+                            Exceedance probability&nbsp;
+                        </help>
+                  {{selection.firstRegion().exceedanceProbability}}%
+              </div>
 
           </ng-container>
 
-          <ng-container *ngIf="tweets.length === 0">
+            <ng-container *ngIf="selection.tweetCount() === 0 && showTimeline">
 
-            <div *ngIf="selection" class="app-tweet-heading"
-                 style="color: black">{{selection.firstRegion().title}}<br/></div>
-            <div class="app-tweet-sub-heading">No Tweets</div>
-            <span *ngIf="!selection" class="app-tweet-heading" style="color: black">Loading ...<br/></span>
-          </ng-container>
+                <div *ngIf="selection " class="app-tweet-heading"
+                     style="color: black">{{selection.firstRegion().title}}<br/></div>
+                <div class="app-tweet-sub-heading">No Tweets</div>
+                <span *ngIf="!selection" class="app-tweet-heading" style="color: black">Loading ...<br/></span>
+            </ng-container>
         </ng-container>
         <ng-container *ngIf="selection.count > 1">
           <span class="app-tweet-heading">{{selection.count}} regions selected</span>
@@ -35,37 +35,41 @@
         <mat-icon matTooltip="Download these Tweets as a CSV file.">vertical_align_bottom</mat-icon>
       </button>
       <button mat-icon-button class="app-toolbar-btn app-tweet-btn app-tweet-refresh-btn" (click)="refresh()">
-        <mat-icon matTooltip="Manually refresh the tweet list.">refresh</mat-icon>
+          <mat-icon matTooltip="Manually refresh the tweet list.">refresh</mat-icon>
       </button>
-      <div class="app-toolbar-separator"></div>
+        <div class="app-toolbar-separator"></div>
     </ng-container>
 
-    <div *ngIf="!ready">
-      <mat-spinner diameter="48" class="app-tweet-area-loading-spinner"></mat-spinner>
-    </div>
+      <div *ngIf="!ready && selection.all().length > 0">
+          <mat-spinner diameter="48" class="app-tweet-area-loading-spinner"></mat-spinner>
+      </div>
   </mat-toolbar>
 
+    <div class="app-tweet-table">
 
-  <div class="app-tweet-table" *ngIf="showTimeline">
 
-
-    <mat-tab-group (selectedTabChange)="update(null)">
-        <mat-tab>
-            <ng-template mat-tab-label>
-                <span class="app-tweet-visible-tweets-tab-label">{{ready ? visibleTweets.length : ''}} Tweets</span>
-            </ng-template>
-            <ng-template matTabContent>
-                <app-tweet-list (update)="update($event)" [annotationTypes]="annotationTypes" [tweets]="visibleTweets"
-                                group="visible"
-                                [style.visibility]="tweetsReady ? 'visible' : 'hidden'"></app-tweet-list>
+        <mat-tab-group (selectedTabChange)="tabChanged($event)">
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <span *ngIf="showTimeline"
+                          class="app-tweet-visible-tweets-tab-label">{{selection.tweetCount()}}
+                        Tweet{{selection.tweetCount() === 1 ? '' : 's'}}</span>
+                </ng-template>
+                <ng-template matTabContent>
+                    <app-tweet-list (update)="update($event)" *ngIf="showTimeline" [annotationTypes]="annotationTypes"
+                                    [criteria]="tweetCriteria" [ignored]="false"
+                                    group="visible"
+                                    [style.visibility]="tweetsReady ? 'visible' : 'hidden'"></app-tweet-list>
             </ng-template>
         </mat-tab>
         <mat-tab>
             <ng-template mat-tab-label>
-                <span class="app-tweet-hidden-tweets-tab-label">{{ready ? hiddenTweets.length : ''}} Ignored</span>
+                <span *ngIf="showTimeline"
+                      class="app-tweet-hidden-tweets-tab-label">Ignored</span>
             </ng-template>
             <ng-template matTabContent>
-                <app-tweet-list group="hidden" [tweets]="hiddenTweets" (update)="update($event)"
+                <app-tweet-list (update)="update($event)" *ngIf="showTimeline" [criteria]="tweetCriteria"
+                                [ignored]="true" group="hidden"
                                 [style.visibility]="tweetsReady ? 'visible' : 'hidden'"></app-tweet-list>
             </ng-template>
         </mat-tab>
