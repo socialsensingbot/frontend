@@ -1,16 +1,16 @@
 {
-  "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"10.0.0\",\"stackType\":\"custom-customCloudformation\",\"metadata\":{}}",
-  "Parameters": {
-    "env": {
-      "Type": "String"
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"10.2.1\",\"stackType\":\"custom-customCloudformation\",\"metadata\":{}}",
+  "Parameters" : {
+    "env" : {
+      "Type" : "String"
     }
   },
-  "Conditions": {
-    "ShouldNotCreateEnvResources": {
-      "Fn::Equals": [
+  "Conditions" : {
+    "ShouldNotCreateEnvResources" : {
+      "Fn::Equals" : [
         {
-          "Ref": "env"
+          "Ref" : "env"
         },
         "NONE"
       ]

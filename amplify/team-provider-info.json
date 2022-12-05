@@ -82,32 +82,45 @@
         "userPoolGroups": {}
       },
       "function": {
-        "S3Triggerb3a090e2": {
-          "deploymentBucketName": "amplify-socialsensing-prod-224245-deployment",
-          "s3Key": "amplify-builds/S3Triggerb3a090e2-754e48743050344b787a-build.zip",
-          "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
+        "S3Triggerb3a090e2" : {
+          "deploymentBucketName" : "amplify-socialsensing-prod-224245-deployment",
+          "s3Key" : "amplify-builds/S3Triggerb3a090e2-4131435063664f773769-build.zip",
+          "secretsPathAmplifyAppId" : "dtmxl3q3i7oix"
         },
-        "query": {
-          "deploymentBucketName": "amplify-socialsensing-prod-224245-deployment",
-          "s3Key": "amplify-builds/query-64776a33704870377865-build.zip",
-          "secretsPathAmplifyAppId": "dtmxl3q3i7oix"
+        "query" : {
+          "deploymentBucketName" : "amplify-socialsensing-prod-224245-deployment",
+          "s3Key" : "amplify-builds/query-2b657a7844356275746f-build.zip",
+          "secretsPathAmplifyAppId" : "dtmxl3q3i7oix"
         },
         "twitterCompliance" : {
           "deploymentBucketName" : "amplify-socialsensing-prod-224245-deployment",
-          "s3Key" : "amplify-builds/twitterCompliance-5877644a425561383271-build.zip",
+          "s3Key" : "amplify-builds/twitterCompliance-6f6d5272576e39703530-build.zip",
           "secretsPathAmplifyAppId" : "dtmxl3q3i7oix"
         },
         "api" : {
           "deploymentBucketName" : "amplify-socialsensing-prod-224245-deployment",
-          "s3Key" : "amplify-builds/api-315264585852684e6364-build.zip",
+          "s3Key" : "amplify-builds/api-78426336624451656e66-build.zip",
           "secretsPathAmplifyAppId" : "dtmxl3q3i7oix"
         },
-        "sqsquery" : {}
-      },
-      "hosting": {
-        "amplifyhosting": {
-          "type": "cicd"
+        "sqsquery" : {
+          "secretsPathAmplifyAppId" : "dtmxl3q3i7oix"
         }
+      },
+      "hosting" : {
+        "amplifyhosting" : {
+          "type" : "cicd"
+        }
+      },
+      "storage" : {
+        "jsonstorage" : {}
+      },
+      "api" : {
+        "socialsensing" : {},
+        "query" : {},
+        "api" : {}
+      },
+      "custom" : {
+        "querySQS" : {}
       }
     }
   },

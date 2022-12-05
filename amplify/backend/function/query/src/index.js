@@ -41,7 +41,7 @@ var awsServerlessExpress = require("aws-serverless-express");
 var server = awsServerlessExpress.createServer(require("./app"));
 var handler = function (event, context) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        console.log("EVENT DATA: ".concat(JSON.stringify(event)));
+        console.log("EVENT DATA: " + JSON.stringify(event));
         return [2 /*return*/, awsServerlessExpress.proxy(server, event, context, "PROMISE").promise];
     });
 }); };
