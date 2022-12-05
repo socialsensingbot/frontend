@@ -4,8 +4,7 @@ name: Sync OAS to ReadMe
 on:
   push:
     branches:
-      - main
-      - release/2.6
+      - master
 jobs:
   sync:
     runs-on: ubuntu-latest

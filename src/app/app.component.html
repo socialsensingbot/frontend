@@ -45,10 +45,11 @@
 
 
 </div>
-<mat-progress-bar *ngIf="loading.progressPercentage > 0 && loading.progressPercentage  < 99.99"
+<mat-progress-bar *ngIf="loading.showProgress"
                   [value]="loading.progressPercentage*100"
                   class="app-loading-progress"
                   mode="determinate"></mat-progress-bar>
 
-<mat-spinner *ngIf="loading.showSpinner" [mode]="loading.spinnerMode" [value]="loading.progressPercentage*100"
+<mat-spinner *ngIf="loading.showSpinner" [mode]="loading.spinnerMode" [style.opacity]="loading.opacity"
+             [value]="loading.progressPercentage*100"
              class="app-loading-spinner"></mat-spinner>

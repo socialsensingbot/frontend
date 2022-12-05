@@ -64,13 +64,7 @@ export class MapComponent implements OnInit, OnDestroy {
     public twitterPanelHeader: boolean;
     public activity = false;
     public ready = false;
-    public sliderOptions: DateRangeSliderOptions = {
-        max:      Date.now(),
-        min:      Date.now() - 7 * ONE_DAY,
-        startMin: Date.now() - ONE_DAY,
-        startMax: Date.now(),
-        now:      Date.now(),
-    };
+    public sliderOptions: DateRangeSliderOptions = null;
     public selection = new RegionSelection();
     public showTwitterTimeline: boolean;
     _routerStateChangeSub: Subscription;
@@ -482,9 +476,10 @@ export class MapComponent implements OnInit, OnDestroy {
         let {lower, upper} = range;
         log.debug("sliderChange(" + lower + "->" + upper + ")");
         this._dateMax = upper;
-        this._dateMin = Math.max(this.sliderOptions.min, lower);
+        this._dateMin = Math.min(Math.max(this.sliderOptions.min, lower), upper);
         this.sliderOptions.startMin = this._dateMin;
         this.sliderOptions.startMax = this._dateMax;
+        this.validateSliderOptionsValues();
 
         this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
         if (this.pref.combined.animateOnTimeSliderChange) {
@@ -507,17 +502,18 @@ export class MapComponent implements OnInit, OnDestroy {
         // tslint:disable-next-line:prefer-const
         let {lower, upper} = range;
         log.debug("sliderExtentChange(" + lower + "->" + upper + ")");
-        this._dateMin = Math.max(lower, this.sliderOptions.startMin);
-        this._dateMax = Math.min(upper, this.sliderOptions.startMax);
         this.sliderOptions = {
             ...this.sliderOptions,
             min:      lower,
             max:      upper,
-            startMin: this._dateMin,
-            startMax: this._dateMax,
+            startMin: lower,
+            startMax: upper,
             now:      await this.data.now()
         };
-        await this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
+        this._dateMin = this.sliderOptions.startMin;
+        this._dateMax = this.sliderOptions.startMax;
+        this.validateSliderOptionsValues();
+        await this.updateSearch({min_time: lower, max_time: upper, min_range_time: lower, max_range_time: upper});
         this.liveUpdating = (this._dateMax >= await this.data.now() - this.pref.combined.continuousUpdateThresholdInMinutes * 60_000);
         if (this.ready) {
             await this.scheduleResetLayers(this.activeStatistic, false);
@@ -657,6 +653,7 @@ export class MapComponent implements OnInit, OnDestroy {
             startMax: this._dateMax,
             now:      roundToMinute(now),
         };
+        this.validateSliderOptionsValues();
         await this.updateSearch({min_time: this._dateMin, max_time: this._dateMax});
         this._sliderIsStale = true;
     }
@@ -670,7 +667,7 @@ export class MapComponent implements OnInit, OnDestroy {
             this.activity = true;
             await this.resetStatisticsLayer(layer, clearSelected, approximateFirst);
             this.activity = false;
-        }, layer, false, false, true);
+        }, layer, true, false, true);
     }
 
     /**
@@ -694,30 +691,15 @@ export class MapComponent implements OnInit, OnDestroy {
             selected,
             min_time,
             max_time,
+            min_range_time,
+            max_range_time,
             min_offset,
             max_offset,
             active_layer
-        } = params;
+        } = params
         this._newParams = params;
         this._absoluteTime = await this.data.now();
-        // These handle the date slider min_time & max_time values
-        if (typeof min_time !== "undefined") {
-            this._dateMin = roundToHour(Math.max(+min_time, await this.data.minDate()));
-        } else {
-            this._dateMin = roundToHour(await this.data.now() - (ONE_DAY));
-        }
-        if (typeof max_time !== "undefined") {
-            this._dateMax = roundToMinute(Math.min(+max_time, await this.data.now()));
-        } else {
-            this._dateMax = roundToMinute(await this.data.now());
-        }
-        this.sliderOptions = {
-            min:      await this.data.minDate(),
-            max:      await this.data.now(),
-            startMin: this._dateMin,
-            startMax: this._dateMax,
-            now:      await this.data.now()
-        };
+        await this.setSliderRangeFromParams(min_range_time, max_range_time, min_time, max_time);
         if (typeof active_layer !== "undefined") {
             this.activeLayerGroup = active_layer;
         }
@@ -762,6 +744,45 @@ export class MapComponent implements OnInit, OnDestroy {
         return undefined;
     }
 
+    private async setSliderRangeFromParams(min_range_time, max_range_time, min_time, max_time): Promise<void> {
+        const min = +min_range_time || await this.data.minDate();
+        const max = +max_range_time || await this.data.now();
+        // These handle the date slider min_time & max_time values
+        if (typeof min_time !== "undefined") {
+            this._dateMin = roundToHour(Math.max(+min_time, min));
+        } else {
+            this._dateMin = roundToHour(await this.data.now() - (ONE_DAY));
+        }
+        if (typeof max_time !== "undefined") {
+            this._dateMax = roundToMinute(Math.min(+max_time, max));
+        } else {
+            this._dateMax = roundToMinute(await this.data.now());
+        }
+        this.sliderOptions = {
+            min:      min,
+            max:      max,
+            startMin: this._dateMin,
+            startMax: this._dateMax,
+            now:      await this.data.now()
+        };
+        if (this.sliderOptions.startMin > this.sliderOptions.startMax) {
+            this.sliderOptions.startMin = await this.data.minDate();
+            this.sliderOptions.startMax = await this.data.now();
+        }
+        this.validateSliderOptionsValues();
+    }
+
+    private validateSliderOptionsValues(): void {
+        if (this.sliderOptions.min > this.sliderOptions.max) {
+            throw new Error(
+                `Cannot set the min ${new Date(this.sliderOptions.min)} to be greater than the max ${new Date(this.sliderOptions.max)}`);
+        }
+        if (this.sliderOptions.startMin > this.sliderOptions.startMax) {
+            throw new Error(`Cannot set the startMin ${new Date(this.sliderOptions.startMin)} to be greater than the startMax ${new Date(
+                this.sliderOptions.startMax)}`)
+        }
+    }
+
     /**
      * This method does all the heavy lifting and is called when
      * the map is ready and data is loaded.
@@ -791,15 +812,16 @@ export class MapComponent implements OnInit, OnDestroy {
             this._dataset = this.pref.combined.defaultDataSet;
         }
         await this.data.init(this.dataset);
-        if (this.route.snapshot.queryParamMap.has("layer_group")) {
-            this._activeLayerGroup = this.route.snapshot.queryParamMap.get("layer_group");
+        let params: any = this.route.snapshot.queryParamMap;
+        if (params.has("layer_group")) {
+            this._activeLayerGroup = params.get("layer_group");
         } else {
             this._activeLayerGroup = this.pref.defaultLayer().id;
         }
         this.updateAnnotationTypes();
 
-        if (this.route.snapshot.queryParamMap.has("active_polygon")) {
-            this._activeRegionType = this.route.snapshot.queryParamMap.get("active_polygon");
+        if (params.has("active_polygon")) {
+            this._activeRegionType = params.get("active_polygon");
         } else {
             this._activeRegionType = this.data.mapMetadata.defaultRegionType;
         }
@@ -815,12 +837,11 @@ export class MapComponent implements OnInit, OnDestroy {
         this._map.setView(latLng([lat, lng]), zoom, {animate: true, duration: 4000});
         this.countries = await this.data.regionsOfType(this.pref.combined.countryDownloadRegionType);
         this.countries.forEach(i => this.selectedCountries.push(i.value));
+        await this.setSliderRangeFromParams(params.min_range_time, params.max_range_time, params.min_time, params.max_time);
 
         this._loggedIn = await Auth.currentAuthenticatedUser() != null;
-
         this._exec.changeState("map-init");
         this.load(true).then(() => this.loading.loaded());
-
         // noinspection ES6MissingAwait
         this.checkForLiveUpdating();
         this._searchParams.subscribe(async params => {
@@ -1152,7 +1173,9 @@ export class MapComponent implements OnInit, OnDestroy {
                     });
                 this._geojson[layer] = newLayer.addTo(curLayerGroup);
             };
-            await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this._dateMin, this._dateMax).then(
+            this.validateSliderOptionsValues();
+            await this.data.getRegionStatsMap(this.activeLayerGroup, this.activeRegionType, this.sliderOptions.startMin,
+                                              this.sliderOptions.startMax).then(
                 i => i ? processStats(i) : null);
 
             /*
@@ -1275,6 +1298,7 @@ export class MapComponent implements OnInit, OnDestroy {
             startMax: this._dateMax || await this.data.now(),
             now:      await this.data.now(),
         };
+        this.validateSliderOptionsValues();
         await this.checkForLiveUpdating();
 
     }
@@ -1284,10 +1308,12 @@ export class MapComponent implements OnInit, OnDestroy {
         if (this.destroyed) {
             return;
         }
-        if (this.sliderOptions.startMax >= await this.data.now() - this.pref.combined.continuousUpdateThresholdInMinutes * 60_000) {
+        if (this.sliderOptions && this.sliderOptions.startMax >= await this.data.now() - this.pref.combined.continuousUpdateThresholdInMinutes * 60_000) {
             this.liveUpdating = true;
         } else {
-            log.debug("LIVE UPDATES OFF: slider position was ", this.sliderOptions.startMax);
+            if (this.sliderOptions) {
+                log.debug("LIVE UPDATES OFF: slider position was ", this.sliderOptions.startMax);
+            }
         }
         if (this.liveUpdating) {
             log.debug("LIVE UPDATES ON");

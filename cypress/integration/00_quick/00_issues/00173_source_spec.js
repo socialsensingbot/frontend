@@ -1,13 +1,14 @@
-import {LONDON_TWEET, LONDON_TWEET_MENU, MAP_URL} from "../../../support";
+import {LONDON_TWEET, LONDON_TWEET_MENU, MAP_URL, MAX_DATE_MILLIS, MIN_DATE_MILLIS} from "../../../support";
 
 const sourceOptions = "body .tweet-list-item-menu-source-btn";
 const twitterIdClass = LONDON_TWEET;
-const url = MAP_URL + "?selected=greater%20london&max_offset=0&min_offset=-1439";
+const url = MAP_URL + "?selected=greater%20london" + "&max_time=" + MAX_DATE_MILLIS + "&min_time=" + MIN_DATE_MILLIS + "&active_number=exceedance&active_polygon=county&max_range_time=" + MAX_DATE_MILLIS + "&min_range_time=" + MIN_DATE_MILLIS;
+
 let clickSourceMenu = function () {
     cy.get(LONDON_TWEET_MENU, {timeout: 60000}).click({force: true});
     cy.get(sourceOptions).contains("Source");
-  cy.get(sourceOptions).click();
-  cy.wait(3000);
+    cy.get(sourceOptions).click();
+    cy.wait(3000);
 
 };
 describe('00173 Source: : https://github.com/socialsensingbot/frontend/issues/173 ', function () {
@@ -35,15 +36,14 @@ describe('00173 Source: : https://github.com/socialsensingbot/frontend/issues/17
       cy.get(LONDON_TWEET_MENU, {timeout: 60000}).should('be.visible');
       clickSourceMenu();
       cy.get("body .tweet-list-item-menu-source-clear", {timeout: 30000}).click();
+      cy.wait(10000);
       clickSourceMenu();
-      cy.get("body .tweet-list-item-menu-source-level-coastal-not-selected", {timeout: 30000});
-      cy.get("body .tweet-list-item-menu-source-level-coastal", {timeout: 30000}).click();
-      cy.wait(4000);
+      cy.get("body .tweet-list-item-menu-source-level-coastal-not-selected", {timeout: 30000}).click();
+      cy.wait(10000);
       clickSourceMenu();
       cy.get("body .tweet-list-item-menu-source-level-coastal-selected", {timeout: 30000});
-      cy.get("body .tweet-list-item-menu-source-level-river-not-selected", {timeout: 30000});
-      cy.get("body .tweet-list-item-menu-source-level-river", {timeout: 30000}).click();
-      cy.wait(4000);
+      cy.get("body .tweet-list-item-menu-source-level-river-not-selected", {timeout: 30000}).click();
+      cy.wait(10000);
       clickSourceMenu();
       cy.get("body .tweet-list-item-menu-source-level-coastal-not-selected", {timeout: 30000});
       cy.get("body .tweet-list-item-menu-source-level-river-selected", {timeout: 30000});

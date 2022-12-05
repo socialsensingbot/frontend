@@ -443,7 +443,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         return this.exec.queue("update-timeseries-graph", null,
                                async () => {
                                    // Immutable copy
-                                   const query = JSON.parse(JSON.stringify(q));
+                                   const query = JSON.parse(JSON.stringify(q)) as TimeseriesRESTQuery;
                                    log.debug("Graph update from query ", query);
                                    const text: string = query.textSearch;
                                    if (query.layer && (text.length > 0 || force)) {
@@ -460,7 +460,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
                                        log.debug("Skipped time series update, force=" + force);
                                    }
 
-                               }, q.__series_id + "-" + force, false, false, true, "inactive"
+                               }, q.__series_id + "-" + force, true, true, true, "inactive"
         );
 
     }
@@ -484,15 +484,17 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
         }
 
         try {
+            let endDate: any = this.range.controls.end.value !== null ? roundToHour(
+                this.range.controls.end.value.getTime()) : nowRoundedToHour();
+            let startDate: any = this.range.controls.start.value !== null ? roundToHour(
+                this.range.controls.start.value.getTime()) : (nowRoundedToHour() - (365.24 * dayInMillis));
             const payload: any = {
                 ...query.layer,
                 location: query.location,
                 regions:  query.regions,
 
-                startDate: this.range.controls.start.value !== null ? roundToHour(
-                    this.range.controls.start.value.getTime()) : (nowRoundedToHour() - (365.24 * dayInMillis)),
-                endDate:   this.range.controls.end.value !== null ? roundToHour(
-                    this.range.controls.end.value.getTime()) : nowRoundedToHour(),
+                startDate: startDate,
+                endDate:   endDate,
                 name:      "time",
                 timePeriod
             };
@@ -502,7 +504,7 @@ export class TimeseriesAnalyticsComponent implements OnInit, OnDestroy, OnChange
             if (payload.regions.length === 0) {
                 payload.regions = this.pref.combined.analyticsDefaultRegions;
             }
-            const serverResults = await this._api.callMapAPIWithCacheAndDatePaging(this.map.id + "/analytics/time", payload);
+            const serverResults = await this._api.callMapAPIWithCacheAndDatePaging(this.map.id + "/analytics/time", payload, true);
             log.debug("Server result was ", serverResults);
             this.error = false;
             return this.queryTransform(serverResults);

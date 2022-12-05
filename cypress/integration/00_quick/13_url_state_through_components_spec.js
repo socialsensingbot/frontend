@@ -22,7 +22,7 @@ describe('11 Analytics: ', function () {
 
         it('Import from Map Stats', () => {
             let url = MAP_URL + "?active_number=exceedance&active_polygon=county&selected=greater%20london";
-            cy.visit(url);
+            cy.visitAndErrorCheck(url);
             cy.login();
             cy.visitAndWait(url);
             cy.twitterPanelHeader("Greater London");
@@ -33,13 +33,13 @@ describe('11 Analytics: ', function () {
             cy.url().should("contain", ANALYTICS_URL + "/time");
             cy.wait(5000);
             cy.get('.mat-chip').should("contain.text", "Greater London");
-            cy.wait(3000);
+            cy.wait(30000);
             snapshot('app-timeseries-multi-query-chart', "13-analytics-timeseries-imported-from-map-1");
 
-            cy.url({timeout: 30000}).should("equal",
-                                            ANALYTICS_URL + "/time?active_number=count&active_polygon=county&selected=greater%20london&max_time=1631664000000&min_time=1631577600000&active_layer=flood");
+            cy.url({timeout: 30000}).should("contain",
+                                            ANALYTICS_URL + "/time?active_number=count&active_polygon=county&selected=greater%20london");
             cy.get("#loading-div", {timeout: 60000}).should("not.exist");
-            cy.wait(4000);
+            cy.wait(30000);
             snapshot('app-timeseries-multi-query-chart', "13-analytics-timeseries-graph");
 
             // cy.get('#mat-button-toggle-2-button > .mat-button-toggle-label-content').click();

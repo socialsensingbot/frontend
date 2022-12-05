@@ -40,7 +40,7 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
      */
     public sliderOptions: Options = {
         floor:      Date.now(),
-        ceil:       Date.now(),
+        ceil:       Date.now() - 1000,
         showTicks:  false,
         ticksArray: [],
         stepsArray: [],
@@ -133,6 +133,9 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
      */
     @Input()
     public set options(value: DateRangeSliderOptions) {
+        if (value === null) {
+            return;
+        }
         log.debug("Options: " + JSON.stringify(value));
         this._options = value;
         if (value.min <= 0) {
@@ -168,8 +171,10 @@ export class DateRangeSliderComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.updateTimerSub = timer(0, 60 * 1000).subscribe(i => {
                                                                 log.debug("Received new time-keyed data");
-                                                                this.updateTicks();
-                                                                this.refresh.emit();
+                                                                if (this.ready) {
+                                                                    this.updateTicks();
+                                                                    this.refresh.emit();
+                                                                }
                                                             }
         );
     }
