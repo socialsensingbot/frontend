@@ -20,10 +20,10 @@
     "socialsensing-api": "file:socialsensing-api-1.0.0.tgz"
   },
   "devDependencies": {
-    "@types/node": "^16.11.22",
-    "ts-node": "~7.0.0",
+    "@types/node": "^18.11.10",
+    "ts-node": "~10.9.1",
     "tslint": "~6.1.0",
-    "typescript": "^3.9.10"
+    "typescript": "^4.9.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

@@ -3,9 +3,13 @@ cd $(dirname $0)
 cd ..
 cp src/app/map/data/map-data.ts api/
 cd api && npm install
-cd ./amplify/backend/function/query && npm install && ./build.sh
+cd -
+cd ./amplify/backend/function/query && npm install && ./build.sh 
+cd -
 cd ./amplify/backend/function/api && npm install && ./build.sh
+cd -
 cd ./amplify/backend/function/sqsquery && npm install && ./build.sh
+cd -
 
 npx browserslist@latest --update-db
 

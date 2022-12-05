@@ -21,16 +21,16 @@
   },
   "devDependencies": {
     "@types/mocha": "^9.1.0",
-    "@types/node": "^16.11.22",
+    "@types/node": "^18.11.10",
     "ansi-colors": "^4.1.3",
     "chai": "*",
     "colors": "^1.4.0",
     "diff": "^5.0.0",
     "mocha": "*",
     "supertest": "*",
-    "ts-node": "~7.0.0",
+    "ts-node": "~10.9.1",
     "tslint": "~6.1.0",
-    "typescript": "^3.9.10"
+    "typescript": "^4.9.3"
   },
   "scripts": {
     "test": "STORAGE_JSONSTORAGE_BUCKETNAME=json183906-dev npx mocha -b --timeout 180s --exit --trace-warnings test/**/*.test.js",
